@@ -1,0 +1,49 @@
+# remove the following ignores for your project
+/config/pimcore/constants.php
+
+# symfony default
+/.web-server-pid
+/config/pimcore/parameters.yml
+/build/
+/phpunit.xml
+/public/bundles/
+
+# local config
+/.env.local
+/.env.local.php
+/.env.*.local
+!/config/local
+/config/local/*
+!config/local/.gitkeep
+
+/var/*
+!/var/.gitkeep
+!/var/classes/
+/var/classes/DataObject
+
+!/var/config
+/var/config/system.yml
+/var/config/maintenance.php
+
+# project specific recommendations
+/var/config/tag-manager.php
+/var/config/reports.php
+
+
+/public/var/
+/public/sitemap*.xml
+
+# PHP-CS-Fixer
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+
+# composer
+/vendor/
+
+# PhpStorm / IDEA
+.idea
+# NetBeans
+nbproject
+
+# temp
+.temp
