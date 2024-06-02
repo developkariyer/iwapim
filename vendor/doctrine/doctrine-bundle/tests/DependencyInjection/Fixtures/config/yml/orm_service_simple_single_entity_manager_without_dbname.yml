@@ -1,0 +1,10 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+
+    orm:
+        default_entity_manager: default
+        mappings:
+            YamlBundle: ~

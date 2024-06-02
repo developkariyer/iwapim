@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53529a1d0b9c43a5991c0cbb5f377462",
+    "content-hash": "fd6086618244964544b39d4469ef6169",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -59,6 +59,52 @@
                 "source": "https://github.com/Bacon/BaconQrCode/tree/2.0.8"
             },
             "time": "2022-12-07T17:46:57+00:00"
+        },
+        {
+            "name": "blackbit_digital_commerce/pimcore-iframe-portlet",
+            "version": "v1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BlackbitNeueMedien/pimcore-iframe-portlet.git",
+                "reference": "bfc092134ee6157b05868efa5f00fdf63095c25b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BlackbitNeueMedien/pimcore-iframe-portlet/zipball/bfc092134ee6157b05868efa5f00fdf63095c25b",
+                "reference": "bfc092134ee6157b05868efa5f00fdf63095c25b",
+                "shasum": ""
+            },
+            "type": "pimcore-bundle",
+            "extra": {
+                "pimcore": {
+                    "bundles": [
+                        "Blackbit\\BlackbitIframePortletBundle\\BlackbitIframePortletBundle"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Blackbit\\BlackbitIframePortletBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Blackbit",
+                    "email": "info@blackbit.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Add portlets to embed websites to Pimcore dashboards",
+            "homepage": "https://pimcore.blackbit.de",
+            "support": {
+                "issues": "https://github.com/BlackbitNeueMedien/pimcore-iframe-portlet/issues",
+                "source": "https://github.com/BlackbitNeueMedien/pimcore-iframe-portlet/tree/v1.0.5"
+            },
+            "time": "2022-05-02T08:30:07+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",

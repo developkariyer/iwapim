@@ -73,3 +73,7 @@ services:
     # App\EventListener\TestListener:
     #     tags:
     #         - { name: kernel.event_listener, event: pimcore.dataobject.preUpdate, method: onObjectPreUpdate }
+
+    App\EventListener\ProductListener:
+        tags:
+            - { name: 'kernel.event_subscriber' }

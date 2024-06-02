@@ -1,0 +1,19 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
+    orm:
+        enable_lazy_ghost_objects: true
+        filters:
+            soft_delete:
+                class: Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter
+                enabled: true
+            myFilter:
+                class: Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter
+                enabled: true
+                parameters:
+                    myParameter: myValue
+                    mySecondParameter: mySecondValue

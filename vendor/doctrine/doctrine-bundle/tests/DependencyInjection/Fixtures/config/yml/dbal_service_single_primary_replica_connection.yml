@@ -1,0 +1,17 @@
+doctrine:
+    dbal:
+        dbname: mysql_db
+        user: mysql_user
+        password: mysql_s3cr3t
+        unix_socket: /path/to/mysqld.sock
+        keep_replica: true
+        default_table_options:
+            engine: InnoDB
+        options:
+            !php/const PDO::ATTR_STRINGIFY_FETCHES: 1
+        replicas:
+            replica1:
+                user: replica_user
+                dbname: replica_db
+                password: replica_s3cr3t
+                unix_socket: /path/to/mysqld_replica.sock

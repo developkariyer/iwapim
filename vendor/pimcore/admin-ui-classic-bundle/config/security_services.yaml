@@ -1,0 +1,36 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    #
+    # SECURITY
+    #
+
+    # Authenticators for handling admin login and session authentications
+    Pimcore\Bundle\AdminBundle\Security\Authenticator\AdminTokenAuthenticator:
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: security }
+
+    Pimcore\Bundle\AdminBundle\Security\CsrfProtectionHandler:
+        public: true
+        arguments:
+            - '%pimcore_admin.csrf_protection.excluded_routes%'
+            - '@twig'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: security }
+
+    Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler:
+        public: true
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: security }
+
+    pimcore_admin_bundle.content_security_policy_handler:
+        alias: Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler
+        public: true

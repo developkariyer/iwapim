@@ -1,0 +1,5 @@
+blackbit_iframe_portlet:
+    resource: "@BlackbitIframePortletBundle/Controller/"
+    type:     annotation
+    prefix:   /
+

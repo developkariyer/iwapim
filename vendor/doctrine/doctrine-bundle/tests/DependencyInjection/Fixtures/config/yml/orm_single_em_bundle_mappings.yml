@@ -1,0 +1,21 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
+    orm:
+        validate_xml_mapping: true
+        mappings:
+            AnnotationsBundle: ~
+            AttributesBundle:
+                type: attribute
+            YamlBundle:
+                dir: Resources/config/doctrine
+                alias: yml
+            manual:
+                type: xml
+                prefix: Fixtures\Bundles\XmlBundle
+                dir: "%kernel.root_dir%/tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine"
+                alias: TestAlias

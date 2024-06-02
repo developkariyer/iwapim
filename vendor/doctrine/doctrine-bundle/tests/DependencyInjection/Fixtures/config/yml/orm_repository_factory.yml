@@ -1,0 +1,13 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
+    orm:
+        repository_factory: repository_factory
+
+services:
+    repository_factory:
+        class: Doctrine\Bundle\DoctrineBundle\Repository\RepositoryFactory

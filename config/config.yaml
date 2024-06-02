@@ -134,3 +134,6 @@ framework:
 #         name: ''
 #         email: ''
 
+
+    workflows:
+        enabled: true

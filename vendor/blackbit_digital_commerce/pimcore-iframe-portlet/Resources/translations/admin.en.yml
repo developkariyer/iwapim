@@ -1,0 +1,5 @@
+BlackbitIframePortletBundle_title_of_settings: Settings
+BlackbitIframePortletBundle_label_for_url: URL
+BlackbitIframePortletBundle_button_text: Save
+BlackbitIframePortletBundle_empty_url_error: Please set URL in settings
+BlackbitIframePortletBundle_portlet_name: IFrame (embed URL)

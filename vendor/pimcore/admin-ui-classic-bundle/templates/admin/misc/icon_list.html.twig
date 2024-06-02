@@ -1,0 +1,192 @@
+{% set webRoot = constant('PIMCORE_WEB_ROOT') %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pimcore :: Icon list</title>
+    <style type="text/css">
+
+        body {
+            font-family: Arial;
+            font-size: 12px;
+        }
+
+        .icons {
+            width:1200px;
+            margin: 0 auto;
+        }
+
+        .icon {
+            text-align: center;
+            width:100px;
+            height:75px;
+            margin: 0 10px 20px 0;
+            float: left;
+            font-size: 10px;
+            word-wrap: break-word;
+            cursor: copy;
+            padding-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .icon.black {
+            background-color: #0C0F12;
+        }
+
+        .icon.black .label {
+            color: #fff;
+        }
+
+        .info {
+            text-align: center;
+            margin-bottom: 30px;
+            clear: both;
+            font-size: 22px;
+            padding-top: 50px;
+        }
+
+        .info small {
+            font-size: 16px;
+        }
+
+        .icon img {
+            width: 50px;
+        }
+
+        .language-icon img{
+            width: 16px;
+            cursor: copy;
+        }
+
+        .variant + .icon:not(.variant){
+            border: 2px dotted green;
+        }
+        .variant{
+            display: none;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="info">
+    <a target="_blank">Color Icons</a>
+    <br>
+    <small>based on the <a href="https://github.com/google/material-design-icons/blob/master/LICENSE" target="_blank">Material Design Icons</a></small>
+</div>
+
+<div id="color_icons" class="icons">
+    <div style="margin-bottom: 20px; text-align: left">ℹ Click on icon to copy path to clipboard.</div>
+    {% for icon in colorIcons %}
+        {% set iconPath = icon|replace({(webRoot): ''}) %}
+        <div class="icon">
+            {{ icon | pimcore_inline_icon | raw }}
+            <div class="label">
+                {{ iconPath in iconsCss  ? '*' : '' }}
+                {{ iconPath|basename }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="info">
+    <a target="_blank">White Icons</a>
+    <br>
+    <small>based on the <a href="https://github.com/google/material-design-icons/blob/master/LICENSE" target="_blank">Material Design Icons</a></small>
+</div>
+
+<div id="white_icons" class="icons">
+    {% for icon in whiteIcons %}
+        {% set iconPath = icon|replace({(webRoot): ''}) %}
+        <div class="icon black">
+            {{ icon | pimcore_inline_icon | raw }}
+            <div class="label">
+                {{ iconPath in iconsCss  ? '*' : '' }}
+                {{ iconPath|basename }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="info">
+    <a href="https://github.com/twitter/twemoji" target="_blank">Source (Twemoji)</a>
+</div>
+
+<div id="twemoji" class="icons">
+    <div style="margin-bottom: 20px; text-align: left">ℹ Click on icon to copy path to clipboard.</div>
+    <div style="margin-bottom: 20px; text-align: left">ℹ Click on icon with green border to display all its related variants. Click on the letter to display flags with the clicked initial</div>
+    {% for icon in twemoji %}
+        {% set iconPath = icon|replace({(webRoot): ''}) %}
+        {#
+            Any icon with basename that has a dash will be considered as a variant to avoid recurisvely searching for "parent" icon.
+            It happens that all icon that have variants have at least a prefix of 4-5 characters.
+        #}
+        {% if '-' in iconPath and iconPath|basename|split('-')[0]|length > 3 %}
+            <div class="icon variant">
+                {{ icon | pimcore_twemoji_variant_icon | raw }}
+                <div class="label">{{ iconPath|basename }}</div>
+            </div>
+        {% else %}
+            <div class="icon">
+                {{ icon | pimcore_inline_icon | raw }}
+                <div class="label">{{ iconPath|basename }}</div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="info">
+    Flags
+</div>
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Code</th>
+        <th>Name</th>
+    </tr>
+    {% for langOpt in languageOptions %}
+        <tr>
+            <td class="language-icon">{{ langOpt['flag'] | pimcore_inline_icon | raw }}</td>
+            <td>{{ langOpt['language'] }}</td>
+            <td>{{ langOpt['display'] }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<script
+    src="https://code.jquery.com/jquery-3.7.0.slim.js"
+    integrity="sha256-7GO+jepT9gJe9LB4XFf8snVOjX3iYNb0FHYr5LI1N5c="
+    crossorigin="anonymous"
+    {{ pimcore_csp.getNonceHtmlAttribute()|raw }}></script>
+<script src="/bundles/pimcoreadmin/js/pimcore/common.js"></script>
+<script src="/bundles/pimcoreadmin/js/pimcore/functions.js"></script>
+<script src="/bundles/pimcoreadmin/js/pimcore/helpers.js"></script>
+
+<script {{ pimcore_csp.getNonceHtmlAttribute()|raw }}>
+    $( document ).ready(function() {
+        // Add click event to copy icon path on all icons
+        $('img').each(function () {
+            $(this).click(function () {
+                pimcore.helpers.copyStringToClipboard($(this).data('imgpath'));
+            });
+        });
+        // Twimoji only: clicking on icon with green border displays all its variants
+        $('.icon:not(.variant)').each(function () {
+            $(this).click(function () {
+                let variants = $(this).prevUntil('div.icon:not(.variant)');
+                variants.each(function () {
+                    if (!$(this).is(':visible')) {
+                        let img = $(this).children('img');
+                        img.attr('src', img.data('imgpath'));
+                        $(this).show();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

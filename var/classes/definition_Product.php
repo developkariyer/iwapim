@@ -3,14 +3,16 @@
 /**
  * Inheritance: yes
  * Variants: no
+ * Title: Product
  *
  * Fields Summary:
+ * - picture [image]
  * - iwasku [input]
+ * - iwaskuActive [checkbox]
  * - productCode [input]
  * - productClass [select]
  * - name [input]
  * - description [textarea]
- * - picture [image]
  * - productWidth [numeric]
  * - productHeight [numeric]
  * - productDepth [numeric]
@@ -19,16 +21,21 @@
  * - packegeHeight [numeric]
  * - packageDepth [numeric]
  * - packageWeight [numeric]
+ * - seoTitle [input]
+ * - seoDescription [textarea]
+ * - seoKeywords [fieldcollections]
+ * - bundleItems [manyToManyObjectRelation]
+ * - marketingMaterials [manyToManyObjectRelation]
  */
 
 return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'dao' => NULL,
    'id' => 'product',
    'name' => 'Product',
-   'title' => '',
+   'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1717192076,
+   'modificationDate' => 1717279979,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -42,7 +49,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
   ),
    'allowInherit' => true,
    'allowVariants' => false,
-   'showVariants' => false,
+   'showVariants' => true,
    'layoutDefinitions' => 
   \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
      'name' => 'pimcore_root',
@@ -73,7 +80,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
         array (
           0 => 
           \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
-             'name' => 'Layout',
+             'name' => 'productionPanel',
              'type' => NULL,
              'region' => NULL,
              'title' => 'Ürün Tanımı',
@@ -86,6 +93,29 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'children' => 
             array (
               0 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Image::__set_state(array(
+                 'name' => 'picture',
+                 'title' => 'Ürün Resmi',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => 'float: right; overflow: hidden; position: relative;',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'uploadPath' => '',
+                 'width' => '',
+                 'height' => '',
+              )),
+              1 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'iwasku',
                  'title' => 'IWASKU',
@@ -115,7 +145,55 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'defaultValueGenerator' => '',
               )),
-              1 => 
+              2 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Layout\Text::__set_state(array(
+                 'name' => 'Layout',
+                 'type' => NULL,
+                 'region' => NULL,
+                 'title' => '',
+                 'width' => '',
+                 'height' => '',
+                 'collapsible' => false,
+                 'collapsed' => false,
+                 'bodyStyle' => '',
+                 'datatype' => 'layout',
+                 'children' => 
+                array (
+                ),
+                 'locked' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'fieldtype' => 'text',
+                 'html' => '<span style="background-color: rgb(255, 255, 255);">​</span><div style=""><font color="#404040"><span style="background-color: rgb(246, 246, 246);">IWASKU numarası üretmek için <b>Aktif</b> seçeneği işaretlenmiş olmalıdır.</span></font></div><div style=""><font color="#404040"><span style="background-color: rgb(246, 246, 246);"><br></span></font></div><div style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);"><span style="color: rgb(64, 64, 64); background-color: rgb(246, 246, 246);"></span></div>
+<div class="alert alert-success">Eğer bu kart doğrudan satışa sunulacak bir ürün için değilse <b>Aktif</b> seçeneğini işaretlemeyin. IWASKU numarası sadece bir defa üretilebilir ve değiştirilemez.</div>',
+                 'renderingClass' => '',
+                 'renderingData' => '',
+                 'border' => false,
+              )),
+              3 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Checkbox::__set_state(array(
+                 'name' => 'iwaskuActive',
+                 'title' => 'Aktif',
+                 'tooltip' => '',
+                 'mandatory' => true,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'defaultValue' => 0,
+                 'defaultValueGenerator' => '',
+              )),
+              4 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'productCode',
                  'title' => 'Ürün Kodu',
@@ -145,7 +223,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'defaultValueGenerator' => '',
               )),
-              2 => 
+              5 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Select::__set_state(array(
                  'name' => 'productClass',
                  'title' => 'Ürün Sınıfı',
@@ -164,74 +242,16 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'blockedVarsForExport' => 
                 array (
                 ),
-                 'options' => 
-                array (
-                  0 => 
-                  array (
-                    'key' => 'Islamic Metal (IM)',
-                    'value' => 'IM',
-                  ),
-                  1 => 
-                  array (
-                    'key' => 'Colorful Metal (CM)',
-                    'value' => 'CM',
-                  ),
-                  2 => 
-                  array (
-                    'key' => 'Islamic Ahşap (IA)',
-                    'value' => 'IA',
-                  ),
-                  3 => 
-                  array (
-                    'key' => 'Trend Ahşap (TA)',
-                    'value' => 'TA',
-                  ),
-                  4 => 
-                  array (
-                    'key' => 'Islamic Tabletop (IT)',
-                    'value' => 'IT',
-                  ),
-                  5 => 
-                  array (
-                    'key' => 'Shukran Cam (SC)',
-                    'value' => 'SC',
-                  ),
-                  6 => 
-                  array (
-                    'key' => 'Colorful Harita (CA)',
-                    'value' => 'CA',
-                  ),
-                  7 => 
-                  array (
-                    'key' => 'Ahşap Mobilya (AM)',
-                    'value' => 'AM',
-                  ),
-                  8 => 
-                  array (
-                    'key' => 'Islamic Jewelry (IJ)',
-                    'value' => 'IJ',
-                  ),
-                  9 => 
-                  array (
-                    'key' => 'Islamic Textil (IX)',
-                    'value' => 'IX',
-                  ),
-                  10 => 
-                  array (
-                    'key' => 'Diğer (ZZ)',
-                    'value' => 'ZZ',
-                  ),
-                ),
-                 'defaultValue' => '',
+                 'defaultValue' => NULL,
                  'columnLength' => 190,
-                 'dynamicOptions' => false,
+                 'dynamicOptions' => true,
                  'defaultValueGenerator' => '',
                  'width' => '',
-                 'optionsProviderType' => 'configure',
-                 'optionsProviderClass' => '',
+                 'optionsProviderType' => 'class',
+                 'optionsProviderClass' => '\\App\\Model\\DataObject\\ProductClassOptionsProvider',
                  'optionsProviderData' => '',
               )),
-              3 => 
+              6 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'name',
                  'title' => 'Ürün Adı',
@@ -261,7 +281,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'defaultValueGenerator' => '',
               )),
-              4 => 
+              7 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Textarea::__set_state(array(
                  'name' => 'description',
                  'title' => 'Ürün Tanımı',
@@ -286,29 +306,6 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'height' => '',
                  'width' => '',
               )),
-              5 => 
-              \Pimcore\Model\DataObject\ClassDefinition\Data\Image::__set_state(array(
-                 'name' => 'picture',
-                 'title' => 'Ürün Resmi',
-                 'tooltip' => '',
-                 'mandatory' => false,
-                 'noteditable' => false,
-                 'index' => false,
-                 'locked' => false,
-                 'style' => '',
-                 'permissions' => NULL,
-                 'fieldtype' => '',
-                 'relationType' => false,
-                 'invisible' => false,
-                 'visibleGridView' => false,
-                 'visibleSearch' => false,
-                 'blockedVarsForExport' => 
-                array (
-                ),
-                 'uploadPath' => '',
-                 'width' => '',
-                 'height' => '',
-              )),
             ),
              'locked' => false,
              'blockedVarsForExport' => 
@@ -323,10 +320,10 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
           )),
           1 => 
           \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
-             'name' => 'Layout',
+             'name' => 'dimensionsPanel',
              'type' => NULL,
              'region' => NULL,
-             'title' => '',
+             'title' => 'Ebatlar',
              'width' => '',
              'height' => '',
              'collapsible' => false,
@@ -337,7 +334,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
             array (
               0 => 
               \Pimcore\Model\DataObject\ClassDefinition\Layout\Fieldset::__set_state(array(
-                 'name' => 'Layout',
+                 'name' => 'productFieldset',
                  'type' => NULL,
                  'region' => NULL,
                  'title' => 'Ürün',
@@ -480,7 +477,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
               )),
               1 => 
               \Pimcore\Model\DataObject\ClassDefinition\Layout\Fieldset::__set_state(array(
-                 'name' => 'Layout',
+                 'name' => 'packageFieldset',
                  'type' => NULL,
                  'region' => NULL,
                  'title' => 'Paket (Kutu)',
@@ -633,6 +630,250 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'labelWidth' => 100,
              'labelAlign' => 'left',
           )),
+          2 => 
+          \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
+             'name' => 'seoPanel',
+             'type' => NULL,
+             'region' => NULL,
+             'title' => 'SEO',
+             'width' => '',
+             'height' => '',
+             'collapsible' => false,
+             'collapsed' => false,
+             'bodyStyle' => '',
+             'datatype' => 'layout',
+             'children' => 
+            array (
+              0 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
+                 'name' => 'seoTitle',
+                 'title' => 'SEO Başlığı',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => true,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => true,
+                 'visibleSearch' => true,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'defaultValue' => NULL,
+                 'columnLength' => 190,
+                 'regex' => '',
+                 'regexFlags' => 
+                array (
+                ),
+                 'unique' => false,
+                 'showCharCount' => false,
+                 'width' => '',
+                 'defaultValueGenerator' => '',
+              )),
+              1 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Textarea::__set_state(array(
+                 'name' => 'seoDescription',
+                 'title' => 'SEO Açıklama',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'maxLength' => NULL,
+                 'showCharCount' => false,
+                 'excludeFromSearchIndex' => false,
+                 'height' => '',
+                 'width' => '',
+              )),
+              2 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Fieldcollections::__set_state(array(
+                 'name' => 'seoKeywords',
+                 'title' => 'SEO Keywords',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'allowedTypes' => 
+                array (
+                  0 => 'seyKeywordsFC',
+                ),
+                 'lazyLoading' => true,
+                 'maxItems' => NULL,
+                 'disallowAddRemove' => false,
+                 'disallowReorder' => false,
+                 'collapsed' => false,
+                 'collapsible' => false,
+                 'border' => false,
+              )),
+            ),
+             'locked' => false,
+             'blockedVarsForExport' => 
+            array (
+            ),
+             'fieldtype' => 'panel',
+             'layout' => NULL,
+             'border' => false,
+             'icon' => '',
+             'labelWidth' => 100,
+             'labelAlign' => 'left',
+          )),
+          3 => 
+          \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
+             'name' => 'bundleLayout',
+             'type' => NULL,
+             'region' => NULL,
+             'title' => 'Set',
+             'width' => '',
+             'height' => '',
+             'collapsible' => false,
+             'collapsed' => false,
+             'bodyStyle' => '',
+             'datatype' => 'layout',
+             'children' => 
+            array (
+              0 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\ManyToManyObjectRelation::__set_state(array(
+                 'name' => 'bundleItems',
+                 'title' => 'Set İçeriği',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => true,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'classes' => 
+                array (
+                  0 => 
+                  array (
+                    'classes' => 'Product',
+                  ),
+                ),
+                 'displayMode' => 'grid',
+                 'pathFormatterClass' => '',
+                 'maxItems' => NULL,
+                 'visibleFields' => 'iwasku,productCode,name,productClass,seoTitle',
+                 'allowToCreateNewObject' => false,
+                 'allowToClearRelation' => true,
+                 'optimizedAdminLoading' => false,
+                 'enableTextSelection' => false,
+                 'visibleFieldDefinitions' => 
+                array (
+                ),
+                 'width' => '',
+                 'height' => '',
+              )),
+            ),
+             'locked' => false,
+             'blockedVarsForExport' => 
+            array (
+            ),
+             'fieldtype' => 'panel',
+             'layout' => NULL,
+             'border' => false,
+             'icon' => '',
+             'labelWidth' => 100,
+             'labelAlign' => 'left',
+          )),
+          4 => 
+          \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
+             'name' => 'marketingLayout',
+             'type' => NULL,
+             'region' => NULL,
+             'title' => 'Reklam',
+             'width' => '',
+             'height' => '',
+             'collapsible' => false,
+             'collapsed' => false,
+             'bodyStyle' => '',
+             'datatype' => 'layout',
+             'children' => 
+            array (
+              0 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\ManyToManyObjectRelation::__set_state(array(
+                 'name' => 'marketingMaterials',
+                 'title' => 'Marketing Materials',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => true,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'classes' => 
+                array (
+                  0 => 
+                  array (
+                    'classes' => 'MarketingMaterial',
+                  ),
+                ),
+                 'displayMode' => 'grid',
+                 'pathFormatterClass' => '',
+                 'maxItems' => NULL,
+                 'visibleFields' => 'id,key,title,campaignName,status',
+                 'allowToCreateNewObject' => false,
+                 'allowToClearRelation' => true,
+                 'optimizedAdminLoading' => false,
+                 'enableTextSelection' => false,
+                 'visibleFieldDefinitions' => 
+                array (
+                ),
+                 'width' => '',
+                 'height' => '',
+              )),
+            ),
+             'locked' => false,
+             'blockedVarsForExport' => 
+            array (
+            ),
+             'fieldtype' => 'panel',
+             'layout' => NULL,
+             'border' => false,
+             'icon' => '',
+             'labelWidth' => 100,
+             'labelAlign' => 'left',
+          )),
         ),
          'locked' => false,
          'blockedVarsForExport' => 
@@ -655,20 +896,20 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
      'labelAlign' => 'left',
   )),
    'icon' => '',
-   'group' => '',
+   'group' => 'Ürün Yönetimi',
    'showAppLoggerTab' => false,
    'linkGeneratorReference' => '',
    'previewGeneratorReference' => '',
    'compositeIndices' => 
   array (
   ),
-   'showFieldLookup' => false,
+   'showFieldLookup' => true,
    'propertyVisibility' => 
   array (
     'grid' => 
     array (
       'id' => true,
-      'key' => false,
+      'key' => true,
       'path' => true,
       'published' => true,
       'modificationDate' => true,
@@ -677,7 +918,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
     'search' => 
     array (
       'id' => true,
-      'key' => false,
+      'key' => true,
       'path' => true,
       'published' => true,
       'modificationDate' => true,
