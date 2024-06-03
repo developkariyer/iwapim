@@ -1,11 +1,13 @@
 {# templates/products/list.html.twig #}
 {% extends 'base.html.twig' %}
 
+{% block title %}Products List{% endblock %}
+
 {% block content %}
     <h1>Products</h1>
-    <ul>
+    <ul class="list-group">
         {% for product in products %}
-            <li>
+            <li class="list-group-item">
                 <a href="{{ path('product_detail', {'id': product.id}) }}">
                     {{ product.name }}
                 </a>

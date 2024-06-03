@@ -1,9 +1,11 @@
 {# templates/products/detail.html.twig #}
 {% extends 'base.html.twig' %}
 
+{% block title %}Product Detail{% endblock %}
+
 {% block content %}
     <h1>{{ product.name }}</h1>
-    <img src="{{ product.picture | pimcore_image_url }}" alt="{{ product.name }}">
+    <img src="{{ product.picture | pimcore_image_url }}" alt="{{ product.name }}" class="img-fluid">
     <p>{{ product.description }}</p>
     <p>Product Code: {{ product.productCode }}</p>
     <p>Product Class: {{ product.productClass }}</p>
