@@ -6,7 +6,7 @@
 /config/pimcore/parameters.yml
 /build/
 /phpunit.xml
-/public/bundles/
+#/public/bundles/
 
 # local config
 /.env.local
@@ -38,7 +38,7 @@
 /.php-cs-fixer.cache
 
 # composer
-/vendor/
+#/vendor/
 
 # PhpStorm / IDEA
 .idea
