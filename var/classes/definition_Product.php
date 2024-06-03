@@ -35,7 +35,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1717279979,
+   'modificationDate' => 1717384258,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -647,7 +647,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
               0 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'seoTitle',
-                 'title' => 'SEO Başlığı',
+                 'title' => 'SEO Başlığı (&lt;h1&gt;)',
                  'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,
@@ -702,7 +702,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
               2 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Fieldcollections::__set_state(array(
                  'name' => 'seoKeywords',
-                 'title' => 'SEO Keywords',
+                 'title' => 'SEO Anahtar Kelimeler',
                  'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,

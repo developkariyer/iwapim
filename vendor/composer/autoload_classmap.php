@@ -8154,6 +8154,8 @@ return array(
     'Symfony\\Component\\Messenger\\Event\\WorkerStartedEvent' => $vendorDir . '/symfony/messenger/Event/WorkerStartedEvent.php',
     'Symfony\\Component\\Messenger\\Event\\WorkerStoppedEvent' => $vendorDir . '/symfony/messenger/Event/WorkerStoppedEvent.php',
     'Symfony\\Component\\Messenger\\Exception\\DelayedMessageHandlingException' => $vendorDir . '/symfony/messenger/Exception/DelayedMessageHandlingException.php',
+    'Symfony\\Component\\Messenger\\Exception\\EnvelopeAwareExceptionInterface' => $vendorDir . '/symfony/messenger/Exception/EnvelopeAwareExceptionInterface.php',
+    'Symfony\\Component\\Messenger\\Exception\\EnvelopeAwareExceptionTrait' => $vendorDir . '/symfony/messenger/Exception/EnvelopeAwareExceptionTrait.php',
     'Symfony\\Component\\Messenger\\Exception\\ExceptionInterface' => $vendorDir . '/symfony/messenger/Exception/ExceptionInterface.php',
     'Symfony\\Component\\Messenger\\Exception\\HandlerFailedException' => $vendorDir . '/symfony/messenger/Exception/HandlerFailedException.php',
     'Symfony\\Component\\Messenger\\Exception\\InvalidArgumentException' => $vendorDir . '/symfony/messenger/Exception/InvalidArgumentException.php',

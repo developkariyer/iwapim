@@ -9092,6 +9092,8 @@ class ComposerStaticInit53529a1d0b9c43a5991c0cbb5f377462
         'Symfony\\Component\\Messenger\\Event\\WorkerStartedEvent' => __DIR__ . '/..' . '/symfony/messenger/Event/WorkerStartedEvent.php',
         'Symfony\\Component\\Messenger\\Event\\WorkerStoppedEvent' => __DIR__ . '/..' . '/symfony/messenger/Event/WorkerStoppedEvent.php',
         'Symfony\\Component\\Messenger\\Exception\\DelayedMessageHandlingException' => __DIR__ . '/..' . '/symfony/messenger/Exception/DelayedMessageHandlingException.php',
+        'Symfony\\Component\\Messenger\\Exception\\EnvelopeAwareExceptionInterface' => __DIR__ . '/..' . '/symfony/messenger/Exception/EnvelopeAwareExceptionInterface.php',
+        'Symfony\\Component\\Messenger\\Exception\\EnvelopeAwareExceptionTrait' => __DIR__ . '/..' . '/symfony/messenger/Exception/EnvelopeAwareExceptionTrait.php',
         'Symfony\\Component\\Messenger\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/messenger/Exception/ExceptionInterface.php',
         'Symfony\\Component\\Messenger\\Exception\\HandlerFailedException' => __DIR__ . '/..' . '/symfony/messenger/Exception/HandlerFailedException.php',
         'Symfony\\Component\\Messenger\\Exception\\InvalidArgumentException' => __DIR__ . '/..' . '/symfony/messenger/Exception/InvalidArgumentException.php',
