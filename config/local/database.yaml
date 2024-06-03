@@ -1,0 +1,2 @@
+doctrine:
+    dbal: { connections: { default: { host: localhost, port: 3306, user: slackuser, password: Gezegen2329, dbname: iwapim, mapping_types: { enum: string, bit: boolean }, server_version: 8.0.36-2ubuntu3 } } }
