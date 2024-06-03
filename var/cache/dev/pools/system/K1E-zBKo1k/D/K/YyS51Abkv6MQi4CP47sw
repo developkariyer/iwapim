@@ -1,0 +1,3 @@
+<?php //App%255CController%255CWeb2printController
+
+return [PHP_INT_MAX, []];

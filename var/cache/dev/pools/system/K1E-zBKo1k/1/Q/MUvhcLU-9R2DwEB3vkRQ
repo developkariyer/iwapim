@@ -1,0 +1,3 @@
+<?php //Pimcore%255CKernel%2523getLogDir
+
+return [PHP_INT_MAX, []];
