@@ -35,7 +35,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1717412436,
+   'modificationDate' => 1717419991,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
