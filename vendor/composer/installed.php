@@ -3,7 +3,7 @@
         'name' => 'pimcore/skeleton',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'e691ba2db8cb1f2f5aff4615c49cd0b8f73f9f7b',
+        'reference' => '680b0897085f10168f0318c3ba297a5efe3b66f4',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -667,7 +667,7 @@
         'pimcore/skeleton' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'e691ba2db8cb1f2f5aff4615c49cd0b8f73f9f7b',
+            'reference' => '680b0897085f10168f0318c3ba297a5efe3b66f4',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -1761,6 +1761,24 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'twbs/bootstrap' => array(
+            'pretty_version' => 'v5.3.3',
+            'version' => '5.3.3.0',
+            'reference' => '6e1f75f420f68e1d52733b8e407fc7c3766c9dba',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../twbs/bootstrap',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'twbs/bootstrap-icons' => array(
+            'pretty_version' => 'v1.11.3',
+            'version' => '1.11.3.0',
+            'reference' => '8d88686c03c3768a2d82ba4f20c3c4e1b100fa29',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../twbs/bootstrap-icons',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'twig/extra-bundle' => array(
             'pretty_version' => 'v3.10.0',
             'version' => '3.10.0.0',
@@ -1787,6 +1805,12 @@
             'install_path' => __DIR__ . '/../twig/twig',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'twitter/bootstrap' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => 'v5.3.3',
+            ),
         ),
         'umpirsky/country-list' => array(
             'pretty_version' => '2.0.6',
