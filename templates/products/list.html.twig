@@ -22,7 +22,7 @@
                 <div class="col-md-4 product-item" data-class="{{ product.getProductClass }}">
                     <div class="card card-custom">
                         {% if product.picture %}
-                            <img src="{{ product.picture.getFullPath() }}" class="card-img-top" alt="{{ product.name }}">
+                            <img src="{{ product.picture.getThumbnail('default') }}" class="card-img-top" alt="{{ product.name }}">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ product.name }}</h5>

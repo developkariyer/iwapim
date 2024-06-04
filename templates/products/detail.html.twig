@@ -8,7 +8,7 @@
         <h1>{{ product.name }}</h1>
         {% if product.picture %}
             <a href="{{ product.picture.getFullPath() }}" target="_blank">
-                <img src="{{ product.picture.getThumbnail('thumbnail') }}" class="img-thumbnail" alt="{{ product.name }}" style="max-width: 150px;">
+                <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail" alt="{{ product.name }}" style="max-width: 150px;">
             </a>
         {% endif %}
     </div>
