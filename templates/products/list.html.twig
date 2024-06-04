@@ -33,6 +33,12 @@
                                 </div>
                                 <div class="col-md-5">
                                     <div class="card-body">
+                                        <h6>Varyasyonlar:</h6>
+                                        <ul>
+                                            {% for child in product.children %}
+                                                <li>{{ child.variationType }}: {{ child.key }}</li>
+                                            {% endfor %}
+                                        </ul>
                                     </div>
                                 </div>
                                 {% set firstImage = null %}
