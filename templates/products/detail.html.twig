@@ -76,6 +76,21 @@
                         <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 3000 }}</td>
                         <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 5000 }}</td>
                     </tr>
+                    {% if product.bundleItems|length > 0 %}
+                        <tr><td colspan="7">Set İçindeki Ürünlerin Paket (Kutu) Ebatları</td></tr>
+                            {% for item in product.bundleItems %}
+                                <tr>
+                                    <td><strong>{{ item.name }}</strong></td>
+                                    <td>{{ item.packageWidth }}</td>
+                                    <td>{{ item.packegeHeight }}</td>
+                                    <td>{{ item.packageDepth }}</td>
+                                    <td>{{ item.packageWeight }}</td>
+                                    <td>{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 3000 }}</td>
+                                    <td>{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 5000 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
