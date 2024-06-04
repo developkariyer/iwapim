@@ -13,6 +13,8 @@
  * - productClass [select]
  * - name [input]
  * - description [textarea]
+ * - variationType [select]
+ * - album [imageGallery]
  * - productWidth [numeric]
  * - productHeight [numeric]
  * - productDepth [numeric]
@@ -35,7 +37,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1717419991,
+   'modificationDate' => 1717532098,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -111,7 +113,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'blockedVarsForExport' => 
                 array (
                 ),
-                 'uploadPath' => '',
+                 'uploadPath' => 'products/images',
                  'width' => '',
                  'height' => '',
               )),
@@ -303,6 +305,73 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'maxLength' => NULL,
                  'showCharCount' => false,
                  'excludeFromSearchIndex' => false,
+                 'height' => '',
+                 'width' => '',
+              )),
+              8 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Select::__set_state(array(
+                 'name' => 'variationType',
+                 'title' => 'Varyasyon Tipi',
+                 'tooltip' => 'Varyasyon değeri ürün anahtar adıdır.',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'options' => 
+                array (
+                  0 => 
+                  array (
+                    'key' => 'Ebat',
+                    'value' => 'size',
+                  ),
+                  1 => 
+                  array (
+                    'key' => 'Renk',
+                    'value' => 'color',
+                  ),
+                ),
+                 'defaultValue' => '',
+                 'columnLength' => 190,
+                 'dynamicOptions' => false,
+                 'defaultValueGenerator' => '',
+                 'width' => '',
+                 'optionsProviderType' => 'configure',
+                 'optionsProviderClass' => '',
+                 'optionsProviderData' => '',
+              )),
+              9 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\ImageGallery::__set_state(array(
+                 'name' => 'album',
+                 'title' => 'Ürün Görselleri',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'uploadPath' => '',
+                 'ratioX' => NULL,
+                 'ratioY' => NULL,
+                 'predefinedDataTemplates' => '',
                  'height' => '',
                  'width' => '',
               )),
@@ -744,7 +813,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
           )),
           3 => 
           \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
-             'name' => 'bundleLayout',
+             'name' => 'bundlePanel',
              'type' => NULL,
              'region' => NULL,
              'title' => 'Set',
@@ -810,7 +879,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
           )),
           4 => 
           \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
-             'name' => 'marketingLayout',
+             'name' => 'marketingPanel',
              'type' => NULL,
              'region' => NULL,
              'title' => 'Reklam',
@@ -862,6 +931,32 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'height' => '',
               )),
+            ),
+             'locked' => false,
+             'blockedVarsForExport' => 
+            array (
+            ),
+             'fieldtype' => 'panel',
+             'layout' => NULL,
+             'border' => false,
+             'icon' => '',
+             'labelWidth' => 100,
+             'labelAlign' => 'left',
+          )),
+          5 => 
+          \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
+             'name' => 'listingPanel',
+             'type' => NULL,
+             'region' => NULL,
+             'title' => '',
+             'width' => '',
+             'height' => '',
+             'collapsible' => false,
+             'collapsed' => false,
+             'bodyStyle' => '',
+             'datatype' => 'layout',
+             'children' => 
+            array (
             ),
              'locked' => false,
              'blockedVarsForExport' => 
@@ -928,6 +1023,32 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'enableGridLocking' => false,
    'deletedDataComponents' => 
   array (
+    0 => 
+    \Pimcore\Model\DataObject\ClassDefinition\Data\ImageGallery::__set_state(array(
+       'name' => 'adf',
+       'title' => 'Adf',
+       'tooltip' => '',
+       'mandatory' => false,
+       'noteditable' => false,
+       'index' => false,
+       'locked' => false,
+       'style' => '',
+       'permissions' => NULL,
+       'fieldtype' => '',
+       'relationType' => false,
+       'invisible' => false,
+       'visibleGridView' => false,
+       'visibleSearch' => false,
+       'blockedVarsForExport' => 
+      array (
+      ),
+       'uploadPath' => '',
+       'ratioX' => NULL,
+       'ratioY' => NULL,
+       'predefinedDataTemplates' => '',
+       'height' => '',
+       'width' => '',
+    )),
   ),
    'blockedVarsForExport' => 
   array (

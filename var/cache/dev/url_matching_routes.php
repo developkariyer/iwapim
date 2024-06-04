@@ -459,6 +459,7 @@ return [
             [['_route' => 'pimcore_bundle_seo_settings_robotstxtput', '_controller' => 'Pimcore\\Bundle\\SeoBundle\\Controller\\SettingsController::robotsTxtPutAction'], null, ['PUT' => 0], null, false, false, null],
         ],
         '/admin/bundle/glossary/settings/glossary' => [[['_route' => 'pimcore_bundle_glossary_settings_glossary', '_controller' => 'Pimcore\\Bundle\\GlossaryBundle\\Controller\\SettingsController::glossaryAction'], null, ['POST' => 0], null, false, false, null]],
+        '/products' => [[['_route' => 'products_list', '_controller' => 'App\\Controller\\ProductsController::listAction'], null, null, null, false, false, null]],
     ],
     [ // $regexpList
         0 => '{^(?'
@@ -490,6 +491,7 @@ return [
                     .')'
                     .'|sset/webdav(.*)(*:525)'
                 .')'
+                .'|/product/([^/]++)(*:551)'
             .')/?$}sDu',
     ],
     [ // $dynamicRoutes
@@ -506,8 +508,9 @@ return [
         382 => [[['_route' => 'fos_js_routing_js', '_controller' => 'fos_js_routing.controller::indexAction', '_format' => 'js'], ['_format'], ['GET' => 0], null, false, true, null]],
         450 => [[['_route' => 'pimcore_admin_dataobject_dataobject_diffversions', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\DataObject\\DataObjectController::diffVersionsAction'], ['from', 'to'], ['GET' => 0], null, false, true, null]],
         501 => [[['_route' => 'pimcore_admin_document_document_diffversions', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\Document\\DocumentController::diffVersionsAction'], ['from', 'to'], ['GET' => 0], null, false, true, null]],
-        525 => [
-            [['_route' => 'pimcore_webdav', '_controller' => 'Pimcore\\Bundle\\CoreBundle\\Controller\\WebDavController::webdavAction'], ['path'], null, null, false, true, null],
+        525 => [[['_route' => 'pimcore_webdav', '_controller' => 'Pimcore\\Bundle\\CoreBundle\\Controller\\WebDavController::webdavAction'], ['path'], null, null, false, true, null]],
+        551 => [
+            [['_route' => 'product_detail', '_controller' => 'App\\Controller\\ProductsController::detailAction'], ['id'], null, null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

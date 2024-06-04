@@ -1,0 +1,26 @@
+pimcore:
+    assets:
+        image:
+            thumbnails:
+                definitions:
+                    listpage:
+                        items:
+                            -
+                                method: scaleByHeight
+                                arguments:
+                                    height: 150
+                                    forceResize: true
+                        medias: {  }
+                        name: listpage
+                        description: ''
+                        group: ''
+                        format: SOURCE
+                        quality: 85
+                        highResolution: null
+                        preserveColor: false
+                        preserveMetaData: false
+                        rasterizeSVG: false
+                        downloadable: false
+                        modificationDate: 1717492151
+                        creationDate: 1717492135
+                        preserveAnimation: false

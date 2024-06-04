@@ -1,0 +1,806 @@
+<?php
+
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Extension\SandboxExtension;
+use Twig\Markup;
+use Twig\Sandbox\SecurityError;
+use Twig\Sandbox\SecurityNotAllowedTagError;
+use Twig\Sandbox\SecurityNotAllowedFilterError;
+use Twig\Sandbox\SecurityNotAllowedFunctionError;
+use Twig\Source;
+use Twig\Template;
+
+/* products/detail.html.twig */
+class __TwigTemplate_c99d29c6c3173f37cda58121632039b9 extends Template
+{
+    private $source;
+    private $macros = [];
+
+    public function __construct(Environment $env)
+    {
+        parent::__construct($env);
+
+        $this->source = $this->getSourceContext();
+
+        $this->blocks = [
+            'title' => [$this, 'block_title'],
+            'content' => [$this, 'block_content'],
+        ];
+        $this->sandbox = $this->env->getExtension('\Twig\Extension\SandboxExtension');
+        $this->checkSecurity();
+    }
+
+    protected function doGetParent(array $context)
+    {
+        // line 2
+        return "base.html.twig";
+    }
+
+    protected function doDisplay(array $context, array $blocks = [])
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "products/detail.html.twig"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "products/detail.html.twig"));
+
+        $this->parent = $this->loadTemplate("base.html.twig", "products/detail.html.twig", 2);
+        $this->parent->display($context, array_merge($this->blocks, $blocks));
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+    }
+
+    // line 4
+    public function block_title($context, array $blocks = [])
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
+
+        echo "Ürün Detayı";
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+    }
+
+    // line 6
+    public function block_content($context, array $blocks = [])
+    {
+        $macros = $this->macros;
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2 = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->enter($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "content"));
+
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "content"));
+
+        // line 7
+        echo "    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h1>";
+        // line 9
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 9, $this->source); })()), "key", [], "any", false, false, true, 9), 9, $this->source), "html", null, true);
+        echo " ";
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 9, $this->source); })()), "name", [], "any", false, false, true, 9), 9, $this->source), "html", null, true);
+        echo " (";
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 9, $this->source); })()), "productClass", [], "any", false, false, true, 9), 9, $this->source), "html", null, true);
+        echo ")</h1>
+            <div class=\"row\">
+                <div class=\"col-md-6\">
+                    <p><strong>Ürün Kodu:</strong> ";
+        // line 12
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 12, $this->source); })()), "productCode", [], "any", false, false, true, 12), 12, $this->source), "html", null, true);
+        echo "</p>
+                    <p><strong>IWASKU:</strong> ";
+        // line 13
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 13, $this->source); })()), "iwasku", [], "any", false, false, true, 13), 13, $this->source), "html", null, true);
+        echo "</p>
+                    <p><strong>Aktif:</strong> ";
+        // line 14
+        echo ((twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 14, $this->source); })()), "iwaskuActive", [], "any", false, false, true, 14)) ? ("Evet") : ("Hayır"));
+        echo "</p>
+                </div>
+                <div class=\"col-md-6\">
+                    <p><strong>SEO Başlığı:</strong> ";
+        // line 17
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 17, $this->source); })()), "seoTitle", [], "any", false, false, true, 17), 17, $this->source), "html", null, true);
+        echo "</p>
+                    <p><strong>SEO Açıklaması:</strong> ";
+        // line 18
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 18, $this->source); })()), "seoDescription", [], "any", false, false, true, 18), 18, $this->source), "html", null, true);
+        echo "</p>
+                    <p><strong>SEO Anahtar Kelimeler:</strong> ";
+        // line 19
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 19, $this->source); })()), "seoKeywords", [], "any", false, false, true, 19), 19, $this->source), "html", null, true);
+        echo "</p>
+                </div>
+            </div>
+            <p><strong>Açıklama:</strong> ";
+        // line 22
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 22, $this->source); })()), "description", [], "any", false, false, true, 22), 22, $this->source), "html", null, true);
+        echo "</p>
+        </div>
+    </div>
+
+   ";
+        // line 26
+        if ((twig_length_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 26, $this->source); })()), "album", [], "any", false, false, true, 26)) > 0)) {
+            // line 27
+            echo "        <div class=\"card card-custom mb-3\">
+            <div class=\"card-body\">
+                <h2>Ürün Görselleri</h2>
+                <div class=\"row\">
+                    ";
+            // line 31
+            $context['_parent'] = $context;
+            $context['_seq'] = twig_ensure_traversable(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 31, $this->source); })()), "album", [], "any", false, false, true, 31));
+            foreach ($context['_seq'] as $context["_key"] => $context["image"]) {
+                // line 32
+                echo "                        ";
+                if ($context["image"]) {
+                    // line 33
+                    echo "                            <div class=\"col-md-3\">
+                                <a href=\"";
+                    // line 34
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["image"], "image", [], "any", false, false, true, 34), "getFullPath", [], "method", false, false, true, 34), 34, $this->source), "html", null, true);
+                    echo "\" target=\"_blank\">
+                                    <img src=\"";
+                    // line 35
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["image"], "image", [], "any", false, false, true, 35), "getThumbnail", ["default"], "method", false, false, true, 35), 35, $this->source), "html", null, true);
+                    echo "\" class=\"img-thumbnail mb-3\" alt=\"Ürün Görseli\">
+                                </a>
+                            </div>
+                        ";
+                }
+                // line 39
+                echo "                    ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_iterated'], $context['_key'], $context['image'], $context['_parent'], $context['loop']);
+            $context = array_intersect_key($context, $_parent) + $_parent;
+            // line 40
+            echo "                </div>
+            </div>
+        </div>
+    ";
+        }
+        // line 44
+        echo "
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Ebatlar</h2>
+            <table class=\"table\">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>En</th>
+                        <th>Boy</th>
+                        <th>Derinlik</th>
+                        <th>Ağırlık</th>
+                        <th>Kara Desi</th>
+                        <th>Hava/Deniz Desi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ürün</strong></td>
+                        <td>";
+        // line 63
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 63, $this->source); })()), "productWidth", [], "any", false, false, true, 63), 63, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 64
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 64, $this->source); })()), "productHeight", [], "any", false, false, true, 64), 64, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 65
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 65, $this->source); })()), "productDepth", [], "any", false, false, true, 65), 65, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 66
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 66, $this->source); })()), "productWeight", [], "any", false, false, true, 66), 66, $this->source), "html", null, true);
+        echo "</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Paket (Kutu)</strong></td>
+                        <td>";
+        // line 72
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 72, $this->source); })()), "packageWidth", [], "any", false, false, true, 72), 72, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 73
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 73, $this->source); })()), "packegeHeight", [], "any", false, false, true, 73), 73, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 74
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 74, $this->source); })()), "packageDepth", [], "any", false, false, true, 74), 74, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 75
+        echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 75, $this->source); })()), "packageWeight", [], "any", false, false, true, 75), 75, $this->source), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 76
+        echo twig_escape_filter($this->env, (max($this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 76, $this->source); })()), "packageWeight", [], "any", false, false, true, 76), 76, $this->source), ((twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 76, $this->source); })()), "packageWidth", [], "any", false, false, true, 76) * twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 76, $this->source); })()), "packegeHeight", [], "any", false, false, true, 76)) * twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 76, $this->source); })()), "packageDepth", [], "any", false, false, true, 76))) / 3000), "html", null, true);
+        echo "</td>
+                        <td>";
+        // line 77
+        echo twig_escape_filter($this->env, (max($this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 77, $this->source); })()), "packageWeight", [], "any", false, false, true, 77), 77, $this->source), ((twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 77, $this->source); })()), "packageWidth", [], "any", false, false, true, 77) * twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 77, $this->source); })()), "packegeHeight", [], "any", false, false, true, 77)) * twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 77, $this->source); })()), "packageDepth", [], "any", false, false, true, 77))) / 5000), "html", null, true);
+        echo "</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Renk Varyasyonları</h2>
+            <div class=\"row\">
+                ";
+        // line 88
+        $context['_parent'] = $context;
+        $context['_seq'] = twig_ensure_traversable(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 88, $this->source); })()), "children", [], "any", false, false, true, 88));
+        foreach ($context['_seq'] as $context["_key"] => $context["child"]) {
+            // line 89
+            echo "                    ";
+            if ((twig_get_attribute($this->env, $this->source, $context["child"], "variationType", [], "any", false, false, true, 89) == "color")) {
+                // line 90
+                echo "                        <div class=\"col-md-3\">
+                            <div class=\"card card-custom mb-3\">
+                                <div class=\"card-body\">
+                                    <h5>";
+                // line 93
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "key", [], "any", false, false, true, 93), 93, $this->source), "html", null, true);
+                echo "</h5>
+                                    ";
+                // line 94
+                if (twig_get_attribute($this->env, $this->source, $context["child"], "picture", [], "any", false, false, true, 94)) {
+                    // line 95
+                    echo "                                        <a href=\"";
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["child"], "picture", [], "any", false, false, true, 95), "getFullPath", [], "method", false, false, true, 95), 95, $this->source), "html", null, true);
+                    echo "\" target=\"_blank\">
+                                            <img src=\"";
+                    // line 96
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["child"], "picture", [], "any", false, false, true, 96), "getThumbnail", ["default"], "method", false, false, true, 96), 96, $this->source), "html", null, true);
+                    echo "\" class=\"img-thumbnail mb-3\" alt=\"";
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "name", [], "any", false, false, true, 96), 96, $this->source), "html", null, true);
+                    echo "\" style=\"max-width: 150px;\">
+                                        </a>
+                                    ";
+                }
+                // line 99
+                echo "                                    <p><strong>Ürün Kodu:</strong> ";
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "productCode", [], "any", false, false, true, 99), 99, $this->source), "html", null, true);
+                echo "</p>
+                                    <p><strong>IWASKU:</strong> ";
+                // line 100
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "iwasku", [], "any", false, false, true, 100), 100, $this->source), "html", null, true);
+                echo "</p>
+                                    <p><strong>Aktif:</strong> ";
+                // line 101
+                echo ((twig_get_attribute($this->env, $this->source, $context["child"], "iwaskuActive", [], "any", false, false, true, 101)) ? ("Evet") : ("Hayır"));
+                echo "</p>
+                                </div>
+                            </div>
+                        </div>
+                    ";
+            }
+            // line 106
+            echo "                ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['child'], $context['_parent'], $context['loop']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 107
+        echo "                <div class=\"col-md-3\">
+                    <div class=\"card card-custom mb-3\">
+                        <div class=\"card-body\">
+                            <h5>Yeni Renk Ekle</h5>
+                            <form action=\"/path/to/your/handler\" method=\"post\">
+                                <div class=\"mb-3\">
+                                    <label for=\"color\" class=\"form-label\">Renk</label>
+                                    <input type=\"text\" class=\"form-control\" id=\"color\" name=\"color\">
+                                </div>
+                                <button type=\"submit\" class=\"btn btn-primary\">Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Ebat Varyasyonları</h2>
+            <div class=\"row\">
+                ";
+        // line 129
+        $context['_parent'] = $context;
+        $context['_seq'] = twig_ensure_traversable(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 129, $this->source); })()), "children", [], "any", false, false, true, 129));
+        foreach ($context['_seq'] as $context["_key"] => $context["child"]) {
+            // line 130
+            echo "                    ";
+            if ((twig_get_attribute($this->env, $this->source, $context["child"], "variationType", [], "any", false, false, true, 130) == "size")) {
+                // line 131
+                echo "                        <div class=\"col-md-3\">
+                            <div class=\"card card-custom mb-3\">
+                                <div class=\"card-body\">
+                                    <h5>";
+                // line 134
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "key", [], "any", false, false, true, 134), 134, $this->source), "html", null, true);
+                echo "</h5>
+                                    ";
+                // line 135
+                if (twig_get_attribute($this->env, $this->source, $context["child"], "picture", [], "any", false, false, true, 135)) {
+                    // line 136
+                    echo "                                        <a href=\"";
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["child"], "picture", [], "any", false, false, true, 136), "getFullPath", [], "method", false, false, true, 136), 136, $this->source), "html", null, true);
+                    echo "\" target=\"_blank\">
+                                            <img src=\"";
+                    // line 137
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["child"], "picture", [], "any", false, false, true, 137), "getThumbnail", ["default"], "method", false, false, true, 137), 137, $this->source), "html", null, true);
+                    echo "\" class=\"img-thumbnail mb-3\" alt=\"";
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "name", [], "any", false, false, true, 137), 137, $this->source), "html", null, true);
+                    echo "\" style=\"max-width: 150px;\">
+                                        </a>
+                                    ";
+                }
+                // line 140
+                echo "                                    <p><strong>Ürün Kodu:</strong> ";
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "productCode", [], "any", false, false, true, 140), 140, $this->source), "html", null, true);
+                echo "</p>
+                                    <p><strong>IWASKU:</strong> ";
+                // line 141
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["child"], "iwasku", [], "any", false, false, true, 141), 141, $this->source), "html", null, true);
+                echo "</p>
+                                    <p><strong>Aktif:</strong> ";
+                // line 142
+                echo ((twig_get_attribute($this->env, $this->source, $context["child"], "iwaskuActive", [], "any", false, false, true, 142)) ? ("Evet") : ("Hayır"));
+                echo "</p>
+                                </div>
+                            </div>
+                        </div>
+                    ";
+            }
+            // line 147
+            echo "                ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['child'], $context['_parent'], $context['loop']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 148
+        echo "                <div class=\"col-md-3\">
+                    <div class=\"card card-custom mb-3\">
+                        <div class=\"card-body\">
+                            <h5>Yeni Ebat Ekle</h5>
+                            <form action=\"/path/to/your/handler\" method=\"post\">
+                                <div class=\"mb-3\">
+                                    <label for=\"size\" class=\"form-label\">Ebat İsmi</label>
+                                    <input type=\"text\" class=\"form-control\" id=\"size\" name=\"size\">
+                                </div>
+                                <button type=\"submit\" class=\"btn btn-primary\">Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Set İçeriği</h2>
+            ";
+        // line 169
+        if ((twig_length_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 169, $this->source); })()), "bundleItems", [], "any", false, false, true, 169)) > 0)) {
+            // line 170
+            echo "                <ul>
+                    ";
+            // line 171
+            $context['_parent'] = $context;
+            $context['_seq'] = twig_ensure_traversable(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 171, $this->source); })()), "bundleItems", [], "any", false, false, true, 171));
+            foreach ($context['_seq'] as $context["_key"] => $context["item"]) {
+                // line 172
+                echo "                        <li>";
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["item"], "name", [], "any", false, false, true, 172), 172, $this->source), "html", null, true);
+                echo "</li>
+                    ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_iterated'], $context['_key'], $context['item'], $context['_parent'], $context['loop']);
+            $context = array_intersect_key($context, $_parent) + $_parent;
+            // line 174
+            echo "                </ul>
+            ";
+        } else {
+            // line 176
+            echo "                <p>Set içeriği yok.</p>
+            ";
+        }
+        // line 178
+        echo "        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Listing</h2>
+            <p>Listing henüz hazır değil.</p>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Stok Takip</h2>
+            <p>Stok henüz hazır değil.</p>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Reklam</h2>
+            ";
+        // line 198
+        if ((twig_length_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 198, $this->source); })()), "marketingMaterials", [], "any", false, false, true, 198)) > 0)) {
+            // line 199
+            echo "                <ul>
+                    ";
+            // line 200
+            $context['_parent'] = $context;
+            $context['_seq'] = twig_ensure_traversable(twig_get_attribute($this->env, $this->source, (isset($context["product"]) || array_key_exists("product", $context) ? $context["product"] : (function () { throw new RuntimeError('Variable "product" does not exist.', 200, $this->source); })()), "marketingMaterials", [], "any", false, false, true, 200));
+            foreach ($context['_seq'] as $context["_key"] => $context["material"]) {
+                // line 201
+                echo "                        <li>
+                            <strong>Başlık:</strong> ";
+                // line 202
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["material"], "title", [], "any", false, false, true, 202), 202, $this->source), "html", null, true);
+                echo "<br>
+                            <strong>Açıklama:</strong> ";
+                // line 203
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["material"], "description", [], "any", false, false, true, 203), 203, $this->source), "html", null, true);
+                echo "<br>
+                            <strong>Kampanya Adı:</strong> ";
+                // line 204
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["material"], "campaignName", [], "any", false, false, true, 204), 204, $this->source), "html", null, true);
+                echo "<br>
+                            <strong>Durum:</strong> ";
+                // line 205
+                echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, $context["material"], "status", [], "any", false, false, true, 205), 205, $this->source), "html", null, true);
+                echo "<br>
+                            <strong>Varlık:</strong>
+                            ";
+                // line 207
+                if (twig_get_attribute($this->env, $this->source, $context["material"], "asset", [], "any", false, false, true, 207)) {
+                    // line 208
+                    echo "                                <a href=\"";
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["material"], "asset", [], "any", false, false, true, 208), "getFullPath", [], "method", false, false, true, 208), 208, $this->source), "html", null, true);
+                    echo "\" target=\"_blank\">";
+                    echo twig_escape_filter($this->env, $this->sandbox->ensureToStringAllowed(twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, $context["material"], "asset", [], "any", false, false, true, 208), "getFilename", [], "method", false, false, true, 208), 208, $this->source), "html", null, true);
+                    echo "</a>
+                            ";
+                } else {
+                    // line 210
+                    echo "                                Yok
+                            ";
+                }
+                // line 212
+                echo "                        </li>
+                    ";
+            }
+            $_parent = $context['_parent'];
+            unset($context['_seq'], $context['_iterated'], $context['_key'], $context['material'], $context['_parent'], $context['loop']);
+            $context = array_intersect_key($context, $_parent) + $_parent;
+            // line 214
+            echo "                </ul>
+            ";
+        } else {
+            // line 216
+            echo "                <p>Reklam materyalleri yok.</p>
+            ";
+        }
+        // line 218
+        echo "        </div>
+    </div>
+
+";
+        
+        $__internal_6f47bbe9983af81f1e7450e9a3e3768f->leave($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof);
+
+        
+        $__internal_5a27a8ba21ca79b61932376b2fa922d2->leave($__internal_5a27a8ba21ca79b61932376b2fa922d2_prof);
+
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function getTemplateName()
+    {
+        return "products/detail.html.twig";
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function isTraitable()
+    {
+        return false;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function getDebugInfo()
+    {
+        return array (  517 => 218,  513 => 216,  509 => 214,  502 => 212,  498 => 210,  490 => 208,  488 => 207,  483 => 205,  479 => 204,  475 => 203,  471 => 202,  468 => 201,  464 => 200,  461 => 199,  459 => 198,  437 => 178,  433 => 176,  429 => 174,  420 => 172,  416 => 171,  413 => 170,  411 => 169,  388 => 148,  382 => 147,  374 => 142,  370 => 141,  365 => 140,  357 => 137,  352 => 136,  350 => 135,  346 => 134,  341 => 131,  338 => 130,  334 => 129,  310 => 107,  304 => 106,  296 => 101,  292 => 100,  287 => 99,  279 => 96,  274 => 95,  272 => 94,  268 => 93,  263 => 90,  260 => 89,  256 => 88,  242 => 77,  238 => 76,  234 => 75,  230 => 74,  226 => 73,  222 => 72,  213 => 66,  209 => 65,  205 => 64,  201 => 63,  180 => 44,  174 => 40,  168 => 39,  161 => 35,  157 => 34,  154 => 33,  151 => 32,  147 => 31,  141 => 27,  139 => 26,  132 => 22,  126 => 19,  122 => 18,  118 => 17,  112 => 14,  108 => 13,  104 => 12,  94 => 9,  90 => 7,  80 => 6,  61 => 4,  38 => 2,);
+    }
+
+    public function getSourceContext()
+    {
+        return new Source("{# templates/products/detail.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Ürün Detayı{% endblock %}
+
+{% block content %}
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h1>{{ product.key }} {{ product.name }} ({{ product.productClass }})</h1>
+            <div class=\"row\">
+                <div class=\"col-md-6\">
+                    <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
+                    <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
+                    <p><strong>Aktif:</strong> {{ product.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                </div>
+                <div class=\"col-md-6\">
+                    <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
+                    <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
+                    <p><strong>SEO Anahtar Kelimeler:</strong> {{ product.seoKeywords }}</p>
+                </div>
+            </div>
+            <p><strong>Açıklama:</strong> {{ product.description }}</p>
+        </div>
+    </div>
+
+   {% if product.album|length > 0 %}
+        <div class=\"card card-custom mb-3\">
+            <div class=\"card-body\">
+                <h2>Ürün Görselleri</h2>
+                <div class=\"row\">
+                    {% for image in product.album %}
+                        {% if image %}
+                            <div class=\"col-md-3\">
+                                <a href=\"{{ image.image.getFullPath() }}\" target=\"_blank\">
+                                    <img src=\"{{ image.image.getThumbnail('default') }}\" class=\"img-thumbnail mb-3\" alt=\"Ürün Görseli\">
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Ebatlar</h2>
+            <table class=\"table\">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>En</th>
+                        <th>Boy</th>
+                        <th>Derinlik</th>
+                        <th>Ağırlık</th>
+                        <th>Kara Desi</th>
+                        <th>Hava/Deniz Desi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ürün</strong></td>
+                        <td>{{ product.productWidth }}</td>
+                        <td>{{ product.productHeight }}</td>
+                        <td>{{ product.productDepth }}</td>
+                        <td>{{ product.productWeight }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Paket (Kutu)</strong></td>
+                        <td>{{ product.packageWidth }}</td>
+                        <td>{{ product.packegeHeight }}</td>
+                        <td>{{ product.packageDepth }}</td>
+                        <td>{{ product.packageWeight }}</td>
+                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 3000 }}</td>
+                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 5000 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Renk Varyasyonları</h2>
+            <div class=\"row\">
+                {% for child in product.children %}
+                    {% if child.variationType == 'color' %}
+                        <div class=\"col-md-3\">
+                            <div class=\"card card-custom mb-3\">
+                                <div class=\"card-body\">
+                                    <h5>{{ child.key }}</h5>
+                                    {% if child.picture %}
+                                        <a href=\"{{ child.picture.getFullPath() }}\" target=\"_blank\">
+                                            <img src=\"{{ child.picture.getThumbnail('default') }}\" class=\"img-thumbnail mb-3\" alt=\"{{ child.name }}\" style=\"max-width: 150px;\">
+                                        </a>
+                                    {% endif %}
+                                    <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
+                                    <p><strong>IWASKU:</strong> {{ child.iwasku }}</p>
+                                    <p><strong>Aktif:</strong> {{ child.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class=\"col-md-3\">
+                    <div class=\"card card-custom mb-3\">
+                        <div class=\"card-body\">
+                            <h5>Yeni Renk Ekle</h5>
+                            <form action=\"/path/to/your/handler\" method=\"post\">
+                                <div class=\"mb-3\">
+                                    <label for=\"color\" class=\"form-label\">Renk</label>
+                                    <input type=\"text\" class=\"form-control\" id=\"color\" name=\"color\">
+                                </div>
+                                <button type=\"submit\" class=\"btn btn-primary\">Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Ebat Varyasyonları</h2>
+            <div class=\"row\">
+                {% for child in product.children %}
+                    {% if child.variationType == 'size' %}
+                        <div class=\"col-md-3\">
+                            <div class=\"card card-custom mb-3\">
+                                <div class=\"card-body\">
+                                    <h5>{{ child.key }}</h5>
+                                    {% if child.picture %}
+                                        <a href=\"{{ child.picture.getFullPath() }}\" target=\"_blank\">
+                                            <img src=\"{{ child.picture.getThumbnail('default') }}\" class=\"img-thumbnail mb-3\" alt=\"{{ child.name }}\" style=\"max-width: 150px;\">
+                                        </a>
+                                    {% endif %}
+                                    <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
+                                    <p><strong>IWASKU:</strong> {{ child.iwasku }}</p>
+                                    <p><strong>Aktif:</strong> {{ child.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class=\"col-md-3\">
+                    <div class=\"card card-custom mb-3\">
+                        <div class=\"card-body\">
+                            <h5>Yeni Ebat Ekle</h5>
+                            <form action=\"/path/to/your/handler\" method=\"post\">
+                                <div class=\"mb-3\">
+                                    <label for=\"size\" class=\"form-label\">Ebat İsmi</label>
+                                    <input type=\"text\" class=\"form-control\" id=\"size\" name=\"size\">
+                                </div>
+                                <button type=\"submit\" class=\"btn btn-primary\">Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Set İçeriği</h2>
+            {% if product.bundleItems|length > 0 %}
+                <ul>
+                    {% for item in product.bundleItems %}
+                        <li>{{ item.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Set içeriği yok.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Listing</h2>
+            <p>Listing henüz hazır değil.</p>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Stok Takip</h2>
+            <p>Stok henüz hazır değil.</p>
+        </div>
+    </div>
+
+    <div class=\"card card-custom mb-3\">
+        <div class=\"card-body\">
+            <h2>Reklam</h2>
+            {% if product.marketingMaterials|length > 0 %}
+                <ul>
+                    {% for material in product.marketingMaterials %}
+                        <li>
+                            <strong>Başlık:</strong> {{ material.title }}<br>
+                            <strong>Açıklama:</strong> {{ material.description }}<br>
+                            <strong>Kampanya Adı:</strong> {{ material.campaignName }}<br>
+                            <strong>Durum:</strong> {{ material.status }}<br>
+                            <strong>Varlık:</strong>
+                            {% if material.asset %}
+                                <a href=\"{{ material.asset.getFullPath() }}\" target=\"_blank\">{{ material.asset.getFilename() }}</a>
+                            {% else %}
+                                Yok
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Reklam materyalleri yok.</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+", "products/detail.html.twig", "/var/www/iwapim/templates/products/detail.html.twig");
+    }
+    
+    public function checkSecurity()
+    {
+        static $tags = array("if" => 26, "for" => 31);
+        static $filters = array("escape" => 9, "length" => 26);
+        static $functions = array("max" => 76);
+
+        try {
+            $this->sandbox->checkSecurity(
+                ['if', 'for'],
+                ['escape', 'length'],
+                ['max']
+            );
+        } catch (SecurityError $e) {
+            $e->setSourceContext($this->source);
+
+            if ($e instanceof SecurityNotAllowedTagError && isset($tags[$e->getTagName()])) {
+                $e->setTemplateLine($tags[$e->getTagName()]);
+            } elseif ($e instanceof SecurityNotAllowedFilterError && isset($filters[$e->getFilterName()])) {
+                $e->setTemplateLine($filters[$e->getFilterName()]);
+            } elseif ($e instanceof SecurityNotAllowedFunctionError && isset($functions[$e->getFunctionName()])) {
+                $e->setTemplateLine($functions[$e->getFunctionName()]);
+            }
+
+            throw $e;
+        }
+
+    }
+}

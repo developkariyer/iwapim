@@ -448,6 +448,8 @@ return [
     'pimcore_bundle_seo_settings_robotstxtput' => [[], ['_controller' => 'Pimcore\\Bundle\\SeoBundle\\Controller\\SettingsController::robotsTxtPutAction'], [], [['text', '/admin/bundle/seo/robots-txt']], [], [], []],
     'pimcore_bundle_glossary_settings_glossary' => [[], ['_controller' => 'Pimcore\\Bundle\\GlossaryBundle\\Controller\\SettingsController::glossaryAction'], [], [['text', '/admin/bundle/glossary/settings/glossary']], [], [], []],
     'pimcore_webdav' => [['path'], ['_controller' => 'Pimcore\\Bundle\\CoreBundle\\Controller\\WebDavController::webdavAction'], ['path' => '.*'], [['variable', '', '.*', 'path', true], ['text', '/asset/webdav']], [], [], []],
+    'products_list' => [[], ['_controller' => 'App\\Controller\\ProductsController::listAction'], [], [['text', '/products']], [], [], []],
+    'product_detail' => [['id'], ['_controller' => 'App\\Controller\\ProductsController::detailAction'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/product']], [], [], []],
     'Pimcore\Bundle\AdminBundle\Controller\Admin\Asset\AssetController::treeGetRootAction' => [[], ['_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\Asset\\AssetController::treeGetRootAction'], [], [['text', '/admin/asset/tree-get-root']], [], [], []],
     'Pimcore\Bundle\AdminBundle\Controller\Admin\Asset\AssetController::deleteInfoAction' => [[], ['_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\Asset\\AssetController::deleteInfoAction'], [], [['text', '/admin/asset/delete-info']], [], [], []],
     'Pimcore\Bundle\AdminBundle\Controller\Admin\Asset\AssetController::getDataByIdAction' => [[], ['_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\Asset\\AssetController::getDataByIdAction'], [], [['text', '/admin/asset/get-data-by-id']], [], [], []],
@@ -870,4 +872,6 @@ return [
     'Pimcore\Bundle\SeoBundle\Controller\SettingsController::robotsTxtGetAction' => [[], ['_controller' => 'Pimcore\\Bundle\\SeoBundle\\Controller\\SettingsController::robotsTxtGetAction'], [], [['text', '/admin/bundle/seo/robots-txt']], [], [], []],
     'Pimcore\Bundle\SeoBundle\Controller\SettingsController::robotsTxtPutAction' => [[], ['_controller' => 'Pimcore\\Bundle\\SeoBundle\\Controller\\SettingsController::robotsTxtPutAction'], [], [['text', '/admin/bundle/seo/robots-txt']], [], [], []],
     'Pimcore\Bundle\GlossaryBundle\Controller\SettingsController::glossaryAction' => [[], ['_controller' => 'Pimcore\\Bundle\\GlossaryBundle\\Controller\\SettingsController::glossaryAction'], [], [['text', '/admin/bundle/glossary/settings/glossary']], [], [], []],
+    'App\Controller\ProductsController::listAction' => [[], ['_controller' => 'App\\Controller\\ProductsController::listAction'], [], [['text', '/products']], [], [], []],
+    'App\Controller\ProductsController::detailAction' => [['id'], ['_controller' => 'App\\Controller\\ProductsController::detailAction'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/product']], [], [], []],
 ];

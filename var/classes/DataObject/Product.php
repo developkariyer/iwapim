@@ -12,6 +12,8 @@
  * - productClass [select]
  * - name [input]
  * - description [textarea]
+ * - variationType [select]
+ * - album [imageGallery]
  * - productWidth [numeric]
  * - productHeight [numeric]
  * - productDepth [numeric]
@@ -41,6 +43,7 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductClass(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByName(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByDescription(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByVariationType(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductWidth(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductHeight(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductDepth(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
@@ -64,6 +67,8 @@ public const FIELD_PRODUCT_CODE = 'productCode';
 public const FIELD_PRODUCT_CLASS = 'productClass';
 public const FIELD_NAME = 'name';
 public const FIELD_DESCRIPTION = 'description';
+public const FIELD_VARIATION_TYPE = 'variationType';
+public const FIELD_ALBUM = 'album';
 public const FIELD_PRODUCT_WIDTH = 'productWidth';
 public const FIELD_PRODUCT_HEIGHT = 'productHeight';
 public const FIELD_PRODUCT_DEPTH = 'productDepth';
@@ -87,6 +92,8 @@ protected $productCode;
 protected $productClass;
 protected $name;
 protected $description;
+protected $variationType;
+protected $album;
 protected $productWidth;
 protected $productHeight;
 protected $productDepth;
@@ -417,6 +424,94 @@ public function setDescription(?string $description): static
 	$this->markFieldDirty("description", true);
 
 	$this->description = $description;
+
+	return $this;
+}
+
+/**
+* Get variationType - Varyasyon Tipi
+* @return string|null
+*/
+public function getVariationType(): ?string
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("variationType");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->variationType;
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("variationType")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("variationType");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set variationType - Varyasyon Tipi
+* @param string|null $variationType
+* @return $this
+*/
+public function setVariationType(?string $variationType): static
+{
+	$this->markFieldDirty("variationType", true);
+
+	$this->variationType = $variationType;
+
+	return $this;
+}
+
+/**
+* Get album - Ürün Görselleri
+* @return \Pimcore\Model\DataObject\Data\ImageGallery|null
+*/
+public function getAlbum(): ?\Pimcore\Model\DataObject\Data\ImageGallery
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("album");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->album;
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("album")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("album");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set album - Ürün Görselleri
+* @param \Pimcore\Model\DataObject\Data\ImageGallery|null $album
+* @return $this
+*/
+public function setAlbum(?\Pimcore\Model\DataObject\Data\ImageGallery $album): static
+{
+	$this->markFieldDirty("album", true);
+
+	$this->album = $album;
 
 	return $this;
 }
