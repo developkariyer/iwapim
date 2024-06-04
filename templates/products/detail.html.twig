@@ -8,7 +8,7 @@
         <div class="card-body">
             <h1>
                 {% if parentProduct %}
-                    {{ parentProduct.key }} {{ parentProduct.name }}
+                    {{ parentProduct.key }} {{ parentProduct.name }}<i>
                     {% if product.variationType == 'size' %}
                         Ebat
                     {% elseif product.variationType == 'color' %}
@@ -19,7 +19,7 @@
                     : {{ product.key }}
                 {% else %}
                     {{ product.key }} {{ product.name }}
-                {% endif %}
+                {% endif %}</i>
                 ({{ product.productClass }})
             </h1>
             <div class="row">
