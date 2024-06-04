@@ -5,9 +5,6 @@
 
 {% block content %}
     <div class="card card-custom">
-        {% if product.picture %}
-            <img src="{{ product.picture.getThumbnail('default') }}" class="card-img-top" alt="{{ product.name }}">
-        {% endif %}
         <div class="card-body">
             <h1 class="card-title">{{ product.name }}</h1>
             <p class="card-text">{{ product.description }}</p>
@@ -16,5 +13,8 @@
             <p><strong>Dimensions:</strong> {{ product.productWidth }} x {{ product.productHeight }} x {{ product.productDepth }}</p>
             <p><strong>Weight:</strong> {{ product.productWeight }}</p>
         </div>
+        {% if product.picture %}
+            <img src="{{ product.picture.getFullPath() }}" class="card-img-bottom" alt="{{ product.name }}">
+        {% endif %}
     </div>
 {% endblock %}
