@@ -44,8 +44,7 @@
                                                             Renk:
                                                         {% else %}
                                                             {{ child.variationType }}:
-                                                        {% endif %}
-                                                        {{ child.key }}
+                                                        {% endif %}<a href="{{ path('product_detail', {'id': child.id}) }}" target="_blank">{{ child.key }}</a>
                                                     </li>
                                                 {% endfor %}
                                             </ul>
