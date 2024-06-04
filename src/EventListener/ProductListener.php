@@ -10,14 +10,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProductListener implements EventSubscriberInterface
 {
 
-    private function picturePath($object)
-    {
-        if ($object instanceof Product) {
-            return '/products/' . $object->getProductCode() . '/images/';
-        }
-        return null;
-    }
-
     public static function getSubscribedEvents()
     {
         return [
@@ -34,11 +26,6 @@ class ProductListener implements EventSubscriberInterface
             if (!$object->getProductCode()) {
                 $object->setProductCode($this->generateUniqueCode());
             }
-            if ($picture = $object->getPicture()) {
-                error_log(print_r($picture, true));
-                $picture->setPath($this->picturePath($object));
-                $picture->setCustomUploadPath($this->picturePath($object));
-            }
         }
     }
 
@@ -54,11 +41,6 @@ class ProductListener implements EventSubscriberInterface
                 }
                 $iwasku = "{$topMostProduct->getProductClass()}_{$topMostProduct->getProductCode()}_{$object->getProductCode()}";
                 $object->setIwasku($iwasku);
-            }
-            if ($picture = $object->getPicture()) {
-                error_log(print_r($picture, true));
-                $picture->setPath($this->picturePath($object));
-                $picture->setCustomUploadPath($this->picturePath($object));
             }
         }
     }
