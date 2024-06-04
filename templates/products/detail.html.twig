@@ -145,31 +145,34 @@
 
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <h2>Alt Ürünler (Varyasyonlar)</h2>
+            <h2>Ebat Varyasyonları</h2>
+            {% set colorVariationsFound = false %}
             {% if product.children|length > 0 %}
                 <div class="row">
                     {% for child in product.children %}
-                        <div class="col-md-4">
-                            <div class="card card-custom mb-3">
-                                <div class="card-body">
-                                    <h5>{{ child.name }}</h5>
-                                    {% if child.picture %}
-                                        <a href="{{ child.picture.getFullPath() }}" target="_blank">
-                                            <img src="{{ child.picture.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
-                                        </a>
-                                    {% endif %}
-                                    <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
-                                    <p><strong>Ürün Sınıfı:</strong> {{ child.productClass }}</p>
-                                    <p><strong>IWASKU:</strong> {{ child.iwasku }}</p>
-                                    <p><strong>Aktif:</strong> {{ child.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
-                                    <p><strong>Açıklama:</strong> {{ child.description }}</p>
+                        {% if child.variationType == 'size' %}
+                            {% set colorVariationsFound = true %}
+                            <div class="col-md-3">
+                                <div class="card card-custom mb-3">
+                                    <div class="card-body">
+                                        <h5>{{ child.key }}</h5>
+                                        {% if child.picture %}
+                                            <a href="{{ child.picture.getFullPath() }}" target="_blank">
+                                                <img src="{{ child.picture.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
+                                            </a>
+                                        {% endif %}
+                                        <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
+                                        <p><strong>IWASKU:</strong> {{ child.iwasku }}</p>
+                                        <p><strong>Aktif:</strong> {{ child.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
-            {% else %}
-                <p>Alt ürün yok.</p>
+            {% endif %}
+            {% if not colorVariationsFound %}
+                <p>Ebat seçeneği yok.</p>
             {% endif %}
         </div>
     </div>
