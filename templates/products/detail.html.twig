@@ -6,14 +6,12 @@
 {% block content %}
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start">
-                <h1>{{ product.key }} {{ product.name }}</h1>
-                {% if product.picture %}
-                    <a href="{{ product.picture.getFullPath() }}" target="_blank">
-                        <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail" alt="{{ product.name }}" style="max-width: 150px;">
-                    </a>
-                {% endif %}
-            </div>
+            <h1>{{ product.key }} {{ product.name }}</h1>
+            {% if product.picture %}
+                <a href="{{ product.picture.getFullPath() }}" target="_blank">
+                    <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail float-end ms-3 mb-3" alt="{{ product.name }}" style="max-width: 150px;">
+                </a>
+            {% endif %}
             <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
             <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
             <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
