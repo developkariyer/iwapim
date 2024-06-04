@@ -21,11 +21,11 @@
             {% for product in products %}
                 <div class="product-item" data-class="{{ product.getProductClass }}">
                     <div class="card mb-3">
+                        <a href="{{ path('product_detail', {'id': product.id}) }}" target="_blank">
                         <div class="row g-0">
                             {% if product.picture %}
                                 <div class="col-md-2">
                                     <img src="{{ product.picture.getThumbnail('listpage') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
-                                    <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">Detayları Gör</a>
                                 </div>
                             {% endif %}
                             <div class="col-md-5">
@@ -42,6 +42,7 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endfor %}
