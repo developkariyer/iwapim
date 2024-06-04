@@ -51,8 +51,8 @@
                         <td>{{ product.packegeHeight }}</td>
                         <td>{{ product.packageDepth }}</td>
                         <td>{{ product.packageWeight }}</td>
-                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth) / 3000) }}</td>
-                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth) / 5000) }}</td>
+                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 3000 }}</td>
+                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 5000 }}</td>
                     </tr>
                 </tbody>
             </table>
