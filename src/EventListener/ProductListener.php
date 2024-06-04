@@ -9,6 +9,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProductListener implements EventSubscriberInterface
 {
+
+    private function picturePath($object)
+    {
+        if ($object instanceof Product) {
+            return '/products/' . $object->getProductCode() . '/images/';
+        }
+        return null;
+    }
+
     public static function getSubscribedEvents()
     {
         return [
@@ -25,7 +34,9 @@ class ProductListener implements EventSubscriberInterface
             if (!$object->getProductCode()) {
                 $object->setProductCode($this->generateUniqueCode());
             }
-            $this->setCustomUploadPath($object);
+            if ($picture = $object->getPicture()) {
+                $picture->setUploadPath($this->picturePath($object);
+            }
         }
     }
 
@@ -42,7 +53,9 @@ class ProductListener implements EventSubscriberInterface
                 $iwasku = "{$topMostProduct->getProductClass()}_{$topMostProduct->getProductCode()}_{$object->getProductCode()}";
                 $object->setIwasku($iwasku);
             }
-            $this->setCustomUploadPath($object);
+            if ($picture = $object->getPicture()) {
+                $picture->setUploadPath($this->picturePath($object);
+            }
         }
     }
 
@@ -86,17 +99,6 @@ class ProductListener implements EventSubscriberInterface
         $listing = new Listing();
         $listing->setCondition('productCode = ?', [$productCode]);
         return $listing->count() > 0;
-    }
-
-    private function setCustomUploadPath(Product $product)
-    {
-        $image = $product->getPicture();
-        if ($image) {
-            $newPath = '/products/' . $product->getProductCode() . '/images/';
-            $image->setCustomUploadPath(function () use ($newPath) {
-                return $newPath;
-            });
-        }
     }
 
 }
