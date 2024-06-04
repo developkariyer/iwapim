@@ -4,7 +4,14 @@
 {% block title %}Product Detail{% endblock %}
 
 {% block content %}
-    <h1>{{ product.name }}</h1>
+    <div class="d-flex justify-content-between align-items-start">
+        <h1>{{ product.name }}</h1>
+        {% if product.picture %}
+            <a href="{{ product.picture.getFullPath() }}" target="_blank">
+                <img src="{{ product.picture.getThumbnail('thumbnail') }}" class="img-thumbnail" alt="{{ product.name }}" style="max-width: 150px;">
+            </a>
+        {% endif %}
+    </div>
 
     <ul class="nav nav-tabs" id="productTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -18,6 +25,9 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="marketing-tab" data-bs-toggle="tab" data-bs-target="#marketing" type="button" role="tab" aria-controls="marketing" aria-selected="false">Marketing</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="listing-tab" data-bs-toggle="tab" data-bs-target="#listing" type="button" role="tab" aria-controls="listing" aria-selected="false">Listing</button>
         </li>
     </ul>
     <div class="tab-content" id="productTabContent">
@@ -38,10 +48,11 @@
             <p><strong>SEO Keywords:</strong> {{ product.seoKeywords }}</p>
         </div>
         <div class="tab-pane fade" id="marketing" role="tabpanel" aria-labelledby="marketing-tab">
+            <p><strong>Marketing Materials:</strong> Coming soon</p>
         </div>
+        <div class="tab-pane fade" id="listing" role="tabpanel" aria-labelledby="listing-tab">
+            <p><strong>Listings:</strong> Coming soon</p>
+        </div>
+        
     </div>
-
-    {% if product.picture %}
-        <img src="{{ product.picture.getFullPath() }}" class="img-fluid mt-3" alt="{{ product.name }}">
-    {% endif %}
 {% endblock %}
