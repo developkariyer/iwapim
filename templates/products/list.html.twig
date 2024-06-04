@@ -45,7 +45,7 @@
                                                         {% else %}
                                                             {{ child.variationType }}:
                                                         {% endif %}
-                                                        <a href="{{ path('product_detail', {'id': child.id}) }}" target="_blank">{{ child.key }}</a>
+                                                        {{ child.key }}
                                                     </li>
                                                 {% endfor %}
                                             </ul>
