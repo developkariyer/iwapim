@@ -8,7 +8,7 @@
         <div class="card-body">
             <h1>{{ product.key }} {{ product.name }}</h1>
             {% if product.picture %}
-                <a href="{{ product.picture.getFullPath() }}" target="_blank">
+                <a href="{{ product.picture.getThumbnail('etsy') }}" target="_blank">
                     <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail float-end ms-3 mb-3" alt="{{ product.name }}" style="max-width: 150px;">
                 </a>
             {% endif %}
