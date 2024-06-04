@@ -23,17 +23,45 @@
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Ebatlar</h2>
-            <p><strong>En:</strong> {{ product.productWidth }}</p>
-            <p><strong>Boy:</strong> {{ product.productHeight }}</p>
-            <p><strong>Derinlik:</strong> {{ product.productDepth }}</p>
-            <p><strong>Ağırlık:</strong> {{ product.productWeight }}</p>
-            <h3>Paket (Kutu)</h3>
-            <p><strong>En:</strong> {{ product.packageWidth }}</p>
-            <p><strong>Boy:</strong> {{ product.packegeHeight }}</p>
-            <p><strong>Yükseklik:</strong> {{ product.packageDepth }}</p>
-            <p><strong>Ağırlık:</strong> {{ product.packageWeight }}</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Ürün</th>
+                        <th>Paket (Kutu)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>En</strong></td>
+                        <td>{{ product.productWidth }}</td>
+                        <td>{{ product.packageWidth }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Boy</strong></td>
+                        <td>{{ product.productHeight }}</td>
+                        <td>{{ product.packegeHeight }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Derinlik</strong></td>
+                        <td>{{ product.productDepth }}</td>
+                        <td>{{ product.packageDepth }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ağırlık</strong></td>
+                        <td>{{ product.productWeight }}</td>
+                        <td>{{ product.packageWeight }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desi</strong></td>
+                        <td>{{ (product.productWidth * product.productHeight * product.productDepth) / 3000 }}</td>
+                        <td>{{ (product.packageWidth * product.packegeHeight * product.packageDepth) / 3000 }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+
 
     <div class="card card-custom mb-3">
         <div class="card-body">
