@@ -106,9 +106,10 @@
                             <div class="card card-custom mb-3">
                                 <div class="card-body">
                                     <h5>{{ child.key }}</h5>
-                                    {% if child.picture %}
-                                        <a href="{{ child.picture.getFullPath() }}" target="_blank">
-                                            <img src="{{ child.picture.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
+                                    {% if child.album|length > 0 %}
+                                        {% set firstImage = child.album[0].image %}
+                                        <a href="{{ firstImage.getFullPath() }}" target="_blank">
+                                            <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
                                         </a>
                                     {% endif %}
                                     <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
@@ -147,9 +148,10 @@
                             <div class="card card-custom mb-3">
                                 <div class="card-body">
                                     <h5>{{ child.key }}</h5>
-                                    {% if child.picture %}
-                                        <a href="{{ child.picture.getFullPath() }}" target="_blank">
-                                            <img src="{{ child.picture.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
+                                    {% if child.album|length > 0 %}
+                                        {% set firstImage = child.album[0].image %}
+                                        <a href="{{ firstImage.getFullPath() }}" target="_blank">
+                                            <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
                                         </a>
                                     {% endif %}
                                     <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
