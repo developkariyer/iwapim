@@ -6,17 +6,22 @@
 {% block content %}
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <h1>{{ product.key }} {{ product.name }}</h1>
-            {% if product.picture %}
-                <a href="{{ product.picture.getFullPath() }}" target="_blank">
-                    <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail float-end ms-3 mb-3" alt="{{ product.name }}" style="max-width: 150px;">
-                    </a>
-            {% endif %}
-            <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
-            <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
-            <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
-            <p><strong>Aktif:</strong> {{ product.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
-            <p><strong>Açıklama:</strong> {{ product.description }}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h1>{{ product.key }} {{ product.name }}</h1>
+                    <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
+                    <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
+                    <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
+                    <p><strong>Aktif:</strong> {{ product.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                    <p><strong>Açıklama:</strong> {{ product.description }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h2>SEO</h2>
+                    <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
+                    <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
+                    <p><strong>SEO Anahtar Kelimeler:</strong> {{ product.seoKeywords }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -38,7 +43,6 @@
             </div>
         </div>
     {% endif %}
-
 
     <div class="card card-custom mb-3">
         <div class="card-body">
@@ -76,15 +80,6 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-
-    <div class="card card-custom mb-3">
-        <div class="card-body">
-            <h2>SEO</h2>
-            <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
-            <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
-            <p><strong>SEO Anahtar Kelimeler:</strong> {{ product.seoKeywords }}</p>
         </div>
     </div>
 
