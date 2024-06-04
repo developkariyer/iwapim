@@ -1,5 +1,5 @@
 # remove the following ignores for your project
-/config/pimcore/constants.php
+#/config/pimcore/constants.php
 
 # symfony default
 /.web-server-pid
@@ -13,24 +13,24 @@
 /.env.local.php
 /.env.*.local
 !/config/local
-/config/local/*
+#/config/local/*
 !config/local/.gitkeep
 
-/var/*
+#/var/*
 !/var/.gitkeep
 !/var/classes/
-/var/classes/DataObject
+#/var/classes/DataObject
 
 !/var/config
-/var/config/system.yml
-/var/config/maintenance.php
+#/var/config/system.yml
+#/var/config/maintenance.php
 
 # project specific recommendations
-/var/config/tag-manager.php
-/var/config/reports.php
+#/var/config/tag-manager.php
+#/var/config/reports.php
 
 
-/public/var/
+#/public/var/
 /public/sitemap*.xml
 
 # PHP-CS-Fixer
