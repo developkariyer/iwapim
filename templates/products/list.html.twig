@@ -25,6 +25,7 @@
                             {% if product.picture %}
                                 <div class="col-md-2">
                                     <img src="{{ product.picture.getThumbnail('listpage') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+                                    <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">Detayları Gör</a>
                                 </div>
                             {% endif %}
                             <div class="col-md-5">
@@ -33,12 +34,11 @@
                                     <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
                                     <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
                                     <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
+                                    <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="card-body">
-                                    <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
-                                    <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">Detayları Gör</a>
                                 </div>
                             </div>
                         </div>
