@@ -1,15 +1,15 @@
 {# templates/products/list.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Products List{% endblock %}
+{% block title %}Ürün Listesi{% endblock %}
 
 {% block content %}
-    <h1>Products</h1>
+    <h1>Ürünler</h1>
 
     <div class="mb-3">
-        <label for="productClassSelect" class="form-label">Select Product Class</label>
+        <label for="productClassSelect" class="form-label">Ürün Sınıfını Seçin</label>
         <select id="productClassSelect" class="form-select" onchange="filterProductsByClass(this.value)">
-            <option value="">All Classes</option>
+            <option value="">Tüm Sınıflar</option>
             {% for productClass in productClasses %}
                 <option value="{{ productClass.key }}">{{ productClass.productClassName }}</option>
             {% endfor %}
@@ -25,9 +25,12 @@
                             <img src="{{ product.picture.getThumbnail('default') }}" class="card-img-top" alt="{{ product.name }}">
                         {% endif %}
                         <div class="card-body">
-                            <h5 class="card-title">{{ product.name }}</h5>
+                            <h5 class="card-title">{{ product.key }} {{ product.name }}</h5>
+                            <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
+                            <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
+                            <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
                             <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
-                            <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">View Details</a>
+                            <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">Detayları Gör</a>
                         </div>
                     </div>
                 </div>
