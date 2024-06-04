@@ -23,11 +23,11 @@
                     <div class="card mb-3">
                         <div class="row g-0">
                             {% if product.picture %}
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <img src="{{ product.picture.getThumbnail('default') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
                                 </div>
                             {% endif %}
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ product.key }} {{ product.name }}</h5>
                                     <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
@@ -35,7 +35,7 @@
                                     <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card-body">
                                     <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
                                     <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">Detayları Gör</a>
