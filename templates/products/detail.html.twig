@@ -1,55 +1,97 @@
 {# templates/products/detail.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Product Detail{% endblock %}
+{% block title %}Ürün Detayı{% endblock %}
 
 {% block content %}
     <div class="card card-custom mb-3">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start">
-                <h1>{{ product.name }}</h1>
+                <h1>{{ product.key }} {{ product.name }}</h1>
                 {% if product.picture %}
                     <a href="{{ product.picture.getFullPath() }}" target="_blank">
                         <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail" alt="{{ product.name }}" style="max-width: 150px;">
                     </a>
                 {% endif %}
             </div>
-            <p><strong>Product Code:</strong> {{ product.productCode }}</p>
-            <p><strong>Product Class:</strong> {{ product.productClass }}</p>
-            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
+            <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
+            <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
+            <p><strong>Aktif:</strong> {{ product.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+            <p><strong>Açıklama:</strong> {{ product.description }}</p>
         </div>
     </div>
 
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <h2>Dimensions</h2>
-            <p><strong>Width:</strong> {{ product.productWidth }}</p>
-            <p><strong>Height:</strong> {{ product.productHeight }}</p>
-            <p><strong>Depth:</strong> {{ product.productDepth }}</p>
-            <p><strong>Weight:</strong> {{ product.productWeight }}</p>
+            <h2>Ebatlar</h2>
+            <p><strong>En:</strong> {{ product.productWidth }}</p>
+            <p><strong>Boy:</strong> {{ product.productHeight }}</p>
+            <p><strong>Derinlik:</strong> {{ product.productDepth }}</p>
+            <p><strong>Ağırlık:</strong> {{ product.productWeight }}</p>
+            <h3>Paket (Kutu)</h3>
+            <p><strong>En:</strong> {{ product.packageWidth }}</p>
+            <p><strong>Boy:</strong> {{ product.packegeHeight }}</p>
+            <p><strong>Yükseklik:</strong> {{ product.packageDepth }}</p>
+            <p><strong>Ağırlık:</strong> {{ product.packageWeight }}</p>
         </div>
     </div>
 
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>SEO</h2>
-            <p><strong>SEO Title:</strong> {{ product.seoTitle }}</p>
-            <p><strong>SEO Description:</strong> {{ product.seoDescription }}</p>
-            <p><strong>SEO Keywords:</strong> {{ product.seoKeywords }}</p>
+            <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
+            <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
+            <p><strong>SEO Anahtar Kelimeler:</strong> {{ product.seoKeywords }}</p>
         </div>
     </div>
 
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <h2>Marketing</h2>
-            <p><strong>Marketing Materials:</strong> Coming soon</p>
+            <h2>Set İçeriği</h2>
+            {% if product.bundleItems|length > 0 %}
+                <ul>
+                    {% for item in product.bundleItems %}
+                        <li>{{ item.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Set içeriği yok.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card-custom mb-3">
+        <div class="card-body">
+            <h2>Reklam</h2>
+            {% if product.marketingMaterials|length > 0 %}
+                <ul>
+                    {% for material in product.marketingMaterials %}
+                        <li>
+                            <strong>Başlık:</strong> {{ material.title }}<br>
+                            <strong>Açıklama:</strong> {{ material.description }}<br>
+                            <strong>Kampanya Adı:</strong> {{ material.campaignName }}<br>
+                            <strong>Durum:</strong> {{ material.status }}<br>
+                            <strong>Varlık:</strong>
+                            {% if material.asset %}
+                                <a href="{{ material.asset.getFullPath() }}" target="_blank">{{ material.asset.getFilename() }}</a>
+                            {% else %}
+                                Yok
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Reklam materyalleri yok.</p>
+            {% endif %}
         </div>
     </div>
 
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Listing</h2>
-            <p><strong>Listings:</strong> Coming soon</p>
+            <p>Listing henüz hazır değil.</p>
         </div>
     </div>
+
 {% endblock %}
