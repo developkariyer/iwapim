@@ -35,9 +35,20 @@
                                 <div class="card-body">
                                 </div>
                             </div>
-                            {% if product.picture %}
+                            {% set firstImage = null %}
+                            {% if product.album|length > 0 %}
+                                {% set firstImage = product.album[0].image %}
+                            {% else %}
+                                {% for child in product.children %}
+                                    {% if child.album|length > 0 %}
+                                        {% set firstImage = child.album[0].image %}
+                                        {% break %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if firstImage %}
                                 <div class="col-md-2 text-end">
-                                    <img src="{{ product.picture.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ product.name }}">
+                                    <img src="{{ firstImage.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ product.name }}">
                                 </div>
                             {% endif %}
                         </div>

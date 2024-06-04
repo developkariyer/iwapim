@@ -23,7 +23,7 @@
         </div>
     </div>
 
-   {% if product.album|length > 0 %}
+    {% if product.album|length > 0 %}
         <div class="card card-custom mb-3">
             <div class="card-body">
                 <h2>Ürün Görselleri</h2>
@@ -184,11 +184,23 @@
         <div class="card-body">
             <h2>Set İçeriği</h2>
             {% if product.bundleItems|length > 0 %}
-                <ul>
+                <div class="row">
                     {% for item in product.bundleItems %}
-                        <li>{{ item.name }}</li>
+                        <div class="col-md-3">
+                            <div class="card card-custom mb-3">
+                                <div class="card-body">
+                                    <h5>{{ item.key }} {{ item.name }}</h5>
+                                    {% if item.album|length > 0 %}
+                                        {% set firstImage = item.album[0].image %}
+                                        <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ item.name }}" style="max-width: 150px;">
+                                    {% endif %}
+                                    <p><strong>Ürün Kodu:</strong> {{ item.productCode }}</p>
+                                    <p><strong>IWASKU:</strong> {{ item.iwasku }}</p>
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
-                </ul>
+                </div>
             {% else %}
                 <p>Set içeriği yok.</p>
             {% endif %}
