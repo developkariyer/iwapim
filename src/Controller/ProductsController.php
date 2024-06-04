@@ -5,7 +5,6 @@ namespace App\Controller;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\ProductClass;
 use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,12 +25,21 @@ class ProductsController extends FrontendController
         // Fetch the products
         $productList = $products->load();
 
+        // Filter out child products
+        $parentProducts = [];
+        foreach ($productList as $product) {
+            if ($product->getParent() instanceof Product) {
+                continue; // Skip child products
+            }
+            $parentProducts[] = $product;
+        }
+
         // Fetch product classes
         $productClassListing = new ProductClassListing();
         $productClasses = $productClassListing->load();
 
         return $this->render('products/list.html.twig', [
-            'products' => $productList,
+            'products' => $parentProducts,
             'productClasses' => $productClasses,
         ]);
     }
