@@ -36,6 +36,7 @@ class ProductListener implements EventSubscriberInterface
             }
             if ($picture = $object->getPicture()) {
                 error_log(print_r($picture, true));
+                $picture->setPath($this->picturePath($object);
                 //$picture->setUploadPath($this->picturePath($object));
             }
         }
@@ -56,6 +57,7 @@ class ProductListener implements EventSubscriberInterface
             }
             if ($picture = $object->getPicture()) {
                 error_log(print_r($picture, true));
+                $picture->setPath($this->picturePath($object);
                 //$picture->setUploadPath($this->picturePath($object));
             }
         }
