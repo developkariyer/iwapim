@@ -19,9 +19,11 @@ class ProductsController extends FrontendController
     {
         // Create a new Listing object
         $products = new Listing();
-        $products->setOrderKey('productCode, key'); 
-        $products->setOrder('asc'); 
-
+        $queryBuilder = $products->onCreateQuery(function (\Doctrine\DBAL\Query\QueryBuilder $builder) {
+            $builder->orderBy('productCode', 'ASC');
+            $builder->addOrderBy('key', 'ASC');
+        });
+        
         // Fetch the products
         $productList = $products->load();
 
