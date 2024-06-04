@@ -20,7 +20,7 @@
         <div class="row">
             {% for product in products %}
                 <div class="product-item" data-class="{{ product.getProductClass }}">
-                    <div class="card mb-3">
+                    <div class="card mb-3 p-0">
                         <a href="{{ path('product_detail', {'id': product.id}) }}" target="_blank" class="text-decoration-none text-dark">
                         <div class="row g-0">
                             <div class="col-md-5">
