@@ -4,13 +4,17 @@
 {% block title %}Product Detail{% endblock %}
 
 {% block content %}
-    <h1>{{ product.name }}</h1>
-    {% if product.picture %}
-        <img src="{{ product.picture.getThumbnail('default') }}" alt="{{ product.name }}" class="img-fluid">
-    {% endif %}
-    <p>{{ product.description }}</p>
-    <p>Product Code: {{ product.productCode }}</p>
-    <p>Product Class: {{ product.productClass }}</p>
-    <p>Dimensions: {{ product.productWidth }} x {{ product.productHeight }} x {{ product.productDepth }}</p>
-    <p>Weight: {{ product.productWeight }}</p>
+    <div class="card card-custom">
+        {% if product.picture %}
+            <img src="{{ product.picture.getThumbnail('default') }}" class="card-img-top" alt="{{ product.name }}">
+        {% endif %}
+        <div class="card-body">
+            <h1 class="card-title">{{ product.name }}</h1>
+            <p class="card-text">{{ product.description }}</p>
+            <p><strong>Product Code:</strong> {{ product.productCode }}</p>
+            <p><strong>Product Class:</strong> {{ product.productClass }}</p>
+            <p><strong>Dimensions:</strong> {{ product.productWidth }} x {{ product.productHeight }} x {{ product.productDepth }}</p>
+            <p><strong>Weight:</strong> {{ product.productWeight }}</p>
+        </div>
+    </div>
 {% endblock %}

@@ -3,15 +3,29 @@
 
 {% block title %}Products List{% endblock %}
 
+{% block productClass %}
+<ul class="list-group">
+    {% for productClass in productClasses %}
+        <li class="list-group-item">{{ productClass }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
 {% block content %}
-    <h1>Products</h1>
-    <ul class="list-group">
+    <div class="row">
         {% for product in products %}
-            <li class="list-group-item">
-                <a href="{{ path('product_detail', {'id': product.id}) }}">
-                    {{ product.name }}
-                </a>
-            </li>
+            <div class="col-md-4">
+                <div class="card card-custom">
+                    {% if product.picture %}
+                        <img src="{{ product.picture.getThumbnail('default') }}" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
+                        <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}

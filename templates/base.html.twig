@@ -9,32 +9,44 @@
     <link rel="stylesheet" href="{{ asset('bundles/bootstrap/icons/font/bootstrap-icons.css') }}">
     {% block stylesheets %}
     {% endblock %}
+    <style>
+        .search-bar {
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        .card-custom {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Features</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Pricing</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="container">
+        <form class="search-bar">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for products...">
+                <button class="btn btn-primary" type="button"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+
+        {% block accordion %}
+        <div class="accordion" id="productClassAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Product Classes
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#productClassAccordion">
+                    <div class="accordion-body">
+                        {% block productClass %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+
         {% block content %}
         {% endblock %}
     </div>

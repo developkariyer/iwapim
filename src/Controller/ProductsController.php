@@ -16,16 +16,22 @@ class ProductsController extends FrontendController
      */
     public function listAction(Request $request): Response
     {
-        // Create a new Listing object
         $products = new Listing();
-        $products->setOrderKey('name'); // Example: Order by name
-        $products->setOrder('asc'); // Example: Order ascending
+        $products->setOrderKey('name'); 
+        $products->setOrder('asc'); 
 
-        // Fetch the products
         $productList = $products->load();
+
+        $productClasses = [];
+        foreach ($productList as $product) {
+            if (!in_array($product->getProductClass(), $productClasses)) {
+                $productClasses[] = $product->getProductClass();
+            }
+        }
 
         return $this->render('products/list.html.twig', [
             'products' => $productList,
+            'productClasses' => $productClasses,
         ]);
     }
 
