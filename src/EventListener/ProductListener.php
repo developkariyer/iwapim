@@ -35,7 +35,8 @@ class ProductListener implements EventSubscriberInterface
                 $object->setProductCode($this->generateUniqueCode());
             }
             if ($picture = $object->getPicture()) {
-                $picture->setUploadPath($this->picturePath($object));
+                error_log(print_r($picture, true));
+                //$picture->setUploadPath($this->picturePath($object));
             }
         }
     }
@@ -54,7 +55,8 @@ class ProductListener implements EventSubscriberInterface
                 $object->setIwasku($iwasku);
             }
             if ($picture = $object->getPicture()) {
-                $picture->setUploadPath($this->picturePath($object));
+                error_log(print_r($picture, true));
+                //$picture->setUploadPath($this->picturePath($object));
             }
         }
     }
