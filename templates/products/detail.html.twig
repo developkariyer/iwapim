@@ -27,41 +27,34 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Ürün</th>
-                        <th>Paket (Kutu)</th>
+                        <th>En</th>
+                        <th>Boy</th>
+                        <th>Derinlik</th>
+                        <th>Ağırlık</th>
+                        <th>Desi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>En</strong></td>
+                        <td><strong>Ürün</strong></td>
                         <td>{{ product.productWidth }}</td>
-                        <td>{{ product.packageWidth }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Boy</strong></td>
                         <td>{{ product.productHeight }}</td>
-                        <td>{{ product.packegeHeight }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Derinlik</strong></td>
                         <td>{{ product.productDepth }}</td>
-                        <td>{{ product.packageDepth }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Ağırlık</strong></td>
                         <td>{{ product.productWeight }}</td>
-                        <td>{{ product.packageWeight }}</td>
+                        <td>{{ (product.productWidth * product.productHeight * product.productDepth) / 3000 }}</td>
                     </tr>
                     <tr>
-                        <td><strong>Desi</strong></td>
-                        <td>{{ (product.productWidth * product.productHeight * product.productDepth) / 3000 }}</td>
+                        <td><strong>Paket (Kutu)</strong></td>
+                        <td>{{ product.packageWidth }}</td>
+                        <td>{{ product.packegeHeight }}</td>
+                        <td>{{ product.packageDepth }}</td>
+                        <td>{{ product.packageWeight }}</td>
                         <td>{{ (product.packageWidth * product.packegeHeight * product.packageDepth) / 3000 }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
 
     <div class="card card-custom mb-3">
         <div class="card-body">
