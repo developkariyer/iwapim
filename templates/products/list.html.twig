@@ -21,7 +21,7 @@
             {% for product in products %}
                 <div class="product-item" data-class="{{ product.getProductClass }}">
                     <div class="card mb-3">
-                        <a href="{{ path('product_detail', {'id': product.id}) }}" target="_blank">
+                        <a href="{{ path('product_detail', {'id': product.id}) }}" target="_blank" class="text-decoration-none">
                         <div class="row g-0">
                             {% if product.picture %}
                                 <div class="col-md-2">
