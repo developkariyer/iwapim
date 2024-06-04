@@ -11,7 +11,7 @@
         <select id="productClassSelect" class="form-select" onchange="filterProductsByClass(this.value)">
             <option value="">Tüm Sınıflar</option>
             {% for productClass in productClasses %}
-                <option value="{{ productClass.key }}">{{ productClass.productClassName }}</option>
+                <option value="{{ productClass.key }}">{{ productClass.productClassName }} ({{ productClass.key }})</option>
             {% endfor %}
         </select>
     </div>

@@ -31,7 +31,8 @@
                         <th>Boy</th>
                         <th>Derinlik</th>
                         <th>Ağırlık</th>
-                        <th>Desi</th>
+                        <th>Kara Desi</th>
+                        <th>Hava/Deniz Desi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +42,8 @@
                         <td>{{ product.productHeight }}</td>
                         <td>{{ product.productDepth }}</td>
                         <td>{{ product.productWeight }}</td>
-                        <td>{{ (product.productWidth * product.productHeight * product.productDepth) / 3000 }}</td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td><strong>Paket (Kutu)</strong></td>
@@ -49,7 +51,8 @@
                         <td>{{ product.packegeHeight }}</td>
                         <td>{{ product.packageDepth }}</td>
                         <td>{{ product.packageWeight }}</td>
-                        <td>{{ (product.packageWidth * product.packegeHeight * product.packageDepth) / 3000 }}</td>
+                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth) / 3000) }}</td>
+                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth) / 5000) }}</td>
                     </tr>
                 </tbody>
             </table>
