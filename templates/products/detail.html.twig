@@ -106,8 +106,11 @@
                             <div class="card card-custom mb-3">
                                 <div class="card-body">
                                     <h5>{{ child.key }}</h5>
-                                    {% if child.album|length > 0 %}
-                                        {% set firstImage = child.album[0].image %}
+                                    {% set firstImage = null %}
+                                    {% if child.album and child.album.items|length > 0 %}
+                                        {% set firstImage = child.album.items[0].image %}
+                                    {% endif %}
+                                    {% if firstImage %}
                                         <a href="{{ firstImage.getFullPath() }}" target="_blank">
                                             <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
                                         </a>
@@ -137,7 +140,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Ebat Varyasyonları</h2>
@@ -148,8 +151,11 @@
                             <div class="card card-custom mb-3">
                                 <div class="card-body">
                                     <h5>{{ child.key }}</h5>
-                                    {% if child.album|length > 0 %}
-                                        {% set firstImage = child.album[0].image %}
+                                    {% set firstImage = null %}
+                                    {% if child.album and child.album.items|length > 0 %}
+                                        {% set firstImage = child.album.items[0].image %}
+                                    {% endif %}
+                                    {% if firstImage %}
                                         <a href="{{ firstImage.getFullPath() }}" target="_blank">
                                             <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
                                         </a>
@@ -179,7 +185,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Set İçeriği</h2>
@@ -190,8 +196,11 @@
                             <div class="card card-custom mb-3">
                                 <div class="card-body">
                                     <h5>{{ item.key }} {{ item.name }}</h5>
-                                    {% if item.album|length > 0 %}
-                                        {% set firstImage = item.album[0].image %}
+                                    {% set firstImage = null %}
+                                    {% if item.album and item.album.items|length > 0 %}
+                                        {% set firstImage = item.album.items[0].image %}
+                                    {% endif %}
+                                    {% if firstImage %}
                                         <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ item.name }}" style="max-width: 150px;">
                                     {% endif %}
                                     <p><strong>Ürün Kodu:</strong> {{ item.productCode }}</p>
@@ -206,7 +215,7 @@
             {% endif %}
         </div>
     </div>
-
+    
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Listing</h2>
