@@ -36,12 +36,12 @@
                                     </div>
                                 </div>
                                 {% set firstImage = null %}
-                                {% if product.album|length > 0 %}
-                                    {% set firstImage = product.album[0].image %}
+                                {% if product.album and product.album.items|length > 0 %}
+                                    {% set firstImage = product.album.items[0].image %}
                                 {% else %}
-                                    {% for child in product.children %}
-                                        {% if child.album|length > 0 %}
-                                            {% set firstImage = child.album[0].image %}
+                                    {% for child in product.children if not firstImage %}
+                                        {% if child.album and child.album.items|length > 0 %}
+                                            {% set firstImage = child.album.items[0].image %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
