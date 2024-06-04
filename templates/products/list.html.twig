@@ -36,8 +36,8 @@
                                 </div>
                             </div>
                             {% if product.picture %}
-                                <div class="col-md-2">
-                                    <img src="{{ product.picture.getThumbnail('listpage') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+                                <div class="col-md-2 text-end">
+                                    <img src="{{ product.picture.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ product.name }}">
                                 </div>
                             {% endif %}
                         </div>
@@ -47,7 +47,7 @@
             {% endfor %}
         </div>
     </div>
-    
+
     <script>
         function filterProductsByClass(classKey) {
             var items = document.querySelectorAll('.product-item');
