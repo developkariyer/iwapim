@@ -20,6 +20,24 @@
         </div>
     </div>
 
+    {% if product.album|length > 0 %}
+        <div class="card card-custom mb-3">
+            <div class="card-body">
+                <h2>Ürün Görselleri</h2>
+                <div class="row">
+                    {% for image in product.album %}
+                        <div class="col-md-3">
+                            <a href="{{ image.getFullPath() }}" target="_blank">
+                                <img src="{{ image.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="Ürün Görseli">
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Ebatlar</h2>
