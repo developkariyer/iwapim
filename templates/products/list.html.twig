@@ -27,7 +27,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ product.name }}</h5>
                             <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
-                            <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary">View Details</a>
+                            <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary" target="_blank">View Details</a>
                         </div>
                     </div>
                 </div>

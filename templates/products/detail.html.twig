@@ -4,17 +4,45 @@
 {% block title %}Product Detail{% endblock %}
 
 {% block content %}
-    <div class="card card-custom">
-        <div class="card-body">
-            <h1 class="card-title">{{ product.name }}</h1>
-            <p class="card-text">{{ product.description }}</p>
+    <h1>{{ product.name }}</h1>
+
+    <ul class="nav nav-tabs" id="productTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dimensions-tab" data-bs-toggle="tab" data-bs-target="#dimensions" type="button" role="tab" aria-controls="dimensions" aria-selected="false">Dimensions</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false">SEO</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="marketing-tab" data-bs-toggle="tab" data-bs-target="#marketing" type="button" role="tab" aria-controls="marketing" aria-selected="false">Marketing</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="productTabContent">
+        <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
             <p><strong>Product Code:</strong> {{ product.productCode }}</p>
             <p><strong>Product Class:</strong> {{ product.productClass }}</p>
-            <p><strong>Dimensions:</strong> {{ product.productWidth }} x {{ product.productHeight }} x {{ product.productDepth }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+        </div>
+        <div class="tab-pane fade" id="dimensions" role="tabpanel" aria-labelledby="dimensions-tab">
+            <p><strong>Width:</strong> {{ product.productWidth }}</p>
+            <p><strong>Height:</strong> {{ product.productHeight }}</p>
+            <p><strong>Depth:</strong> {{ product.productDepth }}</p>
             <p><strong>Weight:</strong> {{ product.productWeight }}</p>
         </div>
-        {% if product.picture %}
-            <img src="{{ product.picture.getFullPath() }}" class="card-img-bottom" alt="{{ product.name }}">
-        {% endif %}
+        <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+            <p><strong>SEO Title:</strong> {{ product.seoTitle }}</p>
+            <p><strong>SEO Description:</strong> {{ product.seoDescription }}</p>
+            <p><strong>SEO Keywords:</strong> {{ product.seoKeywords }}</p>
+        </div>
+        <div class="tab-pane fade" id="marketing" role="tabpanel" aria-labelledby="marketing-tab">
+            <p><strong>Marketing Materials:</strong> {{ product.marketingMaterials }}</p>
+        </div>
     </div>
+
+    {% if product.picture %}
+        <img src="{{ product.picture.getFullPath() }}" class="img-fluid mt-3" alt="{{ product.name }}">
+    {% endif %}
 {% endblock %}
