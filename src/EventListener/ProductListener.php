@@ -21,8 +21,11 @@ class ProductListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
 
-        if ($object instanceof Product && !$object->getProductCode()) {
-            $object->setProductCode($this->generateUniqueCode());
+        if ($object instanceof Product) {
+            if (!$object->getProductCode()) {
+                $object->setProductCode($this->generateUniqueCode());
+            }
+            $this->setCustomUploadPath($object);
         }
     }
 
@@ -30,13 +33,16 @@ class ProductListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
 
-        if ($object instanceof Product && !$object->getIwasku() && $object->getIwaskuActive()) {
-            $topMostProduct = $this->getTopMostProduct($object);
-            if (empty($topMostProduct)) {
-                $topMostProduct = $object;
+        if ($object instanceof Product) {
+            if (!$object->getIwasku() && $object->getIwaskuActive()) {
+                $topMostProduct = $this->getTopMostProduct($object);
+                if (empty($topMostProduct)) {
+                    $topMostProduct = $object;
+                }
+                $iwasku = "{$topMostProduct->getProductClass()}_{$topMostProduct->getProductCode()}_{$object->getProductCode()}";
+                $object->setIwasku($iwasku);
             }
-            $iwasku = "{$topMostProduct->getProductClass()}_{$topMostProduct->getProductCode()}_{$object->getProductCode()}";
-            $object->setIwasku($iwasku);
+            $this->setCustomUploadPath($object);
         }
     }
 
@@ -81,4 +87,16 @@ class ProductListener implements EventSubscriberInterface
         $listing->setCondition('productCode = ?', [$productCode]);
         return $listing->count() > 0;
     }
+
+    private function setCustomUploadPath(Product $product)
+    {
+        $image = $product->getPicture();
+        if ($image) {
+            $newPath = '/products/' . $product->getProductCode() . '/images/';
+            $image->setCustomUploadPath(function () use ($newPath) {
+                return $newPath;
+            });
+        }
+    }
+
 }
