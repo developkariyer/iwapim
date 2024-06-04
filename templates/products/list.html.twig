@@ -45,14 +45,14 @@
                                                         {% else %}
                                                             {{ child.variationType }}:
                                                         {% endif %}
-                                                        {{ child.key }}
+                                                        <a href="{{ path('product_detail', {'id': child.id}) }}" target="_blank">{{ child.key }}</a>
                                                     </li>
                                                 {% endfor %}
                                             </ul>
                                         {% else %}
                                             <p>Varyasyon yok</p>
                                         {% endif %}
-                                    </div>
+                                    </div>                                    
                                 </div>
                                 {% set firstImage = null %}
                                 {% if product.album and product.album.items|length > 0 %}
