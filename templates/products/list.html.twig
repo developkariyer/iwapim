@@ -30,10 +30,9 @@
                             {% endif %}
                             <div class="col-md-5">
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ product.key }} {{ product.name }}</h5>
+                                    <h5 class="card-title">{{ product.key }} {{ product.name }} ({{ product.productClass }})</h5>
                                     <strong>IWASKU:</strong> {{ product.iwasku }}<br>
                                     <strong>Ürün Kodu:</strong> {{ product.productCode }}<br>
-                                    <strong>Ürün Sınıfı:</strong> {{ product.productClass }}<br>
                                     {{ product.description|slice(0, 100) }}...
                                 </div>
                             </div>
