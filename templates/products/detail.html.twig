@@ -10,7 +10,7 @@
             {% if product.picture %}
                 <a href="{{ product.picture.getFullPath() }}" target="_blank">
                     <img src="{{ product.picture.getThumbnail('default') }}" class="img-thumbnail float-end ms-3 mb-3" alt="{{ product.name }}" style="max-width: 150px;">
-                </a>
+                    </a>
             {% endif %}
             <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
             <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
@@ -108,9 +108,39 @@
 
     <div class="card card-custom mb-3">
         <div class="card-body">
+            <h2>Alt Ürünler (Varyasyonlar)</h2>
+            {% if product.children|length > 0 %}
+                <div class="row">
+                    {% for child in product.children %}
+                        <div class="col-md-4">
+                            <div class="card card-custom mb-3">
+                                <div class="card-body">
+                                    <h5>{{ child.name }}</h5>
+                                    {% if child.picture %}
+                                        <a href="{{ child.picture.getFullPath() }}" target="_blank">
+                                            <img src="{{ child.picture.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
+                                        </a>
+                                    {% endif %}
+                                    <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
+                                    <p><strong>Ürün Sınıfı:</strong> {{ child.productClass }}</p>
+                                    <p><strong>IWASKU:</strong> {{ child.iwasku }}</p>
+                                    <p><strong>Aktif:</strong> {{ child.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                                    <p><strong>Açıklama:</strong> {{ child.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Alt ürün yok.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card-custom mb-3">
+        <div class="card-body">
             <h2>Listing</h2>
             <p>Listing henüz hazır değil.</p>
         </div>
     </div>
-
 {% endblock %}
