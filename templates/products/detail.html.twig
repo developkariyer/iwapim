@@ -70,21 +70,6 @@
 
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <h2>Set İçeriği</h2>
-            {% if product.bundleItems|length > 0 %}
-                <ul>
-                    {% for item in product.bundleItems %}
-                        <li>{{ item.name }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Set içeriği yok.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="card card-custom mb-3">
-        <div class="card-body">
             <h2>Renk Varyasyonları</h2>
             {% set colorVariationsFound = false %}
             {% if product.children|length > 0 %}
@@ -147,6 +132,21 @@
             {% endif %}
             {% if not colorVariationsFound %}
                 <p>Ebat seçeneği yok.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card-custom mb-3">
+        <div class="card-body">
+            <h2>Set İçeriği</h2>
+            {% if product.bundleItems|length > 0 %}
+                <ul>
+                    {% for item in product.bundleItems %}
+                        <li>{{ item.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Set içeriği yok.</p>
             {% endif %}
         </div>
     </div>
