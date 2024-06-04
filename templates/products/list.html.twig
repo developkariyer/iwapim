@@ -39,7 +39,7 @@
                                 {% if product.album and product.album.items|length > 0 %}
                                     {% set firstImage = product.album.items[0].image %}
                                 {% else %}
-                                    {% for child in product.children if not firstImage %}
+                                    {% for child in product.children %}
                                         {% if child.album and child.album.items|length > 0 %}
                                             {% set firstImage = child.album.items[0].image %}
                                         {% endif %}
