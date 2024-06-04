@@ -19,7 +19,7 @@ class ProductsController extends FrontendController
     {
         // Create a new Listing object
         $products = new Listing();
-        $products->setOrderKey('`productCode`, `key`');
+        $products->setOrderKey('key');
         $products->setOrder('asc');
         
         // Fetch the products
