@@ -22,36 +22,35 @@
                 <div class="product-item" data-class="{{ product.getProductClass }}">
                     <div class="card mb-3 p-0">
                         <a href="{{ path('product_detail', {'id': product.id}) }}" target="_blank" class="text-decoration-none text-dark">
-                        <div class="row g-0">
-                            <div class="col-md-5">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ product.key }} {{ product.name }} ({{ product.productClass }})</h5>
-                                    <strong>IWASKU:</strong> {{ product.iwasku }}<br>
-                                    <strong>Ürün Kodu:</strong> {{ product.productCode }}<br>
-                                    {{ product.description|slice(0, 100) }}...
+                            <div class="row g-0">
+                                <div class="col-md-5">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ product.key }} {{ product.name }} ({{ product.productClass }})</h5>
+                                        <strong>IWASKU:</strong> {{ product.iwasku }}<br>
+                                        <strong>Ürün Kodu:</strong> {{ product.productCode }}<br>
+                                        {{ product.description|slice(0, 100) }}...
+                                    </div>
                                 </div>
+                                <div class="col-md-5">
+                                    <div class="card-body">
+                                    </div>
+                                </div>
+                                {% set firstImage = null %}
+                                {% if product.album|length > 0 %}
+                                    {% set firstImage = product.album[0].image %}
+                                {% else %}
+                                    {% for child in product.children if not firstImage %}
+                                        {% if child.album|length > 0 %}
+                                            {% set firstImage = child.album[0].image %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% if firstImage %}
+                                    <div class="col-md-2 text-end">
+                                        <img src="{{ firstImage.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ product.name }}">
+                                    </div>
+                                {% endif %}
                             </div>
-                            <div class="col-md-5">
-                                <div class="card-body">
-                                </div>
-                            </div>
-                            {% set firstImage = null %}
-                            {% if product.album|length > 0 %}
-                                {% set firstImage = product.album[0].image %}
-                            {% else %}
-                                {% for child in product.children %}
-                                    {% if child.album|length > 0 %}
-                                        {% set firstImage = child.album[0].image %}
-                                        {% break %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                            {% if firstImage %}
-                                <div class="col-md-2 text-end">
-                                    <img src="{{ firstImage.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ product.name }}">
-                                </div>
-                            {% endif %}
-                        </div>
                         </a>
                     </div>
                 </div>
