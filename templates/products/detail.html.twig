@@ -111,6 +111,42 @@
 
     <div class="card card-custom mb-3">
         <div class="card-body">
+            <h2>Renk Varyasyonları</h2>
+            {% set colorVariationsFound = false %}
+            {% if product.children|length > 0 %}
+                <div class="row">
+                    {% for child in product.children %}
+                        {% if child.variationType == 'color' %}
+                            {% set colorVariationsFound = true %}
+                            <div class="col-md-4">
+                                <div class="card card-custom mb-3">
+                                    <div class="card-body">
+                                        <h5>{{ child.name }}</h5>
+                                        {% if child.picture %}
+                                            <a href="{{ child.picture.getFullPath() }}" target="_blank">
+                                                <img src="{{ child.picture.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ child.name }}" style="max-width: 150px;">
+                                            </a>
+                                        {% endif %}
+                                        <p><strong>Ürün Kodu:</strong> {{ child.productCode }}</p>
+                                        <p><strong>Ürün Sınıfı:</strong> {{ child.productClass }}</p>
+                                        <p><strong>IWASKU:</strong> {{ child.iwasku }}</p>
+                                        <p><strong>Aktif:</strong> {{ child.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                                        <p><strong>Açıklama:</strong> {{ child.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if not colorVariationsFound %}
+                <p>Renk seçeneği yok.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card-custom mb-3">
+        <div class="card-body">
             <h2>Alt Ürünler (Varyasyonlar)</h2>
             {% if product.children|length > 0 %}
                 <div class="row">
