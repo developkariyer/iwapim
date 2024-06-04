@@ -3,29 +3,48 @@
 
 {% block title %}Products List{% endblock %}
 
-{% block productClass %}
-<ul class="list-group">
-    {% for productClass in productClasses %}
-        <li class="list-group-item">{{ productClass }}</li>
-    {% endfor %}
-</ul>
-{% endblock %}
-
 {% block content %}
-    <div class="row">
-        {% for product in products %}
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    {% if product.picture %}
-                        <img src="{{ product.picture.getThumbnail('default') }}" class="card-img-top" alt="{{ product.name }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
-                        <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary">View Details</a>
+    <h1>Products</h1>
+
+    <div class="mb-3">
+        <label for="productClassSelect" class="form-label">Select Product Class</label>
+        <select id="productClassSelect" class="form-select" onchange="filterProductsByClass(this.value)">
+            <option value="">All Classes</option>
+            {% for productClass in productClasses %}
+                <option value="{{ productClass.key }}">{{ productClass.productClassName }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div id="productsList">
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 product-item" data-class="{{ product.getProductClass }}">
+                    <div class="card card-custom">
+                        {% if product.picture %}
+                            <img src="{{ product.picture.getFullPath() }}" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
+                            <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-primary">View Details</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
+
+    <script>
+        function filterProductsByClass(classKey) {
+            var items = document.querySelectorAll('.product-item');
+            items.forEach(function(item) {
+                if (classKey === "" || item.getAttribute('data-class') === classKey) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
+    </script>
 {% endblock %}
