@@ -31,10 +31,10 @@
                             <div class="col-md-5">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ product.key }} {{ product.name }}</h5>
-                                    <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
-                                    <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
-                                    <p><strong>Ürün Sınıfı:</strong> {{ product.productClass }}</p>
-                                    <p class="card-text">{{ product.description|slice(0, 100) }}...</p>
+                                    <strong>IWASKU:</strong> {{ product.iwasku }}<br>
+                                    <strong>Ürün Kodu:</strong> {{ product.productCode }}<br>
+                                    <strong>Ürün Sınıfı:</strong> {{ product.productClass }}<br>
+                                    {{ product.description|slice(0, 100) }}...
                                 </div>
                             </div>
                             <div class="col-md-5">
