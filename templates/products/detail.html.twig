@@ -7,17 +7,8 @@
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h1>
-                {{ product.key }} {{ product.name }}
-                {% if parentProduct %}
-                    {{ parentProduct.key }} {{ parentProduct.name }}<i>
-                    {% if product.variationType == 'size' %}
-                        Ebat
-                    {% elseif product.variationType == 'color' %}
-                        Renk
-                    {% else %}
-                        {{ product.variationType }}
-                    {% endif %}
-                    : {{ product.key }}
+                {% if product.variation %}
+                    {{ product.parent.key }} {{ product.name }} {{ product.key }}
                 {% else %}
                     {{ product.key }} {{ product.name }}
                 {% endif %}</i>
