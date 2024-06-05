@@ -137,7 +137,7 @@ class ProductsController extends FrontendController
         if (count($product->getChildren()) == 0) {
             $newVariation = new Product();
             $newVariation->setParent($product);
-            $newVariation->setType(DataObject::OBJECT_TYPE_VARIANT);
+            $newVariation->setType('variant');
             $newVariation->setKey($newSize);
             $variation = new Objectbrick\Data\Variation($newVariation);
             $variation->setVariationSize($newSize);
