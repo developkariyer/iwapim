@@ -127,6 +127,7 @@ class ProductsController extends FrontendController
         // if there are no children or no color variations
         if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($colors) == 1 && empty($colors[0]))) {
             $newVariation = new Product();
+            $newVariation->setProductCode($this->generateUniqueCode());
             $newVariation->setParent($product);
             $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
             $newVariation->setKey($newSize);
@@ -150,6 +151,7 @@ class ProductsController extends FrontendController
         foreach ($colors as $color) {
             $newVariation = new Product();
             $newVariation->setParent($product);
+            $newVariation->setProductCode($this->generateUniqueCode());
             $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
             $newVariation->setKey($newSize . ' ' . $color);
             $newVariation->setVariationSize($newSize);
@@ -166,8 +168,102 @@ class ProductsController extends FrontendController
      */
     public function addColorAction(Request $request, $id): Response
     {
+        $product = Product::getById($id);
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        if ($product->getParent() instanceof Product) {
+            throw $this->createNotFoundException('Variants cannot be re-varianted');
+        }
+
+        $newColor = $request->get('newColor');
+        $sizes = [];
+        $colors = [];
+        foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
+            $size = $variant->getVariationSize();
+            $color = $variant->getVariationColor();
+            if (!in_array($size, $sizes)) {
+                $sizes[] = $size;
+            }
+            if (!in_array($color, $colors)) {
+                $colors[] = $color;
+            }
+        }
+
+        if (in_array($newColor, $colors) || empty($newColor)) {
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        // if there are no children or no size variations
+        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($sizes) == 1 && empty($sizes[0]))) {
+            $newVariation = new Product();
+            $newVariation->setProductCode($this->generateUniqueCode());
+            $newVariation->setParent($product);
+            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+            $newVariation->setKey($newColor);
+            $newVariation->setVariationColor($newColor);
+            $newVariation->setPublished(true);
+            $newVariation->save();
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        // if there are no size variations
+        if (count($colors) == 1 && empty($colors[0])) {
+            foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
+                $variant->setVariationColor($newColor);
+                $variant->setKey($variant->getVariationSize(). ' ' . $newColor);
+                $variant->save();
+            }
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        // if there are both size and color variations
+        foreach ($sizes as $size) {
+            $newVariation = new Product();
+            $newVariation->setParent($product);
+            $newVariation->setProductCode($this->generateUniqueCode());
+            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+            $newVariation->setKey($size . ' ' . $newColor);
+            $newVariation->setVariationSize($size);
+            $newVariation->setVariationColor($newColor);
+            $newVariation->setPublished(true);
+            $newVariation->save();
+        }
+
         return $this->redirectToRoute('product_detail', ['id' => $id]);
     }
+
+    private function generateUniqueCode()
+    {
+        while (true) {
+            $candidateCode = $this->generateCustomString(6);
+            if (!$this->isProductCodeExists($candidateCode)) {
+                return $candidateCode;
+            }
+        }
+    }
+
+    private function isProductCodeExists($productCode)
+    {
+        $listing = new Listing();
+        $listing->setCondition('productCode = ?', [$productCode]);
+        return $listing->count() > 0;
+    }
+
+    private function generateCustomString($length = 6) {
+        $characters = 'ABCDEFGHJKMNPQRSTVWXYZ123456789';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomIndex = mt_rand(0, $charactersLength - 1);
+            $randomString .= $characters[$randomIndex];
+        }
+
+        return $randomString;
+    }
+
 }
 
 
