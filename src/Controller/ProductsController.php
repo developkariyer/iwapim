@@ -25,7 +25,7 @@ class ProductsController extends FrontendController
         $products->setOrderKey('key');
         $products->setOrder('asc');
         $productList = $products->load();
-        $parentProducts = [];
+        $topProducts = [];
         foreach ($productList as $product) {
             if ($product->getParent() instanceof Product) {
                 continue;
@@ -33,20 +33,16 @@ class ProductsController extends FrontendController
             $sizes = [];
             $colors = [];
             foreach ($product->getChildren() as $variant) {
-                if ($variation = $variant->getVariation()) {
-                    foreach ($variation->getItems() as $item) {
-                        $size = $item->getVariationSize();
-                        $color = $item->getVariationColor();
-                        if ($size && !in_array($size, $sizes)) {
-                            $sizes[] = $size;
-                        }
-                        if ($color && !in_array($color, $colors)) {
-                            $colors[] = $color;
-                        }                                
-                    }
+                $size = $variant->getVariationSize();
+                $color = $variant->getVariationColor();
+                if ($size && !in_array($size, $sizes)) {
+                    $sizes[] = $size;
                 }
+                if ($color && !in_array($color, $colors)) {
+                    $colors[] = $color;
+                }                                
             }
-            $parentProducts[] = [
+            $topProducts[] = [
                 'product' => $product,
                 'sizes' => $sizes,
                 'colors' => $colors,
@@ -55,7 +51,7 @@ class ProductsController extends FrontendController
         $productClassListing = new ProductClassListing();
         $productClasses = $productClassListing->load();
         return $this->render('products/list.html.twig', [
-            'products' => $parentProducts,
+            'products' => $topProducts,
             'productClasses' => $productClasses,
         ]);
     }
@@ -76,23 +72,19 @@ class ProductsController extends FrontendController
         $variations = [];
 
         foreach ($product->getChildren() as $variant) {
-            if ($variation = $variant->getVariation()) {
-                foreach ($variation->getItems() as $item) {
-                    $size = $item->getVariationSize() ?? 'Ebat Yok';
-                    $color = $item->getVariationColor() ?? 'Renk Yok';
-                    if (empty($variations[$size])) {
-                        $variations[$size] = [];
-                    }
-                    $variations[$size][$color] = $variant;
-
-                    if (!in_array($size, $sizes)) {
-                        $sizes[] = $size;
-                    }
-                    if (!in_array($color, $colors)) {
-                        $colors[] = $color;
-                    }                                
-                }
+            $size = $variant->getVariationSize() ?? 'Ebat Yok';
+            $color = $variant->getVariationColor() ?? 'Renk Yok';
+            if (empty($variations[$size])) {
+                $variations[$size] = [];
             }
+            $variations[$size][$color] = $variant;
+
+            if (!in_array($size, $sizes)) {
+                $sizes[] = $size;
+            }
+            if (!in_array($color, $colors)) {
+                $colors[] = $color;
+            }                                
         }
 
         return $this->render('products/detail.html.twig', [
@@ -120,13 +112,9 @@ class ProductsController extends FrontendController
         $newSize = $request->get('newSize');
         $sizes = [];
         foreach ($product->getChildren() as $variant) {
-            if ($variation = $variant->getVariation()) {
-                foreach ($variation->getItems() as $item) {
-                    $size = $item->getVariationSize();
-                    if (!in_array($size, $sizes)) {
-                        $sizes[] = $size;
-                    }
-                }
+            $size = $variant->getVariationSize();
+            if (!in_array($size, $sizes)) {
+                $sizes[] = $size;
             }
         }
 
@@ -138,11 +126,9 @@ class ProductsController extends FrontendController
         if (!count($product->getChildren())) {
             $newVariation = new Product();
             $newVariation->setParent($product);
-            $newVariation->setType('variant');
+            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
             $newVariation->setKey($newSize);
-            $variation = new Variation($newVariation);
-            $variation->setVariationSize($newSize);
-            $newVariation->getObjectbricks()->setBrick($variation->getType(), $variation);
+            $newVariation->setVariationSize($newSize);
             $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
