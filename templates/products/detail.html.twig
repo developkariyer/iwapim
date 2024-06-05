@@ -23,10 +23,12 @@
                     <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
                     <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
                     <p><strong>SEO Anahtar Kelimeler:</strong>
-                        {{ for seoKeyword in product.seoKeywords.items }}
-                            <li>{{ seoKeyword }}</li>
-                        {{ endfor }}
-                    </p>
+                        <ul>
+                            {% for seoKeyword in product.seoKeywords %}
+                                <li>{{ seoKeyword.keyword }}</li>
+                            {% endfor %}
+                        </ul>
+                    </p>                    
                 </div>
             </div>
         </div>
