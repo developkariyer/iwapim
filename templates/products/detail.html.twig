@@ -22,7 +22,11 @@
                     <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
                     <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
                     <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
-                    <p><strong>SEO Anahtar Kelimeler:</strong> {{ product.seoKeywords }}</p>
+                    <p><strong>SEO Anahtar Kelimeler:</strong>
+                        {{ for seoKeyword in product.seoKeywords.items }}
+                            <li>{{ seoKeyword }}</li>
+                        {{ endfor }}
+                    </p>
                 </div>
             </div>
         </div>
