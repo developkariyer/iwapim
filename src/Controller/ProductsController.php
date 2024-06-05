@@ -17,27 +17,34 @@ class ProductsController extends FrontendController
      */
     public function listAction(Request $request): Response
     {
-        // Create a new Listing object
         $products = new Listing();
         $products->setOrderKey('key');
         $products->setOrder('asc');
-        
-        // Fetch the products
         $productList = $products->load();
-
-        // Filter out child products
         $parentProducts = [];
         foreach ($productList as $product) {
-            if ($product->getParent() instanceof Product) {
-                continue; // Skip child products
+            $sizes = [];
+            $colors = [];
+            foreach ($product->getChildren() as $variant) {
+                if ($variation = $variant->getVariation()) {
+                    $size = $variation->getVariationSize();
+                    $color = $variation->getVariationColor();
+                }
+                if ($size && !in_array($size, $sizes)) {
+                    $sizes[] = $size;
+                }
+                if ($color && !in_array($color, $colors)) {
+                    $colors[] = $color;
+                }                                
             }
-            $parentProducts[] = $product;
+            $parentProducts[] = [
+                'product' => $product,
+                'sizes' => $sizes,
+                'colors' => $colors,
+            ];
         }
-
-        // Fetch product classes
         $productClassListing = new ProductClassListing();
         $productClasses = $productClassListing->load();
-
         return $this->render('products/list.html.twig', [
             'products' => $parentProducts,
             'productClasses' => $productClasses,
@@ -64,3 +71,10 @@ class ProductsController extends FrontendController
         ]);
     }
 }
+
+
+/*            
+            if ($product->getParent() instanceof Product) {
+                continue; // Skip child products
+            }
+*/

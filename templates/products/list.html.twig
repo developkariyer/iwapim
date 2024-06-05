@@ -18,55 +18,60 @@
 
     <div id="productsList">
         <div class="row">
-            {% for product in products %}
-                <div class="product-item" data-class="{{ product.getProductClass }}">
+            {% for productData in products %}
+                <div class="product-item" data-class="{{ productData.product.getProductClass }}">
                     <div class="card mb-3 p-0">
                         <div class="row g-0">
                             <div class="col-md-5">
                                 <div class="card-body">
-                                    <a href="{{ path('product_detail', {'id': product.id}) }}" target="_blank">
-                                    <h5 class="card-title">{{ product.key }} {{ product.name }} ({{ product.productClass }})</h5>
+                                    <a href="{{ path('product_detail', {'id': productData.product.id}) }}" target="_blank">
+                                        <h5 class="card-title">{{ productData.product.key }} {{ productData.product.name }} ({{ productData.product.productClass }})</h5>
                                     </a>
-                                    <strong>IWASKU:</strong> {{ product.iwasku }}<br>
-                                    <strong>Ürün Kodu:</strong> {{ product.productCode }}<br>
-                                    {{ product.description|slice(0, 100) }}...
+                                    <strong>IWASKU:</strong> {{ productData.product.iwasku }}<br>
+                                    <strong>Ürün Kodu:</strong> {{ productData.product.productCode }}<br>
+                                    {{ productData.product.description|slice(0, 100) }}...
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="card-body">
                                     <h6>Varyasyonlar:</h6>
-                                    {% if product.children|length > 0 %}
-                                        <ul>
-                                            {% for child in product.children %}
-                                                <li>
-                                                    {% if child.variationType == 'size' %}
-                                                        Ebat:
-                                                    {% elseif child.variationType == 'color' %}
-                                                        Renk:
-                                                    {% else %}
-                                                        {{ child.variationType }}:
-                                                    {% endif %}<a href="{{ path('product_detail', {'id': child.id}) }}" target="_blank">{{ child.key }}</a>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
+                                    {% if productData.sizes or productData.colors %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Ebatlar:</h6>
+                                                <ul>
+                                                    {% for size in productData.sizes %}
+                                                        <li>{{ size }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Renkler:</h6>
+                                                <ul>
+                                                    {% for color in productData.colors %}
+                                                        <li>{{ color }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
                                     {% else %}
                                         <p>Varyasyon yok</p>
                                     {% endif %}
                                 </div>
                             </div>
                             {% set firstImage = null %}
-                            {% if product.album and product.album.items|length > 0 %}
-                                {% set firstImage = product.album.items[0].image %}
+                            {% if productData.product.album and productData.product.album.items|length > 0 %}
+                                {% set firstImage = productData.product.album.items[0].image %}
                             {% else %}
-                                {% for child in product.children %}
-                                    {% if child.album and child.album.items|length > 0 %}
-                                        {% set firstImage = child.album.items[0].image %}
+                                {% for variation in productData.product.getChildren() %}
+                                    {% if variation.album and variation.album.items|length > 0 %}
+                                        {% set firstImage = variation.album.items[0].image %}
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
                             {% if firstImage %}
                                 <div class="col-md-2 text-end">
-                                    <img src="{{ firstImage.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ product.name }}">
+                                    <img src="{{ firstImage.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ productData.product.name }}">
                                 </div>
                             {% endif %}
                         </div>
