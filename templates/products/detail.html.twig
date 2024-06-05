@@ -122,7 +122,7 @@
                             <th>{{ color }}</th>
                             {% for size in sizes %}
                                 <td>
-                                    {% set variation = variations[size, color] %}
+                                    {% set variation = variations[size][color] %}
                                     {% if variation %}
                                         <a href="{{ path('product_detail', {'id': variation.id}) }}" target="_blank">{{ variation.key }}</a>
                                     {% else %}
