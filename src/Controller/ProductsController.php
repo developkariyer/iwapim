@@ -67,11 +67,7 @@ class ProductsController extends FrontendController
             throw $this->createNotFoundException('Product not found');
         }
 
-        $parentProduct = $product->getParent();
-        $parentProduct = $parentProduct instanceof Product ? $parentProduct : null;
-
         return $this->render('products/detail.html.twig', [
-            'parentProduct' => $parentProduct,
             'product' => $product,
         ]);
     }

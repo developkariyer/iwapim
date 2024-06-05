@@ -65,7 +65,7 @@
                                 {% set firstImage = productData.product.album.items[0].image %}
                             {% else %}
                                 {% for variation in productData.product.getChildren() %}
-                                    {% if variation.album and variation.album.items|length > 0 %}
+                                    {% if variation.album and variation.album.items|length > 0 and !firstImage %}
                                         {% set firstImage = variation.album.items[0].image %}
                                     {% endif %}
                                 {% endfor %}
