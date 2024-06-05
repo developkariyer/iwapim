@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Pimcore\Controller\FrontendController;
+use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Objectbrick;
@@ -136,9 +137,11 @@ class ProductsController extends FrontendController
         if (count($product->getChildren()) == 0) {
             $newVariation = new Product();
             $newVariation->setParent($product);
+            $newVariation->setType(DataObject::OBJECT_TYPE_VARIANT);
             $newVariation->setKey($newSize);
             $variation = new Objectbrick\Data\Variation($newVariation);
             $variation->setVariationSize($newSize);
+            $newVariation->getVariation()->setItems([$variation]);
             $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
