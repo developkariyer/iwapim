@@ -144,7 +144,6 @@
                 <div class="col-md-6">
                     <form action="{{ path('add_size', {'id': product.id}) }}" method="post" class="d-flex">
                         <div class="form-group mr-2">
-                            <label for="newSize" class="sr-only">Yeni Ebat</label>
                             <input type="text" id="newSize" name="newSize" class="form-control" placeholder="Yeni Ebat" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Ekle</button>
@@ -153,7 +152,6 @@
                 <div class="col-md-6">
                     <form action="{{ path('add_color', {'id': product.id}) }}" method="post" class="d-flex">
                         <div class="form-group mr-2">
-                            <label for="newColor" class="sr-only">Yeni Renk</label>
                             <input type="text" id="newColor" name="newColor" class="form-control" placeholder="Yeni Renk" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Ekle</button>
