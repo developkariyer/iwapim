@@ -23,10 +23,12 @@ class ProductsController extends FrontendController
         $productList = $products->load();
         $parentProducts = [];
         foreach ($productList as $product) {
+            if ($product->getParent() instanceof Product) {
+                continue;
+            }
             $sizes = [];
             $colors = [];
             foreach ($product->getChildren() as $variant) {
-                var_dump($variant);
                 if ($variation = $variant->getVariation()) {
                     foreach ($variation->getItems() as $item) {
                         $size = $item->getVariationSize();
@@ -76,8 +78,3 @@ class ProductsController extends FrontendController
 }
 
 
-/*            
-            if ($product->getParent() instanceof Product) {
-                continue; // Skip child products
-            }
-*/
