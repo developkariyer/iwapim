@@ -128,7 +128,7 @@ class ProductsController extends FrontendController
             $newVariation->setParent($product);
             $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
             $newVariation->setKey($newSize);
-            $newVariation->setVariationSize($newSize);
+            $newVariation->setVariantSize($newSize);
             $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
