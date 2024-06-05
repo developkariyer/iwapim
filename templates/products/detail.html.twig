@@ -97,9 +97,10 @@
                     {% endif %}
                 </tbody>
             </table>
-                    </div>
+        </div>
     </div>
 
+    {% if not product.variation.items %}
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Varyasyonlar</h2>
@@ -160,6 +161,7 @@
             </div>
         </div>
     </div>                
+    {% endif %}
     
     <div class="card card-custom mb-3">
         <div class="card-body">
