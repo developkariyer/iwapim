@@ -3,11 +3,8 @@
 namespace App\Controller;
 
 use Pimcore\Controller\FrontendController;
-use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Objectbrick;
-use Pimcore\Model\DataObject\Objectbrick\Data\Variation;
 use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
