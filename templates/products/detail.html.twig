@@ -6,14 +6,11 @@
 {% block content %}
     <div class="card card-custom mb-3">
         <div class="card-body">
-            <h1>
-                {% if product.variation %}
-                    {{ product.parent.key }} {{ product.name }} {{ product.key }}
-                {% else %}
-                    {{ product.key }} {{ product.name }}
-                {% endif %}
-                ({{ product.productClass }})
-            </h1>
+            {% if product.variation %}
+                <h1>{{ product.parent.key }} {{ product.name }} {{ product.key }}</h1><br>Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': product.parent.id}) }}" target="_blank">{{ product.parent.key }} {{ product.parent.name }}</a>
+            {% else %}
+                <h1>{{ product.key }} {{ product.name }} ({{ product.productClass }})</h1>
+            {% endif %}
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
