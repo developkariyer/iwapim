@@ -7,6 +7,7 @@ use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Objectbrick;
+use Pimcore\Model\DataObject\Objectbrick\Data\Variation;
 use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -134,14 +135,14 @@ class ProductsController extends FrontendController
         }
 
         // if there is no children
-        if (count($product->getChildren()) == 0) {
+        if (!count($product->getChildren())) {
             $newVariation = new Product();
             $newVariation->setParent($product);
             $newVariation->setType('variant');
             $newVariation->setKey($newSize);
-            $variation = new Objectbrick\Data\Variation($newVariation);
+            $variation = new Variation($newVariation);
             $variation->setVariationSize($newSize);
-            $newVariation->getVariation()->setItems([$variation]);
+            $newVariation->getObjectbricks()->setBrick($variation->getType(), $variation);
             $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
