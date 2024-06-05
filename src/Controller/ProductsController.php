@@ -32,7 +32,7 @@ class ProductsController extends FrontendController
             }
             $sizes = [];
             $colors = [];
-            foreach ($product->getChildren() as $variant) {
+            foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
                 $size = $variant->getVariationSize();
                 $color = $variant->getVariationColor();
                 if ($size && !in_array($size, $sizes)) {
@@ -71,7 +71,7 @@ class ProductsController extends FrontendController
         $colors = [];
         $variations = [];
 
-        foreach ($product->getChildren() as $variant) {
+        foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
             $size = $variant->getVariationSize() ?? 'Ebat Yok';
             $color = $variant->getVariationColor() ?? 'Renk Yok';
             if (empty($variations[$size])) {
@@ -111,7 +111,7 @@ class ProductsController extends FrontendController
 
         $newSize = $request->get('newSize');
         $sizes = [];
-        foreach ($product->getChildren() as $variant) {
+        foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
             $size = $variant->getVariationSize();
             if (!in_array($size, $sizes)) {
                 $sizes[] = $size;
@@ -123,19 +123,19 @@ class ProductsController extends FrontendController
         }
 
         // if there is no children
-        if (!count($product->getChildren())) {
+        if (!count($product->getChildren(includingUnpublished:TRUE))) {
             $newVariation = new Product();
             $newVariation->setParent($product);
             $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
             $newVariation->setKey($newSize);
-            $newVariation->setVariantSize($newSize);
+            $newVariation->setVariationSize($newSize);
             $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
         if (count($sizes) == 1 && empty($sizes[0])) {
             $t = false;
-            foreach ($product->getChildren() as $variant) {
+            foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
                 $variation = $variant->getVariation();
                 $variation->setVariationSize($newSize);
                 $variant->setKey($variation->getVariationSize() . ' ' . $variation->getVariationColor());
