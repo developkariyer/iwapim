@@ -33,12 +33,12 @@ class ImportAssetsCommand extends AbstractCommand
 
         foreach ($iterator as $file) {
             $relativePath = str_replace($sourceDir, '', $file->getPathname());
-            
+
             // Skip files in _default_upload_bucket
             if (strpos($relativePath, '_default_upload_bucket') !== false) {
                 continue;
             }
-            
+
             $targetPath = $targetDir . $relativePath;
             $targetPath = str_replace('\\', '/', $targetPath); // Normalize the path for different OS
 
@@ -52,6 +52,8 @@ class ImportAssetsCommand extends AbstractCommand
                     $assetFolder->save();
                 }
             } else {
+                // Check if the asset already exists
+                $asset = Asset::getByPath($targetPath);
                 if ($asset) {
                     // Check if the existing asset's size matches the source file's size
                     if ($asset->getFileSize() == $file->getSize()) {
@@ -59,7 +61,7 @@ class ImportAssetsCommand extends AbstractCommand
                         continue;
                     }
                 }
-                
+
                 // Add file as an asset
                 $asset = new Asset();
                 $asset->setFilename(basename($targetPath));
