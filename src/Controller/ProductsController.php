@@ -5,6 +5,7 @@ namespace App\Controller;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\objectbricks\Variation;
 use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,6 +106,63 @@ class ProductsController extends FrontendController
      */
     public function addSizeAction(Request $request, $id): Response
     {
+        $product = Product::getById($id);
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        if ($product->getParent() instanceof Product) {
+            throw $this->createNotFoundException('Variants cannot be re-varianted');
+        }
+
+        $newSize = $request->get('newSize');
+        $sizes = [];
+        foreach ($product->getChildren() as $variant) {
+            if ($variation = $variant->getVariation()) {
+                foreach ($variation->getItems() as $item) {
+                    $size = $item->getVariationSize();
+                    if (!in_array($size, $sizes)) {
+                        $sizes[] = $size;
+                    }
+                }
+            }
+        }
+
+        if (in_array($newSize, $sizes) || empty($newSize)) {
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        // if there is no children
+        if (count($product->getChildren()) == 0) {
+            $newVariation = new Product();
+            $newVariation->setParent($product);
+            $newVariation->setKey($newSize);
+
+            $variation = new Variation();
+            
+
+
+            $product->addVariation($newSize, '');
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        if (count($sizes) == 1 && empty($sizes[0])) {
+            $t = false;
+            foreach ($product->getChildren() as $variant) {
+                $variation = $variant->getVariation();
+                $variation->setVariationSize($newSize);
+                $variant->setKey($variation->getVariationSize() . ' ' . $variation->getVariationColor());
+                $variant->save();
+                $t = true;
+            }
+            if (!$t) {
+                $product->addVariation($newSize, '');
+            }
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        
+
         return $this->redirectToRoute('product_detail', ['id' => $id]);
     }    
 
