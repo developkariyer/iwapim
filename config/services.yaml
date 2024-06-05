@@ -60,13 +60,15 @@ services:
         tags: [ 'console.command' ]
 
 
+    App\Command\ImportAssetsCommand:
+        tags: ['console.command']
+
     App\Command\HelloWorldCommand:
         tags: [ 'console.command' ]
 
 
 
     # Example custom templating helper
-    # App\Templating\Helper\Example:
     #     # templating helpers need to be public as they
     #     # are fetched from the container on demand
     #     public: true
