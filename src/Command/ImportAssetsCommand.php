@@ -51,15 +51,20 @@ class ImportAssetsCommand extends AbstractCommand
                     $assetFolder->save();
                 }
             } else {
-                // Add file as an asset
-                $asset = Asset::getByPath($targetPath);
-                if (!$asset) {
-                    $asset = new Asset();
-                    $asset->setFilename(basename($targetPath));
-                    $asset->setParent(Asset::getByPath(dirname($targetPath)));
-                    $asset->setData(file_get_contents($file->getPathname()));
-                    $asset->save();
+                if ($asset) {
+                    // Check if the existing asset's size matches the source file's size
+                    if ($asset->getFileSize() == $file->getSize()) {
+                        $this->writeComment("Skipping existing asset: $targetPath");
+                        continue;
+                    }
                 }
+                
+                // Add file as an asset
+                $asset = new Asset();
+                $asset->setFilename(basename($targetPath));
+                $asset->setParent(Asset::getByPath(dirname($targetPath)));
+                $asset->setStream(fopen($file->getPathname(), 'r'));
+                $asset->save();
             }
         }
     }
