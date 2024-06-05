@@ -130,7 +130,7 @@
                                                 {% set firstImage = variation.album.items[0].image %}
                                             {% endif %}
                                             {% if firstImage %}
-                                                <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ variation.name }}" style="max-width: 50px;">
+                                                <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail" alt="{{ variation.name }}" style="max-width: 150px;">
                                             {% else %}
                                                 {{ variation.key }}
                                             {% endif %}
