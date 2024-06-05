@@ -5,7 +5,7 @@ namespace App\Controller;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\objectbricks\Variation;
+use Pimcore\Model\DataObject\Objectbrick;
 use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -137,12 +137,10 @@ class ProductsController extends FrontendController
             $newVariation = new Product();
             $newVariation->setParent($product);
             $newVariation->setKey($newSize);
-
-            $variation = new Variation();
-            
-
-
-            $product->addVariation($newSize, '');
+            $variation = new Objectbrick\Data\Variation();
+            $variation->setVariationSize($newSize);
+            $newVariation->setVariation($variation);
+            $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
