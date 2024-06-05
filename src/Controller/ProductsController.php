@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProductsController extends FrontendController
 {
+
     /**
      * @Route("/products", name="products_list")
      */
@@ -97,6 +98,22 @@ class ProductsController extends FrontendController
             'colors' => $colors,
             'variations' => $variations,
         ]);
+    }
+
+    /**
+     * @Route("/product/{id}/add-size", name="add_size", methods={"POST"})
+     */
+    public function addSizeAction(Request $request, $id): Response
+    {
+        return $this->redirectToRoute('product_detail', ['id' => $id]);
+    }    
+
+    /**
+     * @Route("/product/{id}/add-color", name="add_color", methods={"POST"})
+     */
+    public function addColorAction(Request $request, $id): Response
+    {
+        return $this->redirectToRoute('product_detail', ['id' => $id]);
     }
 }
 
