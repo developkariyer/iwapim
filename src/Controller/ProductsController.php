@@ -91,7 +91,7 @@ class ProductsController extends FrontendController
             }
         }
 
-        var_dump($sizes, $colors, $variations); die();
+        var_dump($sizes, $colors); die();
         return $this->render('products/detail.html.twig', [
             'product' => $product,
             'sizes' => $sizes,
