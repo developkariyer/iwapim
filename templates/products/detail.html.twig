@@ -91,7 +91,7 @@
                         <tr><td colspan="7" class="text-center"><h4>Set İçindeki Ürünlerin Paket (Kutu) Ebatları</h4></td></tr>
                         {% for item in product.bundleItems %}
                             <tr>
-                                <td class="text-nowrap"><strong>{{ item.name }}</strong></td>
+                                <td class="text-nowrap"><strong>{{ item.key }} {{ item.name }}</strong></td>
                                 <td class="text-nowrap">{{ item.packageWidth }}</td>
                                 <td class="text-nowrap">{{ item.packegeHeight }}</td>
                                 <td class="text-nowrap">{{ item.packageDepth }}</td>
