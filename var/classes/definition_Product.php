@@ -2,18 +2,17 @@
 
 /**
  * Inheritance: yes
- * Variants: no
+ * Variants: yes
  * Title: Product
  *
  * Fields Summary:
- * - picture [image]
  * - iwasku [input]
  * - iwaskuActive [checkbox]
  * - productCode [input]
  * - productClass [select]
  * - name [input]
  * - description [textarea]
- * - variationType [select]
+ * - variation [objectbricks]
  * - album [imageGallery]
  * - productWidth [numeric]
  * - productHeight [numeric]
@@ -37,7 +36,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1717532098,
+   'modificationDate' => 1717622852,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -50,7 +49,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
   array (
   ),
    'allowInherit' => true,
-   'allowVariants' => false,
+   'allowVariants' => true,
    'showVariants' => true,
    'layoutDefinitions' => 
   \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
@@ -95,29 +94,6 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'children' => 
             array (
               0 => 
-              \Pimcore\Model\DataObject\ClassDefinition\Data\Image::__set_state(array(
-                 'name' => 'picture',
-                 'title' => 'Ürün Resmi',
-                 'tooltip' => '',
-                 'mandatory' => false,
-                 'noteditable' => false,
-                 'index' => false,
-                 'locked' => false,
-                 'style' => 'float: right; overflow: hidden; position: relative;',
-                 'permissions' => NULL,
-                 'fieldtype' => '',
-                 'relationType' => false,
-                 'invisible' => false,
-                 'visibleGridView' => false,
-                 'visibleSearch' => false,
-                 'blockedVarsForExport' => 
-                array (
-                ),
-                 'uploadPath' => 'products/images',
-                 'width' => '',
-                 'height' => '',
-              )),
-              1 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'iwasku',
                  'title' => 'IWASKU',
@@ -147,7 +123,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'defaultValueGenerator' => '',
               )),
-              2 => 
+              1 => 
               \Pimcore\Model\DataObject\ClassDefinition\Layout\Text::__set_state(array(
                  'name' => 'Layout',
                  'type' => NULL,
@@ -173,7 +149,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'renderingData' => '',
                  'border' => false,
               )),
-              3 => 
+              2 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Checkbox::__set_state(array(
                  'name' => 'iwaskuActive',
                  'title' => 'Aktif',
@@ -195,7 +171,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'defaultValue' => 0,
                  'defaultValueGenerator' => '',
               )),
-              4 => 
+              3 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'productCode',
                  'title' => 'Ürün Kodu',
@@ -225,7 +201,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'defaultValueGenerator' => '',
               )),
-              5 => 
+              4 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Select::__set_state(array(
                  'name' => 'productClass',
                  'title' => 'Ürün Sınıfı',
@@ -253,7 +229,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'optionsProviderClass' => '\\App\\Model\\DataObject\\ProductClassOptionsProvider',
                  'optionsProviderData' => '',
               )),
-              6 => 
+              5 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'name',
                  'title' => 'Ürün Adı',
@@ -283,7 +259,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'width' => '',
                  'defaultValueGenerator' => '',
               )),
-              7 => 
+              6 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Textarea::__set_state(array(
                  'name' => 'description',
                  'title' => 'Ürün Tanımı',
@@ -308,11 +284,37 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'height' => '',
                  'width' => '',
               )),
+              7 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Layout\Text::__set_state(array(
+                 'name' => 'Layout',
+                 'type' => NULL,
+                 'region' => NULL,
+                 'title' => '',
+                 'width' => '',
+                 'height' => '',
+                 'collapsible' => false,
+                 'collapsed' => false,
+                 'bodyStyle' => '',
+                 'datatype' => 'layout',
+                 'children' => 
+                array (
+                ),
+                 'locked' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'fieldtype' => 'text',
+                 'html' => '<div style=""><font color="#404040"><span style="background-color: rgb(246, 246, 246);"><br></span></font></div><div style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);"><span style="color: rgb(64, 64, 64); background-color: rgb(246, 246, 246);"></span></div>
+<div class="alert alert-success">Eğer bu ana ürün tanımı ise herhangi bir varyasyon seçmeyiniz.</div>',
+                 'renderingClass' => '',
+                 'renderingData' => '',
+                 'border' => false,
+              )),
               8 => 
-              \Pimcore\Model\DataObject\ClassDefinition\Data\Select::__set_state(array(
-                 'name' => 'variationType',
-                 'title' => 'Varyasyon Tipi',
-                 'tooltip' => 'Varyasyon değeri ürün anahtar adıdır.',
+              \Pimcore\Model\DataObject\ClassDefinition\Data\Objectbricks::__set_state(array(
+                 'name' => 'variation',
+                 'title' => 'Varyasyon ise',
+                 'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,
                  'index' => false,
@@ -327,27 +329,12 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'blockedVarsForExport' => 
                 array (
                 ),
-                 'options' => 
+                 'allowedTypes' => 
                 array (
-                  0 => 
-                  array (
-                    'key' => 'Ebat',
-                    'value' => 'size',
-                  ),
-                  1 => 
-                  array (
-                    'key' => 'Renk',
-                    'value' => 'color',
-                  ),
+                  0 => 'Variation',
                 ),
-                 'defaultValue' => '',
-                 'columnLength' => 190,
-                 'dynamicOptions' => false,
-                 'defaultValueGenerator' => '',
-                 'width' => '',
-                 'optionsProviderType' => 'configure',
-                 'optionsProviderClass' => '',
-                 'optionsProviderData' => '',
+                 'maxItems' => NULL,
+                 'border' => false,
               )),
               9 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\ImageGallery::__set_state(array(
@@ -1023,32 +1010,6 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'enableGridLocking' => false,
    'deletedDataComponents' => 
   array (
-    0 => 
-    \Pimcore\Model\DataObject\ClassDefinition\Data\ImageGallery::__set_state(array(
-       'name' => 'adf',
-       'title' => 'Adf',
-       'tooltip' => '',
-       'mandatory' => false,
-       'noteditable' => false,
-       'index' => false,
-       'locked' => false,
-       'style' => '',
-       'permissions' => NULL,
-       'fieldtype' => '',
-       'relationType' => false,
-       'invisible' => false,
-       'visibleGridView' => false,
-       'visibleSearch' => false,
-       'blockedVarsForExport' => 
-      array (
-      ),
-       'uploadPath' => '',
-       'ratioX' => NULL,
-       'ratioY' => NULL,
-       'predefinedDataTemplates' => '',
-       'height' => '',
-       'width' => '',
-    )),
   ),
    'blockedVarsForExport' => 
   array (

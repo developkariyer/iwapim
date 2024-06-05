@@ -2,17 +2,16 @@
 
 /**
  * Inheritance: yes
- * Variants: no
+ * Variants: yes
  *
  * Fields Summary:
- * - picture [image]
  * - iwasku [input]
  * - iwaskuActive [checkbox]
  * - productCode [input]
  * - productClass [select]
  * - name [input]
  * - description [textarea]
- * - variationType [select]
+ * - variation [objectbricks]
  * - album [imageGallery]
  * - productWidth [numeric]
  * - productHeight [numeric]
@@ -36,14 +35,12 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 
 /**
 * @method static \Pimcore\Model\DataObject\Product\Listing getList(array $config = [])
-* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByPicture(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByIwasku(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByIwaskuActive(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductCode(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductClass(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByName(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByDescription(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
-* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByVariationType(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductWidth(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductHeight(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductDepth(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
@@ -60,14 +57,13 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 
 class Product extends Concrete
 {
-public const FIELD_PICTURE = 'picture';
 public const FIELD_IWASKU = 'iwasku';
 public const FIELD_IWASKU_ACTIVE = 'iwaskuActive';
 public const FIELD_PRODUCT_CODE = 'productCode';
 public const FIELD_PRODUCT_CLASS = 'productClass';
 public const FIELD_NAME = 'name';
 public const FIELD_DESCRIPTION = 'description';
-public const FIELD_VARIATION_TYPE = 'variationType';
+public const FIELD_VARIATION = 'variation';
 public const FIELD_ALBUM = 'album';
 public const FIELD_PRODUCT_WIDTH = 'productWidth';
 public const FIELD_PRODUCT_HEIGHT = 'productHeight';
@@ -85,14 +81,13 @@ public const FIELD_MARKETING_MATERIALS = 'marketingMaterials';
 
 protected $classId = "product";
 protected $className = "Product";
-protected $picture;
 protected $iwasku;
 protected $iwaskuActive;
 protected $productCode;
 protected $productClass;
 protected $name;
 protected $description;
-protected $variationType;
+protected $variation;
 protected $album;
 protected $productWidth;
 protected $productHeight;
@@ -118,50 +113,6 @@ public static function create(array $values = []): static
 	$object = new static();
 	$object->setValues($values);
 	return $object;
-}
-
-/**
-* Get picture - Ürün Resmi
-* @return \Pimcore\Model\Asset\Image|null
-*/
-public function getPicture(): ?\Pimcore\Model\Asset\Image
-{
-	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
-		$preValue = $this->preGetValue("picture");
-		if ($preValue !== null) {
-			return $preValue;
-		}
-	}
-
-	$data = $this->picture;
-
-	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("picture")->isEmpty($data)) {
-		try {
-			return $this->getValueFromParent("picture");
-		} catch (InheritanceParentNotFoundException $e) {
-			// no data from parent available, continue ...
-		}
-	}
-
-	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
-		return $data->getPlain();
-	}
-
-	return $data;
-}
-
-/**
-* Set picture - Ürün Resmi
-* @param \Pimcore\Model\Asset\Image|null $picture
-* @return $this
-*/
-public function setPicture(?\Pimcore\Model\Asset\Image $picture): static
-{
-	$this->markFieldDirty("picture", true);
-
-	$this->picture = $picture;
-
-	return $this;
 }
 
 /**
@@ -429,46 +380,39 @@ public function setDescription(?string $description): static
 }
 
 /**
-* Get variationType - Varyasyon Tipi
-* @return string|null
+* @return \Pimcore\Model\DataObject\Product\Variation
 */
-public function getVariationType(): ?string
+public function getVariation(): ?\Pimcore\Model\DataObject\Objectbrick
 {
+	$data = $this->variation;
+	if (!$data) {
+		if (\Pimcore\Tool::classExists("\\Pimcore\\Model\\DataObject\\Product\\Variation")) {
+			$data = new \Pimcore\Model\DataObject\Product\Variation($this, "variation");
+			$this->variation = $data;
+		} else {
+			return null;
+		}
+	}
 	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
-		$preValue = $this->preGetValue("variationType");
+		$preValue = $this->preGetValue("variation");
 		if ($preValue !== null) {
 			return $preValue;
 		}
-	}
-
-	$data = $this->variationType;
-
-	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("variationType")->isEmpty($data)) {
-		try {
-			return $this->getValueFromParent("variationType");
-		} catch (InheritanceParentNotFoundException $e) {
-			// no data from parent available, continue ...
-		}
-	}
-
-	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
-		return $data->getPlain();
 	}
 
 	return $data;
 }
 
 /**
-* Set variationType - Varyasyon Tipi
-* @param string|null $variationType
+* Set variation - Varyasyon ise
+* @param \Pimcore\Model\DataObject\Objectbrick|null $variation
 * @return $this
 */
-public function setVariationType(?string $variationType): static
+public function setVariation(?\Pimcore\Model\DataObject\Objectbrick $variation): static
 {
-	$this->markFieldDirty("variationType", true);
-
-	$this->variationType = $variationType;
-
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Objectbricks $fd */
+	$fd = $this->getClass()->getFieldDefinition("variation");
+	$this->variation = $fd->preSetData($this, $variation);
 	return $this;
 }
 

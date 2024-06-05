@@ -491,7 +491,13 @@ return [
                     .')'
                     .'|sset/webdav(.*)(*:525)'
                 .')'
-                .'|/product/([^/]++)(*:551)'
+                .'|/product/([^/]++)(?'
+                    .'|(*:554)'
+                    .'|/add\\-(?'
+                        .'|size(*:575)'
+                        .'|color(*:588)'
+                    .')'
+                .')'
             .')/?$}sDu',
     ],
     [ // $dynamicRoutes
@@ -509,8 +515,10 @@ return [
         450 => [[['_route' => 'pimcore_admin_dataobject_dataobject_diffversions', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\DataObject\\DataObjectController::diffVersionsAction'], ['from', 'to'], ['GET' => 0], null, false, true, null]],
         501 => [[['_route' => 'pimcore_admin_document_document_diffversions', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\Document\\DocumentController::diffVersionsAction'], ['from', 'to'], ['GET' => 0], null, false, true, null]],
         525 => [[['_route' => 'pimcore_webdav', '_controller' => 'Pimcore\\Bundle\\CoreBundle\\Controller\\WebDavController::webdavAction'], ['path'], null, null, false, true, null]],
-        551 => [
-            [['_route' => 'product_detail', '_controller' => 'App\\Controller\\ProductsController::detailAction'], ['id'], null, null, false, true, null],
+        554 => [[['_route' => 'product_detail', '_controller' => 'App\\Controller\\ProductsController::detailAction'], ['id'], null, null, false, true, null]],
+        575 => [[['_route' => 'add_size', '_controller' => 'App\\Controller\\ProductsController::addSizeAction'], ['id'], ['POST' => 0], null, false, false, null]],
+        588 => [
+            [['_route' => 'add_color', '_controller' => 'App\\Controller\\ProductsController::addColorAction'], ['id'], ['POST' => 0], null, false, false, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

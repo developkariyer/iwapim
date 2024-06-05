@@ -1993,6 +1993,26 @@
         <argument type="service" id=".service_locator.jIByowl.App\Controller\Web2printController"/>
       </call>
     </service>
+    <service id="App\Command\HelloWorldCommand" class="App\Command\HelloWorldCommand" autowire="true" autoconfigure="true">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <call method="setName">
+        <argument>app:hello-world</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Outputs Hello, World!</argument>
+      </call>
+    </service>
+    <service id="App\Command\ImportAssetsCommand" class="App\Command\ImportAssetsCommand" autowire="true" autoconfigure="true">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <call method="setName">
+        <argument>app:import-assets</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Imports all files from public/var/assets to Pimcore assets</argument>
+      </call>
+    </service>
     <service id="App\EventListener\ProductListener" class="App\EventListener\ProductListener" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
     </service>
@@ -13600,6 +13620,10 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Web2printController" class="App\Controller\Web2printController" public="true" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Web2printController" class="App\Controller\Web2printController" public="true" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Web2printController" class="App\Controller\Web2printController" public="true" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\HelloWorldCommand" class="App\Command\HelloWorldCommand" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Command\HelloWorldCommand" class="App\Command\HelloWorldCommand" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\ImportAssetsCommand" class="App\Command\ImportAssetsCommand" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Command\ImportAssetsCommand" class="App\Command\ImportAssetsCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\EventDispatcher\EventSubscriberInterface.0.App\EventListener\ProductListener" class="App\EventListener\ProductListener" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\EventListener\ProductListener" class="App\EventListener\ProductListener" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Pimcore\Bundle\AdminBundle\GDPR\DataProvider\DataProviderInterface.0.Pimcore\Bundle\AdminBundle\GDPR\DataProvider\Assets" class="Pimcore\Bundle\AdminBundle\GDPR\DataProvider\Assets" autowire="true" abstract="true"/>
@@ -16424,6 +16448,20 @@
     <service id=".errored..service_locator.WwIVeH3.Symfony\Component\HttpKernel\Event\ResponseEvent" class="Symfony\Component\HttpKernel\Event\ResponseEvent">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.WwIVeH3&quot;: it references class &quot;Symfony\Component\HttpKernel\Event\ResponseEvent&quot; but no such service exists."/>
     </service>
+    <service id=".App\Command\HelloWorldCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>app:hello-world</argument>
+      <argument type="collection"/>
+      <argument>Outputs Hello, World!</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="App\Command\HelloWorldCommand"/>
+    </service>
+    <service id=".App\Command\ImportAssetsCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>app:import-assets</argument>
+      <argument type="collection"/>
+      <argument>Imports all files from public/var/assets to Pimcore assets</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="App\Command\ImportAssetsCommand"/>
+    </service>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>about</argument>
       <argument type="collection"/>
@@ -17105,8 +17143,10 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.Rl.PzsV"/>
+      <argument type="service" id=".service_locator.9edQ1UL"/>
       <argument type="collection">
+        <argument key="app:hello-world">App\Command\HelloWorldCommand</argument>
+        <argument key="app:import-assets">App\Command\ImportAssetsCommand</argument>
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
         <argument key="cache:clear">console.command.cache_clear</argument>
@@ -17221,9 +17261,11 @@
         <argument key="pimcore:workflow:dump">Pimcore\Bundle\CoreBundle\Command\WorkflowDumpCommand</argument>
       </argument>
     </service>
-    <service id=".service_locator.Rl.PzsV" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.9edQ1UL" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Command\HelloWorldCommand" type="service_closure" id=".App\Command\HelloWorldCommand.lazy"/>
+        <argument key="App\Command\ImportAssetsCommand" type="service_closure" id=".App\Command\ImportAssetsCommand.lazy"/>
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
         <argument key="console.command.assets_install" type="service_closure" id=".console.command.assets_install.lazy"/>
         <argument key="console.command.cache_clear" type="service_closure" id=".console.command.cache_clear.lazy"/>

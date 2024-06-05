@@ -1,0 +1,51 @@
+<?php
+
+use Pimcore\Model\Asset;
+use Pimcore\Model\Asset\Image;
+
+require_once '/var/www/iwapim/config/startup_cli.php';
+
+// Directory to scan
+$directory = '../public/var/assets';
+
+// Function to add a file as an asset in Pimcore
+function addAsset($filePath, $parentFolderId = 1) {
+    $fileName = basename($filePath);
+    
+    // Check if the asset already exists
+    $existingAsset = Asset::getByPath('/' . $fileName);
+    if ($existingAsset) {
+        echo "Asset already exists: $fileName\n";
+        return;
+    }
+
+    // Create the asset
+    $asset = new Image();
+    $asset->setParentId($parentFolderId);
+    $asset->setFilename($fileName);
+    $asset->setData(file_get_contents($filePath));
+    $asset->save();
+
+    echo "Added asset: $fileName\n";
+}
+
+// Traverse the directory and add JPG files to Pimcore assets
+function traverseDirectory($directory, $parentFolderId = 1) {
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+    
+    foreach ($files as $file) {
+        if ($file->isDir()) {
+            continue;
+        }
+        
+        $filePath = $file->getRealPath();
+        if (strtolower($file->getExtension()) === 'jpg') {
+            addAsset($filePath, $parentFolderId);
+        }
+    }
+}
+
+// Start the process
+traverseDirectory($directory);
+
+echo "Asset import completed.\n";
