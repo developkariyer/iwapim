@@ -103,21 +103,21 @@
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Varyasyonlar</h2>
-            <table class="table table-bordered">
+            <table class="table table-bordered text-center">
                 <thead>
                     <tr>
-                        <th style="text-align: center; vertical-align: middle; white-space: nowrap;">Renkler\Ebatlar</th>
+                        <th class="text-nowrap">Renkler\Ebatlar</th>
                         {% for size in sizes %}
-                            <th style="text-align: center; vertical-align: middle;">{{ size }}</th>
+                            <th>{{ size }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for color in colors %}
                         <tr>
-                            <th style="text-align: center; vertical-align: middle;">{{ color }}</th>
+                            <th>{{ color }}</th>
                             {% for size in sizes %}
-                                <td style="text-align: center; vertical-align: middle;">
+                                <td>
                                     {% set variation = variations[size][color] %}
                                     {% if variation %}
                                         <a href="{{ path('product_detail', {'id': variation.id}) }}">
