@@ -26,6 +26,7 @@ class ProductsController extends FrontendController
             $sizes = [];
             $colors = [];
             foreach ($product->getChildren() as $variant) {
+                var_dump($variant);
                 if ($variation = $variant->getBricks()->getVariation()) {
                     $size = $variation->getVariationSize();
                     $color = $variation->getVariationColor();
