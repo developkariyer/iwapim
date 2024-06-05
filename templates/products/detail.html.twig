@@ -108,14 +108,14 @@
                     <tr>
                         <th class="text-nowrap">Renkler\Ebatlar</th>
                         {% for size in sizes %}
-                            <th class="align-middle">{{ size }}</th>
+                            <th>{{ size }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for color in colors %}
                         <tr>
-                            <th>{{ color }}</th>
+                            <th class="align-middle">{{ color }}</th>
                             {% for size in sizes %}
                                 <td>
                                     {% set variation = variations[size][color] %}
