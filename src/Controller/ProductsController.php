@@ -137,9 +137,8 @@ class ProductsController extends FrontendController
             $newVariation = new Product();
             $newVariation->setParent($product);
             $newVariation->setKey($newSize);
-            $variation = new Objectbrick\Data\Variation($product);
+            $variation = new Objectbrick\Data\Variation($newVariation);
             $variation->setVariationSize($newSize);
-            $newVariation->setVariation($variation);
             $newVariation->save();            
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
