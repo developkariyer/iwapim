@@ -50,55 +50,54 @@
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Ebatlar</h2>
-            <table class="table table-bordered">
+            <table class="table table-bordered text-center">
                 <thead>
                     <tr>
-                        <th></th>
-                        <th>En</th>
-                        <th>Boy</th>
-                        <th>Derinlik</th>
-                        <th>Ağırlık</th>
-                        <th>Kara Desi</th>
-                        <th>Hava/Deniz Desi</th>
+                        <th class="text-nowrap"></th>
+                        <th class="text-nowrap">En</th>
+                        <th class="text-nowrap">Boy</th>
+                        <th class="text-nowrap">Derinlik</th>
+                        <th class="text-nowrap">Ağırlık</th>
+                        <th class="text-nowrap">Kara Desi</th>
+                        <th class="text-nowrap">Hv/Dz Desi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>Ürün</strong></td>
-                        <td>{{ product.productWidth }}</td>
-                        <td>{{ product.productHeight }}</td>
-                        <td>{{ product.productDepth }}</td>
-                        <td>{{ product.productWeight }}</td>
-                        <td></td>
-                        <td></td>
+                        <td class="text-nowrap"><strong>Ürün</strong></td>
+                        <td class="text-nowrap">{{ product.productWidth }}</td>
+                        <td class="text-nowrap">{{ product.productHeight }}</td>
+                        <td class="text-nowrap">{{ product.productDepth }}</td>
+                        <td class="text-nowrap">{{ product.productWeight }}</td>
+                        <td class="text-nowrap"></td>
+                        <td class="text-nowrap"></td>
                     </tr>
                     <tr>
-                        <td><strong>Paket (Kutu)</strong></td>
-                        <td>{{ product.packageWidth }}</td>
-                        <td>{{ product.packegeHeight }}</td>
-                        <td>{{ product.packageDepth }}</td>
-                        <td>{{ product.packageWeight }}</td>
-                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 3000 }}</td>
-                        <td>{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 5000 }}</td>
+                        <td class="text-nowrap"><strong>Paket (Kutu)</strong></td>
+                        <td class="text-nowrap">{{ product.packageWidth }}</td>
+                        <td class="text-nowrap">{{ product.packegeHeight }}</td>
+                        <td class="text-nowrap">{{ product.packageDepth }}</td>
+                        <td class="text-nowrap">{{ product.packageWeight }}</td>
+                        <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 3000 }}</td>
+                        <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 5000 }}</td>
                     </tr>
                     {% if product.bundleItems|length > 0 %}
-                        <tr><td colspan="7"><h4>Set İçindeki Ürünlerin Paket (Kutu) Ebatları</h4></td></tr>
-                            {% for item in product.bundleItems %}
-                                <tr>
-                                    <td><strong>{{ item.name }}</strong></td>
-                                    <td>{{ item.packageWidth }}</td>
-                                    <td>{{ item.packegeHeight }}</td>
-                                    <td>{{ item.packageDepth }}</td>
-                                    <td>{{ item.packageWeight }}</td>
-                                    <td>{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 3000 }}</td>
-                                    <td>{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 5000 }}</td>
-                                </tr>
-                            {% endfor %}
-                        </ul>
+                        <tr><td colspan="7" class="text-center"><h4>Set İçindeki Ürünlerin Paket (Kutu) Ebatları</h4></td></tr>
+                        {% for item in product.bundleItems %}
+                            <tr>
+                                <td class="text-nowrap"><strong>{{ item.name }}</strong></td>
+                                <td class="text-nowrap">{{ item.packageWidth }}</td>
+                                <td class="text-nowrap">{{ item.packegeHeight }}</td>
+                                <td class="text-nowrap">{{ item.packageDepth }}</td>
+                                <td class="text-nowrap">{{ item.packageWeight }}</td>
+                                <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 3000 }}</td>
+                                <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 5000 }}</td>
+                            </tr>
+                        {% endfor %}
                     {% endif %}
                 </tbody>
             </table>
-        </div>
+                    </div>
     </div>
 
     <div class="card card-custom mb-3">
@@ -121,7 +120,7 @@
                                 <td style="text-align: center; vertical-align: middle;">
                                     {% set variation = variations[size][color] %}
                                     {% if variation %}
-                                        <a href="{{ path('product_detail', {'id': variation.id}) }}" target="_blank">
+                                        <a href="{{ path('product_detail', {'id': variation.id}) }}">
                                             {% set firstImage = null %}
                                             {% if variation.album and variation.album.items|length > 0 %}
                                                 {% set firstImage = variation.album.items[0].image %}
