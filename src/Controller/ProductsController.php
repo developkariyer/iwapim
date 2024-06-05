@@ -67,8 +67,35 @@ class ProductsController extends FrontendController
             throw $this->createNotFoundException('Product not found');
         }
 
+        $sizes = [];
+        $colors = [];
+        $variations = [];
+
+        foreach ($product->getChildren() as $variant) {
+            if ($variation = $variant->getVariation()) {
+                foreach ($variation->getItems() as $item) {
+                    $size = $item->getVariationSize() ?? '-';
+                    $color = $item->getVariationColor() ?? '-';
+                    if (empty($variations[$size])) {
+                        $variations[$size] = [];
+                    }
+                    $variations[$size][$color] = $variant;
+
+                    if (!in_array($size, $sizes)) {
+                        $sizes[] = $size;
+                    }
+                    if (!in_array($color, $colors)) {
+                        $colors[] = $color;
+                    }                                
+                }
+            }
+        }
+
         return $this->render('products/detail.html.twig', [
             'product' => $product,
+            'sizes' => $sizes,
+            'colors' => $colors,
+            'variations' => $variations,
         ]);
     }
 }
