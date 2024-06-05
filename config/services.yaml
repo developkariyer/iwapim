@@ -60,6 +60,10 @@ services:
         tags: [ 'console.command' ]
 
 
+    App\Command\HelloWorldCommand:
+        tags: [ 'console.command' ]
+
+
 
     # Example custom templating helper
     # App\Templating\Helper\Example:
