@@ -107,21 +107,22 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Renkler\Ebatlar</th>
+                        <th style="text-align: center; vertical-align: middle; white-space: nowrap;">Renkler\Ebatlar</th>
                         {% for size in sizes %}
-                            <th>{{ size }}</th>
+                            <th style="text-align: center; vertical-align: middle;">{{ size }}</th>
                         {% endfor %}
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for color in colors %}
                         <tr>
-                            <th>{{ color }}</th>
+                            <th style="text-align: center; vertical-align: middle;">{{ color }}</th>
                             {% for size in sizes %}
-                                <td>
+                                <td style="text-align: center; vertical-align: middle;">
                                     {% set variation = variations[size][color] %}
                                     {% if variation %}
-                                        <a href="{{ path('product_detail', {'id': variation.id}) }}">
+                                        <a href="{{ path('product_detail', {'id': variation.id}) }}" target="_blank">
                                             {% set firstImage = null %}
                                             {% if variation.album and variation.album.items|length > 0 %}
                                                 {% set firstImage = variation.album.items[0].image %}
@@ -141,7 +142,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+                    </div>
     </div>                
     
     <div class="card card-custom mb-3">
