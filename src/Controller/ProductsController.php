@@ -27,16 +27,18 @@ class ProductsController extends FrontendController
             $colors = [];
             foreach ($product->getChildren() as $variant) {
                 var_dump($variant);
-                if ($variation = $variant->getBricks()->getVariation()) {
-                    $size = $variation->getVariationSize();
-                    $color = $variation->getVariationColor();
+                if ($variation = $variant->getVariation()) {
+                    foreach ($variation->getItems() as $item) {
+                        $size = $item->getVariationSize();
+                        $color = $item->getVariationColor();
+                        if ($size && !in_array($size, $sizes)) {
+                            $sizes[] = $size;
+                        }
+                        if ($color && !in_array($color, $colors)) {
+                            $colors[] = $color;
+                        }                                
+                    }
                 }
-                if ($size && !in_array($size, $sizes)) {
-                    $sizes[] = $size;
-                }
-                if ($color && !in_array($color, $colors)) {
-                    $colors[] = $color;
-                }                                
             }
             $parentProducts[] = [
                 'product' => $product,
