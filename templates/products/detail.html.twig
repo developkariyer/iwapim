@@ -124,7 +124,17 @@
                                 <td>
                                     {% set variation = variations[size][color] %}
                                     {% if variation %}
-                                        <a href="{{ path('product_detail', {'id': variation.id}) }}" target="_blank">{{ variation.key }}</a>
+                                        <a href="{{ path('product_detail', {'id': variation.id}) }}" target="_blank">
+                                            {% set firstImage = null %}
+                                            {% if variation.album and variation.album.items|length > 0 %}
+                                                {% set firstImage = variation.album.items[0].image %}
+                                            {% endif %}
+                                            {% if firstImage %}
+                                                <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ variation.name }}" style="max-width: 50px;">
+                                            {% else %}
+                                                {{ variation.key }}
+                                            {% endif %}
+                                        </a>
                                     {% else %}
                                         -
                                     {% endif %}
