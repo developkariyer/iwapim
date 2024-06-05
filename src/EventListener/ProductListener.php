@@ -34,7 +34,7 @@ class ProductListener implements EventSubscriberInterface
         $object = $event->getObject();
 
         if ($object instanceof Product) {
-            if (!$object->getIwasku() && $object->getIwaskuActive()) {
+            if (!$object->getIwasku() && $object->getProductClass() && $object->getIwaskuActive()) {
                 $topMostProduct = $this->getTopMostProduct($object);
                 if (empty($topMostProduct)) {
                     $topMostProduct = $object;
