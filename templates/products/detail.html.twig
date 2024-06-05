@@ -11,7 +11,7 @@
                     {{ product.parent.key }} {{ product.name }} {{ product.key }}
                 {% else %}
                     {{ product.key }} {{ product.name }}
-                {% endif %}</i>
+                {% endif %}
                 ({{ product.productClass }})
             </h1>
             <div class="row">
@@ -39,7 +39,7 @@
                         {% if image %}
                             <div class="col-md-3">
                                 <a href="{{ image.image.getFullPath() }}" target="_blank">
-                                    <img src="{{ image.image.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="Ürün Görseli">
+                                    <img src="{{ image.image.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="Ürün Görseli" style="border-radius: 10px; padding: 0; margin: 0;">
                                 </a>
                             </div>
                         {% endif %}
@@ -52,7 +52,7 @@
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Ebatlar</h2>
-            <table class="table">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th></th>
@@ -106,7 +106,7 @@
     <div class="card card-custom mb-3">
         <div class="card-body">
             <h2>Varyasyonlar</h2>
-            <table class="table">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Renkler\Ebatlar</th>
@@ -130,7 +130,7 @@
                                                 {% set firstImage = variation.album.items[0].image %}
                                             {% endif %}
                                             {% if firstImage %}
-                                                <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail" alt="{{ variation.name }}" style="max-width: 150px;">
+                                                <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail" alt="{{ variation.name }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;">
                                             {% else %}
                                                 {{ variation.key }}
                                             {% endif %}
@@ -162,7 +162,7 @@
                                         {% set firstImage = item.album.items[0].image %}
                                     {% endif %}
                                     {% if firstImage %}
-                                        <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ item.name }}" style="max-width: 150px;">
+                                        <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ item.name }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;">
                                     {% endif %}
                                     <p><strong>Ürün Kodu:</strong> {{ item.productCode }}</p>
                                     <p><strong>IWASKU:</strong> {{ item.iwasku }}</p>
