@@ -175,6 +175,7 @@ class ProductsController extends FrontendController
 
         if (!empty($newSize) && !empty($allVariants['sizes'][0])) {
             error_log('!empty($newSize) && !empty($allVariants[\'sizes\'][0])');
+            var_dump($colorVariants);
             foreach ($colorVariants as $color => $variant) {
                 $this->addVariant($variant, $newSize.' '.$color, $newSize, '', true);
             }
