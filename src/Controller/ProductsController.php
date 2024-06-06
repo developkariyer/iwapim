@@ -57,6 +57,7 @@ class ProductsController extends FrontendController
 
         $parentProduct = null;
         while ($parent = $product->getParent()) {
+            var_dump($parent->getPath());
             if ($parent->getPath() === '/') {
                 break;
             }
