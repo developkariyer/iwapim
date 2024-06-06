@@ -76,11 +76,26 @@
     <!-- Tab panes -->
     <div class="tab-content">
         <div class="tab-pane fade show active" id="resimler" role="tabpanel" aria-labelledby="resimler-tab">
+            {% if product.album|length > 0 %}
             <div class="card card-custom mb-3">
                 <div class="card-body">
                     <h2>Ürün Görselleri</h2>
+                    <div class="row">
+                        {% for image in product.album %}
+                            {% if image %}
+                                <div class="col-md-3">
+                                    <a href="{{ image.image.getFullPath() }}" target="_blank">
+                                        <img src="{{ image.image.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="Ürün Görseli" style="border-radius: 10px; padding: 0; margin: 0;">
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+            {% else %}
+                <p>Ürün görseli yok.</p>
+            {% endif %}
         </div>
         <div class="tab-pane fade" id="ebatlar" role="tabpanel" aria-labelledby="ebatlar-tab">
             <div class="card card-custom mb-3">
@@ -291,25 +306,6 @@
             </div>        
         </div>
     </div>
-
-    {% if product.album|length > 0 %}
-        <div class="card card-custom mb-3">
-            <div class="card-body">
-                <h2>Ürün Görselleri</h2>
-                <div class="row">
-                    {% for image in product.album %}
-                        {% if image %}
-                            <div class="col-md-3">
-                                <a href="{{ image.image.getFullPath() }}" target="_blank">
-                                    <img src="{{ image.image.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="Ürün Görseli" style="border-radius: 10px; padding: 0; margin: 0;">
-                                </a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    {% endif %}
 
 {% endblock %}
 
