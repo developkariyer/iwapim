@@ -284,24 +284,33 @@
             <div class="card card-custom mb-3">
                 <div class="card-body">
                     <h2>Reklam</h2>
-                    {% if product.marketingMaterials|length > 0 %}
-                        <ul>
-                            {% for material in product.marketingMaterials %}
-                                <li>
-                                    <strong>Başlık:</strong> {{ material.title }}<br>
-                                    <strong>Açıklama:</strong> {{ material.description }}<br>
-                                    <strong>Kampanya Adı:</strong> {{ material.campaignName }}<br>
-                                    <strong>Durum:</strong> {{ material.status }}<br>
-                                    <strong>Varlık:</strong>
-                                    {% if material.asset %}
-                                        <a href="{{ material.asset.getFullPath() }}" target="_blank"><img src="{{ material.asset.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ material.title }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;"></a>
-                                    {% else %}
-                                        Yok
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
+                        {% if product.marketingMaterials|length > 0 %}
+                            <div class="row">
+                                {% for material in product.marketingMaterials %}
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ material.title }}</h5>
+                                                <p class="card-text"><strong>Açıklama:</strong> {{ material.description }}</p>
+                                                <p class="card-text"><strong>Kampanya Adı:</strong> {{ material.campaignName }}</p>
+                                                <p class="card-text"><strong>Durum:</strong> {{ material.status }}</p>
+                                            </div>
+                                            {% if material.asset %}
+                                                <div class="card-footer bg-white border-0">
+                                                    <a href="{{ material.asset.getFullPath() }}" target="_blank">
+                                                        <img src="{{ material.asset.getThumbnail('default') }}" class="img-thumbnail" alt="{{ material.title }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 100%;">
+                                                    </a>
+                                                </div>
+                                            {% else %}
+                                                <div class="card-footer bg-white border-0">
+                                                    <p class="text-center">Yok</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
                         <p>Reklam materyalleri yok.</p>
                     {% endif %}
                 </div>
