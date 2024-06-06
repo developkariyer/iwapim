@@ -157,7 +157,7 @@ class ProductsController extends FrontendController
             error_log ('do nothing');
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         } else {
-            error_log ($newColor, $newSize);
+            error_log ('C:'.$newColor.' S:'.$newSize);
         }
 
         // if a new color, first add its variation to parent
