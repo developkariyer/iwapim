@@ -60,6 +60,7 @@ class ProductsController extends FrontendController
             if ($parent instanceof Product) {
                 $parentProduct = $parent;
             }
+            var_dump($parent);
         }
 
         return $this->render('products/detail.html.twig', [
