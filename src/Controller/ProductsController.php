@@ -129,9 +129,9 @@ class ProductsController extends FrontendController
     }
 
     /**
-     * @Route("/product/{id}/add-size-color", name="add_size_color", methods={"POST"})
+     * @Route("/product/{id}/add", name="add", methods={"POST"})
      */
-    public function addSizeColorAction(Request $request, $id): Response
+    public function addAction(Request $request, $id): Response
     {
         echo "Run";
         $product = Product::getById($id);
