@@ -178,10 +178,15 @@ class ProductsController extends FrontendController
 
         if (!empty($newSize) && empty($allVariants['sizes'][0])) {
             error_log('4');
-            foreach ($colorVariants as $color => $variant) {
-                error_log('4.1:'.$color);
-                $variants = $this->sizeVariantObjects($variant);
-                $this->updateVariant($variants[$allVariants['sizes'][0]], $variant, $newSize.' '.$color, $newSize, '', true);
+            if (empty($colorVariants)) {
+                $colorObject = $this->addVariant($product, $newSize, '', '', false);
+                $this->addVariant($colorObject, $newSize, $newSize, '', true);
+            } else {
+                foreach ($colorVariants as $color => $variant) {
+                    error_log('4.1:'.$color);
+                    $variants = $this->sizeVariantObjects($variant);
+                    $this->updateVariant($variants[$allVariants['sizes'][0]], $variant, $newSize.' '.$color, $newSize, '', true);
+                }
             }
         }
 
