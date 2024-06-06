@@ -56,7 +56,8 @@ class ProductsController extends FrontendController
         $allVariants = $this->traverseAllVariants($product);
 
         $parentProduct = null;
-        while ($parent = $product->getParent()) {
+        $parent = $product;
+        while ($parent = $parent->getParent()) {
             var_dump($parent->getPath());
             if ($parent->getPath() === '/') {
                 break;
