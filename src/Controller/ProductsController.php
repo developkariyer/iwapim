@@ -151,7 +151,7 @@ class ProductsController extends FrontendController
             (!empty($newColor) && !empty($newColor)) ||
             (empty($newSize) && in_array($newColor, $allVariants['colors'])) ||
             (empty($newColor) && in_array($newSize, $allVariants['sizes']))) {
-            // do nothing
+            error_log('do nothing');
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
