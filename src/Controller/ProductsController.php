@@ -27,22 +27,11 @@ class ProductsController extends FrontendController
             if ($product->getParent() instanceof Product) {
                 continue;
             }
-            $sizes = [];
-            $colors = [];
-            foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
-                $size = $variant->getVariationSize();
-                $color = $variant->getVariationColor();
-                if ($size && !in_array($size, $sizes)) {
-                    $sizes[] = $size;
-                }
-                if ($color && !in_array($color, $colors)) {
-                    $colors[] = $color;
-                }                                
-            }
+            $allVariants = $this->traverseAllVariants($product);
             $topProducts[] = [
                 'product' => $product,
-                'sizes' => $sizes,
-                'colors' => $colors,
+                'sizes' => $allVariants['sizes'],
+                'colors' => $allVariants['colors'],
             ];
         }
         $productClassListing = new ProductClassListing();
@@ -64,31 +53,13 @@ class ProductsController extends FrontendController
             throw $this->createNotFoundException('Product not found');
         }
 
-        $sizes = [];
-        $colors = [];
-        $variations = [];
-
-        foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
-            $size = $variant->getVariationSize() ?? 'Ebat Yok';
-            $color = $variant->getVariationColor() ?? 'Renk Yok';
-            if (empty($variations[$size])) {
-                $variations[$size] = [];
-            }
-            $variations[$size][$color] = $variant;
-
-            if (!in_array($size, $sizes)) {
-                $sizes[] = $size;
-            }
-            if (!in_array($color, $colors)) {
-                $colors[] = $color;
-            }                                
-        }
+        $allVariants = $this->traverseAllVariants($product);
 
         return $this->render('products/detail.html.twig', [
             'product' => $product,
-            'sizes' => $sizes,
-            'colors' => $colors,
-            'variations' => $variations,
+            'sizes' => $allVariants['sizes'],
+            'colors' => $allVariants['colors'],
+            'variations' => $allVariants['variants'],
         ]);
     }
 
@@ -107,25 +78,14 @@ class ProductsController extends FrontendController
         }
 
         $newSize = $request->get('newSize');
-        $sizes = [];
-        $colors = [];
-        foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
-            $size = $variant->getVariationSize();
-            $color = $variant->getVariationColor();
-            if (!in_array($size, $sizes)) {
-                $sizes[] = $size;
-            }
-            if (!in_array($color, $colors)) {
-                $colors[] = $color;
-            }
-        }
+        $allVariants = $this->traverseAllVariants($product);
 
-        if (in_array($newSize, $sizes) || empty($newSize)) {
+        if (in_array($newSize, $allVariants['sizes']) || empty($newSize)) {
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
         // if there are no children or no color variations
-        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($colors) == 1 && empty($colors[0]))) {
+        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($allVariants['colors']) == 1 && empty($allVariants['colors'][0]))) {
             $newVariation = new Product();
             $newVariation->setProductCode($this->generateUniqueCode());
             $newVariation->setParent($product);
@@ -138,7 +98,7 @@ class ProductsController extends FrontendController
         }
 
         // if there are no size variations
-        if (count($sizes) == 1 && empty($sizes[0])) {
+        if (count($allVariants['sizes']) == 1 && empty($allVariants['sizes'][0])) {
             foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
                 $variant->setVariationSize($newSize);
                 $variant->setKey($newSize . ' ' . $variant->getVariationColor());
@@ -148,7 +108,7 @@ class ProductsController extends FrontendController
         }
 
         // if there are both size and color variations
-        foreach ($colors as $color) {
+        foreach ($allVariants['colors'] as $color) {
             $newVariation = new Product();
             $newVariation->setParent($product);
             $newVariation->setProductCode($this->generateUniqueCode());
@@ -178,25 +138,14 @@ class ProductsController extends FrontendController
         }
 
         $newColor = $request->get('newColor');
-        $sizes = [];
-        $colors = [];
-        foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
-            $size = $variant->getVariationSize();
-            $color = $variant->getVariationColor();
-            if (!in_array($size, $sizes)) {
-                $sizes[] = $size;
-            }
-            if (!in_array($color, $colors)) {
-                $colors[] = $color;
-            }
-        }
+        $allVariants = $this->traverseAllVariants($product);
 
-        if (in_array($newColor, $colors) || empty($newColor)) {
+        if (in_array($newColor, $allVariants['colors']) || empty($newColor)) {
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
         // if there are no children or no size variations
-        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($sizes) == 1 && empty($sizes[0]))) {
+        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($allVariants['sizes']) == 1 && empty($allVariants['sizes'][0]))) {
             $newVariation = new Product();
             $newVariation->setProductCode($this->generateUniqueCode());
             $newVariation->setParent($product);
@@ -209,7 +158,7 @@ class ProductsController extends FrontendController
         }
 
         // if there are no size variations
-        if (count($colors) == 1 && empty($colors[0])) {
+        if (count($allVariants['colors']) == 1 && empty($allVariants['colors'][0])) {
             foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
                 $variant->setVariationColor($newColor);
                 $variant->setKey($variant->getVariationSize(). ' ' . $newColor);
@@ -219,7 +168,7 @@ class ProductsController extends FrontendController
         }
 
         // if there are both size and color variations
-        foreach ($sizes as $size) {
+        foreach ($allVariants['sizes'] as $size) {
             $newVariation = new Product();
             $newVariation->setParent($product);
             $newVariation->setProductCode($this->generateUniqueCode());
@@ -263,6 +212,64 @@ class ProductsController extends FrontendController
 
         return $randomString;
     }
+
+    /**
+     * Traverses all variants of a given product and organizes them by size and color.
+     *
+     * @param Product $product
+     * @param bool $includingUnpublished
+     * @return array
+     */
+    private function traverseAllVariants(Product $product, bool $includingUnpublished = true): array
+    {
+        $variants = [];
+        $sizes = [];
+        $colors = [];
+
+        // Helper function to traverse variants recursively
+        $this->traverseVariantsRecursively($product, $variants, $sizes, $colors, $includingUnpublished);
+
+        return [
+            'variants' => $variants,
+            'sizes' => $sizes,
+            'colors' => $colors
+        ];
+    }
+
+    /**
+     * Helper function to traverse variants recursively and populate arrays.
+     *
+     * @param \Pimcore\Model\DataObject\AbstractObject $product
+     * @param array &$variants
+     * @param array &$sizes
+     * @param array &$colors
+     * @param bool $includingUnpublished
+     * @return void
+     */
+    private function traverseVariantsRecursively($product, array &$variants, array &$sizes, array &$colors, bool $includingUnpublished): void
+    {
+        foreach ($product->getChildren(includingUnpublished:$includingUnpublished) as $variant) {
+            $size = $variant->getVariationSize() ?? '';
+            $color = $variant->getVariationColor() ?? '';
+
+            if (!in_array($size, $sizes, true)) {
+                $sizes[] = $size;
+            }
+
+            if (!in_array($color, $colors, true)) {
+                $colors[] = $color;
+            }
+
+            if (!isset($variants[$size])) {
+                $variants[$size] = [];
+            }
+
+            $variants[$size][$color] = $variant;
+
+            $this->traverseVariantsRecursively($variant, $variants, $sizes, $colors, $includingUnpublished);
+        }
+    }
+
 
 }
 
