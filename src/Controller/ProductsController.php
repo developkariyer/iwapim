@@ -55,8 +55,16 @@ class ProductsController extends FrontendController
 
         $allVariants = $this->traverseAllVariants($product);
 
+        $parentProduct = null;
+        while ($parent = $product->getParent()) {
+            if ($parent instanceof Product) {
+                $parentProduct = $parent;
+            }
+        }
+
         return $this->render('products/detail.html.twig', [
             'product' => $product,
+            'parentProduct' => $parentProduct,
             'sizes' => $allVariants['sizes'],
             'colors' => $allVariants['colors'],
             'variations' => $allVariants['variants'],

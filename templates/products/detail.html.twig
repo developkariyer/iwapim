@@ -6,9 +6,9 @@
 {% block content %}
     <div class="card card-custom mb-3">
         <div class="card-body">
-            {% if product.type == 'variant' %}
-                <i>Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': product.parent.id}) }}">{{ product.parent.key }} {{ product.parent.name }}</a></i>
-                <h1>{{ product.parent.key }} {{ product.name }} {{ product.key }} ({{ product.productClass }})</h1>
+            {% if parentProduct %}
+                <i>Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a></i>
+                <h1>{{ parentProduct.key }} {{ product.name }} {{ product.key }} ({{ product.productClass }})</h1>
             {% else %}
                 <h1>{{ product.key }} {{ product.name }} ({{ product.productClass }})</h1>
             {% endif %}
