@@ -220,7 +220,7 @@ class ProductsController extends FrontendController
      * @param bool $includingUnpublished
      * @return array
      */
-    private function traverseAllVariants(Product $product, bool $includingUnpublished = false): array
+    private function traverseAllVariants(Product $product, bool $includingUnpublished = true): array
     {
         $variants = [];
         $sizes = [];
@@ -264,8 +264,10 @@ class ProductsController extends FrontendController
             if (!isset($variants[$size])) {
                 $variants[$size] = [];
             }
-
-            $variants[$size][$color] = $variant;
+            // if published add to matrix
+            if ($variant->isPublished()) {
+                $variants[$size][$color] = $variant;
+            }
 
             $this->traverseVariantsRecursively($variant, $variants, $sizes, $colors, $includingUnpublished);
         }
