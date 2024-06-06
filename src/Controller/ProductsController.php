@@ -78,7 +78,7 @@ class ProductsController extends FrontendController
     private function colorVariantObjects(Product $product): array
     {
         $colorVariants = [];
-        foreach ($product->getChildren() as $variant) {
+        foreach ($product->getChildren(includingUnpublished:true) as $variant) {
             $color = $variant->getVariationColor() ?? '';
             $colorVariants[$color] = $variant;
         }
