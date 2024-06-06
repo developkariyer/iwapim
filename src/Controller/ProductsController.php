@@ -113,9 +113,11 @@ class ProductsController extends FrontendController
         return $variation;
     }
 
-    private function updateVariant(Product $variant, Product $parent, $key, $size, $color, $published): Product
+    private function updateVariant(Product $variant, Product|null $parent, $key, $size, $color, $published): Product
     {
-        $variant->setParent($parent);
+        if ($parent) {
+            $variant->setParent($parent);
+        }
         $variant->setKey($key);
         if (!empty($size)) {
             $variant->setVariationSize($size);
@@ -186,7 +188,18 @@ class ProductsController extends FrontendController
             }
         }
 
+        $allVariants = $this->traverseAllVariants($product);
+        $colorVariants = $this->colorVariantObjects($product);
 
+        foreach ($allVariants['sizes'] as $size) {
+            foreach ($allVariants['colors'] as $color) {
+                if ($allVariants['variants'][$size][$color] instanceof Product)  {
+                    $this->updateVariant($allVariants['variants'][$size][$color], null, $size.' '.$color, $size, '', true);
+                } else {
+                    $this->addVariant($colorVariants[$color], $size.' '.$color, $size, '', true);
+                }
+            }
+        }
 
         return $this->redirectToRoute('product_detail', ['id' => $id]);
     }    
