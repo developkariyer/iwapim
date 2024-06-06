@@ -152,10 +152,10 @@
             </div>
         </div>
         <div class="tab-pane fade" id="varyasyonlar" role="tabpanel" aria-labelledby="varyasyonlar-tab">
-            {% if product.type != 'variant' %}
             <div class="card card-custom mb-3">
                 <div class="card-body">
                     <h2>Varyasyonlar</h2>
+                    {% if product.type != 'variant' %}
                     <table class="table table-bordered text-center table-striped">
                         <thead>
                             <tr>
@@ -211,11 +211,11 @@
                             </form>
                         </div>
                     </div>
+                    {% else %}               
+                        Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a>
+                    {% endif %}    
                 </div>
             </div>
-            {% else %}               
-                Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a>
-            {% endif %}
         </div>
         <div class="tab-pane fade" id="set-icerigi" role="tabpanel" aria-labelledby="set-icerigi-tab">
             <div class="card card-custom mb-3">
