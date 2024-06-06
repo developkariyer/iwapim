@@ -212,7 +212,9 @@
                         </div>
                     </div>
                 </div>
-            </div>                
+            </div>
+            {% else %}               
+                Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a>
             {% endif %}
         </div>
         <div class="tab-pane fade" id="set-icerigi" role="tabpanel" aria-labelledby="set-icerigi-tab">
