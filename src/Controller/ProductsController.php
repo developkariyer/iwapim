@@ -133,6 +133,7 @@ class ProductsController extends FrontendController
      */
     public function addSizeColorAction(Request $request, $id): Response
     {
+        echo "Run";
         $product = Product::getById($id);
         if (!$product) {
             throw $this->createNotFoundException('Product not found');
