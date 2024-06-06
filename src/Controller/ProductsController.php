@@ -58,7 +58,6 @@ class ProductsController extends FrontendController
         $parentProduct = null;
         $parent = $product;
         while ($parent = $parent->getParent()) {
-            var_dump($parent->getPath());
             if ($parent->getPath() === '/') {
                 break;
             }
@@ -76,10 +75,63 @@ class ProductsController extends FrontendController
         ]);
     }
 
+    private function colorVariantObjects(Product $product): array
+    {
+        $colorVariants = [];
+        foreach ($product->getChildren() as $variant) {
+            $color = $variant->getVariationColor() ?? '';
+            $colorVariants[$color] = $variant;
+        }
+        return $colorVariants;
+    }
+
+    private function sizeVariantObjects(Product $product): array
+    {
+        $sizeVariants = [];
+        foreach ($product->getChildren() as $variant) {
+            $size = $variant->getVariationSize() ?? '';
+            $sizeVariants[$size] = $variant;
+        }
+        return $sizeVariants;
+    }
+
+    private function addVariant(Product $parent, $key, $size, $color, $published): Product
+    {
+        $variation = new Product();
+        $variation->setParent($parent);
+        $variation->setProductCode($this->generateUniqueCode());
+        $variation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+        $variation->setKey($key);
+        if (!empty($size)) {
+            $variation->setVariationSize($size);
+        }
+        if (!empty($color)) {
+            $variation->setVariationColor($color);
+        }
+        $variation->setPublished($published);
+        $variation->save();
+        return $variation;
+    }
+
+    private function updateVariant(Product $variant, Product $parent, $key, $size, $color, $published): Product
+    {
+        $variant->setParent($parent);
+        $variant->setKey($key);
+        if (!empty($size)) {
+            $variant->setVariationSize($size);
+        }
+        if (!empty($color)) {
+            $variant->setVariationColor($color);
+        }
+        $variant->setPublished($published);
+        $variant->save();
+        return $variant;
+    }
+
     /**
-     * @Route("/product/{id}/add-size", name="add_size", methods={"POST"})
+     * @Route("/product/{id}/add-size-color", name="add_size_color", methods={"POST"})
      */
-    public function addSizeAction(Request $request, $id): Response
+    public function addSizeColorAction(Request $request, $id): Response
     {
         $product = Product::getById($id);
         if (!$product) {
@@ -90,111 +142,45 @@ class ProductsController extends FrontendController
             throw $this->createNotFoundException('Variants cannot be re-varianted');
         }
 
-        $newSize = $request->get('newSize');
+        $newSize = $request->get('newSize', '');
+        $newColor = $request->get('newColor', '');
+
         $allVariants = $this->traverseAllVariants($product);
 
-        if (in_array($newSize, $allVariants['sizes']) || empty($newSize)) {
+        if ((empty($newSize) && empty($newColor)) || 
+            (!empty($newColor) && !empty($newColor)) ||
+            (empty($newSize) && in_array($newColor, $allVariants['colors'])) ||
+            (empty($newColor) && in_array($newSize, $allVariants['sizes']))) {
+            // do nothing
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
-        // if there are no children or no color variations
-        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($allVariants['colors']) == 1 && empty($allVariants['colors'][0]))) {
-            $newVariation = new Product();
-            $newVariation->setProductCode($this->generateUniqueCode());
-            $newVariation->setParent($product);
-            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
-            $newVariation->setKey($newSize);
-            $newVariation->setVariationSize($newSize);
-            $newVariation->setPublished(true);
-            $newVariation->save();
-            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        // if a new color, first add its variation to parent
+        if (!empty($newColor) && !empty($allVariants['colors'][0])) {
+            $this->addVariant($product, $newColor, '', $newColor, false);
         }
 
-        // if there are no size variations
-        if (count($allVariants['sizes']) == 1 && empty($allVariants['sizes'][0])) {
-            foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
-                $variant->setVariationSize($newSize);
-                $variant->setKey($newSize . ' ' . $variant->getVariationColor());
-                $variant->save();
+        $colorVariants = $this->colorVariantObjects($product);
+
+        if (!empty($newColor) && empty($allVariants['colors'][0])) {
+            $colorVariants[$newColor] = $this->updateVariant($colorVariants[$allVariants['colors'][0]], $product, $newColor, '', $newColor, false);
+        }
+
+        if (!empty($newSize) && !empty($allVariants['sizes'][0])) {
+            foreach ($colorVariants as $color => $variant) {
+                $this->addVariant($variant, $newSize.' '.$color, $newSize, '', true);
             }
-            return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
-        // if there are both size and color variations
-        foreach ($allVariants['colors'] as $color) {
-            $newVariation = new Product();
-            $newVariation->setParent($product);
-            $newVariation->setProductCode($this->generateUniqueCode());
-            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
-            $newVariation->setKey($newSize . ' ' . $color);
-            $newVariation->setVariationSize($newSize);
-            $newVariation->setVariationColor($color);
-            $newVariation->setPublished(true);
-            $newVariation->save();
+        if (!empty($newSize) && empty($allVariants['sizes'][0])) {
+            foreach ($colorVariants as $color => $variant) {
+                $variants = $this->sizeVariantObjects($variant);
+                $this->updateVariant($variants[$allVariants['sizes'][0]], $variant, $newSize.' '.$color, $newSize, '', true);
+            }
         }
 
         return $this->redirectToRoute('product_detail', ['id' => $id]);
     }    
-
-    /**
-     * @Route("/product/{id}/add-color", name="add_color", methods={"POST"})
-     */
-    public function addColorAction(Request $request, $id): Response
-    {
-        $product = Product::getById($id);
-        if (!$product) {
-            throw $this->createNotFoundException('Product not found');
-        }
-
-        if ($product->getParent() instanceof Product) {
-            throw $this->createNotFoundException('Variants cannot be re-varianted');
-        }
-
-        $newColor = $request->get('newColor');
-        $allVariants = $this->traverseAllVariants($product);
-
-        if (in_array($newColor, $allVariants['colors']) || empty($newColor)) {
-            return $this->redirectToRoute('product_detail', ['id' => $id]);
-        }
-
-        // if there are no children or no size variations
-        if (!count($product->getChildren(includingUnpublished:TRUE)) || (count($allVariants['sizes']) == 1 && empty($allVariants['sizes'][0]))) {
-            $newVariation = new Product();
-            $newVariation->setProductCode($this->generateUniqueCode());
-            $newVariation->setParent($product);
-            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
-            $newVariation->setKey($newColor);
-            $newVariation->setVariationColor($newColor);
-            $newVariation->setPublished(true);
-            $newVariation->save();
-            return $this->redirectToRoute('product_detail', ['id' => $id]);
-        }
-
-        // if there are no size variations
-        if (count($allVariants['colors']) == 1 && empty($allVariants['colors'][0])) {
-            foreach ($product->getChildren(includingUnpublished:TRUE) as $variant) {
-                $variant->setVariationColor($newColor);
-                $variant->setKey($variant->getVariationSize(). ' ' . $newColor);
-                $variant->save();
-            }
-            return $this->redirectToRoute('product_detail', ['id' => $id]);
-        }
-
-        // if there are both size and color variations
-        foreach ($allVariants['sizes'] as $size) {
-            $newVariation = new Product();
-            $newVariation->setParent($product);
-            $newVariation->setProductCode($this->generateUniqueCode());
-            $newVariation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
-            $newVariation->setKey($size . ' ' . $newColor);
-            $newVariation->setVariationSize($size);
-            $newVariation->setVariationColor($newColor);
-            $newVariation->setPublished(true);
-            $newVariation->save();
-        }
-
-        return $this->redirectToRoute('product_detail', ['id' => $id]);
-    }
 
     private function generateUniqueCode()
     {

@@ -150,7 +150,7 @@
             </table>
             <div class="row">
                 <div class="col-md-6">
-                    <form action="{{ path('add_size', {'id': product.id}) }}" method="post" class="d-flex">
+                    <form action="{{ path('add_size_color', {'id': product.id}) }}" method="post" class="d-flex">
                         <div class="form-group mr-2">
                             <input type="text" id="newSize" name="newSize" class="form-control" placeholder="Yeni Ebat" required>
                         </div>
@@ -158,7 +158,7 @@
                     </form>
                 </div>
                 <div class="col-md-6">
-                    <form action="{{ path('add_color', {'id': product.id}) }}" method="post" class="d-flex">
+                    <form action="{{ path('add_size_color', {'id': product.id}) }}" method="post" class="d-flex">
                         <div class="form-group mr-2">
                             <input type="text" id="newColor" name="newColor" class="form-control" placeholder="Yeni Renk" required>
                         </div>
