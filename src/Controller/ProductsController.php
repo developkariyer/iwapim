@@ -133,7 +133,8 @@ class ProductsController extends FrontendController
      */
     public function addAction(Request $request, $id): Response
     {
-        echo "Run";
+        error_log('Controller triggered');
+        
         $product = Product::getById($id);
         if (!$product) {
             throw $this->createNotFoundException('Product not found');
