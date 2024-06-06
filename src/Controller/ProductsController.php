@@ -228,6 +228,7 @@ class ProductsController extends FrontendController
 
         // Helper function to traverse variants recursively
         $this->traverseVariantsRecursively($product, $variants, $sizes, $colors, $includingUnpublished);
+        $this->initializeVariantsMatrix($variants, $sizes, $colors);
 
         return [
             'variants' => $variants,
@@ -270,6 +271,27 @@ class ProductsController extends FrontendController
         }
     }
 
+    /**
+     * Ensures all combinations of sizes and colors are initialized in the variants matrix.
+     *
+     * @param array &$variants
+     * @param array $sizes
+     * @param array $colors
+     * @return void
+     */
+    private function initializeVariantsMatrix(array &$variants, array $sizes, array $colors): void
+    {
+        foreach ($sizes as $size) {
+            if (!isset($variants[$size])) {
+                $variants[$size] = [];
+            }
+            foreach ($colors as $color) {
+                if (!isset($variants[$size][$color])) {
+                    $variants[$size][$color] = null;
+                }
+            }
+        }
+    }
 
 }
 
