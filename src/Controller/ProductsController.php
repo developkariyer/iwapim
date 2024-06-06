@@ -88,7 +88,7 @@ class ProductsController extends FrontendController
     private function sizeVariantObjects(Product $product): array
     {
         $sizeVariants = [];
-        foreach ($product->getChildren() as $variant) {
+        foreach ($product->getChildren(includingUnpublished:true) as $variant) {
             $size = $variant->getVariationSize() ?? '';
             $sizeVariants[$size] = $variant;
         }
