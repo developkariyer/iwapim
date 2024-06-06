@@ -294,7 +294,7 @@
                                     <strong>Durum:</strong> {{ material.status }}<br>
                                     <strong>Varlık:</strong>
                                     {% if material.asset %}
-                                        <a href="{{ material.asset.getFullPath() }}" target="_blank">{{ material.asset.getFilename() }}</a>
+                                        <a href="{{ material.asset.getFullPath() }}" target="_blank"><img src="{{ material.asset.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ material.title }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;"></a>
                                     {% else %}
                                         Yok
                                     {% endif %}
