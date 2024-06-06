@@ -134,7 +134,7 @@ class ProductsController extends FrontendController
     public function addAction(Request $request, $id): Response
     {
         error_log('Controller triggered');
-        
+
         $product = Product::getById($id);
         if (!$product) {
             throw $this->createNotFoundException('Product not found');
@@ -154,6 +154,7 @@ class ProductsController extends FrontendController
             (empty($newSize) && in_array($newColor, $allVariants['colors'])) ||
             (empty($newColor) && in_array($newSize, $allVariants['sizes']))) {
             // do nothing
+            error_log ('do nothing');
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
