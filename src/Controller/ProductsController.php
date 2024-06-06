@@ -155,40 +155,38 @@ class ProductsController extends FrontendController
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
 
-        // if a new color, first add its variation to parent
         if (!empty($newColor) && !empty($allVariants['colors'][0])) {
-            error_log('1');
-            $this->addVariant($product, $newColor, '', $newColor, false);
+            $colorObject = $this->addVariant($product, $newColor, '', $newColor, false);
+            foreach ($allVariants['sizes'] as $size) {
+                $this->addVariant($colorObject, $size.' '.$newColor, $size, '', true);
+            }
         }
 
         $colorVariants = $this->colorVariantObjects($product);
 
         if (!empty($newColor) && empty($allVariants['colors'][0])) {
-            error_log('2');
             $colorVariants[$newColor] = $this->updateVariant($colorVariants[$allVariants['colors'][0]], $product, $newColor, '', $newColor, false);
         }
 
         if (!empty($newSize) && !empty($allVariants['sizes'][0])) {
-            error_log('3');
             foreach ($colorVariants as $color => $variant) {
-                error_log('3.1:'.$color);
                 $this->addVariant($variant, $newSize.' '.$color, $newSize, '', true);
             }
         }
 
         if (!empty($newSize) && empty($allVariants['sizes'][0])) {
-            error_log('4');
             if (empty($colorVariants)) {
                 $colorObject = $this->addVariant($product, $newSize, '', '', false);
                 $this->addVariant($colorObject, $newSize, $newSize, '', true);
             } else {
                 foreach ($colorVariants as $color => $variant) {
-                    error_log('4.1:'.$color);
                     $variants = $this->sizeVariantObjects($variant);
                     $this->updateVariant($variants[$allVariants['sizes'][0]], $variant, $newSize.' '.$color, $newSize, '', true);
                 }
             }
         }
+
+
 
         return $this->redirectToRoute('product_detail', ['id' => $id]);
     }    
