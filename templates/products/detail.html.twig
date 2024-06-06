@@ -255,31 +255,32 @@
             </div>
         </div>
         <div class="tab-pane fade" id="reklam" role="tabpanel" aria-labelledby="reklam-tab">
-            <div class="card card-custom mb-3">
-                <div class="card-body">
-                    <h2>Reklam</h2>
-                    {% if product.marketingMaterials|length > 0 %}
-                        <ul>
-                            {% for material in product.marketingMaterials %}
-                                <li>
-                                    <strong>Başlık:</strong> {{ material.title }}<br>
-                                    <strong>Açıklama:</strong> {{ material.description }}<br>
-                                    <strong>Kampanya Adı:</strong> {{ material.campaignName }}<br>
-                                    <strong>Durum:</strong> {{ material.status }}<br>
-                                    <strong>Varlık:</strong>
-                                    {% if material.asset %}
-                                        <a href="{{ material.asset.getFullPath() }}" target="_blank">{{ material.asset.getFilename() }}</a>
-                                    {% else %}
-                                        Yok
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Reklam materyalleri yok.</p>
-                    {% endif %}
-                </div>
-            </div>
+        </div>
+    </div>
+
+    <div class="card card-custom mb-3">
+        <div class="card-body">
+            <h2>Reklam</h2>
+            {% if product.marketingMaterials|length > 0 %}
+                <ul>
+                    {% for material in product.marketingMaterials %}
+                        <li>
+                            <strong>Başlık:</strong> {{ material.title }}<br>
+                            <strong>Açıklama:</strong> {{ material.description }}<br>
+                            <strong>Kampanya Adı:</strong> {{ material.campaignName }}<br>
+                            <strong>Durum:</strong> {{ material.status }}<br>
+                            <strong>Varlık:</strong>
+                            {% if material.asset %}
+                                <a href="{{ material.asset.getFullPath() }}" target="_blank">{{ material.asset.getFilename() }}</a>
+                            {% else %}
+                                Yok
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Reklam materyalleri yok.</p>
+            {% endif %}
         </div>
     </div>
 
