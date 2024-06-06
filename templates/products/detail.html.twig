@@ -76,10 +76,10 @@
     <!-- Tab panes -->
     <div class="tab-content">
         <div class="tab-pane fade show active" id="resimler" role="tabpanel" aria-labelledby="resimler-tab">
-            {% if product.album|length > 0 %}
             <div class="card card-custom mb-3">
                 <div class="card-body">
                     <h2>Ürün Görselleri</h2>
+                    {% if product.album|length > 0 %}
                     <div class="row">
                         {% for image in product.album %}
                             {% if image %}
@@ -91,11 +91,11 @@
                             {% endif %}
                         {% endfor %}
                     </div>
+                    {% else %}
+                        <p>Ürün görseli yok.</p>
+                    {% endif %}
                 </div>
             </div>
-            {% else %}
-                <p>Ürün görseli yok.</p>
-            {% endif %}
         </div>
         <div class="tab-pane fade" id="ebatlar" role="tabpanel" aria-labelledby="ebatlar-tab">
             <div class="card card-custom mb-3">
@@ -212,7 +212,7 @@
                         </div>
                     </div>
                     {% else %}               
-                        Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a>
+                        Varyasyon üründür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a>
                     {% endif %}    
                 </div>
             </div>
