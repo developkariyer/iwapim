@@ -171,6 +171,7 @@ class ProductsController extends FrontendController
                 $colorVariants[$newColor] = $this->updateVariant($colorVariants[$allVariants['colors'][0]], $product, $newColor, '', $newColor, false);
             } else {
                 $colorVariants[$newColor] = $this->addVariant($product, $newColor, '', $newColor, false);
+                $this->addVariant($colorVariants[$newColor], $newColor, '', '', true);
             }
         }
 
