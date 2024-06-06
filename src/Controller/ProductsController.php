@@ -148,7 +148,7 @@ class ProductsController extends FrontendController
         $allVariants = $this->traverseAllVariants($product);
 
         if ((empty($newSize) && empty($newColor)) || 
-            (!empty($newColor) && !empty($newColor)) ||
+            (!empty($newSize) && !empty($newColor)) ||
             (empty($newSize) && in_array($newColor, $allVariants['colors'])) ||
             (empty($newColor) && in_array($newSize, $allVariants['sizes']))) {
             error_log('do nothing: C:'. $newColor .' S:'. $newSize);
