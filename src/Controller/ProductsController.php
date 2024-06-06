@@ -220,7 +220,7 @@ class ProductsController extends FrontendController
      * @param bool $includingUnpublished
      * @return array
      */
-    private function traverseAllVariants(Product $product, bool $includingUnpublished = true): array
+    private function traverseAllVariants(Product $product, bool $includingUnpublished = false): array
     {
         $variants = [];
         $sizes = [];
