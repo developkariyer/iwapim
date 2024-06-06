@@ -253,19 +253,18 @@ class ProductsController extends FrontendController
             $size = $variant->getVariationSize() ?? '';
             $color = $variant->getVariationColor() ?? '';
 
-            if (!in_array($size, $sizes, true)) {
-                $sizes[] = $size;
-            }
-
-            if (!in_array($color, $colors, true)) {
-                $colors[] = $color;
-            }
-
-            if (!isset($variants[$size])) {
-                $variants[$size] = [];
-            }
-            // if published add to matrix
             if ($variant->isPublished()) {
+                if (!in_array($size, $sizes, true)) {
+                    $sizes[] = $size;
+                }
+
+                if (!in_array($color, $colors, true)) {
+                    $colors[] = $color;
+                }
+
+                if (!isset($variants[$size])) {
+                    $variants[$size] = [];
+                }
                 $variants[$size][$color] = $variant;
             }
 
