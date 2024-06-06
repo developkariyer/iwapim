@@ -287,7 +287,7 @@
                         {% if product.marketingMaterials|length > 0 %}
                             <div class="row">
                                 {% for material in product.marketingMaterials %}
-                                    <div class="col-md-4 mb-4">
+                                    <div class="col-md-3 mb-4">
                                         <div class="card h-100">
                                             <div class="card-body">
                                                 <h5 class="card-title">{{ material.title }}</h5>
@@ -296,9 +296,9 @@
                                                 <p class="card-text"><strong>Durum:</strong> {{ material.status }}</p>
                                             </div>
                                             {% if material.asset %}
-                                                <div class="card-footer bg-white border-0">
+                                                <div class="card-footer bg-white border-0 p-0">
                                                     <a href="{{ material.asset.getFullPath() }}" target="_blank">
-                                                        <img src="{{ material.asset.getThumbnail('default') }}" class="img-thumbnail" alt="{{ material.title }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 100%;">
+                                                        <img src="{{ material.asset.getThumbnail('default') }}" class="img-fluid w-100" alt="{{ material.title }}" style="border-radius: 0 0 10px 10px;">
                                                     </a>
                                                 </div>
                                             {% else %}
@@ -309,7 +309,7 @@
                                         </div>
                                     </div>
                                 {% endfor %}
-                            </div>
+                            </div>                        
                         {% else %}
                         <p>Reklam materyalleri yok.</p>
                     {% endif %}
