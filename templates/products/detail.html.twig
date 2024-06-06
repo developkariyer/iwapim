@@ -45,7 +45,10 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="ebatlar-tab" data-bs-toggle="tab" data-bs-target="#ebatlar" type="button" role="tab" aria-controls="ebatlar" aria-selected="true">Ebatlar</button>
+            <button class="nav-link active" id="resimler-tab" data-bs-toggle="tab" data-bs-target="#resimler" type="button" role="tab" aria-controls="resimler" aria-selected="true">Ürün Görselleri</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ebatlar-tab" data-bs-toggle="tab" data-bs-target="#ebatlar" type="button" role="tab" aria-controls="ebatlar" aria-selected="false">Ebatlar</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="varyasyonlar-tab" data-bs-toggle="tab" data-bs-target="#varyasyonlar" type="button" role="tab" aria-controls="varyasyonlar" aria-selected="false">Varyasyonlar</button>
@@ -72,7 +75,14 @@
 
     <!-- Tab panes -->
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="ebatlar" role="tabpanel" aria-labelledby="ebatlar-tab">
+        <div class="tab-pane fade show active" id="resimler" role="tabpanel" aria-labelledby="resimler-tab">
+            <div class="card card-custom mb-3">
+                <div class="card-body">
+                    <h2>Ürün Görselleri</h2>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="ebatlar" role="tabpanel" aria-labelledby="ebatlar-tab">
             <div class="card card-custom mb-3">
                 <div class="card-body">
                     <h2>Ebatlar</h2>
