@@ -129,8 +129,8 @@
                                 <td class="text-nowrap">{{ product.packegeHeight }}</td>
                                 <td class="text-nowrap">{{ product.packageDepth }}</td>
                                 <td class="text-nowrap">{{ product.packageWeight }}</td>
-                                <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 3000 }}</td>
-                                <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)) / 5000 }}</td>
+                                <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)/3000) }}</td>
+                                <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)/5000) }}</td>
                             </tr>
                             {% if product.bundleItems|length > 0 %}
                                 <tr><td colspan="7" class="text-center"><h4>Set İçindeki Ürünlerin Paket (Kutu) Ebatları</h4></td></tr>
@@ -141,8 +141,8 @@
                                         <td class="text-nowrap">{{ item.packegeHeight }}</td>
                                         <td class="text-nowrap">{{ item.packageDepth }}</td>
                                         <td class="text-nowrap">{{ item.packageWeight }}</td>
-                                        <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 3000 }}</td>
-                                        <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)) / 5000 }}</td>
+                                        <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)/3000) }}</td>
+                                        <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)/5000) }}</td>
                                     </tr>
                                 {% endfor %}
                             {% endif %}

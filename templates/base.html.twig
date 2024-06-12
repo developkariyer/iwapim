@@ -7,6 +7,8 @@
     <title>{% block title %}My Website{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('bundles/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('bundles/bootstrap/font/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/adminlte/css/adminlte.min.css') }}">
+
     {% block stylesheets %}
     {% endblock %}
     <style>
@@ -34,6 +36,7 @@
     </div>
 
     <script src="{{ asset('bundles/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('bundles/adminlte/js/adminlte.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     {% block javascripts %}
