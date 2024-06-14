@@ -6,6 +6,7 @@ use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Event\Model\DataObjectEvent;
+use Pimcore\Model\Element\ValidationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProductListener implements EventSubscriberInterface
@@ -62,13 +63,11 @@ class ProductListener implements EventSubscriberInterface
             if (!$object->getIwasku() && $object->getProductClass() && $object->getIwaskuActive()) {
                 $parent = $object->getParent();
                 if (!$parent instanceOf Product) {
-                    $object->setIwaskuActive(false);
-                    return;
+                    throw new ValidationException("Sadece ebat ve renk tanımlı ürünler için IWASKU numarası alınabilir.");
                 }
                 $mainProduct = $parent->getParent();
                 if (!$mainProduct instanceOf Product) {
-                    $object->setIwaskuActive(false);
-                    return;
+                    throw new ValidationException("Sadece ebat ve renk tanımlı ürünler için IWASKU numarası alınabilir.");
                 }
                 $iwasku = "{$mainProduct->getProductClass()}_{$mainProduct->getProductCode()}_{$object->getProductCode()}";
                 $object->setIwasku($iwasku);
