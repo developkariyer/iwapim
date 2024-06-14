@@ -60,13 +60,11 @@ class ProductListener implements EventSubscriberInterface
 
         if ($object instanceof Product) {
             if (!$object->getIwasku() && $object->getProductClass() && $object->getIwaskuActive()) {
-                if (!$object->isVariant()) {
+                $parent = $object->getParent();
+                if (!$parent instanceOf Product) {
                     return;
                 }
-                if (!$object->getParent()->isVariant()) {
-                    return;
-                }
-                $mainProduct = $object->getParent()->getParent();
+                $mainProduct = $parent->getParent();
                 if (!$mainProduct instanceOf Product) {
                     return;
                 }
