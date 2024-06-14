@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Event\Model\DataObjectEvent;
@@ -15,7 +16,33 @@ class ProductListener implements EventSubscriberInterface
         return [
             'pimcore.dataobject.preAdd' => 'onPreAdd',
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
+            'pimcore.dataobject.postUpdate' => 'onPostUpdate',
         ];
+    }
+
+    public function onPostUpdate(DataObjectEvent $event)
+    {
+        $object = $event->getObject();
+        if ($object instanceof Product) {
+            $productClass = $object->getProductClass();
+            $targetFolderPath = '/Ürünler';
+            if (!empty($productClass)) {
+                $targetFolderPath .= '/' . $productClass;
+                $targetFolder = DataObject::getByPath($targetFolderPath);
+                if (!$targetFolder) {
+                    $targetFolder = new DataObject\Folder();
+                    $targetFolder->setKey($productClass);
+                    $targetFolder->setParent(DataObject::getByPath('/Ürünler'));
+                    $targetFolder->save();
+                }
+            } else {
+                $targetFolder = DataObject::getByPath($targetFolderPath);
+            }
+            if ($targetFolder instanceof Folder) {
+                $object->setParent($targetFolder);
+                $object->save();
+            }
+        }
     }
 
     public function onPreAdd(DataObjectEvent $event)
