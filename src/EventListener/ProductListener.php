@@ -60,26 +60,20 @@ class ProductListener implements EventSubscriberInterface
 
         if ($object instanceof Product) {
             if (!$object->getIwasku() && $object->getProductClass() && $object->getIwaskuActive()) {
-                $topMostProduct = $this->getTopMostProduct($object);
-                if (empty($topMostProduct)) {
-                    $topMostProduct = $object;
+                if (!$object->isVariant()) {
+                    return;
                 }
-                $iwasku = "{$topMostProduct->getProductClass()}_{$topMostProduct->getProductCode()}_{$object->getProductCode()}";
+                if (!$object->getParent()->isVariant()) {
+                    return;
+                }
+                $mainProduct = $object->getParent()->getParent();
+                if (!$mainProduct instanceOf Product) {
+                    return;
+                }
+                $iwasku = "{$mainProduct->getProductClass()}_{$mainProduct->getProductCode()}_{$object->getProductCode()}";
                 $object->setIwasku($iwasku);
             }
         }
-    }
-
-    private function getTopMostProduct(Product $object)
-    {
-        $parent = $object;
-        $topMostProduct = null;
-        while ($parent = $parent->getParent()) {
-            if ($parent instanceof Product) {
-                $topMostProduct = $parent;
-            }
-        }
-        return $topMostProduct;
     }
 
     private function generateCustomString($length = 6) {
