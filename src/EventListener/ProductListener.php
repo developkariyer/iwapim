@@ -38,10 +38,8 @@ class ProductListener implements EventSubscriberInterface
             } else {
                 $targetFolder = DataObject::getByPath($targetFolderPath);
             }
-            if ($targetFolder instanceof Folder) {
-                $object->setParent($targetFolder);
-                $object->save();
-            }
+            $object->setParent($targetFolder);
+            $object->save();
         }
     }
 
