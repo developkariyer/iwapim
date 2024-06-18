@@ -16,7 +16,9 @@
     "pimcore/admin-ui-classic-bundle": "^1.0",
     "pimcore/pimcore": "^11.0.4",
     "symfony/dotenv": "^6.2",
-    "symfony/runtime": "^6.2"
+    "symfony/runtime": "^6.2",
+    "twbs/bootstrap": "^5.3",
+    "twbs/bootstrap-icons": "^1.11"
   },
   "require-dev": {
     "codeception/codeception": "^5.0.3",
@@ -44,7 +46,13 @@
     ],
     "post-update-cmd": [
       "Pimcore\\Composer::postUpdate",
-      "@pimcore-scripts"
+      "@pimcore-scripts",
+      "rm -rf public/bundles/bootstrap",
+      "mkdir -p public/bundles/bootstrap/css public/bundles/bootstrap/js public/bundles/bootstrap/font public/bundles/bootstrap/icons",
+      "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css public/bundles/bootstrap/css/",
+      "cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js public/bundles/bootstrap/js/",
+      "cp vendor/twbs/bootstrap-icons/font/bootstrap-icons.css public/bundles/bootstrap/font/",
+      "cp vendor/twbs/bootstrap-icons/icons/* public/bundles/bootstrap/icons/"
     ],
     "pimcore-scripts": [
       "Pimcore\\Composer::clearCache",

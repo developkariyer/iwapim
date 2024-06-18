@@ -10,9 +10,11 @@
  * - productCode [input]
  * - productClass [select]
  * - name [input]
+ * - nameEnglish [input]
  * - description [textarea]
- * - variation [objectbricks]
  * - album [imageGallery]
+ * - variationSize [input]
+ * - variationColor [input]
  * - productWidth [numeric]
  * - productHeight [numeric]
  * - productDepth [numeric]
@@ -26,6 +28,9 @@
  * - seoKeywords [fieldcollections]
  * - bundleItems [manyToManyObjectRelation]
  * - marketingMaterials [manyToManyObjectRelation]
+ * - urls [fieldcollections]
+ * - unitCost [numeric]
+ * - maliyet [fieldcollections]
  */
 
 namespace Pimcore\Model\DataObject;
@@ -40,7 +45,10 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductCode(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductClass(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByName(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByNameEnglish(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByDescription(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByVariationSize(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByVariationColor(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductWidth(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductHeight(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductDepth(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
@@ -53,6 +61,7 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getBySeoDescription(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByBundleItems(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByMarketingMaterials(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByUnitCost(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 */
 
 class Product extends Concrete
@@ -62,9 +71,11 @@ public const FIELD_IWASKU_ACTIVE = 'iwaskuActive';
 public const FIELD_PRODUCT_CODE = 'productCode';
 public const FIELD_PRODUCT_CLASS = 'productClass';
 public const FIELD_NAME = 'name';
+public const FIELD_NAME_ENGLISH = 'nameEnglish';
 public const FIELD_DESCRIPTION = 'description';
-public const FIELD_VARIATION = 'variation';
 public const FIELD_ALBUM = 'album';
+public const FIELD_VARIATION_SIZE = 'variationSize';
+public const FIELD_VARIATION_COLOR = 'variationColor';
 public const FIELD_PRODUCT_WIDTH = 'productWidth';
 public const FIELD_PRODUCT_HEIGHT = 'productHeight';
 public const FIELD_PRODUCT_DEPTH = 'productDepth';
@@ -78,6 +89,9 @@ public const FIELD_SEO_DESCRIPTION = 'seoDescription';
 public const FIELD_SEO_KEYWORDS = 'seoKeywords';
 public const FIELD_BUNDLE_ITEMS = 'bundleItems';
 public const FIELD_MARKETING_MATERIALS = 'marketingMaterials';
+public const FIELD_URLS = 'urls';
+public const FIELD_UNIT_COST = 'unitCost';
+public const FIELD_MALIYET = 'maliyet';
 
 protected $classId = "product";
 protected $className = "Product";
@@ -86,9 +100,11 @@ protected $iwaskuActive;
 protected $productCode;
 protected $productClass;
 protected $name;
+protected $nameEnglish;
 protected $description;
-protected $variation;
 protected $album;
+protected $variationSize;
+protected $variationColor;
 protected $productWidth;
 protected $productHeight;
 protected $productDepth;
@@ -102,6 +118,9 @@ protected $seoDescription;
 protected $seoKeywords;
 protected $bundleItems;
 protected $marketingMaterials;
+protected $urls;
+protected $unitCost;
+protected $maliyet;
 
 
 /**
@@ -336,6 +355,50 @@ public function setName(?string $name): static
 }
 
 /**
+* Get nameEnglish - Ürün Adı (İngilizce)
+* @return string|null
+*/
+public function getNameEnglish(): ?string
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("nameEnglish");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->nameEnglish;
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("nameEnglish")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("nameEnglish");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set nameEnglish - Ürün Adı (İngilizce)
+* @param string|null $nameEnglish
+* @return $this
+*/
+public function setNameEnglish(?string $nameEnglish): static
+{
+	$this->markFieldDirty("nameEnglish", true);
+
+	$this->nameEnglish = $nameEnglish;
+
+	return $this;
+}
+
+/**
 * Get description - Ürün Tanımı
 * @return string|null
 */
@@ -380,43 +443,6 @@ public function setDescription(?string $description): static
 }
 
 /**
-* @return \Pimcore\Model\DataObject\Product\Variation
-*/
-public function getVariation(): ?\Pimcore\Model\DataObject\Objectbrick
-{
-	$data = $this->variation;
-	if (!$data) {
-		if (\Pimcore\Tool::classExists("\\Pimcore\\Model\\DataObject\\Product\\Variation")) {
-			$data = new \Pimcore\Model\DataObject\Product\Variation($this, "variation");
-			$this->variation = $data;
-		} else {
-			return null;
-		}
-	}
-	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
-		$preValue = $this->preGetValue("variation");
-		if ($preValue !== null) {
-			return $preValue;
-		}
-	}
-
-	return $data;
-}
-
-/**
-* Set variation - Varyasyon ise
-* @param \Pimcore\Model\DataObject\Objectbrick|null $variation
-* @return $this
-*/
-public function setVariation(?\Pimcore\Model\DataObject\Objectbrick $variation): static
-{
-	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Objectbricks $fd */
-	$fd = $this->getClass()->getFieldDefinition("variation");
-	$this->variation = $fd->preSetData($this, $variation);
-	return $this;
-}
-
-/**
 * Get album - Ürün Görselleri
 * @return \Pimcore\Model\DataObject\Data\ImageGallery|null
 */
@@ -456,6 +482,94 @@ public function setAlbum(?\Pimcore\Model\DataObject\Data\ImageGallery $album): s
 	$this->markFieldDirty("album", true);
 
 	$this->album = $album;
+
+	return $this;
+}
+
+/**
+* Get variationSize - Varyant ise Ebatı
+* @return string|null
+*/
+public function getVariationSize(): ?string
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("variationSize");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->variationSize;
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("variationSize")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("variationSize");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set variationSize - Varyant ise Ebatı
+* @param string|null $variationSize
+* @return $this
+*/
+public function setVariationSize(?string $variationSize): static
+{
+	$this->markFieldDirty("variationSize", true);
+
+	$this->variationSize = $variationSize;
+
+	return $this;
+}
+
+/**
+* Get variationColor - Variant ise Rengi
+* @return string|null
+*/
+public function getVariationColor(): ?string
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("variationColor");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->variationColor;
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("variationColor")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("variationColor");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set variationColor - Variant ise Rengi
+* @param string|null $variationColor
+* @return $this
+*/
+public function setVariationColor(?string $variationColor): static
+{
+	$this->markFieldDirty("variationColor", true);
+
+	$this->variationColor = $variationColor;
 
 	return $this;
 }
@@ -1024,6 +1138,107 @@ public function setMarketingMaterials(?array $marketingMaterials): static
 		$this->markFieldDirty("marketingMaterials", true);
 	}
 	$this->marketingMaterials = $fd->preSetData($this, $marketingMaterials);
+	return $this;
+}
+
+/**
+* @return \Pimcore\Model\DataObject\Fieldcollection|null
+*/
+public function getUrls(): ?\Pimcore\Model\DataObject\Fieldcollection
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("urls");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->getClass()->getFieldDefinition("urls")->preGetData($this);
+	return $data;
+}
+
+/**
+* Set urls - Urls
+* @param \Pimcore\Model\DataObject\Fieldcollection|null $urls
+* @return $this
+*/
+public function setUrls(?\Pimcore\Model\DataObject\Fieldcollection $urls): static
+{
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Fieldcollections $fd */
+	$fd = $this->getClass()->getFieldDefinition("urls");
+	$this->urls = $fd->preSetData($this, $urls);
+	return $this;
+}
+
+/**
+* Get unitCost - Birim Maliyet
+* @return float|null
+*/
+public function getUnitCost(): ?float
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("unitCost");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->unitCost;
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("unitCost")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("unitCost");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set unitCost - Birim Maliyet
+* @param float|null $unitCost
+* @return $this
+*/
+public function setUnitCost(?float $unitCost): static
+{
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Numeric $fd */
+	$fd = $this->getClass()->getFieldDefinition("unitCost");
+	$this->unitCost = $fd->preSetData($this, $unitCost);
+	return $this;
+}
+
+/**
+* @return \Pimcore\Model\DataObject\Fieldcollection|null
+*/
+public function getMaliyet(): ?\Pimcore\Model\DataObject\Fieldcollection
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("maliyet");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->getClass()->getFieldDefinition("maliyet")->preGetData($this);
+	return $data;
+}
+
+/**
+* Set maliyet - Maliyet
+* @param \Pimcore\Model\DataObject\Fieldcollection|null $maliyet
+* @return $this
+*/
+public function setMaliyet(?\Pimcore\Model\DataObject\Fieldcollection $maliyet): static
+{
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Fieldcollections $fd */
+	$fd = $this->getClass()->getFieldDefinition("maliyet");
+	$this->maliyet = $fd->preSetData($this, $maliyet);
 	return $this;
 }
 

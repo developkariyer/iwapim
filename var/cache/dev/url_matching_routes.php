@@ -323,9 +323,9 @@ return [
         '/admin/misc/test' => [[['_route' => 'pimcore_admin_misc_test', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\MiscController::testAction'], null, null, null, false, false, null]],
         '/admin/notification/recipients' => [[['_route' => 'pimcore_admin_notification_recipients', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::recipientsAction'], null, ['GET' => 0], null, false, false, null]],
         '/admin/notification/send' => [[['_route' => 'pimcore_admin_notification_send', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::sendAction'], null, ['POST' => 0], null, false, false, null]],
-        '/admin/notification/find' => [[['_route' => 'pimcore_admin_notification_find', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::findAction'], null, null, null, false, false, null]],
-        '/admin/notification/find-all' => [[['_route' => 'pimcore_admin_notification_findall', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::findAllAction'], null, null, null, false, false, null]],
-        '/admin/notification/find-last-unread' => [[['_route' => 'pimcore_admin_notification_findlastunread', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::findLastUnreadAction'], null, null, null, false, false, null]],
+        '/admin/notification/find' => [[['_route' => 'pimcore_admin_notification_find', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::findAction'], null, ['GET' => 0], null, false, false, null]],
+        '/admin/notification/find-all' => [[['_route' => 'pimcore_admin_notification_findall', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::findAllAction'], null, ['POST' => 0], null, false, false, null]],
+        '/admin/notification/find-last-unread' => [[['_route' => 'pimcore_admin_notification_findlastunread', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::findLastUnreadAction'], null, ['GET' => 0], null, false, false, null]],
         '/admin/notification/mark-as-read' => [[['_route' => 'pimcore_admin_notification_markasread', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::markAsReadAction'], null, ['PUT' => 0], null, false, false, null]],
         '/admin/notification/delete' => [[['_route' => 'pimcore_admin_notification_delete', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::deleteAction'], null, ['DELETE' => 0], null, false, false, null]],
         '/admin/notification/delete-all' => [[['_route' => 'pimcore_admin_notification_deleteall', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\NotificationController::deleteAllAction'], null, ['DELETE' => 0], null, false, false, null]],
@@ -493,10 +493,7 @@ return [
                 .')'
                 .'|/product/([^/]++)(?'
                     .'|(*:554)'
-                    .'|/add\\-(?'
-                        .'|size(*:575)'
-                        .'|color(*:588)'
-                    .')'
+                    .'|/add(*:566)'
                 .')'
             .')/?$}sDu',
     ],
@@ -516,9 +513,8 @@ return [
         501 => [[['_route' => 'pimcore_admin_document_document_diffversions', '_controller' => 'Pimcore\\Bundle\\AdminBundle\\Controller\\Admin\\Document\\DocumentController::diffVersionsAction'], ['from', 'to'], ['GET' => 0], null, false, true, null]],
         525 => [[['_route' => 'pimcore_webdav', '_controller' => 'Pimcore\\Bundle\\CoreBundle\\Controller\\WebDavController::webdavAction'], ['path'], null, null, false, true, null]],
         554 => [[['_route' => 'product_detail', '_controller' => 'App\\Controller\\ProductsController::detailAction'], ['id'], null, null, false, true, null]],
-        575 => [[['_route' => 'add_size', '_controller' => 'App\\Controller\\ProductsController::addSizeAction'], ['id'], ['POST' => 0], null, false, false, null]],
-        588 => [
-            [['_route' => 'add_color', '_controller' => 'App\\Controller\\ProductsController::addColorAction'], ['id'], ['POST' => 0], null, false, false, null],
+        566 => [
+            [['_route' => 'add', '_controller' => 'App\\Controller\\ProductsController::addAction'], ['id'], ['POST' => 0], null, false, false, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

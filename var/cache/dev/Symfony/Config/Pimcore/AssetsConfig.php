@@ -2,6 +2,7 @@
 
 namespace Symfony\Config\Pimcore;
 
+require_once __DIR__.\DIRECTORY_SEPARATOR.'Assets'.\DIRECTORY_SEPARATOR.'ThumbnailsConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'Assets'.\DIRECTORY_SEPARATOR.'FrontendPrefixesConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'Assets'.\DIRECTORY_SEPARATOR.'ImageConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'Assets'.\DIRECTORY_SEPARATOR.'VideoConfig.php';
@@ -18,6 +19,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
  */
 class AssetsConfig 
 {
+    private $thumbnails;
     private $frontendPrefixes;
     private $previewImageThumbnail;
     private $defaultUploadPath;
@@ -31,6 +33,21 @@ class AssetsConfig
     private $metadata;
     private $typeDefinitions;
     private $_usedProperties = [];
+
+    /**
+     * @default {"allowed_formats":["avif","eps","gif","jpeg","jpg","pjpeg","png","svg","tiff","webm","webp","print"],"max_scaling_factor":5}
+    */
+    public function thumbnails(array $value = []): \Symfony\Config\Pimcore\Assets\ThumbnailsConfig
+    {
+        if (null === $this->thumbnails) {
+            $this->_usedProperties['thumbnails'] = true;
+            $this->thumbnails = new \Symfony\Config\Pimcore\Assets\ThumbnailsConfig($value);
+        } elseif (0 < \func_num_args()) {
+            throw new InvalidConfigurationException('The node created by "thumbnails()" has already been initialized. You cannot pass values the second time you call thumbnails().');
+        }
+
+        return $this->thumbnails;
+    }
 
     /**
      * @default {"source":"","thumbnail":"","thumbnail_deferred":""}
@@ -206,6 +223,12 @@ class AssetsConfig
 
     public function __construct(array $value = [])
     {
+        if (array_key_exists('thumbnails', $value)) {
+            $this->_usedProperties['thumbnails'] = true;
+            $this->thumbnails = new \Symfony\Config\Pimcore\Assets\ThumbnailsConfig($value['thumbnails']);
+            unset($value['thumbnails']);
+        }
+
         if (array_key_exists('frontend_prefixes', $value)) {
             $this->_usedProperties['frontendPrefixes'] = true;
             $this->frontendPrefixes = new \Symfony\Config\Pimcore\Assets\FrontendPrefixesConfig($value['frontend_prefixes']);
@@ -286,6 +309,9 @@ class AssetsConfig
     public function toArray(): array
     {
         $output = [];
+        if (isset($this->_usedProperties['thumbnails'])) {
+            $output['thumbnails'] = $this->thumbnails->toArray();
+        }
         if (isset($this->_usedProperties['frontendPrefixes'])) {
             $output['frontend_prefixes'] = $this->frontendPrefixes->toArray();
         }
