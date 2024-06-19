@@ -6,15 +6,15 @@
 /config/pimcore/parameters.yml
 /build/
 /phpunit.xml
-#/public/bundles/
+/public/bundles/
 
 # local config
 /.env.local
 /.env.local.php
 /.env.*.local
-!/config/local
-#/config/local/*
-!config/local/.gitkeep
+#!config/local
+/config/local/*
+!/config/local/.gitkeep
 
 /var/*
 !/var/.gitkeep
@@ -23,15 +23,15 @@
 /var/cache
 
 !/var/config
-#/var/config/system.yml
-#/var/config/maintenance.php
+/var/config/system.yml
+/var/config/maintenance.php
 
 # project specific recommendations
 #/var/config/tag-manager.php
 #/var/config/reports.php
 
 
-#/public/var/
+/public/var/
 /public/sitemap*.xml
 
 # PHP-CS-Fixer
