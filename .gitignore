@@ -48,3 +48,7 @@ nbproject
 
 # temp
 .temp
+var/log/dev.log
+var/log/usage.log
+var/log/debug.log
+var/log/php.log
