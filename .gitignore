@@ -16,10 +16,10 @@
 #/config/local/*
 !config/local/.gitkeep
 
-#/var/*
+/var/*
 !/var/.gitkeep
-#!/var/classes/
-#/var/classes/DataObject
+!/var/classes/
+!/var/classes/DataObject
 /var/cache
 
 !/var/config
