@@ -25,8 +25,8 @@ class ProductListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
         if ($object instanceof Product) {
-            $productClass = $object->getProductClass();
             $targetFolderPath = '/Ürünler';
+            $productClass = $object->getProductClass();
             if (!empty($productClass)) {
                 $targetFolderPath .= '/' . $productClass;
                 $targetFolder = DataObject::getByPath($targetFolderPath);

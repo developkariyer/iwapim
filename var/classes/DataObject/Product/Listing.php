@@ -79,6 +79,18 @@ public function filterByName ($data, $operator = '='): static
 }
 
 /**
+* Filter by nameEnglish (Ürün Adı (İngilizce))
+* @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
+* @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterByNameEnglish ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("nameEnglish")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
 * Filter by description (Ürün Tanımı)
 * @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
 * @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
@@ -87,6 +99,30 @@ public function filterByName ($data, $operator = '='): static
 public function filterByDescription ($data, $operator = '='): static
 {
 	$this->getClass()->getFieldDefinition("description")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
+* Filter by variationSize (Varyant ise Ebatı)
+* @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
+* @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterByVariationSize ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("variationSize")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
+* Filter by variationColor (Variant ise Rengi)
+* @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
+* @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterByVariationColor ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("variationColor")->addListingFilter($this, $data, $operator);
 	return $this;
 }
 
@@ -231,6 +267,18 @@ public function filterByBundleItems ($data, $operator = '='): static
 public function filterByMarketingMaterials ($data, $operator = '='): static
 {
 	$this->getClass()->getFieldDefinition("marketingMaterials")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
+* Filter by unitCost (Birim Maliyet)
+* @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
+* @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterByUnitCost ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("unitCost")->addListingFilter($this, $data, $operator);
 	return $this;
 }
 

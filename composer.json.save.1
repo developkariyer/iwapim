@@ -1,0 +1,61 @@
+{
+  "name": "pimcore/skeleton",
+  "type": "project",
+  "license": "GPL-3.0-or-later",
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "process-timeout": 0,
+    "allow-plugins": {
+      "symfony/runtime": true
+    }
+  },
+  "prefer-stable": true,
+  "require": {
+    "blackbit_digital_commerce/pimcore-iframe-portlet": "^1.0",
+    "pimcore/admin-ui-classic-bundle": "^1.0",
+    "pimcore/pimcore": "^11.0.4",
+    "symfony/dotenv": "^6.2",
+    "symfony/runtime": "^6.2",
+    "twbs/bootstrap": "^5.3",
+    "twbs/bootstrap-icons": "*"
+  },
+  "require-dev": {
+    "codeception/codeception": "^5.0.3",
+    "codeception/module-symfony": "^3.1.0"
+  },
+  "suggest": {
+    "pimcore/data-hub": "Universal data interface for GraphQL, CSV and other formats"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/",
+      "Pimcore\\Model\\DataObject\\": "var/classes/DataObject"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "App\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "post-create-project-cmd": "Pimcore\\Composer::postCreateProject",
+    "post-install-cmd": [
+      "Pimcore\\Composer::postInstall",
+      "@pimcore-scripts"
+    ],
+    "post-update-cmd": [
+      "Pimcore\\Composer::postUpdate",
+      "@pimcore-scripts",
+      "rm -rf public/bundles/bootstrap",
+      "mkdir -p public/bundles/bootstrap/css public/bundles/bootstrap/js public/bundles/bootstrap/font",
+      "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css public/bundles/bootstrap/css/",
+      "cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js public/bundles/bootstrap/js/",
+      "cp vendor/twbs/bootstrap-icons/font/bootstrap-icons.css public/bundles/bootfont/"
+    ],
+    "pimcore-scripts": [
+      "Pimcore\\Composer::clearCache",
+      "Pimcore\\Composer::installAssets"
+    ]
+  }
+}

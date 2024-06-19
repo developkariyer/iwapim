@@ -1366,6 +1366,23 @@
           <parameter key="use_hardlinks">true</parameter>
           <parameter key="disable_stack_trace">false</parameter>
         </parameter>
+        <parameter key="thumbnails" type="collection">
+          <parameter key="allowed_formats" type="collection">
+            <parameter>avif</parameter>
+            <parameter>eps</parameter>
+            <parameter>gif</parameter>
+            <parameter>jpeg</parameter>
+            <parameter>jpg</parameter>
+            <parameter>pjpeg</parameter>
+            <parameter>png</parameter>
+            <parameter>svg</parameter>
+            <parameter>tiff</parameter>
+            <parameter>webm</parameter>
+            <parameter>webp</parameter>
+            <parameter>print</parameter>
+          </parameter>
+          <parameter key="max_scaling_factor">5</parameter>
+        </parameter>
         <parameter key="frontend_prefixes" type="collection">
           <parameter key="source"></parameter>
           <parameter key="thumbnail"></parameter>
@@ -4372,6 +4389,14 @@
         <argument type="collection">
           <argument type="service_closure" id="App\EventListener\ProductListener"/>
           <argument>onPreUpdate</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>pimcore.dataobject.postUpdate</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="App\EventListener\ProductListener"/>
+          <argument>onPostUpdate</argument>
         </argument>
         <argument>0</argument>
       </call>
