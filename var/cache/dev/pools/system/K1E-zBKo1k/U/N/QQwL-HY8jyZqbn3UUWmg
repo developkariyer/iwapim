@@ -1,3 +1,0 @@
-<?php //Pimcore%255CKernel%2523getEnvironmentsForDevBundles
-
-return [PHP_INT_MAX, []];

@@ -1,3 +1,0 @@
-<?php //Pimcore%255CKernel%2523boot
-
-return [PHP_INT_MAX, []];

@@ -1,6 +1,6 @@
 <?php
 /**
- * Gumlet.php
+ * InsightTimer.php
  *
  * @package Embera
  * @author Michael Pratt <yo@michael-pratt.com>
@@ -15,18 +15,18 @@ namespace Embera\Provider;
 use Embera\Url;
 
 /**
- * Gumlet Provider
+ * InsightTimer Provider
  *
- * @link https://gumlet.com
+ * @link https://insighttimer.com
  */
-class Gumlet extends ProviderAdapter implements ProviderInterface
+class InsightTimer extends ProviderAdapter implements ProviderInterface
 {
     /** inline {@inheritdoc} */
-    protected $endpoint = 'https://api.gumlet.com/v1/oembed';
+    protected $endpoint = 'https://widgets.insighttimer.com/services/oembed';
 
     /** inline {@inheritdoc} */
     protected static $hosts = [
-        'gumlet.com', '*.gumlet.io', 'gumlet.tv'
+        'insighttimer.com'
     ];
 
     /** inline {@inheritdoc} */
@@ -36,12 +36,12 @@ class Gumlet extends ProviderAdapter implements ProviderInterface
     protected $httpsSupport = true;
 
     /** inline {@inheritdoc} */
-    protected $responsiveSupport = false;
+    protected $responsiveSupport = true;
 
     /** inline {@inheritdoc} */
     public function validateUrl(Url $url)
     {
-        return (bool) (preg_match('~gumlet\.(com|io|tv)/(watch|embed)/([^/]+)~i', (string) $url));
+        return (bool) (preg_match('~insighttimer\.com/([^/]+)~i', (string) $url));
     }
 
     /** inline {@inheritdoc} */
