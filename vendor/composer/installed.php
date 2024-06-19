@@ -3,7 +3,7 @@
         'name' => 'pimcore/skeleton',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '9af52b8cbf028c8f0d9414391caab0304fe2c9f9',
+        'reference' => 'd6a22bc07e087f25940f674793b8e5ee4d63b55f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -667,7 +667,7 @@
         'pimcore/skeleton' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '9af52b8cbf028c8f0d9414391caab0304fe2c9f9',
+            'reference' => 'd6a22bc07e087f25940f674793b8e5ee4d63b55f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
