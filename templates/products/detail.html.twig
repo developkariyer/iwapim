@@ -3,7 +3,7 @@
 
 {% block title %}
 {% if parentProduct %}
-    {{ parentProduct.key }} {{ product.name }} {{ product.key }} ({{ product.productClass }})
+    {{ parentProduct.key }} {{ product.name }} {{ product.parent.key }} {{ product.key }} ({{ product.productClass }})
 {% else %}
     {{ product.key }} {{ product.name }} ({{ product.productClass }})
 {% endif %}
@@ -16,7 +16,7 @@
         <div class="card-body">
             {% if parentProduct %}
                 <i>Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a></i>
-                <h1>{{ parentProduct.key }} {{ product.name }} {{ product.key }} ({{ product.productClass }})</h1>
+                <h1>{{ parentProduct.key }} {{ product.name }} {{ product.parent.key }} {{ product.key }} ({{ product.productClass }})</h1>
             {% else %}
                 <h1>{{ product.key }} {{ product.name }} ({{ product.productClass }})</h1>
             {% endif %}
@@ -181,7 +181,7 @@
                                                     {% if firstImage %}
                                                         <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail" alt="{{ variation.name }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;">
                                                     {% else %}
-                                                        {{ variation.key }}
+                                                        {{ variation.parent.key }} {{ variation.key }}
                                                     {% endif %}
                                                 </a>
                                             {% else %}

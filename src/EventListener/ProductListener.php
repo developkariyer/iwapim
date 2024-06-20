@@ -17,31 +17,7 @@ class ProductListener implements EventSubscriberInterface
         return [
             'pimcore.dataobject.preAdd' => 'onPreAdd',
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
-            'pimcore.dataobject.postUpdate' => 'onPostUpdate',
         ];
-    }
-
-    public function onPostUpdate(DataObjectEvent $event)
-    {
-        $object = $event->getObject();
-        if ($object instanceof Product) {
-            $targetFolderPath = '/Ürünler';
-            $productClass = $object->getProductClass();
-            if (!empty($productClass)) {
-                $targetFolderPath .= '/' . $productClass;
-                $targetFolder = DataObject::getByPath($targetFolderPath);
-                if (!$targetFolder) {
-                    $targetFolder = new DataObject\Folder();
-                    $targetFolder->setKey($productClass);
-                    $targetFolder->setParent(DataObject::getByPath('/Ürünler'));
-                    $targetFolder->save();
-                }
-            } else {
-                $targetFolder = DataObject::getByPath($targetFolderPath);
-            }
-            $object->setParent($targetFolder);
-            $object->save();
-        }
     }
 
     public function onPreAdd(DataObjectEvent $event)
@@ -52,27 +28,55 @@ class ProductListener implements EventSubscriberInterface
             if (!$object->getProductCode()) {
                 $object->setProductCode($this->generateUniqueCode());
             }
+
+            $objectType = $object->getType();
+            if ($objectType === DataObject::OBJECT_TYPE_VARIANT) {
+                $parent = $object->getParent();
+                $grandParent = $parent ? $parent->getParent() : null;
+                if ($grandParent instanceof Product) {
+                    $object->setVariationSize($object->getKey());
+                } else {
+                    $object->setVariationColor($object->getKey());
+                }
+            }
         }
     }
 
     public function onPreUpdate(DataObjectEvent $event)
     {
         $object = $event->getObject();
-
-        if ($object instanceof Product) {
-            if (!$object->getIwasku() && $object->getProductClass() && $object->getIwaskuActive()) {
-                $parent = $object->getParent();
-                if (!$parent instanceOf Product) {
-                    throw new ValidationException("Sadece ebat ve renk tanımlı ürünler için IWASKU numarası alınabilir.");
-                }
-                $mainProduct = $parent->getParent();
-                if (!$mainProduct instanceOf Product) {
-                    throw new ValidationException("Sadece ebat ve renk tanımlı ürünler için IWASKU numarası alınabilir.");
-                }
-                $iwasku = "{$mainProduct->getProductClass()}_{$mainProduct->getProductCode()}_{$object->getProductCode()}";
-                $object->setIwasku($iwasku);
-            }
+        if (!$object instanceof Product) {
+            return;
         }
+
+        $objectType = $object->getType();
+        if ($objectType === DataObject::OBJECT_TYPE_VARIANT) {
+            $parent = $object->getParent();
+            $grandParent = $parent ? $parent->getParent() : null;
+            if ($grandParent instanceof Product) {
+                $object->setVariationSize($object->getKey());
+                if ($object->getIwaskuActive() && empty($object->getIwasku())) {
+                    $iwasku = "{$grandParent->getProductClass()}_{$grandParent->getProductCode()}_{$object->getProductCode()}";
+                    $object->setIwasku($iwasku);             
+                }
+            } else {
+                $object->setVariationColor($object->getKey());
+            }
+            return;
+        }
+
+        $productClass = $object->getProductClass();
+        if (empty($productClass)) {
+            return;
+        }
+        $targetFolder = DataObject::getByPath('/Ürünler/' . $productClass);
+        if (!$targetFolder) {
+            $targetFolder = new DataObject\Folder();
+            $targetFolder->setKey($productClass);
+            $targetFolder->setParent(DataObject::getByPath('/Ürünler'));
+            $targetFolder->save();
+        }
+        $object->setParent($targetFolder);
     }
 
     private function generateCustomString($length = 6) {
@@ -91,7 +95,7 @@ class ProductListener implements EventSubscriberInterface
     private function generateUniqueCode()
     {
         while (true) {
-            $candidateCode = $this->generateCustomString(6);
+            $candidateCode = $this->generateCustomString(5);
             if (!$this->isProductCodeExists($candidateCode)) {
                 return $candidateCode;
             }

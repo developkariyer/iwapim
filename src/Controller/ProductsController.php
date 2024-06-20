@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Pimcore\Controller\FrontendController;
+use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
@@ -21,6 +22,7 @@ class ProductsController extends FrontendController
         $products = new Listing();
         $products->setOrderKey('key');
         $products->setOrder('asc');
+        $products->setObjectTypes([DataObject::OBJECT_TYPE_OBJECT]);
         $productList = $products->load();
         $topProducts = [];
         foreach ($productList as $product) {
@@ -75,6 +77,89 @@ class ProductsController extends FrontendController
         ]);
     }
 
+    /**
+     * @Route("/product/{id}/add", name="add", methods={"POST"})
+     */
+    public function addAction(Request $request, $id): Response
+    {
+        $product = Product::getById($id);
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        if ($product->getParent() instanceof Product) {
+            throw $this->createNotFoundException('Variants cannot be re-varianted');
+        }
+
+        $newSize = $request->get('newSize', '');
+        $newColor = $request->get('newColor', '');
+
+        $allVariants = $this->traverseAllVariants($product);
+
+        if ($this->shouldDoNothing($newSize, $newColor, $allVariants)) {
+            error_log('do nothing: C:'. $newColor .' S:'. $newSize);
+            return $this->redirectToRoute('product_detail', ['id' => $id]);
+        }
+
+        $colorVariants = $this->colorVariantObjects($product);
+
+        if (!empty($newColor)) {
+            $this->handleNewColor($newColor, $allVariants, $colorVariants, $product);
+        }
+
+        if (!empty($newSize)) {
+            $this->handleNewSize($newSize, $allVariants, $colorVariants, $product);
+        }
+
+        return $this->redirectToRoute('product_detail', ['id' => $id]);
+    }
+
+    private function shouldDoNothing($newSize, $newColor, $allVariants)
+    {
+        return  (empty($newSize) && empty($newColor)) ||
+                (!empty($newSize) && !empty($newColor)) ||
+                (empty($newSize) && in_array($newColor, $allVariants['colors'])) ||
+                (empty($newColor) && in_array($newSize, $allVariants['sizes']));
+    }
+
+    private function handleNewColor($newColor, $allVariants, $colorVariants, $product)
+    {
+        if (isset($allVariants['colors'][0]) && $allVariants['colors'][0] === 'Renk yok') {
+            $oldColor = $allVariants['colors'][0];
+            $this->updateVariant($colorVariants[$oldColor], null, $newColor, '', $newColor, false);
+        } else {
+            $colorVariants[$newColor] = $this->addVariant($product, $newColor, '', $newColor, false);
+            if (empty($allVariants['sizes'])) {
+                $allVariants['sizes'] = ['Ebat yok'];
+            }
+            foreach ($allVariants['sizes'] as $size) {
+                $this->addVariant($colorVariants[$newColor], $size, $size, '', true);
+            }
+        }
+    }
+
+    private function handleNewSize($newSize, $allVariants, $colorVariants, $product)
+    {
+        if (isset($allVariants['sizes'][0]) && $allVariants['sizes'][0] === 'Ebat yok') {
+            $oldSize = $allVariants['sizes'][0];
+            foreach ($colorVariants as $variant) {
+                $sizeVariants = $this->sizeVariantObjects($variant);
+                $this->updateVariant($sizeVariants[$oldSize], $variant, $newSize, $newSize, '', true);
+            }
+        } else {
+            if (empty($colorVariants)) {
+                $colorVariants['Renk yok'] = $this->addVariant($product, 'Renk yok', '', 'Renk yok', false);
+            }
+            foreach ($colorVariants as $variant) {
+                $this->addVariant($variant, $newSize, $newSize, '', true);
+            }
+        }
+    }
+
+
+    /* Private functions */
+
+    
     private function colorVariantObjects(Product $product): array
     {
         $colorVariants = [];
@@ -130,89 +215,10 @@ class ProductsController extends FrontendController
         return $variant;
     }
 
-    /**
-     * @Route("/product/{id}/add", name="add", methods={"POST"})
-     */
-    public function addAction(Request $request, $id): Response
-    {
-        $product = Product::getById($id);
-        if (!$product) {
-            throw $this->createNotFoundException('Product not found');
-        }
-
-        if ($product->getParent() instanceof Product) {
-            throw $this->createNotFoundException('Variants cannot be re-varianted');
-        }
-
-        $newSize = $request->get('newSize', '');
-        $newColor = $request->get('newColor', '');
-
-        $allVariants = $this->traverseAllVariants($product);
-
-        if ((empty($newSize) && empty($newColor)) || 
-            (!empty($newSize) && !empty($newColor)) ||
-            (empty($newSize) && in_array($newColor, $allVariants['colors'])) ||
-            (empty($newColor) && in_array($newSize, $allVariants['sizes']))) {
-            error_log('do nothing: C:'. $newColor .' S:'. $newSize);
-            return $this->redirectToRoute('product_detail', ['id' => $id]);
-        }
-
-        if (!empty($newColor) && !empty($allVariants['colors'][0])) {
-            $colorObject = $this->addVariant($product, $newColor, '', $newColor, false);
-            foreach ($allVariants['sizes'] as $size) {
-                $this->addVariant($colorObject, $size.' '.$newColor, $size, '', true);
-            }
-        }
-
-        $colorVariants = $this->colorVariantObjects($product);
-
-        if (!empty($newColor) && empty($allVariants['colors'][0])) {
-            if (isset($allVariants['colors'][0]) && isset($colorVariants[$allVariants['colors'][0]]) && $colorVariants[$allVariants['colors'][0]] instanceof Product) {
-                $colorVariants[$newColor] = $this->updateVariant($colorVariants[$allVariants['colors'][0]], $product, $newColor, '', $newColor, false);
-            } else {
-                $colorVariants[$newColor] = $this->addVariant($product, $newColor, '', $newColor, false);
-                $this->addVariant($colorVariants[$newColor], $newColor, '', '', true);
-            }
-        }
-
-        if (!empty($newSize) && !empty($allVariants['sizes'][0])) {
-            foreach ($colorVariants as $color => $variant) {
-                $this->addVariant($variant, $newSize.' '.$color, $newSize, '', true);
-            }
-        }
-
-        if (!empty($newSize) && empty($allVariants['sizes'][0])) {
-            if (empty($colorVariants)) {
-                $colorObject = $this->addVariant($product, $newSize, '', '', false);
-                $this->addVariant($colorObject, $newSize, $newSize, '', true);
-            } else {
-                foreach ($colorVariants as $color => $variant) {
-                    $variants = $this->sizeVariantObjects($variant);
-                    $this->updateVariant($variants[$allVariants['sizes'][0]], $variant, $newSize.' '.$color, $newSize, '', true);
-                }
-            }
-        }
-
-        $allVariants = $this->traverseAllVariants($product);
-        $colorVariants = $this->colorVariantObjects($product);
-
-        foreach ($allVariants['sizes'] as $size) {
-            foreach ($allVariants['colors'] as $color) {
-                if ($allVariants['variants'][$size][$color] instanceof Product)  {
-                    $this->updateVariant($allVariants['variants'][$size][$color], null, $size.' '.$color, $size, '', true);
-                } else {
-                    $this->addVariant($colorVariants[$color], $size.' '.$color, $size, '', true);
-                }
-            }
-        }
-
-        return $this->redirectToRoute('product_detail', ['id' => $id]);
-    }    
-
     private function generateUniqueCode()
     {
         while (true) {
-            $candidateCode = $this->generateCustomString(6);
+            $candidateCode = $this->generateCustomString(5);
             if (!$this->isProductCodeExists($candidateCode)) {
                 return $candidateCode;
             }
@@ -230,12 +236,10 @@ class ProductsController extends FrontendController
         $characters = 'ABCDEFGHJKMNPQRSTVWXYZ123456789';
         $charactersLength = strlen($characters);
         $randomString = '';
-
         for ($i = 0; $i < $length; $i++) {
             $randomIndex = mt_rand(0, $charactersLength - 1);
             $randomString .= $characters[$randomIndex];
         }
-
         return $randomString;
     }
 
