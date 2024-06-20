@@ -3,13 +3,22 @@
         'name' => 'pimcore/skeleton',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'd6a22bc07e087f25940f674793b8e5ee4d63b55f',
+        'reference' => '1b61509e85fa6d86b201cff704df4caa956b58bf',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'almasaeed2010/adminlte' => array(
+            'pretty_version' => 'v4.0.0-beta1',
+            'version' => '4.0.0.0-beta1',
+            'reference' => '1bcb775aed63e0e7ab3dc8af20076e51906db8ac',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../almasaeed2010/adminlte',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'bacon/bacon-qr-code' => array(
             'pretty_version' => '2.0.8',
             'version' => '2.0.8.0',
@@ -667,7 +676,7 @@
         'pimcore/skeleton' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'd6a22bc07e087f25940f674793b8e5ee4d63b55f',
+            'reference' => '1b61509e85fa6d86b201cff704df4caa956b58bf',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

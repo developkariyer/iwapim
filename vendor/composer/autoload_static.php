@@ -953,6 +953,7 @@ class ComposerStaticInit53529a1d0b9c43a5991c0cbb5f377462
         'App\\EventSubscriber\\BundleSetupSubscriber' => __DIR__ . '/../..' . '/src/EventSubscriber/BundleSetupSubscriber.php',
         'App\\Kernel' => __DIR__ . '/../..' . '/src/Kernel.php',
         'App\\Model\\DataObject\\ProductClassOptionsProvider' => __DIR__ . '/../..' . '/src/Model/DataObject/ProductClassOptionsProvider.php',
+        'App\\Model\\Traits\\ProductTrait' => __DIR__ . '/../..' . '/src/Model/Traits/ProductTrait.php',
         'App\\Tests\\Functional\\Command\\CliCommandTest' => __DIR__ . '/../..' . '/tests/Functional/Command/CliCommandTest.php',
         'App\\Tests\\Unit\\Controller\\DefaultControllerTest' => __DIR__ . '/../..' . '/tests/Unit/Controller/DefaultControllerTest.php',
         'App\\Tests\\Unit\\ReadmeTest' => __DIR__ . '/../..' . '/tests/Unit/ReadmeTest.php',

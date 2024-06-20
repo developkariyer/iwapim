@@ -4,13 +4,13 @@ namespace App\EventListener;
 
 use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Event\Model\DataObjectEvent;
-use Pimcore\Model\Element\ValidationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use App\Model\Traits\ProductTrait;
 
 class ProductListener implements EventSubscriberInterface
 {
+    use ProductTrait;
 
     public static function getSubscribedEvents()
     {
@@ -23,12 +23,10 @@ class ProductListener implements EventSubscriberInterface
     public function onPreAdd(DataObjectEvent $event)
     {
         $object = $event->getObject();
-
         if ($object instanceof Product) {
             if (!$object->getProductCode()) {
                 $object->setProductCode($this->generateUniqueCode());
             }
-
             $objectType = $object->getType();
             if ($objectType === DataObject::OBJECT_TYPE_VARIANT) {
                 $parent = $object->getParent();
@@ -48,7 +46,6 @@ class ProductListener implements EventSubscriberInterface
         if (!$object instanceof Product) {
             return;
         }
-
         $objectType = $object->getType();
         if ($objectType === DataObject::OBJECT_TYPE_VARIANT) {
             $parent = $object->getParent();
@@ -64,7 +61,6 @@ class ProductListener implements EventSubscriberInterface
             }
             return;
         }
-
         $productClass = $object->getProductClass();
         if (empty($productClass)) {
             return;
@@ -77,36 +73,6 @@ class ProductListener implements EventSubscriberInterface
             $targetFolder->save();
         }
         $object->setParent($targetFolder);
-    }
-
-    private function generateCustomString($length = 6) {
-        $characters = 'ABCDEFGHJKMNPQRSTVWXYZ123456789';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $randomIndex = mt_rand(0, $charactersLength - 1);
-            $randomString .= $characters[$randomIndex];
-        }
-
-        return $randomString;
-    }
-
-    private function generateUniqueCode()
-    {
-        while (true) {
-            $candidateCode = $this->generateCustomString(5);
-            if (!$this->isProductCodeExists($candidateCode)) {
-                return $candidateCode;
-            }
-        }
-    }
-
-    private function isProductCodeExists($productCode)
-    {
-        $listing = new Listing();
-        $listing->setCondition('productCode = ?', [$productCode]);
-        return $listing->count() > 0;
     }
 
 }

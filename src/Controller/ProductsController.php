@@ -10,9 +10,11 @@ use Pimcore\Model\DataObject\ProductClass\Listing as ProductClassListing;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Model\Traits\ProductTrait;
 
 class ProductsController extends FrontendController
 {
+    use ProductTrait;
 
     /**
      * @Route("/products", name="products_list")
@@ -50,13 +52,10 @@ class ProductsController extends FrontendController
     public function detailAction(Request $request, $id): Response
     {
         $product = Product::getById($id);
-
         if (!$product) {
             throw $this->createNotFoundException('Product not found');
         }
-
         $allVariants = $this->traverseAllVariants($product);
-
         $parentProduct = null;
         $parent = $product;
         while ($parent = $parent->getParent()) {
@@ -67,7 +66,6 @@ class ProductsController extends FrontendController
                 $parentProduct = $parent;
             }
         }
-
         return $this->render('products/detail.html.twig', [
             'product' => $product,
             'parentProduct' => $parentProduct,
@@ -86,31 +84,22 @@ class ProductsController extends FrontendController
         if (!$product) {
             throw $this->createNotFoundException('Product not found');
         }
-
         if ($product->getParent() instanceof Product) {
             throw $this->createNotFoundException('Variants cannot be re-varianted');
         }
-
         $newSize = $request->get('newSize', '');
         $newColor = $request->get('newColor', '');
-
         $allVariants = $this->traverseAllVariants($product);
-
         if ($this->shouldDoNothing($newSize, $newColor, $allVariants)) {
-            error_log('do nothing: C:'. $newColor .' S:'. $newSize);
             return $this->redirectToRoute('product_detail', ['id' => $id]);
         }
-
         $colorVariants = $this->colorVariantObjects($product);
-
         if (!empty($newColor)) {
             $this->handleNewColor($newColor, $allVariants, $colorVariants, $product);
         }
-
         if (!empty($newSize)) {
             $this->handleNewSize($newSize, $allVariants, $colorVariants, $product);
         }
-
         return $this->redirectToRoute('product_detail', ['id' => $id]);
     }
 
@@ -213,34 +202,6 @@ class ProductsController extends FrontendController
         $variant->setPublished($published);
         $variant->save();
         return $variant;
-    }
-
-    private function generateUniqueCode()
-    {
-        while (true) {
-            $candidateCode = $this->generateCustomString(5);
-            if (!$this->isProductCodeExists($candidateCode)) {
-                return $candidateCode;
-            }
-        }
-    }
-
-    private function isProductCodeExists($productCode)
-    {
-        $listing = new Listing();
-        $listing->setCondition('productCode = ?', [$productCode]);
-        return $listing->count() > 0;
-    }
-
-    private function generateCustomString($length = 6) {
-        $characters = 'ABCDEFGHJKMNPQRSTVWXYZ123456789';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomIndex = mt_rand(0, $charactersLength - 1);
-            $randomString .= $characters[$randomIndex];
-        }
-        return $randomString;
     }
 
     /**

@@ -15,6 +15,7 @@ return array(
     'App\\EventSubscriber\\BundleSetupSubscriber' => $baseDir . '/src/EventSubscriber/BundleSetupSubscriber.php',
     'App\\Kernel' => $baseDir . '/src/Kernel.php',
     'App\\Model\\DataObject\\ProductClassOptionsProvider' => $baseDir . '/src/Model/DataObject/ProductClassOptionsProvider.php',
+    'App\\Model\\Traits\\ProductTrait' => $baseDir . '/src/Model/Traits/ProductTrait.php',
     'App\\Tests\\Functional\\Command\\CliCommandTest' => $baseDir . '/tests/Functional/Command/CliCommandTest.php',
     'App\\Tests\\Unit\\Controller\\DefaultControllerTest' => $baseDir . '/tests/Unit/Controller/DefaultControllerTest.php',
     'App\\Tests\\Unit\\ReadmeTest' => $baseDir . '/tests/Unit/ReadmeTest.php',
