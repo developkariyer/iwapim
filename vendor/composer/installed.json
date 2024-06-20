@@ -1,62 +1,6 @@
 {
     "packages": [
         {
-            "name": "almasaeed2010/adminlte",
-            "version": "v4.0.0-beta1",
-            "version_normalized": "4.0.0.0-beta1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ColorlibHQ/AdminLTE.git",
-                "reference": "1bcb775aed63e0e7ab3dc8af20076e51906db8ac"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ColorlibHQ/AdminLTE/zipball/1bcb775aed63e0e7ab3dc8af20076e51906db8ac",
-                "reference": "1bcb775aed63e0e7ab3dc8af20076e51906db8ac",
-                "shasum": ""
-            },
-            "time": "2024-05-18T12:20:03+00:00",
-            "type": "library",
-            "installation-source": "dist",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Colorlib"
-                }
-            ],
-            "description": "AdminLTE - admin control panel and dashboard that's based on Bootstrap 4",
-            "homepage": "https://adminlte.io/",
-            "keywords": [
-                "JS",
-                "admin",
-                "back-end",
-                "css",
-                "less",
-                "responsive",
-                "template",
-                "theme",
-                "web"
-            ],
-            "support": {
-                "issues": "https://github.com/ColorlibHQ/AdminLTE/issues",
-                "source": "https://github.com/ColorlibHQ/AdminLTE/tree/v4.0.0-beta1"
-            },
-            "funding": [
-                {
-                    "url": "https://www.paypal.me/daniel007in",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/danny007in",
-                    "type": "github"
-                }
-            ],
-            "install-path": "../almasaeed2010/adminlte"
-        },
-        {
             "name": "bacon/bacon-qr-code",
             "version": "2.0.8",
             "version_normalized": "2.0.8.0",
@@ -5306,17 +5250,17 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.2.3",
-            "version_normalized": "11.2.3.0",
+            "version": "11.2.5",
+            "version_normalized": "11.2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8475044fbb0af57c8daea06bcfe21e2785401f97"
+                "reference": "be9e3ed32a1287a9bfda15936cc86fef4e4cf591"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8475044fbb0af57c8daea06bcfe21e2785401f97",
-                "reference": "8475044fbb0af57c8daea06bcfe21e2785401f97",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/be9e3ed32a1287a9bfda15936cc86fef4e4cf591",
+                "reference": "be9e3ed32a1287a9bfda15936cc86fef4e4cf591",
                 "shasum": ""
             },
             "require": {
@@ -5349,7 +5293,7 @@
             "suggest": {
                 "ext-soap": "To be able to generate mocks based on WSDL files"
             },
-            "time": "2024-06-19T05:31:11+00:00",
+            "time": "2024-06-20T13:11:31+00:00",
             "bin": [
                 "phpunit"
             ],
@@ -5389,7 +5333,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.2.3"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.2.5"
             },
             "funding": [
                 {

@@ -12,7 +12,6 @@
   },
   "prefer-stable": true,
   "require": {
-    "almasaeed2010/adminlte": "~4.0.0-beta1",
     "blackbit_digital_commerce/pimcore-iframe-portlet": "^1.0",
     "pimcore/admin-ui-classic-bundle": "^1.0",
     "pimcore/pimcore": "^11.0.4",
