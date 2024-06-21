@@ -8,20 +8,18 @@ use Pimcore\Model\DataObject\ClassDefinition\DynamicOptionsProvider\SelectOption
 
 class ProductClassOptionsProvider implements SelectOptionsProviderInterface
 {
-    public function getOptions(array $context, Data $fieldDefinition): array
+    public function getOptions(array $context, Data $fieldDefinition = null): array
     {
         $options = [];
         $productClasses = new ProductClass\Listing();
         $productClasses->setOrderKey('order');
         $productClasses->setOrder('asc');
-
         foreach ($productClasses as $productClass) {
             $options[] = [
                 'key' => "{$productClass->getProductClassName()} ({$productClass->getKey()})",
                 'value' => $productClass->getKey()
             ];
         }
-
         return $options;
     }
 

@@ -5,7 +5,6 @@
  * Variants: no
  *
  * Fields Summary:
- * - nodeName [input]
  * - nodeType [select]
  * - nodeDescription [textarea]
  * - perLandDeci [numeric]
@@ -28,7 +27,6 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 
 /**
 * @method static \Pimcore\Model\DataObject\PricingNode\Listing getList(array $config = [])
-* @method static \Pimcore\Model\DataObject\PricingNode\Listing|\Pimcore\Model\DataObject\PricingNode|null getByNodeName(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\PricingNode\Listing|\Pimcore\Model\DataObject\PricingNode|null getByNodeType(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\PricingNode\Listing|\Pimcore\Model\DataObject\PricingNode|null getByNodeDescription(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\PricingNode\Listing|\Pimcore\Model\DataObject\PricingNode|null getByPerLandDeci(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
@@ -45,7 +43,6 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 
 class PricingNode extends Concrete
 {
-public const FIELD_NODE_NAME = 'nodeName';
 public const FIELD_NODE_TYPE = 'nodeType';
 public const FIELD_NODE_DESCRIPTION = 'nodeDescription';
 public const FIELD_PER_LAND_DECI = 'perLandDeci';
@@ -62,7 +59,6 @@ public const FIELD_VAR_AIR_DECI = 'varAirDeci';
 
 protected $classId = "price";
 protected $className = "PricingNode";
-protected $nodeName;
 protected $nodeType;
 protected $nodeDescription;
 protected $perLandDeci;
@@ -87,50 +83,6 @@ public static function create(array $values = []): static
 	$object = new static();
 	$object->setValues($values);
 	return $object;
-}
-
-/**
-* Get nodeName - Düğüm İsmi
-* @return string|null
-*/
-public function getNodeName(): ?string
-{
-	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
-		$preValue = $this->preGetValue("nodeName");
-		if ($preValue !== null) {
-			return $preValue;
-		}
-	}
-
-	$data = $this->nodeName;
-
-	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("nodeName")->isEmpty($data)) {
-		try {
-			return $this->getValueFromParent("nodeName");
-		} catch (InheritanceParentNotFoundException $e) {
-			// no data from parent available, continue ...
-		}
-	}
-
-	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
-		return $data->getPlain();
-	}
-
-	return $data;
-}
-
-/**
-* Set nodeName - Düğüm İsmi
-* @param string|null $nodeName
-* @return $this
-*/
-public function setNodeName(?string $nodeName): static
-{
-	$this->markFieldDirty("nodeName", true);
-
-	$this->nodeName = $nodeName;
-
-	return $this;
 }
 
 /**

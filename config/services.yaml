@@ -80,6 +80,6 @@ services:
     #     tags:
     #         - { name: kernel.event_listener, event: pimcore.dataobject.preUpdate, method: onObjectPreUpdate }
 
-    App\EventListener\ProductListener:
+    App\EventListener\DataObjectListener:
         tags:
             - { name: 'kernel.event_subscriber' }

@@ -6,7 +6,6 @@
  * Title: Fiyatlama Kalemi
  *
  * Fields Summary:
- * - nodeName [input]
  * - nodeType [select]
  * - nodeDescription [textarea]
  * - perLandDeci [numeric]
@@ -29,7 +28,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Fiyatlama Kalemi',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1718218426,
+   'modificationDate' => 1718976917,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -73,36 +72,6 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
          'children' => 
         array (
           0 => 
-          \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
-             'name' => 'nodeName',
-             'title' => 'Düğüm İsmi',
-             'tooltip' => '',
-             'mandatory' => false,
-             'noteditable' => false,
-             'index' => true,
-             'locked' => false,
-             'style' => '',
-             'permissions' => NULL,
-             'fieldtype' => '',
-             'relationType' => false,
-             'invisible' => false,
-             'visibleGridView' => true,
-             'visibleSearch' => true,
-             'blockedVarsForExport' => 
-            array (
-            ),
-             'defaultValue' => NULL,
-             'columnLength' => 190,
-             'regex' => '',
-             'regexFlags' => 
-            array (
-            ),
-             'unique' => false,
-             'showCharCount' => false,
-             'width' => '',
-             'defaultValueGenerator' => '',
-          )),
-          1 => 
           \Pimcore\Model\DataObject\ClassDefinition\Data\Select::__set_state(array(
              'name' => 'nodeType',
              'title' => 'Düğüm Tipi',
@@ -178,7 +147,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'optionsProviderClass' => '',
              'optionsProviderData' => '',
           )),
-          2 => 
+          1 => 
           \Pimcore\Model\DataObject\ClassDefinition\Layout\Fieldcontainer::__set_state(array(
              'name' => 'Field Container',
              'type' => NULL,
@@ -253,7 +222,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'labelWidth' => 100,
              'labelAlign' => 'left',
           )),
-          3 => 
+          2 => 
           \Pimcore\Model\DataObject\ClassDefinition\Layout\Tabpanel::__set_state(array(
              'name' => 'Layout',
              'type' => NULL,
@@ -897,6 +866,36 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'enableGridLocking' => false,
    'deletedDataComponents' => 
   array (
+    0 => 
+    \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
+       'name' => 'nodeName',
+       'title' => 'Düğüm İsmi',
+       'tooltip' => '',
+       'mandatory' => false,
+       'noteditable' => false,
+       'index' => true,
+       'locked' => false,
+       'style' => '',
+       'permissions' => NULL,
+       'fieldtype' => '',
+       'relationType' => false,
+       'invisible' => false,
+       'visibleGridView' => true,
+       'visibleSearch' => true,
+       'blockedVarsForExport' => 
+      array (
+      ),
+       'defaultValue' => NULL,
+       'columnLength' => 190,
+       'regex' => '',
+       'regexFlags' => 
+      array (
+      ),
+       'unique' => false,
+       'showCharCount' => false,
+       'width' => '',
+       'defaultValueGenerator' => '',
+    )),
   ),
    'blockedVarsForExport' => 
   array (

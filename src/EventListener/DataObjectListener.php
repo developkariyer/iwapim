@@ -7,8 +7,9 @@ use Pimcore\Model\DataObject\Product;
 use Pimcore\Event\Model\DataObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use App\Model\Traits\ProductTrait;
+use Pimcore\Cache;
 
-class ProductListener implements EventSubscriberInterface
+class DataObjectListener implements EventSubscriberInterface
 {
     use ProductTrait;
 
@@ -17,7 +18,29 @@ class ProductListener implements EventSubscriberInterface
         return [
             'pimcore.dataobject.preAdd' => 'onPreAdd',
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
+            'pimcore.dataobject.postUpdate' => 'onPostUpdate',
         ];
+    }
+
+    public function onPostUpdate(DataObjectEvent $event)
+    {
+        $object = $event->getObject();
+        if ($object instanceof ProductClass || $object instanceof Product) {
+            Cache::remove('productClasses');
+            return;
+        }
+        if ($object instanceof Brand) {
+            Cache::remove('brands');
+            return;
+        }
+        if ($object instanceof PricingNode) {
+            Cache::remove('pricingNodes');
+            return;
+        }
+        if ($object instanceof CostNode) {
+            Cache::remove('costNodes');
+            return;
+        }
     }
 
     public function onPreAdd(DataObjectEvent $event)
