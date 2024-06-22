@@ -5,7 +5,7 @@ namespace App\Model\Traits;
 use Pimcore\Model\DataObject\Product\Listing;
 
 trait ProductTrait
-{
+{/*
     private function generateCustomString($length = 6) {
         $characters = 'ABCDEFGHJKMNPQRSTVWXYZ123456789';
         $charactersLength = strlen($characters);
@@ -19,7 +19,7 @@ trait ProductTrait
         return $randomString;
     }
 
-    private function generateUniqueCode()
+    private function generateUniqueCode($baseCode = '', $numberDigits = 5)
     {
         while (true) {
             $candidateCode = $this->generateCustomString(5);
@@ -34,5 +34,5 @@ trait ProductTrait
         $listing = new Listing();
         $listing->setCondition('productCode = ?', [$productCode]);
         return $listing->count() > 0;
-    }
+    }*/
 }

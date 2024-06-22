@@ -41,10 +41,10 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1718976514,
+   'modificationDate' => 1719080391,
    'userOwner' => 2,
    'userModification' => 2,
-   'parentClass' => '',
+   'parentClass' => 'App\\Model\\DataObject\\Product',
    'implementsInterfaces' => '',
    'listingParentClass' => '',
    'useTraits' => '',
@@ -201,7 +201,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'regexFlags' => 
                 array (
                 ),
-                 'unique' => true,
+                 'unique' => false,
                  'showCharCount' => false,
                  'width' => '',
                  'defaultValueGenerator' => '',

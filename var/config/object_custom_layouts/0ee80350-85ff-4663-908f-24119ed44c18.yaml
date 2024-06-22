@@ -1,0 +1,756 @@
+pimcore:
+    objects:
+        custom_layouts:
+            definitions:
+                0ee80350-85ff-4663-908f-24119ed44c18:
+                    id: 0ee80350-85ff-4663-908f-24119ed44c18
+                    name: mainProduct
+                    description: ''
+                    creationDate: 1719056055
+                    modificationDate: 1719056686
+                    userOwner: 2
+                    classId: product
+                    layoutDefinitions:
+                        name: pimcore_root
+                        type: null
+                        region: null
+                        title: null
+                        width: 0
+                        height: 0
+                        collapsible: false
+                        collapsed: false
+                        bodyStyle: null
+                        datatype: layout
+                        children:
+                            -
+                                name: Layout
+                                type: null
+                                region: null
+                                title: ''
+                                width: ''
+                                height: ''
+                                collapsible: false
+                                collapsed: false
+                                bodyStyle: ''
+                                datatype: layout
+                                children:
+                                    -
+                                        name: productionPanel
+                                        type: null
+                                        region: null
+                                        title: 'Ürün Tanımı'
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: productCode
+                                                title: 'Ürün Kodu'
+                                                tooltip: ''
+                                                mandatory: true
+                                                noteditable: true
+                                                index: true
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: input
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                defaultValue: null
+                                                columnLength: 190
+                                                regex: ''
+                                                regexFlags: {  }
+                                                unique: true
+                                                showCharCount: false
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
+                                            -
+                                                name: productClass
+                                                title: 'Ürün Sınıfı'
+                                                tooltip: ''
+                                                mandatory: true
+                                                noteditable: false
+                                                index: true
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: select
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                options:
+                                                    -
+                                                        key: 'Islamic Metal (IM)'
+                                                        value: IM
+                                                    -
+                                                        key: 'Colorful Metal (CM)'
+                                                        value: CM
+                                                    -
+                                                        key: 'Islamic Ahşap (IA)'
+                                                        value: IA
+                                                    -
+                                                        key: 'Trend Ahşap (TA)'
+                                                        value: TA
+                                                    -
+                                                        key: 'Islamic Tabletop (IT)'
+                                                        value: IT
+                                                    -
+                                                        key: 'Shukran Cam (SC)'
+                                                        value: SC
+                                                    -
+                                                        key: 'Colorful Harita (CH)'
+                                                        value: CH
+                                                    -
+                                                        key: 'Mobilya Ahşap (MA)'
+                                                        value: MA
+                                                    -
+                                                        key: 'Islamic Jewelry (IJ)'
+                                                        value: IJ
+                                                    -
+                                                        key: 'Islamic Textile (IX)'
+                                                        value: IX
+                                                    -
+                                                        key: 'Özel Yapım (ZC)'
+                                                        value: ZC
+                                                    -
+                                                        key: 'Diğer (ZZ)'
+                                                        value: ZZ
+                                                defaultValue: null
+                                                columnLength: 190
+                                                dynamicOptions: false
+                                                defaultValueGenerator: ''
+                                                width: ''
+                                                optionsProviderType: class
+                                                optionsProviderClass: \App\Model\DataObject\ProductClassOptionsProvider
+                                                optionsProviderData: ''
+                                                datatype: data
+                                            -
+                                                name: name
+                                                title: 'Ürün Adı'
+                                                tooltip: ''
+                                                mandatory: true
+                                                noteditable: false
+                                                index: true
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: input
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                defaultValue: null
+                                                columnLength: 190
+                                                regex: ''
+                                                regexFlags: {  }
+                                                unique: false
+                                                showCharCount: false
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
+                                            -
+                                                name: nameEnglish
+                                                title: 'Ürün Adı (İngilizce)'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: input
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                defaultValue: null
+                                                columnLength: 190
+                                                regex: ''
+                                                regexFlags: {  }
+                                                unique: false
+                                                showCharCount: false
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
+                                            -
+                                                name: description
+                                                title: 'Ürün Tanımı'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: textarea
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                maxLength: null
+                                                showCharCount: false
+                                                excludeFromSearchIndex: false
+                                                height: ''
+                                                width: ''
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: dimensionsPanel
+                                        type: null
+                                        region: null
+                                        title: Ebatlar
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: productFieldset
+                                                type: null
+                                                region: null
+                                                title: Ürün
+                                                width: ''
+                                                height: ''
+                                                collapsible: false
+                                                collapsed: false
+                                                bodyStyle: ''
+                                                datatype: layout
+                                                children:
+                                                    -
+                                                        name: productWidth
+                                                        title: En
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                    -
+                                                        name: productHeight
+                                                        title: Boy
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                    -
+                                                        name: productDepth
+                                                        title: Yükseklik
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                    -
+                                                        name: productWeight
+                                                        title: Ağırlık
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                locked: false
+                                                fieldtype: fieldset
+                                                labelWidth: 100
+                                                labelAlign: left
+                                            -
+                                                name: packageFieldset
+                                                type: null
+                                                region: null
+                                                title: 'Paket (Kutu)'
+                                                width: ''
+                                                height: ''
+                                                collapsible: false
+                                                collapsed: false
+                                                bodyStyle: ''
+                                                datatype: layout
+                                                children:
+                                                    -
+                                                        name: packageWidth
+                                                        title: En
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                    -
+                                                        name: packegeHeight
+                                                        title: Boy
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                    -
+                                                        name: packageDepth
+                                                        title: Yükseklik
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                    -
+                                                        name: packageWeight
+                                                        title: Ağırlık
+                                                        tooltip: ''
+                                                        mandatory: false
+                                                        noteditable: false
+                                                        index: false
+                                                        locked: false
+                                                        style: ''
+                                                        permissions: null
+                                                        fieldtype: numeric
+                                                        relationType: false
+                                                        invisible: false
+                                                        visibleGridView: false
+                                                        visibleSearch: false
+                                                        defaultValue: null
+                                                        integer: false
+                                                        unsigned: false
+                                                        minValue: null
+                                                        maxValue: null
+                                                        unique: false
+                                                        decimalSize: null
+                                                        decimalPrecision: null
+                                                        width: ''
+                                                        defaultValueGenerator: ''
+                                                        datatype: data
+                                                locked: false
+                                                fieldtype: fieldset
+                                                labelWidth: 100
+                                                labelAlign: left
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: seoPanel
+                                        type: null
+                                        region: null
+                                        title: SEO
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: seoTitle
+                                                title: 'SEO Başlığı (&lt;h1&gt;)'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: true
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: input
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                defaultValue: null
+                                                columnLength: 190
+                                                regex: ''
+                                                regexFlags: {  }
+                                                unique: false
+                                                showCharCount: false
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
+                                            -
+                                                name: seoDescription
+                                                title: 'SEO Açıklama'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: textarea
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                maxLength: null
+                                                showCharCount: false
+                                                excludeFromSearchIndex: false
+                                                height: ''
+                                                width: ''
+                                                datatype: data
+                                            -
+                                                name: seoKeywords
+                                                title: 'SEO Anahtar Kelimeler'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: fieldcollections
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                allowedTypes:
+                                                    - seyKeywordsFC
+                                                lazyLoading: true
+                                                maxItems: null
+                                                disallowAddRemove: false
+                                                disallowReorder: false
+                                                collapsed: false
+                                                collapsible: false
+                                                border: false
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: bundlePanel
+                                        type: null
+                                        region: null
+                                        title: Set
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: bundleItems
+                                                title: 'Set İçeriği'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: manyToManyObjectRelation
+                                                relationType: true
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                classes:
+                                                    -
+                                                        classes: Product
+                                                displayMode: grid
+                                                pathFormatterClass: ''
+                                                maxItems: null
+                                                visibleFields: 'iwasku,productCode,name,productClass,seoTitle'
+                                                allowToCreateNewObject: false
+                                                allowToClearRelation: true
+                                                optimizedAdminLoading: false
+                                                enableTextSelection: false
+                                                visibleFieldDefinitions: {  }
+                                                width: ''
+                                                height: ''
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: marketingPanel
+                                        type: null
+                                        region: null
+                                        title: Reklam
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: marketingMaterials
+                                                title: 'Marketing Materials'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: manyToManyObjectRelation
+                                                relationType: true
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                classes:
+                                                    -
+                                                        classes: MarketingMaterial
+                                                displayMode: grid
+                                                pathFormatterClass: ''
+                                                maxItems: null
+                                                visibleFields: 'id,key,title,campaignName,status'
+                                                allowToCreateNewObject: false
+                                                allowToClearRelation: true
+                                                optimizedAdminLoading: false
+                                                enableTextSelection: false
+                                                visibleFieldDefinitions: {  }
+                                                width: ''
+                                                height: ''
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: pricingPanel
+                                        type: null
+                                        region: null
+                                        title: Fiyatlandırma
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: unitCost
+                                                title: 'Birim Maliyet'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: numeric
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                defaultValue: null
+                                                integer: false
+                                                unsigned: false
+                                                minValue: null
+                                                maxValue: null
+                                                unique: false
+                                                decimalSize: null
+                                                decimalPrecision: null
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: genericCostPanel
+                                        type: null
+                                        region: null
+                                        title: Maliyet
+                                        width: ''
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: maliyet
+                                                title: Maliyet
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: fieldcollections
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                allowedTypes:
+                                                    - costItems
+                                                lazyLoading: true
+                                                maxItems: null
+                                                disallowAddRemove: false
+                                                disallowReorder: false
+                                                collapsed: false
+                                                collapsible: false
+                                                border: false
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                locked: false
+                                fieldtype: tabpanel
+                                border: false
+                                tabPosition: top
+                        locked: false
+                        fieldtype: panel
+                        layout: null
+                        border: false
+                        icon: null
+                        labelWidth: 100
+                        labelAlign: left
+                    default: 1

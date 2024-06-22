@@ -64,7 +64,7 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByUnitCost(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 */
 
-class Product extends Concrete
+class Product extends \App\Model\DataObject\Product
 {
 public const FIELD_IWASKU = 'iwasku';
 public const FIELD_IWASKU_ACTIVE = 'iwaskuActive';
