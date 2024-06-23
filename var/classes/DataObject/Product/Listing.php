@@ -103,7 +103,7 @@ public function filterByDescription ($data, $operator = '='): static
 }
 
 /**
-* Filter by variationSize (Varyant ise Ebatı)
+* Filter by variationSize (Varyant Ebatı)
 * @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
 * @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
 * @return $this
@@ -115,7 +115,7 @@ public function filterByVariationSize ($data, $operator = '='): static
 }
 
 /**
-* Filter by variationColor (Variant ise Rengi)
+* Filter by variationColor (Variant Rengi)
 * @param string|int|float|array|Model\Element\ElementInterface $data  comparison data, can be scalar or array (if operator is e.g. "IN (?)")
 * @param string $operator  SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
 * @return $this
@@ -279,6 +279,42 @@ public function filterByMarketingMaterials ($data, $operator = '='): static
 public function filterByUnitCost ($data, $operator = '='): static
 {
 	$this->getClass()->getFieldDefinition("unitCost")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
+* Filter by productCosts (Ortak Maliyetler)
+* @param mixed $data
+* @param string $operator SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterByProductCosts ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("productCosts")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
+* Filter by colorCosts (Renk Maliyetleri)
+* @param mixed $data
+* @param string $operator SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterByColorCosts ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("colorCosts")->addListingFilter($this, $data, $operator);
+	return $this;
+}
+
+/**
+* Filter by sizeCosts (Ebat Maliyetleri)
+* @param mixed $data
+* @param string $operator SQL comparison operator, e.g. =, <, >= etc. You can use "?" as placeholder, e.g. "IN (?)"
+* @return $this
+*/
+public function filterBySizeCosts ($data, $operator = '='): static
+{
+	$this->getClass()->getFieldDefinition("sizeCosts")->addListingFilter($this, $data, $operator);
 	return $this;
 }
 

@@ -7,7 +7,7 @@ pimcore:
                     name: colorVariant
                     description: ''
                     creationDate: 1719056097
-                    modificationDate: 1719056236
+                    modificationDate: 1719163610
                     userOwner: 2
                     classId: product
                     layoutDefinitions:
@@ -82,7 +82,7 @@ pimcore:
                                         datatype: data
                                     -
                                         name: variationColor
-                                        title: 'Variant ise Rengi'
+                                        title: 'Variant Rengi'
                                         tooltip: ''
                                         mandatory: false
                                         noteditable: false

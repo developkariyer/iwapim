@@ -10,6 +10,7 @@
  * - cost [numeric]
  * - currency [select]
  * - description [textarea]
+ * - unitCost [calculatedValue]
  */
 
 namespace Pimcore\Model\DataObject;
@@ -33,6 +34,7 @@ public const FIELD_UNIT = 'unit';
 public const FIELD_COST = 'cost';
 public const FIELD_CURRENCY = 'currency';
 public const FIELD_DESCRIPTION = 'description';
+public const FIELD_UNIT_COST = 'unitCost';
 
 protected $classId = "cost";
 protected $className = "CostNode";
@@ -56,9 +58,9 @@ public static function create(array $values = []): static
 
 /**
 * Get amount - Miktar
-* @return float|null
+* @return string|null
 */
-public function getAmount(): ?float
+public function getAmount(): ?string
 {
 	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
 		$preValue = $this->preGetValue("amount");
@@ -78,10 +80,10 @@ public function getAmount(): ?float
 
 /**
 * Set amount - Miktar
-* @param float|null $amount
+* @param string|null $amount
 * @return $this
 */
-public function setAmount(?float $amount): static
+public function setAmount(?string $amount): static
 {
 	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Numeric $fd */
 	$fd = $this->getClass()->getFieldDefinition("amount");
@@ -127,9 +129,9 @@ public function setUnit(?string $unit): static
 
 /**
 * Get cost - Tutar
-* @return float|null
+* @return string|null
 */
-public function getCost(): ?float
+public function getCost(): ?string
 {
 	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
 		$preValue = $this->preGetValue("cost");
@@ -149,10 +151,10 @@ public function getCost(): ?float
 
 /**
 * Set cost - Tutar
-* @param float|null $cost
+* @param string|null $cost
 * @return $this
 */
-public function setCost(?float $cost): static
+public function setCost(?string $cost): static
 {
 	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Numeric $fd */
 	$fd = $this->getClass()->getFieldDefinition("cost");
@@ -230,6 +232,20 @@ public function setDescription(?string $description): static
 	$this->description = $description;
 
 	return $this;
+}
+
+/**
+* Get unitCost - Birim Maliyet
+* @return mixed
+*/
+public function getUnitCost(): mixed
+{
+	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('unitCost');
+	$data->setContextualData("object", null, null, null);
+	$object = $this;
+	$data = \Pimcore\Model\DataObject\Service::getCalculatedFieldValue($object, $data);
+
+	return $data;
 }
 
 }

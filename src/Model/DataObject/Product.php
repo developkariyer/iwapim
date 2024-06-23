@@ -3,6 +3,7 @@
 namespace App\Model\DataObject;
 
 use Pimcore\Model\DataObject\Concrete;
+use Pimcore\Model\DataObject\Product\Listing;
 
 class Product extends Concrete
 {
@@ -13,6 +14,7 @@ class Product extends Concrete
 
     public function getLevel()
     {
+        error_log('getLevel called for '.$this->key.' with parent object '.$this->getParent()->key);
         $parent = $this->getParent();
         if (!$parent instanceof Product) {
             return self::MAIN_PRODUCT;
@@ -29,18 +31,15 @@ class Product extends Concrete
         if (!empty($this->getProductCode)) {
             return;
         }
-        $baseCode = '';
         switch ($this->getLevel()) {
             case self::SIZE_VARIANT:
-                $baseCode = $this->getParent()->getParent()->getProductCode() . '_';
             case self::COLOR_VARIANT:
-                $baseCode .= $this->getParent()->getProductCode() . '_';
                 $numberDigits = 2;
                 break;
             case self::MAIN_PRODUCT:
                 $numberDigits = 5;
         }
-        $productCode = self::generateUniqueCode($baseCode, $numberDigits);
+        $productCode = $this->generateUniqueCode($numberDigits);
         $this->setProductCode($productCode);
     }
 
@@ -65,30 +64,42 @@ class Product extends Concrete
 
     public function addColor($color): Product
     {
-        try {
-            return $this->addVariant($color, '', $color, false);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        return $this->addVariant($color, '', $color, false);
     }
 
     public function addSize($size): Product
     {
-        try {
-            return $this->addVariant($size, $size, '', true);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        return $this->addVariant($size, $size, '', true);
     }
 
-    private static function generateUniqueCode($baseCode='', $numberDigits=5)
+    private function generateUniqueCode($numberDigits=5)
     {
+        //look for an identical key name first
+        $code = $this->findSimilarKey();
+        if ($code) {
+            return $code;
+        }
         while (true) {
             $candidateCode = self::generateCustomString($numberDigits);
-            if (!self::getByProductCode($baseCode.$candidateCode, ['limit' => 1,'unpublished' => true])) {
+            if (!$this->findByField('productCode', $candidateCode)) {
                 return $candidateCode;
             }
         }
+    }
+
+    private function findByField($field, $value)
+    {
+        $list = new Listing();
+        $list->setCondition("`$field` = ?", [$value]);
+        $list->setUnpublished(true);
+        $list->setLimit(1);
+        return $list->current();
+    }
+
+    private function findSimilarKey()
+    {
+        $current = $this->findByField('key', $this->key);
+        return $current ? $current->getProductCode() : null;   
     }
 
     private static function generateCustomString($length = 6) {

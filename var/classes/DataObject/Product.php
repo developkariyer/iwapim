@@ -30,7 +30,10 @@
  * - marketingMaterials [manyToManyObjectRelation]
  * - urls [fieldcollections]
  * - unitCost [numeric]
- * - maliyet [fieldcollections]
+ * - productCosts [advancedManyToManyObjectRelation]
+ * - productCost [calculatedValue]
+ * - colorCosts [advancedManyToManyObjectRelation]
+ * - sizeCosts [advancedManyToManyObjectRelation]
  */
 
 namespace Pimcore\Model\DataObject;
@@ -62,6 +65,9 @@ use Pimcore\Model\DataObject\PreGetValueHookInterface;
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByBundleItems(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByMarketingMaterials(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 * @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByUnitCost(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByProductCosts(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getByColorCosts(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
+* @method static \Pimcore\Model\DataObject\Product\Listing|\Pimcore\Model\DataObject\Product|null getBySizeCosts(mixed $value, ?int $limit = null, int $offset = 0, ?array $objectTypes = null)
 */
 
 class Product extends \App\Model\DataObject\Product
@@ -91,7 +97,10 @@ public const FIELD_BUNDLE_ITEMS = 'bundleItems';
 public const FIELD_MARKETING_MATERIALS = 'marketingMaterials';
 public const FIELD_URLS = 'urls';
 public const FIELD_UNIT_COST = 'unitCost';
-public const FIELD_MALIYET = 'maliyet';
+public const FIELD_PRODUCT_COSTS = 'productCosts';
+public const FIELD_PRODUCT_COST = 'productCost';
+public const FIELD_COLOR_COSTS = 'colorCosts';
+public const FIELD_SIZE_COSTS = 'sizeCosts';
 
 protected $classId = "product";
 protected $className = "Product";
@@ -120,7 +129,9 @@ protected $bundleItems;
 protected $marketingMaterials;
 protected $urls;
 protected $unitCost;
-protected $maliyet;
+protected $productCosts;
+protected $colorCosts;
+protected $sizeCosts;
 
 
 /**
@@ -487,7 +498,7 @@ public function setAlbum(?\Pimcore\Model\DataObject\Data\ImageGallery $album): s
 }
 
 /**
-* Get variationSize - Varyant ise Ebatı
+* Get variationSize - Varyant Ebatı
 * @return string|null
 */
 public function getVariationSize(): ?string
@@ -517,7 +528,7 @@ public function getVariationSize(): ?string
 }
 
 /**
-* Set variationSize - Varyant ise Ebatı
+* Set variationSize - Varyant Ebatı
 * @param string|null $variationSize
 * @return $this
 */
@@ -531,7 +542,7 @@ public function setVariationSize(?string $variationSize): static
 }
 
 /**
-* Get variationColor - Variant ise Rengi
+* Get variationColor - Variant Rengi
 * @return string|null
 */
 public function getVariationColor(): ?string
@@ -561,7 +572,7 @@ public function getVariationColor(): ?string
 }
 
 /**
-* Set variationColor - Variant ise Rengi
+* Set variationColor - Variant Rengi
 * @param string|null $variationColor
 * @return $this
 */
@@ -1214,31 +1225,175 @@ public function setUnitCost(?float $unitCost): static
 }
 
 /**
-* @return \Pimcore\Model\DataObject\Fieldcollection|null
+* Get productCosts - Ortak Maliyetler
+* @return \Pimcore\Model\DataObject\Data\ObjectMetadata[]
 */
-public function getMaliyet(): ?\Pimcore\Model\DataObject\Fieldcollection
+public function getProductCosts(): array
 {
 	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
-		$preValue = $this->preGetValue("maliyet");
+		$preValue = $this->preGetValue("productCosts");
 		if ($preValue !== null) {
 			return $preValue;
 		}
 	}
 
-	$data = $this->getClass()->getFieldDefinition("maliyet")->preGetData($this);
+	$data = $this->getClass()->getFieldDefinition("productCosts")->preGetData($this);
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("productCosts")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("productCosts");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
 	return $data;
 }
 
 /**
-* Set maliyet - Maliyet
-* @param \Pimcore\Model\DataObject\Fieldcollection|null $maliyet
+* Set productCosts - Ortak Maliyetler
+* @param \Pimcore\Model\DataObject\Data\ObjectMetadata[] $productCosts
 * @return $this
 */
-public function setMaliyet(?\Pimcore\Model\DataObject\Fieldcollection $maliyet): static
+public function setProductCosts(?array $productCosts): static
 {
-	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\Fieldcollections $fd */
-	$fd = $this->getClass()->getFieldDefinition("maliyet");
-	$this->maliyet = $fd->preSetData($this, $maliyet);
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation $fd */
+	$fd = $this->getClass()->getFieldDefinition("productCosts");
+	$hideUnpublished = \Pimcore\Model\DataObject\Concrete::getHideUnpublished();
+	\Pimcore\Model\DataObject\Concrete::setHideUnpublished(false);
+	$currentData = \Pimcore\Model\DataObject\Service::useInheritedValues(false, function() {
+		return $this->getProductCosts();
+	});
+	\Pimcore\Model\DataObject\Concrete::setHideUnpublished($hideUnpublished);
+	$isEqual = $fd->isEqual($currentData, $productCosts);
+	if (!$isEqual) {
+		$this->markFieldDirty("productCosts", true);
+	}
+	$this->productCosts = $fd->preSetData($this, $productCosts);
+	return $this;
+}
+
+/**
+* Get productCost - Ürün Maliyeti
+* @return mixed
+*/
+public function getProductCost(): mixed
+{
+	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('productCost');
+	$data->setContextualData("object", null, null, null);
+	$object = $this;
+	$data = \Pimcore\Model\DataObject\Service::getCalculatedFieldValue($object, $data);
+
+	return $data;
+}
+
+/**
+* Get colorCosts - Renk Maliyetleri
+* @return \Pimcore\Model\DataObject\Data\ObjectMetadata[]
+*/
+public function getColorCosts(): array
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("colorCosts");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->getClass()->getFieldDefinition("colorCosts")->preGetData($this);
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("colorCosts")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("colorCosts");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set colorCosts - Renk Maliyetleri
+* @param \Pimcore\Model\DataObject\Data\ObjectMetadata[] $colorCosts
+* @return $this
+*/
+public function setColorCosts(?array $colorCosts): static
+{
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation $fd */
+	$fd = $this->getClass()->getFieldDefinition("colorCosts");
+	$hideUnpublished = \Pimcore\Model\DataObject\Concrete::getHideUnpublished();
+	\Pimcore\Model\DataObject\Concrete::setHideUnpublished(false);
+	$currentData = \Pimcore\Model\DataObject\Service::useInheritedValues(false, function() {
+		return $this->getColorCosts();
+	});
+	\Pimcore\Model\DataObject\Concrete::setHideUnpublished($hideUnpublished);
+	$isEqual = $fd->isEqual($currentData, $colorCosts);
+	if (!$isEqual) {
+		$this->markFieldDirty("colorCosts", true);
+	}
+	$this->colorCosts = $fd->preSetData($this, $colorCosts);
+	return $this;
+}
+
+/**
+* Get sizeCosts - Ebat Maliyetleri
+* @return \Pimcore\Model\DataObject\Data\ObjectMetadata[]
+*/
+public function getSizeCosts(): array
+{
+	if ($this instanceof PreGetValueHookInterface && !\Pimcore::inAdmin()) {
+		$preValue = $this->preGetValue("sizeCosts");
+		if ($preValue !== null) {
+			return $preValue;
+		}
+	}
+
+	$data = $this->getClass()->getFieldDefinition("sizeCosts")->preGetData($this);
+
+	if (\Pimcore\Model\DataObject::doGetInheritedValues() && $this->getClass()->getFieldDefinition("sizeCosts")->isEmpty($data)) {
+		try {
+			return $this->getValueFromParent("sizeCosts");
+		} catch (InheritanceParentNotFoundException $e) {
+			// no data from parent available, continue ...
+		}
+	}
+
+	if ($data instanceof \Pimcore\Model\DataObject\Data\EncryptedField) {
+		return $data->getPlain();
+	}
+
+	return $data;
+}
+
+/**
+* Set sizeCosts - Ebat Maliyetleri
+* @param \Pimcore\Model\DataObject\Data\ObjectMetadata[] $sizeCosts
+* @return $this
+*/
+public function setSizeCosts(?array $sizeCosts): static
+{
+	/** @var \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation $fd */
+	$fd = $this->getClass()->getFieldDefinition("sizeCosts");
+	$hideUnpublished = \Pimcore\Model\DataObject\Concrete::getHideUnpublished();
+	\Pimcore\Model\DataObject\Concrete::setHideUnpublished(false);
+	$currentData = \Pimcore\Model\DataObject\Service::useInheritedValues(false, function() {
+		return $this->getSizeCosts();
+	});
+	\Pimcore\Model\DataObject\Concrete::setHideUnpublished($hideUnpublished);
+	$isEqual = $fd->isEqual($currentData, $sizeCosts);
+	if (!$isEqual) {
+		$this->markFieldDirty("sizeCosts", true);
+	}
+	$this->sizeCosts = $fd->preSetData($this, $sizeCosts);
 	return $this;
 }
 

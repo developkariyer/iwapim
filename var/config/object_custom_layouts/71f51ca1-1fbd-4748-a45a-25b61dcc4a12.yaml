@@ -7,7 +7,7 @@ pimcore:
                     name: sizeVariant
                     description: ''
                     creationDate: 1719056317
-                    modificationDate: 1719056371
+                    modificationDate: 1719163610
                     userOwner: 2
                     classId: product
                     layoutDefinitions:
@@ -132,7 +132,7 @@ pimcore:
                                                 datatype: data
                                             -
                                                 name: variationSize
-                                                title: 'Varyant ise Ebatı'
+                                                title: 'Varyant Ebatı'
                                                 tooltip: ''
                                                 mandatory: false
                                                 noteditable: false
@@ -522,8 +522,8 @@ pimcore:
                                         datatype: layout
                                         children:
                                             -
-                                                name: maliyet
-                                                title: Maliyet
+                                                name: productCost
+                                                title: 'Ürün Maliyeti'
                                                 tooltip: ''
                                                 mandatory: false
                                                 noteditable: false
@@ -531,20 +531,17 @@ pimcore:
                                                 locked: false
                                                 style: ''
                                                 permissions: null
-                                                fieldtype: fieldcollections
+                                                fieldtype: calculatedValue
                                                 relationType: false
                                                 invisible: false
-                                                visibleGridView: false
-                                                visibleSearch: false
-                                                allowedTypes:
-                                                    - costItems
-                                                lazyLoading: true
-                                                maxItems: null
-                                                disallowAddRemove: false
-                                                disallowReorder: false
-                                                collapsed: false
-                                                collapsible: false
-                                                border: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
                                                 datatype: data
                                         locked: false
                                         fieldtype: panel

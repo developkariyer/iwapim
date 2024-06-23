@@ -39,7 +39,8 @@ class DataObjectListener implements EventSubscriberInterface
      * @param GenericEvent $event
      */
     public function onPreSendData(GenericEvent $event)
-    {   
+    {
+        error_log('Triggered onPreSendData');
         $object = $event->getArgument('object');
         if ($object instanceof Product) {
             $data = $event->getArgument('data');
@@ -75,7 +76,7 @@ class DataObjectListener implements EventSubscriberInterface
     public function onPostUpdate(DataObjectEvent $event)
     {
         $object = $event->getObject();
-        error_log('Triggered onPostUpdate from '.$object->getKey().' with level of '.$object->getLevel());
+        error_log('Triggered onPostUpdate from '.$object->getKey());
         if ($object instanceof ProductClass || $object instanceof Product) {
             Cache::remove('productClasses');
             return;
@@ -103,8 +104,8 @@ class DataObjectListener implements EventSubscriberInterface
     public function onPreAdd(DataObjectEvent $event)
     {
         $object = $event->getObject();
-        error_log('Triggered onPreAdd from '.$object->getKey().' with level of '.$object->getLevel());
         if ($object instanceof Product) {
+            error_log('Triggered onPreAdd from '.$object->getKey().' with level of '.$object->getLevel());
             $object->checkProductCode();
             switch ($object->getLevel()) {
                 case $object::COLOR_VARIANT:
@@ -116,6 +117,12 @@ class DataObjectListener implements EventSubscriberInterface
                     $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     break;
                 case $object::MAIN_PRODUCT:
+                    if (empty($object->getName())) {
+                        $object->setName($object->getKey());
+                    }
+                    if (empty($object->getProductClass())) {
+                        $object->setProductClass('TASLAK');
+                    }
             }    
         }
     }
@@ -130,37 +137,44 @@ class DataObjectListener implements EventSubscriberInterface
     public function onPreUpdate(DataObjectEvent $event)
     {
         $object = $event->getObject();
-        error_log('Triggered onPreUpdate from '.$object->getKey().' with level of '.$object->getLevel());
         if ($object instanceof Product) {
+            error_log('Triggered onPreUpdate from '.$object->getKey().' with level of '.$object->getLevel());
             switch ($object->getLevel()) {
                 case $object::MAIN_PRODUCT:
                     $productClass = $object->getProductClass();
                     if (empty($productClass)) {
                         return;
                     }
-                    $targetFolder = DataObject::getByPath('/Ürünler/' . $productClass);
+                    $targetFolder = DataObject\Folder::getByPath('/Ürünler/' . $productClass);
                     if (!$targetFolder) {
                         $targetFolder = new DataObject\Folder();
                         $targetFolder->setKey($productClass);
-                        $targetFolder->setParent(DataObject::getByPath('/Ürünler'));
+                        $targetFolder->setParent(DataObject\Folder::getByPath('/Ürünler'));
                         $targetFolder->save();
                     }
-                    $object->setParent($targetFolder);        
+                    $object->setParent($targetFolder);
                     break;
                 case $object::COLOR_VARIANT:
                     $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     $object->setVariationColor($object->getKey());
+                    $object->setPublished(false);
                     break;
                 case $object::SIZE_VARIANT:
                     $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     $object->setVariationSize($object->getKey());
                     if ($object->getIwaskuActive() && empty($object->getIwasku())) {
                         $grandParent = $object->getParent()->getParent();
-                        $iwasku = "{$grandParent->getProductClass()}_{$grandParent->getProductCode()}_{$object->getParent()->getProductCode()}_{$object->getProductCode()}";
-                        $object->setIwasku($iwasku);             
+                        $productClass = $grandParent->getProductClass();
+                        if ($productClass !== 'TASLAK') {
+                            $iwasku = "{$productClass}_{$grandParent->getProductCode()}_{$object->getParent()->getProductCode()}_{$object->getProductCode()}";
+                            $object->setIwasku($iwasku);             
+                        } else {
+                            $object->setIwaskuActive(null);
+                        }
                     }
             }
         }
+        error_log('onPreUpdate finished');
     }
 
     /**
@@ -174,8 +188,8 @@ class DataObjectListener implements EventSubscriberInterface
         if ($this->postAddRunning) return;
         $this->postAddRunning = true;
         $object = $event->getObject();
-        error_log('Triggered onPostAdd from '.$object->getKey().' with level of '.$object->getLevel());
         if ($object instanceof Product) {
+            error_log('Triggered onPostAdd from '.$object->getKey().' with level of '.$object->getLevel());
             switch ($object->getLevel()) {
                 case $object::COLOR_VARIANT:
                     $this->addSizesToColorVariant($object);

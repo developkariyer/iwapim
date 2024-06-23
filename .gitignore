@@ -52,3 +52,7 @@ var/log/dev.log
 var/log/usage.log
 var/log/debug.log
 var/log/php.log
+tmp/costNode_0.txt
+tmp/costNode_1.txt
+tmp/costNode_2.txt
+tmp/costNodes.txt

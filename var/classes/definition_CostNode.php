@@ -11,6 +11,7 @@
  * - cost [numeric]
  * - currency [select]
  * - description [textarea]
+ * - unitCost [calculatedValue]
  */
 
 return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
@@ -20,7 +21,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Maliyet Kalemi',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1718257021,
+   'modificationDate' => 1719165548,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -102,8 +103,8 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'minValue' => NULL,
                  'maxValue' => NULL,
                  'unique' => false,
-                 'decimalSize' => NULL,
-                 'decimalPrecision' => NULL,
+                 'decimalSize' => 12,
+                 'decimalPrecision' => 3,
                  'width' => 100,
                  'defaultValueGenerator' => '',
               )),
@@ -223,8 +224,8 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'minValue' => NULL,
                  'maxValue' => NULL,
                  'unique' => false,
-                 'decimalSize' => NULL,
-                 'decimalPrecision' => NULL,
+                 'decimalSize' => 12,
+                 'decimalPrecision' => 3,
                  'width' => 100,
                  'defaultValueGenerator' => '',
               )),
@@ -320,6 +321,32 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'height' => 50,
              'width' => 300,
           )),
+          3 => 
+          \Pimcore\Model\DataObject\ClassDefinition\Data\CalculatedValue::__set_state(array(
+             'name' => 'unitCost',
+             'title' => 'Birim Maliyet',
+             'tooltip' => '',
+             'mandatory' => false,
+             'noteditable' => false,
+             'index' => false,
+             'locked' => false,
+             'style' => '',
+             'permissions' => NULL,
+             'fieldtype' => '',
+             'relationType' => false,
+             'invisible' => false,
+             'visibleGridView' => true,
+             'visibleSearch' => true,
+             'blockedVarsForExport' => 
+            array (
+            ),
+             'elementType' => 'numeric',
+             'calculatorType' => 'class',
+             'calculatorExpression' => 'object.getCost() / object.getAmount() ~ \'\'',
+             'calculatorClass' => 'App\\Calculator\\CostCalculator',
+             'columnLength' => 190,
+             'width' => '',
+          )),
         ),
          'locked' => false,
          'blockedVarsForExport' => 
@@ -374,30 +401,6 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'enableGridLocking' => false,
    'deletedDataComponents' => 
   array (
-    0 => 
-    \Pimcore\Model\DataObject\ClassDefinition\Data\Datetime::__set_state(array(
-       'name' => 'updatedAt',
-       'title' => 'Güncelleme',
-       'tooltip' => '',
-       'mandatory' => false,
-       'noteditable' => false,
-       'index' => false,
-       'locked' => false,
-       'style' => '',
-       'permissions' => NULL,
-       'fieldtype' => '',
-       'relationType' => false,
-       'invisible' => false,
-       'visibleGridView' => true,
-       'visibleSearch' => true,
-       'blockedVarsForExport' => 
-      array (
-      ),
-       'defaultValue' => NULL,
-       'useCurrentDate' => true,
-       'columnType' => 'bigint(20)',
-       'defaultValueGenerator' => '',
-    )),
   ),
    'blockedVarsForExport' => 
   array (

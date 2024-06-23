@@ -31,7 +31,10 @@
  * - marketingMaterials [manyToManyObjectRelation]
  * - urls [fieldcollections]
  * - unitCost [numeric]
- * - maliyet [fieldcollections]
+ * - productCosts [advancedManyToManyObjectRelation]
+ * - productCost [calculatedValue]
+ * - colorCosts [advancedManyToManyObjectRelation]
+ * - sizeCosts [advancedManyToManyObjectRelation]
  */
 
 return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
@@ -41,7 +44,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1719080391,
+   'modificationDate' => 1719165917,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => 'App\\Model\\DataObject\\Product',
@@ -374,7 +377,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
               10 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'variationSize',
-                 'title' => 'Varyant ise Ebatı',
+                 'title' => 'Varyant Ebatı',
                  'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,
@@ -404,7 +407,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
               11 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\Input::__set_state(array(
                  'name' => 'variationColor',
-                 'title' => 'Variant ise Rengi',
+                 'title' => 'Variant Rengi',
                  'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,
@@ -1127,9 +1130,62 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'children' => 
             array (
               0 => 
-              \Pimcore\Model\DataObject\ClassDefinition\Data\Fieldcollections::__set_state(array(
-                 'name' => 'maliyet',
-                 'title' => 'Maliyet',
+              \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation::__set_state(array(
+                 'name' => 'productCosts',
+                 'title' => 'Ortak Maliyetler',
+                 'tooltip' => 'Her renk ve ebat için aynı olan maliyet kalemleri',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => true,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'classes' => 
+                array (
+                ),
+                 'displayMode' => NULL,
+                 'pathFormatterClass' => '',
+                 'maxItems' => NULL,
+                 'visibleFields' => 'id,key,unitCost,unit,currency',
+                 'allowToCreateNewObject' => false,
+                 'allowToClearRelation' => true,
+                 'optimizedAdminLoading' => false,
+                 'enableTextSelection' => false,
+                 'visibleFieldDefinitions' => 
+                array (
+                ),
+                 'width' => '',
+                 'height' => '',
+                 'allowedClassId' => 'CostNode',
+                 'columns' => 
+                array (
+                  0 => 
+                  array (
+                    'type' => 'number',
+                    'position' => 1,
+                    'key' => 'sarf',
+                    'label' => 'Sarf',
+                  ),
+                ),
+                 'columnKeys' => 
+                array (
+                  0 => 'sarf',
+                ),
+                 'enableBatchEdit' => false,
+                 'allowMultipleAssignments' => true,
+              )),
+              1 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\CalculatedValue::__set_state(array(
+                 'name' => 'productCost',
+                 'title' => 'Ürün Maliyeti',
                  'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,
@@ -1140,22 +1196,123 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'fieldtype' => '',
                  'relationType' => false,
                  'invisible' => false,
+                 'visibleGridView' => true,
+                 'visibleSearch' => true,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'elementType' => 'numeric',
+                 'calculatorType' => 'class',
+                 'calculatorExpression' => '',
+                 'calculatorClass' => 'App\\Calculator\\CostCalculator',
+                 'columnLength' => 190,
+                 'width' => '',
+              )),
+              2 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation::__set_state(array(
+                 'name' => 'colorCosts',
+                 'title' => 'Renk Maliyetleri',
+                 'tooltip' => 'Sadece renkten kaynaklanan, her ebatta aynı olan maliyetler',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => true,
+                 'invisible' => false,
                  'visibleGridView' => false,
                  'visibleSearch' => false,
                  'blockedVarsForExport' => 
                 array (
                 ),
-                 'allowedTypes' => 
+                 'classes' => 
                 array (
-                  0 => 'costItems',
                 ),
-                 'lazyLoading' => true,
+                 'displayMode' => NULL,
+                 'pathFormatterClass' => '',
                  'maxItems' => NULL,
-                 'disallowAddRemove' => false,
-                 'disallowReorder' => false,
-                 'collapsed' => false,
-                 'collapsible' => false,
-                 'border' => false,
+                 'visibleFields' => 'id,key,unitCost,unit,currency',
+                 'allowToCreateNewObject' => false,
+                 'allowToClearRelation' => true,
+                 'optimizedAdminLoading' => false,
+                 'enableTextSelection' => false,
+                 'visibleFieldDefinitions' => 
+                array (
+                ),
+                 'width' => '',
+                 'height' => '',
+                 'allowedClassId' => 'CostNode',
+                 'columns' => 
+                array (
+                  0 => 
+                  array (
+                    'type' => 'number',
+                    'position' => 1,
+                    'key' => 'sarf',
+                    'label' => 'Sarf',
+                  ),
+                ),
+                 'columnKeys' => 
+                array (
+                  0 => 'sarf',
+                ),
+                 'enableBatchEdit' => false,
+                 'allowMultipleAssignments' => true,
+              )),
+              3 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation::__set_state(array(
+                 'name' => 'sizeCosts',
+                 'title' => 'Ebat Maliyetleri',
+                 'tooltip' => 'Sadece ebat değişimi ile ilgili olan maliyetler',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => true,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'classes' => 
+                array (
+                ),
+                 'displayMode' => NULL,
+                 'pathFormatterClass' => '',
+                 'maxItems' => NULL,
+                 'visibleFields' => 'id,key,unitCost,unit,currency',
+                 'allowToCreateNewObject' => false,
+                 'allowToClearRelation' => true,
+                 'optimizedAdminLoading' => false,
+                 'enableTextSelection' => false,
+                 'visibleFieldDefinitions' => 
+                array (
+                ),
+                 'width' => '',
+                 'height' => '',
+                 'allowedClassId' => 'CostNode',
+                 'columns' => 
+                array (
+                  0 => 
+                  array (
+                    'type' => 'number',
+                    'position' => 1,
+                    'key' => 'sarf',
+                    'label' => 'Sarf',
+                  ),
+                ),
+                 'columnKeys' => 
+                array (
+                  0 => 'sarf',
+                ),
+                 'enableBatchEdit' => false,
+                 'allowMultipleAssignments' => true,
               )),
             ),
              'locked' => false,

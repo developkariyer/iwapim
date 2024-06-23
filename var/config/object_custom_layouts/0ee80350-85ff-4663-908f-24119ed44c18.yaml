@@ -7,7 +7,7 @@ pimcore:
                     name: mainProduct
                     description: ''
                     creationDate: 1719056055
-                    modificationDate: 1719056686
+                    modificationDate: 1719165911
                     userOwner: 2
                     classId: product
                     layoutDefinitions:
@@ -711,8 +711,47 @@ pimcore:
                                         datatype: layout
                                         children:
                                             -
-                                                name: maliyet
-                                                title: Maliyet
+                                                name: productCosts
+                                                title: 'Ortak Maliyetler'
+                                                tooltip: 'Her renk ve ebat için aynı olan maliyet kalemleri'
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: advancedManyToManyObjectRelation
+                                                relationType: true
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                classes: {  }
+                                                displayMode: null
+                                                pathFormatterClass: ''
+                                                maxItems: null
+                                                visibleFields: 'id,key,unitCost,unit,currency'
+                                                allowToCreateNewObject: false
+                                                allowToClearRelation: true
+                                                optimizedAdminLoading: false
+                                                enableTextSelection: false
+                                                visibleFieldDefinitions: {  }
+                                                width: ''
+                                                height: ''
+                                                allowedClassId: CostNode
+                                                columns:
+                                                    -
+                                                        type: number
+                                                        position: 1
+                                                        key: sarf
+                                                        label: Sarf
+                                                columnKeys:
+                                                    - sarf
+                                                enableBatchEdit: false
+                                                allowMultipleAssignments: true
+                                                datatype: data
+                                            -
+                                                name: productCost
+                                                title: 'Ürün Maliyeti'
                                                 tooltip: ''
                                                 mandatory: false
                                                 noteditable: false
@@ -720,20 +759,17 @@ pimcore:
                                                 locked: false
                                                 style: ''
                                                 permissions: null
-                                                fieldtype: fieldcollections
+                                                fieldtype: calculatedValue
                                                 relationType: false
                                                 invisible: false
-                                                visibleGridView: false
-                                                visibleSearch: false
-                                                allowedTypes:
-                                                    - costItems
-                                                lazyLoading: true
-                                                maxItems: null
-                                                disallowAddRemove: false
-                                                disallowReorder: false
-                                                collapsed: false
-                                                collapsible: false
-                                                border: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
                                                 datatype: data
                                         locked: false
                                         fieldtype: panel
