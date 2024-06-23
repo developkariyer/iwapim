@@ -1,0 +1,16 @@
+pimcore:
+    assets:
+        metadata:
+            predefined:
+                definitions:
+                    14e59563-5faf-45ef-a926-3261b0539755:
+                        name: URL
+                        description: ''
+                        type: input
+                        targetSubtype: image
+                        data: ''
+                        config: ''
+                        language: null
+                        group: Marketplace
+                        creationDate: 1719178509
+                        modificationDate: 1719178725

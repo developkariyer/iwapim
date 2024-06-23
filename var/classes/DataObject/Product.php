@@ -31,9 +31,12 @@
  * - urls [fieldcollections]
  * - unitCost [numeric]
  * - productCosts [advancedManyToManyObjectRelation]
- * - productCost [calculatedValue]
+ * - mainProductCost [calculatedValue]
  * - colorCosts [advancedManyToManyObjectRelation]
+ * - colorCost [calculatedValue]
  * - sizeCosts [advancedManyToManyObjectRelation]
+ * - sizeCost [calculatedValue]
+ * - productCost [calculatedValue]
  */
 
 namespace Pimcore\Model\DataObject;
@@ -98,9 +101,12 @@ public const FIELD_MARKETING_MATERIALS = 'marketingMaterials';
 public const FIELD_URLS = 'urls';
 public const FIELD_UNIT_COST = 'unitCost';
 public const FIELD_PRODUCT_COSTS = 'productCosts';
-public const FIELD_PRODUCT_COST = 'productCost';
+public const FIELD_MAIN_PRODUCT_COST = 'mainProductCost';
 public const FIELD_COLOR_COSTS = 'colorCosts';
+public const FIELD_COLOR_COST = 'colorCost';
 public const FIELD_SIZE_COSTS = 'sizeCosts';
+public const FIELD_SIZE_COST = 'sizeCost';
+public const FIELD_PRODUCT_COST = 'productCost';
 
 protected $classId = "product";
 protected $className = "Product";
@@ -1278,12 +1284,12 @@ public function setProductCosts(?array $productCosts): static
 }
 
 /**
-* Get productCost - Ürün Maliyeti
+* Get mainProductCost - Temel Maliyet
 * @return mixed
 */
-public function getProductCost(): mixed
+public function getMainProductCost(): mixed
 {
-	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('productCost');
+	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('mainProductCost');
 	$data->setContextualData("object", null, null, null);
 	$object = $this;
 	$data = \Pimcore\Model\DataObject\Service::getCalculatedFieldValue($object, $data);
@@ -1345,6 +1351,20 @@ public function setColorCosts(?array $colorCosts): static
 }
 
 /**
+* Get colorCost - Renk Maliyeti
+* @return mixed
+*/
+public function getColorCost(): mixed
+{
+	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('colorCost');
+	$data->setContextualData("object", null, null, null);
+	$object = $this;
+	$data = \Pimcore\Model\DataObject\Service::getCalculatedFieldValue($object, $data);
+
+	return $data;
+}
+
+/**
 * Get sizeCosts - Ebat Maliyetleri
 * @return \Pimcore\Model\DataObject\Data\ObjectMetadata[]
 */
@@ -1395,6 +1415,34 @@ public function setSizeCosts(?array $sizeCosts): static
 	}
 	$this->sizeCosts = $fd->preSetData($this, $sizeCosts);
 	return $this;
+}
+
+/**
+* Get sizeCost - Ebat Maliyeti
+* @return mixed
+*/
+public function getSizeCost(): mixed
+{
+	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('sizeCost');
+	$data->setContextualData("object", null, null, null);
+	$object = $this;
+	$data = \Pimcore\Model\DataObject\Service::getCalculatedFieldValue($object, $data);
+
+	return $data;
+}
+
+/**
+* Get productCost - Ürün Maliyeti
+* @return mixed
+*/
+public function getProductCost(): mixed
+{
+	$data = new \Pimcore\Model\DataObject\Data\CalculatedValue('productCost');
+	$data->setContextualData("object", null, null, null);
+	$object = $this;
+	$data = \Pimcore\Model\DataObject\Service::getCalculatedFieldValue($object, $data);
+
+	return $data;
 }
 
 }

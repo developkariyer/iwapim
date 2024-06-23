@@ -32,9 +32,12 @@
  * - urls [fieldcollections]
  * - unitCost [numeric]
  * - productCosts [advancedManyToManyObjectRelation]
- * - productCost [calculatedValue]
+ * - mainProductCost [calculatedValue]
  * - colorCosts [advancedManyToManyObjectRelation]
+ * - colorCost [calculatedValue]
  * - sizeCosts [advancedManyToManyObjectRelation]
+ * - sizeCost [calculatedValue]
+ * - productCost [calculatedValue]
  */
 
 return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
@@ -44,7 +47,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1719165917,
+   'modificationDate' => 1719168270,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => 'App\\Model\\DataObject\\Product',
@@ -1184,8 +1187,8 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
               )),
               1 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\CalculatedValue::__set_state(array(
-                 'name' => 'productCost',
-                 'title' => 'Ürün Maliyeti',
+                 'name' => 'mainProductCost',
+                 'title' => 'Temel Maliyet',
                  'tooltip' => '',
                  'mandatory' => false,
                  'noteditable' => false,
@@ -1196,8 +1199,8 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'fieldtype' => '',
                  'relationType' => false,
                  'invisible' => false,
-                 'visibleGridView' => true,
-                 'visibleSearch' => true,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
                  'blockedVarsForExport' => 
                 array (
                 ),
@@ -1262,6 +1265,32 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'allowMultipleAssignments' => true,
               )),
               3 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\CalculatedValue::__set_state(array(
+                 'name' => 'colorCost',
+                 'title' => 'Renk Maliyeti',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'elementType' => 'numeric',
+                 'calculatorType' => 'class',
+                 'calculatorExpression' => '',
+                 'calculatorClass' => 'App\\Calculator\\CostCalculator',
+                 'columnLength' => 190,
+                 'width' => '',
+              )),
+              4 => 
               \Pimcore\Model\DataObject\ClassDefinition\Data\AdvancedManyToManyObjectRelation::__set_state(array(
                  'name' => 'sizeCosts',
                  'title' => 'Ebat Maliyetleri',
@@ -1313,6 +1342,58 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                 ),
                  'enableBatchEdit' => false,
                  'allowMultipleAssignments' => true,
+              )),
+              5 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\CalculatedValue::__set_state(array(
+                 'name' => 'sizeCost',
+                 'title' => 'Ebat Maliyeti',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => false,
+                 'visibleSearch' => false,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'elementType' => 'numeric',
+                 'calculatorType' => 'class',
+                 'calculatorExpression' => '',
+                 'calculatorClass' => 'App\\Calculator\\CostCalculator',
+                 'columnLength' => 190,
+                 'width' => '',
+              )),
+              6 => 
+              \Pimcore\Model\DataObject\ClassDefinition\Data\CalculatedValue::__set_state(array(
+                 'name' => 'productCost',
+                 'title' => 'Ürün Maliyeti',
+                 'tooltip' => '',
+                 'mandatory' => false,
+                 'noteditable' => false,
+                 'index' => false,
+                 'locked' => false,
+                 'style' => '',
+                 'permissions' => NULL,
+                 'fieldtype' => '',
+                 'relationType' => false,
+                 'invisible' => false,
+                 'visibleGridView' => true,
+                 'visibleSearch' => true,
+                 'blockedVarsForExport' => 
+                array (
+                ),
+                 'elementType' => 'numeric',
+                 'calculatorType' => 'class',
+                 'calculatorExpression' => '',
+                 'calculatorClass' => 'App\\Calculator\\CostCalculator',
+                 'columnLength' => 190,
+                 'width' => '',
               )),
             ),
              'locked' => false,

@@ -18,6 +18,7 @@ pimcore:
         error_pages:
             default: ''
             localized:
+                tr: ''
                 en: ''
     objects:
         versions:

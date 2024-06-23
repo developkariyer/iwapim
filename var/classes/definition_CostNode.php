@@ -21,7 +21,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Maliyet Kalemi',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1719165548,
+   'modificationDate' => 1719176918,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -92,7 +92,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'fieldtype' => '',
                  'relationType' => false,
                  'invisible' => false,
-                 'visibleGridView' => true,
+                 'visibleGridView' => false,
                  'visibleSearch' => true,
                  'blockedVarsForExport' => 
                 array (
@@ -213,7 +213,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                  'fieldtype' => '',
                  'relationType' => false,
                  'invisible' => false,
-                 'visibleGridView' => true,
+                 'visibleGridView' => false,
                  'visibleSearch' => true,
                  'blockedVarsForExport' => 
                 array (
@@ -376,13 +376,13 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'compositeIndices' => 
   array (
   ),
-   'showFieldLookup' => false,
+   'showFieldLookup' => true,
    'propertyVisibility' => 
   array (
     'grid' => 
     array (
       'id' => true,
-      'key' => false,
+      'key' => true,
       'path' => true,
       'published' => true,
       'modificationDate' => true,
@@ -391,7 +391,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
     'search' => 
     array (
       'id' => true,
-      'key' => false,
+      'key' => true,
       'path' => true,
       'published' => true,
       'modificationDate' => true,

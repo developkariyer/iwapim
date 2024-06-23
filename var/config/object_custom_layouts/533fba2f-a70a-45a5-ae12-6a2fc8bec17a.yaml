@@ -7,7 +7,7 @@ pimcore:
                     name: colorVariant
                     description: ''
                     creationDate: 1719056097
-                    modificationDate: 1719163610
+                    modificationDate: 1719168259
                     userOwner: 2
                     classId: product
                     layoutDefinitions:
@@ -23,94 +23,234 @@ pimcore:
                         datatype: layout
                         children:
                             -
-                                name: productionPanel
+                                name: Layout
                                 type: null
                                 region: null
-                                title: 'Ürün Tanımı'
-                                width: ''
-                                height: ''
+                                title: null
+                                width: 0
+                                height: 0
                                 collapsible: false
                                 collapsed: false
-                                bodyStyle: ''
+                                bodyStyle: null
                                 datatype: layout
                                 children:
                                     -
-                                        name: productCode
-                                        title: 'Ürün Kodu'
-                                        tooltip: ''
-                                        mandatory: true
-                                        noteditable: true
-                                        index: true
-                                        locked: false
-                                        style: ''
-                                        permissions: null
-                                        fieldtype: input
-                                        relationType: false
-                                        invisible: false
-                                        visibleGridView: true
-                                        visibleSearch: true
-                                        defaultValue: null
-                                        columnLength: 190
-                                        regex: ''
-                                        regexFlags: {  }
-                                        unique: true
-                                        showCharCount: false
+                                        name: productionPanel
+                                        type: null
+                                        region: null
+                                        title: 'Ürün Tanımı'
                                         width: ''
-                                        defaultValueGenerator: ''
-                                        datatype: data
-                                    -
-                                        name: album
-                                        title: 'Ürün Görselleri'
-                                        tooltip: ''
-                                        mandatory: false
-                                        noteditable: false
-                                        index: false
-                                        locked: false
-                                        style: ''
-                                        permissions: null
-                                        fieldtype: imageGallery
-                                        relationType: false
-                                        invisible: false
-                                        visibleGridView: false
-                                        visibleSearch: false
-                                        uploadPath: ''
-                                        ratioX: null
-                                        ratioY: null
-                                        predefinedDataTemplates: ''
                                         height: ''
-                                        width: ''
-                                        datatype: data
-                                    -
-                                        name: variationColor
-                                        title: 'Variant Rengi'
-                                        tooltip: ''
-                                        mandatory: false
-                                        noteditable: false
-                                        index: true
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: productCode
+                                                title: 'Ürün Kodu'
+                                                tooltip: ''
+                                                mandatory: true
+                                                noteditable: true
+                                                index: true
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: input
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                defaultValue: null
+                                                columnLength: 190
+                                                regex: ''
+                                                regexFlags: {  }
+                                                unique: true
+                                                showCharCount: false
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
+                                            -
+                                                name: album
+                                                title: 'Ürün Görselleri'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: imageGallery
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                uploadPath: ''
+                                                ratioX: null
+                                                ratioY: null
+                                                predefinedDataTemplates: ''
+                                                height: ''
+                                                width: ''
+                                                datatype: data
+                                            -
+                                                name: variationColor
+                                                title: 'Variant Rengi'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: true
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: input
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                defaultValue: null
+                                                columnLength: 190
+                                                regex: ''
+                                                regexFlags: {  }
+                                                unique: false
+                                                showCharCount: false
+                                                width: ''
+                                                defaultValueGenerator: ''
+                                                datatype: data
                                         locked: false
-                                        style: ''
-                                        permissions: null
-                                        fieldtype: input
-                                        relationType: false
-                                        invisible: false
-                                        visibleGridView: true
-                                        visibleSearch: true
-                                        defaultValue: null
-                                        columnLength: 190
-                                        regex: ''
-                                        regexFlags: {  }
-                                        unique: false
-                                        showCharCount: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
+                                    -
+                                        name: genericCostPanel
+                                        type: null
+                                        region: null
+                                        title: Maliyet
                                         width: ''
-                                        defaultValueGenerator: ''
-                                        datatype: data
+                                        height: ''
+                                        collapsible: false
+                                        collapsed: false
+                                        bodyStyle: ''
+                                        datatype: layout
+                                        children:
+                                            -
+                                                name: mainProductCost
+                                                title: 'Temel Maliyet'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: calculatedValue
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
+                                                datatype: data
+                                            -
+                                                name: colorCosts
+                                                title: 'Renk Maliyetleri'
+                                                tooltip: 'Sadece renkten kaynaklanan, her ebatta aynı olan maliyetler'
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: advancedManyToManyObjectRelation
+                                                relationType: true
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                classes: {  }
+                                                displayMode: null
+                                                pathFormatterClass: ''
+                                                maxItems: null
+                                                visibleFields: 'id,key,unitCost,unit,currency'
+                                                allowToCreateNewObject: false
+                                                allowToClearRelation: true
+                                                optimizedAdminLoading: false
+                                                enableTextSelection: false
+                                                visibleFieldDefinitions: {  }
+                                                width: ''
+                                                height: ''
+                                                allowedClassId: CostNode
+                                                columns:
+                                                    -
+                                                        type: number
+                                                        position: 1
+                                                        key: sarf
+                                                        label: Sarf
+                                                columnKeys:
+                                                    - sarf
+                                                enableBatchEdit: false
+                                                allowMultipleAssignments: true
+                                                datatype: data
+                                            -
+                                                name: colorCost
+                                                title: 'Renk Maliyeti'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: calculatedValue
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
+                                                datatype: data
+                                            -
+                                                name: productCost
+                                                title: 'Ürün Maliyeti'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: calculatedValue
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: true
+                                                visibleSearch: true
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
+                                                datatype: data
+                                        locked: false
+                                        fieldtype: panel
+                                        layout: null
+                                        border: false
+                                        icon: ''
+                                        labelWidth: 100
+                                        labelAlign: left
                                 locked: false
-                                fieldtype: panel
-                                layout: null
+                                fieldtype: tabpanel
                                 border: false
-                                icon: ''
-                                labelWidth: 100
-                                labelAlign: left
+                                tabPosition: top
                         locked: false
                         fieldtype: panel
                         layout: null

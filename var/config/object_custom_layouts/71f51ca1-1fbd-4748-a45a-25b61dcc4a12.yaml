@@ -7,7 +7,7 @@ pimcore:
                     name: sizeVariant
                     description: ''
                     creationDate: 1719056317
-                    modificationDate: 1719163610
+                    modificationDate: 1719168267
                     userOwner: 2
                     classId: product
                     layoutDefinitions:
@@ -521,6 +521,111 @@ pimcore:
                                         bodyStyle: ''
                                         datatype: layout
                                         children:
+                                            -
+                                                name: mainProductCost
+                                                title: 'Temel Maliyet'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: calculatedValue
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
+                                                datatype: data
+                                            -
+                                                name: colorCost
+                                                title: 'Renk Maliyeti'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: calculatedValue
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
+                                                datatype: data
+                                            -
+                                                name: sizeCosts
+                                                title: 'Ebat Maliyetleri'
+                                                tooltip: 'Sadece ebat değişimi ile ilgili olan maliyetler'
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: advancedManyToManyObjectRelation
+                                                relationType: true
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                classes: {  }
+                                                displayMode: null
+                                                pathFormatterClass: ''
+                                                maxItems: null
+                                                visibleFields: 'id,key,unitCost,unit,currency'
+                                                allowToCreateNewObject: false
+                                                allowToClearRelation: true
+                                                optimizedAdminLoading: false
+                                                enableTextSelection: false
+                                                visibleFieldDefinitions: {  }
+                                                width: ''
+                                                height: ''
+                                                allowedClassId: CostNode
+                                                columns:
+                                                    -
+                                                        type: number
+                                                        position: 1
+                                                        key: sarf
+                                                        label: Sarf
+                                                columnKeys:
+                                                    - sarf
+                                                enableBatchEdit: false
+                                                allowMultipleAssignments: true
+                                                datatype: data
+                                            -
+                                                name: sizeCost
+                                                title: 'Ebat Maliyeti'
+                                                tooltip: ''
+                                                mandatory: false
+                                                noteditable: false
+                                                index: false
+                                                locked: false
+                                                style: ''
+                                                permissions: null
+                                                fieldtype: calculatedValue
+                                                relationType: false
+                                                invisible: false
+                                                visibleGridView: false
+                                                visibleSearch: false
+                                                elementType: numeric
+                                                calculatorType: class
+                                                calculatorExpression: ''
+                                                calculatorClass: App\Calculator\CostCalculator
+                                                columnLength: 190
+                                                width: ''
+                                                datatype: data
                                             -
                                                 name: productCost
                                                 title: 'Ürün Maliyeti'
