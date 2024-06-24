@@ -1,0 +1,5 @@
+.vscode
+.phpunit.cache
+/vendor/
+.idea
+src/.last_api_deprecation_warning

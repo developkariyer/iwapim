@@ -57,7 +57,7 @@ class Product extends Concrete
             $variation->setVariationColor($color);
         }
         $variation->setPublished($published);
-        $variation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+        //$variation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
         $variation->save();
         return $variation;
     }

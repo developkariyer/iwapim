@@ -174,7 +174,7 @@ class ProductsController extends FrontendController
         $variation = new Product();
         $variation->setParent($parent);
         $variation->setProductCode($this->generateUniqueCode());
-        $variation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+        //$variation->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
         $variation->setKey($key);
         if (!empty($size)) {
             $variation->setVariationSize($size);

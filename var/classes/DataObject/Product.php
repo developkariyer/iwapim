@@ -2,7 +2,7 @@
 
 /**
  * Inheritance: yes
- * Variants: yes
+ * Variants: no
  *
  * Fields Summary:
  * - iwasku [input]

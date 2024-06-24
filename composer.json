@@ -15,6 +15,7 @@
     "blackbit_digital_commerce/pimcore-iframe-portlet": "^1.0",
     "pimcore/admin-ui-classic-bundle": "^1.0",
     "pimcore/pimcore": "^11.0.4",
+    "shopify/shopify-api": "^5.5",
     "symfony/dotenv": "^6.2",
     "symfony/runtime": "^6.2",
     "twbs/bootstrap": "^5.3",
@@ -48,11 +49,12 @@
       "Pimcore\\Composer::postUpdate",
       "@pimcore-scripts",
       "rm -rf public/bundles/bootstrap",
-      "mkdir -p public/bundles/bootstrap/css public/bundles/bootstrap/js public/bundles/bootstrap/font public/bundles/bootstrap/icons",
+      "mkdir -p public/bundles/adminlte public/bundles/bootstrap/css public/bundles/bootstrap/js public/bundles/bootstrap/font public/bundles/bootstrap/icons",
       "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css public/bundles/bootstrap/css/",
       "cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js public/bundles/bootstrap/js/",
-      "cp vendor/twbs/bootstrap-icons/font/bootstrap-icons.css public/bundles/bootstrap/font/",
-      "cp vendor/twbs/bootstrap-icons/icons/* public/bundles/bootstrap/icons/"
+      "cp -r vendor/twbs/bootstrap-icons/font/* public/bundles/bootstrap/font/",
+      "cp -r vendor/twbs/bootstrap-icons/icons/* public/bundles/bootstrap/icons/",
+      "cp -r vendor/adminlte/dist/* public/bundles/adminlte/"
     ],
     "pimcore-scripts": [
       "Pimcore\\Composer::clearCache",

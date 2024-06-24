@@ -5,6 +5,7 @@ namespace App\EventListener;
 use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\ClassDefinition\CustomLayout;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\ProductClass;
 use Pimcore\Event\Model\DataObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Pimcore\Cache;
@@ -110,11 +111,11 @@ class DataObjectListener implements EventSubscriberInterface
             switch ($object->getLevel()) {
                 case $object::COLOR_VARIANT:
                     $object->setVariationColor($object->getKey());
-                    $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+                    //$object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     break;
                 case $object::SIZE_VARIANT:
                     $object->setVariationSize($object->getKey());
-                    $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+                    //$object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     break;
                 case $object::MAIN_PRODUCT:
                     if (empty($object->getName())) {
@@ -155,18 +156,19 @@ class DataObjectListener implements EventSubscriberInterface
                     $object->setParent($targetFolder);
                     break;
                 case $object::COLOR_VARIANT:
-                    $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+                    //$object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     $object->setVariationColor($object->getKey());
                     $object->setPublished(false);
                     break;
                 case $object::SIZE_VARIANT:
-                    $object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
+                    //$object->setType(\Pimcore\Model\DataObject\AbstractObject::OBJECT_TYPE_VARIANT); 
                     $object->setVariationSize($object->getKey());
                     if ($object->getIwaskuActive() && empty($object->getIwasku())) {
                         $grandParent = $object->getParent()->getParent();
-                        $productClass = $grandParent->getProductClass();
+                        $pc = ProductClass::getByKey($grandParent->getProductClass(), 1);
+                        $productClass = $pc->getProductClassName();
                         if ($productClass !== 'TASLAK') {
-                            $iwasku = "{$productClass}_{$grandParent->getProductCode()}_{$object->getParent()->getProductCode()}_{$object->getProductCode()}";
+                            $iwasku = "{$productClass}{$grandParent->getProductCode()}_{$object->getParent()->getProductCode()}_{$object->getProductCode()}";
                             $object->setIwasku($iwasku);             
                         } else {
                             $object->setIwaskuActive(null);
@@ -244,5 +246,6 @@ class DataObjectListener implements EventSubscriberInterface
             }
         }
     }
+
 
 }

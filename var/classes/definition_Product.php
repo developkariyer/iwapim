@@ -2,7 +2,7 @@
 
 /**
  * Inheritance: yes
- * Variants: yes
+ * Variants: no
  * Title: Product
  *
  * Fields Summary:
@@ -47,7 +47,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => 'Product',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1719168270,
+   'modificationDate' => 1719241017,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => 'App\\Model\\DataObject\\Product',
@@ -60,8 +60,8 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
   array (
   ),
    'allowInherit' => true,
-   'allowVariants' => true,
-   'showVariants' => true,
+   'allowVariants' => false,
+   'showVariants' => false,
    'layoutDefinitions' => 
   \Pimcore\Model\DataObject\ClassDefinition\Layout\Panel::__set_state(array(
      'name' => 'pimcore_root',

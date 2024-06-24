@@ -16,7 +16,7 @@ class ProductClassOptionsProvider implements SelectOptionsProviderInterface
         $productClasses->setOrder('asc');
         foreach ($productClasses as $productClass) {
             $options[] = [
-                'key' => "{$productClass->getProductClassName()} ({$productClass->getKey()})",
+                'key' => "{$productClass->getKey()} ({$productClass->getProductClassName()})",
                 'value' => $productClass->getKey()
             ];
         }
