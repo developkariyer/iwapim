@@ -1,6 +1,8 @@
 # remove the following ignores for your project
 #/config/pimcore/constants.php
 
+src/Command/ImportShopifyProducts.php
+
 # symfony default
 /.web-server-pid
 /config/pimcore/parameters.yml
@@ -52,7 +54,4 @@ var/log/dev.log
 var/log/usage.log
 var/log/debug.log
 var/log/php.log
-tmp/costNode_0.txt
-tmp/costNode_1.txt
-tmp/costNode_2.txt
-tmp/costNodes.txt
+tmp/*
