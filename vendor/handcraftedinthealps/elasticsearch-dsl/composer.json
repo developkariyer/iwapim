@@ -1,0 +1,50 @@
+{
+    "name": "handcraftedinthealps/elasticsearch-dsl",
+    "description": "Elasticsearch DSL library",
+    "type": "library",
+    "homepage": "http://ongr.io",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ONGR team",
+            "homepage": "http://www.ongr.io"
+        },
+        {
+            "name": "Handcrafted in the Alps Team",
+            "homepage": "https://github.com/handcraftedinthealps/ElasticsearchDSL/graphs/contributors"
+        },
+        {
+            "name": "Haydar KULEKCI",
+            "homepage": "https://github.com/hkulekci/ElasticsearchDSL/graphs/contributors"
+        }
+    ],
+    "require": {
+        "ext-json": "*",
+        "php": "^8.0",
+        "symfony/serializer": "^2.8 || ^3.4 || ^4.0 || ^5.0 || ^6.0",
+        "elasticsearch/elasticsearch": "^8.0"
+    },
+    "require-dev": {
+        "nyholm/psr7": "^1.5",
+        "phpunit/phpunit": "^5.7.26 || ^7.5.20 || ^8.0 || ^9.0",
+        "squizlabs/php_codesniffer": "^2.0 || ^3.0"
+    },
+    "suggest": {
+      "elasticsearch/elasticsearch": "This library is for elasticsearch/elasticsearch client to enhance it with DSL functionality."
+    },
+    "autoload": {
+        "psr-4": {
+            "ONGR\\ElasticsearchDSL\\": "src/"
+        },
+        "exclude-from-classmap": ["/tests/"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ONGR\\ElasticsearchDSL\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "ongr/elasticsearch-dsl": "self.version"
+    },
+    "minimum-stability": "dev"
+}

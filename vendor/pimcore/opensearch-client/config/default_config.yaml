@@ -1,0 +1,3 @@
+pimcore_open_search_client:
+  clients:
+    default:

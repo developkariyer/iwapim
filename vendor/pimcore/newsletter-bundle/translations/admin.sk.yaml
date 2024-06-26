@@ -1,0 +1,31 @@
+---
+newsletter_active: "Newsletter je akt\xEDvny"
+newsletter_confirmed: "Newsletter je potvrden\xFD"
+newsletter: Newsletter
+add_newsletter: "Prida\u0165 newsletter"
+send_newsletter: "Odosla\u0165 newsletter"
+send_test_newsletter: "Odosla\u0165 testovac\xED newsletter"
+newsletter_send_error: "Newsletter sa nepodarilo odosla\u0165, pros\xEDm kontaktujte
+  svojho administr\xE1tora!"
+newsletter_sent_message: "Newsletter je teraz rozposielan\xFD v\u0161etk\xFDm pr\xEDjemcom
+  v procese na pozad\xED (m\xF4\u017Eete po\u010Das neho zatvori\u0165 administr\xE1ciu)
+  a m\xF4\u017Ee trva\u0165 a\u017E hodinu."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: "Naozaj chcete odosla\u0165
+  newsletter v\u0161etk\xFDm pr\xEDjemcom"
+newsletter_enableTrackingParameters: "Prida\u0165 trackovacie parametre k odkazom"
+newsletter_sendingMode: "Odosielac\xED m\xF3d"
+newsletter_sendingmode_single: "Singl (Rendrova\u0165 dokument pre ka\u017Ed\xFD e-mail
+  individu\xE1lne)"
+newsletter_sendingmode_batch: "Hromadne (Rendrova\u0165 dokument len raz)"
+newsletter_sendingPanel: "Odosielac\xED panel newsletteru"
+newsletter_dirty_warning: "Newsletter najsk\xF4r ulo\u017Ete, pros\xEDm."
+newsletter_sending: Odosielanie newsletteru
+newsletter_sourceAdapter: "Adapt\xE9r zdroju adries"
+newsletter_default: "Defaultn\xFD zoznam z\xE1znamov (Object List)"
+newsletter_csvList: CSV zoznam
+newsletter_testsend: Odosielanie testovacieho newsletteru
+newsletter_test_sent_message: "Testovac\xED newsletter bol odoslan\xFD \xFAspe\u0161ne"
+newsletter_choose_report: Vyberte report
+newsletter_email_field_name: Pole s e-mailom
+newsletter_report: Custom Report
+...

@@ -1,0 +1,32 @@
+imports:
+    - { resource: graphql.yml }
+    - { resource: eventlistener.yml }
+
+services:
+
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # auto-register all commands as services
+    Pimcore\Bundle\DataHubBundle\Command\:
+        resource: '../../Command'
+
+    Pimcore\Bundle\DataHubBundle\Controller\:
+        resource: '../../Controller'
+        public: true
+        autowire: true
+        autoconfigure: true
+        tags: ['controller.service_arguments']
+    
+    Pimcore\Bundle\DataHubBundle\Service\:
+        resource: '../../Service'
+        public: true
+        autowire: true
+        autoconfigure: true
+
+    Pimcore\Bundle\DataHubBundle\Installer:
+        public: true
+        arguments:
+            $bundle: "@=service('kernel').getBundle('PimcoreDataHubBundle')"

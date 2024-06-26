@@ -7,13 +7,19 @@
     "sort-packages": true,
     "process-timeout": 0,
     "allow-plugins": {
-      "symfony/runtime": true
+      "symfony/runtime": true,
+      "php-http/discovery": true
     }
   },
   "prefer-stable": true,
   "require": {
     "blackbit_digital_commerce/pimcore-iframe-portlet": "^1.0",
-    "pimcore/admin-ui-classic-bundle": "^1.0",
+    "pimcore/admin-ui-classic-bundle": "^1.4",
+    "pimcore/advanced-object-search": "^6.0",
+    "pimcore/data-hub": "^1.7",
+    "pimcore/data-importer": "^1.9",
+    "pimcore/newsletter-bundle": "^1.1",
+    "pimcore/perspective-editor": "^1.7",
     "pimcore/pimcore": "^11.0.4",
     "shopify/shopify-api": "^5.5",
     "symfony/dotenv": "^6.2",

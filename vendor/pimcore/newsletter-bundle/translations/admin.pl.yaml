@@ -1,0 +1,29 @@
+---
+newsletter_active: Aktywuj newsletter
+newsletter_confirmed: Potwierdzony newsletter
+newsletter: Newsletter
+add_newsletter: Dodaj newsletter'a
+send_newsletter: "Wy\u015Blij teraz newsletter"
+send_test_newsletter: "Wy\u015Blij Test-Newsletter"
+newsletter_send_error: "Nie mo\u017Cesz wys\u0142a\u0107 newsletter'a, prosz\u0119
+  skontaktuj si\u0119 z administracj\u0105!"
+newsletter_sent_message: "Newsletter jest teraz wysy\u0142any do wszystkich odbiorc\xF3w,
+  proces ten odbywa si\u0119 w tle i mo\u017Ce to trwa\u0107 do godziny."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: "Czy na pewno chcesz
+  wys\u0142a\u0107 newsletter do wszystkich odbiorc\xF3w ? "
+newsletter_enableTrackingParameters: "Dodaj Parametr Opomiaruj\u0105cy do Link\xF3w"
+newsletter_sendingMode: "Tryb Wysy\u0142ania"
+newsletter_sendingmode_single: "Pojedynczo (Renderuj ka\u017Cd\u0105 poczt\u0119 indywidualnie)"
+newsletter_sendingmode_batch: Zadanie pakietowe (Renderuj emaila tylko raz)
+newsletter_sendingPanel: "Panel Wysy\u0142ania Newslettera"
+newsletter_dirty_warning: Newsletter nie jest zapisany. Zapisz najpierw.
+newsletter_sending: "Wysy\u0142anie Newslettera"
+newsletter_sourceAdapter: "Adapter \u0179r\xF3d\u0142owy Adres\xF3w"
+newsletter_default: "Domy\u015Blna Lista Obiekt\xF3w"
+newsletter_csvList: Lista CSV
+newsletter_testsend: "Wysy\u0142anie Testowego Newslettera"
+newsletter_test_sent_message: "Testowy Newsletter zosta\u0142 wys\u0142any pomy\u015Blnie"
+newsletter_choose_report: Wybierz raport
+newsletter_email_field_name: Nazwa pola Email
+newsletter_report: Custom Report
+...

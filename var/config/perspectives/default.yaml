@@ -1,0 +1,85 @@
+pimcore:
+    perspectives:
+        definitions:
+            default:
+                elementTree:
+                    -
+                        type: objects
+                        position: left
+                        expanded: false
+                        hidden: false
+                        sort: 0
+                        treeContextMenu:
+                            object:
+                                items:
+                                    add: true
+                                    addFolder: true
+                                    importCsv: true
+                                    cut: true
+                                    copy: true
+                                    paste: true
+                                    delete: true
+                                    rename: true
+                                    reload: true
+                                    publish: true
+                                    unpublish: true
+                                    searchAndMove: true
+                                    lock: true
+                                    unlock: true
+                                    lockAndPropagate: true
+                                    unlockAndPropagate: true
+                                    changeChildrenSortBy: true
+                    -
+                        type: assets
+                        position: right
+                        expanded: false
+                        hidden: false
+                        sort: 0
+                        treeContextMenu:
+                            asset:
+                                items:
+                                    add:
+                                        hidden: false
+                                        items:
+                                            upload: true
+                                            uploadCompatibility: true
+                                            uploadZip: true
+                                            importFromServer: true
+                                            uploadFromUrl: true
+                                    addFolder: true
+                                    rename: true
+                                    copy: true
+                                    cut: true
+                                    paste: true
+                                    pasteCut: true
+                                    delete: true
+                                    searchAndMove: true
+                                    lock: true
+                                    unlock: true
+                                    lockAndPropagate: true
+                                    unlockAndPropagate: true
+                                    reload: true
+                iconCls: pimcore_nav_icon_perspective
+                icon: null
+                dashboards:
+                    predefined:
+                        welcome:
+                            positions:
+                                -
+                                    -
+                                        id: 1
+                                        type: pimcore.layout.portlets.modificationStatistic
+                                        config: null
+                                    -
+                                        id: 2
+                                        type: pimcore.layout.portlets.modifiedAssets
+                                        config: null
+                                -
+                                    -
+                                        id: 3
+                                        type: pimcore.layout.portlets.modifiedObjects
+                                        config: null
+                                    -
+                                        id: 4
+                                        type: pimcore.layout.portlets.modifiedDocuments
+                                        config: null

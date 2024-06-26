@@ -1,0 +1,33 @@
+---
+newsletter_active: "H\xEDrlev\xE9l akt\xEDv"
+newsletter_confirmed: "H\xEDrlev\xE9l meger\u0151s\xEDtve"
+newsletter: "H\xEDrlev\xE9l"
+add_newsletter: "H\xEDrlev\xE9l hozz\xE1ad\xE1sa"
+send_newsletter: "H\xEDrlev\xE9l k\xFCld\xE9se most"
+send_test_newsletter: "Teszt h\xEDrlev\xE9l k\xFCld\xE9se"
+newsletter_send_error: "A h\xEDrlev\xE9l k\xFCld\xE9se sikertelen, vegye fel a kapcsolatot
+  az adminisztr\xE1torral."
+newsletter_sent_message: "H\xEDrlevel\xE9t minden c\xEDmzettnek elk\xFCldj\xFCk, ez
+  a folyamat a h\xE1tt\xE9rben zajlik (id\u0151k\xF6zben bez\xE1rhatja a pimcore-t),
+  \xE9s ak\xE1r egy \xF3r\xE1t is ig\xE9nybe vehet."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: "T\xE9nyleg el szeretn\xE9
+  k\xFCldeni a h\xEDrlevelet minden c\xEDmzettnek"
+newsletter_enableTrackingParameters: "K\xF6vet\u0151 param\xE9terek hozz\xE1ad\xE1sa
+  a linkekhez"
+newsletter_sendingMode: "K\xFCld\xE9s m\xF3dja"
+newsletter_sendingmode_single: "Egyenk\xE9nt (Minden email t\xF6rzs\xE9t \xFAjra,
+  egyes\xE9vel l\xE9trehozza)"
+newsletter_sendingmode_batch: "K\xF6tegelt (Csak egyszer j\xF6n l\xE9tre az email
+  t\xF6rzse)"
+newsletter_sendingPanel: "H\xEDrlev\xE9l k\xFCld\u0151 panel"
+newsletter_dirty_warning: "H\xEDrlev\xE9l nincs mentve. El\u0151bb mentsd el."
+newsletter_sending: "H\xEDrlev\xE9l k\xFCld\xE9se"
+newsletter_sourceAdapter: Address Source Adapter
+newsletter_default: "Alap\xE9rtelmezett Objektum lista"
+newsletter_csvList: CSV lista
+newsletter_testsend: "H\xEDrlev\xE9l teszt k\xFCld\xE9s"
+newsletter_test_sent_message: "Teszt h\xEDrlev\xE9l sikeresen elk\xFCldve"
+newsletter_choose_report: "V\xE1lassz riportot"
+newsletter_email_field_name: "Email mez\u0151 neve"
+newsletter_report: Custom Report
+...

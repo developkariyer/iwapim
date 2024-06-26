@@ -1,0 +1,30 @@
+---
+newsletter_active: Nieuwsbrief actief
+newsletter_confirmed: Nieuwsbrief bevestigd
+newsletter: Nieuwsbrief
+add_newsletter: Nieuwsbrief toevoegen
+send_newsletter: Nieuwsbrief verzenden
+send_test_newsletter: Testnieuwsbrief verzenden
+newsletter_send_error: Nieuwsbrief kan niet worden verstuurd, neem contact op met
+  de beheerder!
+newsletter_sent_message: De nieuwsbrief wordt nu verstuurd naar alle ontvangers. Dit
+  proces loopt in de achtergrond (Pimcore kan worden gesloten in de tussentijd) en
+  kan tot 1 uur duren.
+do_you_really_want_to_send_the_newsletter_to_all_recipients: Weet u zeker dat u de
+  nieuwsbrief naar alle adressen wilt versturen?
+newsletter_enableTrackingParameters: Tracking parameters toevoegen aan links
+newsletter_sendingMode: Verzendmodus
+newsletter_sendingmode_single: Enkel (bouw elke email afzonderlijk op)
+newsletter_sendingmode_batch: Batch (Bouw email slechts 1 keer op)
+newsletter_sendingPanel: Nieuwsbrief versturen
+newsletter_dirty_warning: Nieuwsbrief is nog niet opgeslagen. Bewaar eerst je wijzigingen
+newsletter_sending: Nieuwsbrief versturen
+newsletter_sourceAdapter: Adres Bron Adapter
+newsletter_default: Standaard Object lijst
+newsletter_csvList: CSV Lijst
+newsletter_testsend: NIeuwsbrief test versturen
+newsletter_test_sent_message: Test nieuwsbrief succesvol verstuurd
+newsletter_choose_report: Kies een rapport
+newsletter_email_field_name: Email veld naam
+newsletter_report: Custom Report
+...

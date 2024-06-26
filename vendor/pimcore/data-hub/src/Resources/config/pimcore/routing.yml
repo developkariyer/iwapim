@@ -1,0 +1,12 @@
+app:
+    resource: "@PimcoreDataHubBundle/Controller/"
+    type:     annotation
+
+
+admin_pimcoredatahub_config:
+    path: /pimcore-datahub-webservices/explorer/{clientname}
+    defaults: { _controller: Pimcore\Bundle\DataHubBundle\Controller\GraphQLExplorerController::explorerAction }
+
+admin_pimcoredatahub_webservice:
+    path: /pimcore-graphql-webservices/{clientname}
+    defaults: { _controller: Pimcore\Bundle\DataHubBundle\Controller\WebserviceController::webonyxAction }

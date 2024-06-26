@@ -1,0 +1,32 @@
+---
+newsletter_active: Newsletter Attiva
+newsletter_confirmed: Newsletter Confermata
+newsletter: Newsletter
+add_newsletter: Aggiungi Newsletter
+send_newsletter: Invia Newsletter Adesso
+send_test_newsletter: Inviare Newsletter di Prova
+newsletter_send_error: "Non \xE8 possibile inviare la newsletter, contattare per favore
+  con l'amministratore!"
+newsletter_sent_message: "La newsletter sta per essere inviata a tutti i destinatari;
+  questo processo si compie in background e pu\xF2 durare fino ad un'ora (nel frattempo
+  puoi chiudere pimcore)."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: Vuoi veramente inviare
+  la newsletter a tutti i destinatari
+newsletter_enableTrackingParameters: Aggiungi parametri per il tracciamento ai collegamenti
+newsletter_sendingMode: "Modalit\xE0 Invio"
+newsletter_sendingmode_single: Singola (rappresenta individualmente ogni messaggio)
+newsletter_sendingmode_batch: Blocco (rappresenta una sola volta il messaggio)
+newsletter_sendingPanel: Pannello Invio Newsletter
+newsletter_dirty_warning: "La Newsletter non \xE8 ancora salvata. Prima di poter far
+  altro \xE8 necessario salvarla."
+newsletter_sending: Invio Newsletter
+newsletter_sourceAdapter: Connettore fonte indirizzo
+newsletter_default: Lista oggetto predefinito
+newsletter_csvList: Lista CSV
+newsletter_testsend: Test di invio Newsletter
+newsletter_test_sent_message: "L'invio della Newsletter di test \xE8 andato a buon
+  fine"
+newsletter_choose_report: Scegli un rapporto
+newsletter_email_field_name: Nome campo email
+newsletter_report: Custom Report
+...

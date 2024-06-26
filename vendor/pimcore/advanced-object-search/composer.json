@@ -1,0 +1,38 @@
+{
+  "name": "pimcore/advanced-object-search",
+  "license": "GPL-3.0+",
+  "type": "pimcore-bundle",
+  "config": {
+    "sort-packages": true
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "handcraftedinthealps/elasticsearch-dsl": "^8.0",
+    "pimcore/opensearch-client": "^1.0.0",
+    "pimcore/pimcore": "^11.1",
+    "symfony/config": "^6.2",
+    "symfony/console": "^6.2",
+    "symfony/dependency-injection": "^6.2",
+    "symfony/event-dispatcher": "^6.2",
+    "symfony/http-foundation": "^6.2",
+    "symfony/http-kernel": "^6.2",
+    "symfony/messenger": "^6.2",
+    "symfony/routing": "^6.2"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^1.9.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "AdvancedObjectSearchBundle\\": "src/"
+    }
+  },
+  "extra": {
+    "pimcore": {
+      "bundles": [
+        "AdvancedObjectSearchBundle\\AdvancedObjectSearchBundle"
+      ]
+    }
+  }
+}

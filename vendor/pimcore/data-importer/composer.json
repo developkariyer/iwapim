@@ -1,0 +1,60 @@
+{
+  "name": "pimcore/data-importer",
+  "license": "GPL-3.0-or-later",
+  "type": "pimcore-bundle",
+  "description": "Adds a comprehensive import functionality to Pimcore Datahub",
+  "config": {
+    "sort-packages": true,
+    "preferred-install": {
+      "pimcore/pimcore": "source",
+      "*": "dist"
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "pimcore/compatibility-bridge-v10": "^1.0",
+    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+    "ext-fileinfo": "*",
+    "ext-json": "*",
+    "dragonmantank/cron-expression": "^3.1",
+    "league/flysystem-sftp-v3": "^3.0",
+    "nesbot/carbon": "^2.27",
+    "phpoffice/phpspreadsheet": "^1.24 || ^2.1",
+    "pimcore/data-hub": "^1.6",
+    "pimcore/pimcore": "^10.6 || ^11.0",
+    "symfony/mime": "^5.2 || ^6.2",
+    "webmozarts/console-parallelization": "^1.2.0 || ^2.0.0"
+  },
+  "require-dev": {
+    "codeception/codeception": "^4.1.12 || ^5.0.3",
+    "codeception/module-asserts": "^2",
+    "codeception/module-symfony": "^1.6.0 || ^3.1.0",
+    "codeception/phpunit-wrapper": "^9",
+    "phpstan/phpstan": "^1.9.11",
+    "phpunit/phpunit": "^9.3"
+  },
+  "suggest": {
+    "pimcore/admin-ui-classic-bundle": "Required for Pimcore 11"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pimcore\\Bundle\\DataImporterBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Pimcore\\Bundle\\DataImporterBundle\\Tests\\": "tests"
+    },
+    "files": [
+      "kernel/Kernel.php"
+    ]
+  },
+  "extra": {
+    "pimcore": {
+      "bundles": [
+        "Pimcore\\Bundle\\DataImporterBundle\\PimcoreDataImporterBundle"
+      ]
+    }
+  }
+}

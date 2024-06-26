@@ -1,0 +1,95 @@
+framework:
+    messenger:
+        transports:
+            pimcore_index_queues: "doctrine://default?queue_name=pimcore_index_queues"
+
+        routing:
+            'AdvancedObjectSearchBundle\Messenger\QueueMessage': pimcore_index_queues
+
+
+advanced_object_search:
+    index_configuration:
+        elements_per_loop: 100
+        nested_fields_limit: 200
+        total_fields_limit: 100000
+
+    field_definition_adapters:
+        default: 'bundle.advanced_object_search.filter.default'
+        calculatedValue: 'bundle.advanced_object_search.filter.calculatedValue'
+        checkbox: 'bundle.advanced_object_search.filter.checkbox'
+        country: 'bundle.advanced_object_search.filter.country'
+        countrymultiselect: 'bundle.advanced_object_search.filter.countrymultiselect'
+        date: 'bundle.advanced_object_search.filter.date'
+        datetime: 'bundle.advanced_object_search.filter.datetime'
+        fieldcollections: 'bundle.advanced_object_search.filter.fieldcollections'
+        manyToOneRelation: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\ManyToOneRelation'
+        language: 'bundle.advanced_object_search.filter.language'
+        languagemultiselect: 'bundle.advanced_object_search.filter.languagemultiselect'
+        localizedfields: 'bundle.advanced_object_search.filter.localizedfields'
+        manyToManyRelation: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\ManyToManyRelation'
+        advancedManyToManyRelation: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\AdvancedManyToManyRelation'
+        multiselect: 'bundle.advanced_object_search.filter.multiselect'
+        numeric: 'bundle.advanced_object_search.filter.numeric'
+        objectbricks: 'bundle.advanced_object_search.filter.objectbricks'
+        manyToManyObjectRelation: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\ManyToManyObjectRelation'
+        advancedManyToManyObjectRelation: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\AdvancedManyToManyObjectRelation'
+        quantityValue: 'bundle.advanced_object_search.filter.quantityValue'
+        select: 'bundle.advanced_object_search.filter.select'
+        time: 'bundle.advanced_object_search.filter.time'
+        user: 'bundle.advanced_object_search.filter.user'
+        table: 'bundle.advanced_object_search.filter.table'
+
+        # legacy mappings
+        href: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\ManyToOneRelation'
+        objects: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\ManyToManyObjectRelation'
+        multihref: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\ManyToManyRelation'
+        multihrefMetadata: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\AdvancedManyToManyRelation'
+        objectsMetadata: 'AdvancedObjectSearchBundle\Filter\FieldDefinitionAdapter\AdvancedManyToManyObjectRelation'
+
+    core_fields_configuration:
+        -
+            field: id
+            type: long
+            title: ID
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Numeric
+        -
+            field: index
+            type: long
+            title: Index
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Numeric
+        -
+            field: creationDate
+            type: date
+            title: creationdate
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Datetime
+        -
+            field: modificationDate
+            type: date
+            title: modificationdate
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Datetime
+        -
+            field: published
+            type: boolean
+            title: published
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Select
+            values: { options: [{ key: 'Yes', value: true }, { key: 'No', value: false }] }
+        -
+            field: type
+            type: keyword
+            title: type
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Select
+            values: { options: [{ key: Variant, value: variant }, { key: Object, value: object }] }
+        -
+            field: key
+            type: keyword
+            title: key
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Input
+        -
+            field: path
+            type: keyword
+            title: path
+            fieldDefinition: Pimcore\Model\DataObject\ClassDefinition\Data\Input
+        -
+            field: className
+            title: classname
+            type: keyword

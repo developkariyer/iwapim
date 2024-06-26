@@ -137,3 +137,18 @@ framework:
 
     workflows:
         enabled: true
+
+
+pimcore_open_search_client:
+    clients:
+        default:
+            hosts: ['https://localhost:9200']
+            password: 'Gezegen2329'
+            username: 'admin'
+            ssl_verification: false
+
+
+# Define the client to be used by advanced object search
+advanced_object_search:
+    client_name: default 
+    index_name_prefix: 'advanced_object_search_'

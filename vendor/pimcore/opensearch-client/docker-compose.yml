@@ -1,0 +1,9 @@
+version: '3.0'
+services:
+    php-opensearch-client-bundle:
+        image: pimcore/pimcore:php8.2-debug-latest
+        environment:
+            PHP_IDE_CONFIG: serverName=localhost
+        volumes:
+            - .:/var/cli/
+            - ./.docker/30-xdebug.ini:/usr/local/etc/php/conf.d/30-xdebug.ini

@@ -1,0 +1,80 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "timeout": 5,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "testFrameworkOptions": "--testsuite=Tests",
+    "logs": {
+        "text": "dist/infection.log"
+    },
+    "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            "Assert::.*"
+        ],
+        "@default": true,
+        "Assignment": {
+            "ignore": [
+                // This is a perfectly valid case but too hard to test.
+                "Webmozarts\\Console\\Parallelization\\Process\\SymfonyProcessLauncher::freeTerminatedProcesses"
+            ]
+        },
+        "Break_": {
+            "ignore": [
+                "Webmozarts\\Console\\Parallelization\\Process\\SymfonyProcessLauncher::run"
+            ]
+        },
+        "CastString": {
+            "ignore": [
+                "Webmozarts\\Console\\Parallelization\\Input\\InputOptionsSerializer::quoteOptionValue"
+            ],
+            "ignoreSourceCodeByRegex": [
+                "\\(string\\) \\$numberOfProcesses.*"
+            ]
+        },
+        "CloneRemoval": false,
+        "DecrementInteger": {
+            ignore: [
+                // The segment size or batch size are not critical
+                "Webmozarts\\Console\\Parallelization\\ParallelExecutorFactory::create"
+            ],
+            "ignoreSourceCodeByRegex": [
+                ".*\\$numberOfStreamedItems = .*",
+                ".*\\$numberOfItems \\?\\? 0.*",
+                ".*return min\\(\\$exitCode, 255\\);.*"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                // The input value cannot be null hence the boolean changed has no influence.
+                "Webmozarts\\Console\\Parallelization\\Input\\ParallelizationInput::coerceNumberOfProcesses"
+            ]
+        },
+        "IncrementInteger": {
+            ignore: [
+                // The segment size or batch size are not critical
+                "Webmozarts\\Console\\Parallelization\\ParallelExecutorFactory::create"
+            ],
+            "ignoreSourceCodeByRegex": [
+                ".*\\$numberOfItems \\?\\? 0.*",
+                ".*return min\\(\\$exitCode, 255\\);.*"
+            ]
+        },
+        "MBString": false,
+        "MethodCallRemoval": {
+            "ignore": [
+                "Webmozarts\\Console\\Parallelization\\Process\\StandardSymfonyProcessFactory::startProcess"
+            ],
+            "ignoreSourceCodeByRegex": [
+                "\\$currentInputStream->close\\(\\);",
+            ]
+        },
+        "LogicalAnd": {
+            "ignoreSourceCodeByRegex": [
+                ".*ResettableContainerInterface.*"
+            ]
+        }
+    }
+}

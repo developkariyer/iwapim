@@ -1,0 +1,30 @@
+---
+newsletter_active: Newsletter ist aktiv
+newsletter_confirmed: "Newsletter best\xE4tigt"
+newsletter: Newsletter
+add_newsletter: "Newsletter hinzuf\xFCgen"
+send_newsletter: Newsletter JETZT versenden
+send_test_newsletter: Newsletter Testversand
+newsletter_send_error: Der Newsletter kann nicht versendet werden, bitte informieren
+  Sie Ihren Administrator!
+newsletter_sent_message: "Der Newsletter wird nun im Hintergrund an alle Empf\xE4nger
+  versendet, dies kann bis zu einer Stunde dauern. (Sie k\xF6nnen pimcore derweil
+  schlie\xDFen)"
+do_you_really_want_to_send_the_newsletter_to_all_recipients: "Wollen Sie den Newsletter
+  wirklich an alle Empf\xE4nger versenden ?"
+newsletter_enableTrackingParameters: "Tracking-Parameter zu Links hinzuf\xFCgen"
+newsletter_sendingMode: Versand-Modus
+newsletter_sendingmode_single: Einzeln (Rendere jede E-Mail individuell)
+newsletter_sendingmode_batch: Batch (Rendere E-Mail nur einmal)
+newsletter_sendingPanel: Newsletter-Versandpanel
+newsletter_dirty_warning: Newsletter wurde noch nicht gespeichert. Bitte zuerst speichern.
+newsletter_sending: Sendet Newsletter
+newsletter_sourceAdapter: Adressquellen-Adapter
+newsletter_default: Standard-Objektliste
+newsletter_csvList: CSV-Liste
+newsletter_testsend: Newsletter-Testversand
+newsletter_test_sent_message: Test-Newsletter erfolgreich versendet
+newsletter_choose_report: "W\xE4hle ein Bericht"
+newsletter_email_field_name: E-Mail-Feldname
+newsletter_report: Individueller Bericht
+...

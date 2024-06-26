@@ -1,0 +1,19 @@
+{
+  "name": "pimcore/compatibility-bridge-v10",
+  "license": "GPL-3.0+",
+  "type": "pimcore-bundle",
+  "description": "Pimcore Compatibility Bridge provides class aliases for the classes which were moved/updated and are necessary for backwards compatibility.",
+  "config": {
+    "sort-packages": true
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
+  },
+  "autoload": {
+    "files": [
+      "src/autoload.php"
+    ]
+  }
+}

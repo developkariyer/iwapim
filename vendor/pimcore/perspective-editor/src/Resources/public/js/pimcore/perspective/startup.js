@@ -1,0 +1,121 @@
+/**
+ * Pimcore
+ *
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Pimcore Commercial License (PCL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
+ *
+ *  @copyright  Copyright (c) Pimcore GmbH (http://www.pimcore.org)
+ *  @license    http://www.pimcore.org/license     GPLv3 and PCL
+ */
+
+
+pimcore.registerNS('pimcore.settings.perspectiveview');
+
+pimcore.settings.perspectiveview = Class.create({
+
+    panelId: 'perspective_view_panel_id',
+
+    initialize: function () {
+        // if the new event exists, we use this
+        if (pimcore.events.preMenuBuild) {
+            document.addEventListener(pimcore.events.preMenuBuild, this.createNavigationEntry.bind(this));
+        } else {
+            document.addEventListener(pimcore.events.pimcoreReady, this.createNavigationEntry.bind(this));
+        }
+    },
+
+    activate: function () {
+       Ext.getCmp('pimcore_panel_tabs').setActiveItem(this.getTabPanel());
+    },
+
+    createNavigationEntry: function (e) {
+        const perspectiveCfg = pimcore.globalmanager.get('perspective');
+
+        if(!perspectiveCfg.inToolbar('settings.perspectiveEditor')){
+            return;
+        }
+
+        const user = pimcore.globalmanager.get('user');
+        if (user.isAllowed('perspective_editor')) {
+            const navigationItem = {
+                text: t('plugin_pimcore_perspectiveeditor_perspective_view_editor'),
+                iconCls: 'pimcore_nav_icon_perspective',
+                handler: this.openPerspectiveEditor.bind(this)
+            };
+
+            if(e.type === pimcore.events.preMenuBuild){
+                let menu = e.detail.menu.settings;
+
+                menu.items.push(navigationItem);
+            }
+
+            if(e.type === pimcore.events.pimcoreReady){
+                let menu = pimcore.globalmanager.get('layout_toolbar').settingsMenu;
+
+                menu.add(navigationItem);
+            }
+        }
+    },
+
+    getTabPanel: function () {
+        if (!this.panel) {
+            const user = pimcore.globalmanager.get('user');
+
+            this.panel = new Ext.Panel({
+                id: this.panelId,
+                iconCls: 'pimcore_nav_icon_perspective',
+                title: t('plugin_pimcore_perspectiveeditor_perspective_view_editor'),
+                border: false,
+                layout: 'fit',
+                closable: true,
+                items: [
+                    new Ext.TabPanel({
+                        items: [
+                            new pimcore.bundle.perspectiveeditor.PerspectiveEditor(),
+                            new pimcore.bundle.perspectiveeditor.ViewEditor(!user.isAllowed('perspective_editor_view_edit')),
+                        ],
+                    }),
+                ],
+            });
+
+            var tabPanel = Ext.getCmp('pimcore_panel_tabs');
+            tabPanel.add(this.panel);
+            tabPanel.setActiveItem(this.panelId);
+
+            this.panel.on('destroy', function () {
+                pimcore.globalmanager.get('plugin_pimcore_perspectiveeditor').panel = false;
+                pimcore.globalmanager.remove('plugin_pimcore_perspectiveeditor');
+            });
+
+            pimcore.layout.refresh();
+        }
+
+        return this.panel;
+    },
+
+    addToPimcorePanel: function(id){
+        pimcore.globalmanager.get(id).on("beforedestroy", function () {
+            pimcore.globalmanager.remove(id);
+        });
+
+        var pimcoreTabPanel = Ext.getCmp("pimcore_panel_tabs");
+        pimcoreTabPanel.add(pimcore.globalmanager.get(id));
+        pimcoreTabPanel.setActiveItem(id);
+
+        pimcore.layout.refresh();
+    },
+
+    openPerspectiveEditor: function () {
+        try{
+            pimcore.globalmanager.get('plugin_pimcore_perspectiveeditor').activate();
+        } catch (e) {
+            this.getTabPanel();
+            pimcore.globalmanager.add('plugin_pimcore_perspectiveeditor', settingsPerspectiveView);
+        }
+    }
+});
+
+const settingsPerspectiveView = new pimcore.settings.perspectiveview();

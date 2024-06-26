@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * Pimcore
+ *
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Pimcore Commercial License (PCL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
+ *
+ *  @copyright  Copyright (c) Pimcore GmbH (http://www.pimcore.org)
+ *  @license    http://www.pimcore.org/license     GPLv3 and PCL
+ */
+
+namespace AdvancedObjectSearchBundle\Model\SavedSearch;
+
+use AdvancedObjectSearchBundle\Model\SavedSearch;
+use Pimcore\Model;
+
+/**
+ * @method SavedSearch[] load()
+ * @method int getTotalCount()
+ */
+class Listing extends Model\Listing\AbstractListing
+{
+    /**
+     * Contains the results of the list. They are all an instance of SavedSearch
+     *
+     * @var array
+     */
+    public $savedSearches = [];
+
+    /**
+     * Tests if the given key is an valid order key to sort the results
+     *
+     * @return bool
+     */
+    public function isValidOrderKey($key): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param array $savedSearches
+     *
+     * @return $this
+     */
+    public function setSavedSearches($savedSearches)
+    {
+        $this->savedSearches = $savedSearches;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSavedSearches()
+    {
+        return $this->savedSearches;
+    }
+}

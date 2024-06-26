@@ -1,0 +1,31 @@
+---
+newsletter_active: "Newsletter je aktivn\xED"
+newsletter_confirmed: Newsleter je potvrzen
+newsletter: Newletter
+add_newsletter: "P\u0159idat Newsletter"
+send_newsletter: "Odeslat newsletter nyn\xED"
+send_test_newsletter: "Odeslat testovac\xED newsletter"
+newsletter_send_error: "Newsletter se nepoda\u0159ilo odeslat, kontaktujte sv\xE9ho
+  administr\xE1tora pros\xEDm!"
+newsletter_sent_message: "V\xE1\u0161 newsletter je rozes\xEDl\xE1n v\u0161em p\u0159\xEDjemc\u016Fm
+  v procesu na pozad\xED (m\u016F\u017Eete po\u010Das n\u011Bj zav\u0159\xEDt administraci
+  Pimcore) a m\u016F\u017Ee trvat a\u017E hodinu."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: "Opravdu si p\u0159ejete
+  odeslat newsletter v\u0161em p\u0159\xEDjemc\u016Fm"
+newsletter_enableTrackingParameters: "P\u0159idat trackovac\xED parametry k odkaz\u016Fm"
+newsletter_sendingMode: "Odes\xEDlac\xED m\xF3d"
+newsletter_sendingmode_single: "Singl (Rendrovat dokument pre ka\u017Ed\xFD e-mail
+  individu\xE1ln\u011B)"
+newsletter_sendingmode_batch: "Hromadn\u011B (Rendrovat dokument jenom jednou)"
+newsletter_sendingPanel: "Odes\xEDlac\xED panel newsletteru"
+newsletter_dirty_warning: "Newletter nejd\u0159\xEDv ulo\u017Ete, pros\xEDm."
+newsletter_sending: "Odes\xEDl\xE1n\xED newsletteru"
+newsletter_sourceAdapter: "Adapt\xE9r zdroje adres"
+newsletter_default: "V\xFDchoz\xED seznam z\xE1znam\u016F (Object List)"
+newsletter_csvList: CSV seznam
+newsletter_testsend: "Odes\xEDl\xE1n\xED testovac\xEDho newsletteru"
+newsletter_test_sent_message: "Testovac\xED newsletter byl odesl\xE1n \xFAsp\u011B\u0161n\u011B"
+newsletter_choose_report: Vyberte report
+newsletter_email_field_name: Pole s e-mailem
+newsletter_report: Custom Report
+...

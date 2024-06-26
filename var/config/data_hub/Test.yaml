@@ -1,0 +1,79 @@
+pimcore_data_hub:
+    configurations:
+        Test:
+            general:
+                active: true
+                type: dataImporterDataObject
+                name: Test
+                description: ''
+                group: ''
+                path: null
+                modificationDate: 1719263457
+                createDate: 1719262827
+            loaderConfig:
+                type: upload
+                settings:
+                    uploadFilePath: Test/upload.import
+            interpreterConfig:
+                type: csv
+                settings:
+                    skipFirstRow: true
+                    delimiter: ','
+                    enclosure: '"'
+                    escape: \
+            resolverConfig:
+                elementType: dataObject
+                dataObjectClassId: product
+                loadingStrategy:
+                    type: id
+                    settings:
+                        dataSourceIndex: '0'
+                createLocationStrategy:
+                    type: staticPath
+                    settings:
+                        path: /Ürünler
+                locationUpdateStrategy:
+                    type: noChange
+                publishingStrategy:
+                    type: noChangeUnpublishNew
+            processingConfig:
+                executionType: sequential
+                idDataIndex: '0'
+                cleanup:
+                    doCleanup: true
+                    strategy: unpublish
+            mappingConfig:
+                -
+                    label: A
+                    dataSourceIndex:
+                        - '1'
+                    transformationResultType: default
+                    dataTarget:
+                        type: direct
+                        settings:
+                            fieldName: name
+                            language: ''
+                            writeIfTargetIsNotEmpty: true
+                            writeIfSourceIsEmpty: true
+                    transformationPipeline: {  }
+                -
+                    label: B
+                    dataSourceIndex:
+                        - '5'
+                    transformationResultType: default
+                    dataTarget:
+                        type: direct
+                        settings:
+                            fieldName: productClass
+                            language: ''
+                            writeIfTargetIsNotEmpty: true
+                            writeIfSourceIsEmpty: true
+                    transformationPipeline: {  }
+            executionConfig:
+                scheduleType: job
+                cronDefinition: ''
+                scheduledAt: '25-06-2024 00:10'
+            permissions:
+                user: {  }
+                role: {  }
+            workspaces: {  }

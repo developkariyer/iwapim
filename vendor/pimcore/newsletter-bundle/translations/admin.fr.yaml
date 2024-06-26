@@ -1,0 +1,31 @@
+---
+newsletter_active: Newsletter active
+newsletter_confirmed: "Newsletter Valid\xE9e"
+newsletter: Newsletter
+add_newsletter: Ajouter une Newsletter
+send_newsletter: Envoyer la Newsletter maintenant
+send_test_newsletter: Envoyer la Newsletter de test
+newsletter_send_error: Impossible d'envoyer votre Newsletter, veuillez contacter votre
+  administrateur !
+newsletter_sent_message: "Votre Newsletter est envoy\xE9e \xE0 tous les destinataires,
+  ce traitement est r\xE9alis\xE9 en t\xE2che de fond (vous pouvez quitter pimcore)
+  et peut durer jusqu'\xE0 une heure."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: "Souhaitez-vous vraiment
+  envoyer la Newsletter \xE0 tous les destinataires"
+newsletter_enableTrackingParameters: "Ajouter des Param\xE8tres de Suivi aux Liens"
+newsletter_sendingMode: Mode d'envoi
+newsletter_sendingmode_single: "Unique (G\xE9n\xE8re chaque Mail individuellement)"
+newsletter_sendingmode_batch: "Lot (G\xE9n\xE8re Mail seulement une fois)"
+newsletter_sendingPanel: Panneau d'envoi de la Newsletter
+newsletter_dirty_warning: "La Newsletter n'est pas encore enregistr\xE9e. Veuillez
+  la sauvegarder en premier."
+newsletter_sending: Envoi de la Newsletter
+newsletter_sourceAdapter: Adapteur source pour les adresses
+newsletter_default: "Liste d'objet par d\xE9faut"
+newsletter_csvList: Liste CSV
+newsletter_testsend: Test d'envoi de la Newsletter
+newsletter_test_sent_message: "Test d'envoi de la Newsletter r\xE9ussi"
+newsletter_choose_report: "S\xE9lectionner un rapport"
+newsletter_email_field_name: Nom du champ e-mail
+newsletter_report: Custom Report
+...

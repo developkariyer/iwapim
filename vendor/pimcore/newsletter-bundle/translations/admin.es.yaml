@@ -1,0 +1,29 @@
+---
+newsletter_active: Newsletter activo
+newsletter_confirmed: Newsletter confirmado
+newsletter: "Bolet\xEDn electr\xF3nico"
+add_newsletter: Agregar Newsletter
+send_newsletter: Enviar Newsletter ahora
+send_test_newsletter: Enviar Newsletter de prueba
+newsletter_send_error: No se pudo enviar su newsletter, por favor contacte a su administrador!
+newsletter_sent_message: "Su newsletter fue enviado a todos sus destinatarios. Este
+  proceso ser\xE1 finalizado en segundo plano (puede cerrar pimcore mientras tanto)
+  y puede tardar hasta una hora."
+do_you_really_want_to_send_the_newsletter_to_all_recipients: Enviar el newsletter
+  a todos los destinatarios?
+newsletter_enableTrackingParameters: newsletter_enableTrackingParameters
+newsletter_sendingMode: newsletter_sendingMode
+newsletter_sendingmode_single: newsletter_sendingmode_single
+newsletter_sendingmode_batch: newsletter_sendingmode_batch
+newsletter_sendingPanel: newsletter_sendingPanel
+newsletter_dirty_warning: newsletter_dirty_warning
+newsletter_sending: newsletter_sending
+newsletter_sourceAdapter: newsletter_sourceAdapter
+newsletter_default: newsletter_default
+newsletter_csvList: newsletter_csvList
+newsletter_testsend: newsletter_testsend
+newsletter_test_sent_message: newsletter_test_sent_message
+newsletter_choose_report: newsletter_choose_report
+newsletter_email_field_name: newsletter_email_field_name
+newsletter_report: Custom Report
+...

@@ -1,0 +1,53 @@
+{
+  "name": "pimcore/opensearch-client",
+  "license": "GPL-3.0+",
+  "type": "pimcore-bundle",
+  "description": "Pimcore Opensearch Client",
+  "config": {
+    "discard-changes": true,
+    "sort-packages": true,
+    "preferred-install": {
+      "pimcore/pimcore": "source",
+      "*": "dist"
+    },
+    "allow-plugins": {
+      "php-http/discovery": false
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^8.0",
+    "pimcore/pimcore": "^10.6 || ^11.0",
+    "opensearch-project/opensearch-php": "^2.2.0"
+  },
+  "require-dev": {
+    "codeception/codeception": "^4.1.12 || ^5.0.10",
+    "codeception/phpunit-wrapper": "^9",
+    "codeception/module-asserts": "^2",
+    "codeception/module-symfony": "^1.6.0 || ^3.1.1",
+    "phpstan/phpstan": "^1.10.5",
+    "phpstan/phpstan-symfony": "^1.2.20",
+    "phpunit/phpunit": "^9.3 || 10.2.7",
+    "nyholm/psr7": "^1",
+    "symfony/phpunit-bridge": "^6",
+    "fakerphp/faker": "^1.23"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pimcore\\Bundle\\OpenSearchClientBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Pimcore\\Bundle\\OpenSearchClientBundle\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "pimcore": {
+      "bundles": [
+        "Pimcore\\Bundle\\OpensearchClientBundle\\PimcoreOpenSearchClientBundle"
+      ]
+    }
+  }
+}
