@@ -55,3 +55,6 @@ var/log/usage.log
 var/log/debug.log
 var/log/php.log
 tmp/*
+src/Command/ImportShopifyProductsCommand.php
+iwapim.sql
+iwapim.sql.gz
