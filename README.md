@@ -1,9 +1,6 @@
-# Pimcore Project Skeleton 
+# IWAPIM
 
 **DO NOT USE INSTALLERS FOR THIS REPOSITORY. THIS IS HIGLY MODIFIED AND EXPERIMENTAL!**
-
-This skeleton should be used by experienced Pimcore developers for starting a new project from the ground up. 
-If you are new to Pimcore, it's better to start with our demo package, listed below 😉
 
 ## To-Dos
 - Add all data in google product sheets
