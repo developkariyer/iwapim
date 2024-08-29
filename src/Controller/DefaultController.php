@@ -73,8 +73,8 @@ class DefaultController extends FrontendController
         if ($request->cookies->get('id_token')) {
             return $this->redirectToRoute('default_homepage');
         }
-        $slackClientId = '4259060865782.7050155097943';
-        $slackSecret = '22639a4bfb9b55151f84b89043a29c43';
+        $slackClientId = '';
+        $slackSecret = '';
 
         // Debug session ID to check if it changes
         error_log("Session ID: " . session_id());
