@@ -25,14 +25,7 @@ class ProductAdminStyle extends AdminStyle
                     $this->elementIcon = '/custom/navyobject.svg';
                     break;
                 case 1:
-                    $this->elementIcon = '/custom/redobject.svg';
-                    break;
-                case 2:
-                    if (count($element->getBundleItems())) {
-                        $this->elementIcon = '/custom/setbox.svg';
-                    } else {
-                        $this->elementIcon = (count($element->getListingItems())) ? '/custom/deployment.svg' : '/custom/object.svg';
-                    }
+                    $this->elementIcon = (count($element->getListingItems())) ? '/custom/deployment.svg' : '/custom/object.svg';
                     break;
                 default:
             }
@@ -47,18 +40,13 @@ class ProductAdminStyle extends AdminStyle
         if ($this->element instanceof Product) {
             $config = parent::getElementQtipConfig();
             $config['title'] = "{$this->element->getId()}: {$this->element->getName()}";
-            $shopifyVariations = count($this->element->getListingItems());
+            $shopifyVariations = $total = count($this->element->getListingItems());
             foreach ($this->element->getChildren() as $child) {
                 if ($child instanceof Product) {
                     $shopifyVariations += count($child->getListingItems());
-                    foreach ($child->getChildren() as $subChild) {
-                        if ($subChild instanceof Product) {
-                            $shopifyVariations += count($subChild->getListingItems());
-                        }
-                    }
                 }
             }
-            $config['text'] = count($this->element->getListingItems())."/$shopifyVariations listing bağlı<br>";
+            $config['text'] = "$total/$shopifyVariations listing bağlı<br>";
             $image = $this->element->getInheritedField('image');
             if ($image) {
                 $config["text"] .= "<img src='{$image->getThumbnail()->getPath()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";

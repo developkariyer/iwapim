@@ -66,10 +66,7 @@ class Product extends Concrete
 
     public function checkIwasku()
     {
-        if ($this->level() < 2) {
-            return;
-        }
-        if ($this->isPublished() && strlen($this->getIwasku()) != 12) {
+        if ($this->level() == 1 && $this->isPublished() && strlen($this->getIwasku()) != 12) {
             $pid = $this->getInheritedField("ProductIdentifier");
             $iwasku = str_pad(str_replace('-', '', $pid), 7, '0', STR_PAD_RIGHT);
             $iwasku .= $this->getProductCode();
@@ -118,15 +115,8 @@ class Product extends Concrete
             if ($child instanceof Product) {
                 $sizes[] = $child->getVariationSize();
                 $colors[] = $child->getVariationColor();
-                foreach ($child->getChildren([Product::OBJECT_TYPE_OBJECT], true) as $variant) {
-                    if ($variant instanceof Product) {
-                        $sizes[] = $variant->getVariationSize();
-                        $colors[] = $variant->getVariationColor();                            
-                    }
-                }
             }
         }
-        // remove null values and make unique and sort
         $sizes = array_unique(array_filter($sizes));
         $colors = array_unique(array_filter($colors));
         sort($sizes);
@@ -181,6 +171,9 @@ class Product extends Concrete
         if ($this->level() > 0) {
             return;
         }
+        if (!$this->getFixVariations()) {
+            return;
+        }
         if (self::$recursiveCounter > 5) {
             self::$recursiveCounter = 0;
             throw new \Exception('Recursive counter exceeded!');
@@ -204,59 +197,54 @@ class Product extends Concrete
                 $colors[] = $trimColor;
             }
         }
-        //(trim($this->getVariationColorList(), "\n ") === 'Mat') ? ['Black', 'Copper', 'Gold', 'Silver'] : 
 
         $sizes = array_values(array_unique(array_filter(array_map('trim', $sizes))));
         $colors = array_values(array_unique(array_filter(array_map('trim', $colors))));
-        $sizeArray = $colorArray = [];
+
+        if (empty($sizes)) {
+            $sizes = ['Tek Ebat'];
+        }
+        if (empty($colors)) {
+            $colors = ['Tek Renk'];
+        }
+
+        foreach ($sizes as $size) {
+            foreach ($colors as $color) {
+                $matrix[$size][$color] = false;
+            }
+        }
+
         foreach ($this->getChildren() as $child) {
             if (!$child instanceof Product) {continue;}
-            if (!in_array($child->getVariationSize(), $sizes)) {
-                //$child->delete();
-            } else {
-                $sizeArray[$child->getVariationSize()] = $child;
-                $colorArray[$child->getVariationSize()] = [];
-                foreach ($child->getChildren() as $variant) {
-                    if (!$variant instanceof Product) {continue;}
-                    if (!in_array($variant->getVariationColor(), $colors)) {
-                        //$variant->delete();
-                    } else {
-                        $colorArray[$child->getVariationSize()][$variant->getVariationColor()] = true;
-                    }
+            if (!in_array($child->getVariationSize(), $sizes) || !in_array($child->getVariationColor(), $colors)) {
+                if (!$child->getListingItems()) {
+                    $child->delete();
+                } else {
+                    $child->setPublished(false);
+                    $child->save();
                 }
+                continue;
+            }
+            $matrix[$child->getVariationSize()][$child->getVariationColor()] = true;
+        }
+
+        foreach ($sizes as $size) {
+            foreach ($colors as $color) {
+                if ($matrix[$size][$color] || empty($size) || empty($color)) {
+                    continue;
+                }
+                $newSize = new \Pimcore\Model\DataObject\Product();
+                $newSize->setParent($this);
+                $newSize->setVariationSize($size);
+                $newSize->setVariationColor($color);
+                $newSize->setPublished(true);
+                $newSize->checkProductCode();
+                $newSize->checkKey();
+                $newSize->save();
             }
         }
-        try {
-            foreach ($sizes as $size) {
-                if (empty($size)) {continue;}
-                if (!isset($sizeArray[$size])) {
-                    $newSize = new \Pimcore\Model\DataObject\Product();
-                    $newSize->setParent($this);
-                    $newSize->setVariationSize($size);
-                    $newSize->checkProductCode();
-                    $newSize->checkKey();
-                    error_log("Details of newSize: {$newSize->getVariationSize()} - {$newSize->getProductCode()} - {$newSize->getKey()}");
-                    $newSize->save();
-                    usleep(300000);
-                    $sizeArray[$size] = $newSize;
-                }
-                foreach ($colors as $color) {
-                    if (empty($color)) {continue;}
-                    if (!isset($colorArray[$size][$color])) {
-                        $newColor = new \Pimcore\Model\DataObject\Product();
-                        $newColor->setParent($sizeArray[$size]);
-                        $newColor->setVariationColor($color);
-                        $newColor->checkProductCode();
-                        $newColor->checkKey();
-                        $newColor->save();                        
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            error_log("Error in checkVariations: {$e->getMessage()}");
-            usleep(300000);
-            $this->checkVariations();
-        }
+        $this->setFixVariations(false);
+        $this->save();
     }
 
     public function addVariant($variant)

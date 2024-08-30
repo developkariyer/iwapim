@@ -262,6 +262,7 @@ class ImportCommand extends AbstractCommand
                     'Etsy' => new EtsyConnector($marketplace),
                     'Shopify' => new ShopifyConnector($marketplace),
                     'Trendyol' => new TrendyolConnector($marketplace),
+                    'Bol.com' => new BolConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {
@@ -287,57 +288,3 @@ class ImportCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 }
-
-/*
-### **Areas of Concern and Recommendations**
-
-1. **Overuse of Static Variables:**
-   - The command relies heavily on static variables to store options and arguments (`$downloadFlag`, `$importFlag`, etc.). This approach can lead to issues with testability and maintainability, especially in concurrent or multi-threaded environments.
-     - **Recommendation:** Use instance variables instead of static variables for storing state within the command execution. This will make the code more modular and easier to test.
-
-2. **Direct `echo` Statements:**
-   - The code uses `echo` statements for output, which is not the best practice in Symfony commands. This can make it difficult to manage output in different environments (e.g., logging vs. console output).
-     - **Recommendation:** Use the `$output->writeln()` method for outputting information. This allows better integration with Symfony's console component and provides more flexibility in managing output.
-
-3. **Inconsistent Use of Event Listeners:**
-   - The methods `removeListeners()` and `addListeners()` are intended to manage event listeners, but they contain commented-out code that suggests an incomplete or uncertain implementation.
-     - **Recommendation:** Clean up the commented-out code or fully implement the listener management. If certain listeners are not needed, it's better to remove them rather than leaving them commented out.
-
-4. **Hardcoded File Paths:**
-   - The `importImagesToProducts()` method uses a hardcoded path (`PIMCORE_PROJECT_ROOT . '/tmp/images/'`), which reduces flexibility and might cause issues if the directory structure changes.
-     - **Recommendation:** Make file paths configurable through environment variables or a configuration file, allowing for more flexibility and adaptability to different environments.
-
-5. **Insufficient Error Handling for File Operations:**
-   - The `importImagesToProducts()` method directly manipulates files (e.g., deleting non-image files) without comprehensive error handling. If the file system is not accessible or if permissions are incorrect, this could lead to failures.
-     - **Recommendation:** Add error handling around file operations to ensure that the script fails gracefully if it encounters file-related issues.
-
-6. **Potential SQL Injection Risk:**
-   - The SQL queries in `prepareShopifyLineItems()` are written using raw SQL with user-supplied data. While the query itself is unlikely to be directly exposed to user input, this approach is generally less safe.
-     - **Recommendation:** Use parameterized queries or a query builder provided by Pimcore's DBAL to minimize the risk of SQL injection and improve code readability.
-
-7. **Heavy Reliance on `try-finally`:**
-   - The use of `try-finally` is appropriate for ensuring listeners are re-added, but the logic within the `try` block is complex and could benefit from being broken down into smaller, more manageable methods.
-     - **Recommendation:** Refactor the `execute` method to break down the logic into smaller, dedicated methods for each task (e.g., `processMarketplace`, `downloadData`, `importData`). This will make the code easier to understand and maintain.
-
-8. **Tight Coupling Between Command and Connectors:**
-   - The command is tightly coupled to the specific connector classes (`AmazonConnector`, `ShopifyConnector`, etc.), making it harder to extend or modify the behavior for different marketplaces.
-     - **Recommendation:** Consider using a dependency injection pattern or a factory pattern to manage the creation and use of connectors. This would decouple the command from specific implementations and make the code more flexible.
-
-9. **Inefficient File Handling in `importImagesToProducts()`:**
-   - The method loads each image file into memory with `file_get_contents()` before creating an asset, which can be inefficient for large files or a large number of files.
-     - **Recommendation:** Consider streaming the file contents directly to the asset instead of loading the entire file into memory. This will reduce memory usage and improve performance.
-
-10. **Unclear Flow of Execution:**
-    - The `execute` method handles multiple operations (downloading, importing, processing images) in a sequential manner, which can make the flow of execution unclear and prone to errors.
-      - **Recommendation:** Structure the command to separate concerns more clearly, perhaps by using Symfony events or dedicated service classes for each major operation (e.g., downloading, importing, image processing).
-
-11. **Lack of Error Handling in Download and Import Operations:**
-    - The operations for downloading and importing data from marketplaces do not have robust error handling. If a download or import fails, the script will continue without addressing the failure.
-      - **Recommendation:** Implement error handling for the download and import processes, ensuring that failures are logged or reported, and that the script can recover or exit gracefully.
-
-12. **Lack of Logging:**
-    - There is no logging mechanism in place to track the progress or errors, which makes it difficult to diagnose issues in production.
-      - **Recommendation:** Integrate a logging library (such as Monolog) to log important events, errors, and progress. This will help in debugging and monitoring the application's behavior.
-
-By addressing these issues, the command will be more robust, maintainable, and easier to test and extend.
-*/
