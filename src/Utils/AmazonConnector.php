@@ -136,7 +136,7 @@ class AmazonConnector
     public function download($forceDownload = false)
     {
         foreach ($this->countryCodes as $country) {
-            echo "Downloading Amazon reports for $country\n";
+            echo "\n  Downloading Amazon reports for $country\n";
             foreach (array_keys($this->amazonReports) as $reportType) {
                 $this->downloadAmazonReport($reportType, $forceDownload, $country);
             }
