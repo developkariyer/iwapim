@@ -38,14 +38,17 @@ class AmazonConnector
         }
 
         $countryCodes = $marketplace->getMerchantIds();
-        print_r($countryCodes);
-
         $missingCodes = array_diff($countryCodes, array_keys(AmazonMerchantIdList::$amazonMerchantIdList));
-
         if (!empty($missingCodes)) {
             $missingCodesStr = implode(', ', $missingCodes);
             throw new \Exception("The following country codes are not in merchantIdList in AmazonConnector class: $missingCodesStr");
         }
+
+        $endpoint = match ($countryCodes[0]) {
+            "CA","US","MX","BR" => Endpoint::NA,
+            "SG","AU","JP" => Endpoint::FE,
+            default => Endpoint::EU,
+        };
 
         $this->marketplace = $marketplace;
         $this->countryCodes = $countryCodes;
@@ -53,7 +56,7 @@ class AmazonConnector
             clientId: $marketplace->getClientId(),
             clientSecret: $marketplace->getClientSecret(),
             refreshToken: $marketplace->getRefreshToken(),
-            endpoint: Endpoint::EU
+            endpoint: $endpoint
         );
         if (!$this->amazonSellerConnector) {
             throw new \Exception("Amazon Seller Connector is not created");
@@ -185,10 +188,13 @@ class AmazonConnector
             'UK' => 'https://www.amazon.co.uk',    // United Kingdom
             'FR' => 'https://www.amazon.fr',       // France
             'NL' => 'https://www.amazon.nl',       // Netherlands
+            'BE' => 'https://www.amazon.com.be',   // Belgium
             'DE' => 'https://www.amazon.de',       // Germany
             'IT' => 'https://www.amazon.it',       // Italy
             'SE' => 'https://www.amazon.se',       // Sweden
+            //'' => '',      // South Africa
             'PL' => 'https://www.amazon.pl',       // Poland
+            'SA' => 'https://www.amazon.sa',       // Saudi Arabia
             'EG' => 'https://www.amazon.eg',       // Egypt
             'TR' => 'https://www.amazon.com.tr',   // Turkey
             'AE' => 'https://www.amazon.ae',       // United Arab Emirates
@@ -196,7 +202,6 @@ class AmazonConnector
             'SG' => 'https://www.amazon.sg',       // Singapore
             'AU' => 'https://www.amazon.com.au',   // Australia
             'JP' => 'https://www.amazon.co.jp',    // Japan
-            'BE' => 'https://www.amazon.com.be',   // Belgium
         ];
         
         $l = new Link();
