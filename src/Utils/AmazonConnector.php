@@ -141,7 +141,6 @@ class AmazonConnector
                 $this->downloadAmazonReport($reportType, $forceDownload, $country);
             }
             $this->getListings($country);
-            return count($this->listings[$country]);
         }
     }
 
