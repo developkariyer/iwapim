@@ -10,44 +10,22 @@ use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 
+use App\Select\AmazonMerchantIdList;
 use App\Utils\Utility;
-
 
 class AmazonConnector
 {
-    private static array $merchantIdList = [
-        'CA' => 'A2EUQ1WTGCTBG2',
-        'US' => 'ATVPDKIKX0DER',
-        'MX' => 'A1AM78C64UM0Y8',
-        //        'BR' => 'A2Q3Y263D00KWC',
-        //sallama        'ES' => 'A1RKKUPIHCS9HS',
-        //        'UK' => 'A1F83G8C2ARO7P',
-        //        'FR' => 'A13V1IB3VIYZZH',
-        //sallama        'NL' => 'A1805IZSGTT6HS',
-        //        'DE' => 'A1PA6795UKMFR9',
-        //sallama        'IT' => 'APJ6JRA9NG5V4',
-        //sallama        'SE' => 'A2NODRKZP88ZB9',
-        //sallama        'PL' => 'A1C3SOZRARQ6R3',
-        //sallama        'EG' => 'ARBP9OOSHTCHU',
-        //sallama        'TR' => 'A33AVAJ2PDY3EV',
-        //sallama        'AE' => 'A17E79C6D8DWNP',
-        //sallama        'IN' => 'A21TJRUUN4KGV',
-        //sallama        'SG' => 'A19VAU5U5O7RUS',
-        //sallama        'AU' => 'A39IBJ37TRP1C6',
-        //        'JP' => 'A1VC38T7YXB528',
-    ];
-
     private array $amazonReports = [
-        'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => null,
-        'GET_MERCHANT_LISTINGS_ALL_DATA' => null,
+        'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
+        'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
     ];
 
     private $amazonSellerConnector = null;
-    private $country = null;
+    private $countryCodes = [];
     private $marketplace = null;
     private $listings = [];
 
-    public function __construct(Marketplace $marketplace, $country = 'US')
+    public function __construct(Marketplace $marketplace)
     {
         if (!$marketplace instanceof Marketplace ||
             !$marketplace->getPublished() ||
@@ -58,30 +36,38 @@ class AmazonConnector
         ) {
             throw new \Exception("Marketplace is not published, is not Amazon or credentials are empty");
         }
-        if (!in_array($country, array_keys(self::$merchantIdList))) {
-            throw new \Exception("Country $country is not in merchantIdList in AmazonConnector class");
+
+        $countryCodes = $marketplace->getMerchantIds();
+        print_r($countryCodes);
+
+        $missingCodes = array_diff($countryCodes, array_keys(AmazonMerchantIdList::$amazonMerchantIdList));
+
+        if (!empty($missingCodes)) {
+            $missingCodesStr = implode(', ', $missingCodes);
+            throw new \Exception("The following country codes are not in merchantIdList in AmazonConnector class: $missingCodesStr");
         }
+
         $this->marketplace = $marketplace;
-        $this->country = $country;
+        $this->countryCodes = $countryCodes;
         $this->amazonSellerConnector = SellingPartnerApi::seller(
             clientId: $marketplace->getClientId(),
             clientSecret: $marketplace->getClientSecret(),
             refreshToken: $marketplace->getRefreshToken(),
-            endpoint: Endpoint::NA
+            endpoint: Endpoint::EU
         );
         if (!$this->amazonSellerConnector) {
             throw new \Exception("Amazon Seller Connector is not created");
         }
     }
 
-    protected function downloadAmazonReport($reportType, $forceDownload)
+    protected function downloadAmazonReport($reportType, $forceDownload, $country)
     {
         $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         if (!in_array($reportType, array_keys($this->amazonReports))) {
             throw new \Exception("Report Type $reportType is not in reportNames in AmazonConnector class");
         }
         echo "\n        Downloading Report $reportType ";
-        $filename = "tmp/{$marketplaceKey}_{$reportType}_{$this->country}.csv";
+        $filename = "tmp/{$marketplaceKey}_{$reportType}_{$country}.csv";
         
         if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
             $report = file_get_contents($filename);
@@ -89,7 +75,7 @@ class AmazonConnector
         } else {
             echo "Waiting Report ";
             $reportsApi = $this->amazonSellerConnector->reportsV20210630();
-            $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [self::$merchantIdList[$this->country]]));
+            $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonMerchantIdList::$amazonMerchantIdList[$country]]));
             $reportId = $response->json()['reportId'];
             while (true) {
                 sleep(10);
@@ -112,10 +98,10 @@ class AmazonConnector
         if (substr($report, 0, 2) === "\x1f\x8b") {
             $report = gzdecode($report);
         }
-        $this->amazonReports[$reportType] = $report;
+        $this->amazonReports[$reportType][$country] = $report;
     }
 
-    public function downloadAmazonSku($sku)
+    public function downloadAmazonSku($sku, $country)
     {
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $t = 0;
@@ -124,7 +110,7 @@ class AmazonConnector
             try {
                 $listingItem = $listingsApi->getListingsItem(
                     sellerId: $this->marketplace->getMerchantId(),
-                    marketplaceIds: [self::$merchantIdList[$this->country]],
+                    marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
                     sku: $sku,
                     includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
                 );
@@ -145,11 +131,14 @@ class AmazonConnector
 
     public function download($forceDownload = false)
     {
-        foreach (array_keys($this->amazonReports) as $reportType) {
-            $this->downloadAmazonReport($reportType, $forceDownload);
+        foreach ($this->countryCodes as $country) {
+            echo "Downloading Amazon reports for $country\n";
+            foreach (array_keys($this->amazonReports) as $reportType) {
+                $this->downloadAmazonReport($reportType, $forceDownload, $country);
+            }
+            $this->getListings($country);
+            return count($this->listings[$country]);
         }
-        $this->getListings();
-        return count($this->listings);
     }
 
     public function downloadOrders()
@@ -157,14 +146,14 @@ class AmazonConnector
         
     }
 
-    public function getListings()
+    public function getListings($country)
     {
         $listings = [];
         foreach ($this->amazonReports as $reportType=>$report) {
-            if (empty($report)) {
+            if (empty($report[$country])) {
                 throw new \Exception("Report is empty. Did you first call download() method to populate reports?");
             }
-            $lines = explode("\n", $report);
+            $lines = explode("\n", $report[$country]);
             $header = str_getcsv(array_shift($lines), "\t");
             foreach ($lines as $line) {
                 $data = str_getcsv($line, "\t");
@@ -175,8 +164,7 @@ class AmazonConnector
                 $listings[] = $listing['seller-sku'] ?? $listing['sku'] ?? '';
             }
         }
-        $this->listings =  array_unique($listings);
-        return $this->listings;
+        $this->listings[$country] =  array_unique($listings);
     }
 
     private function getImage($listing) {
@@ -187,9 +175,32 @@ class AmazonConnector
         return null;
     }
 
-    private function getUrlLink($listing) {
+    private function getUrlLink($listing, $country) {
+        $amazonWebsites = [
+            'CA' => 'https://www.amazon.ca',       // Canada
+            'US' => 'https://www.amazon.com',      // United States
+            'MX' => 'https://www.amazon.com.mx',   // Mexico
+            'BR' => 'https://www.amazon.com.br',   // Brazil
+            'ES' => 'https://www.amazon.es',       // Spain
+            'UK' => 'https://www.amazon.co.uk',    // United Kingdom
+            'FR' => 'https://www.amazon.fr',       // France
+            'NL' => 'https://www.amazon.nl',       // Netherlands
+            'DE' => 'https://www.amazon.de',       // Germany
+            'IT' => 'https://www.amazon.it',       // Italy
+            'SE' => 'https://www.amazon.se',       // Sweden
+            'PL' => 'https://www.amazon.pl',       // Poland
+            'EG' => 'https://www.amazon.eg',       // Egypt
+            'TR' => 'https://www.amazon.com.tr',   // Turkey
+            'AE' => 'https://www.amazon.ae',       // United Arab Emirates
+            'IN' => 'https://www.amazon.in',       // India
+            'SG' => 'https://www.amazon.sg',       // Singapore
+            'AU' => 'https://www.amazon.com.au',   // Australia
+            'JP' => 'https://www.amazon.co.jp',    // Japan
+            'BE' => 'https://www.amazon.com.be',   // Belgium
+        ];
+        
         $l = new Link();
-        $l->setPath('https://www.amazon.com/dp/' . ($listing['summaries'][0]['asin'] ?? ''));
+        $l->setPath($amazonWebsites[$country].'/dp/' . ($listing['summaries'][0]['asin'] ?? ''));
         return $l;
     }
 
@@ -223,59 +234,65 @@ class AmazonConnector
 
     public function import($updateFlag, $importFlag)
     {
-        if (empty($this->listings)) {
-            echo "Nothing to import\n";
-        }
-        $marketplaceFolder = Utility::checkSetPath(
+        $marketplaceRootFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
-        $total = count($this->listings);
-        $index = 0;
-        foreach ($this->listings as $sku) {
-            echo "($index/$total) Processing SKU $sku ...";
-            $listing = $this->downloadAmazonSKU($sku);
-            $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
-            $parent = null;
-            if (isset($listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'])) {
-                $parentSku = $listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'];
-                $parent = VariantProduct::findOneByField('uniqueMarketplaceId', $parentSku, unpublished: true);
-                if (!$parent) {
-                    $parent = VariantProduct::addUpdateVariant(
-                        variant: [
-                            'title' => 'TEMPORARY PARENT',
-                            'uniqueMarketplaceId' => $parentSku,
-                            'published' => false,
-                        ],
-                        importFlag: true,
-                        updateFlag: true,
-                        marketplace: $this->marketplace,
-                        parent: Utility::checkSetPath($path, $marketplaceFolder)
-                    );
+
+        foreach ($this->countryCodes as $country) {
+            if (empty($this->listings[$country])) {
+                echo "Nothing to import in $country\n";
+            }
+            $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
+            $total = count($this->listings[$country]);
+            $index = 0;
+            foreach ($this->listings[$country] as $sku) {
+                echo "($index/$total) Processing SKU $sku ...";
+                $listing = $this->downloadAmazonSKU($sku, $country);
+                $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
+                $parent = null;
+                if (isset($listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'])) {
+                    $parentSku = $listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'];
+                    
+                    $parent = VariantProduct::findOneByField('uniqueMarketplaceId', "{$this->marketplace->getKey()}.{$country}.{$parentSku}", unpublished: true);
+                    if (!$parent) {
+                        $parent = VariantProduct::addUpdateVariant(
+                            variant: [
+                                'title' => 'TEMPORARY PARENT',
+                                'uniqueMarketplaceId' => "{$this->marketplace->getKey()}.{$country}.{$parentSku}",
+                                'published' => false,
+                            ],
+                            importFlag: true,
+                            updateFlag: true,
+                            marketplace: $this->marketplace,
+                            parent: Utility::checkSetPath($path, $marketplaceFolder)
+                        );
+                    }
                 }
+                if (!$parent) {
+                    $parent = Utility::checkSetPath($path, $marketplaceFolder);
+                }
+                VariantProduct::addUpdateVariant(
+                    variant: [
+                        'imageUrl' => $this->getImage($listing),
+                        'urlLink' => $this->getUrlLink($listing, $country),
+                        'salePrice' => $listing['offers'][0]['price']['amount'] ?? 0,
+                        'saleCurrency' => $listing['offers'][0]['price']['currency'] ?? 'USD',
+                        'title' => $this->getTitle($listing),
+                        'attributes' => $this->getAttributes($listing),
+                        'tmp_uniqueMarketplaceId' => $sku,
+                        'uniqueMarketplaceId' => "{$this->marketplace->getKey()}.{$country}.{$sku}",
+                        'apiResponseJson' => json_encode($listing),
+                        'published' => empty($listing['offers']) ? false : true,
+                    ],
+                    importFlag: $importFlag,
+                    updateFlag: $updateFlag,
+                    marketplace: $this->marketplace,
+                    parent: $parent
+                );
+                echo "OK\n";
+                $index++;
             }
-            if (!$parent) {
-                $parent = Utility::checkSetPath($path, $marketplaceFolder);
-            }
-            VariantProduct::addUpdateVariant(
-                variant: [
-                    'imageUrl' => $this->getImage($listing),
-                    'urlLink' => $this->getUrlLink($listing),
-                    'salePrice' => $listing['offers'][0]['price']['amount'] ?? 0,
-                    'saleCurrency' => $listing['offers'][0]['price']['currency'] ?? 'USD',
-                    'title' => $this->getTitle($listing),
-                    'attributes' => $this->getAttributes($listing),
-                    'uniqueMarketplaceId' => $sku,
-                    'apiResponseJson' => json_encode($listing),
-                    'published' => empty($listing['offers']) ? false : true,
-                ],
-                importFlag: $importFlag,
-                updateFlag: $updateFlag,
-                marketplace: $this->marketplace,
-                parent: $parent
-            );
-            echo "OK\n";
-            $index++;
         }
     }
 

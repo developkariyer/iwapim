@@ -174,14 +174,9 @@ class Product extends Concrete
         if (!$this->getFixVariations()) {
             return;
         }
-        if (self::$recursiveCounter > 5) {
-            self::$recursiveCounter = 0;
-            throw new \Exception('Recursive counter exceeded!');
-        }
         if (!$this->isPublished()) {
             return;
         }
-        self::$recursiveCounter++;
         $sizes = explode("\n", str_replace(['"',' '], '', $this->getVariationSizeList()));
         $variationColors = explode("\n", str_replace('"', '', $this->getVariationColorList()));
         $colors = [];
@@ -192,7 +187,9 @@ class Product extends Concrete
             } elseif ($trimColor === 'Shiny') {
                 $colors = array_merge($colors, ['Shiny Copper', 'Shiny Gold', 'Shiny Silver']);
             } elseif ($trimColor === 'Karma') {
-                $colors = array_merge($colors, ['ISOB', 'ISOG', 'IBOS', 'IBOG', 'IGOS', 'IGOB']);
+                $colors = array_merge($colors, ['ISOB', 'ISOG', 'IBOS', 'IBOG', 'IGOS', 'IGOB', 'Black', 'Gold', 'Silver']);
+            } elseif ($trimColor === 'GSKarma') {
+                $colors = array_merge($colors, ['IGOS', 'ISOG', 'Gold', 'Silver']);
             } elseif (!empty($trimColor)) {
                 $colors[] = $trimColor;
             }

@@ -40,6 +40,15 @@ class CleanCommand extends AbstractCommand
                 break;
             }
             foreach ($products as $product) {
+                if ($product->level() == 0) {
+                    echo "* Found first level product {$product->getKey()}\n";
+                    $product->setFixVariations(true);
+                    $product->checkVariations();
+                    $product->save();
+                    continue;
+                } else {
+                    continue;
+                }
                 if ($product->level() == 1 && count($product->getChildren())) {
                     $parent = $product->getParent();
                     echo "* Found second level product {$product->getKey()}\n";
