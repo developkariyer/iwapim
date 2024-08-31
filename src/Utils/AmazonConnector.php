@@ -70,7 +70,7 @@ class AmazonConnector
         if (!in_array($reportType, array_keys($this->amazonReports))) {
             throw new \Exception("Report Type $reportType is not in reportNames in AmazonConnector class");
         }
-        echo "\n        Downloading Report $reportType ";
+        echo "        Downloading Report $reportType ";
         $filename = "tmp/{$marketplaceKey}_{$reportType}_{$country}.csv";
         
         if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
