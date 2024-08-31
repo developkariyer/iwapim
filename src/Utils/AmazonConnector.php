@@ -128,7 +128,7 @@ class AmazonConnector
                     return null;
                 }
                 echo "w";
-                usleep($t*300);
+                sleep($t);
             }
         }
     }
