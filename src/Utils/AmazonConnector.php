@@ -61,6 +61,7 @@ class AmazonConnector
         if (!$this->amazonSellerConnector) {
             throw new \Exception("Amazon Seller Connector is not created");
         }
+        print_r($countryCodes);
     }
 
     protected function downloadAmazonReport($reportType, $forceDownload, $country)
