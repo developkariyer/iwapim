@@ -121,7 +121,7 @@ class AmazonConnector
                 $listingItem = $listingsApi->getListingsItem(
                     sellerId: $this->marketplace->getMerchantId(),
                     marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
-                    sku: $sku,
+                    sku: rawurlencode($sku),
                     includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
                 );
                 if ($listingItem->status() == 200) {
