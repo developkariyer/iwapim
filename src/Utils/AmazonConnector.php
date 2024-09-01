@@ -71,7 +71,7 @@ class AmazonConnector
             throw new \Exception("Report Type $reportType is not in reportNames in AmazonConnector class");
         }
         echo "        Downloading Report $reportType ";
-        $filename = "tmp/{$marketplaceKey}_{$reportType}_{$country}.csv";
+        $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$reportType}_{$country}.csv";
         
         if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
             $report = file_get_contents($filename);
@@ -107,10 +107,15 @@ class AmazonConnector
 
     public function downloadAmazonSku($sku, $country)
     {
+        $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $t = 0;
         while (true) {
             $t++;
+            $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$sku}_{$country}.json";
+            if (file_exists($filename) && filemtime($filename) > time() - 86400) {
+                return json_decode(file_get_contents($filename), true);
+            }
             try {
                 $listingItem = $listingsApi->getListingsItem(
                     sellerId: $this->marketplace->getMerchantId(),
@@ -119,7 +124,9 @@ class AmazonConnector
                     includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
                 );
                 if ($listingItem->status() == 200) {
-                    return $listingItem->json();
+                    $retval = $listingItem->json();
+                    file_put_contents($filename, json_encode($retval));
+                    return $retval;
                 }
             } catch (\Exception $e) {
                 echo ''. $e->getMessage() .'';
@@ -258,7 +265,6 @@ class AmazonConnector
                 $parent = null;
                 if (isset($listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'])) {
                     $parentSku = $listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'];
-                    
                     $parent = VariantProduct::findOneByField('uniqueMarketplaceId', "{$this->marketplace->getKey()}.{$country}.{$parentSku}", unpublished: true);
                     if (!$parent) {
                         $parent = VariantProduct::addUpdateVariant(
@@ -285,7 +291,6 @@ class AmazonConnector
                         'saleCurrency' => $listing['offers'][0]['price']['currency'] ?? 'USD',
                         'title' => $this->getTitle($listing),
                         'attributes' => $this->getAttributes($listing),
-                        'tmp_uniqueMarketplaceId' => $sku,
                         'uniqueMarketplaceId' => "{$this->marketplace->getKey()}.{$country}.{$sku}",
                         'apiResponseJson' => json_encode($listing),
                         'published' => empty($listing['offers']) ? false : true,
