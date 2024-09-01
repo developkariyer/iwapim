@@ -292,6 +292,7 @@ class AmazonConnector
                         'saleCurrency' => $listing['offers'][0]['price']['currency'] ?? 'USD',
                         'title' => $this->getTitle($listing),
                         'attributes' => $this->getAttributes($listing),
+                        'amazonAsin' => $listing['summaries'][0]['asin'] ?? '',
                         'uniqueMarketplaceId' => "{$this->marketplace->getKey()}.{$country}.{$sku}",
                         'apiResponseJson' => json_encode($listing),
                         'published' => empty($listing['offers']) ? false : true,

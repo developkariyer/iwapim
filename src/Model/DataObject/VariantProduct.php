@@ -120,6 +120,7 @@ class VariantProduct extends Concrete
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
+        $this->setAmazonAsin($variant['amazonAsin'] ?? '');
         $this->setMarketplace($marketplace);
         $this->setParent($parent);
         $this->setPublished($variant['published'] ?? false);
