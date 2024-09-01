@@ -8,7 +8,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
 
-class TrendyolConnector
+class TrendyolConnector implements MarketplaceConnectorInterface
 {
 
     private $marketplace = null;

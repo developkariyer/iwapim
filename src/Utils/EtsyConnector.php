@@ -8,7 +8,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
 
-class EtsyConnector
+class EtsyConnector implements MarketplaceConnectorInterface
 {
 
     private $marketplace = null;

@@ -13,7 +13,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 use App\Select\AmazonMerchantIdList;
 use App\Utils\Utility;
 
-class AmazonConnector
+class AmazonConnector implements MarketplaceConnectorInterface
 {
     private array $amazonReports = [
         'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
