@@ -114,6 +114,7 @@ class AmazonConnector
             $t++;
             $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$sku}_{$country}.json";
             if (file_exists($filename) && filemtime($filename) > time() - 86400) {
+                echo " (cached) ";
                 return json_decode(file_get_contents($filename), true);
             }
             try {
