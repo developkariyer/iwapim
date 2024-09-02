@@ -137,21 +137,7 @@ class CacheImagesCommand extends AbstractCommand
         foreach ($json['images'] as $image) {
             $listingImageList[] = static::processImage($image['url'], $trendyolFolder, self::trendyolOldFileName($image['url']));
         }
-        $items = [];
-        foreach ($listingImageList as $asset) {
-            $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
-            $advancedImage->setImage($asset);
-            $items[] = $advancedImage;
-        }
-        $variant->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
-        if (!empty($listingImageList)) {
-            $variant->setImageUrl(
-                new \Pimcore\Model\DataObject\Data\ExternalImage(
-                    "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $listingImageList[0]->getFullPath())
-                )
-            );
-        }
-        $variant->save();
+        $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()}\n";
     }
     

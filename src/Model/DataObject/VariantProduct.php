@@ -144,4 +144,24 @@ class VariantProduct extends Concrete
         }
         return $result;    
     }
+
+    public function fixImageCache(array $listingImageList)
+    {
+        if (empty($listingImageList)) {
+            return;
+        }
+        $items = [];
+        foreach ($listingImageList as $asset) {
+            $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
+            $advancedImage->setImage($asset);
+            $items[] = $advancedImage;
+        }
+        $this->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
+        $this->setImageUrl(
+            new \Pimcore\Model\DataObject\Data\ExternalImage(
+                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $listingImageList[0]->getFullPath())
+            )
+        );
+        $this->save();
+    }
 }
