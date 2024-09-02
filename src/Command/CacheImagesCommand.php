@@ -137,6 +137,7 @@ class CacheImagesCommand extends AbstractCommand
         foreach ($json['images'] as $image) {
             $listingImageList[] = static::processImage($image['url'], $trendyolFolder, self::trendyolOldFileName($image['url']));
         }
+        $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()}\n";
     }

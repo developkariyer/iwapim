@@ -152,6 +152,9 @@ class VariantProduct extends Concrete
         }
         $items = [];
         foreach ($listingImageList as $asset) {
+            if (empty($asset)) {
+                continue;
+            }
             $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
             $advancedImage->setImage($asset);
             $items[] = $advancedImage;
@@ -162,6 +165,7 @@ class VariantProduct extends Concrete
                 "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $listingImageList[0]->getFullPath())
             )
         );
+        echo "saved";
         $this->save();
     }
 }
