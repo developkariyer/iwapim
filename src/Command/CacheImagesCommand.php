@@ -167,14 +167,24 @@ class CacheImagesCommand extends AbstractCommand
             $asset = new Asset\Image();
             $asset->setData($imageData);
             $asset->setFilename($newFileName);
-            $asset->setParent($parent);
-            try {
-                $asset->save();
-                echo "+";
-            } catch (\Exception $e) {
-                echo "Failed to save asset: " . $e->getMessage() . "\n";
-                return null;
-            }
+            echo "+";
+        }
+
+        $firstLetter = substr($newFileName, 0, 1);
+        $secondLetter = substr($newFileName, 1, 1);
+        $thirdLetter = substr($newFileName, 2, 1);
+
+        $parent = Utility::checkSetAssetPath($firstLetter, $parent);
+        $parent = Utility::checkSetAssetPath($secondLetter, $parent);
+        $parent = Utility::checkSetAssetPath($thirdLetter, $parent);
+
+        $asset->setParent($parent);
+        try {
+            $asset->save();
+            echo "P";
+        } catch (\Exception $e) {
+            echo "Failed to save asset: " . $e->getMessage() . "\n";
+            return null;
         }
         return $asset;
     }
