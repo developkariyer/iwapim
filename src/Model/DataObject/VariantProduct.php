@@ -145,7 +145,7 @@ class VariantProduct extends Concrete
         return $result;    
     }
 
-    public function fixImageCache(array $listingImageList)
+    public function fixImageCache(array $listingImageList, $variantImage = null)
     {
         if (empty($listingImageList)) {
             return;
@@ -160,11 +160,11 @@ class VariantProduct extends Concrete
             $items[] = $advancedImage;
         }
         $this->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
-        $this->setImageUrl(
-            new \Pimcore\Model\DataObject\Data\ExternalImage(
-                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $listingImageList[0]->getFullPath())
-            )
+        $variantImage = $variantImage ?? $listingImageList[0];
+        $urlImage = new \Pimcore\Model\DataObject\Data\ExternalImage(
+            "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $variantImage->getFullPath())
         );
+        $this->setImageUrl($urlImage);
         $this->save();
     }
 }

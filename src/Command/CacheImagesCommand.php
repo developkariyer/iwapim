@@ -22,6 +22,13 @@ use App\Utils\Utility;
 class CacheImagesCommand extends AbstractCommand
 {
     
+    static $cacheFolder;
+    static $amazonFolder;
+    static $etsyFolder;
+    static $shopifyFolder;
+    static $trendyolFolder;
+    static $bolcomFolder;
+
     protected function configure()
     {
         $this
@@ -34,6 +41,13 @@ class CacheImagesCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        static::$cacheFolder = Utility::checkSetAssetPath('Image Cache');
+        static::$amazonFolder = Utility::checkSetAssetPath('Amazon', static::$cacheFolder);
+        static::$etsyFolder = Utility::checkSetAssetPath('Etsy', static::$cacheFolder);
+        static::$shopifyFolder = Utility::checkSetAssetPath('Shopify', static::$cacheFolder);
+        static::$trendyolFolder = Utility::checkSetAssetPath('Trendyol', static::$cacheFolder);
+        static::$bolcomFolder = Utility::checkSetAssetPath('Bol.com', static::$cacheFolder);
+
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
@@ -130,76 +144,24 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processTrendyol($variant)
     {
-        $cacheFolder = Utility::checkSetAssetPath('Image Cache');
-        $trendyolFolder = Utility::checkSetAssetPath('Trendyol', $cacheFolder);
         $json = self::getApiResponse($variant->getId());
         $listingImageList = [];
         foreach ($json['images'] as $image) {
-            $listingImageList[] = static::processImage($image['url'], $trendyolFolder, self::trendyolOldFileName($image['url']));
+            $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, self::trendyolOldFileName($image['url']));
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()}\n";
     }
-    
-/*    
-    protected static function processTrendyol()
+
+    protected static function processShopify($variant)
     {
-        echo "Loading Trendyol objects...\n";
-        $cacheFolder = Utility::checkSetAssetPath('Image Cache');
-        $trendyolFolder = Utility::checkSetAssetPath('Trendyol', $cacheFolder);
-        $listObject = new TrendyolVariantListing();
-        $listObject->setUnpublished(true);
-        $trendyolList = $listObject->load();
-        foreach ($trendyolList as $trendyol) {
-            echo "    Processing Trendyol object: {$trendyol->getId()}: ";
-            $imageFolder = Utility::checkSetAssetPath("{$trendyol->getBarcode()}", $trendyolFolder);
-            $listingImageList = [];
-            $images = json_decode($trendyol->getImages() ?? [], true);
-            foreach ($images as $image) {
-                $imageName = "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg";
-                $asset = self::findImageByName($imageName);
-                if ($asset) {
-                    echo ".";
-                } else {
-                    try {
-                        $imageData = file_get_contents($image['url']);
-                    } catch (\Exception $e) {
-                        echo "Failed to get image data: " . $e->getMessage() . "\n";
-                        sleep(3);
-                        continue;
-                    }
-                    sleep(2);
-                    if ($imageData === false) {
-                        echo "-";
-                        continue;
-                    }
-                    $asset = new Asset\Image();
-                    $asset->setData($imageData);
-                    $asset->setFilename($imageName);
-                    $asset->setParent($imageFolder);
-                    try {
-                        $asset->save();
-                        echo "+";
-                    } catch (\Exception $e) {
-                        echo "Failed to save asset: " . $e->getMessage() . "\n";
-                        continue;
-                    }
-                } 
-                $listingImageList[] = $asset;
-            }
-            $items = [];
-            foreach($listingImageList as $img){
-                $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
-                $advancedImage->setImage($img);
-                $items[] = $advancedImage;
-            }
-            $trendyol->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
-            $trendyol->save();
-            echo "\n";
-        }
+        $json = self::getApiResponse($variant->getId());
+        
     }
-*//*
+
+    
+/*
     protected static function processShopify()
     {
         echo "Loading Shopify objects...\n";
