@@ -51,7 +51,7 @@ class CacheImagesCommand extends AbstractCommand
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
-        $offset = 16800;
+        $offset = 0;
 
         while (true) {
             $listingObject->setLimit($pageSize);
@@ -80,7 +80,7 @@ class CacheImagesCommand extends AbstractCommand
 //                        self::processEtsy($variant);
                         break;
                     case 'Shopify':
-//                        self::processShopify($variant);
+                        self::processShopify($variant);
                         break;
                     case 'Trendyol':
                         self::processTrendyol($variant);
