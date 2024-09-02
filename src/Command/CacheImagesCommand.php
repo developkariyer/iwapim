@@ -82,14 +82,14 @@ class CacheImagesCommand extends AbstractCommand
                         break;
                     case 'Shopify':
                         echo "S";
-//                        self::processShopify($variant);
+                        self::processShopify($variant);
                         break;
                     case 'Trendyol':
                         echo "T";
-//                        self::processTrendyol($variant);
+                        self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
-//                        self::processBolCom($variant);
+                        self::processBolCom($variant);
                         break;
                     default:
                         break;
