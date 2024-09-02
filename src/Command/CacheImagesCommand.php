@@ -118,11 +118,12 @@ class CacheImagesCommand extends AbstractCommand
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         echo " *".count($imageArray)."* ";
         print_r($imageArray);
-        exit;
         $listingImageList = [];
         $variantImage = null;
         foreach ($imageArray as $image) {
-            $imgProcessed = static::processImage($image['src'], static::$shopifyFolder, "Shopify_{$image['id']}.jpg");
+            $id = $image["id"] ?? '';
+            $src = $image['src'] ??'';
+            $imgProcessed = static::processImage($src, static::$shopifyFolder, "Shopify_{$id}.jpg");
             $listingImageList[] = $imgProcessed;
             if (in_array($variant->getUniqueMarketplaceId(), $parentJson['variant_ids'])) {
                 $variantImage = $imgProcessed;
