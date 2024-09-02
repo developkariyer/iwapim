@@ -116,8 +116,6 @@ class CacheImagesCommand extends AbstractCommand
         $json = self::getApiResponse($variant->getId());
         $parentJson = self::getParentResponse($variant->getId());
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
-        echo " *".count($imageArray)."* ";
-        print_r($imageArray);
         $listingImageList = [];
         $variantImage = null;
         foreach ($imageArray as $image) {
