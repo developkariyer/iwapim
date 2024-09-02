@@ -114,9 +114,10 @@ class CacheImagesCommand extends AbstractCommand
     {
         $json = self::getApiResponse($variant->getId());
         $parentJson = self::getParentResponse($variant->getId());
+        $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
         $variantImage = null;
-        foreach ($parentJson['images'] as $image) {
+        foreach ($imageArray as $image) {
             $imgProcessed = static::processImage($image['src'], static::$shopifyFolder, "Shopify_{$image['id']}.jpg");
             $listingImageList[] = $imgProcessed;
             if (in_array($variant->getUniqueMarketplaceId(), $parentJson['variant_ids'])) {
