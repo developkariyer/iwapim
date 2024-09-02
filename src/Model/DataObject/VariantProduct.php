@@ -165,7 +165,6 @@ class VariantProduct extends Concrete
                 "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $listingImageList[0]->getFullPath())
             )
         );
-        echo "saved";
         $this->save();
     }
 }
