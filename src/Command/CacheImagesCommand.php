@@ -79,7 +79,7 @@ class CacheImagesCommand extends AbstractCommand
                         break;
                 }
             }
-            echo "Processed {$offset} of {$totalCount}.\n";
+            echo "\nProcessed {$offset} of {$totalCount}";
             $offset += $pageSize;
         }
         return Command::SUCCESS;
