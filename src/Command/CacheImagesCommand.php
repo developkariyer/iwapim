@@ -84,51 +84,58 @@ class CacheImagesCommand extends AbstractCommand
         return Command::SUCCESS;
     }
     
-    protected static function  processTrendyol($variant)
+    protected static function processImage($url, $parent, $oldFileName = '')
+    {
+        $newFileName = self::createUniqueFileNameFromUrl($url);
+        if ($oldFileName) {
+            $asset = self::findImageByName($oldFileName);
+            if ($asset) {
+                $asset->setFilename($newFileName);
+                $asset->setParent($parent);
+                $asset->save();
+                echo 'R';
+            }
+        }
+        if (empty($asset)) {
+            $asset = self::findImageByName($newFileName);
+            echo '.';
+        }
+        if (!$asset) {
+            try {
+                $imageData = file_get_contents($url);
+            } catch (\Exception $e) {
+                echo "Failed to get image data: " . $e->getMessage() . "\n";
+                sleep(3);
+                return null;
+            }
+            sleep(2);
+            if ($imageData === false) {
+                echo "-";
+                return null;
+            }
+            $asset = new Asset\Image();
+            $asset->setData($imageData);
+            $asset->setFilename($newFileName);
+            $asset->setParent($parent);
+            try {
+                $asset->save();
+                echo "+";
+            } catch (\Exception $e) {
+                echo "Failed to save asset: " . $e->getMessage() . "\n";
+                return null;
+            }
+        }
+        return $asset;
+    }
+
+    protected static function processTrendyol($variant)
     {
         $cacheFolder = Utility::checkSetAssetPath('Image Cache');
         $trendyolFolder = Utility::checkSetAssetPath('Trendyol', $cacheFolder);
         $json = self::getApiResponse($variant->getId());
         $listingImageList = [];
         foreach ($json['images'] as $image) {
-            $oldFileName = self::trendyolOldFileName($image['url']);
-            $newFileName = self::createUniqueFileNameFromUrl($image['url']);
-            $asset = self::findImageByName($oldFileName);
-            if ($asset) {
-                $asset->setFilename($newFileName);
-                $asset->setParent($trendyolFolder);
-                $asset->save();
-                echo 'R';
-            } else {
-                $asset = self::findImageByName($newFileName);
-                echo '.';
-            }
-            if (!$asset) {
-                try {
-                    $imageData = file_get_contents($image['url']);
-                } catch (\Exception $e) {
-                    echo "Failed to get image data: " . $e->getMessage() . "\n";
-                    sleep(3);
-                    continue;
-                }
-                sleep(2);
-                if ($imageData === false) {
-                    echo "-";
-                    continue;
-                }
-                $asset = new Asset\Image();
-                $asset->setData($imageData);
-                $asset->setFilename($newFileName);
-                $asset->setParent($trendyolFolder);
-                try {
-                    $asset->save();
-                    echo "+";
-                } catch (\Exception $e) {
-                    echo "Failed to save asset: " . $e->getMessage() . "\n";
-                    continue;
-                }
-            }
-            $listingImageList[] = $asset;
+            $listingImageList[] = static::processImage($image['url'], $trendyolFolder, self::trendyolOldFileName($image['url']));
         }
         $items = [];
         foreach ($listingImageList as $asset) {
@@ -137,6 +144,13 @@ class CacheImagesCommand extends AbstractCommand
             $items[] = $advancedImage;
         }
         $variant->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
+        if (!empty($listingImageList)) {
+            $variant->setImageUrl(
+                new \Pimcore\Model\DataObject\Data\ExternalImage(
+                    "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $listingImageList[0]->getFullPath())
+                )
+            );
+        }
         $variant->save();
         echo "{$variant->getId()}\n";
     }
