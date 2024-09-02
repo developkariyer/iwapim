@@ -91,7 +91,6 @@ class CacheImagesCommand extends AbstractCommand
                     default:
                         break;
                 }
-                echo "{$variant->getId()}";
             }
             echo "\nProcessed {$offset} of {$totalCount}";
             $offset += $pageSize;
@@ -125,6 +124,7 @@ class CacheImagesCommand extends AbstractCommand
             }
         }
         $variant->fixImageCache($listingImageList, $variantImage);
+        echo "{$variant->getId()} ";
     }
 
     protected static function processImage($url, $parent, $oldFileName = '')
