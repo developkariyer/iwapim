@@ -123,12 +123,13 @@ class CacheImagesCommand extends AbstractCommand
         foreach ($imageArray as $image) {
             $id = $image["id"] ?? '';
             $src = $image['src'] ??'';
+            $variant_ids = $parentJson['variant_ids'] ?? [];
             if (empty($id) || empty($src)) {
                 continue;
             }
             $imgProcessed = static::processImage($src, static::$shopifyFolder, "Shopify_{$id}.jpg");
             $listingImageList[] = $imgProcessed;
-            if (in_array($variant->getUniqueMarketplaceId(), $parentJson['variant_ids'])) {
+            if (in_array($variant->getUniqueMarketplaceId(), $variant_ids)) {
                 $variantImage = $imgProcessed;
             }
         }
