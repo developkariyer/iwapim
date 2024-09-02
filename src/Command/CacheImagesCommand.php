@@ -184,11 +184,12 @@ class CacheImagesCommand extends AbstractCommand
         }
         if (empty($asset)) {
             $asset = self::findImageByName($newFileName);
-            echo '.';
+            echo '_';
         }
         if (!$asset) {
             try {
                 $imageData = file_get_contents($url);
+                echo "D";
             } catch (\Exception $e) {
                 echo "Failed to get image data: " . $e->getMessage() . "\n";
                 sleep(3);
@@ -215,11 +216,12 @@ class CacheImagesCommand extends AbstractCommand
 
         if ($asset->getParent() !== $parent) {
             $asset->setParent($parent);
+            echo "P";
         }
         
         try {
             $asset->save();
-            echo "P";
+            echo ".";
         } catch (\Exception $e) {
             echo "Failed to save asset: " . $e->getMessage() . "\n";
             return null;
