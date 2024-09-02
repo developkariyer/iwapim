@@ -394,7 +394,7 @@ class CacheImagesCommand extends AbstractCommand
 
     private static function getParentResponse($id)
     {
-        return static::getResponseFromDb($id,'parentApiResponseJson');
+        return static::getResponseFromDb($id,'parentResponseJson');
     }
 
     private static function createUniqueFileNameFromUrl($url)
