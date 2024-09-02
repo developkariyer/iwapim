@@ -172,13 +172,14 @@ class CacheImagesCommand extends AbstractCommand
         if (empty($url)) {
             return null;
         }
+        $dirty = false;
         $newFileName = self::createUniqueFileNameFromUrl($url);
         if ($oldFileName) {
             $asset = self::findImageByName($oldFileName);
             if ($asset) {
                 $asset->setFilename($newFileName);
                 $asset->setParent($parent);
-                $asset->save();
+                $dirty = true;
                 echo 'R';
             }
         }
@@ -204,6 +205,7 @@ class CacheImagesCommand extends AbstractCommand
             $asset->setData($imageData);
             $asset->setFilename($newFileName);
             echo "+";
+            $dirty = true;
         }
 
         $firstLetter = substr($newFileName, 0, 1);
@@ -217,11 +219,16 @@ class CacheImagesCommand extends AbstractCommand
         if ($asset->getParent() !== $parent) {
             $asset->setParent($parent);
             echo "P";
+            $dirty = true;
         }
         
         try {
-            $asset->save();
-            echo ".";
+            if ($dirty) {
+                $asset->save();
+                echo ":";
+            } else {
+                echo ".";
+            }
         } catch (\Exception $e) {
             echo "Failed to save asset: " . $e->getMessage() . "\n";
             return null;
