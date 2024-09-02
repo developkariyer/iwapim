@@ -404,11 +404,11 @@ class CacheImagesCommand extends AbstractCommand
     private static function getResponseFromDb($id, $fieldName)
     {
         $db = \Pimcore\Db::get();
-        $response = $db->get('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=?', [$id, $fieldName]);
+        $response = $db->fetchOne('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=? LIMIT 1', [$id, $fieldName]);
         if (empty($response)) {
             return [];
         }
-        return json_decode($response->getBody(), true);
+        return json_decode($response, true);
     }
 
     private static function getApiResponse($id)
