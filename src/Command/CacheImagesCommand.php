@@ -47,6 +47,7 @@ class CacheImagesCommand extends AbstractCommand
             if (empty($variants)) {
                 break;
             }
+            $totalCount = $listingObject->getTotalCount();
             foreach ($variants as $variant) {
                 $variantMarketplace = $variant->getMarketplace();
                 if (empty($variantMarketplace)) {
@@ -75,46 +76,13 @@ class CacheImagesCommand extends AbstractCommand
 //                        self::processBolCom($variant);
                         break;
                     default:
-                        continue;
+                        break;
                 }
             }
+            echo "Processed {$offset} of {$totalCount}.\n";
         }
         return Command::SUCCESS;
     }
-
-    private static function getResponseFromDb($id, $fieldName)
-    {
-        $db = Db::get();
-        $response = $db->get('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=?', [$id, $fieldName]);
-        if (empty($response)) {
-            return [];
-        }
-        return json_decode($response->getBody(), true);
-    }
-
-    private static function getApiResponse($id)
-    {
-        return static::getResponseFromDb($id, 'apiResponseJson');
-    }
-
-    private static function getParentResponse($id)
-    {
-        return static::getResponseFromDb($id,'parentApiResponseJson');
-    }
-
-    private static function createUniqueFileNameFromUrl($url)
-    {
-        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));        
-        $hash = md5($url);        
-        $extension = strtolower($pathInfo['extension']);
-        return "$hash.$extension";
-    }
-
-    private static function trendyolOldFileName($url)
-    {
-        return "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $url).".jpg";
-    }
-
     
     protected static function  processTrendyol($variant)
     {
@@ -431,6 +399,39 @@ class CacheImagesCommand extends AbstractCommand
             return Asset::getByPath($result);
         }
         return null;
+    }
+
+    private static function getResponseFromDb($id, $fieldName)
+    {
+        $db = Db::get();
+        $response = $db->get('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=?', [$id, $fieldName]);
+        if (empty($response)) {
+            return [];
+        }
+        return json_decode($response->getBody(), true);
+    }
+
+    private static function getApiResponse($id)
+    {
+        return static::getResponseFromDb($id, 'apiResponseJson');
+    }
+
+    private static function getParentResponse($id)
+    {
+        return static::getResponseFromDb($id,'parentApiResponseJson');
+    }
+
+    private static function createUniqueFileNameFromUrl($url)
+    {
+        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));        
+        $hash = md5($url);        
+        $extension = strtolower($pathInfo['extension']);
+        return "$hash.$extension";
+    }
+
+    private static function trendyolOldFileName($url)
+    {
+        return "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $url).".jpg";
     }
 
 
