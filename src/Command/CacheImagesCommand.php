@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Asset;
 use Pimcore\Model\Asset\Listing as AssetListing;
-use Pimcore\Db;
 use App\Utils\Utility;
 
 
@@ -404,7 +403,7 @@ class CacheImagesCommand extends AbstractCommand
 
     private static function getResponseFromDb($id, $fieldName)
     {
-        $db = Db::get();
+        $db = \Pimcore\Db::get();
         $response = $db->get('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=?', [$id, $fieldName]);
         if (empty($response)) {
             return [];
