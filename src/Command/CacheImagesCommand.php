@@ -80,6 +80,7 @@ class CacheImagesCommand extends AbstractCommand
                 }
             }
             echo "Processed {$offset} of {$totalCount}.\n";
+            $offset += $pageSize;
         }
         return Command::SUCCESS;
     }
