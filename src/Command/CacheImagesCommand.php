@@ -91,13 +91,41 @@ class CacheImagesCommand extends AbstractCommand
                     default:
                         break;
                 }
+                echo "{$variant->getId()}";
             }
             echo "\nProcessed {$offset} of {$totalCount}";
             $offset += $pageSize;
         }
         return Command::SUCCESS;
     }
-    
+
+    protected static function processTrendyol($variant)
+    {
+        $json = self::getApiResponse($variant->getId());
+        $listingImageList = [];
+        foreach ($json['images'] as $image) {
+            $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
+        }
+        $listingImageList = array_unique($listingImageList);
+        $variant->fixImageCache($listingImageList);
+    }
+
+    protected static function processShopify($variant)
+    {
+        $json = self::getApiResponse($variant->getId());
+        $parentJson = self::getParentResponse($variant->getId());
+        $listingImageList = [];
+        $variantImage = null;
+        foreach ($parentJson['images'] as $image) {
+            $imgProcessed = static::processImage($image['src'], static::$shopifyFolder, "Shopify_{$image['id']}.jpg");
+            $listingImageList[] = $imgProcessed;
+            if (in_array($variant->getUniqueMarketplaceId(), $parentJson['variant_ids'])) {
+                $variantImage = $imgProcessed;
+            }
+        }
+        $variant->fixImageCache($listingImageList, $variantImage);
+    }
+
     protected static function processImage($url, $parent, $oldFileName = '')
     {
         $newFileName = self::createUniqueFileNameFromUrl($url);
@@ -141,25 +169,6 @@ class CacheImagesCommand extends AbstractCommand
         }
         return $asset;
     }
-
-    protected static function processTrendyol($variant)
-    {
-        $json = self::getApiResponse($variant->getId());
-        $listingImageList = [];
-        foreach ($json['images'] as $image) {
-            $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, self::trendyolOldFileName($image['url']));
-        }
-        $listingImageList = array_unique($listingImageList);
-        $variant->fixImageCache($listingImageList);
-        echo "{$variant->getId()}\n";
-    }
-
-    protected static function processShopify($variant)
-    {
-        $json = self::getApiResponse($variant->getId());
-        
-    }
-
     
 /*
     protected static function processShopify()
@@ -387,15 +396,9 @@ class CacheImagesCommand extends AbstractCommand
     private static function createUniqueFileNameFromUrl($url)
     {
         $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));        
-        $hash = md5($url);        
+        $hash = md5($url);
         $extension = strtolower($pathInfo['extension']);
         return "$hash.$extension";
     }
-
-    private static function trendyolOldFileName($url)
-    {
-        return "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $url).".jpg";
-    }
-
 
 }
