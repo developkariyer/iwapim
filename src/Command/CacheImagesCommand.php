@@ -8,11 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Pimcore\Model\DataObject\AmazonVariant;
-use Pimcore\Model\DataObject\AmazonVariant\Listing as AmazonVariantListing;
-use Pimcore\Model\DataObject\EtsyListing\Listing as EtsyListingListing;
-use Pimcore\Model\DataObject\ShopifyListing\Listing as ShopifyListingListing;
-use Pimcore\Model\DataObject\TrendyolVariant\Listing as TrendyolVariantListing;
+use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Asset;
 use Pimcore\Model\Asset\Listing as AssetListing;
 use Pimcore\Db;
@@ -39,23 +35,145 @@ class CacheImagesCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$input->getOption('skip-amazon')) {
-            self::processAmazon();
+        $listingObject = new VariantProduct\Listing();
+        $listingObject->setUnpublished(true);
+        $pageSize = 50;
+        $offset = 0;
+
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $variants = $listingObject->load();
+            if (empty($variants)) {
+                break;
+            }
+            foreach ($variants as $variant) {
+                $variantMarketplace = $variant->getMarketplace();
+                if (empty($variantMarketplace)) {
+                    echo "Variant {$variant->getId()} has no marketplace.\n";
+                    continue;
+                }
+                $variantType = $variantMarketplace->getMarketPlaceType();
+                if (empty($variantType)) {
+                    echo "Variant {$variant->getId()} has no marketplace->type.\n";
+                    continue;
+                }
+                switch ($variantType) {
+                    case 'Amazon':
+//                        self::processAmazon($variant);
+                        break;
+                    case 'Etsy':
+//                        self::processEtsy($variant);
+                        break;
+                    case 'Shopify':
+//                        self::processShopify($variant);
+                        break;
+                    case 'Trendyol':
+                        self::processTrendyol($variant);
+                        break;
+                    case 'Bol.com':
+//                        self::processBolCom($variant);
+                        break;
+                    default:
+                        continue;
+                }
+            }
         }
-        if (!$input->getOption('skip-etsy')) {
-            self::processEtsy();
-        }
-        if (!$input->getOption('skip-shopify')) {
-            self::processShopify();
-        }
-        if (!$input->getOption('skip-trendyol')) {
-            self::processTrendyol();
-        }
-        
         return Command::SUCCESS;
     }
 
+    private static function getResponseFromDb($id, $fieldName)
+    {
+        $db = Db::get();
+        $response = $db->get('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=?', [$id, $fieldName]);
+        if (empty($response)) {
+            return [];
+        }
+        return json_decode($response->getBody(), true);
+    }
 
+    private static function getApiResponse($id)
+    {
+        return static::getResponseFromDb($id, 'apiResponseJson');
+    }
+
+    private static function getParentResponse($id)
+    {
+        return static::getResponseFromDb($id,'parentApiResponseJson');
+    }
+
+    private static function createUniqueFileNameFromUrl($url)
+    {
+        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));        
+        $hash = md5($url);        
+        $extension = strtolower($pathInfo['extension']);
+        return "$hash.$extension";
+    }
+
+    private static function trendyolOldFileName($url)
+    {
+        return "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $url).".jpg";
+    }
+
+    
+    protected static function  processTrendyol($variant)
+    {
+        $cacheFolder = Utility::checkSetAssetPath('Image Cache');
+        $trendyolFolder = Utility::checkSetAssetPath('Trendyol', $cacheFolder);
+        $json = self::getApiResponse($variant->getId());
+        $listingImageList = [];
+        foreach ($json['images'] as $image) {
+            $oldFileName = self::trendyolOldFileName($image['url']);
+            $newFileName = self::createUniqueFileNameFromUrl($image['url']);
+            $asset = self::findImageByName($oldFileName);
+            if ($asset) {
+                $asset->setFilename($newFileName);
+                $asset->setParent($trendyolFolder);
+                $asset->save();
+                echo 'R';
+            } else {
+                $asset = self::findImageByName($newFileName);
+                echo '.';
+            }
+            if (!$asset) {
+                try {
+                    $imageData = file_get_contents($image['url']);
+                } catch (\Exception $e) {
+                    echo "Failed to get image data: " . $e->getMessage() . "\n";
+                    sleep(3);
+                    continue;
+                }
+                sleep(2);
+                if ($imageData === false) {
+                    echo "-";
+                    continue;
+                }
+                $asset = new Asset\Image();
+                $asset->setData($imageData);
+                $asset->setFilename($newFileName);
+                $asset->setParent($trendyolFolder);
+                try {
+                    $asset->save();
+                    echo "+";
+                } catch (\Exception $e) {
+                    echo "Failed to save asset: " . $e->getMessage() . "\n";
+                    continue;
+                }
+            }
+            $listingImageList[] = $asset;
+        }
+        $items = [];
+        foreach ($listingImageList as $asset) {
+            $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
+            $advancedImage->setImage($asset);
+            $items[] = $advancedImage;
+        }
+        $variant->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
+        $variant->save();
+        echo "{$variant->getId()}\n";
+    }
+    
+/*    
     protected static function processTrendyol()
     {
         echo "Loading Trendyol objects...\n";
@@ -111,9 +229,8 @@ class CacheImagesCommand extends AbstractCommand
             $trendyol->save();
             echo "\n";
         }
-
     }
-
+*//*
     protected static function processShopify()
     {
         echo "Loading Shopify objects...\n";
@@ -170,8 +287,8 @@ class CacheImagesCommand extends AbstractCommand
             echo "\n";
         }
 
-    }
-
+    }*/
+/*
     protected static function processEtsy()
     {
         echo "Loading Etsy objects...\n";
@@ -227,8 +344,8 @@ class CacheImagesCommand extends AbstractCommand
             $etsy->save();        
             echo "\n";
         }
-    }    
-
+    }    */
+/*
     protected static function processAmazon()
     {
         echo "Loading Amazon objects...";
@@ -297,7 +414,7 @@ class CacheImagesCommand extends AbstractCommand
                 echo "\n";
             }
         }
-    }
+    }*/
 
     protected static function findImageByName($imageName)
     {
