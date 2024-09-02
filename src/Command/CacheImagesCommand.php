@@ -77,15 +77,16 @@ class CacheImagesCommand extends AbstractCommand
 //                        self::processAmazon($variant);
                         break;
                     case 'Etsy':
-//                        self::processEtsy($variant);
+                        echo 'E';
+                        self::processEtsy($variant);
                         break;
                     case 'Shopify':
                         echo "S";
-                        self::processShopify($variant);
+//                        self::processShopify($variant);
                         break;
                     case 'Trendyol':
                         echo "T";
-                        self::processTrendyol($variant);
+//                        self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
 //                        self::processBolCom($variant);
@@ -104,7 +105,7 @@ class CacheImagesCommand extends AbstractCommand
     {
         $json = self::getApiResponse($variant->getId());
         $listingImageList = [];
-        foreach ($json['images'] as $image) {
+        foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
         }
         $listingImageList = array_unique($listingImageList);
@@ -118,7 +119,7 @@ class CacheImagesCommand extends AbstractCommand
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
         $variantImage = null;
-        foreach ($imageArray as $image) {
+        foreach ($imageArray ?? [] as $image) {
             $id = $image["id"] ?? '';
             $src = $image['src'] ??'';
             $variant_ids = $parentJson['variant_ids'] ?? [];
@@ -135,8 +136,42 @@ class CacheImagesCommand extends AbstractCommand
         echo "{$variant->getId()} ";
     }
 
+    protected static function processEtsy($variant)
+    {
+        $json = self::getApiResponse($variant->getId());
+        $parentJson = self::getParentResponse($variant->getId());
+        $variantProperty = [];
+        $listingImageList = [];
+        foreach ($json['property_values'] ?? [] as $property) {
+            foreach ($property['value_ids'] ?? [] as $valueId) {
+                $variantProperty[] = "{$property['property_id']}_{$valueId}";
+            }
+        }
+
+        foreach ($parentJson['variation_images'] ?? [] as $variationImage) {
+            if (in_array("{$variationImage['property_id']}_{$variationImage['value_id']}", $variantProperty)) {
+                $myVariantImage = $variationImage['image_id'];
+                break;
+            }
+        }
+
+        $variantImageObj = null;
+        foreach ($parentJson["images"] ?? [] as $image) {
+            $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder, "Etsy_{$image['listing_id']}_{$image['listing_image_id']}.jpg");
+            $listingImageList[$image['listing_image_id']] = $imgProcessed;
+            if ($myVariantImage === $image['listing_image_id']) {
+                $variantImageObj = $imgProcessed;
+            }
+        }
+        $variant->fixImageCache($listingImageList, $variantImageObj);
+        echo "{$variant->getId()} ";        
+    }
+
     protected static function processImage($url, $parent, $oldFileName = '')
     {
+        if (empty($url)) {
+            return null;
+        }
         $newFileName = self::createUniqueFileNameFromUrl($url);
         if ($oldFileName) {
             $asset = self::findImageByName($oldFileName);
@@ -178,7 +213,10 @@ class CacheImagesCommand extends AbstractCommand
         $parent = Utility::checkSetAssetPath($secondLetter, $parent);
         $parent = Utility::checkSetAssetPath($thirdLetter, $parent);
 
-        $asset->setParent($parent);
+        if ($asset->getParent() !== $parent) {
+            $asset->setParent($parent);
+        }
+        
         try {
             $asset->save();
             echo "P";
@@ -189,64 +227,6 @@ class CacheImagesCommand extends AbstractCommand
         return $asset;
     }
     
-/*
-    protected static function processShopify()
-    {
-        echo "Loading Shopify objects...\n";
-        $cacheFolder = Utility::checkSetAssetPath('Image Cache');
-        $shopifyFolder = Utility::checkSetAssetPath('Shopify', $cacheFolder);
-        $listObject = new ShopifyListingListing();
-        $listObject->setUnpublished(true);
-        $shopifyList = $listObject->load();
-        foreach ($shopifyList as $shopify) {
-            echo "    Processing Shopify object: {$shopify->getId()}: ";
-            $imageFolder = Utility::checkSetAssetPath("{$shopify->getShopifyId()}", $shopifyFolder);
-            $listingImageList = [];
-            $images = json_decode($shopify->getImagesjson() ?? [], true);
-            foreach ($images as $image) {
-                $imageName = "Shopify_{$image['id']}.jpg";
-                $asset = self::findImageByName($imageName);
-                if ($asset) {
-                    echo ".";
-                } else {
-                    sleep(1);
-                    try {
-                        $imageData = file_get_contents($image['src']);
-                    } catch (\Exception $e) {
-                        echo "Failed to get image data: " . $e->getMessage() . "\n";
-                        sleep(3);
-                        continue;
-                    }
-                    if ($imageData === false) {
-                        echo "-";
-                        continue;
-                    }
-                    $asset = new Asset\Image();
-                    $asset->setData($imageData);
-                    $asset->setFilename($imageName);
-                    $asset->setParent($imageFolder);
-                    try {
-                        $asset->save();
-                        echo "+";
-                    } catch (\Exception $e) {
-                        echo "Failed to save asset: " . $e->getMessage() . "\n";
-                        continue;
-                    }
-                } 
-                $listingImageList[] = $asset;
-            }
-            $items = [];
-            foreach($listingImageList as $img){
-                $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
-                $advancedImage->setImage($img);
-                $items[] = $advancedImage;
-            }
-            $shopify->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
-            $shopify->save();        
-            echo "\n";
-        }
-
-    }*/
 /*
     protected static function processEtsy()
     {
