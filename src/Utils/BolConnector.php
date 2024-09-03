@@ -526,6 +526,7 @@ class  BolConnector
                         Utility::sanitizeVariable($listing['listing']['categoryName'] ?? 'Tasnif-Edilmemiş'),
                         $marketplaceFolder
                     );
+                    $title = $listing['listing']['title'] ?? '';
                 } else {
                     $familyFolder = Utility::checkSetPath(
                         Utility::sanitizeVariable($family),
@@ -534,6 +535,7 @@ class  BolConnector
                             $marketplaceFolder
                         )
                     );
+                    $title = "({$family}) " . ($listing['listing']['title'] ?? '');
                 }
                 VariantProduct::addUpdateVariant(
                     variant: [
@@ -541,7 +543,7 @@ class  BolConnector
                         'urlLink' => $this->getUrlLink($listing['listing']),
                         'salePrice' => $listing['listing']['bundlePricesPrice'] ?? 0,
                         'saleCurrency' => 'EUR',
-                        'title' => $listing['listing']['title'] ?? '',
+                        'title' => $title,
                         'attributes' => $listing['attributes'],
                         'uniqueMarketplaceId' => $listing['listing']['bolProductId'] ?? '',
                         'apiResponseJson' => json_encode($listing['listing']),
