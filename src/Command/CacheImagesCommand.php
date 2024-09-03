@@ -148,6 +148,7 @@ class CacheImagesCommand extends AbstractCommand
             }
         }
 
+        $myVariantImage = null;
         foreach ($parentJson['variation_images'] ?? [] as $variationImage) {
             if (in_array("{$variationImage['property_id']}_{$variationImage['value_id']}", $variantProperty)) {
                 $myVariantImage = $variationImage['image_id'];
