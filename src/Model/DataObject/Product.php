@@ -203,7 +203,7 @@ class Product extends Concrete
         }
         foreach ($technicals as $asset) {
             if (empty($technicalFolder)) {
-                $technicalFolder = $this->generateAssetPath('Kilavuz');
+                $technicalFolder = $this->generateAssetPath('Klavuz');
             }
             $this->updateAsset($asset, $technicalFolder);
         }
@@ -212,6 +212,9 @@ class Product extends Concrete
                 $rawMediaFolder = $this->generateAssetPath('Ham');
             }
             $this->updateAsset($asset, $rawMediaFolder);
+        }
+        if (empty($albumFolder)) {
+            $albumFolder = $this->generateAssetPath('Album');
         }
         $this->updateAsset($this->getImage(), $albumFolder);
         $this->updateAsset($this->getVideo1(), $albumFolder);
