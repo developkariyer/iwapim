@@ -70,33 +70,14 @@ class  BolConnector
         $filenamejson = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
 
         if (!$forceDownload && file_exists($filename) && file_exists($filenamejson) && filemtime($filename) > time() - 86400) {
-
-            //$csvContent = file_get_contents($filename);
             $contentJson = file_get_contents($filenamejson);
             $this->listings = json_decode($contentJson, true);
-            // $rows = array_map('str_getcsv', explode("\n", trim($csvContent)));
-
-            // if (!empty($rows)) {
-                
-            //     $headers = array_shift($rows);
-            //     foreach ($rows as $row) {
-            //         if (count($row) === count($headers)) {
-            //             $this->listings[] = array_combine($headers, $row);
-            //         }
-            //     }
-            //}
             echo "Using cached data ";
-
-
         } else {   
             $this->listings = [];
             $processStatusApi = "";
             $entityId = "";
-
-            // get access token
             $this->getAccessToken();
-
-
             $headers = [
                 'Authorization: Bearer ' . $this->accessToken,
                 'Accept: application/vnd.retailer.v10+json',
@@ -141,18 +122,15 @@ class  BolConnector
                     echo 'Curl error: ' . curl_error($ch);
                     break; 
                 } else {
-   
                     $data = json_decode($response, true);
                     $status = $data['status'] ?? ''; 
                     $entityId = $data['entityId'] ?? null;
                     echo "Status: $status, Entity Id: $entityId\n";
                 }
                 curl_close($ch);
-               
                 if ($status !== 'SUCCESS') {
-                    sleep(5);
+                    exit;
                 }
-            
             } while ($status !== 'SUCCESS');
 
             
@@ -213,7 +191,6 @@ class  BolConnector
                 'Accept: application/vnd.retailer.v10+json',
             ];
     
-           
             $ch = curl_init("https://api.bol.com/retailer/content/catalog-products/".$ean);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -223,8 +200,8 @@ class  BolConnector
     
             if (curl_errno($ch)) {
                 echo 'Curl error: ' . curl_error($ch);
+                exit;
             } else {
-                echo $response;
                 $decoded_response = json_decode($response, true);
                 if (isset($decoded_response["published"])) {
                     $listing["published"] = $decoded_response["published"];
@@ -233,18 +210,13 @@ class  BolConnector
                     echo 'published Anahtar bulunamadi veya eksik!' . "\n";
                     $listing["published"] = null; 
                 }
-
                 if (isset($decoded_response['gpc']['chunkId'])) {
                     $chunkId = $decoded_response['gpc']['chunkId'];
                     $listing["chunkId"] = $chunkId;
-                    echo "Chunk ID: " . $chunkId;
-
                 } else {
                     $listing["chunkId"] = null;
                 }
-                
                 $listing["attributes"] = $decoded_response["attributes"];
-                      
                 if (isset($decoded_response['attributes']) && is_array($decoded_response['attributes'])) {
                     foreach ($decoded_response['attributes'] as $attribute) {
                         if (isset($attribute['id']) && $attribute['id'] === 'Title' && isset($attribute['values'][0]['value'])) {
@@ -254,7 +226,6 @@ class  BolConnector
                         }
                     }
                 } 
-
                 echo $listing['title'];
             }
             curl_close($ch);
