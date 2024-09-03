@@ -89,6 +89,7 @@ class CacheImagesCommand extends AbstractCommand
                         self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
+                        echo "B";
                         self::processBolCom($variant);
                         break;
                     default:
