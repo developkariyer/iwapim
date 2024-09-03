@@ -32,8 +32,7 @@ class CleanCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        self::traverseObjectFolders(ObjectFolder::getById(149861));
-        self::traverseAssetFolder(Folder::getById(1));
+        //self::traverseObjectFolders(ObjectFolder::getById(149861));
         self::traverseAssetFolder(Folder::getById(1));
         return Command::SUCCESS;
     }
@@ -57,6 +56,9 @@ class CleanCommand extends AbstractCommand
 
     private static function traverseAssetFolder($assetFolder)
     {
+        if ($assetFolder->getFullPath() === "/Image Cache") {
+            return;
+        }
         static::$level++;
         echo str_pad('', static::$level, ' ')."Found folder: " . $assetFolder->getFullPath() . "\r";
         if ($assetFolder instanceof Folder) {
