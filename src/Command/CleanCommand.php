@@ -32,7 +32,7 @@ class CleanCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        self::traverseObjectFolders(ObjectFolder::getById(149861));
+        //self::traverseObjectFolders(ObjectFolder::getById(149861));
         self::traverseAssetFolder(Folder::getById(1));
         return Command::SUCCESS;
     }
