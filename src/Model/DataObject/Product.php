@@ -139,31 +139,80 @@ class Product extends Concrete
         $asset->save();
     }
 
+    protected function generateAssetPath($mainFolderString)
+    {
+        $productIdentifier = $this->getInheritedField("productIdentifier"); // e.g. AMS-123A
+        $mainFolder = Utility::checkSetAssetPath($mainFolderString);
+        $level1Folder = Utility::checkSetAssetPath(
+            strtok($productIdentifier, '-'),
+            $mainFolder
+        );
+        $productIdentifierCode = strtok('-');
+        $level2Folder = Utility::checkSetAssetPath(
+            substr($productIdentifierCode, 0, 1),
+            $level1Folder
+        );
+        $level3Folder = Utility::checkSetAssetPath(
+            substr($productIdentifierCode, 1, 1),
+            $level2Folder
+        );
+        return $level3Folder;
+    }
+
     public function checkAssetFolders()
     {
         if (!$this->isPublished()) {
             return;
         }
-        $mainAlbumFolder = Utility::checkSetAssetPath('Ürün Albümleri');
+/*        $mainAlbumFolder = Utility::checkSetAssetPath('Ürün Albümleri');
         $mainDesignFolder = Utility::checkSetAssetPath('Ürün Tasarımları');
         $mainTechnicalsFolders = Utility::checkSetAssetPath('Ürün Dokümanları');
-        $albumFolder = Utility::checkSetAssetPath($this->getInheritedField('productIdentifier'), $mainAlbumFolder);
-        $designFolder = Utility::checkSetAssetPath($this->getInheritedField('productIdentifier'), $mainDesignFolder);
-        $technicalFolder = Utility::checkSetAssetPath($this->getInheritedField('productIdentifier'), $mainTechnicalsFolders);
+        $mainRawFolder = Utility::checkSetAssetPath('Ham Görseller');
+
+        $albumFolder = Utility::checkSetAssetPath(
+            $this->getInheritedField('productIdentifier'),
+            $mainAlbumFolder
+        );
+        $designFolder = Utility::checkSetAssetPath(
+            $this->getInheritedField('productIdentifier'),
+            $mainDesignFolder
+        );
+        $technicalFolder = Utility::checkSetAssetPath(
+            $this->getInheritedField('productIdentifier'),
+            $mainTechnicalsFolders
+        );
+        $rawMediaFolder = Utility::checkSetAssetPath(
+            $this->getInheritedField('productIdentifier'),
+            $mainRawFolder
+        );
+*/
+        $albumFolder = $this->generateAssetPath('Ürün Albümleri');
+        $designFolder = $this->generateAssetPath('Ürün Tasarımları');
+        $technicalFolder = $this->generateAssetPath('Teknik Dokümanlar');
+        $rawMediaFolder = $this->generateAssetPath('Ham Görseller');
+
         $album = $this->getAlbum();
         $design = $this->getDesignFiles();
         $technicals = $this->getTechnicals();
-        foreach ($album as $index=>$asset) {
+        $rawMedia = $this->getRawMedia();
+
+        foreach ($album as $asset) {
             if (!$asset) {continue;}
             $this->updateAsset($asset->getImage(), $albumFolder);
         }
-        foreach ($design as $index=>$asset) {
+        foreach ($design as $asset) {
             $this->updateAsset($asset, $designFolder);
         }
-        foreach ($technicals as $index=>$asset) {
+        foreach ($technicals as $asset) {
             $this->updateAsset($asset, $technicalFolder);
         }
+        foreach ($rawMedia as $asset) {
+            $this->updateAsset($asset, $rawMediaFolder);
+        }
         $this->updateAsset($this->getImage(), $albumFolder);
+        $this->updateAsset($this->getVideo1(), $albumFolder);
+        $this->updateAsset($this->getVideo2(), $albumFolder);
+        $this->updateAsset($this->getVideo3(), $albumFolder);
     }
 
     public function checkVariations()
