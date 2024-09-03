@@ -520,6 +520,12 @@ class  BolConnector
         foreach ($families as $family => $listings) {
             echo "Processing Family $family ...\n";
             foreach ($listings as $listing) {
+                if ($listing['listing']['bolProductId'] === '9300000128993681') {
+                    print_r($listing);
+                    exit;
+                } else {
+                    continue;
+                }
                 echo "    Listing {$listing['listing']['bolProductId']}:{$listing['listing']['ean']} ...";
                 if ($family === 'Tasnif-Edilmemiş') {
                     $familyFolder = Utility::checkSetPath(
