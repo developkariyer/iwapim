@@ -518,7 +518,20 @@ class  BolConnector
         }
 
         foreach ($families as $family => $listings) {
-            $familyFolder = Utility::checkSetPath(Utility::sanitizeVariable($family), $marketplaceFolder);
+            if ($family === 'Tasnif-Edilmemiş') {
+                $familyFolder = Utility::checkSetPath(
+                    Utility::sanitizeVariable($listing['categoryName'] ?? 'Tasnif-Edilmemiş'),
+                    $marketplaceFolder
+                );
+            } else {
+                $familyFolder = Utility::checkSetPath(
+                    Utility::sanitizeVariable($listing['categoryName'] ?? 'Tasnif-Edilmemiş'),
+                    Utility::checkSetPath(
+                        Utility::sanitizeVariable($family),
+                        $marketplaceFolder
+                    )
+                );
+            }
             echo "Processing Family $family ...\n";
             foreach ($listings as $listing) {
                 echo "    Listing {$listing['listing']['bolProductId']}:{$listing['listing']['ean']} ...";
