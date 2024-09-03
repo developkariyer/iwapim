@@ -162,7 +162,7 @@ class VariantProduct extends Concrete
         }
         $this->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
         $variantImage = $variantImage ?? reset($listingImageList);
-        if ($variantImage instanceof Asset/Image) {
+        if ($variantImage instanceof Asset\Image) {
             $urlImage = new \Pimcore\Model\DataObject\Data\ExternalImage(
                 "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $variantImage->getFullPath())
             );
