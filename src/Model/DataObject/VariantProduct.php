@@ -161,10 +161,12 @@ class VariantProduct extends Concrete
         }
         $this->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
         $variantImage = $variantImage ?? reset($listingImageList);
-        $urlImage = new \Pimcore\Model\DataObject\Data\ExternalImage(
-            "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $variantImage->getFullPath())
-        );
-        $this->setImageUrl($urlImage);
+        if ($variantImage instanceof Asset/Image) {
+            $urlImage = new \Pimcore\Model\DataObject\Data\ExternalImage(
+                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $variantImage->getFullPath())
+            );
+            $this->setImageUrl($urlImage);
+        }
         $this->save();
     }
 }
