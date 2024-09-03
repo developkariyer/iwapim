@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\DataObject\Folder as ObjectFolder;
+use Pimcore\Model\DataObject\Product;
 
 #[AsCommand(
     name: 'app:clean',
