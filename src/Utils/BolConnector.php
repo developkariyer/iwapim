@@ -14,7 +14,6 @@ class  BolConnector
     private $listings = [];
     private $accessToken = "";
 
-
     public function __construct(Marketplace $marketplace)
     {
         if (!$marketplace instanceof Marketplace ||
@@ -194,7 +193,6 @@ class  BolConnector
         }
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
-
 
         echo "count listings: ".count($this->listings);
         
@@ -495,11 +493,59 @@ class  BolConnector
         $total = count($this->listings);
         $index = 0;
 
-    
+        $families = [];
 
+        echo "Re-generating family trees...\n";
+        foreach ($this->listings as $listing) {
+            $family = "Tasnif-Edilmemiş";
+            $attributeDetails = $this->getAttributes($listing);
+            $attributeArray = array_map(function($attribute) {
+                return $attribute['values'][0]['value'] ?? null;
+            }, array_column($listing['attributes'], null, 'id'));
+            if (!empty($attributeArray['Family Name'])) {
+                $family = $attributeArray['Family Name'];
+                $attributeDetails = trim(substr($listing['title'], strlen($attributeArray['Family Name'])));
+            }
+            if (!is_array($families[$family])) {
+                $families[$family] = [];
+            }
+            $families[$family][] = [
+                'attributes' => $attributeDetails,
+                'listing' => $listing,
+            ];
+        }
+
+        foreach ($families as $family => $listings) {
+            $familyFolder = Utility::checkSetPath(Utility::sanitizeVariable($family), $marketplaceFolder);
+            echo "Processing Family $family ...\n";
+            foreach ($listings as $listing) {
+                echo "    Listing {$listing['listing']['bolProductId']}:{$listing['listing']['ean']} ...";
+                VariantProduct::addUpdateVariant(
+                    variant: [
+                        'imageUrl' => $this->getImage($listing['listing']),
+                        'urlLink' => $this->getUrlLink($listing['listing']),
+                        'salePrice' => $listing['listing']['bundlePricesPrice'] ?? 0,
+                        'saleCurrency' => 'EUR',
+                        'title' => $listing['listing']['title'] ?? '',
+                        'attributes' => $listing['attributes'],
+                        'uniqueMarketplaceId' => $listing['listing']['bolProductId'] ?? '',
+                        'apiResponseJson' => json_encode($listing['listing']),
+                        'published' => $listing['listing']['published'],
+                    ],
+                    importFlag: $importFlag,
+                    updateFlag: $updateFlag,
+                    marketplace: $this->marketplace,
+                    parent: $familyFolder
+                );
+                echo "OK\n";
+                $index++;
+            }
+        }
+
+/*
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['bolProductId']}:{$listing['title']} ...";
-  
+
             $path = Utility::sanitizeVariable($listing['categoryName'] ?? 'Tasnif-Edilmemiş');
             $parent = Utility::checkSetPath($path, $marketplaceFolder);
             if ($listing['bolProductId']) {
@@ -524,7 +570,7 @@ class  BolConnector
             );
             echo "OK\n";
             $index++;
-        }
+        }*/
     }
 
     public function downloadOrders()
