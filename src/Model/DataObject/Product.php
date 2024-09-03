@@ -157,11 +157,11 @@ class Product extends Concrete
         );
         $productIdentifierCode = strtok('-');
         $level2Folder = Utility::checkSetAssetPath(
-            substr($productIdentifier, 0, strlen($productIdentifierCode)+1),
+            substr($productIdentifier, 0, strlen($productIdentifierCode)+1).'__',
             $level1Folder
         );
         $level3Folder = Utility::checkSetAssetPath(
-            substr($productIdentifier, 0, strlen($productIdentifierCode)+2),
+            substr($productIdentifier, 0, strlen($productIdentifierCode)+2).'_',
             $level2Folder
         );
         return Utility::checkSetAssetPath(
