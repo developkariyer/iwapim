@@ -493,7 +493,9 @@ class  BolConnector
         $total = count($this->listings);
         $index = 0;
 
-        $families = [];
+        $families = [
+            'Tasnif-Edilmemiş' => []
+        ];
 
         echo "Re-generating family trees...\n";
         foreach ($this->listings as $listing) {
