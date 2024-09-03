@@ -508,7 +508,7 @@ class  BolConnector
                 $family = $attributeArray['Family Name'];
                 $attributeDetails = trim(substr($listing['title'], strlen($attributeArray['Family Name'])));
             }
-            if (!is_array($families[$family])) {
+            if (!isset($families[$family])) {
                 $families[$family] = [];
             }
             $families[$family][] = [
