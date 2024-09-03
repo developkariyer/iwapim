@@ -44,11 +44,23 @@ class CleanCommand extends AbstractCommand
     {
         foreach ($parent->getChildren() as $category) {
             if ($category instanceof ObjectFolder) {
-                $folders = [];
+                echo "Running in folder: " . $category->getFullPath() . "\n";
+                $folder = [];
                 for ($t=0;$t<20;$t++) {
                     $min = str_pad($t * 20 + 1, 3, "0", STR_PAD_LEFT);
                     $max = str_pad(($t + 1) * 20, 3, "0", STR_PAD_LEFT);
                     $folder[$t] = Utility::checkSetPath("$min-$max", $category);
+                }
+                foreach ($category->getChildren() as $product) {
+                    if ($product instanceof Product) {
+                        echo "    Moving product: " . $product->getFullPath() . "\n";
+                        preg_match('/\d+/', $product->getProductIdentifier(), $matches);
+                        if (is_numeric($matches[0])) {
+                            $index = intval($matches[0]) / 20;
+                            $product->setParent($folder[$index]);
+                            $product->save();
+                        }
+                    }
                 }
             }
         }
