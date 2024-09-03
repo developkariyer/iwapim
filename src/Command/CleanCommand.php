@@ -33,9 +33,9 @@ class CleanCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //self::traverseObjectFolders(ObjectFolder::getById(149861));
         //self::traverseAssetFolder(Folder::getById(1));
         self::splitProductFolders(ObjectFolder::getById(149861));
+        self::traverseObjectFolders(ObjectFolder::getById(149861));
         return Command::SUCCESS;
     }
 
@@ -70,15 +70,21 @@ class CleanCommand extends AbstractCommand
     {
         if ($objectFolder instanceof ObjectFolder) {
             echo "Running in folder: " . $objectFolder->getFullPath() . "\n";
+            $childCount = 0;
             foreach ($objectFolder->getChildren() as $child) {
+                $childCount++;
                 if ($child instanceof ObjectFolder) {
                     self::traverseObjectFolders($child);
                 }
                 if ($child instanceof Product) {
-                    $child->save();
-                    echo "Saved: " . $child->getFullPath() . "\n";
-                    self::traverseObjectFolders($child);
+                    //$child->save();
+                    //echo "Saved: " . $child->getFullPath() . "\n";
+                    //self::traverseObjectFolders($child);
                 }
+            }
+            if ($childCount === 0) {
+                $objectFolder->delete();
+                echo "Deleted folder: " . $objectFolder->getFullPath() . "\n";
             }
         }
     }
