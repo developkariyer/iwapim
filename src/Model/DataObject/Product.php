@@ -6,8 +6,7 @@ use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Product\Listing;
 use App\Utils\Utility;
 use Pimcore\Model\DataObject\Service;
-use Pimcore\Model\Asset;
-
+use Pimcore\Model\DataObject\Data\Video;
 
 class Product extends Concrete
 {
@@ -131,9 +130,12 @@ class Product extends Concrete
         if (!$asset) {
             return;
         }
-        error_log(get_class($asset));
-        return;
-        if (!$asset || ( $asset->getParent() && $asset->getParent()->getFullPath() === $folder->getFullPath())) {
+        if ($asset instanceof Video) {
+            $asset = $asset->getData();
+            error_log(get_class($asset));
+            return;
+        }
+        if ($asset->getParent() && $asset->getParent()->getFullPath() === $folder->getFullPath()) {
             return;
         }
         $originalFilename = pathinfo($asset->getFilename(), PATHINFO_FILENAME);
