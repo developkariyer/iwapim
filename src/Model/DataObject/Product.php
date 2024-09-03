@@ -174,29 +174,8 @@ class Product extends Concrete
         if (!$this->isPublished()) {
             return;
         }
-/*        $mainAlbumFolder = Utility::checkSetAssetPath('Ürün Albümleri');
-        $mainDesignFolder = Utility::checkSetAssetPath('Ürün Tasarımları');
-        $mainTechnicalsFolders = Utility::checkSetAssetPath('Ürün Dokümanları');
-        $mainRawFolder = Utility::checkSetAssetPath('Ham Görseller');
 
-        $albumFolder = Utility::checkSetAssetPath(
-            $this->getInheritedField('productIdentifier'),
-            $mainAlbumFolder
-        );
-        $designFolder = Utility::checkSetAssetPath(
-            $this->getInheritedField('productIdentifier'),
-            $mainDesignFolder
-        );
-        $technicalFolder = Utility::checkSetAssetPath(
-            $this->getInheritedField('productIdentifier'),
-            $mainTechnicalsFolders
-        );
-        $rawMediaFolder = Utility::checkSetAssetPath(
-            $this->getInheritedField('productIdentifier'),
-            $mainRawFolder
-        );
-*/
-        $albumFolder = $this->generateAssetPath('Katalog');
+        $albumFolder = $this->generateAssetPath('Album');
         $designFolder = $this->generateAssetPath('Tasarim');
         $technicalFolder = $this->generateAssetPath('Klavuz');
         $rawMediaFolder = $this->generateAssetPath('Ham');
