@@ -203,7 +203,7 @@ class Product extends Concrete
         }
         foreach ($technicals as $asset) {
             if (empty($technicalFolder)) {
-                $technicalsFolder = $this->generateAssetPath('Kilavuz');
+                $technicalFolder = $this->generateAssetPath('Kilavuz');
             }
             $this->updateAsset($asset, $technicalFolder);
         }
