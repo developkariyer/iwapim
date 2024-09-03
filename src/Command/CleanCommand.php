@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\Asset\Folder;
+use Pimcore\Model\DataObject\Folder as ObjectFolder;
 
 #[AsCommand(
     name: 'app:clean',
@@ -30,9 +31,26 @@ class CleanCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $homeFolder = Folder::getById(1);
-        self::traverseAssetFolder($homeFolder);
+        //$homeFolder = Folder::getById(1);
+        //self::traverseAssetFolder($homeFolder);
+        $homeFolder = ObjectFolder::getById(149861);
+        self::traverseObjectFolders($homeFolder);
         return Command::SUCCESS;
+    }
+
+    private static function traverseObjectFolders($objectFolder)
+    {
+        if ($objectFolder instanceof ObjectFolder) {
+            foreach ($objectFolder->getChildren() as $child) {
+                if ($child instanceof ObjectFolder) {
+                    self::traverseObjectFolders($child);
+                }
+                if ($child instanceof Product) {
+                    $child->save();
+                    echo "Saved: " . $child->getFullPath() . "\n";
+                }
+            }
+        }
     }
 
     private static function traverseAssetFolder($assetFolder)
