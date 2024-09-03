@@ -20,6 +20,7 @@ use App\Utils\AmazonConnector;
 use App\Utils\ShopifyConnector;
 use App\Utils\EtsyConnector;
 use App\Utils\TrendyolConnector;
+use App\Utils\BolConnector;
 
 
 #[AsCommand(
