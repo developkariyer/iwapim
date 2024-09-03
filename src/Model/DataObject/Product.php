@@ -181,10 +181,7 @@ class Product extends Concrete
             return;
         }
 
-        $albumFolder = $this->generateAssetPath('Album');
-        $designFolder = $this->generateAssetPath('Tasarim');
-        $technicalFolder = $this->generateAssetPath('Klavuz');
-        $rawMediaFolder = $this->generateAssetPath('Ham');
+        $albumFolder = $designFolder = $technicalFolder = $rawMediaFolder = null;
 
         $album = $this->getAlbum();
         $design = $this->getDesignFiles();
@@ -193,15 +190,27 @@ class Product extends Concrete
 
         foreach ($album as $asset) {
             if (!$asset) {continue;}
+            if (empty($albumFolder)) {
+                $albumFolder = $this->generateAssetPath('Album');
+            }
             $this->updateAsset($asset->getImage(), $albumFolder);
         }
         foreach ($design as $asset) {
+            if (empty($designFolder)) {
+                $designFolder = $this->generateAssetPath('Tasarim');
+            }
             $this->updateAsset($asset, $designFolder);
         }
         foreach ($technicals as $asset) {
+            if (empty($technicalFolder)) {
+                $technicalsFolder = $this->generateAssetPath('Kilavuz');
+            }
             $this->updateAsset($asset, $technicalFolder);
         }
         foreach ($rawMedia as $asset) {
+            if (empty($rawMediaFolder)) {
+                $rawMediaFolder = $this->generateAssetPath('Ham');
+            }
             $this->updateAsset($asset, $rawMediaFolder);
         }
         $this->updateAsset($this->getImage(), $albumFolder);
