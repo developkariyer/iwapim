@@ -41,6 +41,7 @@ class CleanCommand extends AbstractCommand
     private static function traverseObjectFolders($objectFolder)
     {
         if ($objectFolder instanceof ObjectFolder) {
+            echo "Running in folder: " . $objectFolder->getFullPath() . "\n";
             foreach ($objectFolder->getChildren() as $child) {
                 if ($child instanceof ObjectFolder) {
                     self::traverseObjectFolders($child);
