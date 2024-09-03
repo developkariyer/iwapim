@@ -38,7 +38,7 @@ class CleanCommand extends AbstractCommand
     private static function traverseAssetFolder($assetFolder)
     {
         static::$level++;
-        echo str_pad('', static::$level, ' ')."Found folder: " . $assetFolder->getFullPath() . "\n";
+//        echo str_pad('', static::$level, ' ')."Found folder: " . $assetFolder->getFullPath() . "\n";
         if ($assetFolder instanceof Folder) {
             $childCount = 0;
             foreach ($assetFolder->getChildren() as $child) {
@@ -48,10 +48,10 @@ class CleanCommand extends AbstractCommand
                 }
             }
             if ($childCount === 0) {
-                //$assetFolder->delete();
+                $assetFolder->delete();
                 echo str_pad('', static::$level, ' ')."***************Deleted folder: " . $assetFolder->getFullPath() . "\n";
             } else {
-                echo str_pad("", static::$level, " ")."Folder not empty: " . $assetFolder->getFullPath() . "\n";
+//                echo str_pad("", static::$level, " ")."Folder not empty: " . $assetFolder->getFullPath() . "\n";
             }
         }
         static::$level--;
