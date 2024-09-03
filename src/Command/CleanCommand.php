@@ -50,6 +50,8 @@ class CleanCommand extends AbstractCommand
             if ($childCount === 0) {
                 //$assetFolder->delete();
                 echo str_pad('', static::$level, ' ')."Deleted folder: " . $assetFolder->getFullPath() . "\n";
+            } else {
+                echo str_pad("", static::$level, " ")."Folder not empty: " . $assetFolder->getFullPath() . "\n";
             }
         }
         static::$level--;
