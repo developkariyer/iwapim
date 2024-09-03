@@ -6,6 +6,7 @@ use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\VariantProduct\Listing;
 use App\Utils\Utility;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\Asset;
 
 class VariantProduct extends Concrete
 {
