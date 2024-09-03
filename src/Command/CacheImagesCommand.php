@@ -175,19 +175,20 @@ class CacheImagesCommand extends AbstractCommand
         }
         $dirty = false;
         $newFileName = self::createUniqueFileNameFromUrl($url);
-        if ($oldFileName) {
-            $asset = self::findImageByName($oldFileName);
-            if ($asset) {
-                $asset->setFilename($newFileName);
-                $asset->setParent($parent);
-                $dirty = true;
-                echo 'R';
+        $asset = self::findImageByName($newFileName);
+        if ($asset) {
+            echo "_";
+        } else {
+            if ($oldFileName) {
+                $asset = self::findImageByName($oldFileName);
+                if ($asset) {
+                    $asset->setFilename($newFileName);
+                    $asset->setParent($parent);
+                    $dirty = true;
+                    echo 'R';
+                }
             }
-        }
-        if (empty($asset)) {
-            $asset = self::findImageByName($newFileName);
-            echo '_';
-        }
+        } 
         if (!$asset) {
             try {
                 $imageData = file_get_contents($url);
