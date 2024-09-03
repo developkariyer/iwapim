@@ -132,8 +132,6 @@ class Product extends Concrete
         }
         if ($asset instanceof Video) {
             $asset = $asset->getData();
-            error_log(get_class($asset));
-            return;
         }
         if ($asset->getParent() && $asset->getParent()->getFullPath() === $folder->getFullPath()) {
             return;
