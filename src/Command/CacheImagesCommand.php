@@ -51,7 +51,7 @@ class CacheImagesCommand extends AbstractCommand
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
-        $offset = 0;
+        $offset = 14550;
 
         while (true) {
             $listingObject->setLimit($pageSize);
@@ -89,7 +89,7 @@ class CacheImagesCommand extends AbstractCommand
                         self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
-                        self::processBolCom($variant);
+//                        self::processBolCom($variant);
                         break;
                     default:
                         break;
