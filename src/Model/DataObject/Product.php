@@ -164,7 +164,7 @@ class Product extends Concrete
             "{$identifierParts[0]}-{$append}__",
             $level1Folder
         );
-        $append = left($identifierParts[1], 0, 2);
+        $append = substr($identifierParts[1], 0, 2);
         $level3Folder = Utility::checkSetAssetPath(
             "{$identifierParts[0]}-{$append}_",
             $level2Folder
