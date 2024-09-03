@@ -6,6 +6,8 @@ use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Product\Listing;
 use App\Utils\Utility;
 use Pimcore\Model\DataObject\Service;
+use Pimcore\Model\Asset;
+
 
 class Product extends Concrete
 {
@@ -126,7 +128,12 @@ class Product extends Concrete
 
     protected function updateAsset($asset, $folder)
     {
-        if (!$asset || $asset->getParent()->getFullPath() === $folder->getFullPath()) {
+        if (!$asset) {
+            return;
+        }
+        error_log(get_class($asset));
+        return;
+        if (!$asset || ( $asset->getParent() && $asset->getParent()->getFullPath() === $folder->getFullPath())) {
             return;
         }
         $originalFilename = pathinfo($asset->getFilename(), PATHINFO_FILENAME);
