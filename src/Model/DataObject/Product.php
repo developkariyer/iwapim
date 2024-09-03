@@ -148,20 +148,25 @@ class Product extends Concrete
 
     protected function generateAssetPath($mainFolderString)
     {
-        $productIdentifier = $this->getInheritedField("productIdentifier"); // e.g. AMS-123A
-        $productType = strtok($productIdentifier, '-');
+        $productIdentifier = str_replace(' ', '', $this->getInheritedField("productIdentifier")); // e.g. AMS-123A
+        $identifierParts = explode('-', $productIdentifier);
+        if (count($identifierParts) != 2) {
+            error_log("Invalid product identifier: $productIdentifier");
+            return;
+        }
         $mainFolder = Utility::checkSetAssetPath($mainFolderString);
         $level1Folder = Utility::checkSetAssetPath(
-            $productType,
+            $identifierParts[0],
             $mainFolder
         );
-        $productIdentifierCode = strtok('-');
+        $append = left($identifierParts[1], 1);
         $level2Folder = Utility::checkSetAssetPath(
-            substr($productIdentifier, 0, strlen($productIdentifierCode)+1).'__',
+            "{$identifierParts[0]}-{$append}__",
             $level1Folder
         );
+        $append = left($identifierParts[1], 2);
         $level3Folder = Utility::checkSetAssetPath(
-            substr($productIdentifier, 0, strlen($productIdentifierCode)+2).'_',
+            "{$identifierParts[0]}-{$append}_",
             $level2Folder
         );
         return Utility::checkSetAssetPath(
