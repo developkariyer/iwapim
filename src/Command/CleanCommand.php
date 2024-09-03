@@ -12,6 +12,7 @@ use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
+use App\Utils\Utility;
 
 #[AsCommand(
     name: 'app:clean',
@@ -33,8 +34,24 @@ class CleanCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //self::traverseObjectFolders(ObjectFolder::getById(149861));
-        self::traverseAssetFolder(Folder::getById(1));
+        //self::traverseAssetFolder(Folder::getById(1));
+        self::splitProductFolders(ObjectFolder::getById(149861));
         return Command::SUCCESS;
+    }
+
+
+    private static function splitProductFolders($parent)
+    {
+        foreach ($parent->getChildren() as $category) {
+            if ($category instanceof ObjectFolder) {
+                $folders = [];
+                for ($t=0;$t<20;$t++) {
+                    $min = str_pad($t * 20 + 1, 3, "0", STR_PAD_LEFT);
+                    $max = str_pad(($t + 1) * 20, 3, "0", STR_PAD_LEFT);
+                    $folder[$t] = Utility::checkSetPath("$min-$max", $category);
+                }
+            }
+        }
     }
 
     private static function traverseObjectFolders($objectFolder)
