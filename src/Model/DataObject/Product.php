@@ -163,7 +163,10 @@ class Product extends Concrete
             substr($productIdentifierCode, 1, 1),
             $level2Folder
         );
-        return $level3Folder;
+        return Utility::checkSetAssetPath(
+            $productIdentifierCode,
+            $level3Folder
+        );
     }
 
     public function checkAssetFolders()
