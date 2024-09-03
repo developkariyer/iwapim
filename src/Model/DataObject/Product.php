@@ -196,10 +196,10 @@ class Product extends Concrete
             $mainRawFolder
         );
 */
-        $albumFolder = $this->generateAssetPath('Ürün Albümleri');
-        $designFolder = $this->generateAssetPath('Ürün Tasarımları');
-        $technicalFolder = $this->generateAssetPath('Teknik Dokümanlar');
-        $rawMediaFolder = $this->generateAssetPath('Ham Görseller');
+        $albumFolder = $this->generateAssetPath('Katalog');
+        $designFolder = $this->generateAssetPath('Tasarim');
+        $technicalFolder = $this->generateAssetPath('Klavuz');
+        $rawMediaFolder = $this->generateAssetPath('Ham');
 
         $album = $this->getAlbum();
         $design = $this->getDesignFiles();
