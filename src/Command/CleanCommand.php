@@ -50,6 +50,7 @@ class CleanCommand extends AbstractCommand
                 if ($child instanceof Product) {
                     $child->save();
                     echo "Saved: " . $child->getFullPath() . "\n";
+                    self::traverseObjectFolders($child);
                 }
             }
         }
