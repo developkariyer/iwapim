@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Pimcore\Cache;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
+use Pimcore\Model\DataObject\Service;
+
 class DataObjectListener implements EventSubscriberInterface
 {
 
