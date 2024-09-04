@@ -171,6 +171,8 @@ class Product extends Concrete
 
     public function checkAssetFolders()
     {
+        return;
+        
         if (!$this->isPublished()) {
             return;
         }
