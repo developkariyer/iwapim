@@ -187,24 +187,4 @@ class DataObjectListener implements EventSubscriberInterface
         }
     }
 
-    private function doModifyCustomLayouts(array $data, Product $object, int $customLayoutToSelect, array $layoutsToRemove): array
-    {
-        $data['currentLayoutId'] = $customLayoutToSelect;
-        $customLayout = CustomLayout::getById($customLayoutToSelect);
-        $data['layout'] = $customLayout->getLayoutDefinitions();
-        Service::enrichLayoutDefinition($data['layout'], $object);
-        
-        if (!empty($layoutsToRemove)) {
-            //remove main layout from valid layouts
-            $validLayouts = $data['validLayouts'];
-            foreach($validLayouts as $key => $validLayout) {
-                if(in_array($validLayout['id'], $layoutsToRemove)) {
-                    unset($validLayouts[$key]);
-                }
-            }
-            $data['validLayouts'] = array_values($validLayouts);            
-        }
-        return $data; 
-    }
-
 }
