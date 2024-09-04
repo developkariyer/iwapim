@@ -36,23 +36,31 @@ class DataObjectListener implements EventSubscriberInterface
         ];
     }
 
+    protected function doModifyCustomLayouts(Product $object, GenericEvent $event)
+    {
+        $level = $object->level();
+        $data = $event->getArgument('data');
+        if (empty($data['validLayouts'])) {
+            return;
+        }
+        foreach ($data['validLayouts'] as $key=>$layout) {
+            if (($layout['name'] === 'product' && $level == 0) || ($layout['name'] === 'variant' && $level == 1)) {
+                $data['currentLayoutId'] = $layout['id'];
+                $customLayout = CustomLayout::getById($layout['id']);
+                $data['layout'] = $customLayout->getLayoutDefinitions();
+                Service::enrichLayoutDefinition($data['layout'], $object);
+            } else {
+                unset($data['validLayouts'][$key]);
+            }
+        }
+        $event->setArgument('data', $data);
+    }
+
     public function onPreSendData(GenericEvent $event)
     {
         $object = $event->getArgument('object');
         if ($object instanceof Product) {
-            $level = $object->level();
-            $data = $event->getArgument('data');
-            $dataChanged = false;
-            foreach ($data['validLayouts'] ?? [] as $layout) {
-                if (($layout['name'] === 'product' && $level == 0) || ($layout['name'] === 'variant' && $level == 1)) {
-                    $data['currentLayoutId'] = $layout['id'];
-                    $dataChanged = true;
-                    break;
-                }
-            }
-            if ($dataChanged) {
-                $event->setArgument('data', $data);
-            }
+            $this->doModifyCustomLayouts($object, $event);
         }
     }
 
