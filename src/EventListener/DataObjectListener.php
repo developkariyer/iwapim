@@ -42,7 +42,7 @@ class DataObjectListener implements EventSubscriberInterface
         if ($object instanceof Product) {
             $level = $object->level();
             $data = $event->getArgument('data');
-            //file_put_contents('tmp/data.json', json_encode($data));
+            file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/data.json", json_encode($data));
         }
     }
 
