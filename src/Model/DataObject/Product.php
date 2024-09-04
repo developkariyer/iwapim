@@ -217,9 +217,6 @@ class Product extends Concrete
             $albumFolder = $this->generateAssetPath('Album');
         }
         $this->updateAsset($this->getImage(), $albumFolder);
-        $this->updateAsset($this->getVideo1(), $albumFolder);
-        $this->updateAsset($this->getVideo2(), $albumFolder);
-        $this->updateAsset($this->getVideo3(), $albumFolder);
     }
 
     public function checkVariations()

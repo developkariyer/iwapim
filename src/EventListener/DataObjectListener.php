@@ -32,7 +32,7 @@ class DataObjectListener implements EventSubscriberInterface
             'pimcore.dataobject.postUpdate' => 'onPostUpdate',
             'pimcore.dataobject.postLoad' => 'onPostLoad',
             'pimcore.admin.resolve.elementAdminStyle' => 'onResolveElementAdminStyle',
-//            'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
+            'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
         ];
     }
 
@@ -40,9 +40,8 @@ class DataObjectListener implements EventSubscriberInterface
     {
         $object = $event->getArgument('object');
         if ($object instanceof Product) {
-            $data = $event->getArgument('data');
-            file_put_contents('/var/www/iwapim/tmp/data.json', json_encode($data));
-            file_put_contents('/var/www/iwapim/tmp/data.txt', print_r($data, true));
+            $level = $object->level();
+            
         }
     }
 
@@ -165,6 +164,27 @@ class DataObjectListener implements EventSubscriberInterface
                 $object->setVariationColorList('');
             }
         }
+    }
+
+    private function doModifyCustomLayouts(array $data, Product $object, int $customLayoutToSelect, array $layoutsToRemove): array
+    {
+        $data['currentLayoutId'] = $customLayoutToSelect;
+        $customLayout = CustomLayout::getById($customLayoutToSelect);
+        $data['layout'] = $customLayout->getLayoutDefinitions();
+        Service::enrichLayoutDefinition($data['layout'], $object);
+        
+        if (!empty($layoutsToRemove)) {
+            //remove main layout from valid layouts
+            $validLayouts = $data['validLayouts'];
+            foreach($validLayouts as $key => $validLayout) {
+                if(in_array($validLayout['id'], $layoutsToRemove)) {
+                    unset($validLayouts[$key]);
+                }
+            }
+            $data['validLayouts'] = array_values($validLayouts);            
+        }
+
+        return $data; 
     }
 
 }
