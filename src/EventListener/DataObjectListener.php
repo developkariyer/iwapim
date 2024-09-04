@@ -42,7 +42,17 @@ class DataObjectListener implements EventSubscriberInterface
         if ($object instanceof Product) {
             $level = $object->level();
             $data = $event->getArgument('data');
-            file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/data.json", json_encode($data));
+            $dataChanged = false;
+            foreach ($data['validLayouts'] ?? [] as $layout) {
+                if (($layout['name'] === 'product' && $level == 0) || ($layout['name'] === 'variant' && $level == 1)) {
+                    $data['currentLayoutId'] = $layout['id'];
+                    $dataChanged = true;
+                    break;
+                }
+            }
+            if ($dataChanged) {
+                $event->setArgument('data', $data);
+            }
         }
     }
 
