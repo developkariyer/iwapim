@@ -162,12 +162,12 @@ class DataObjectListener implements EventSubscriberInterface
         $object = $event->getObject();
         $image_url = '';
         if ($object instanceof Product) {
-/*            $image_url = self::traverseProducts($object);
+            $image_url = self::traverseProducts($object);
             if (!empty($image_url)) {
                 $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
             } else {
                 $object->setImageUrl(null);
-            }*/
+            }
             if (!$object->getParent() instanceof Product) {
                 [$sizes, $colors] = $object->listVariations();
                 $object->setVariationSizeList(implode("\n", $sizes));
