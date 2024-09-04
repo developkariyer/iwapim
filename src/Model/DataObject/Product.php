@@ -47,13 +47,7 @@ class Product extends Concrete
 
     public function level()
     {
-        $level = 0;
-        $parent = $this->getParent();
-        while ($parent instanceof Product) {
-            $level++;
-            $parent = $parent->getParent();
-        }
-        return $level;
+        return ($this->getParent() instanceof Product) ? 1 : 0;
     }
 
     public function checkProductCode($numberDigits = 5)

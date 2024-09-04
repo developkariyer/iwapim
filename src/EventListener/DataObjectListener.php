@@ -41,7 +41,8 @@ class DataObjectListener implements EventSubscriberInterface
         $object = $event->getArgument('object');
         if ($object instanceof Product) {
             $level = $object->level();
-            
+            $data = $event->getArgument('data');
+            file_put_contents(json_encode($data), 'tmp/data.json');
         }
     }
 
