@@ -63,7 +63,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         }
         print_r($countryCodes);
         $fbaInventory = $this->amazonSellerConnector->fbaInventoryV1();
-        $response = $fbaInventory->getInventorySummaries('Marketplace');
+        $response = $fbaInventory->getInventorySummaries(granularityType: 'Marketplace', granularityId: AmazonMerchantIdList::$amazonMerchantIdList['US'], marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['US']]);
         print_r($response->json());
         exit;
     }
