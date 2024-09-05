@@ -136,7 +136,9 @@ class Product extends Concrete
         $productIdentifier = $this->getInheritedField('productIdentifier');
         $timestamp = date("YmdHis");
         $newFilename = "{$productIdentifier}_{$timestamp}_{$originalFilename}.{$extension}";
-        $asset->setFilename($newFilename);
+        if (strpos($originalFilename, "{$productIdentifier}_") !== 0) {
+            $asset->setFilename($newFilename);
+        }
         $asset->setParent($folder);
         $asset->save();
     }
