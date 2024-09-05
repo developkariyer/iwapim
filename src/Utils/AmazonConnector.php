@@ -62,9 +62,30 @@ class AmazonConnector implements MarketplaceConnectorInterface
             throw new \Exception("Amazon Seller Connector is not created");
         }
         print_r($countryCodes);
+
         $fbaInventory = $this->amazonSellerConnector->fbaInventoryV1();
-        $response = $fbaInventory->getInventorySummaries(granularityType: 'Marketplace', granularityId: AmazonMerchantIdList::$amazonMerchantIdList['US'], marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['US']]);
-        print_r($response->json());
+        $nextToken = null;
+        $allInventorySummaries = [];
+        do {
+            $response = $fbaInventory->getInventorySummaries(
+                granularityType: 'Marketplace',
+                granularityId: AmazonMerchantIdList::$amazonMerchantIdList['US'],
+                marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['US']],
+                nextToken: $nextToken
+            );
+        
+            // Append the current page of results to the total inventory array
+            $inventorySummaries = $response['payload']['inventorySummaries'];
+            $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
+        
+            // Check for the next token
+            $nextToken = $response['payload']['nextToken'] ?? null;        
+
+        } while ($nextToken);
+        // use pagination to get all results
+    
+        print_r($allInventorySummaries);
+
         exit;
     }
 
