@@ -171,13 +171,13 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     nextToken: $nextToken
                 );
                 $responseData = $response->json();
-                $inventorySummaries = $responseData['payload'] ?? [];
-                $allInventorySummaries = array_merge($allInventorySummaries, [$inventorySummaries]);
+                $inventorySummaries = $responseData['payload']['inventorySummaries'] ?? [];
+                $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
                 $nextToken = $responseData['pagination']['nextToken'] ?? null;
                 sleep(1); echo ".";
             } while ($nextToken);
         }
-        file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/inventory.json", json_encode($allInventorySummaries));
+        file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/inventory.json", json_encode($allInventorySummaries));
     }
 
     public function getListings($country)
