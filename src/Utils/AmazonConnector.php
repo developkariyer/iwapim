@@ -199,6 +199,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         }
                         $dbFields[$key] = $value;
                     }
+                    $dbFields['countryCode'] = $country;
                     $sql .= implode(',', array_keys($dbFields)) . ") VALUES (";
                     $sql .= implode(',', array_fill(0, count($dbFields), '?')) . ")";
                     $sql .= " ON DUPLICATE KEY UPDATE ";
