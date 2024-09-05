@@ -177,9 +177,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 sleep(1); echo ".";
             } while ($nextToken);
         }
-        print_r($allInventorySummaries);
-        exit;
-        $db = \Pimcore\Db::get();
+        file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/inventory.json", json_encode($allInventorySummaries));
     }
 
     public function getListings($country)
