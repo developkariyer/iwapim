@@ -37,6 +37,11 @@ class EtsyConnector implements MarketplaceConnectorInterface
 
     }
 
+    public function downloadInventory()
+    {
+
+    }
+
     private function getImage($listing) {
         return null;
     }

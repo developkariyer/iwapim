@@ -27,6 +27,8 @@ class ImportCommand extends AbstractCommand
     private static $downloadFlag = false;
     private static $importFlag = false;
     private static $updateFlag = false;
+    private static $ordersFlag = false;
+    private static $inventoryFlag = false;
     private static $marketplaceArg = null;
     private static $resetVariantsFlag = null;
     private static $amazonFlag = false;
@@ -62,6 +64,8 @@ class ImportCommand extends AbstractCommand
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
             ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
+            ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
+            ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
     
@@ -136,6 +140,8 @@ class ImportCommand extends AbstractCommand
         self::$downloadFlag = $input->getOption('download');
         self::$importFlag = $input->getOption('import');
         self::$updateFlag = $input->getOption('update');
+        self::$ordersFlag = $input->getOption('orders');
+        self::$inventoryFlag = $input->getOption('inventory');
         self::$marketplaceArg = $input->getArgument('marketplace');
         self::$amazonFlag = $input->getOption('amazon');
         self::$etsyFlag = $input->getOption('etsy');
@@ -202,8 +208,14 @@ class ImportCommand extends AbstractCommand
                     $connector->import(self::$updateFlag, self::$importFlag);
                     echo "done.\n";
                 }
-                echo "    Getting orders... ";
-                $connector->downloadOrders();
+                if (self::$ordersFlag) {
+                    echo "    Getting orders... ";
+                    $connector->downloadOrders();
+                }
+                if (self::$inventoryFlag) {
+                    echo "    Getting inventory... ";
+                    $connector->downloadInventory();
+                }
                 echo "done.\n";
             }
         } finally {

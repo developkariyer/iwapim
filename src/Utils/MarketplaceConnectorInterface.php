@@ -11,6 +11,9 @@ interface MarketplaceConnectorInterface
     public function download($forceDownload = false);
 
     public function downloadOrders();
+    
+    public function downloadInventory();
 
     public function import($updateFlag, $importFlag);
+
 }

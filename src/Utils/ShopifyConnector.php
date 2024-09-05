@@ -75,6 +75,11 @@ class ShopifyConnector implements MarketplaceConnectorInterface
         return count($this->listings);
     }
 
+    public function downloadInventory()
+    {
+
+    }
+
     public function downloadOrders()
     {
         $db = \Pimcore\Db::get();

@@ -8,7 +8,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
 
-class  BolConnector
+class BolConnector implements MarketplaceConnectorInterface
 {
     private $marketplace = null;
     private $listings = [];
@@ -26,6 +26,7 @@ class  BolConnector
         }
         $this->marketplace = $marketplace;
     }
+
     // Create Access Token
     private function getAccessToken()
     {
@@ -62,6 +63,7 @@ class  BolConnector
         }
         curl_close($curl);
     }
+
     // GET all offers return => .csv
     public function download($forceDownload = false)
     {
@@ -560,6 +562,12 @@ class  BolConnector
             $index++;
         }*/
     }
+
+    public function downloadInventory()
+    {
+
+    }
+
 
     public function downloadOrders()
     {

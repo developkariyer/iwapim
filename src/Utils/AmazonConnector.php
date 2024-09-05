@@ -178,6 +178,31 @@ class AmazonConnector implements MarketplaceConnectorInterface
         
     }
 
+    public function downloadInventory()
+    {
+        foreach ($this->countryCodes as $country) {
+            $inventoryApi = $this->amazonSellerConnector->fbaInventoryV1();
+            $nextToken = null;
+            $allInventorySummaries = [];
+            do {
+                $response = $inventoryApi->getInventorySummaries(
+                    granularityType: 'Marketplace',
+                    granularityId: AmazonMerchantIdList::$amazonMerchantIdList[$country],
+                    marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+                    nextToken: $nextToken
+                );
+                $responseData = $response->json();
+                $inventorySummaries = $responseData['payload'] ?? [];
+                $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
+                $nextToken = $responseData['pagination']['nextToken'] ?? null;
+                sleep(1); echo ".";
+            } while ($nextToken);
+        }
+        print_r($allInventorySummaries);
+        exit;
+        $db = \Pimcore\Db::get();
+    }
+
     public function getListings($country)
     {
         $listings = [];

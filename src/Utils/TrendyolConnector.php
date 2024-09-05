@@ -69,6 +69,11 @@ class TrendyolConnector implements MarketplaceConnectorInterface
         return count($this->listings);
     }
 
+    public function downloadInventory()
+    {
+
+    }
+
     public function downloadOrders()
     {
         
