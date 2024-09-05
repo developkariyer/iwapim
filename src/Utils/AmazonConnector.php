@@ -77,6 +77,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $inventorySummaries = $responseData['payload']['inventorySummaries'] ?? [];
             $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
             $nextToken = $responseData['payload']['nextToken'] ?? null;
+            print_r($responseData);exit;
         } while ($nextToken);
     
         print_r($allInventorySummaries);
