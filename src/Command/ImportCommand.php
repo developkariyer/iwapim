@@ -61,7 +61,8 @@ class ImportCommand extends AbstractCommand
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
-            ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.');
+            ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
+            ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
     
     
@@ -150,6 +151,10 @@ class ImportCommand extends AbstractCommand
                 return self::listMarketplaces();
             }
 
+            if ($input->getOption('memory-table')) {
+                self::prepareShopifyLineItems();
+            }
+
             $marketplaces = self::getMarketplaceObjects();
             foreach ($marketplaces as $marketplace) {
                 if (!self::$allFlag) {
@@ -201,7 +206,6 @@ class ImportCommand extends AbstractCommand
                 $connector->downloadOrders();
                 echo "done.\n";
             }
-            self::prepareShopifyLineItems();
         } finally {
             $this->addListeners();
         }
