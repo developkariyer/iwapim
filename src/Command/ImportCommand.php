@@ -8,14 +8,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Pimcore\Model\DataObject\Marketplace;
-use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Product\Listing;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use App\EventListener\DataObjectListener;
-use Symfony\Component\Finder\Finder;
-use Pimcore\Model\Asset;
 use App\Utils\AmazonConnector;
 use App\Utils\ShopifyConnector;
 use App\Utils\EtsyConnector;
@@ -25,15 +20,13 @@ use App\Utils\BolConnector;
 
 #[AsCommand(
     name: 'app:import',
-    description: 'Imports products from Shopify sites!'
+    description: 'Imports products from Marketplaces!'
 )]
 class ImportCommand extends AbstractCommand
 {
     private static $downloadFlag = false;
     private static $importFlag = false;
     private static $updateFlag = false;
-    private static $generateFlag = false;
-    private static $matchFlag = false;
     private static $marketplaceArg = null;
     private static $resetVariantsFlag = null;
     private static $amazonFlag = false;
@@ -58,22 +51,20 @@ class ImportCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'The marketplace to import from.')
-            ->addOption('list', null, InputOption::VALUE_NONE, 'If set, Lists all possible objects for processing.')
-            ->addOption('download', null, InputOption::VALUE_NONE, 'If set, Shopify listing data will always be downloaded.')
-            ->addOption('import', null, InputOption::VALUE_NONE, 'If set, downloaded listing data will be imported to create missing Shopify objects.')
-            ->addOption('update', null, InputOption::VALUE_NONE, 'If set, existing Shopify objects will be updated.')
-            ->addOption('transfer', null, InputOption::VALUE_NONE, 'If set, existing Shopify objects will be transfered.')
-            ->addOption('generate', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be used to create Product objects.')
-            ->addOption('match', null, InputOption::VALUE_NONE, 'If set, new Shopify objects will be matched tu current Product objects.')
-            ->addOption('images', null, InputOption::VALUE_NONE, 'If set, images will be imported to products.')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
-            ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
-            ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be skipped.')
-            ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
-            ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be skipped.')
-            ;
+            ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'Specify the marketplace to import from. Leave empty to process all available marketplaces.')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Processes all objects across all marketplaces.')
+            ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, processes Amazon objects.')
+            ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, processes Etsy objects.')
+            ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, processes Shopify objects.')
+            ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, processes Trendyol objects.')
+            ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, processes Bol.com objects.')
+            ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
+            ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
+            ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
+            ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.');
     }
+    
+    
 
     private static function getMarketplaceObjects($type = null): array
     {
@@ -144,8 +135,6 @@ class ImportCommand extends AbstractCommand
         self::$downloadFlag = $input->getOption('download');
         self::$importFlag = $input->getOption('import');
         self::$updateFlag = $input->getOption('update');
-        self::$generateFlag = $input->getOption('generate');
-        self::$matchFlag = $input->getOption('match');
         self::$marketplaceArg = $input->getArgument('marketplace');
         self::$amazonFlag = $input->getOption('amazon');
         self::$etsyFlag = $input->getOption('etsy');
@@ -157,11 +146,6 @@ class ImportCommand extends AbstractCommand
         $this->removeListeners();
 
         try {
-            if ($input->getOption('images')) {
-                self::importImagesToProducts();
-                return Command::SUCCESS;
-            }
-
             if ($input->getOption('list')) {
                 return self::listMarketplaces();
             }
