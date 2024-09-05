@@ -75,6 +75,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             );
         
             // Append the current page of results to the total inventory array
+            print_r($response); exit;
             $inventorySummaries = $response->payload->inventorySummaries ?? [];
             $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
         
