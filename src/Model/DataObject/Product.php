@@ -184,6 +184,36 @@ class Product extends Concrete
             return;
         }
 
+        $fieldsToFix = [
+            'Image' => 'Album',
+        ];
+
+        $relationsToFix = [
+            'Technicals' => 'Belge',
+            'DesignFiles' => 'Tasarim',
+        ];
+
+        $collectionsToFix = [
+            'RawFiles',
+            'ProductAlbum'
+        ];
+
+        foreach ($fieldsToFix as $field=>$folder) {
+            $fieldName = "get$field";
+            $asset = $this->$fieldName();
+            $this->updateAsset($asset, $this->cachedAssetPath($folder));
+        }
+
+        foreach ($relationsToFix as $field=>$folder) {
+            $fieldName = "get$field";
+            $fieldObject = $this->$fieldName();
+            if (!$fieldObject) {
+                continue;
+            }
+            foreach ($fieldObject as $asset) {
+                $this->updateAsset($asset, $this->cachedAssetPath($folder));
+            }
+        }
         return;
 
         $technicals = $this->getTechnicals();
@@ -215,7 +245,6 @@ class Product extends Concrete
         if (empty($albumFolder)) {
             $albumFolder = $this->generateAssetPath('Album');
         }
-        $this->updateAsset($this->getImage(), $albumFolder);
     }
 
     public function checkVariations()
