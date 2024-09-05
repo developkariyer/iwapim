@@ -194,8 +194,8 @@ class Product extends Concrete
         ];
 
         $collectionsToFix = [
-            'RawFiles',
-            'ProductAlbum'
+            'RawFiles' => 'Ham',
+            'ProductAlbum' => 'Album'
         ];
 
         foreach ($fieldsToFix as $field=>$folder) {
@@ -214,36 +214,21 @@ class Product extends Concrete
                 $this->updateAsset($asset, $this->cachedAssetPath($folder));
             }
         }
-        return;
 
-        $technicals = $this->getTechnicals();
-        $rawMedia = $this->getRawMedia();
-
-        /*$album = $this->getAlbum();
-        foreach ($album as $asset) {
-            if (!$asset) {continue;}
-            if (empty($albumFolder)) {
-                $albumFolder = $this->generateAssetPath('Album');
+        foreach ($collectionsToFix as $collection => $folder) {
+            $collectionName = "get$collection";
+            $collectionObject = $this->$collectionName();
+            $data = $collectionObject->getData() ?? [];
+            foreach ($data as $element) {
+                $fieldName = $element->getCollectionName();
+                $fieldObject = $element->getCollectionAssets() ?? [];
+                $assetFolder = $this->cachedAssetPath($folder);
+                foreach ($fieldObject as $asset) {
+                    if ($asset instanceof \Pimcore\Model\Asset) {
+                        $this->updateAsset($asset, Utility::checkSetAssetPath($fieldName, $assetFolder));
+                    }
+                }
             }
-            $this->updateAsset($asset->getImage(), $albumFolder);
-        }*/
-        foreach ($this->getDesignFiles() as $asset) {
-            $this->updateAsset($asset, $this->cachedAssetPath('Tasarim'));
-        }
-        foreach ($technicals as $asset) {
-            if (empty($technicalFolder)) {
-                $technicalFolder = $this->generateAssetPath('Klavuz');
-            }
-            $this->updateAsset($asset, $technicalFolder);
-        }
-        foreach ($rawMedia as $asset) {
-            if (empty($rawMediaFolder)) {
-                $rawMediaFolder = $this->generateAssetPath('Ham');
-            }
-            $this->updateAsset($asset, $rawMediaFolder);
-        }
-        if (empty($albumFolder)) {
-            $albumFolder = $this->generateAssetPath('Album');
         }
     }
 
