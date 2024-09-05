@@ -75,11 +75,11 @@ class AmazonConnector implements MarketplaceConnectorInterface
             );
         
             // Append the current page of results to the total inventory array
-            $inventorySummaries = $response['payload']['inventorySummaries'];
+            $inventorySummaries = $response->payload->inventorySummaries ?? [];
             $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
         
             // Check for the next token
-            $nextToken = $response['payload']['nextToken'] ?? null;        
+            $nextToken = $response->payload->nextToken ?? null;        
 
         } while ($nextToken);
         // use pagination to get all results
