@@ -174,6 +174,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         granularityType: 'Marketplace',
                         granularityId: AmazonMerchantIdList::$amazonMerchantIdList[$country],
                         marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+                        details: true,
                         nextToken: $nextToken
                     );
                     $responseData = $response->json();
