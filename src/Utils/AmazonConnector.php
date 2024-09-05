@@ -160,8 +160,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
     public function downloadInventory()
     {
         foreach ($this->countryCodes as $country) {
+            echo "\n    - $country ";
             $filename = PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->marketplace->getKey()).'_'.$country.'_inventory.json';
             if (file_exists($filename) && filemtime($filename) > time() - 86400) {
+                echo " (cached) ";
                 $allInventorySummaries = json_decode(file_get_contents($filename), true);
             } else {
                 $inventoryApi = $this->amazonSellerConnector->fbaInventoryV1();
