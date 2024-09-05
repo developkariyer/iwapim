@@ -73,17 +73,11 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['US']],
                 nextToken: $nextToken
             );
-        
-            // Append the current page of results to the total inventory array
-            print_r($response); exit;
-            $inventorySummaries = $response->payload->inventorySummaries ?? [];
+            $responseData = $response->json();
+            $inventorySummaries = $responseData['payload']['inventorySummaries'] ?? [];
             $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
-        
-            // Check for the next token
-            $nextToken = $response->payload->nextToken ?? null;        
-
+            $nextToken = $responseData['payload']['nextToken'] ?? null;
         } while ($nextToken);
-        // use pagination to get all results
     
         print_r($allInventorySummaries);
 
