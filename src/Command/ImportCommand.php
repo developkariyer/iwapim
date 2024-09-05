@@ -161,24 +161,20 @@ class ImportCommand extends AbstractCommand
                     if (!empty(self::$marketplaceArg) && !in_array($marketplace->getKey(), self::$marketplaceArg)) {
                         continue;
                     }
-                    switch ($marketplace->getMarketplaceType()) {
-                        case 'Amazon':
-                            if (!self::$amazonFlag) continue;
-                            break;
-                        case 'Etsy':
-                            if (!self::$etsyFlag) continue;
-                            break;
-                        case 'Shopify':
-                            if (!self::$shopifyFlag) continue;
-                            break;
-                        case 'Trendyol':
-                            if (!self::$trendyolFlag) continue;
-                            break;
-                        case 'Bol.com':
-                            if (!self::$bolcomFlag) continue;
-                            break;
-                        default:
-                            continue;
+                    if (!self::$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
+                        continue;
+                    }
+                    if (!self::$etsyFlag && $marketplace->getMarketplaceType() === 'Etsy') {
+                        continue;
+                    }
+                    if (!self::$shopifyFlag && $marketplace->getMarketplaceType() === 'Shopify') {
+                        continue;
+                    }
+                    if (!self::$trendyolFlag && $marketplace->getMarketplaceType() === 'Trendyol') {
+                        continue;
+                    }
+                    if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
+                        continue;
                     }
                 }
                 echo "Processing {$marketplace->getMarketplaceType()} Marketplace {$marketplace->getKey()} ...\n";
