@@ -160,21 +160,22 @@ class ImportCommand extends AbstractCommand
                 if (!self::$allFlag) {
                     if (!empty(self::$marketplaceArg) && !in_array($marketplace->getKey(), self::$marketplaceArg)) {
                         continue;
-                    }
-                    if (!self::$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
-                        continue;
-                    }
-                    if (!self::$etsyFlag && $marketplace->getMarketplaceType() === 'Etsy') {
-                        continue;
-                    }
-                    if (!self::$shopifyFlag && $marketplace->getMarketplaceType() === 'Shopify') {
-                        continue;
-                    }
-                    if (!self::$trendyolFlag && $marketplace->getMarketplaceType() === 'Trendyol') {
-                        continue;
-                    }
-                    if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
-                        continue;
+                    } else {
+                        if (!self::$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
+                            continue;
+                        }
+                        if (!self::$etsyFlag && $marketplace->getMarketplaceType() === 'Etsy') {
+                            continue;
+                        }
+                        if (!self::$shopifyFlag && $marketplace->getMarketplaceType() === 'Shopify') {
+                            continue;
+                        }
+                        if (!self::$trendyolFlag && $marketplace->getMarketplaceType() === 'Trendyol') {
+                            continue;
+                        }
+                        if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
+                            continue;
+                        }
                     }
                 }
                 echo "Processing {$marketplace->getMarketplaceType()} Marketplace {$marketplace->getKey()} ...\n";
