@@ -174,7 +174,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $inventorySummaries = $responseData['payload']['inventorySummaries'] ?? [];
                 $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
                 $nextToken = $responseData['pagination']['nextToken'] ?? null;
-                sleep(1); echo ".";
+                usleep(500000);
+                echo ".";
             } while ($nextToken);
         }
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/inventory.json", json_encode($allInventorySummaries));
