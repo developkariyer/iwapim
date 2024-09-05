@@ -178,7 +178,36 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 echo ".";
             } while ($nextToken);
         }
-        file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/inventory.json", json_encode($allInventorySummaries));
+        //file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/inventory.json", json_encode($allInventorySummaries));
+        $db = \Pimcore\Db::get();
+        $db->beginTransaction();
+        try {
+            foreach ($allInventorySummaries as $inventory) {
+                $sql = "INSERT INTO iwa_amazon_inventory (";
+                $dbFields = [];
+                foreach ($inventory as $key=>$value) {
+                    if (is_array($value)) {
+                        $value = json_encode($value);
+                    }
+                    if ($key === 'condition') {
+                        $key = 'itemCondition';
+                    }
+                    $dbFields[$key] = $value;
+                }
+                $sql .= implode(',', array_keys($dbFields)) . ") VALUES (";
+                $sql .= implode(',', array_fill(0, count($dbFields), '?')) . ")";
+                $sql .= " ON DUPLICATE KEY UPDATE ";
+                $sql .= implode(',', array_map(function($key) {
+                    return "$key=?";
+                }, array_keys($dbFields)));
+                $stmt = $db->prepare($sql);
+                $stmt->execute(array_merge(array_values($dbFields), array_values($dbFields)));
+            }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            echo $e->getMessage();
+        }
     }
 
     public function getListings($country)
