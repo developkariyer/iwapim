@@ -218,8 +218,7 @@ class Product extends Concrete
         foreach ($collectionsToFix as $collection => $folder) {
             $collectionName = "get$collection";
             $collectionObject = $this->$collectionName();
-            $data = $collectionObject->getData() ?? [];
-            foreach ($data as $element) {
+            foreach ($collectionObject as $element) {
                 $fieldName = $element->getCollectionName();
                 $fieldObject = $element->getCollectionAssets() ?? [];
                 $assetFolder = $this->cachedAssetPath($folder);
