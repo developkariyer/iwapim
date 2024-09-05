@@ -189,7 +189,7 @@ class Product extends Concrete
         ];
 
         $relationsToFix = [
-            'Technicals' => 'Belge',
+            'Technicals' => 'Dokuman',
             'DesignFiles' => 'Tasarim',
         ];
 
