@@ -158,8 +158,10 @@ class ImportCommand extends AbstractCommand
             $marketplaces = self::getMarketplaceObjects();
             foreach ($marketplaces as $marketplace) {
                 if (!self::$allFlag) {
-                    if (!empty(self::$marketplaceArg) && !in_array($marketplace->getKey(), self::$marketplaceArg)) {
-                        continue;
+                    if (!empty(self::$marketplaceArg)) {
+                        if (!in_array($marketplace->getKey(), self::$marketplaceArg)) {
+                            continue;
+                        }
                     } else {
                         if (!self::$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
                             continue;
@@ -178,6 +180,7 @@ class ImportCommand extends AbstractCommand
                         }
                     }
                 }
+                
                 echo "Processing {$marketplace->getMarketplaceType()} Marketplace {$marketplace->getKey()} ...\n";
                 $connector = match ($marketplace->getMarketplaceType()) {
                     'Amazon' => new AmazonConnector($marketplace),
