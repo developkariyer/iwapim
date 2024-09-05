@@ -62,10 +62,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
             throw new \Exception("Amazon Seller Connector is not created");
         }
         print_r($countryCodes);
-        //https://sellingpartnerapi-na.amazon.com/sellers/v1/marketplaceParticipations
-        $sellers = $this->amazonSellerConnector->sellersV1()->getMarketplaceParticipations();
-        $marketplaceParticipations = $sellers->json();
-        print_r($marketplaceParticipations);
+        $fbaInventory = $this->amazonSellerConnector->fbaInventoryV1();
+        $response = $fbaInventory->getInventorySummaries(['granularityType' => 'Marketplace']);
+        print_r($response->json());
         exit;
     }
 
