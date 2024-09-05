@@ -36,10 +36,12 @@ class ImportCommand extends AbstractCommand
     private static $matchFlag = false;
     private static $marketplaceArg = null;
     private static $resetVariantsFlag = null;
-    private static $skipAmazonFlag = false;
-    private static $skipEtsyFlag = false;
-    private static $skipShopifyFlag = false;
-    private static $skipTrendyolFlag = false;
+    private static $amazonFlag = false;
+    private static $etsyFlag = false;
+    private static $shopifyFlag = false;
+    private static $trendyolFlag = false;
+    private static $allFlag = false;
+    private static $bolcomFlag = false;
 
     private static $itemCodes = [];
 
@@ -65,10 +67,11 @@ class ImportCommand extends AbstractCommand
             ->addOption('generate', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be used to create Product objects.')
             ->addOption('match', null, InputOption::VALUE_NONE, 'If set, new Shopify objects will be matched tu current Product objects.')
             ->addOption('images', null, InputOption::VALUE_NONE, 'If set, images will be imported to products.')
-            ->addOption('skip-amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
-            ->addOption('skip-etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be skipped.')
-            ->addOption('skip-shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
-            ->addOption('skip-trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be skipped.')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
+            ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
+            ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be skipped.')
+            ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
+            ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be skipped.')
             ;
     }
 
@@ -85,23 +88,11 @@ class ImportCommand extends AbstractCommand
     private function removeListeners()
     {
         $this->eventDispatcher->removeSubscriber($this->dataObjectListener);
-        return;
-        $this->eventDispatcher->removeListener('pimcore.dataobject.preAdd', [$this->dataObjectListener, 'onPreAdd']);
-        $this->eventDispatcher->removeListener('pimcore.dataobject.preUpdate', [$this->dataObjectListener, 'onPreUpdate']);
-        $this->eventDispatcher->removeListener('pimcore.dataobject.onPostLoad', [$this->dataObjectListener, 'onPostLoad']);
-        $this->eventDispatcher->removeListener('pimcore.dataobject.onPostUpdate', [$this->dataObjectListener, 'onPostUpdate']);
-        $this->eventDispatcher->removeListener('pimcore.dataobject.preDelete', [$this->dataObjectListener, 'onPreDelete']);
     }
 
     private function addListeners()
     {
         $this->eventDispatcher->addSubscriber($this->dataObjectListener);
-        return;
-        $this->eventDispatcher->addListener('pimcore.dataobject.preAdd', [$this->dataObjectListener, 'onPreAdd']);
-        $this->eventDispatcher->addListener('pimcore.dataobject.preUpdate', [$this->dataObjectListener, 'onPreUpdate']);
-        $this->eventDispatcher->addListener('pimcore.dataobject.onPostLoad', [$this->dataObjectListener, 'onPostLoad']);
-        $this->eventDispatcher->addListener('pimcore.dataobject.onPostUpdate', [$this->dataObjectListener, 'onPostUpdate']);
-        $this->eventDispatcher->addListener('pimcore.dataobject.preDelete', [$this->dataObjectListener, 'onPreDelete']);
     }
 
     private static function listMarketplaces()
@@ -121,73 +112,6 @@ class ImportCommand extends AbstractCommand
             }
         }
         return Command::SUCCESS;
-    }
-
-    protected function importImagesToProducts()
-    {
-        $imageDirectory = PIMCORE_PROJECT_ROOT . '/tmp/images/';
-        $finder = new Finder();
-        $finder->files()->in($imageDirectory)->name('*.png');
-
-        // Load or create the _default_upload_bucket folder
-        $defaultFolder = Asset::getByPath('/_default_upload_bucket');
-        if (!$defaultFolder) {
-            $defaultFolder = new Asset\Folder();
-            $defaultFolder->setFilename('_default_upload_bucket');
-            $defaultFolder->setParent(Asset::getByPath('/')); // Setting root as parent
-            $defaultFolder->save();
-        }
-
-        foreach ($finder as $file) {
-            if (@getimagesize($file->getRealPath()) === false) {
-                unlink($file->getRealPath());
-                echo "Deleted non-image file: {$file->getFilename()}\n";
-                continue;
-            }
-
-            // Extract the filename without extension
-            $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
-
-            // Find the corresponding Product object by productIdentifier
-            $product = Product::getByProductIdentifier($filename, ['limit' => 1,'unpublished' => true]);
-
-            if ($product instanceof Product) {
-                echo "Found Product {$filename}...";
-                $image = $product->getImage();
-                if ($image) {
-                    echo "Product already has an image: $filename\n";
-                    unlink($file->getRealPath());
-                    continue;
-                }
-
-                // Create a new image asset in the _default_upload_bucket folder
-                $imageAssetPath = $file->getRealPath();
-                $imageAsset = new Asset\Image();
-                $imageAsset->setFilename($file->getFilename());
-                $imageAsset->setData(file_get_contents($imageAssetPath));
-                $imageAsset->setParent($defaultFolder);
-                $imageAsset->save();
-
-                // Ensure the asset is properly set with ID and type
-                $imageAsset = Asset::getById($imageAsset->getId()); // Reload the asset to ensure ID is set
-
-                if ($imageAsset instanceof Asset\Image) {
-                    // Directly set the image asset in the Product's image field
-                    $product->setImage($imageAsset);
-
-                    // Save the Product object
-                    $product->save();
-                    $product->checkAssetFolders();
-
-                    echo "Set image {$file->getFilename()} for Product {$filename}\n";
-                    unlink($file->getRealPath());
-                } else {
-                    echo "Failed to load image asset for {$filename}\n";
-                }
-            } else {
-                echo "No Product found with productIdentifier {$filename}\n";
-            }
-        }
     }
 
     protected static function prepareShopifyLineItems()
@@ -223,10 +147,12 @@ class ImportCommand extends AbstractCommand
         self::$generateFlag = $input->getOption('generate');
         self::$matchFlag = $input->getOption('match');
         self::$marketplaceArg = $input->getArgument('marketplace');
-        self::$skipAmazonFlag = $input->getOption('skip-amazon');
-        self::$skipEtsyFlag = $input->getOption('skip-etsy');
-        self::$skipShopifyFlag = $input->getOption('skip-shopify');
-        self::$skipTrendyolFlag = $input->getOption('skip-trendyol');
+        self::$amazonFlag = $input->getOption('amazon');
+        self::$etsyFlag = $input->getOption('etsy');
+        self::$shopifyFlag = $input->getOption('shopify');
+        self::$trendyolFlag = $input->getOption('trendyol');
+        self::$bolcomFlag = $input->getOption('bolcom');
+        self::$allFlag = $input->getOption('all');
 
         $this->removeListeners();
 
@@ -242,20 +168,29 @@ class ImportCommand extends AbstractCommand
 
             $marketplaces = self::getMarketplaceObjects();
             foreach ($marketplaces as $marketplace) {
-                if (!empty(self::$marketplaceArg) && !in_array($marketplace->getKey(), self::$marketplaceArg)) {
-                    continue;
-                }
-                if (self::$skipAmazonFlag && $marketplace->getMarketplaceType() == 'Amazon') {
-                    continue;
-                }
-                if (self::$skipEtsyFlag && $marketplace->getMarketplaceType() == 'Etsy') {
-                    continue;
-                }
-                if (self::$skipShopifyFlag && $marketplace->getMarketplaceType() == 'Shopify') {
-                    continue;
-                }
-                if (self::$skipTrendyolFlag && $marketplace->getMarketplaceType() == 'Trendyol') {
-                    continue;
+                if (!self::$allFlag) {
+                    if (!empty(self::$marketplaceArg) && !in_array($marketplace->getKey(), self::$marketplaceArg)) {
+                        continue;
+                    }
+                    switch ($marketplace->getMarketplaceType()) {
+                        case 'Amazon':
+                            if (!self::$amazonFlag) continue;
+                            break;
+                        case 'Etsy':
+                            if (!self::$etsyFlag) continue;
+                            break;
+                        case 'Shopify':
+                            if (!self::$shopifyFlag) continue;
+                            break;
+                        case 'Trendyol':
+                            if (!self::$trendyolFlag) continue;
+                            break;
+                        case 'Bol.com':
+                            if (!self::$bolcomFlag) continue;
+                            break;
+                        default:
+                            continue;
+                    }
                 }
                 echo "Processing {$marketplace->getMarketplaceType()} Marketplace {$marketplace->getKey()} ...\n";
                 $connector = match ($marketplace->getMarketplaceType()) {

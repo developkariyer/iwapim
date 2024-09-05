@@ -11,6 +11,7 @@ use Pimcore\Model\DataObject\Data\Video;
 class Product extends Concrete
 {
     private static $recursiveCounter = 0;
+    protected $assetPaths = [];
 
     protected static $nullables = [
         'productIdentifier',
@@ -169,33 +170,35 @@ class Product extends Concrete
         );
     }
 
+    protected function cachedAssetPath($path)
+    {
+        if (!isset($this->cachedAssetPaths[$path])) {
+            $this->cachedAssetPaths[$path] = $this->generateAssetPath($path);
+        }
+        return $this->cachedAssetPaths[$path];
+    }
+
     public function checkAssetFolders()
     {
-        return;
-        
         if (!$this->isPublished()) {
             return;
         }
 
-        $albumFolder = $designFolder = $technicalFolder = $rawMediaFolder = null;
+        return;
 
-        $album = $this->getAlbum();
-        $design = $this->getDesignFiles();
         $technicals = $this->getTechnicals();
         $rawMedia = $this->getRawMedia();
 
+        /*$album = $this->getAlbum();
         foreach ($album as $asset) {
             if (!$asset) {continue;}
             if (empty($albumFolder)) {
                 $albumFolder = $this->generateAssetPath('Album');
             }
             $this->updateAsset($asset->getImage(), $albumFolder);
-        }
-        foreach ($design as $asset) {
-            if (empty($designFolder)) {
-                $designFolder = $this->generateAssetPath('Tasarim');
-            }
-            $this->updateAsset($asset, $designFolder);
+        }*/
+        foreach ($this->getDesignFiles() as $asset) {
+            $this->updateAsset($asset, $this->cachedAssetPath('Tasarim'));
         }
         foreach ($technicals as $asset) {
             if (empty($technicalFolder)) {
