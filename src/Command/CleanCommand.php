@@ -63,12 +63,10 @@ class CleanCommand extends AbstractCommand
             }
             foreach ($products as $product) {
                 if ($product->level() == 1) {
-                    if ($product->checkProductCode()) {
-                        $product->save();
-                        echo "s";
-                    } else {
-                        echo ".";
-                    }
+                    $product->checkProductCode();
+                    $product->checkIwasku(true);
+                    $product->save();
+                    echo "s";
                 } else {
                     echo "0";
                 }

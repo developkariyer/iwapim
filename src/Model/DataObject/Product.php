@@ -61,13 +61,13 @@ class Product extends Concrete
         return true;
     }
 
-    public function checkIwasku()
+    public function checkIwasku($forced = false)
     {
-        if ($this->level() == 1 && $this->isPublished() && strlen($this->getIwasku() ?? '') != 12) {
+        if ($forced || ($this->level() == 1 && $this->isPublished() && strlen($this->getIwasku() ?? '') != 12)) {
             $pid = $this->getInheritedField("ProductIdentifier");
             $iwasku = str_pad(str_replace('-', '', $pid), 7, '0', STR_PAD_RIGHT);
             $iwasku .= $this->getProductCode();
-            $this->setIwasku($iwasku);             
+            $this->setIwasku($iwasku);
         }
     }
 
