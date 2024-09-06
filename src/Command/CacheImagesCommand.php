@@ -74,23 +74,23 @@ class CacheImagesCommand extends AbstractCommand
                 }
                 switch ($variantType) {
                     case 'Amazon':
-//                        self::processAmazon($variant);
+//                        if (!$input->getOption('skip-amazon')) self::processAmazon($variant);
                         break;
                     case 'Etsy':
                         echo 'E';
-                        self::processEtsy($variant);
+                        if (!$input->getOption('skip-etsy')) self::processEtsy($variant);
                         break;
                     case 'Shopify':
                         echo "S";
-                        self::processShopify($variant);
+                        if (!$input->getOption('skip-shopify')) self::processShopify($variant);
                         break;
                     case 'Trendyol':
                         echo "T";
-                        self::processTrendyol($variant);
+                        if (!$input->getOption('skip-trendyol')) self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
                         echo "B";
-                        self::processBolCom($variant);
+                        if (!$input->getOption('skip-bolcom')) self::processBolCom($variant);
                         break;
                     default:
                         break;
