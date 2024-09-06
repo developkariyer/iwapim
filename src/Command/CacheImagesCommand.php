@@ -36,6 +36,7 @@ class CacheImagesCommand extends AbstractCommand
             ->addOption('skip-amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
             ->addOption('skip-etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be skipped.')
             ->addOption('skip-shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
+            ->addOption('skip-bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
             ->addOption('skip-trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be skipped.');
     }
 
@@ -51,7 +52,7 @@ class CacheImagesCommand extends AbstractCommand
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
-        $offset = 0;
+        $offset = 38000;
 
         while (true) {
             $listingObject->setLimit($pageSize);
@@ -74,6 +75,7 @@ class CacheImagesCommand extends AbstractCommand
                 }
                 switch ($variantType) {
                     case 'Amazon':
+                        echo "A";
 //                        if (!$input->getOption('skip-amazon')) self::processAmazon($variant);
                         break;
                     case 'Etsy':
