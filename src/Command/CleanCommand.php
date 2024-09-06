@@ -33,9 +33,9 @@ class CleanCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //self::traverseAssetFolder(Folder::getById(1));
+        self::traverseAssetFolder(Folder::getById(1));
         //self::splitProductFolders(ObjectFolder::getById(149861));
-        self::traverseObjectFolders(ObjectFolder::getById(149861));
+//        self::traverseObjectFolders(ObjectFolder::getById(149861));
         return Command::SUCCESS;
     }
 
