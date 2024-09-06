@@ -351,7 +351,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 */
                 // upper or this one
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
-                
+
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => $this->getImage($listing),
@@ -375,5 +375,4 @@ class AmazonConnector implements MarketplaceConnectorInterface
             }
         }
     }
-
 }
