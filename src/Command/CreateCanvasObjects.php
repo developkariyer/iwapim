@@ -61,6 +61,9 @@ class CreateCanvasObjects extends AbstractCommand
                 if ($variant instanceof VariantProduct) {
                     echo "        Found variant: " . $variant->getKey() . "\n";
                     $size = $variant->getAttributes();
+                    $size = explode("|", $size);
+                    $size = (count($size) > 1) ? $size[1] : $size[0];
+                    $size = str_replace(" ", "", $size);
                     $color = 'Standart';
                     $subProduct = new Product();
                     $subProduct->setPublished(true);
