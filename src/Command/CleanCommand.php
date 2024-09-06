@@ -84,8 +84,8 @@ class CleanCommand extends AbstractCommand
                     echo ".";
                     foreach ($child->getChildren() as $variant) {
                         if ($variant instanceof Product) {
-                            $variant->checkIwasku();
                             $variant->checkProductCode();
+                            $variant->checkIwasku();
                             $variant->save();
                             echo "v";
                         }
