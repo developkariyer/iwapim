@@ -41,7 +41,7 @@ class CreateCanvasObjects extends AbstractCommand
             }
             echo "Running in folder: " . $childFolder->getFullPath() . "\n";
             $productIdentifier = "KV-".str_pad($pId, 3, "0", STR_PAD_LEFT);
-            $productName = trim(preg_replace('/\s+/', ' ', str_replace(['_', 'Canvas', 'Printing'], ' ', $childFolder->getKey())));
+            $productName = trim(preg_replace('/\s+/', ' ', str_replace(['-', 'Canvas', 'Printing'], ' ', $childFolder->getKey())));
             $variants = $childFolder->getChildren();
             if (count($variants) > 0) {
                 echo "    Found product: " . $productName . " with ".count($variants)." variants.\n";
@@ -79,7 +79,7 @@ class CreateCanvasObjects extends AbstractCommand
                 }
             }
             $pId++;
-            if ($pId > 5) {
+            if ($pId > 1) {
                 break;
             }
         }
