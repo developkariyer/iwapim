@@ -83,9 +83,6 @@ class CreateCanvasObjects extends AbstractCommand
                 }
             }
             $pId++;
-            if ($pId > 1) {
-                break;
-            }
         }
         return Command::SUCCESS;
     }
