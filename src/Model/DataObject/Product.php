@@ -53,11 +53,14 @@ class Product extends Concrete
 
     public function checkProductCode($numberDigits = 5)
     {
+        Product::setGetInheritedValues(false);
         if (strlen($this->getProductCode()) == $numberDigits) {
+            Product::setGetInheritedValues(true);
             return false;
         }
         $productCode = $this->generateUniqueCode($numberDigits);
         $this->setProductCode($productCode);
+        Product::setGetInheritedValues(true);
         return true;
     }
 
