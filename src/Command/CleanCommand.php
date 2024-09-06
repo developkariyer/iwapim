@@ -26,16 +26,20 @@ class CleanCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addOption('list', null, InputOption::VALUE_NONE, 'If set, the task will list tagged objects, other options are ignored.')
-            ->addOption('tag-only', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
+            ->addOption('asset', null, InputOption::VALUE_NONE, 'If set, the task will list tagged objects, other options are ignored.')
+            ->addOption('object', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        self::traverseAssetFolder(Folder::getById(1));
+        if ($input->getOption('asset')) {
+            self::traverseAssetFolder(Folder::getById(1));
+        }
+        if ($input->getOption('object')) {
+            self::traverseObjectFolders(ObjectFolder::getById(149861));
+        }
         //self::splitProductFolders(ObjectFolder::getById(149861));
-//        self::traverseObjectFolders(ObjectFolder::getById(149861));
         return Command::SUCCESS;
     }
 
