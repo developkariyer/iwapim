@@ -122,7 +122,7 @@ class DataObjectListener implements EventSubscriberInterface
             }
             if ($object->level() == 1) {
                 if ($object->getName()) {
-                    throw new \Exception('Varyasyon seviyesinde isim değiştirilemez.');
+                    throw new \Exception('Varyasyon seviyesinde isim değiştirilemez: ' . $object->getId());
                 }
                 if (!($object->getVariationSize() || $object->getVariationColor())) {
                     throw new \Exception('Varyasyon seviyesinde renk veya ebat belirtilmelidir.');
