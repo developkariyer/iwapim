@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Model\DataObject\VariantProduct;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -108,6 +109,34 @@ class ImportCommand extends AbstractCommand
             }
         }
         return Command::SUCCESS;
+    }
+
+    protected static function prepareOrderTable()
+    {
+        $uniqueMarketplaceId = '';
+        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $marketplace = $variantObject->getMarketplace();
+        $marketplaceKey = $marketplace->getKey(); // field 1
+        $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
+        $mainProductObject = reset($mainProductObjectArray);
+        $productCode = $mainProductObject->getProductCode(); //field 2
+        if ($mainProductObject->level() == 1) {
+            $parent = $mainProductObject->getParent();
+            $parentProductCode = $parent->getProductCode(); // field 3
+        } else {
+            $parentProductCode = $productCode;
+        }
+        $productIdentifier = $mainProductObject->getProductIdentifier();
+        $productType = strtok($productIdentifier,'-'); // field 4
+        // TODO:  verinin normalleştirilmesi: döviz kurları
+        // WARNING: para için asla float kullanma
+        // - bcmath fonksiyonlarını kullan
+        // - veritabanında decimal kullan
+        // - önce 100 ile çarp, işlemini yap, round et, 100'e böl
+        
+
+
+
     }
 
     protected static function prepareShopifyLineItems()
