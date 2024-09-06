@@ -40,7 +40,14 @@ class CleanCommand extends AbstractCommand
             self::traverseObjectFolders(ObjectFolder::getById(149861));
         }
         if ($input->getOption('product-code')) {
-            self::fixProductCodes();
+            try {
+                Product::setGetInheritedValues(false);
+                self::fixProductCodes();
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+            } finally {
+                Product::setGetInheritedValues(true);
+            }
         }
         return Command::SUCCESS;
     }
