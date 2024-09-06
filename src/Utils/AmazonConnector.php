@@ -326,6 +326,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 echo "($index/$total) Processing SKU $sku ...";
                 $listing = $this->downloadAmazonSKU($sku, $country);
                 $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
+                /*
                 $parent = null;
                 if (isset($listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'])) {
                     $parentSku = $listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'];
@@ -347,6 +348,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 if (!$parent) {
                     $parent = Utility::checkSetPath($path, $marketplaceFolder);
                 }
+                */
+                // upper or this one
+                $parent = Utility::checkSetPath($path, $marketplaceFolder);
+                
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => $this->getImage($listing),
