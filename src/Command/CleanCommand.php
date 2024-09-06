@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Pimcore\Model\DataObject\Product\Listing;
 use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
@@ -28,6 +27,7 @@ class CleanCommand extends AbstractCommand
         $this
             ->addOption('asset', null, InputOption::VALUE_NONE, 'If set, the task will list tagged objects, other options are ignored.')
             ->addOption('object', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
+            ->addOption('product-code', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -39,10 +39,44 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('object')) {
             self::traverseObjectFolders(ObjectFolder::getById(149861));
         }
-        //self::splitProductFolders(ObjectFolder::getById(149861));
+        if ($input->getOption('product-code')) {
+            self::fixProductCodes();
+        }
         return Command::SUCCESS;
     }
 
+    //self::splitProductFolders(ObjectFolder::getById(149861));
+
+    private static function fixProductCodes()
+    {
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(true);
+        $pageSize = 50;
+        $offset = 0;
+
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            foreach ($products as $product) {
+                if ($product->level() == 1) {
+                    if ($product->checkProductCode()) {
+                        $product->save();
+                        echo "s";
+                    } else {
+                        echo ".";
+                    }
+                } else {
+                    echo "0";
+                }
+            }
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
+        }
+    }
 
     private static function splitProductFolders($parent)
     {
@@ -81,15 +115,7 @@ class CleanCommand extends AbstractCommand
                     self::traverseObjectFolders($child);
                 }
                 if ($child instanceof Product) {
-                    echo ".";
-                    foreach ($child->getChildren() as $variant) {
-                        if ($variant instanceof Product) {
-                            $variant->checkProductCode();
-                            $variant->checkIwasku();
-                            $variant->save();
-                            echo "v";
-                        }
-                    }
+                    //echo ".";
                     //$child->save();
                     //echo "Saved: " . $child->getFullPath() . "\n";
                     //self::traverseObjectFolders($child);

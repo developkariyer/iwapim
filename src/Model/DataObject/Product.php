@@ -54,10 +54,11 @@ class Product extends Concrete
     public function checkProductCode($numberDigits = 5)
     {
         if (strlen($this->getProductCode()) == $numberDigits) {
-            return;
+            return false;
         }
         $productCode = $this->generateUniqueCode($numberDigits);
         $this->setProductCode($productCode);
+        return true;
     }
 
     public function checkIwasku()
