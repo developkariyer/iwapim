@@ -71,14 +71,15 @@ class CreateCanvasObjects extends AbstractCommand
                     $subProduct->checkKey();
                     $subProduct->checkIwasku();
                     try {
+                        echo "            Saving variant: $size\n";
                         $subProduct->save();
                     } catch (\Exception $e) {
                         echo $e->getMessage();
                     }
                 }
             }
-            $pid++;
-            if ($pid > 5) {
+            $pId++;
+            if ($pId > 5) {
                 break;
             }
         }
