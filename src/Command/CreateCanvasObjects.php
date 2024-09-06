@@ -73,10 +73,10 @@ class CreateCanvasObjects extends AbstractCommand
                     $subProduct->checkProductCode();
                     $subProduct->checkKey();
                     $subProduct->checkIwasku();
-                    $subProduct->addVariant($variant);
                     try {
                         echo "            Saving variant: $size\n";
                         $subProduct->save();
+                        $subProduct->addVariant($variant);
                     } catch (\Exception $e) {
                         echo $e->getMessage();
                     }
