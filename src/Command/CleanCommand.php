@@ -96,9 +96,7 @@ class CleanCommand extends AbstractCommand
             } elseif (count($connectedProduct) > 1) {
                 echo "    WARNING: Found more than one main product for variants: " . implode(", ", $connectedProduct) . "\n";
                 exit;
-            } else {
-                echo "    No main product found\n";
-            }
+            } 
         }
     }
 
