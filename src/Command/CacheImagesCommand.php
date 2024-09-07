@@ -119,19 +119,6 @@ class CacheImagesCommand extends AbstractCommand
     {
         $json = self::getApiResponse($variant->getId());
         $listingImageList = [];
-        $asin = $json['asin'] ?? 'UNKNOWN';
-        $imageFolder = Utility::checkSetAssetPath($asin, static::$amazonFolder);
-        foreach ($json['attributes'] ?? [] as $key=>$value) {
-            if (strpos($key, 'image') !== false) {
-                foreach ($value as $potentialImage) {
-                    if (isset($potentialImage['media_location'])) {
-                        $listingImageList[] = static::processImage($potentialImage['media_location'], $imageFolder);
-                    }
-                }
-            }
-        }
-        $listingImageList = array_unique($listingImageList);
-        $variant->fixImageCache($listingImageList);
     }
 
     protected static function processShopify($variant)
