@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 
 #[AsCommand(
@@ -28,6 +29,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('asset', null, InputOption::VALUE_NONE, 'If set, the task will list tagged objects, other options are ignored.')
             ->addOption('object', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
             ->addOption('product-code', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
+            ->addOption('asin', null, InputOption::VALUE_NONE, 'If set, connections will be updated using Amazon ASIN values.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -49,10 +51,24 @@ class CleanCommand extends AbstractCommand
                 Product::setGetInheritedValues(true);
             }
         }
+        if ($input->getOption('asin')) {
+            self::crossCheckAsins();
+        }
         return Command::SUCCESS;
     }
 
     //self::splitProductFolders(ObjectFolder::getById(149861));
+
+    private static function crossCheckAsins()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT DISTINCT amazonAsin FROM object_varyantproduct WHERE amazonAsin IS NOT NULL";
+        $stmt = $db->query($sql);
+        $asins = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        foreach ($asins as $asin) {
+            
+        }
+    }
 
     private static function fixProductCodes()
     {
@@ -132,7 +148,6 @@ class CleanCommand extends AbstractCommand
             }
         }
     }
-
     private static function traverseAssetFolder($assetFolder)
     {
         if ($assetFolder->getFullPath() === "/Image Cache") {

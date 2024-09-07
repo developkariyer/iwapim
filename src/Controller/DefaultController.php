@@ -22,7 +22,7 @@ class DefaultController extends FrontendController
      */
     public function defaultAction(Request $request): Response
     {
-        $productListing = new ProductListing();
+/*        $productListing = new ProductListing();
         $productListing->setCondition('variationColor is NOT NULL');
         $publishedCount = $productListing->count();
         $productListing->setUnpublished(true);
@@ -62,7 +62,7 @@ class DefaultController extends FrontendController
                 'amazon_listing_count' => $amazonListingCount,
                 'logged_in' => $request->cookies->get('id_token') ? true : false,
             ]
-        );
+        );*/
     }
 
     /**
