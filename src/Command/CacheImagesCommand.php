@@ -98,8 +98,8 @@ class CacheImagesCommand extends AbstractCommand
                         break;
                 }
             }
-            echo "\nProcessed {$offset} of {$totalCount} ";
             $offset += $pageSize;
+            echo "\nProcessed {$offset} of {$totalCount} ";
         }
         return Command::SUCCESS;
     }
@@ -110,6 +110,25 @@ class CacheImagesCommand extends AbstractCommand
         $listingImageList = [];
         foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
+        }
+        $listingImageList = array_unique($listingImageList);
+        $variant->fixImageCache($listingImageList);
+    }
+
+    protected static function processAmazon($variant)
+    {
+        $json = self::getApiResponse($variant->getId());
+        $listingImageList = [];
+        $asin = $json['asin'] ?? 'UNKNOWN';
+        $imageFolder = Utility::checkSetAssetPath($asin, static::$amazonFolder);
+        foreach ($json['attributes'] ?? [] as $key=>$value) {
+            if (strpos($key, 'image') !== false) {
+                foreach ($value as $potentialImage) {
+                    if (isset($potentialImage['media_location'])) {
+                        $listingImageList[] = static::processImage($potentialImage['media_location'], $imageFolder);
+                    }
+                }
+            }
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
