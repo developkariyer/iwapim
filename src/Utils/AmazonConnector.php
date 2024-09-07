@@ -379,7 +379,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     public function catalogItems()
     {
         $catalogConnector = $this->amazonSellerConnector->catalogItemsV20220401();
-        $response = $catalogConnector->getCatalogItems(
+        $response = $catalogConnector->getCatalogItem(
             marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$this->countryCodes[0]]],
             sellerId: $this->marketplace->getMerchantId(),
         );
