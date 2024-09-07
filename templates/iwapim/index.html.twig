@@ -4,3 +4,14 @@
     <h2>{{ pimcore_input("subline") }}</h2>
     {{ pimcore_wysiwyg("content") }}
 {% endfor %}
+
+<p>{{ "Types of elements" | trans }}:</p>
+{% if editmode %}
+    {{ pimcore_relations("objectPaths") }}
+{% else %}
+<ul>
+    {% for element in pimcore_relations("objectPaths") %}
+        <li>{{ element.getType() }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
