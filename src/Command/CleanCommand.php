@@ -94,7 +94,6 @@ class CleanCommand extends AbstractCommand
                 echo "\n    Found main product: " . reset($connectedProduct)->getFullPath() . " with id ".reset($connectedProduct)->getId()."\n";
                 $product = reset($connectedProduct);
                 $product->addVariant($variants);
-                sleep(1);
             } elseif (count($connectedProduct) > 1) {
                 echo "\n    WARNING: Found more than one main product for variants: " . implode(", ", $connectedProduct) . "\n";
                 exit;
