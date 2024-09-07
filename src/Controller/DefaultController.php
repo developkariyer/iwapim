@@ -47,22 +47,12 @@ class DefaultController extends FrontendController
         $amazonListing = new AmazonVariantListing();
         $amazonListing->setUnpublished(true);
         $amazonListingCount = $amazonListing->count();
-
+*/
         return $this->render(
             'iwapim/index.html.twig', 
             [
-                'published_product_count' => $publishedCount,
-                'unpublished_product_count' => $unpublishedCount,
-                'unbound_product_count' => $productListingUnbound,
-                'dimension_product_count' => $dimensionProductCount,
-                'dimension_package_product_count' => $dimensionPackageProductCount,
-                'seo_product_count' => $seoProductCount,
-                'shopify_listing_count' => $shopifyListingCount,
-                'shopify_variant_count' => $shopifyVariantCount,
-                'amazon_listing_count' => $amazonListingCount,
-                'logged_in' => $request->cookies->get('id_token') ? true : false,
             ]
-        );*/
+        );
     }
 
     /**
