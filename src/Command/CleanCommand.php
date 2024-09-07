@@ -66,6 +66,7 @@ class CleanCommand extends AbstractCommand
         $sql = "SELECT DISTINCT amazonAsin FROM object_varyantproduct WHERE amazonAsin IS NOT NULL";
         $stmt = $db->query($sql);
         $asins = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        print_r($asins);
         foreach ($asins as $asin) {
             echo "\rProcessing ASIN: {$asin}                                             \r";
             $listingObject = new VariantProduct\Listing();
