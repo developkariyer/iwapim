@@ -387,7 +387,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries', 'vendorDetails'],
                 sellerId: $this->marketplace->getMerchantId(),
             );
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/catalogItems_$country.json", json_encode($response->json()));    
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/catalogItems_$country.json", json_encode($response->json()));
+            echo "$country OK\n";    
         }
     }
 }
