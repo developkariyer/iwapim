@@ -71,13 +71,13 @@ class CleanCommand extends AbstractCommand
             if (empty($asin)) {
                 continue;
             }
-            //echo "\rProcessing ASIN: {$asin}                                             \r";
+            echo "\rProcessing ASIN: {$asin}                                             \r";
             $listingObject = new VariantProduct\Listing();
             $listingObject->setCondition("amazonAsin = ?", [$asin]);
             $listingObject->setUnpublished(true);
             $variants = $listingObject->load();
             $connectedProduct = [];
-            //echo "\n    Found ".count($variants) . " variants\n";
+            echo "\n    Found ".count($variants) . " variants\n";
             foreach ($variants as $variant) {
                 $mainProduct = $variant->getMainProduct();
                 if (empty($mainProduct)) {
@@ -85,12 +85,20 @@ class CleanCommand extends AbstractCommand
                 }
                 if (count($mainProduct) > 1) {
                     echo "\n    WARNING: Found more than one main product for variant: {$variant->getId()} " . $variant->getFullPath() . "\n";
-                    continue;
+                    exit;
                 }
                 $connectedProduct[] = reset($mainProduct);
             }
             $connectedProduct = array_unique($connectedProduct);
-            //if (count($connectedProduct)) echo "\n    Found ".count($connectedProduct) . " connected products\n";
+            if (count($connectedProduct) == 1) {
+                $product = reset($connectedProduct);
+                $product->addVariant($variants);
+            } elseif (count($connectedProduct) > 1) {
+                echo "\n    WARNING: Found more than one main product for variants: " . implode(", ", $connectedProduct) . "\n";
+                exit;
+            } else {
+                echo "\n    No main product found for variants: " . implode(", ", $variants) . "\n";
+            }
         }
     }
 

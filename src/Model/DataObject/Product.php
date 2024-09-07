@@ -311,10 +311,20 @@ class Product extends Concrete
         $listingIds = array_map(function ($item) {
             return $item->getId();
         }, $listingItems);
-        if (!in_array($variant->getId(), $listingIds)) {
-            $listingItems[] = $variant;
+        if (is_array($variant)) {
+            foreach ($variant as $v) {
+                if (!in_array($v->getId(), $listingIds)) {
+                    $listingItems[] = $v;
+                }
+            }
             $this->setListingItems($listingItems);
             return $this->save();
+        } else {
+            if (!in_array($variant->getId(), $listingIds)) {
+                $listingItems[] = $variant;
+                $this->setListingItems($listingItems);
+                return $this->save();
+            }
         }
     }
 
