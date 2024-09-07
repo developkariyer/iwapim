@@ -68,6 +68,9 @@ class CleanCommand extends AbstractCommand
         $asins = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         print_r($asins);
         foreach ($asins as $asin) {
+            if (empty($asin)) {
+                continue;
+            }
             echo "\rProcessing ASIN: {$asin}                                             \r";
             $listingObject = new VariantProduct\Listing();
             $listingObject->setCondition("amazonAsin = ?", [$asin]);
