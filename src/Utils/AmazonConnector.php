@@ -379,11 +379,15 @@ class AmazonConnector implements MarketplaceConnectorInterface
     public function catalogItems()
     {
         $catalogConnector = $this->amazonSellerConnector->catalogItemsV20220401();
-        $response = $catalogConnector->searchCatalogItems(
-            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$this->countryCodes[0]]],
-            sellerId: $this->marketplace->getMerchantId(),
-            keywords: ['art'],
-        );
-        print_r($response->json());
+        foreach ($this->countryCodes as $country) {
+            $response = $catalogConnector->searchCatalogItems(
+                marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+                identifiers: ['00-C7TP-0V4V', '02-FVXC-15U8', '03-1TJN-HW3U', '03-Z2GQ-K9XT', '04-09I9-D2RF', '05-V9D4-NM8C', '09-6LW4-SWNC', '09-JOBY-BVU4', '09-JWOX-4994', '0C-Y0FW-LC64'],
+                identifiersType: 'SKU',
+                includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries', 'vendorDetails'],
+                sellerId: $this->marketplace->getMerchantId(),
+            );
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/catalogItems_$country.json", json_encode($response->json()));    
+        }
     }
 }
