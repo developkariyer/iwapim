@@ -1,2 +1,6 @@
 <h1>{{ pimcore_input("headline") }}</h1>
 
+{% for i in pimcore_block("contentblock").iterator %}
+    <h2>{{ pimcore_input("subline") }}</h2>
+    {{ pimcore_wysiwyg("content") }}
+{% endfor %}
