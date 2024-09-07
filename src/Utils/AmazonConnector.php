@@ -382,6 +382,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $response = $catalogConnector->searchCatalogItems(
             marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$this->countryCodes[0]]],
             sellerId: $this->marketplace->getMerchantId(),
+            keywords: ['art'],
         );
         print_r($response->json());
     }
