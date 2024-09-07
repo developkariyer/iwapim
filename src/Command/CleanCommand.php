@@ -71,7 +71,7 @@ class CleanCommand extends AbstractCommand
             if (empty($asin)) {
                 continue;
             }
-            echo "\rProcessing ASIN: {$asin}                                             \r";
+            //echo "\rProcessing ASIN: {$asin}                                             \r";
             $listingObject = new VariantProduct\Listing();
             $listingObject->setCondition("amazonAsin = ?", [$asin]);
             $listingObject->setUnpublished(true);
@@ -90,7 +90,7 @@ class CleanCommand extends AbstractCommand
                 $connectedProduct[] = reset($mainProduct);
             }
             $connectedProduct = array_unique($connectedProduct);
-            if (count($connectedProduct)) echo "\n    Found ".count($connectedProduct) . " connected products\n";
+            //if (count($connectedProduct)) echo "\n    Found ".count($connectedProduct) . " connected products\n";
         }
     }
 
