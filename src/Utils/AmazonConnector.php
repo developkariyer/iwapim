@@ -18,7 +18,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     private array $amazonReports = [
         'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
         'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
-        'GET_AFN_INVENTORY_DATA' => [],
+        //'GET_AFN_INVENTORY_DATA' => [],
         'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
         'GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA' => [],
     ];
