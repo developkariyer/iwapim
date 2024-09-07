@@ -1,0 +1,91 @@
+{# templates/products/list.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Ürün Listesi{% endblock %}
+
+{% block content %}
+    <h1>Ürünler</h1>
+
+    <div class="mb-3">
+        <label for="productClassSelect" class="form-label">Ürün Sınıfını Seçin</label>
+        <select id="productClassSelect" class="form-select" onchange="filterProductsByClass(this.value)">
+            <option value="">Tüm Sınıflar</option>
+            {% for productClass in productClasses %}
+                <option value="{{ productClass.key }}">{{ productClass.productClassName }} ({{ productClass.key }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div id="productsList">
+        <div class="row">
+            {% for productData in products %}
+                <div class="product-item" data-class="{{ productData.product.getProductClass }}">
+                    <div class="card mb-3 p-0">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <div class="card-body">
+                                    <a href="{{ path('product_detail', {'id': productData.product.id}) }}">
+                                        <h5 class="card-title">{{ productData.product.key }} {{ productData.product.name }} ({{ productData.product.productClass }})</h5>
+                                    </a>
+                                    <strong>IWASKU:</strong> {{ productData.product.iwasku }}<br>
+                                    <strong>Ürün Kodu:</strong> {{ productData.product.productCode }}<br>
+                                    {{ productData.product.description|slice(0, 100) }}...
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card-body">
+                                    <h6>Ebatlar:</h6>
+                                    {% if productData.sizes %}
+                                        <ul>
+                                            {% for size in productData.sizes %}
+                                                <li>{{ size }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p>Ebat yok</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card-body">
+                                    <h6>Renkler:</h6>
+                                    {% if productData.colors %}
+                                        <ul>
+                                            {% for color in productData.colors %}
+                                                <li>{{ color }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p>Renk yok</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% set firstImage = null %}
+                            {% if productData.product.album and productData.product.album.items|length > 0 %}
+                                {% set firstImage = productData.product.album.items[0].image %}
+                            {% endif %}
+                            {% if firstImage %}
+                                <div class="col-md-2 text-end">
+                                    <img src="{{ firstImage.getThumbnail('listpage') }}" class="img-fluid rounded-end" alt="{{ productData.product.name }}">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function filterProductsByClass(classKey) {
+            var items = document.querySelectorAll('.product-item');
+            items.forEach(function(item) {
+                if (classKey === "" || item.getAttribute('data-class') === classKey) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
+    </script>
+{% endblock %}

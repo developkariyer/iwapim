@@ -1,0 +1,28 @@
+{# templates/iwapim/amazon.html.twig #}
+
+<table border="1">
+    <tr>
+        <th>SKU</th>
+        <th>NAME</th>
+        <th>ASIN</th>
+        <th>FNSKU</th>
+        <th>EID</th>
+        <th>EID Type</th>
+        <th>Parent</th>
+        <th>Link</th>
+        <th>Status</th>
+    </tr>
+{% for listing in amazon_listings %}
+    <tr>
+        <td>{{ listing.sku }}</td>
+        <td>{{ listing.name }}</td>
+        <td>{{ listing.asin }}</td>
+        <td>{{ listing.fnsku }}</td>
+        <td>{{ listing.eid }}</td>
+        <td>{{ listing.eidType }}</td>
+        <td>{{ listing.parent }}</td>
+        <td><a href="https://www.amazon.com/dp/{{ listing.asin }}" target="_blank">https://www.amazon.com/dp/{{ listing.asin }}</a></td>
+        <td>{{ listing.status }}</td>
+    </tr>
+{% endfor %}
+</table>

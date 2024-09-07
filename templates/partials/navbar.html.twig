@@ -1,0 +1,56 @@
+{# templates/snippets/navbar.html.twig #}
+
+<nav class="app-header navbar navbar-expand bg-body"> 
+    <div class="container-fluid">
+        <ul class="navbar-nav">
+            <li class="nav-item"> <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"> <i class="bi bi-list"></i> </a> </li>
+            <li class="nav-item d-none d-md-block"> <a href="/" class="nav-link">Ana Sayfa</a> </li>
+        </ul>
+        <ul class="navbar-nav ms-auto"> 
+            <li class="nav-item"> <a class="nav-link" data-widget="navbar-search" href="#" role="button"> <i class="bi bi-search"></i> </a> </li> 
+            <li class="nav-item dropdown"> <a class="nav-link" data-bs-toggle="dropdown" href="#"> <i class="bi bi-bell-fill"></i>
+                {% if messages|length > 0 %} <span class="navbar-badge badge text-bg-danger">{{ messages|length }}</span> {% endif %} </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                    {% if messages|length > 0 %}
+                        {% for message in messages %}
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <h3 class="dropdown-item-title">
+                                            {{ message.title }}
+                                        </h3>
+                                        <p class="fs-7">{{ message.text }}</p>
+                                        <p class="fs-7 text-secondary"> <i class="bi bi-clock-fill me-1"></i>{{ message.time }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                        {% endfor %}
+                    {% else %}
+                        <a href="#" class="dropdown-item">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <h3 class="dropdown-item-title">
+                                        Bildirim Yok
+                                    </h3>
+                                </div>
+                            </div>
+                        </a>
+                    {% endif %}
+                </div>
+            </li>
+            <li class="nav-item"> <a class="nav-link" href="#" data-lte-toggle="fullscreen"> <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i> <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none;"></i> </a> </li>
+            <li class="nav-item dropdown user-menu"> <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"> <img src="{{ asset('bundles/adminlte/assets/img/user2-160x160.jpg') }}" class="user-image rounded-circle shadow" alt="User Image"> </a>
+                <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                    <li class="user-header text-bg-primary"> <img src="{{ asset('bundles/adminlte/assets/img/user2-160x160.jpg') }}" class="rounded-circle shadow" alt="User Image">
+                        <p>
+                            {{ user.name }}
+                            <small>{{ user.role }}</small>
+                        </p>
+                    </li>
+                    <li class="user-footer"> <a href="#" class="btn btn-default btn-flat float-end">Çıkış</a> </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav> 

@@ -1,0 +1,24 @@
+{# templates/iwapim/footer.html.twig #}
+        <div class="row row-cols-1 row-cols-md-2 m-1 g-3">
+        {% if logged_in|default(false) %}
+            <div id="btn-66a397c265d87" class="col"><a href="/products" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Ürün Bilgisi</a></div>
+            <div id="btn-66a397c265d87" class="col"><a href="/products/variations" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Varyasyon İşlemleri</a></div>
+            <div id="btn-66a397c265d8c" class="col"><a href="/products/sizes" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Ebat İşlemleri</a></div>
+            <div id="btn-66a397c265d81" class="col"><a href="/products/seo" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">SEO İşlemleri</a></div>
+            <div id="btn-66a397c265d82" class="col"><a href="/products/cost" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Maliyet İşlemleri</a></div>
+            <div id="btn-66a397c265d83" class="col"><a href="/products/shopify" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Shopify Bağlantı</a></div>
+            <div id="btn-66a397c265d84" class="col"><a href="/products/amazon" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Amazon Bağlantı</a></div>
+            <div id="btn-66a397c265d96" class="col"><a href="/users" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Kullanıcı Yönetimi</a></div>
+            <div id="btn-66a397c265d97" class="col"><a href="/services" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Servis İşlemleri</a></div>
+            <div id="btn-66a397c265d99" class="col"><a href="/" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Ana Sayfa</a></div>
+            <div id="btn-66a397c265d9a" class="col"><a href="/logout" class="btn btn-danger btn-lg rounded-pill w-100 py-3">Çıkış</a></div>
+        {% else %}
+            <div id="btn-66a397c265d99" class="col-md-6"><a href="/" class="btn btn-secondary btn-lg rounded-pill w-100 py-3">Ana Sayfa</a></div>
+            <div id="btn-66a397c265d9a" class="col-md-6"><a href="/login" class="btn btn-primary btn-lg rounded-pill w-100 py-3">Giriş</a></div>
+        {% endif %}
+        </div>
+    </div>
+    {% block javascripts %}
+    {% endblock %}
+</body>
+</html>

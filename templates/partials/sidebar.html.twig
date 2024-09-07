@@ -1,0 +1,91 @@
+{# templates/partials/sidebar.html.twig #}
+
+<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> 
+    <div class="sidebar-brand"><a href="/" class="brand-link"><span class="brand-text fw-light"><b>IWA</b> PIM Ürün Yönetimi</span></a></div> 
+    <div class="sidebar-wrapper">
+        <nav class="mt-2"> 
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active"> <i class="nav-icon bi bi-badge-tm-fill"></i><p>Markalar <i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                        {% for brand in brands %}
+                            <li class="nav-item">
+                                <a href="/brands/{{ brand.id }}" class="nav-link">
+                                    <i class="nav-icon bi bi-dash"></i>
+                                    <p>
+                                        {{ brand.key }}
+                                    </p>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"> <i class="nav-icon bi bi-box-seam-fill"></i><p>Ürünler <i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                        {% for category in categories %}
+                            <li class="nav-item">
+                                <a href="/category/{{ category.value }}" class="nav-link"> 
+                                    <i class="nav-icon bi bi-dash"></i>
+                                    <p>
+                                        {{ category.key }}
+                                        {% if category.productCount > 0 %}
+                                            <span class="nav-badge badge text-bg-secondary me-2">{{ category.productCount }}</span>
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"> <i class="nav-icon bi bi-clipboard-fill"></i><p>Üretim Maliyetleri<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                        {% for costtype in costtypes %}
+                            <li class="nav-item">
+                                <a href="/costtype/{{ costtype.id }}" class="nav-link"> 
+                                    <i class="nav-icon bi bi-dash"></i>
+                                    <p>
+                                        {{ costtype.key }}
+                                        {% if costtype.productCount > 0 %}
+                                            <span class="nav-badge badge text-bg-secondary me-2">{{ costtype.productCount }}</span>
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"> <i class="nav-icon bi bi-airplane-fill"></i><p>Nakliye Maliyetleri<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                        {% for pricingtype in pricingtypes %}
+                            <li class="nav-item">
+                                <a href="/pricingtype/{{ pricingtype.value }}" class="nav-link"> 
+                                    <i class="nav-icon bi bi-dash"></i>
+                                    <p>
+                                        {{ pricingtype.key }}
+                                        {% if pricingtype.productCount > 0 %}
+                                            <span class="nav-badge badge text-bg-secondary me-2">{{ pricingtype.productCount }}</span>
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"> <i class="nav-icon bi bi-basket2-fill"></i><p>Pazaryerleri<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+</aside> 

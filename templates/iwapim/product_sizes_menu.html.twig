@@ -1,0 +1,19 @@
+{# templates/iwapim/product_size_menu.html.twig #}
+{% include 'iwapim/header.html.twig' %}
+{% block content %}
+
+<div class="jumbotron text-center">
+    <h1>Ebat Bilgileri Tamamlama</h1>
+    <p>Lütfen kategori seçin.<br><strong>Varyasyonlar yanlışsa Slack'ten bildirin.</strong></p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 m-1 g-3">
+    {% for category in categories %}
+        <div id="btn-66a397c265d{{ category }}" class="col"><a href="/products/sizes/{{ category }}" class="btn btn-success btn-lg rounded-pill w-100 py-3">{{ category|upper }}</a></div>
+    {% endfor %}    
+</div>
+<hr>
+
+
+{% endblock %}
+{% include 'iwapim/footer.html.twig' %}

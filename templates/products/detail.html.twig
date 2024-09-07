@@ -1,0 +1,322 @@
+{# templates/products/detail.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{% if parentProduct %}
+    {{ parentProduct.key }} {{ product.name }} {{ product.parent.key }} {{ product.key }} ({{ product.productClass }})
+{% else %}
+    {{ product.key }} {{ product.name }} ({{ product.productClass }})
+{% endif %}
+{% endblock %}
+
+{% block content %}
+    <a href="/products" class="btn btn-primary mb-3">Tüm Ürünler</a>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            {% if parentProduct %}
+                <i>Varyasyon ürünüdür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a></i>
+                <h1>{{ parentProduct.key }} {{ product.name }} {{ product.parent.key }} {{ product.key }} ({{ product.productClass }})</h1>
+            {% else %}
+                <h1>{{ product.key }} {{ product.name }} ({{ product.productClass }})</h1>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>IWASKU:</strong> {{ product.iwasku }}</p>
+                    <p><strong>Aktif:</strong> {{ product.iwaskuActive ? 'Evet' : 'Hayır' }}</p>
+                    <p><strong>Açıklama:</strong> {{ product.description }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Ürün Kodu:</strong> {{ product.productCode }}</p>
+                    <p><strong>SEO Başlığı:</strong> {{ product.seoTitle }}</p>
+                    <p><strong>SEO Açıklaması:</strong> {{ product.seoDescription }}</p>
+                    <p><strong>SEO Anahtar Kelimeler:</strong>
+                        <ul>
+                            {% for seoKeyword in product.seoKeywords %}
+                                <li>{{ seoKeyword.seoKeyword }}</li>
+                            {% endfor %}
+                        </ul>
+                    </p>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="resimler-tab" data-bs-toggle="tab" data-bs-target="#resimler" type="button" role="tab" aria-controls="resimler" aria-selected="true">Ürün Görselleri</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ebatlar-tab" data-bs-toggle="tab" data-bs-target="#ebatlar" type="button" role="tab" aria-controls="ebatlar" aria-selected="false">Ebatlar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="varyasyonlar-tab" data-bs-toggle="tab" data-bs-target="#varyasyonlar" type="button" role="tab" aria-controls="varyasyonlar" aria-selected="false">Varyasyonlar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="set-icerigi-tab" data-bs-toggle="tab" data-bs-target="#set-icerigi" type="button" role="tab" aria-controls="set-icerigi" aria-selected="false">Set İçeriği</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="listing-tab" data-bs-toggle="tab" data-bs-target="#listing" type="button" role="tab" aria-controls="listing" aria-selected="false">Listing</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stok-takip-tab" data-bs-toggle="tab" data-bs-target="#stok-takip" type="button" role="tab" aria-controls="stok-takip" aria-selected="false">Stok Takip</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="uretim-maliyet-tab" data-bs-toggle="tab" data-bs-target="#uretim-maliyet" type="button" role="tab" aria-controls="uretim-maliyet" aria-selected="false">Üretim Maliyet</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="fiyatlama-tab" data-bs-toggle="tab" data-bs-target="#fiyatlama" type="button" role="tab" aria-controls="fiyatlama" aria-selected="false">Fiyatlama</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reklamx-tab" data-bs-toggle="tab" data-bs-target="#reklamx" type="button" role="tab" aria-controls="reklamx" aria-selected="false">Reklam</button>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="resimler" role="tabpanel" aria-labelledby="resimler-tab">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h2>Ürün Görselleri</h2>
+                    {% if product.album|length > 0 %}
+                    <div class="row">
+                        {% for image in product.album %}
+                            {% if image %}
+                                <div class="col-md-3">
+                                    <a href="{{ image.image.getFullPath() }}" target="_blank">
+                                        <img src="{{ image.image.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="Ürün Görseli" style="border-radius: 10px; padding: 0; margin: 0;">
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        <p>Ürün görseli yok.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="ebatlar" role="tabpanel" aria-labelledby="ebatlar-tab">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h2>Ebatlar</h2>
+                    <table class="table table-bordered text-center table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-nowrap" style="width: 40%"></th>
+                                <th class="text-nowrap" style="width: 10%">En</th>
+                                <th class="text-nowrap" style="width: 10%">Boy</th>
+                                <th class="text-nowrap" style="width: 10%">Derinlik</th>
+                                <th class="text-nowrap" style="width: 10%">Ağırlık</th>
+                                <th class="text-nowrap" style="width: 10%">K.Desi</th>
+                                <th class="text-nowrap" style="width: 10%">H.Desi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-nowrap"><strong>Ürün</strong></td>
+                                <td class="text-nowrap">{{ product.productWidth }}</td>
+                                <td class="text-nowrap">{{ product.productHeight }}</td>
+                                <td class="text-nowrap">{{ product.productDepth }}</td>
+                                <td class="text-nowrap">{{ product.productWeight }}</td>
+                                <td class="text-nowrap"></td>
+                                <td class="text-nowrap"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-nowrap"><strong>Paket (Kutu)</strong></td>
+                                <td class="text-nowrap">{{ product.packageWidth }}</td>
+                                <td class="text-nowrap">{{ product.packegeHeight }}</td>
+                                <td class="text-nowrap">{{ product.packageDepth }}</td>
+                                <td class="text-nowrap">{{ product.packageWeight }}</td>
+                                <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)/3000) }}</td>
+                                <td class="text-nowrap">{{ max(product.packageWeight, (product.packageWidth * product.packegeHeight * product.packageDepth)/5000) }}</td>
+                            </tr>
+                            {% if product.bundleItems|length > 0 %}
+                                <tr><td colspan="7" class="text-center"><h4>Set İçindeki Ürünlerin Paket (Kutu) Ebatları</h4></td></tr>
+                                {% for item in product.bundleItems %}
+                                    <tr>
+                                        <td class="text-nowrap"><strong>{{ item.key }} {{ item.name }}</strong></td>
+                                        <td class="text-nowrap">{{ item.packageWidth }}</td>
+                                        <td class="text-nowrap">{{ item.packegeHeight }}</td>
+                                        <td class="text-nowrap">{{ item.packageDepth }}</td>
+                                        <td class="text-nowrap">{{ item.packageWeight }}</td>
+                                        <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)/3000) }}</td>
+                                        <td class="text-nowrap">{{ max(item.packageWeight, (item.packageWidth * item.packegeHeight * item.packageDepth)/5000) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="varyasyonlar" role="tabpanel" aria-labelledby="varyasyonlar-tab">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h2>Varyasyonlar</h2>
+                    {% if product.type != 'variant' %}
+                    <table class="table table-bordered text-center table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-nowrap">Renkler\Ebatlar</th>
+                                {% for size in sizes %}
+                                    <th>{{ size }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for color in colors %}
+                                <tr>
+                                    <th class="align-middle">{{ color }}</th>
+                                    {% for size in sizes %}
+                                        <td>
+                                            {% set variation = variations[size][color] %}
+                                            {% if variation %}
+                                                <a href="{{ path('product_detail', {'id': variation.id}) }}">
+                                                    {% set firstImage = null %}
+                                                    {% if variation.album and variation.album.items|length > 0 %}
+                                                        {% set firstImage = variation.album.items[0].image %}
+                                                    {% endif %}
+                                                    {% if firstImage %}
+                                                        <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail" alt="{{ variation.name }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;">
+                                                    {% else %}
+                                                        {{ variation.parent.key }} {{ variation.key }}
+                                                    {% endif %}
+                                                </a>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form action="{{ path('add', {'id': product.id}) }}" method="post" class="d-flex">
+                                <div class="form-group mr-2">
+                                    <input type="text" id="newSize" name="newSize" class="form-control" placeholder="Yeni Ebat" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Ekle</button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form action="{{ path('add', {'id': product.id}) }}" method="post" class="d-flex">
+                                <div class="form-group mr-2">
+                                    <input type="text" id="newColor" name="newColor" class="form-control" placeholder="Yeni Renk" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}               
+                        Varyasyon üründür. Ana ürün: <a href="{{ path('product_detail', {'id': parentProduct.id}) }}">{{ parentProduct.key }} {{ parentProduct.name }}</a>
+                    {% endif %}    
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="set-icerigi" role="tabpanel" aria-labelledby="set-icerigi-tab">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h2>Set İçeriği</h2>
+                    {% if product.bundleItems|length > 0 %}
+                        <div class="row">
+                            {% for item in product.bundleItems %}
+                                <div class="col-md-3">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5>{{ item.key }} {{ item.name }}</h5>
+                                            {% set firstImage = null %}
+                                            {% if item.album and item.album.items|length > 0 %}
+                                                {% set firstImage = item.album.items[0].image %}
+                                            {% endif %}
+                                            {% if firstImage %}
+                                                <img src="{{ firstImage.getThumbnail('default') }}" class="img-thumbnail mb-3" alt="{{ item.name }}" style="border-radius: 10px; padding: 0; margin: 0; max-width: 150px;">
+                                            {% endif %}
+                                            <p><strong>Ürün Kodu:</strong> {{ item.productCode }}</p>
+                                            <p><strong>IWASKU:</strong> {{ item.iwasku }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Set içeriği yok.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="listing" role="tabpanel" aria-labelledby="listing-tab">
+            <div class="card mb-3 bg-secondary text-muted">
+                <div class="card-body">
+                    <h2>Listing</h2>
+                    <p>Listing henüz hazır değil.</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="stok-takip" role="tabpanel" aria-labelledby="stok-takip-tab">
+            <div class="card mb-3 bg-secondary text-muted">
+                <div class="card-body bg-secondary">
+                    <h2>Stok Takip</h2>
+                    <p>Stok henüz hazır değil.</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="uretim-maliyet" role="tabpanel" aria-labelledby="uretim-maliyet-tab">
+            <div class="card mb-3 bg-secondary text-muted">
+                <div class="card-body">
+                    <h2>Üretim Maliyet</h2>
+                    <p>Maliyet henüz hazır değil.</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="fiyatlama" role="tabpanel" aria-labelledby="fiyatlama-tab">
+            <div class="card mb-3 bg-secondary text-muted">
+                <div class="card-body">
+                    <h2>Fiyatlama</h2>
+                    <p>Fiyatlama henüz hazır değil.</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="reklamx" role="tabpanel" aria-labelledby="reklamx-tab">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h2>Reklam</h2>
+                        {% if product.marketingMaterials|length > 0 %}
+                            <div class="row">
+                                {% for material in product.marketingMaterials %}
+                                    <div class="col-md-3 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ material.title }}</h5>
+                                                <p class="card-text"><strong>Açıklama:</strong> {{ material.description }}</p>
+                                                <p class="card-text"><strong>Kampanya Adı:</strong> {{ material.campaignName }}</p>
+                                                <p class="card-text"><strong>Durum:</strong> {{ material.status }}</p>
+                                            </div>
+                                            {% if material.asset %}
+                                                <div class="card-footer bg-white border-0 p-0">
+                                                    <a href="{{ material.asset.getFullPath() }}" target="_blank">
+                                                        <img src="{{ material.asset.getThumbnail('default') }}" class="img-fluid w-100" alt="{{ material.title }}" style="border-radius: 0 0 10px 10px;">
+                                                    </a>
+                                                </div>
+                                            {% else %}
+                                                <div class="card-footer bg-white border-0">
+                                                    <p class="text-center">Görsel Yok</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                        <p>Reklam materyalleri yok.</p>
+                    {% endif %}
+                </div>
+            </div>        
+        </div>
+    </div>
+
+{% endblock %}
+

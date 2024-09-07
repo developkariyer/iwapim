@@ -1,0 +1,18 @@
+{# templates/iwapim/index.html.twig #}
+{% include 'iwapim/header.html.twig' %}
+{% block content %}
+
+<div class="jumbotron text-center">
+    <h1>IWA Ürün Yönetim</h1>
+    <p><strong>Shopify Ürünleri: {{ shopify_listing_count }} başlık altında {{ shopify_variant_count }} ürün/varyasyon</strong></p>
+    <p><strong>Amazon Ürünleri (sadece US): {{ amazon_listing_count }} SKU</strong></p>
+    <p><strong>Katalog Ürün Adedi: {{ published_product_count }} yayınlanmış, toplam {{ unpublished_product_count }} ürün</strong></p>
+    <p><strong>Katalog - Pazaryerleri Bağlanma Oranı: {{ 100 - 100 * unbound_product_count / (unpublished_product_count) }}%</strong></p>
+    <p><strong>Ebat Bilgileri Tamamlanma Oranı: {{ 100 - 100 * dimension_product_count / (unpublished_product_count) }}%</strong></p>
+    <p><strong>Ambalaj Bilgileri Tamamlanma Oranı: {{ 100 - 100 * dimension_package_product_count / (unpublished_product_count) }}%</strong></p>
+    <p><strong>SEO Bilgileri Tamamlanma Oranı: {{ 100 - 100 * seo_product_count / (unpublished_product_count) }}%</strong></p>
+    <p>Lütfen yapmak istediğiniz işlemi seçiniz.</p>
+</div>
+
+{% endblock %}
+{% include 'iwapim/footer.html.twig' %}

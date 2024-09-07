@@ -1,0 +1,58 @@
+{# templates/iwapim/product_sizes.html.twig #}
+{% include 'iwapim/header.html.twig' %}
+{% block content %}
+
+<div class="jumbotron text-center">
+    <h1>Ebat Bilgileri Eksik Ürün Listeleme</h1>
+    <p>Lütfen ürünü seçin.<br><strong>Varyasyonlar yanlışsa Slack'ten bildirin.</strong></p>
+</div>
+
+<div class="accordion mb-3" id="mainAccordion">
+    {% for product in products %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ product.id }}">
+            <button class="accordion-button collapsed w-100 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ product.id }}" aria-expanded="false" aria-controls="collapse{{ product.id }}">
+                {{ product.key }}
+            </button>
+        </h2>
+        <div id="collapse{{ product.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ product.id }}" data-bs-parent="#mainAccordion">
+            <div class="accordion-body">
+                <form action="{{ path('products_sizes', {'category': category}) }}" method="post">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <div class="mb-3">
+                        <label for="productDimension1" class="form-label">Ürün Eni</label>
+                        <input type="number" step="0.01" class="form-control" id="productDimension1" name="productDimension1" value="{{ product.productDimension1 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDimension2" class="form-label">Ürün Boyu</label>
+                        <input type="number" step="0.01" class="form-control" id="productDimension2" name="productDimension2" value="{{ product.productDimension2 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="packageDimension1" class="form-label">Paket Ebatları (1)</label>
+                        <input type="number" step="0.01" class="form-control" id="packageDimension1" name="packageDimension1" value="{{ product.packageDimension1 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="packageDimension2" class="form-label">Paket Ebatları (2)</label>
+                        <input type="number" step="0.01" class="form-control" id="packageDimension2" name="packageDimension2" value="{{ product.packageDimension2 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="packageDimension3" class="form-label">Paket Ebatları (3)</label>
+                        <input type="number" step="0.01" class="form-control" id="packageDimension3" name="packageDimension3" value="{{ product.packageDimension3 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="packageWeight" class="form-label">Paket Ağırlığı</label>
+                        <input type="number" step="0.01" class="form-control" id="packageWeight" name="packageWeight" value="{{ product.packageWeight }}">
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                        <button type="submit" name="keep" value="empty" class="btn btn-danger ms-auto">Boş Geç</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}                            
+</div>
+
+{% endblock %}
+{% include 'iwapim/footer.html.twig' %}

@@ -1,0 +1,126 @@
+{# templates/iwapim/index.html.twig #}
+{% include 'iwapim/header.html.twig' %}
+{% block content %}
+
+<div class="jumbotron text-center">
+    <h1>Ürün Arama ve Listeleme</h1>
+    <p>Lütfen ürün ile ilgili bir kaç kelime giriniz.</p>
+</div>
+
+<div class="container mt-3">
+    <label for="product-search">Ürün Arama:</label>
+    <select id="product-search" class="form-control" style="width: 100%;"></select>
+</div>
+
+{% if product is defined %}
+
+<div class="container">
+    <ul class="nav nav-tabs" id="productTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="product-info-tab" data-bs-toggle="tab" data-bs-target="#product-info" type="button" role="tab" aria-controls="product-info" aria-selected="true">Ürün Tanımı</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="product-images-tab" data-bs-toggle="tab" data-bs-target="#product-images" type="button" role="tab" aria-controls="product-images" aria-selected="false">Görseller</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="product-dimensions-tab" data-bs-toggle="tab" data-bs-target="#product-dimensions" type="button" role="tab" aria-controls="product-dimensions" aria-selected="false">Ebatlar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="product-seo-tab" data-bs-toggle="tab" data-bs-target="#product-seo" type="button" role="tab" aria-controls="product-seo" aria-selected="false">SEO</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="product-bundle-tab" data-bs-toggle="tab" data-bs-target="#product-bundle" type="button" role="tab" aria-controls="product-bundle" aria-selected="false">Set</button>
+        </li>
+        <!-- Add other tabs as necessary -->
+    </ul>
+    <div class="tab-content" id="productTabsContent">
+        <div class="tab-pane fade show active" id="product-info" role="tabpanel" aria-labelledby="product-info-tab">
+            <h2>{{ productobject.name }}</h2>
+            <p><strong>Ürün Kodu:</strong> {{ productobject.productCode }}</p>
+            <p><strong>Ürün Tanıtıcı Adı:</strong> {{ productobject.productIdentifier }}</p>
+            <p><strong>Kategori:</strong> {{ productobject.productCategory }}</p>
+            <p><strong>Varyant Ebatları:</strong><br> {{ productobject.variationSizeList|nl2br }}</p>
+            <p><strong>Variant Renkleri:</strong><br> {{ productobject.variationColorList|nl2br }}</p>
+            <div class="container">
+                <div class="row">
+                    {% for sizechild in productobject.children %}
+                        {% for colorchild in sizechild.children %}
+                            {% for listingitem in colorchild.listingItems %}
+                                <div class="col-md-4 mb-4">
+                                    <div class="card">
+                                        <a href="{{ listingitem.urlLink.href }}">
+                                            <img src="{{ listingitem.imageUrl.url }}" alt="{{ productobject.name }}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: cover;">
+                                        </a>
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ sizechild.variationSize }} - {{ colorchild.variationColor }}</h5>
+                                            <p class="card-text"> ({{ listingitem.price }})</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+        </div>
+        <div class="tab-pane fade" id="product-images" role="tabpanel" aria-labelledby="product-images-tab">
+            <h2>Görseller</h2>
+            <img src="{{ productobject.imageUrl }}" alt="{{ productobject.name }}" class="img-fluid">
+            <div>
+                {% for image in productobject.album %}
+                    <img src="{{ image }}" alt="Product Image" class="img-thumbnail">
+                {% endfor %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="product-dimensions" role="tabpanel" aria-labelledby="product-dimensions-tab">
+            <h2>Ebatlar</h2>
+            <p>En: {{ productobject.productDimension1 }}</p>
+            <p>Boy: {{ productobject.productDimension2 }}</p>
+            <p>Yükseklik: {{ productobject.productDimension3 }}</p>
+            <p>Ağırlık: {{ productobject.productWeight }}</p>
+        </div>
+        <div class="tab-pane fade" id="product-seo" role="tabpanel" aria-labelledby="product-seo-tab">
+            <h2>SEO</h2>
+            <p>SEO Başlığı: {{ productobject.seoTitle }}</p>
+            <p>SEO Açıklama: {{ productobject.seoDescription }}</p>
+            <p>SEO Anahtar Kelimeler: {{ productobject.seoKeywords }}</p>
+        </div>
+        <div class="tab-pane fade" id="product-bundle" role="tabpanel" aria-labelledby="product-bundle-tab">
+            <h2>Set İçeriği</h2>
+            <ul>
+                {% for bundleItem in productobject.bundleItems %}
+                    <li>{{ bundleItem.name }} - Miktar: {{ bundleItem.amount }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Add other tab contents as necessary -->
+    </div>
+</div>
+
+
+{% endif %}
+
+{% endblock %}
+{% include 'iwapim/footer.html.twig' %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('#product-search').select2({
+                ajax: {
+                    url: '{{ path("products_api") }}',
+                    dataType: 'json',
+                    delay: 250,
+                    cache: true
+                },
+                minimumInputLength: 3,
+                placeholder: 'Ürün arayın',
+                allowClear: true
+            }).on('select2:select', function (e) {
+                var selectedId = e.params.data.id;
+                window.location.href = '/product/' + selectedId;
+            });
+        });
+    </script>
+{% endblock %}
