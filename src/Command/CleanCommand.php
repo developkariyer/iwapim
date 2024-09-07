@@ -77,20 +77,20 @@ class CleanCommand extends AbstractCommand
             $listingObject->setUnpublished(true);
             $variants = $listingObject->load();
             $connectedProduct = [];
-            echo "\n    Found ".count($variants) . " variants\n";
+            //echo "\n    Found ".count($variants) . " variants\n";
             foreach ($variants as $variant) {
                 $mainProduct = $variant->getMainProduct();
                 if (empty($mainProduct)) {
                     continue;
                 }
                 if (count($mainProduct) > 1) {
-                    echo "    WARNING: Found more than one main product for variant: {$variant->getId()} " . $variant->getFullPath() . "\n";
+                    echo "\n    WARNING: Found more than one main product for variant: {$variant->getId()} " . $variant->getFullPath() . "\n";
                     continue;
                 }
                 $connectedProduct[] = reset($mainProduct);
             }
             $connectedProduct = array_unique($connectedProduct);
-            echo "    Found ".count($connectedProduct) . " connected products\n";
+            echo "\n    Found ".count($connectedProduct) . " connected products\n";
         }
     }
 
