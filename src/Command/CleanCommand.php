@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 
@@ -66,7 +67,20 @@ class CleanCommand extends AbstractCommand
         $stmt = $db->query($sql);
         $asins = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         foreach ($asins as $asin) {
-            
+            echo "\rProcessing ASIN: {$asin}                                             \r";
+            $listingObject = new VariantProduct\Listing();
+            $listingObject->setCondition("amazonAsin = ?", [$asin]);
+            $listingObject->setUnpublished(true);
+            $variants = $listingObject->load();
+            $connectedProduct = [];
+            echo "\n    Found ".count($variants) . " variants\n";
+            foreach ($variants as $variant) {
+                $mainProduct = $variant->getMainProduct();
+                if (empty($mainProduct)) {
+                    continue;
+                }
+                $connectedProduct[] = reset($mainProduct);
+            }
         }
     }
 
