@@ -84,7 +84,7 @@ class CleanCommand extends AbstractCommand
                     continue;
                 }
                 if (count($mainProduct) > 1) {
-                    echo "\n    WARNING: Found more than one main product for variant: {$variant->getId()} " . $variant->getFullPath() . "\n";
+                    echo "    WARNING: Found more than one main product for variant: {$variant->getId()} " . $variant->getFullPath() . "\n";
                     exit;
                 }
                 $connectedProduct[] = reset($mainProduct);
@@ -94,10 +94,10 @@ class CleanCommand extends AbstractCommand
                 $product = reset($connectedProduct);
                 $product->addVariant($variants);
             } elseif (count($connectedProduct) > 1) {
-                echo "\n    WARNING: Found more than one main product for variants: " . implode(", ", $connectedProduct) . "\n";
+                echo "    WARNING: Found more than one main product for variants: " . implode(", ", $connectedProduct) . "\n";
                 exit;
             } else {
-                echo "\n    No main product found for variants: " . implode(", ", $variants) . "\n";
+                echo "    No main product found\n";
             }
         }
     }
