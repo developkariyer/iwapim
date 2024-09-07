@@ -91,7 +91,7 @@ class CleanCommand extends AbstractCommand
             }
             $connectedProduct = array_unique($connectedProduct);
             if (count($connectedProduct) == 1) {
-                echo "\n    Found main product: " . reset($connectedProduct)->getFullPath() . "\n";
+                echo "\n    Found main product: " . reset($connectedProduct)->getFullPath() . " with id ".reset($connectedProduct)->getId()."\n";
                 $product = reset($connectedProduct);
                 $product->addVariant($variants);
                 sleep(1);
