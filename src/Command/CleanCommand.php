@@ -66,7 +66,7 @@ class CleanCommand extends AbstractCommand
         $sql = "SELECT DISTINCT amazonAsin FROM object_varyantproduct WHERE amazonAsin IS NOT NULL";
         $stmt = $db->query($sql);
         $asins = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        print_r($asins);
+        //print_r($asins);
         foreach ($asins as $asin) {
             if (empty($asin)) {
                 continue;
@@ -90,7 +90,7 @@ class CleanCommand extends AbstractCommand
                 $connectedProduct[] = reset($mainProduct);
             }
             $connectedProduct = array_unique($connectedProduct);
-            echo "\n    Found ".count($connectedProduct) . " connected products\n";
+            if (count($connectedProduct)) echo "\n    Found ".count($connectedProduct) . " connected products\n";
         }
     }
 
