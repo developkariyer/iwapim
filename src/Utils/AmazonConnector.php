@@ -363,7 +363,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
                 sellerId: $this->marketplace->getMerchantId(),
             );
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_$country.json", json_encode($response->json()));
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_SKU_$country.json", json_encode($response->json()));
             echo "$country OK\n";
             sleep(1); 
         }
@@ -375,7 +375,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
                 sellerId: $this->marketplace->getMerchantId(),
             );
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_$country.json", json_encode($response->json()));
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_ASIN_$country.json", json_encode($response->json()));
             echo "$country OK\n";    
             sleep(1); 
         }
