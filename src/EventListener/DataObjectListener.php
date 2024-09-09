@@ -128,6 +128,9 @@ class DataObjectListener implements EventSubscriberInterface
                     throw new \Exception('Varyasyon seviyesinde renk veya ebat belirtilmelidir.');
                 }
             }*/
+            if ($object->level()>0) {
+                $object->setTechnicals(null);
+            }
         }
         if ($object instanceof Serial) {
             $object->checkLabel();
@@ -185,6 +188,9 @@ class DataObjectListener implements EventSubscriberInterface
             } else {
                 $object->setVariationSizeList('');
                 $object->setVariationColorList('');
+            }
+            if ($object->level()>0) {
+                $object->setTechnicals(null);
             }
         }
     }
