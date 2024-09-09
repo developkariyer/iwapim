@@ -364,7 +364,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 sellerId: $this->marketplace->getMerchantId(),
             );
             file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_$country.json", json_encode($response->json()));
-            echo "$country OK\n";    
+            echo "$country OK\n";
+            sleep(1); 
         }
         foreach ($this->countryCodes as $country) {
             $response = $catalogConnector->searchCatalogItems(
@@ -376,6 +377,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             );
             file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_$country.json", json_encode($response->json()));
             echo "$country OK\n";    
+            sleep(1); 
         }
     }
 }
