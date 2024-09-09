@@ -109,40 +109,29 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $this->amazonReports[$reportType][$country] = $report;
     }
 
-    public function downloadAmazonSku($sku, $country)
+    public function downloadAmazonSku($asin, $country)
     {
         $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
-        $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
-        $t = 0;
-        while (true) {
-            $t++;
-            $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_".rawurlencode($sku)."_{$country}.json";
-            if (file_exists($filename) && filemtime($filename) > time() - 86400) {
-                echo " (cached) ";
-                return json_decode(file_get_contents($filename), true);
+        $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
+        //find at least 20 empty ASINs
+        $identifiers = [$asin];
+        foreach ($this->listings[$country] as $sku=>$listing) {
+            if (empty($listing)) {
+                $identifiers[] = $sku;
             }
-            try {
-                $listingItem = $listingsApi->getListingsItem(
-                    sellerId: $this->marketplace->getMerchantId(),
-                    marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
-                    sku: rawurlencode($sku),
-                    includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
-                );
-                if ($listingItem->status() == 200) {
-                    $retval = $listingItem->json();
-                    file_put_contents($filename, json_encode($retval));
-                    return $retval;
-                }
-            } catch (\Exception $e) {
-                echo ''. $e->getMessage() .'';
-                if ($t>5) {
-                    echo "x";
-                    return null;
-                }
-                echo "w";
-                sleep($t);
+            if (count($identifiers) >= 20) {
+                break;
             }
         }
+        $response = $catalogApi->searchCatalogItems(
+            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+            identifiers: $identifiers,
+            identifiersType: 'ASIN',
+            includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
+            sellerId: $this->marketplace->getMerchantId(),
+        );
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/catalogItems_$asin.json", json_encode($response->json()));
+        exit;
     }
 
     public function download($forceDownload = false)
@@ -323,41 +312,19 @@ class AmazonConnector implements MarketplaceConnectorInterface
             Utility::checkSetPath('Pazaryerleri')
         );
 
-        foreach ($this->countryCodes as $country) {
+        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             if (empty($this->listings[$country])) {
                 echo "Nothing to import in $country\n";
             }
             $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
-            foreach ($this->listings[$country] as $sku) {
-                echo "($index/$total) Processing SKU $sku ...";
-                $listing = $this->downloadAmazonSKU($sku, $country);
+            foreach ($this->listings[$country] as $asin=>$listing) {
+                echo "($index/$total) Processing ASIN $asin ...";
+                if (empty($listing)) {
+                    $listing = $this->downloadAmazonSKU($asin, $country);
+                }
                 $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
-                /*
-                $parent = null;
-                if (isset($listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'])) {
-                    $parentSku = $listing['attributes']['child_parent_sku_relationship'][0]['parent_sku'];
-                    $parent = VariantProduct::findOneByField('uniqueMarketplaceId', "{$this->marketplace->getKey()}.{$country}.{$parentSku}", unpublished: true);
-                    if (!$parent) {
-                        $parent = VariantProduct::addUpdateVariant(
-                            variant: [
-                                'title' => 'TEMPORARY PARENT',
-                                'uniqueMarketplaceId' => "{$this->marketplace->getKey()}.{$country}.{$parentSku}",
-                                'published' => false,
-                            ],
-                            importFlag: true,
-                            updateFlag: true,
-                            marketplace: $this->marketplace,
-                            parent: Utility::checkSetPath($path, $marketplaceFolder)
-                        );
-                    }
-                }
-                if (!$parent) {
-                    $parent = Utility::checkSetPath($path, $marketplaceFolder);
-                }
-                */
-                // upper or this one
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
 
                 VariantProduct::addUpdateVariant(
