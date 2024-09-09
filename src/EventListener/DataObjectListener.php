@@ -45,13 +45,13 @@ class DataObjectListener implements EventSubscriberInterface
         if (empty($data['validLayouts'])) {
             return;
         }
-        foreach ($data['validLayouts'] as $key=>$layout) {
+        foreach ($data['validLayouts'] as $key=>$layout) {/*
             if (($layout['name'] === 'product' && $level == 0) || ($layout['name'] === 'variant' && $level == 1)) {
                 $data['currentLayoutId'] = $layout['id'];
                 $customLayout = CustomLayout::getById($layout['id']);
                 $data['layout'] = $customLayout->getLayoutDefinitions();
                 Service::enrichLayoutDefinition($data['layout'], $object);
-            } /*else {
+            } else {
                 unset($data['validLayouts'][$key]);
             }*/
         }
