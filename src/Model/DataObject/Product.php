@@ -45,6 +45,7 @@ class Product extends Concrete
             }
         }    
         $this->setTechnicals(null);
+        error_log("Nullified: {$this->getKey()}");
     }
 
     public function level()
