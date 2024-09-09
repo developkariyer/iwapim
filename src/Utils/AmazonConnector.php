@@ -147,7 +147,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     public function download($forceDownload = false)
     {
-        foreach ($this->countryCodes as $country) {
+        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             echo "\n  Downloading Amazon reports for $country\n";
             foreach (array_keys($this->amazonReports) as $reportType) {
                 $this->downloadAmazonReport($reportType, $forceDownload, $country);
