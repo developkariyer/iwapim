@@ -44,6 +44,7 @@ class Product extends Concrete
                 $this->$field = null;
             }
         }    
+        $this->setTechnicals(null);
     }
 
     public function level()
