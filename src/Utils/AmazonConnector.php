@@ -126,7 +126,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $response = $catalogApi->searchCatalogItems(
             marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
             identifiers: $identifiers,
-            identifiersType: 'ASIN',
+            identifiersType: 'SKU',
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
@@ -229,7 +229,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     continue;
                 }
                 $listing = array_combine($header, $data);
-                $asin = $listing['asin'] ?? $listing['asin1'] ?? $listing['asin2'] ?? $listing['asin3'] ?? '';
+                //$asin = $listing['asin'] ?? $listing['asin1'] ?? $listing['asin2'] ?? $listing['asin3'] ?? '';
+                $asin = $listing['sku'] ?? $listing['seller-sku'] ?? '';
                 if (!empty($asin)) {
                     $listings[$asin] = '';
                 }
