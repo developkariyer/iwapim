@@ -355,7 +355,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     public function catalogItems()
     {
         $catalogConnector = $this->amazonSellerConnector->catalogItemsV20220401();
-        foreach ($this->countryCodes as $country) {
+        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             $response = $catalogConnector->searchCatalogItems(
                 marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
                 identifiers: ['09-JWOX-4994'],
@@ -367,7 +367,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             echo "$country OK\n";
             sleep(1); 
         }
-        foreach ($this->countryCodes as $country) {
+        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             $response = $catalogConnector->searchCatalogItems(
                 marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
                 identifiers: ['B08B5BJMR5'],
