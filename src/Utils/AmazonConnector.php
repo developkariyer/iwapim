@@ -358,12 +358,23 @@ class AmazonConnector implements MarketplaceConnectorInterface
         foreach ($this->countryCodes as $country) {
             $response = $catalogConnector->searchCatalogItems(
                 marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
-                identifiers: ['00-C7TP-0V4V', '02-FVXC-15U8', '03-1TJN-HW3U', '03-Z2GQ-K9XT', '04-09I9-D2RF', '05-V9D4-NM8C', '09-6LW4-SWNC', '09-JOBY-BVU4', '09-JWOX-4994', '0C-Y0FW-LC64'],
+                identifiers: ['09-JWOX-4994'],
                 identifiersType: 'SKU',
                 includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
                 sellerId: $this->marketplace->getMerchantId(),
             );
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/catalogItems_$country.json", json_encode($response->json()));
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_$country.json", json_encode($response->json()));
+            echo "$country OK\n";    
+        }
+        foreach ($this->countryCodes as $country) {
+            $response = $catalogConnector->searchCatalogItems(
+                marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+                identifiers: ['B08B5BJMR5'],
+                identifiersType: 'ASIN',
+                includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
+                sellerId: $this->marketplace->getMerchantId(),
+            );
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_$country.json", json_encode($response->json()));
             echo "$country OK\n";    
         }
     }
