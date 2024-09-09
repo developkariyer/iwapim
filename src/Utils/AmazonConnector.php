@@ -241,7 +241,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 }
                 $listing = array_combine($header, $data);
                 $asin = $listing['asin'] ?? $listing['asin1'] ?? $listing['asin2'] ?? $listing['asin3'] ?? '';
-                if (empty($asin)) {
+                if (!empty($asin)) {
                     $listings[] = $asin;
                 }
             }
