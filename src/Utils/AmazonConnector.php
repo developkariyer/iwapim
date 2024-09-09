@@ -242,11 +242,11 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $listing = array_combine($header, $data);
                 $asin = $listing['asin'] ?? $listing['asin1'] ?? $listing['asin2'] ?? $listing['asin3'] ?? '';
                 if (!empty($asin)) {
-                    $listings[] = $asin;
+                    $listings[$asin] = '';
                 }
             }
         }
-        $this->listings[$country] =  array_unique($listings);
+        $this->listings[$country] =  $listings;
     }
 
     private function getImage($listing) {
