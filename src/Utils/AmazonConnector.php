@@ -25,6 +25,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     private $amazonSellerConnector = null;
     private $countryCodes = [];
+    private $mainCountry = null;
     private $marketplace = null;
     private $listings = [];
 
@@ -47,7 +48,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
             throw new \Exception("The following country codes are not in merchantIdList in AmazonConnector class: $missingCodesStr");
         }
 
-        $endpoint = match ($countryCodes[0]) {
+        $this->mainCountry = $marketplace->getMainMerchant();
+        $endpoint = match ($this->mainCountry) {
             "CA","US","MX","BR" => Endpoint::NA,
             "SG","AU","JP" => Endpoint::FE,
             default => Endpoint::EU,
@@ -64,7 +66,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
         if (!$this->amazonSellerConnector) {
             throw new \Exception("Amazon Seller Connector is not created");
         }
-        print_r($countryCodes);
     }
 
     protected function downloadAmazonReport($reportType, $forceDownload, $country)
@@ -153,6 +154,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             }
             $this->getListings($country);
         }
+        file_put_contents(PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->marketplace->getKey()).'_listings.json', json_encode($this->listings));
     }
 
     public function downloadOrders()
@@ -238,7 +240,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     continue;
                 }
                 $listing = array_combine($header, $data);
-                $listings[] = $listing['seller-sku'] ?? $listing['sku'] ?? '';
+                $asin = $listing['asin'] ?? $listing['asin1'] ?? $listing['asin2'] ?? $listing['asin3'] ?? '';
+                if (empty($asin)) {
+                    $listings[] = $asin;
+                }
             }
         }
         $this->listings[$country] =  array_unique($listings);
