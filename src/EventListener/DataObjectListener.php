@@ -45,7 +45,7 @@ class DataObjectListener implements EventSubscriberInterface
         if (empty($data['validLayouts'])) {
             return;
         }
-        foreach ($data['validLayouts'] as $key=>$layout) {/*
+        foreach ($data['validLayouts'] as $key=>$layout) {
             if (($layout['name'] === 'product' && $level == 0) || ($layout['name'] === 'variant' && $level == 1)) {
                 $data['currentLayoutId'] = $layout['id'];
                 $customLayout = CustomLayout::getById($layout['id']);
@@ -53,7 +53,7 @@ class DataObjectListener implements EventSubscriberInterface
                 Service::enrichLayoutDefinition($data['layout'], $object);
             } else {
                 unset($data['validLayouts'][$key]);
-            }*/
+            }
         }
         $event->setArgument('data', $data);
     }
@@ -70,6 +70,7 @@ class DataObjectListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
         if ($object instanceof Folder) {
+            Product::setGetInheritedValues(false);
             $parent = $object->getParent();
             if ($object->getKey() === 'Ayarlar' || ($parent && $parent->getKey() === 'Ayarlar')) {
                 throw new \Exception('Ayarlar klasörü ve altındaki ana klasörler silinemez');
@@ -98,6 +99,7 @@ class DataObjectListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
         if ($object instanceof Product) {
+            Product::setGetInheritedValues(false);
             $object->checkProductCode();
         }
     }
@@ -113,6 +115,7 @@ class DataObjectListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
         if ($object instanceof Product) {
+            Product::setGetInheritedValues(false);
             $object->checkIwasku();
             $object->checkProductCode();
             $object->checkProductIdentifier();
@@ -120,7 +123,6 @@ class DataObjectListener implements EventSubscriberInterface
             if ($object->getParent() instanceof Product) {
                 $object->nullify();
             }
-            Product::setGetInheritedValues(false);
             if ($object->level() == 1) {
                 if ($object->getName()) {
                     throw new \Exception('Varyasyon seviyesinde isim değiştirilemez: ' . $object->getId());
@@ -129,7 +131,6 @@ class DataObjectListener implements EventSubscriberInterface
                     throw new \Exception('Varyasyon seviyesinde renk veya ebat belirtilmelidir.');
                 }
             }
-            Product::setGetInheritedValues(true);
         }
         if ($object instanceof Serial) {
             $object->checkLabel();
@@ -140,6 +141,7 @@ class DataObjectListener implements EventSubscriberInterface
     {
         $object = $event->getObject();
         if ($object instanceof Product) {
+            Product::setGetInheritedValues(false);
             if (!$object->getParent() instanceof Product) {
                 $object->checkVariations();
             }
@@ -174,6 +176,7 @@ class DataObjectListener implements EventSubscriberInterface
         $object = $event->getObject();
         $image_url = '';
         if ($object instanceof Product) {
+            Product::setGetInheritedValues(false);
             $image_url = self::traverseProducts($object);
             if (!empty($image_url)) {
                 $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));

@@ -96,7 +96,6 @@ class Product extends Concrete
 
     public function checkProductIdentifier()
     {
-        Product::setGetInheritedValues(false);
         if (empty($this->getProductIdentifier())) {
             return;
         }
@@ -105,7 +104,6 @@ class Product extends Concrete
             $paddedNumber = str_pad($matches[2], 3, '0', STR_PAD_LEFT);
             $this->setProductIdentifier($matches[1] . $paddedNumber . $matches[3]);
         }
-        Product::setGetInheritedValues(true);
     }
 
     public function listVariations()
