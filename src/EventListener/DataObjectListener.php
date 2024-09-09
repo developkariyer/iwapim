@@ -120,17 +120,16 @@ class DataObjectListener implements EventSubscriberInterface
             if ($object->getParent() instanceof Product) {
                 $object->nullify();
             }
-/*            if ($object->level() == 1) {
+            Product::setGetInheritedValues(false);
+            if ($object->level() == 1) {
                 if ($object->getName()) {
                     throw new \Exception('Varyasyon seviyesinde isim değiştirilemez: ' . $object->getId());
                 }
                 if (!($object->getVariationSize() || $object->getVariationColor())) {
                     throw new \Exception('Varyasyon seviyesinde renk veya ebat belirtilmelidir.');
                 }
-            }*/
-            if ($object->level()>0) {
-                $object->setTechnicals(null);
             }
+            Product::setGetInheritedValues(true);
         }
         if ($object instanceof Serial) {
             $object->checkLabel();
