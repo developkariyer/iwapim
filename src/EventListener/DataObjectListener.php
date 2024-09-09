@@ -51,9 +51,9 @@ class DataObjectListener implements EventSubscriberInterface
                 $customLayout = CustomLayout::getById($layout['id']);
                 $data['layout'] = $customLayout->getLayoutDefinitions();
                 Service::enrichLayoutDefinition($data['layout'], $object);
-            } elseif ($layout['id'] != 0) {
+            } /*else {
                 unset($data['validLayouts'][$key]);
-            }
+            }*/
         }
         $event->setArgument('data', $data);
     }
