@@ -100,10 +100,10 @@ class CleanCommand extends AbstractCommand
                                 $newVariantProduct->setMainProduct($mainProduct);
                                 $newVariantProduct->save();
                                 echo "Transfered ";
+                                $child->delete();
+                                echo "Deleted\n";                
                             }                        
                         }
-                        $child->delete();
-                        echo "Deleted\n";                
                     }
                 }
             }
