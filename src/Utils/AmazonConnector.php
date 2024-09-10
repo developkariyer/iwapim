@@ -384,6 +384,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         }
         if (!$found) {
             $amazonCollection = new AmazonMarketplace();
+            $amazonCollection->setMarketplaceId($country);
             $amazonCollection->setTitle($this->getTitle($listing));
             $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
             $amazonCollection->setSalePrice($listing['price'] ?? 0);
