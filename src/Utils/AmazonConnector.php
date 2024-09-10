@@ -345,7 +345,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
-                        marketplace: $this->marketplace,
+                        marketplace: null,
                         parent: Utility::checkSetPath('00 Yeni ASIN', $marketplaceFolder)
                     );
                 }
