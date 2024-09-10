@@ -109,6 +109,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
         if (substr($report, 0, 2) === "\x1f\x8b") {
             $report = gzdecode($report);
         }
+        if (substr($report, 0, 3) === "\xEF\xBB\xBF") {
+            $report = substr($report, 3);
+        }
+
         $this->amazonReports[$reportType][$country] = $report;
     }
 
