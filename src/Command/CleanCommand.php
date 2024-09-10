@@ -70,7 +70,6 @@ class CleanCommand extends AbstractCommand
         }
 
         $stack = [ObjectFolder::getById(223695)];
-        $matchings = [];
         while (!empty($stack)) {
             $folder = array_pop($stack);
             if ($folder instanceof ObjectFolder) {
@@ -88,20 +87,16 @@ class CleanCommand extends AbstractCommand
                         } else {
                             $mainProductArray = $child->getMainProduct();
                             if ($mainProduct = reset($mainProductArray)) {
-                                $newVariantProduct->setMainProduct($mainProduct);
-                                $newVariantProduct->save();
-                                echo "Transfered ";
+                                $mainProduct->addVariant($newVariantProduct);
+                                echo "{$child->getId()} => {$newVariantProduct->getId()} ";
                                 $child->delete();
                                 echo "Deleted\n";                
-                            } else {
-                                echo "No main product found\n";
                             }
                         }
                     }
                 }
             }
         }
-        print_r($matchings);
     }
 
     private static function fixProductCodes()
