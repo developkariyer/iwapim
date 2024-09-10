@@ -9,6 +9,8 @@ use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
+
 
 use App\Select\AmazonMerchantIdList;
 use App\Utils\Utility;
@@ -303,8 +305,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     public function import($updateFlag, $importFlag)
     {
-        $marketplaceRootFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+        $marketplaceFolder = Utility::checkSetPath(
+            "Amazon",
             Utility::checkSetPath('Pazaryerleri')
         );
 
@@ -312,7 +314,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (empty($this->listings[$country])) {
                 echo "Nothing to import in $country\n";
             }
-            $marketplaceFolder = Utility::checkSetPath('Amazon', $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
             foreach ($this->listings[$country] as $listing) {
@@ -323,36 +324,78 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     continue;
                 }
 
-                //$listing['item-name'] = str_replace([chr(0x94), chr(0x96), chr(0xe9)], '', $listing['item-name']);
-
                 // find a VariantProduct with ASIN
                 // if not found, create a new one
                 // if found, add our listing as data collection
 
-
-                $path = Utility::sanitizeVariable($listing['asin1'] ?? 'Tasnif-Edilmemiş');
-                $parent = Utility::checkSetPath($path, $marketplaceFolder);
-                $variantProduct = VariantProduct::addUpdateVariant(
-                    variant: [
-                        'imageUrl' => null, //$this->getImage($listing),
-                        'urlLink' => $this->getUrlLink($listing, $country),
-                        'salePrice' => $listing['price'] ?? 0,
-                        'saleCurrency' => '',
-                        'title' => $this->getTitle($listing),
-                        'attributes' => $this->getAttributes($listing),
-                        'amazonAsin' => $listing['asin1'] ?? '',
-                        'uniqueMarketplaceId' => (string) $listing['listing-id'],
-                        'apiResponseJson' => json_encode([]),
-                        'published' => ($listing['status'] === 'Active') ? true : false,
-                    ],
-                    importFlag: $importFlag,
-                    updateFlag: $updateFlag,
-                    marketplace: $this->marketplace,
-                    parent: $parent
-                );
+                $asin = $listing['asin1'] ?? '';
+                if (empty($asin)) {
+                    echo " Empty ASIN\n";
+                    continue;
+                }
+                $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin);
+                if (!$variantProduct) {
+                    $variantProduct = VariantProduct::addUpdateVariant(
+                        variant: [
+                            'imageUrl' => null,
+                            'urlLink' => $this->getUrlLink($listing, $country),
+                            'salePrice' => 0,
+                            'saleCurrency' => '',
+                            'title' => $this->getTitle($listing),
+                            'attributes' => $this->getAttributes($listing),
+                            'amazonAsin' => $asin,
+                            'uniqueMarketplaceId' => $asin,
+                            'apiResponseJson' => json_encode([]),
+                            'published' => true,
+                        ],
+                        importFlag: $importFlag,
+                        updateFlag: $updateFlag,
+                        marketplace: $this->marketplace,
+                        parent: Utility::checkSetPath('00 Yeni ASIN', $marketplaceFolder)
+                    );
+                }
+                $variantProduct->setAmazonMarketplace($this->processFieldCollection($variantProduct, $listing, $country));
+                $variantProduct->save();
                 echo "OK\n";
             }
         }
+    }
+
+    protected function processFieldCollection($variantProduct, $listing, $country)
+    {
+        $collection = $variantProduct->getAmazonMarketplace();
+        $newCollection = [];
+        $found = false;
+        foreach ($collection as $amazonCollection) {
+            if (!$amazonCollection instanceof AmazonMarketplace) {
+                continue;
+            }
+            if ($amazonCollection->getMarketplaceId() === $country) {
+                $found = true;
+                $amazonCollection->setTitle($this->getTitle($listing));
+                $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
+                $amazonCollection->setSalePrice($listing['price'] ?? 0);
+                $amazonCollection->setSku($listing['seller-sku'] ?? '');
+                $amazonCollection->setListingId($listing['listing-id'] ?? '');
+                $amazonCollection->setQuantity($listing['quantity'] ?? 0);
+                $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+                $amazonCollection->save();
+            }
+            $newCollection[] = $amazonCollection;
+        }
+        if (!$found) {
+            $amazonCollection = new AmazonMarketplace();
+            $amazonCollection->setTitle($this->getTitle($listing));
+            $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
+            $amazonCollection->setSalePrice($listing['price'] ?? 0);
+            $amazonCollection->setSku($listing['seller-sku'] ?? '');
+            $amazonCollection->setListingId($listing['listing-id'] ?? '');
+            $amazonCollection->setQuantity($listing['quantity'] ?? 0);
+            $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+            $amazonCollection->save();
+            $newCollection[] = $amazonCollection;
+        }
+        return $newCollection;
     }
 
     public function catalogItems()
