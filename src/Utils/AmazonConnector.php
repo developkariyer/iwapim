@@ -236,7 +236,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (empty($report[$country])) {
                 throw new \Exception("Report is empty. Did you first call download() method to populate reports?");
             }
-            $lines = explode("\n", $report[$country]);
+            $lines = explode("\n", mb_convert_encoding($report[$country], 'UTF-8', 'UTF-8'));
             $header = str_getcsv(array_shift($lines), "\t");
             foreach ($lines as $line) {
                 $data = str_getcsv($line, "\t");
@@ -321,6 +321,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $index = 0;
             foreach ($this->listings[$country] as $listing) {
                 $index++;
+                if ($country !== 'TR') continue;
                 echo "($index/$total) Processing id {$listing['listing-id']} ...";
                 if (empty($listing)) {
                     echo " Empty\n";
