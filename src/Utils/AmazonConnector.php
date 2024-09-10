@@ -314,6 +314,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             if (empty($this->listings[$country])) {
                 echo "Nothing to import in $country\n";
+            } else {
+                echo "Importing $country\n";
             }
             $total = count($this->listings[$country]);
             $index = 0;
