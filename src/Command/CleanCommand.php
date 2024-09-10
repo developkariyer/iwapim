@@ -62,43 +62,52 @@ class CleanCommand extends AbstractCommand
 
     private static function crossCheckAsins()
     {
-        $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT amazonAsin FROM object_varyantproduct WHERE amazonAsin IS NOT NULL";
-        $stmt = $db->query($sql);
-        $asins = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        //print_r($asins);
-        foreach ($asins as $asin) {
-            if (empty($asin)) {
-                continue;
-            }
-            echo "\rProcessing ASIN: {$asin}                                             \r";
-            $listingObject = new VariantProduct\Listing();
-            $listingObject->setCondition("amazonAsin = ?", [$asin]);
-            $listingObject->setUnpublished(true);
-            $variants = $listingObject->load();
-            $connectedProduct = [];
-            //echo "\n    Found ".count($variants) . " variants\n";
-            foreach ($variants as $variant) {
-                $mainProduct = $variant->getMainProduct();
-                if (empty($mainProduct)) {
-                    continue;
+        function readAsinFromDb($id) {
+            $db = \Pimcore\Db::get();
+            $stmt = $db->prepare("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = 'apiResponseJson' LIMIT 1");
+            $stmt->execute([$id]);
+            $jsonData = $stmt->fetchColumn();
+            if ($jsonData) {
+                $data = json_decode($jsonData, true);
+                if (isset($data['asin'])) {
+                    return $data['summaries'][0]['asin'] ?? $data['asin'] ?? null;
                 }
-                if (count($mainProduct) > 1) {
-                    echo "\n    WARNING: Found more than one main product for variant: {$variant->getId()} " . $variant->getFullPath() . "\n";
-                    exit;
-                }
-                $connectedProduct[] = reset($mainProduct);
-            }
-            $connectedProduct = array_unique($connectedProduct);
-            if (count($connectedProduct) == 1) {
-                echo "\n    Found main product: " . reset($connectedProduct)->getFullPath() . " with id ".reset($connectedProduct)->getId()."\n";
-                $product = reset($connectedProduct);
-                $product->addVariant($variants);
-            } elseif (count($connectedProduct) > 1) {
-                echo "\n    WARNING: Found more than one main product for variants: " . implode(", ", $connectedProduct) . "\n";
-                exit;
-            } 
+            }            
         }
+
+        $stack = [];
+        array_push($stack, ObjectFolder::getById(223695));
+        while (!empty($stack)) {
+            $folder = array_pop($stack);
+            if ($folder instanceof ObjectFolder) {
+                echo "Running in folder: " . $folder->getFullPath() . "\n";
+                foreach ($folder->getChildren() as $child) {
+                    if ($child instanceof ObjectFolder) {
+                        array_push($stack, $child);
+                    }
+                    if ($child instanceof VariantProduct) {
+                        echo "    Found variant product: {$child->getId()} ";
+                        if (!($asin = readAsinFromDb($child->getId()))) {
+                            echo "No ASIN found\n";
+                            continue;
+                        }
+                        echo "ASIN ";
+                        if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
+                            echo "No new variant found\n";
+                            continue;
+                        }
+                        echo " =>{$newVariantProduct->getId()} ";
+                        if ($mainProduct = reset($child->getMainProduct())) {
+                            $newVariantProduct->setMainProduct($mainProduct);
+                            $newVariantProduct->save();
+                            $child->delete();
+                            echo "Transfered and deleted";
+                        }                        
+                    }
+                }
+            }
+        }
+
     }
 
     private static function fixProductCodes()

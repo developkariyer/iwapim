@@ -344,7 +344,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
                             'saleCurrency' => '',
                             'title' => $this->getTitle($listing),
                             'attributes' => $this->getAttributes($listing),
-                            'amazonAsin' => $asin,
                             'uniqueMarketplaceId' => $asin,
                             'apiResponseJson' => json_encode([]),
                             'published' => true,
