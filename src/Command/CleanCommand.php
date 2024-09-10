@@ -108,7 +108,7 @@ class CleanCommand extends AbstractCommand
                         if (!($asin = readAsinFromDb($child->getId()))) {
                             continue;
                         }
-                        if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
+                        if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin, unpublished: true))) {
                             echo "No new variant found for {$child->getId()} with ASIN $asin\n";
                         } else {
                             $mainProductArray = $child->getMainProduct();
