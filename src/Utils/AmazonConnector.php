@@ -138,6 +138,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             foreach ($item['identifiers'][0]['identifiers'] ?? [] as $identifier) {
                 if ($identifier['identifierType'] === 'SKU') {
                     $this->listings[$country][$identifier['identifier']] = $item;
+                    file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$identifier['identifier']}_{$country}.json", json_encode($item));
                 }
             }
         }
@@ -226,6 +227,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     public function getListings($country)
     {
+        $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         $listings = [];
         foreach ($this->amazonReports as $reportType=>$report) {
             if (empty($report[$country])) {
@@ -241,7 +243,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $listing = array_combine($header, $data);
                 $sku = $listing['sku'] ?? $listing['seller-sku'] ?? '';
                 if (!empty($sku)) {
-                    $listings[$sku] = '';
+                    $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$sku}_{$country}.json";
+                    $listings[$sku] = (file_exists($filename) && filemtime($filename) > time() - 86400) ? 
+                                    json_decode(file_get_contents($filename), true) : '';
                 }
             }
         }
