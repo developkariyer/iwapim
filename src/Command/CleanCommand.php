@@ -96,7 +96,7 @@ class CleanCommand extends AbstractCommand
                         } else {
                             $matchings[$child->getId()] = $newVariantProduct->getId();
                             echo " => {$newVariantProduct->getId()} ";
-                            if ($mainProduct = reset($child->getMainProduct())) {
+/*                            if ($mainProduct = reset($child->getMainProduct())) {
                                 $newVariantProduct->setMainProduct($mainProduct);
                                 $newVariantProduct->save();
                                 echo "Transfered ";
@@ -104,7 +104,7 @@ class CleanCommand extends AbstractCommand
                                 echo "Deleted\n";                
                             } else {
                                 echo "No main product found\n";
-                            }
+                            }*/
                         }
                     }
                 }
