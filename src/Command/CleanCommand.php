@@ -83,7 +83,7 @@ class CleanCommand extends AbstractCommand
                             continue;
                         }
                         if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
-                            echo "No new variant found\n";
+                            echo "No new variant found for {$child->getId()} with ASIN $asin\n";
                         } else {
                             $mainProductArray = $child->getMainProduct();
                             if ($mainProduct = reset($mainProductArray)) {
