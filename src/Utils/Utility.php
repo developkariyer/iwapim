@@ -26,8 +26,8 @@ class Utility
         $sanitized = preg_replace('/[^\p{L}\p{N}çÇğĞıİöÖşŞüÜ\-_]/u', '-', $variable);
         $sanitized = preg_replace('/-+/', '-', $sanitized);
         if ($length > 0 && mb_strlen($sanitized, 'UTF-8') > $length) {
-            $half = floor(mb_strlen($sanitized, 'UTF-8') / 2) - floor($length / 2);
-            $sanitized = mb_substr($sanitized, 0, $half, 'UTF-8') . mb_substr($sanitized, -$half, null, 'UTF-8');
+            $half = floor($length / 2);
+            $sanitized = mb_substr($sanitized, 0, $half, 'UTF-8') . mb_substr($sanitized, -($length - $half), null, 'UTF-8');
         }
     
         $sanitized = trim(trim($sanitized, '-'));
