@@ -10,6 +10,7 @@ use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
+use Pimcore\Model\DataObject\Fieldcollection;
 
 
 use App\Select\AmazonMerchantIdList;
@@ -363,7 +364,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     protected function processFieldCollection($variantProduct, $listing, $country)
     {
         $collection = $variantProduct->getAmazonMarketplace();
-        $newCollection = new DataObject\Fieldcollection();
+        $newCollection = new Fieldcollection();
         $found = false;
         foreach ($collection ?? [] as $amazonCollection) {
             if (!$amazonCollection instanceof AmazonMarketplace) {
