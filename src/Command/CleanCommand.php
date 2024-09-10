@@ -100,7 +100,9 @@ class CleanCommand extends AbstractCommand
                                 echo "Transfered ";
                                 $child->delete();
                                 echo "Deleted\n";                
-                            }                        
+                            } else {
+                                echo "No main product found\n";
+                            }
                         }
                     }
                 }
