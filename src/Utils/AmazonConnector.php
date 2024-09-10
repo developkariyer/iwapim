@@ -324,11 +324,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     echo " Empty\n";
                     continue;
                 }
-
-                // find a VariantProduct with ASIN
-                // if not found, create a new one
-                // if found, add our listing as data collection
-
                 $asin = $listing['asin1'] ?? '';
                 if (empty($asin)) {
                     echo " Empty ASIN\n";
