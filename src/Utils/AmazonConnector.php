@@ -238,6 +238,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             foreach ($lines as $line) {
                 $data = str_getcsv($line, "\t");
                 if (count($header) != count($data)) {
+                    echo "Header and data count mismatch\n";
                     continue;
                 }
                 $listing = array_combine($header, $data);
