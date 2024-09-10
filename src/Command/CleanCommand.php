@@ -86,7 +86,8 @@ class CleanCommand extends AbstractCommand
                         if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
                             echo "No new variant found\n";
                         } else {
-                            if ($mainProduct = reset($child->getMainProduct())) {
+                            $mainProductArray = $child->getMainProduct();
+                            if ($mainProduct = reset($mainProductArray)) {
                                 $newVariantProduct->setMainProduct($mainProduct);
                                 $newVariantProduct->save();
                                 echo "Transfered ";
