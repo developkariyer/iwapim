@@ -53,14 +53,14 @@ class CleanCommand extends AbstractCommand
             }
         }
         if ($input->getOption('asin')) {
-            self::crossCheckAsins();
+            self::transferAsins();
         }
         return Command::SUCCESS;
     }
 
     //self::splitProductFolders(ObjectFolder::getById(149861));
 
-    private static function crossCheckAsins()
+    private static function transferAsins()
     {
         function readAsinFromDb($id) {
             $db = \Pimcore\Db::get();
