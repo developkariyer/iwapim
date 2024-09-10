@@ -65,13 +65,8 @@ class CleanCommand extends AbstractCommand
         function readAsinFromDb($id) {
             $db = \Pimcore\Db::get();
             $jsonData = $db->fetchOne("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = 'apiResponseJson' LIMIT 1", [$id]);
-            if ($jsonData) {
-                $data = json_decode($jsonData, true);
-                if (isset($data['asin'])) {
-                    return $data['summaries'][0]['asin'] ?? $data['asin'] ?? null;
-                }
-            }
-            return null;  
+            $data = json_decode($jsonData ?? [], true);
+            return $data['summaries'][0]['asin'] ?? $data['asin'] ?? null;
         }
 
         $stack = [ObjectFolder::getById(223695)];
@@ -85,9 +80,7 @@ class CleanCommand extends AbstractCommand
                         $stack[] = $child;
                     }
                     if ($child instanceof VariantProduct) {
-                        echo "    Found variant product: {$child->getId()} ";
                         if (!($asin = readAsinFromDb($child->getId()))) {
-                            echo "No ASIN found\r                                                             \r";
                             continue;
                         }
                         echo "ASIN ";
