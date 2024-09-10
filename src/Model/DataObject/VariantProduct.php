@@ -107,7 +107,7 @@ class VariantProduct extends Concrete
             throw new \Exception('Parent is required for adding/updating VariantProduct');
         }
         $key_base = "{$marketplace->getKey()} {$variant['title']} ";
-        $key_base.= $variant['attributes'] ?? '';
+        $key_base.= Utility::sanitizeVariable($variant['attributes'] ?? '');
         $key_base = Utility::sanitizeVariable($key_base,250);
         $key = '';
         while (self::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
