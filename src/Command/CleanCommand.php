@@ -120,7 +120,7 @@ class CleanCommand extends AbstractCommand
                                 echo "{$child->getId()} => {$newVariantProduct->getId()} ";
                             }
                             $child->delete();
-                            echo "Deleted\n";                
+                            echo "{$child->getId()} deleted\n";                
                         }
                     }
                 }
