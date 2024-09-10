@@ -316,7 +316,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $index = 0;
             foreach ($this->listings[$country] as $listing) {
                 $index++;
-                print_r($listing);
                 echo "($index/$total) Processing SKU {$listing['listing-id']} ...";
                 if (empty($listing)) {
                     continue;
