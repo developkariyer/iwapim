@@ -163,7 +163,8 @@ class PrepareTableCommand extends AbstractCommand
     }
     protected static function prepareOrderTable($uniqueMarketplaceId)
     {
-        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        //$variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantObject = VariantProduct::getByUniqueMarketplaceId($uniqueMarketplaceId);
         if(!$variantObject) {
             return Command::FAILURE;
         }
