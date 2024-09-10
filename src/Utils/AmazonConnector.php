@@ -16,7 +16,7 @@ use App\Utils\Utility;
 class AmazonConnector implements MarketplaceConnectorInterface
 {
     private array $amazonReports = [
-        'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
+//        'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
         'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
         //'GET_AFN_INVENTORY_DATA' => [],
         //'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
@@ -242,11 +242,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     continue;
                 }
                 $listing = array_combine($header, $data);
-                $sku = $listing['sku'] ?? $listing['seller-sku'] ?? '';
+                $sku = $listing['seller-sku'] ?? '';
                 if (!empty($sku)) {
-                    $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$sku}_{$country}.json";
-                    $listings[$sku] = (file_exists($filename) && filemtime($filename) > time() - 86400) ? 
-                                    json_decode(file_get_contents($filename), true) : '';
+                    $listings[$sku] = $listing;
                 }
             }
         }
@@ -288,35 +286,26 @@ class AmazonConnector implements MarketplaceConnectorInterface
         ];
         
         $l = new Link();
-        $l->setPath($amazonWebsites[$country].'/dp/' . ($listing['summaries'][0]['asin'] ?? ''));
+        $l->setPath($amazonWebsites[$country].'/dp/' . ($listing['asin1'] ?? ''));
         return $l;
     }
 
     private function getAttributes($listing) {
-        $attributes = [];
-        if (!empty($listing['attributes']['size']) && is_array($listing['attributes']['size'])) {
-            $values = array_filter(array_map(function($value) {
-                return str_replace(' ', '', $value);
-            }, array_column($listing['attributes']['size'], 'value')));
-            if (!empty($values)) {
-                $attributes[] = implode('-', $values);
-            }
+        $title = $listing['item-name'];
+        $lastCloseParen = mb_strrpos($title, ')', 0);
+        if ($lastCloseParen === false) {
+            return '';
         }
-        if (!empty($listing['attributes']['color']) && is_array($listing['attributes']['color'])) {
-            $values = array_filter(array_map(function($value) {
-                return str_replace(' ', '', $value);
-            }, array_column($listing['attributes']['color'], 'value')));
-            if (!empty($values)) {
-                $attributes[] = implode('-', $values);
-            }
+        $lastOpenParen = mb_strrpos($title, '(', 0);
+        if ($lastOpenParen === false || $lastOpenParen > $lastCloseParen) {
+            return '';
         }
-        return implode(' ', $attributes);
+        return trim(mb_substr($title, $lastOpenParen + 1, $lastCloseParen - $lastOpenParen - 1));
     }
 
     private function getTitle($listing)
     {
-        //$title = empty($listing['offers']) ? 'NOSALE ' : '';
-        $title = $listing['summaries'][0]['itemName'] ?? '';
+        $title = $listing['item-name'] ?? '';
         return trim($title);
     }
 
@@ -334,43 +323,33 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
-            foreach (array_keys($this->listings[$country]) as $sku) {
+            foreach (array_keys($this->listings[$country]) as $sku=>$listing) {
+                $index++;
                 echo "($index/$total) Processing SKU $sku ...";
-                $listing = $this->listings[$country][$sku];
                 if (empty($listing)) {
-                    $listing = $this->downloadAmazonSKU($sku, $country);
-                } else {
-                    echo " (cached) ";
-                }
-                if (empty($listing)) {
-                    $index++;
                     continue;
                 }
-                $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
+                $path = Utility::sanitizeVariable($listing['asin1'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
-                if (isset($listing['relationships'][0]['relationships'][0]['parentAsins'][0])) {
-                    $parent = Utility::checkSetPath($listing['relationships'][0]['relationships'][0]['parentAsins'][0], $parent);
-                }/*
                 $variantProduct = VariantProduct::addUpdateVariant(
                     variant: [
-                        'imageUrl' => $this->getImage($listing),
+                        'imageUrl' => null, //$this->getImage($listing),
                         'urlLink' => $this->getUrlLink($listing, $country),
-                        'salePrice' => 0,
+                        'salePrice' => $listing['price'] ?? 0,
                         'saleCurrency' => '',
                         'title' => $this->getTitle($listing),
                         'attributes' => $this->getAttributes($listing),
-                        'amazonAsin' => $listing['asin'] ?? '',
-                        'uniqueMarketplaceId' => $listing['asin'],
-                        'apiResponseJson' => json_encode($listing),
-                        'published' => true,
+                        'amazonAsin' => $listing['asin1'] ?? '',
+                        'uniqueMarketplaceId' => $listing['listing-id'],
+                        'apiResponseJson' => json_encode([]),
+                        'published' => ($listing['status'] === 'Active') ? true : false,
                     ],
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,
                     marketplace: $this->marketplace,
                     parent: $parent
-                );*/
+                );
                 echo "OK\n";
-                $index++;
             }
         }
     }
