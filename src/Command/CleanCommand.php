@@ -75,6 +75,7 @@ class CleanCommand extends AbstractCommand
         }
 
         $stack = [ObjectFolder::getById(223695)];
+        $matchings = [];
         while (!empty($stack)) {
             $folder = array_pop($stack);
             if ($folder instanceof ObjectFolder) {
@@ -93,6 +94,7 @@ class CleanCommand extends AbstractCommand
                         if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
                             echo "No new variant found\n";
                         } else {
+                            $matchings[$child->getId()] = $newVariantProduct->getId();
                             echo " => {$newVariantProduct->getId()} ";
                             if ($mainProduct = reset($child->getMainProduct())) {
                                 $newVariantProduct->setMainProduct($mainProduct);
@@ -108,7 +110,7 @@ class CleanCommand extends AbstractCommand
                 }
             }
         }
-
+        print_r($matchings);
     }
 
     private static function fixProductCodes()
