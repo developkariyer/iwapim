@@ -102,7 +102,7 @@ class CleanCommand extends AbstractCommand
         while (!empty($stack)) {
             $folder = array_pop($stack);
             if ($folder instanceof ObjectFolder) {
-                echo "Running in folder: " . $folder->getFullPath() . "\n";
+                echo "Running in folder: " . $folder->getFullPath() . "                             \r";
                 foreach ($folder->getChildren() as $child) {
                     if ($child instanceof ObjectFolder) {
                         $stack[] = $child;
@@ -112,7 +112,7 @@ class CleanCommand extends AbstractCommand
                             continue;
                         }
                         if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin, unpublished: true))) {
-                            echo "No new variant found for {$child->getId()} with ASIN $asin\n";
+                            echo "\nNo new variant found for {$child->getId()} with ASIN $asin\n";
                         } else {
                             $mainProductArray = $child->getMainProduct();
                             if ($mainProduct = reset($mainProductArray)) {
