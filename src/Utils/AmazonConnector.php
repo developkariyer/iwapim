@@ -288,15 +288,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     private function getAttributes($listing) {
         $title = $listing['item-name'];
-        $lastCloseParen = mb_strrpos($title, ')', 0);
-        if ($lastCloseParen === false) {
-            return '';
+        if (preg_match('/\(([^()]*(?:\([^()]*\))*[^()]*)\)$/', $title, $matches)) {
+            return trim($matches[1]);
         }
-        $lastOpenParen = mb_strrpos($title, '(', 0);
-        if ($lastOpenParen === false || $lastOpenParen > $lastCloseParen) {
-            return '';
-        }
-        return trim(mb_substr($title, $lastOpenParen + 1, $lastCloseParen - $lastOpenParen - 1));
+        return '';    
     }
 
     private function getTitle($listing)
