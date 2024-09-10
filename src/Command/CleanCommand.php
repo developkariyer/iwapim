@@ -64,6 +64,7 @@ class CleanCommand extends AbstractCommand
 
     private static function linkCheck()
     {
+        $multipleMainProducts = [];
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
@@ -79,12 +80,13 @@ class CleanCommand extends AbstractCommand
                 $mainProductArray = $variant->getMainProduct();
                 if (count($mainProductArray) > 1) {
                     echo "*************Multiple main products for variantProduct: {$variant->getId()}\n";
-                    sleep(5);
+                    $multipleMainProducts[] = $variant->getId();
                 }                    
             }
             $offset += $pageSize;
             echo "Processed {$offset}\n";
         }
+        print_r($multipleMainProducts);
     }
 
     private static function transferAsins()
