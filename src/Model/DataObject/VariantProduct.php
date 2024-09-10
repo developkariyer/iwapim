@@ -130,7 +130,7 @@ class VariantProduct extends Concrete
         } catch (\Throwable $e) {
             echo "\n**************************************************\n";
             print_r($variant);
-            echo trim("$key_base$key");
+            echo "Key: ".trim("$key_base$key");
             echo "Error: {$e->getMessage()}\n";
             echo "\n**************************************************\n";
             return false;
