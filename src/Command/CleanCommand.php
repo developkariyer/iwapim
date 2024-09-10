@@ -87,7 +87,7 @@ class CleanCommand extends AbstractCommand
                             echo "No new variant found\n";
                         } else {
                             $matchings[$child->getId()] = $newVariantProduct->getId();
-                            echo " => {$newVariantProduct->getId()} ";
+                            echo "    {$child->getId()} => {$newVariantProduct->getId()}\n";
 /*                            if ($mainProduct = reset($child->getMainProduct())) {
                                 $newVariantProduct->setMainProduct($mainProduct);
                                 $newVariantProduct->save();
