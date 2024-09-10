@@ -2,17 +2,27 @@
 
 namespace App\Utils;
 
+use SellingPartnerApi\SellingPartnerApi;
+use SellingPartnerApi\Enums\Endpoint;
+use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
+
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
 
-class BolConnector implements MarketplaceConnectorInterface
+
+class  BolConnector
 {
     private $marketplace = null;
     private $listings = [];
+    private $listingsInfo = [];
     private $accessToken = "";
+    private $offerExportUrl = "https://api.bol.com/retailer/offers/export/";
+    private $processStatusUrl = "https://api.bol.com/shared/process-status/";
+    private $productsUrl  = "https://api.bol.com/retailer/products/";
+    private $productDetailUrl = "https://api.bol.com/retailer/content/catalog-products/";
 
     public function __construct(Marketplace $marketplace)
     {
@@ -26,6 +36,8 @@ class BolConnector implements MarketplaceConnectorInterface
         }
         $this->marketplace = $marketplace;
     }
+
+
 
     // Create Access Token
     private function getAccessToken()
@@ -55,7 +67,7 @@ class BolConnector implements MarketplaceConnectorInterface
 
             // access token
             if (isset($decoded_response['access_token'])) {
-                echo 'Access Token: ' . $decoded_response['access_token'];
+                //echo 'Access Token: ' . $decoded_response['access_token'];
                 $this->accessToken = $decoded_response['access_token'];
             } else {
                 echo 'Anahtar bulunamadi!';
@@ -64,7 +76,7 @@ class BolConnector implements MarketplaceConnectorInterface
         curl_close($curl);
     }
 
-    // GET all offers return => .csv
+  
     public function download($forceDownload = false)
     {
 
@@ -72,371 +84,204 @@ class BolConnector implements MarketplaceConnectorInterface
         $filenamejson = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
 
         if (!$forceDownload && file_exists($filename) && file_exists($filenamejson) && filemtime($filename) > time() - 86400) {
+
+            $csvContent = file_get_contents($filename);
             $contentJson = file_get_contents($filenamejson);
-            $this->listings = json_decode($contentJson, true);
+            $this->listings = json_decode($contentJson, true);          
             echo "Using cached data ";
+
+
         } else {   
             $this->listings = [];
-            $processStatusApi = "";
             $entityId = "";
+
+            // get access token
             $this->getAccessToken();
+
+            // offer post csv
             $headers = [
                 'Authorization: Bearer ' . $this->accessToken,
                 'Accept: application/vnd.retailer.v10+json',
                 'Content-Type: application/vnd.retailer.v10+json'
             ];
-    
-            // POST verisi
             $postData = json_encode(['format' => 'CSV']);
-    
-            // cURL isteği oluştur
-            $ch = curl_init("https://api.bol.com/retailer/offers/export");
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
-            if ($httpCode == 202) {
-                $data = json_decode($response, true);
-                $processStatusApi = $data['processStatusId'] ?? null;
+            $this->addProductInfo($this->offerExportUrl,"",$headers,"POST",$postData);
+            $status = "";
+            $processStatusId= "";
+            foreach ($this->listings as $listingArray) 
+            {
+                if (isset($listingArray[$this->offerExportUrl])) {
+                    $status = $listingArray[$this->offerExportUrl]['status'] ?? null;
+                    $processStatusId = $listingArray[$this->offerExportUrl]['processStatusId'] ?? null;
+                    echo "Status: " . $status . "\n";
+                }
             }
-            
-            echo "Process Status Api: $processStatusApi";
-            // cURL işlemi kapat
-            curl_close($ch);
 
-            // process status control
-            $status = '';
-
-            do {
-                // cURL oturumu başlat
-                $ch = curl_init("https://api.bol.com/shared/process-status/" . $processStatusApi);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            
-                // İstek gönder
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                if (curl_errno($ch)) {
-                    echo 'Curl error: ' . curl_error($ch);
-                    break; 
-                } else {
-                    $data = json_decode($response, true);
-                    $status = $data['status'] ?? ''; 
-                    $entityId = $data['entityId'] ?? null;
-                    echo "Status: $status, Entity Id: $entityId\n";
+            do{
+                $this->addProductInfo($this->processStatusUrl,"",$headers,"GET",null,false,$processStatusId);
+                foreach ($this->listings as $listingArray) 
+                {
+                    if (isset($listingArray[$this->processStatusUrl.$processStatusId])) {
+                        $status = $listingArray[$this->processStatusUrl.$processStatusId]['status'] ?? null;
+                        echo "Status: " . $status . "\n";
+                    }
                 }
-                curl_close($ch);
-                if ($status !== 'SUCCESS') {
-                    exit;
+                if($status === 'SUCCESS')
+                {
+                    foreach ($this->listings as $listingArray) 
+                    {
+                        if (isset($listingArray[$this->processStatusUrl.$processStatusId])) {
+                            $entityId = $listingArray[$this->processStatusUrl.$processStatusId]['entityId'] ?? null;
+                            echo "entityId: " . $entityId . "\n";
+                        }
+                    }
+                    break;
                 }
-            } while ($status !== 'SUCCESS');
+                sleep(5);
+            }while($status !== 'SUCCESS');
 
             
-            // get offers 
+            //get offers 
             $headers = [
                 'Authorization: Bearer ' . $this->accessToken,
                 'Accept: application/vnd.retailer.v9+csv'
             ];
-            $ch = curl_init("https://api.bol.com/retailer/offers/export/".$entityId);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        
-            // istek gonder
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (curl_errno($ch)) {
-                echo 'Curl error: ' . curl_error($ch);
-            } else {
-                echo $response;
-                file_put_contents($filename, $response);
-                $rows = array_map('str_getcsv', explode("\n", trim($response))); 
-                if (!empty($rows)) {
-
-                    $headers = array_shift($rows);
+            $this->addProductInfo($this->offerExportUrl,"",$headers,"GET",null,false,null,$entityId,true);
             
-                    foreach ($rows as $row) {
-                        if (count($row) === count($headers)) { 
-                            $this->listings[] = array_combine($headers, $row);
-                        }
-                    }
-                }
-            }
-            curl_close($ch);  
-            $this->addProductId();
-            $this->addProductDetail();
-            $this->addProductAssets();
-            $this->addProductPlacement();
+            print_r($this->listings);
+            $headers = [
+                'Authorization: Bearer ' . $this->accessToken,
+                'Accept: application/vnd.retailer.v10+json',
+            ];
+
+            //product ids
+            $this->addProductInfo($this->productsUrl,"/product-ids",$headers,"GET",null,true);
+            // product detail
+            $this->addProductInfo($this->productDetailUrl,"",$headers,"GET",null,true);
+            // product assets
+            $this->addProductInfo($this->productsUrl,"/assets",$headers,"GET",null,true);
+            // product placement
+            $this->addProductInfo($this->productsUrl,"/placement",$headers,"GET",null,true);
         }
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
+
 
         echo "count listings: ".count($this->listings);
         
         return  count($this->listings);
     }
 
-
-    // Get catalog product details by EAN
-    private function addProductDetail()
+    private function addProductInfo($url,$urlEnd="",$headers,$method,$postData=null,$boolEan=false,$processStatusId=null,$entityId=null,$csv=false)
     {
         $this->getAccessToken();
-
-        foreach ($this->listings as &$listing) 
-        {
-            $ean = $listing["ean"];
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v10+json',
-            ];
-    
-            $ch = curl_init("https://api.bol.com/retailer/content/catalog-products/".$ean);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
-            if (curl_errno($ch)) {
-                echo 'Curl error: ' . curl_error($ch);
-                exit;
-            } else {
-                $decoded_response = json_decode($response, true);
-                if (isset($decoded_response["published"])) {
-                    $listing["published"] = $decoded_response["published"];
-                    
-                } else {
-                    echo 'published Anahtar bulunamadi veya eksik!' . "\n";
-                    $listing["published"] = null; 
-                }
-                if (isset($decoded_response['gpc']['chunkId'])) {
-                    $chunkId = $decoded_response['gpc']['chunkId'];
-                    $listing["chunkId"] = $chunkId;
-                } else {
-                    $listing["chunkId"] = null;
-                }
-                $listing["attributes"] = $decoded_response["attributes"];
-                if (isset($decoded_response['attributes']) && is_array($decoded_response['attributes'])) {
-                    foreach ($decoded_response['attributes'] as $attribute) {
-                        if (isset($attribute['id']) && $attribute['id'] === 'Title' && isset($attribute['values'][0]['value'])) {
-                            $listing['title'] = $attribute['values'][0]['value'];
-                            echo 'Title: ' . $listing['title'] . "\n";
-                            break;
-                        }
-                    }
-                } 
-                echo $listing['title'];
+        $control = false;
+        foreach ($headers as &$header) {
+            if (strpos($header, 'Authorization:') === 0) {
+                $header = 'Authorization: Bearer ' . $this->accessToken;
+                echo "Anahtar Guncellendi\n";
+                break; 
             }
-            curl_close($ch);
-            sleep(1);
         }
-
-    }
-    // Get product placement
-    private function addProductPlacement()
-    {
-        $this->getAccessToken();
-
+        if(count($this->listings) === 0) {
+            $this->listings[] = [];
+            $control = true;
+        }
+        $firstElementSkipped = false;
         foreach ($this->listings as &$listing) 
         {
-            $ean = $listing["ean"];
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v10+json',
-            ];
-    
-           
-            $ch = curl_init("https://api.bol.com/retailer/products/".$ean."/placement");
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            
-            if (curl_errno($ch)) {
-                echo 'Curl error: ' . curl_error($ch);
-            } else {
-                $decoded_response = json_decode($response, true);                
-                if (isset($decoded_response["url"])) {
-                    $listing["url"] = $decoded_response["url"];
-                    
-                } else {
-                    echo 'URL Anahtar bulunamadi veya eksik!' . "\n";
-                    $listing["url"] = null; 
-                }
-                if (isset($decoded_response['categories']) && is_array($decoded_response['categories'])) {
-                    foreach ($decoded_response['categories'] as $category) {
-                        if (isset($category['categoryName'])) {
-                            echo 'Category Name: ' . $category['categoryName'] . "\n";
-                            $listing["categoryName"] = $category['categoryName'];
-                            break; // İlk bulunan categoryName'i alıp döngüden çıkabilirsiniz
-                        }
-                    }
-                } else {
-                    $listing["categoryName"] = "";
-                }
-                echo $listing["url"];
+            if (!$firstElementSkipped && $boolEan) {
+                $firstElementSkipped = true; 
+                continue;
             }
-            curl_close($ch);
-            sleep(1);
-        
-        }
-    }
-    // Get product assets
-    private function addProductAssets()
-    {
-   
-        $this->getAccessToken();
-
-        foreach ($this->listings as &$listing) 
-        {
-            $ean = $listing["ean"];
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v10+json',
-            ];
+            $urlFunction = "";
+            if($boolEan)
+                $urlFunction = $url.$listing["ean"].$urlEnd;
+            else if($processStatusId)
+                $urlFunction = $url.$processStatusId;
+            else if($entityId)
+                $urlFunction = $url.$entityId;
+            else
+                $urlFunction = $url;
     
-           
-            $ch = curl_init("https://api.bol.com/retailer/products/".$ean."/assets");
+
+            $ch = curl_init($urlFunction);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+            // Post metodunu kontrol et
+            if($method == "POST")
+            {
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            }
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (curl_errno($ch)) {
-                echo 'Curl error: ' . curl_error($ch);
-            } else {
+            if($csv)
+            {
+                $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.csv';
                 echo $response;
-                $decoded_response = json_decode($response, true);  
-                $url_count = 1;
-                if (isset($decoded_response['assets']) && is_array($decoded_response['assets'])) {
-                    foreach ($decoded_response['assets'] as $asset) {
-                        if (isset($asset['variants']) && is_array($asset['variants'])) {
-                            foreach ($asset['variants'] as $variant) {    
-                                if (isset($variant['url'])) {
-                                    echo 'Image URL'.$url_count.': ' . $variant['url'] . PHP_EOL;
-                                    $listing["imageUrl" . $url_count] = $variant['url'];
-                                    $url_count++; 
-                                }
-                            }
-                        } else {
-                            echo 'Variants bulunamadi.';
+                file_put_contents($filename, $response);
+                $rows = array_map('str_getcsv', explode("\n", trim($response))); 
+                if (!empty($rows)) {
+                    $headers = array_shift($rows);
+                    foreach ($rows as $row) {
+                        if (count($row) === count($headers)) { 
+                            $this->listings[] = array_combine($headers, $row);
                         }
                     }
-                } else {
-                    echo 'Assets bulunamadi.';
                 }
+                break;
             }
-            
-            sleep(1);
-        
-        }
-    }
-    // Get Product ids By EAN return =>  bolProductId
-    private function addProductId()
-    {
-        $this->getAccessToken();
-
-        foreach ($this->listings as &$listing) 
-        {
-            $ean = $listing["ean"];
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v10+json',
-            ];
-    
-           
-            $ch = curl_init("https://api.bol.com/retailer/products/".$ean."/product-ids");
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
             if (curl_errno($ch)) {
                 echo 'Curl error: ' . curl_error($ch);
             } else {
-                $decoded_response = json_decode($response, true);                
-                if (isset($decoded_response["bolProductId"])) {
-                    $listing["bolProductId"] = $decoded_response["bolProductId"];
-                    echo 'bolProductId: ' . $listing["bolProductId"] . "\n";
+                $decoded_response = json_decode($response, true);   
+                if ($decoded_response) {
+                    $listing[$urlFunction] = $decoded_response;
+                    echo 'JSON Yaniti: ' . $response . "\n";
+                    
                 } else {
-                    echo 'bolProductId Anahtar bulunamadi veya eksik!' . "\n";
-                    $listing["bolProductId"] = null;
-                }
+                    echo 'Yanit cozumlenemedi veya gecersiz!' . "\n";
+                    $listing[$urlFunction] = null;
+                }                
             }
             curl_close($ch);
             sleep(1);
+            if($control)
+                break;
         }
     }
 
-    private function getVariants()
+    private function singleCurl($url,$urlEnd="",$ean)
     {
         $this->getAccessToken();
-
-        foreach ($this->listings as &$listing) 
-        {
-            $ean = $listing["ean"];
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept-Language: nl',
-                'Accept: application/json'
-            ];
-            
-            $baseUrl = "https://api.bol.com/marketing/catalog/v1/products/" . $ean . "/variants";
-            $queryParams = [
-                'country-code' => 'NL',
-            ];
-            
-
-            $url = $baseUrl . '?' . http_build_query($queryParams);
-            $ch = curl_init($url); 
-            
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            
-            curl_close($ch);  
-    
-            if (curl_errno($ch)) {
-                echo 'cURL error: ' . curl_error($ch);
+        $headers = [
+            'Authorization: Bearer ' . $this->accessToken,
+            'Accept: application/vnd.retailer.v10+json',
+            'Content-Type: application/vnd.retailer.v10+json'
+        ];
+        $urlFunction = $url.$ean.$urlEnd;
+        $ch = curl_init($urlFunction);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if (curl_errno($ch)) {
+            echo 'Curl error: ' . curl_error($ch);
+        } else {
+            $decoded_response = json_decode($response, true);   
+            if ($decoded_response) {
+                echo 'JSON Yaniti: ' . $response . "\n";
+                return $decoded_response;
             } else {
-
-                if ($httpCode === 200) {
-                    echo $response; 
-                } else {
-                    echo "Request failed with HTTP code: " . $httpCode; 
-                    echo "\nResponse: " . $response; 
-                }
-            }
-            sleep(1);
+                echo 'Yanit cozumlenemedi veya gecersiz!' . "\n";
+                return null;
+            }                
         }
 
     }
-
-    private function getUrlLink($listing) {
-        $l = new Link();
-        $l->setPath($listing["url"] ?? '');
-        return $l;
-    }
-
-    private function getImage($listing) {
-        $image = $listing['imageUrl1'] ?? '';
-        if (!empty($image)) {
-            // $imageAsset = Utility::findImageByName("Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image).".jpg");
-            // if ($imageAsset) {
-            //     $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
-            // }
-            return new \Pimcore\Model\DataObject\Data\ExternalImage($image);
-        }
-        return null;
-    }
-
     private function getAttributes($listing) {
         if (!empty($listing['attributes']) && is_array($listing['attributes'])) {
             $values = array_filter(array_map(function($value) {
@@ -450,28 +295,121 @@ class BolConnector implements MarketplaceConnectorInterface
         return '';
     }
 
-    
+
+    private function getUrlLink($listing) {
+        $l = new Link();
+        $l->setPath($listing["url"] ?? '');
+        return $l;
+    }
+
+    private function getImage($listing) {
+        $image = $listing['imageUrl'] ?? '';
+        if (!empty($image)) {
+            $imageAsset = Utility::findImageByName("Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image).".jpg");
+            if ($imageAsset) {
+                $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
+            }
+            return new \Pimcore\Model\DataObject\Data\ExternalImage($image);
+        }
+        return null;
+    }
+
+    private function parseListing() 
+    {
+        $first = true;
+        foreach ($this->listings as $listing) {
+            if ($first) { 
+                $first = false; 
+                continue;
+            }
+            $imageUrl= "";
+            $categoryName = "";
+            $title = "";
+            foreach ($listing[$this->productsUrl . $listing["ean"] . "/assets"]["assets"][0]["variants"] as $variant) 
+            {
+                if ($variant["size"] === "medium") {
+                    $imageUrl = $variant["url"];
+                    break;
+                }
+            }
+            // Category Name 
+            $placementKey = $this->productsUrl . $listing["ean"] . "/placement";
+            if (isset($listing[$placementKey]["categories"]) && !empty($listing[$placementKey]["categories"])) {
+                $categoryName = $listing[$placementKey]["categories"][0]["categoryName"];
+               
+            }
+            else{
+                $decoded_response = $this->singleCurl($this->productsUrl,"/placement",$listing["ean"]);
+                if(isset($decoded_response['categories']) && is_array($decoded_response['categories'])) {
+                    foreach ($decoded_response['categories'] as $category) {
+                        if (isset($category['categoryName'])) {
+                            echo 'Guncellenmis Category Name: ' . $category['categoryName'] . "\n";
+                            $categoryName = $category['categoryName'];
+                            break; 
+                        }
+                    }
+                }
+            }
+
+            $titleKey = $this->productDetailUrl . $listing["ean"];
+            if (isset($listing[$titleKey]["attributes"]) && !empty($listing[$titleKey]["attributes"])) {
+                foreach ($listing[$titleKey]["attributes"] as $attribute) {
+                    if ($attribute["id"] === "Title") {
+                        $title = $attribute["values"][0]["value"];
+                        break;
+                    }
+                }
+            }
+            // Bol Product Id
+            $bolProductId = $listing[$this->productsUrl . $listing["ean"] . "/product-ids"]["bolProductId"];
+            if (empty($bolProductId)) {
+                $decoded_response = $this->singleCurl($this->productsUrl,"/product-ids",$listing["ean"]);
+                $bolProductId = $decoded_response["bolProductId"];
+                echo 'Guncellenmis Bol Product Id: ' . $decoded_response["bolProductId"] . "\n";
+                
+            } 
+
+            $this->listingsInfo[] = [
+                "ean" => $listing["ean"],
+                "bolProductId" => $bolProductId,
+                "bundlePricesPrice" => $listing["bundlePricesPrice"],
+                "published" => $listing[$this->productDetailUrl.$listing["ean"]]["published"],
+                "url" => $listing[$this->productsUrl.$listing["ean"]."/placement"]["url"],
+                "categoryName" => $categoryName,
+                "imageUrl" => $imageUrl,
+                "title" => $title,
+                "attributes" => $listing[$this->productDetailUrl.$listing["ean"]]["attributes"]
+            ];
+
+        }
+
+    }
 
     public function import($updateFlag, $importFlag)
     {
-
         echo "import";
-        if (empty($this->listings)) {
+        $this->parseListing();
+        if (empty($this->listingsInfo)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
-        $total = count($this->listings);
+        $total = count($this->listingsInfo);
         $index = 0;
-
+    
         $families = [
             'Tasnif-Edilmemiş' => []
         ];
 
         echo "Re-generating family trees...\n";
-        foreach ($this->listings as $listing) {
+        $first = true;
+        foreach ($this->listingsInfo as $listing) {
+            if ($first) { 
+                $first = false; 
+                continue;
+            }
             $family = "Tasnif-Edilmemiş";
             $attributeDetails = $this->getAttributes($listing);
             $attributeArray = array_map(function($attribute) {
@@ -489,11 +427,15 @@ class BolConnector implements MarketplaceConnectorInterface
                 'listing' => $listing,
             ];
         }
-
+        
+        
         foreach ($families as $family => $listings) {
             echo "Processing Family $family ...\n";
-            foreach ($listings as $listing) {
-                echo "    Listing {$listing['listing']['bolProductId']}:{$listing['listing']['ean']} ...";
+
+            foreach ($listings as $listing) 
+            {
+                echo "Listing {$listing['listing']['bolProductId']}:{$listing['listing']['ean']} ...";
+  
                 if ($family === 'Tasnif-Edilmemiş') {
                     $familyFolder = Utility::checkSetPath(
                         Utility::sanitizeVariable($listing['listing']['categoryName'] ?? 'Tasnif-Edilmemiş'),
@@ -530,44 +472,9 @@ class BolConnector implements MarketplaceConnectorInterface
                 echo "OK\n";
                 $index++;
             }
+            
         }
-
-/*
-        foreach ($this->listings as $listing) {
-            echo "($index/$total) Processing Listing {$listing['bolProductId']}:{$listing['title']} ...";
-
-            $path = Utility::sanitizeVariable($listing['categoryName'] ?? 'Tasnif-Edilmemiş');
-            $parent = Utility::checkSetPath($path, $marketplaceFolder);
-            if ($listing['bolProductId']) {
-                $parent = Utility::checkSetPath(Utility::sanitizeVariable($listing['bolProductId']), $parent);
-            }
-            VariantProduct::addUpdateVariant(
-                variant: [
-                    'imageUrl' => $this->getImage($listing),
-                    'urlLink' => $this->getUrlLink($listing),
-                    'salePrice' => $listing['bundlePricesPrice'] ?? 0,
-                    'saleCurrency' => 'TL',
-                    'title' => $listing['title'] ?? '',
-                    'attributes' => $this->getAttributes($listing),
-                    'uniqueMarketplaceId' => $listing['id'] ?? '',
-                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['published'],
-                ],
-                importFlag: $importFlag,
-                updateFlag: $updateFlag,
-                marketplace: $this->marketplace,
-                parent: $parent
-            );
-            echo "OK\n";
-            $index++;
-        }*/
     }
-
-    public function downloadInventory()
-    {
-
-    }
-
 
     public function downloadOrders()
     {
@@ -610,5 +517,7 @@ class BolConnector implements MarketplaceConnectorInterface
     //     }
 
     }
+
+
 
 }
