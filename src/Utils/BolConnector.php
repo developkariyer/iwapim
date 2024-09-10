@@ -240,10 +240,7 @@ class  BolConnector
                 $decoded_response = json_decode($response, true);   
                 if ($decoded_response) {
                     $listing[$urlFunction] = $decoded_response;
-                    echo 'JSON Yaniti: ' . $response . "\n";
-                    
                 } else {
-                    echo 'Yanit cozumlenemedi veya gecersiz!' . "\n";
                     $listing[$urlFunction] = null;
                 }                
             }
@@ -273,10 +270,9 @@ class  BolConnector
         } else {
             $decoded_response = json_decode($response, true);   
             if ($decoded_response) {
-                echo 'JSON Yaniti: ' . $response . "\n";
                 return $decoded_response;
             } else {
-                echo 'Yanit cozumlenemedi veya gecersiz!' . "\n";
+                echo "Yanit cozumlenemedi veya gecersiz: $decoded_response\n";
                 return null;
             }                
         }
