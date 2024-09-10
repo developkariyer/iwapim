@@ -228,7 +228,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     public function getListings($country)
     {
-        $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         $listings = [];
         foreach ($this->amazonReports as $reportType=>$report) {
             if (empty($report[$country])) {
