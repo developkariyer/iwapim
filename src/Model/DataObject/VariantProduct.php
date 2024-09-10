@@ -131,9 +131,11 @@ class VariantProduct extends Concrete
             echo "\n**************************************************\n";
             print_r($variant);
             echo "\n**************************************************\n";
-            echo "{$marketplace->getKey()} {$variant['title']} \n";
-            echo $variant['attributes'] ?? ''; echo "\n";
-            echo Utility::sanitizeVariable($key_base,250); echo "\n";
+            echo "0:{$marketplace->getKey()} {$variant['title']} \n";
+            echo "1:".$variant['attributes'] ?? ''; echo "\n";
+            echo "2:".Utility::sanitizeVariable("{$marketplace->getKey()} {$variant['title']}",250); echo "\n";
+            echo "3:".Utility::sanitizeVariable($variant['attributes'],250); echo "\n";
+            echo "4:".Utility::sanitizeVariable("{$marketplace->getKey()} {$variant['title']} {$variant['attributes']}",250); echo "\n";
             echo "\n**************************************************\n";
             echo "Key: ".trim("$key_base$key");
             echo "Error: {$e->getMessage()}\n";
