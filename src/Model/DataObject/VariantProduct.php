@@ -101,13 +101,12 @@ class VariantProduct extends Concrete
         if (!$updateFlag) {
             return true;
         }
-        if (!$marketplace instanceof Marketplace) {
-            throw new \Exception('Marketplace is required for adding/updating VariantProduct');
-        }
         if (!$parent) {
             throw new \Exception('Parent is required for adding/updating VariantProduct');
         }
-        $key_base = "{$marketplace->getKey()} {$variant['title']} ";
+        $key_base = ($marketplace instanceof \Pimcore\Model\DataObject\Marketplace) 
+                    ? "{$marketplace->getKey()} {$variant['title']} " 
+                    : "Amazon {$variant['title']} ";
         $key_base.= Utility::sanitizeVariable($variant['attributes'] ?? '');
         $key_base = Utility::sanitizeVariable($key_base,250);
         $key = '';
