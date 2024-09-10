@@ -180,39 +180,29 @@ class PrepareTableCommand extends AbstractCommand
         }
 
         $mainProductObject = reset($mainProductObjectArray);
-        $productCode = $mainProductObject->getProductCode(); //field 2
-        if (!$productCode) {
-            throw new \Exception('Product code is required for adding/updating VariantProduct');
-        }
-
-        if ($mainProductObject->level() == 1) {
-            $parent = $mainProductObject->getParent();
-            $parentProductCode = $parent->getProductCode(); // field 3
-            if(!$parent) {
-                throw new \Exception('Parent is required for adding/updating VariantProduct');
+        if ($mainProductObject instanceof Product) {
+            $productCode = $mainProductObject->getProductCode(); //field 2
+            if (!$productCode) {
+                throw new \Exception('Product code is required for adding/updating VariantProduct');
             }
-        } else {
-            $parentProductCode = $productCode;
+            if ($mainProductObject->level() == 1) {
+                $parent = $mainProductObject->getParent();
+                $parentProductCode = $parent->getProductCode(); // field 3
+                if(!$parent) {
+                    throw new \Exception('Parent is required for adding/updating VariantProduct');
+                }
+            } else {
+                throw new \Exception('VariantProduct is misconfigured. Please fix it');
+            }
+            $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
+            if (!$productIdentifier) {
+                throw new \Exception('Product identifier is required for adding/updating VariantProduct');
+            }
+            $productType = strtok($productIdentifier,'-'); // field 4
+            PrepareTableCommand::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType);
         }
-
-        $productIdentifier = $mainProductObject->getProductIdentifier();
-
-        if (!$productIdentifier) {
-            throw new \Exception('Product identifier is required for adding/updating VariantProduct');
-        }
-        $productType = strtok($productIdentifier,'-'); // field 4
-
-
-        PrepareTableCommand::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType);
-
-
-        // TODO:  verinin normalleştirilmesi: döviz kurları
-        // WARNING: para için asla float kullanma
-        // - bcmath fonksiyonlarını kullan
-        // - veritabanında decimal kullan
-        // - önce 100 ile çarp, işlemini yap, round et, 100'e böl
-        
     }
+    
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType)
     {
 
