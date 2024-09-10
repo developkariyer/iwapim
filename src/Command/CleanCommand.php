@@ -118,9 +118,9 @@ class CleanCommand extends AbstractCommand
                             if ($mainProduct = reset($mainProductArray)) {
                                 $mainProduct->addVariant($newVariantProduct);
                                 echo "{$child->getId()} => {$newVariantProduct->getId()} ";
-                                $child->delete();
-                                echo "Deleted\n";                
                             }
+                            $child->delete();
+                            echo "Deleted\n";                
                         }
                     }
                 }
