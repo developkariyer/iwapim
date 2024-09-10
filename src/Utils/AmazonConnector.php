@@ -109,17 +109,17 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $this->amazonReports[$reportType][$country] = $report;
     }
 
-    public function downloadAmazonSku($asin, $country)
+    public function downloadAmazonSku($sku, $country)
     {
         $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
-        //find at least 20 empty ASINs
-        $identifiers = [$asin];
+        //find at least 20 empty SKUs
+        $identifiers = [rawurlencode($sku)];
         foreach ($this->listings[$country] as $sku=>$listing) {
             if (empty($listing)) {
-                $identifiers[] = $sku;
+                $identifiers[] = rawurlencode($sku);
             }
-            if (count($identifiers) >= 20) {
+            if (count($identifiers) >= 10) {
                 break;
             }
         }
@@ -130,8 +130,17 @@ class AmazonConnector implements MarketplaceConnectorInterface
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/catalogItems_$asin.json", json_encode($response->json()));
-        exit;
+        sleep(1);
+        $items = $response->json()['payload']['items'] ?? [];
+        foreach ($items as $item) {
+            foreach ($item['identifiers'] as $identifier) {
+                if ($identifier['identifierType'] === 'SKU') {
+                    $this->listings[$country][$identifier['identifier']] = $item;
+                    continue;
+                }
+            }
+        }
+        return $this->listings[$country][$sku];
     }
 
     public function download($forceDownload = false)
@@ -229,10 +238,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     continue;
                 }
                 $listing = array_combine($header, $data);
-                //$asin = $listing['asin'] ?? $listing['asin1'] ?? $listing['asin2'] ?? $listing['asin3'] ?? '';
-                $asin = $listing['sku'] ?? $listing['seller-sku'] ?? '';
-                if (!empty($asin)) {
-                    $listings[$asin] = '';
+                $sku = $listing['sku'] ?? $listing['seller-sku'] ?? '';
+                if (!empty($sku)) {
+                    $listings[$sku] = '';
                 }
             }
         }
@@ -320,10 +328,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
-            foreach ($this->listings[$country] as $asin=>$listing) {
-                echo "($index/$total) Processing ASIN $asin ...";
+            foreach ($this->listings[$country] as $sku=>$listing) {
+                echo "($index/$total) Processing SKU $sku ...";
                 if (empty($listing)) {
-                    $listing = $this->downloadAmazonSKU($asin, $country);
+                    $listing = $this->downloadAmazonSKU($sku, $country);
                 }
                 $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
@@ -353,7 +361,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     }
 
     public function catalogItems()
-    {
+    {/*
         $catalogConnector = $this->amazonSellerConnector->catalogItemsV20220401();
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             $response = $catalogConnector->searchCatalogItems(
@@ -378,6 +386,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
             file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_ASIN_$country.json", json_encode($response->json()));
             echo "$country OK\n";    
             sleep(1); 
-        }
+        }*/
+        $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
+        $listingItem = $listingsApi->getListingsItem(
+            sellerId: $this->marketplace->getMerchantId(),
+            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['US'], AmazonMerchantIdList::$amazonMerchantIdList['MX']],
+            sku: rawurlencode("09-JWOX-4994"),
+            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
+        );
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTlistingsItems_SKU.json", json_encode($listingItem->json()));
     }
 }
