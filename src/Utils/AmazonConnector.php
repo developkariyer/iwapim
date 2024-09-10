@@ -338,6 +338,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 if (isset($listing['relationships'][0]['relationships'][0]['parentAsins'][0])) {
                     $parent = Utility::checkSetPath($listing['relationships'][0]['relationships'][0]['parentAsins'][0], $parent);
                 }
+                print_r($listing);
                 $variantProduct = VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => $this->getImage($listing),
