@@ -336,7 +336,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     echo " Empty ASIN\n";
                     continue;
                 }
-                $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin);
+                $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin, unpublished: true);
                 if (!$variantProduct) {
                     $variantProduct = VariantProduct::addUpdateVariant(
                         variant: [
