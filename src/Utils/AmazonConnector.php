@@ -291,6 +291,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     }
 
     private function getAttributes($listing) {
+        print_r($listing);
         $title = $listing['item-name'];
         $lastCloseParen = mb_strrpos($title, ')', 0);
         if ($lastCloseParen === false) {
