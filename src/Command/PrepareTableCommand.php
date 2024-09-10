@@ -57,7 +57,11 @@ class PrepareTableCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $values = $this->fetchValues();
+        $index = 0;
+        echo "\n";
         foreach ($values as $row) {
+            $index++;
+            echo "\rProcessing $index of " . count($values) . "                            \r";
             $this->prepareOrderTable($row['variant_id']);
         }
         
@@ -202,7 +206,7 @@ class PrepareTableCommand extends AbstractCommand
             PrepareTableCommand::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType);
         }
     }
-    
+
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType)
     {
 
