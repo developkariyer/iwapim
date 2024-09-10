@@ -321,6 +321,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     echo " Empty\n";
                     continue;
                 }
+                if ($index < 50) {
+                    continue;
+                }
                 $path = Utility::sanitizeVariable($listing['asin1'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
                 $variantProduct = VariantProduct::addUpdateVariant(
