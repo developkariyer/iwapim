@@ -378,7 +378,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $amazonCollection->setSalePrice($listing['price'] ?? 0);
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
                 $amazonCollection->setListingId($listing['listing-id'] ?? '');
-                $amazonCollection->setQuantity($listing['quantity'] ?? 0);
+                $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
             }
             $newCollection->add($amazonCollection);
