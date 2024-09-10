@@ -83,7 +83,6 @@ class CleanCommand extends AbstractCommand
                         if (!($asin = readAsinFromDb($child->getId()))) {
                             continue;
                         }
-                        echo "ASIN ";
                         if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
                             echo "No new variant found\n";
                         } else {
