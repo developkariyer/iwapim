@@ -368,6 +368,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $collection = $variantProduct->getAmazonMarketplace();
         $newCollection = new Fieldcollection();
         $found = false;
+        $active = ($listing['status'] ?? '') === 'Active';
         foreach ($collection ?? [] as $amazonCollection) {
             if (!$amazonCollection instanceof AmazonMarketplace) {
                 continue;
@@ -382,6 +383,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
                 $amazonCollection->setStatus($listing['status'] ?? '');
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+            }
+            if ($amazonCollection->getStatus() === 'Active') {
+                $active = true;
             }
             $newCollection->add($amazonCollection);
         }
@@ -399,7 +403,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $newCollection->add($amazonCollection);
         }
         $variantProduct->setAmazonMarketplace($newCollection);
-        $variantProduct->setPublished(true);
+        $variantProduct->setPublished($active);
         $variantProduct->save();
     }
 
