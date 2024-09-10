@@ -136,7 +136,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             foreach ($item['identifiers'] as $identifier) {
                 if ($identifier['identifierType'] === 'SKU') {
                     $this->listings[$country][$identifier['identifier']] = $item;
-                    continue;
+                    echo "SKU $identifier OK\n";
                 }
             }
         }
