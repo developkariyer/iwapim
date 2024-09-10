@@ -288,7 +288,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     private function getAttributes($listing) {
         $title = $listing['item-name'];
-        if (preg_match('/\(([^()]*(?:\([^()]*\))*[^()]*)\)$/', $title, $matches)) {
+        if (preg_match('/\(([^()]*)\)[^\(]*$/', $title, $matches)) {
+
             return trim($matches[1]);
         }
         return '';    
