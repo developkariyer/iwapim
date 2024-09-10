@@ -119,7 +119,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (empty($listing)) {
                 $identifiers[] = rawurlencode($sku);
             }
-            if (count($identifiers) >= 10) {
+            if (count($identifiers) >= 9) {
                 break;
             }
         }
