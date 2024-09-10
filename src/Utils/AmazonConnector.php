@@ -306,7 +306,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $attributes[] = implode('-', $values);
             }
         }
-        return implode('_', $attributes);
+        return implode(' ', $attributes);
     }
 
     private function getTitle($listing)
