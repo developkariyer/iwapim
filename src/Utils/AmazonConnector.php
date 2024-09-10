@@ -113,7 +113,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     {
         $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
-        //find at least 20 empty SKUs
+        //find at least 10 empty SKUs
         $identifiers = [rawurlencode($sku)];
         foreach ($this->listings[$country] as $sku=>$listing) {
             if (empty($listing)) {
@@ -287,7 +287,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     }
 
     private function getAttributes($listing) {
-        $attributes = [];    
+        $attributes = [];
         if (!empty($listing['attributes']['size']) && is_array($listing['attributes']['size'])) {
             $values = array_filter(array_map(function($value) {
                 return str_replace(' ', '', $value);
@@ -309,8 +309,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     private function getTitle($listing)
     {
-        $title = empty($listing['offers']) ? 'NOSALE ' : '';
-        $title .= $listing['summaries'][0]['itemName'] ?? '';
+        //$title = empty($listing['offers']) ? 'NOSALE ' : '';
+        $title = $listing['summaries'][0]['itemName'] ?? '';
         return trim($title);
     }
 
@@ -318,7 +318,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     {
         $marketplaceRootFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
-            Utility::checkSetPath('Pazaryerleri')
+            Utility::checkSetPath('Pazaryerleri_Test')
         );
 
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
@@ -335,19 +335,21 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 }
                 $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
-
-                VariantProduct::addUpdateVariant(
+                if (isset($listing['relationships'][0]['relationships'][0]['parentAsins'][0])) {
+                    $parent = Utility::checkSetPath($listing['relationships'][0]['relationships'][0]['parentAsins'][0], $parent);
+                }
+                $variantProduct = VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => $this->getImage($listing),
                         'urlLink' => $this->getUrlLink($listing, $country),
-                        'salePrice' => $listing['offers'][0]['price']['amount'] ?? 0,
-                        'saleCurrency' => $listing['offers'][0]['price']['currency'] ?? 'USD',
+                        'salePrice' => 0,
+                        'saleCurrency' => '',
                         'title' => $this->getTitle($listing),
                         'attributes' => $this->getAttributes($listing),
-                        'amazonAsin' => $listing['summaries'][0]['asin'] ?? '',
-                        'uniqueMarketplaceId' => "{$this->marketplace->getKey()}.{$country}.{$sku}",
+                        'amazonAsin' => $listing['asin'] ?? '',
+                        'uniqueMarketplaceId' => $listing['asin'],
                         'apiResponseJson' => json_encode($listing),
-                        'published' => empty($listing['offers']) ? false : true,
+                        'published' => true,
                     ],
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,
@@ -390,7 +392,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $listingItem = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
-            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['CA']],
+            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['MX']],
             sku: rawurlencode("09-JWOX-4994"),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
