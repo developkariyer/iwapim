@@ -330,8 +330,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
-            foreach ($this->listings[$country] as $sku=>$listing) {
+            foreach (array_keys($this->listings[$country]) as $sku) {
                 echo "($index/$total) Processing SKU $sku ...";
+                $listing = $this->listings[$country][$sku];
                 if (empty($listing)) {
                     $listing = $this->downloadAmazonSKU($sku, $country);
                 }
