@@ -366,6 +366,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $collection = $variantProduct->getAmazonMarketplace();
         $newCollection = new Fieldcollection();
         $active = false;
+        $found = false;
         foreach ($collection ?? [] as $amazonCollection) {
             if (!$amazonCollection instanceof AmazonMarketplace) {
                 continue;

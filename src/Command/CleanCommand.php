@@ -94,15 +94,16 @@ class CleanCommand extends AbstractCommand
                         echo "ASIN ";
                         if (!($newVariantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin))) {
                             echo "No new variant found\n";
-                            continue;
+                        } else {
+                            echo " => {$newVariantProduct->getId()} ";
+                            if ($mainProduct = reset($child->getMainProduct())) {
+                                $newVariantProduct->setMainProduct($mainProduct);
+                                $newVariantProduct->save();
+                                echo "Transfered ";
+                            }                        
                         }
-                        echo " => {$newVariantProduct->getId()} ";
-                        if ($mainProduct = reset($child->getMainProduct())) {
-                            $newVariantProduct->setMainProduct($mainProduct);
-                            $newVariantProduct->save();
-                            $child->delete();
-                            echo "Transfered and deleted";
-                        }                        
+                        $child->delete();
+                        echo "Deleted\n";                
                     }
                 }
             }
