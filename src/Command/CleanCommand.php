@@ -31,6 +31,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('object', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
             ->addOption('product-code', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
             ->addOption('asin', null, InputOption::VALUE_NONE, 'If set, connections will be updated using Amazon ASIN values.')
+            ->addOption('link-check', null, InputOption::VALUE_NONE, 'If set, VariantProuduct<->Product links will be tested.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -55,10 +56,35 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('asin')) {
             self::transferAsins();
         }
+        if ($input->getOption('link-check')) {
+            self::linkCheck();
+        }
         return Command::SUCCESS;
     }
 
-    //self::splitProductFolders(ObjectFolder::getById(149861));
+    private static function linkCheck()
+    {
+        $listingObject = new VariantProduct\Listing();
+        $listingObject->setUnpublished(true);
+        $pageSize = 50;
+        $offset = 0;
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $variants = $listingObject->load();
+            if (empty($variants)) {
+                break;
+            }
+            foreach ($variants as $variant) {
+                $mainProductArray = $variant->getMainProduct();
+                if (count($mainProductArray) > 1) {
+                    echo "  Multiple main products for variantProduct: {$variant->getId()}\n";
+                }                    
+            }
+            $offset += $pageSize;
+            echo "Processed {$offset}\n";
+        }
+    }
 
     private static function transferAsins()
     {
