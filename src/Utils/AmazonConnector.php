@@ -350,7 +350,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
                 if (isset($listing['relationships'][0]['relationships'][0]['parentAsins'][0])) {
                     $parent = Utility::checkSetPath($listing['relationships'][0]['relationships'][0]['parentAsins'][0], $parent);
-                }
+                }/*
                 $variantProduct = VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => $this->getImage($listing),
@@ -368,7 +368,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     updateFlag: $updateFlag,
                     marketplace: $this->marketplace,
                     parent: $parent
-                );
+                );*/
                 echo "OK\n";
                 $index++;
             }
