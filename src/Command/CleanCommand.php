@@ -78,7 +78,8 @@ class CleanCommand extends AbstractCommand
             foreach ($variants as $variant) {
                 $mainProductArray = $variant->getMainProduct();
                 if (count($mainProductArray) > 1) {
-                    echo "  Multiple main products for variantProduct: {$variant->getId()}\n";
+                    echo "*************Multiple main products for variantProduct: {$variant->getId()}\n";
+                    sleep(5);
                 }                    
             }
             $offset += $pageSize;
