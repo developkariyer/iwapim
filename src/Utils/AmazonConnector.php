@@ -305,14 +305,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
     {
         $marketplaceRootFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
-            Utility::checkSetPath('Pazaryerleri_Test')
+            Utility::checkSetPath('Pazaryerleri')
         );
 
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             if (empty($this->listings[$country])) {
                 echo "Nothing to import in $country\n";
             }
-            $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
+            $marketplaceFolder = Utility::checkSetPath('Amazon', $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
             foreach ($this->listings[$country] as $listing) {
@@ -322,10 +322,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     echo " Empty\n";
                     continue;
                 }
-                if ($index < 50) {
-                    continue;
-                }
-                $listing['item-name'] = str_replace([chr(0x94), chr(0x96), chr(0xe9)], '', $listing['item-name']);
+
+                //$listing['item-name'] = str_replace([chr(0x94), chr(0x96), chr(0xe9)], '', $listing['item-name']);
+
+                // find a VariantProduct with ASIN
+                // if not found, create a new one
+                // if found, add our listing as data collection
+
+
                 $path = Utility::sanitizeVariable($listing['asin1'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
                 $variantProduct = VariantProduct::addUpdateVariant(

@@ -23,16 +23,23 @@ class Utility
 
     public static function sanitizeVariable($variable, $length = 0)
     {
-        $sanitized = preg_replace('/[^\p{L}\p{N}çÇğĞıİöÖşŞüÜ\-_]/u', '-', $variable);
-        $sanitized = preg_replace('/-+/', '-', $sanitized);
-        if ($length > 0 && mb_strlen($sanitized) > $length) {
-            $half = floor($length / 2);
-            $sanitized = mb_substr($sanitized, 0, $half) . mb_substr($sanitized, -($length - $half), null);
+        $ellipsis = '...';
+        if (empty($variable)) {
+            return '';
         }
-    
-        $sanitized = trim(trim($sanitized, '-'));
+        if (!mb_check_encoding($variable, 'UTF-8')) {
+            $variable = mb_convert_encoding($variable, 'UTF-8', 'auto');
+        }
+        $sanitized = preg_replace('/[^\p{L}\p{N}çÇğĞıİöÖşŞüÜ\-_ ]/u', ' ', $variable);
+        $sanitized = preg_replace('/ +/', ' ', $sanitized);
+        if ($length > 0 && mb_strlen($sanitized) > $length) {
+            $half = floor(($length - mb_strlen($ellipsis)) / 2);
+            $sanitized = mb_substr($sanitized, 0, $half) . $ellipsis . mb_substr($sanitized, -$half);
+        }
+        $sanitized = trim($sanitized, " -");
         return $sanitized;
     }
+    
 
     public static function checkSetPath($name, $parent = null) 
     {
