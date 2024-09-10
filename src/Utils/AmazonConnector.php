@@ -134,7 +134,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         sleep(1);
         $items = $response->json()['payload']['items'] ?? [];
         foreach ($items as $item) {
-            foreach ($item['identifiers'] as $identifier) {
+            foreach ($item['identifiers'][0]['identifiers'] ?? [] as $identifier) {
                 if ($identifier['identifierType'] === 'SKU') {
                     $this->listings[$country][$identifier['identifier']] = $item;
                     echo "SKU $identifier OK\n";
