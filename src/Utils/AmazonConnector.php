@@ -296,7 +296,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     private function getTitle($listing)
     {
-        $title = str_replace($this->getAttributes($listing), '', $listing['item-name'] ?? '');
+        $title = str_replace('('.$this->getAttributes($listing).')', '', $listing['item-name'] ?? '');
         return trim($title);
     }
 
