@@ -130,6 +130,11 @@ class VariantProduct extends Concrete
         } catch (\Throwable $e) {
             echo "\n**************************************************\n";
             print_r($variant);
+            echo "\n**************************************************\n";
+            echo "{$marketplace->getKey()} {$variant['title']} \n";
+            echo $variant['attributes'] ?? ''; echo "\n";
+            echo Utility::sanitizeVariable($key_base,250); echo "\n";
+            echo "\n**************************************************\n";
             echo "Key: ".trim("$key_base$key");
             echo "Error: {$e->getMessage()}\n";
             echo "\n**************************************************\n";
