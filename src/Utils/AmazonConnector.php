@@ -44,11 +44,13 @@ class AmazonConnector implements MarketplaceConnectorInterface
             throw new \Exception("Marketplace is not published, is not Amazon or credentials are empty");
         }
 
-        $countryCodes = $marketplace->getMerchantIds();
-        $missingCodes = array_diff($countryCodes, array_keys(AmazonMerchantIdList::$amazonMerchantIdList));
-        if (!empty($missingCodes)) {
-            $missingCodesStr = implode(', ', $missingCodes);
-            throw new \Exception("The following country codes are not in merchantIdList in AmazonConnector class: $missingCodesStr");
+        $countryCodes = $marketplace->getMerchantIds() ?? [];
+        if (!empty($countryCodes)) {
+            $missingCodes = array_diff($countryCodes, array_keys(AmazonMerchantIdList::$amazonMerchantIdList));
+            if (!empty($missingCodes)) {
+                $missingCodesStr = implode(', ', $missingCodes);
+                throw new \Exception("The following country codes are not in merchantIdList in AmazonConnector class: $missingCodesStr");
+            }
         }
 
         $this->mainCountry = $marketplace->getMainMerchant();
