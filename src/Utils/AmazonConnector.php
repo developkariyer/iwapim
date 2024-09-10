@@ -130,6 +130,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
+        print_r($identifiers); exit;
         echo json_encode($response->json());exit;
         sleep(1);
         $items = $response->json()['payload']['items'] ?? [];
