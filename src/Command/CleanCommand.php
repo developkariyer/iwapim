@@ -66,7 +66,7 @@ class CleanCommand extends AbstractCommand
             $db = \Pimcore\Db::get();
             $stmt = $db->prepare("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = 'apiResponseJson' LIMIT 1");
             $stmt->execute([$id]);
-            $jsonData = $stmt->fetchColumn();
+            $jsonData = $stmt->fetchOne();
             if ($jsonData) {
                 $data = json_decode($jsonData, true);
                 if (isset($data['asin'])) {
