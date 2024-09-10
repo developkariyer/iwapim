@@ -318,6 +318,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $index++;
                 echo "($index/$total) Processing SKU {$listing['listing-id']} ...";
                 if (empty($listing)) {
+                    echo " Empty\n";
                     continue;
                 }
                 $path = Utility::sanitizeVariable($listing['asin1'] ?? 'Tasnif-Edilmemiş');
