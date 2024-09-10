@@ -338,6 +338,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $listing = $this->listings[$country][$sku];
                 if (empty($listing)) {
                     $listing = $this->downloadAmazonSKU($sku, $country);
+                } else {
+                    echo " (cached) ";
                 }
                 if (empty($listing)) {
                     $index++;
