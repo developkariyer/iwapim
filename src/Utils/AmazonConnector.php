@@ -356,7 +356,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     );
                 }
                 $this->processFieldCollection($variantProduct, $listing, $country);
-                echo "OK\n";
+                echo $variantProduct->getId();
+                echo " OK\n";
             }
         }
     }
