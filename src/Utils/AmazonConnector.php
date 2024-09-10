@@ -319,7 +319,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
-            foreach (array_keys($this->listings[$country]) as $listing) {
+            foreach ($this->listings[$country] as $listing) {
                 $index++;
                 print_r($listing);
                 echo "($index/$total) Processing SKU {$listing['listing-id']} ...";
