@@ -111,6 +111,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     public function downloadAmazonSku($sku, $country)
     {
+        echo " (download) ";
         $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
         //find at least 10 empty SKUs
