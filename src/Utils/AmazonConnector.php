@@ -337,7 +337,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         'title' => $this->getTitle($listing),
                         'attributes' => $this->getAttributes($listing),
                         'amazonAsin' => $listing['asin1'] ?? '',
-                        'uniqueMarketplaceId' => $listing['listing-id'],
+                        'uniqueMarketplaceId' => (string) $listing['listing-id'],
                         'apiResponseJson' => json_encode([]),
                         'published' => ($listing['status'] === 'Active') ? true : false,
                     ],
