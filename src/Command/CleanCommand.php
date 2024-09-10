@@ -86,7 +86,7 @@ class CleanCommand extends AbstractCommand
                     if ($child instanceof VariantProduct) {
                         echo "    Found variant product: {$child->getId()} ";
                         if (!($asin = readAsinFromDb($child->getId()))) {
-                            echo "No ASIN found\n";
+                            echo "No ASIN found                         \r";
                             continue;
                         }
                         echo "ASIN ";
