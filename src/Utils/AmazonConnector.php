@@ -324,7 +324,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 if ($index < 50) {
                     continue;
                 }
-                $listing['item-name'] = str_replace(chr(94), '', $listing['item-name']);
+                $listing['item-name'] = str_replace(chr(0x94), '', $listing['item-name']);
                 $path = Utility::sanitizeVariable($listing['asin1'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
                 $variantProduct = VariantProduct::addUpdateVariant(
