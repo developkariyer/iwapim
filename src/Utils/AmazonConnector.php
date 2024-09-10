@@ -354,8 +354,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         parent: Utility::checkSetPath('00 Yeni ASIN', $marketplaceFolder)
                     );
                 }
-                $variantProduct->setAmazonMarketplace($this->processFieldCollection($variantProduct, $listing, $country));
-                $variantProduct->save();
+                $this->processFieldCollection($variantProduct, $listing, $country);
                 echo "OK\n";
             }
         }
@@ -364,7 +363,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     protected function processFieldCollection($variantProduct, $listing, $country)
     {
         $collection = $variantProduct->getAmazonMarketplace();
-        $newCollection = [];
+        $newCollection = new DataObject\Fieldcollection();
         $found = false;
         foreach ($collection ?? [] as $amazonCollection) {
             if (!$amazonCollection instanceof AmazonMarketplace) {
@@ -379,9 +378,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $amazonCollection->setListingId($listing['listing-id'] ?? '');
                 $amazonCollection->setQuantity($listing['quantity'] ?? 0);
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
-                $amazonCollection->save();
             }
-            $newCollection[] = $amazonCollection;
+            $newCollection->add($amazonCollection);
         }
         if (!$found) {
             $amazonCollection = new AmazonMarketplace();
@@ -392,10 +390,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $amazonCollection->setListingId($listing['listing-id'] ?? '');
             $amazonCollection->setQuantity($listing['quantity'] ?? 0);
             $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
-            $amazonCollection->save();
-            $newCollection[] = $amazonCollection;
+            $newCollection->add($amazonCollection);
         }
-        return $newCollection;
+        $variantProduct->setAmazonMarketplace($newCollection);
+        $variantProduct->save();
     }
 
     public function catalogItems()
