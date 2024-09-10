@@ -72,18 +72,18 @@ class CleanCommand extends AbstractCommand
                 if (isset($data['asin'])) {
                     return $data['summaries'][0]['asin'] ?? $data['asin'] ?? null;
                 }
-            }            
+            }
+            return null;  
         }
 
-        $stack = [];
-        array_push($stack, ObjectFolder::getById(223695));
+        $stack = [ObjectFolder::getById(223695)];
         while (!empty($stack)) {
             $folder = array_pop($stack);
             if ($folder instanceof ObjectFolder) {
                 echo "Running in folder: " . $folder->getFullPath() . "\n";
                 foreach ($folder->getChildren() as $child) {
                     if ($child instanceof ObjectFolder) {
-                        array_push($stack, $child);
+                        $stack[] = $child;
                     }
                     if ($child instanceof VariantProduct) {
                         echo "    Found variant product: {$child->getId()} ";
@@ -96,7 +96,7 @@ class CleanCommand extends AbstractCommand
                             echo "No new variant found\n";
                             continue;
                         }
-                        echo " =>{$newVariantProduct->getId()} ";
+                        echo " => {$newVariantProduct->getId()} ";
                         if ($mainProduct = reset($child->getMainProduct())) {
                             $newVariantProduct->setMainProduct($mainProduct);
                             $newVariantProduct->save();
