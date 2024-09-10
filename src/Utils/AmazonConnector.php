@@ -130,7 +130,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
-//        echo json_encode($response->json());
+        echo json_encode($response->json());exit;
         sleep(1);
         $items = $response->json()['payload']['items'] ?? [];
         foreach ($items as $item) {
@@ -334,14 +334,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 if (empty($listing)) {
                     $listing = $this->downloadAmazonSKU($sku, $country);
                 }
+                if (empty($listing)) {
+                    $index++;
+                    continue;
+                }
                 $path = Utility::sanitizeVariable($listing['summaries'][0]['productType'] ?? 'Tasnif-Edilmemiş');
                 $parent = Utility::checkSetPath($path, $marketplaceFolder);
                 if (isset($listing['relationships'][0]['relationships'][0]['parentAsins'][0])) {
                     $parent = Utility::checkSetPath($listing['relationships'][0]['relationships'][0]['parentAsins'][0], $parent);
-                }
-                if (empty($listing)) {
-                    $index++;
-                    continue;
                 }
                 print_r($listing);
                 $variantProduct = VariantProduct::addUpdateVariant(
