@@ -371,13 +371,13 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (!$amazonCollection instanceof AmazonMarketplace) {
                 continue;
             }
-            if ($amazonCollection->getMarketplaceId() === $country) {
+            if ($amazonCollection->getListingId() === $listing['listing-id']) {
                 $found = true;
+                $amazonCollection->setMarketplaceId($country);
                 $amazonCollection->setTitle($this->getTitle($listing));
                 $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
                 $amazonCollection->setSalePrice($listing['price'] ?? 0);
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
-                $amazonCollection->setListingId($listing['listing-id'] ?? '');
                 $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
             }
