@@ -242,10 +242,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     continue;
                 }
                 $listing = array_combine($header, $data);
-                $sku = $listing['seller-sku'] ?? '';
-                if (!empty($sku)) {
-                    $listings[$sku] = $listing;
-                }
+                $listings[] = $listing;
             }
         }
         $this->listings[$country] =  $listings;
@@ -291,7 +288,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
     }
 
     private function getAttributes($listing) {
-        print_r($listing);
         $title = $listing['item-name'];
         $lastCloseParen = mb_strrpos($title, ')', 0);
         if ($lastCloseParen === false) {
@@ -324,9 +320,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $marketplaceFolder = Utility::checkSetPath($country, $marketplaceRootFolder);
             $total = count($this->listings[$country]);
             $index = 0;
-            foreach (array_keys($this->listings[$country]) as $sku=>$listing) {
+            foreach (array_keys($this->listings[$country]) as $listing) {
                 $index++;
-                echo "($index/$total) Processing SKU $sku ...";
+                echo "($index/$total) Processing SKU {$listing['listing-id']} ...";
                 if (empty($listing)) {
                     continue;
                 }
