@@ -74,7 +74,8 @@ class VariantProduct extends Concrete
             }
             $object = new \Pimcore\Model\DataObject\VariantProduct();
         }
-        return $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+        $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+        return $object;
     }
 
     public function jsonRead($fieldName)
