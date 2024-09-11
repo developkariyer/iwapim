@@ -110,7 +110,6 @@ class CacheImagesCommand extends AbstractCommand
     {
         $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$variant->getUniqueMarketplaceId()}.json";
         if (!file_exists($filename)) {
-            echo "File not found: {$filename}\n";
             return;
         }
         $json = json_decode(json: file_get_contents(filename: $filename) ?? [], associative: true) ?? [];
