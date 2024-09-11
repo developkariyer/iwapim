@@ -72,7 +72,7 @@ class CacheImagesCommand extends AbstractCommand
                 switch ($variantType) {
                     case 'Amazon':
                         echo "A";
-//                        if (!$input->getOption('skip-amazon')) self::processAmazon($variant);
+                        if (!$input->getOption('skip-amazon')) self::processAmazon(variant: $variant);
                         break;
                     case 'Etsy':
                         echo 'E';
