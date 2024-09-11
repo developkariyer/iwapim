@@ -119,7 +119,7 @@ class CacheImagesCommand extends AbstractCommand
             if ($image['height'] < 1000) {
                 continue;
             }
-            $listingImageList[] = static::processImage(url: $image['link'], parent: static::$amazonFolder, "Amazon_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['link']).".jpg");
+            $listingImageList[] = static::processImage(url: $image['link'], parent: static::$amazonFolder, oldFileName: "Amazon_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['link']).".jpg");
         }
         $listingImageList = array_unique(array: $listingImageList);
         $variant->fixImageCache($listingImageList);
