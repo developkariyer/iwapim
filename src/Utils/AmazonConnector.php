@@ -185,7 +185,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         while (!empty($asins)) {
             $asin = array_pop($asins);
             $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$asin['asin']}.json";
-            if (file_exists($filename) && filemtime($filename) > time() - 86400) {
+            if (file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
                 continue;
             }
             $buckets[$asin['country']][] = $asin['asin'];
@@ -201,7 +201,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         }
     }
 
-    public function downloadAmazonAsins($asins, $country)
+    public function downloadAmazonAsins($asins, $country): void
     {
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
         $response = $catalogApi->searchCatalogItems(
@@ -221,29 +221,29 @@ class AmazonConnector implements MarketplaceConnectorInterface
         echo "Asked ".implode(separator: ',', array: $asins)."; downloaded ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
     }
 
-    public function download($forceDownload = false)
+    public function download($forceDownload = false): void
     {
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             echo "\n  Downloading Amazon reports for $country\n";
             foreach (array_keys($this->amazonReports) as $reportType) {
-                $this->downloadAmazonReport($reportType, $forceDownload, $country);
+                $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $country);
             }
-            $this->getListings($country);
+            $this->getListings(country: $country);
         }
-        file_put_contents(PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->marketplace->getKey()).'_listings.json', json_encode($this->listings));
+        file_put_contents(filename: PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode(string: $this->marketplace->getKey()).'_listings.json', data: json_encode(value: $this->listings));
     }
 
-    public function downloadOrders()
+    public function downloadOrders(): void
     {
         
     }
 
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
         foreach ($this->countryCodes as $country) {
             echo "\n    - $country ";
-            $filename = PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->marketplace->getKey()).'_'.$country.'_inventory.json';
-            if (file_exists($filename) && filemtime($filename) > time() - 86400) {
+            $filename = PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode(string: $this->marketplace->getKey()).'_'.$country.'_inventory.json';
+            if (file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
                 echo " (cached) ";
                 $allInventorySummaries = json_decode(file_get_contents($filename), true);
             } else {
@@ -262,10 +262,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     $inventorySummaries = $responseData['payload']['inventorySummaries'] ?? [];
                     $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
                     $nextToken = $responseData['pagination']['nextToken'] ?? null;
-                    usleep(500000);
+                    usleep(microseconds: 500000);
                     echo ".";
                 } while ($nextToken);
-                file_put_contents($filename, json_encode($allInventorySummaries));
+                file_put_contents(filename: $filename, data: json_encode(value: $allInventorySummaries));
             }
 
             $db = \Pimcore\Db::get();
@@ -275,8 +275,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     $sql = "INSERT INTO iwa_amazon_inventory (";
                     $dbFields = [];
                     foreach ($inventory as $key=>$value) {
-                        if (is_array($value)) {
-                            $value = json_encode($value);
+                        if (is_array(value: $value)) {
+                            $value = json_encode(value: $value);
                         }
                         if ($key === 'condition') {
                             $key = 'itemCondition';
@@ -284,14 +284,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         $dbFields[$key] = $value;
                     }
                     $dbFields['countryCode'] = $country;
-                    $sql .= implode(',', array_keys($dbFields)) . ") VALUES (";
-                    $sql .= implode(',', array_fill(0, count($dbFields), '?')) . ")";
+                    $sql .= implode(separator: ',', array: array_keys($dbFields)) . ") VALUES (";
+                    $sql .= implode(separator: ',', array: array_fill(start_index: 0, count: count(value: $dbFields), value: '?')) . ")";
                     $sql .= " ON DUPLICATE KEY UPDATE ";
-                    $sql .= implode(',', array_map(function($key) {
+                    $sql .= implode(separator: ',', array: array_map(callback: function($key): string {
                         return "$key=?";
-                    }, array_keys($dbFields)));
+                    }, array: array_keys($dbFields)));
                     $stmt = $db->prepare($sql);
-                    $stmt->execute(array_merge(array_values($dbFields), array_values($dbFields)));
+                    $stmt->execute(array_merge(arrays: array_values(array: $dbFields), array_array: values($dbFields)));
                 }
                 $db->commit();
             } catch (\Exception $e) {
