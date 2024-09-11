@@ -157,7 +157,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (empty($country) || !in_array(needle: $country, haystack: ['US', 'UK', 'AU', 'CA'])) {
                 continue;
             }
-            $country = 'UK';
+            $country = 'CA';
             $asins[] = [
                 'asin' => $amazonVariant->getUniqueMarketplaceId(),
                 'country' => $country,
