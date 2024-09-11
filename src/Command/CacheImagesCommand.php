@@ -51,7 +51,7 @@ class CacheImagesCommand extends AbstractCommand
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
-        $pageSize = 50;
+        $pageSize = 250;
         $offset = 0;
 
         while (true) {
@@ -64,11 +64,7 @@ class CacheImagesCommand extends AbstractCommand
             $totalCount = $listingObject->getTotalCount();
             foreach ($variants as $variant) {
                 $variantMarketplace = $variant->getMarketplace();
-                if (empty($variantMarketplace)) {
-                    echo "Variant {$variant->getId()} has no marketplace.\n";
-                    continue;
-                }
-                $variantType = $variantMarketplace->getMarketPlaceType();
+                $variantType = (empty($variantMarketplace)) ? 'Amazon' : $variantMarketplace->getMarketPlaceType();
                 if (empty($variantType)) {
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
                     continue;
@@ -117,8 +113,21 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processAmazon($variant)
     {
-        $json = self::getApiResponse($variant->getId());
+        $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$variant->getUniqueMarketplaceId()}.json";
+        if (!file_exists($filename)) {
+            echo "File not found: {$filename}\n";
+            return;
+        }
+        $json = json_decode(json: file_get_contents(filename: $filename) ?? [], associative: true) ?? [];
         $listingImageList = [];
+        foreach ($json['images'][0]['images'] ?? [] as $image) {
+            if ($image['height'] < 1000) {
+                continue;
+            }
+            $listingImageList[] = static::processImage(url: $image['link'], parent: static::$amazonFolder);
+        }
+        $listingImageList = array_unique(array: $listingImageList);
+        $variant->fixImageCache($listingImageList);
     }
 
     protected static function processShopify($variant)

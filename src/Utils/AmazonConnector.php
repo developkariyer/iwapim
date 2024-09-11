@@ -186,10 +186,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $asin = array_pop($asins);
             $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$asin['asin']}.json";
             if (file_exists($filename) && filemtime($filename) > time() - 86400) {
-                //echo "Skipping {$asin['asin']} from {$asin['country']}\n";
                 continue;
             }
-            echo "Downloading {$asin['asin']} from {$asin['country']}\n";
             $buckets[$asin['country']][] = $asin['asin'];
             if (count(value: $buckets[$asin['country']]) >= 10) {
                 $connectors[$asin['country']]->downloadAmazonAsins(asins: $buckets[$asin['country']], country: $asin['country']);
@@ -220,7 +218,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $downloadedAsins[] = $item['asin'];
             file_put_contents(filename: PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$item['asin']}.json", data: json_encode(value: $item));
         }
-        echo "Downloaded ASINs ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
+        echo "Asked ".implode(separator: ',', array: $asins)."; downloaded ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
     }
 
     public function download($forceDownload = false)
