@@ -186,7 +186,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $asin = array_pop($asins);
             $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$asin['asin']}.json";
             if (file_exists($filename) && filemtime($filename) > time() - 86400) {
-                echo "Skipping {$asin['asin']} from {$asin['country']}\n";
+                //echo "Skipping {$asin['asin']} from {$asin['country']}\n";
                 continue;
             }
             echo "Downloading {$asin['asin']} from {$asin['country']}\n";
