@@ -162,6 +162,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 'country' => $country,
             ];
         }
+        $asins = array_unique(array: $asins, flags: SORT_REGULAR);
         echo count(value: $asins) . " ASINs found.\n";
         return $asins;
     }
