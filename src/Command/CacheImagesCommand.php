@@ -219,7 +219,7 @@ class CacheImagesCommand extends AbstractCommand
                 sleep(3);
                 return null;
             }
-            sleep(2);
+            sleep(1);
             if ($imageData === false) {
                 echo "-";
                 return null;
