@@ -184,6 +184,10 @@ class AmazonConnector implements MarketplaceConnectorInterface
         ];
         while (!empty($asins)) {
             $asin = array_pop($asins);
+            $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$asin['asin']}.json";
+            if (file_exists($filename) && filemtime($filename) > time() - 86400) {
+                continue;
+            }
             $buckets[$asin['country']][] = $asin['asin'];
             if (count(value: $buckets[$asin['country']]) >= 10) {
                 $connectors[$asin['country']]->downloadAmazonAsins(asins: $buckets[$asin['country']], country: $asin['country']);
