@@ -188,6 +188,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
                 $item = json_decode(file_get_contents(filename: $filename), true);
                 $connectors[$asin['country']]->storeJsonData($item);
+                echo ".";
                 continue;
             }
             $buckets[$asin['country']][] = $asin['asin'];
