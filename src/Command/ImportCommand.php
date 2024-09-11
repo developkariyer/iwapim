@@ -67,6 +67,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
             ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
             ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
+            ->addOption('download-asins', null, InputOption::VALUE_NONE, 'Downloads ASINs from Amazon.')
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
     
@@ -157,6 +158,7 @@ class ImportCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0;"
         );
+        return Command::SUCCESS;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -182,7 +184,12 @@ class ImportCommand extends AbstractCommand
             }
 
             if ($input->getOption('memory-table')) {
-                self::prepareShopifyLineItems();
+                return self::prepareShopifyLineItems();
+            }
+
+            if ($input->getOption('download-asins')) {
+                AmazonConnector::downloadAsins();
+                return Command::SUCCESS;
             }
 
             $marketplaces = self::getMarketplaceObjects();
