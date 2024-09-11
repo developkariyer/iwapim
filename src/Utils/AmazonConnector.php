@@ -157,7 +157,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (empty($country) || !in_array(needle: $country, haystack: ['US', 'UK', 'AU', 'CA'])) {
                 continue;
             }
-            $country = 'CA';
             $asins[] = [
                 'asin' => $amazonVariant->getUniqueMarketplaceId(),
                 'country' => $country,
@@ -190,6 +189,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 echo "Skipping {$asin['asin']} from {$asin['country']}\n";
                 continue;
             }
+            echo "Downloading {$asin['asin']} from {$asin['country']}\n";
             $buckets[$asin['country']][] = $asin['asin'];
             if (count(value: $buckets[$asin['country']]) >= 10) {
                 $connectors[$asin['country']]->downloadAmazonAsins(asins: $buckets[$asin['country']], country: $asin['country']);
