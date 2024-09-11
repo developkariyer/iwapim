@@ -54,7 +54,8 @@ class CleanCommand extends AbstractCommand
             }
         }
         if ($input->getOption('asin')) {
-            self::transferAsins();
+            //self::transferAsins();
+            AmazonConnector::downloadAsins();
         }
         if ($input->getOption('link-check')) {
             self::linkCheck();
