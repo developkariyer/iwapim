@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -74,12 +74,7 @@ class ImportCommand extends AbstractCommand
 
     private static function getMarketplaceObjects($type = null): array
     {
-        $list = new Marketplace\Listing();
-        if (!empty($type)) {
-            $list->setCondition("`marketplaceType` = ?", [$type]);
-        }
-        $marketplaces = $list->load();
-        return $marketplaces;
+        return Marketplace::getMarketplaceList($type);
     }
 
     private function removeListeners()

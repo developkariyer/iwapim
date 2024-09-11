@@ -123,7 +123,6 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processShopify($variant)
     {
-        $json = self::getApiResponse($variant->getId());
         $parentJson = self::getParentResponse($variant->getId());
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
@@ -256,149 +255,12 @@ class CacheImagesCommand extends AbstractCommand
         return $asset;
     }
     
-/*
-    protected static function processEtsy()
-    {
-        echo "Loading Etsy objects...\n";
-        $cacheFolder = Utility::checkSetAssetPath('Image Cache');
-        $etsyFolder = Utility::checkSetAssetPath('Etsy', $cacheFolder);
-        $listObject = new EtsyListingListing();
-        $listObject->setUnpublished(true);
-        $etsyList = $listObject->load();
-        foreach ($etsyList as $etsy) {
-            echo "    Processing Etsy object: {$etsy->getId()}: ";
-            $imageFolder = Utility::checkSetAssetPath("{$etsy->getListingId()}", $etsyFolder);
-            $listingImageList = [];
-            $images = json_decode($etsy->getImages() ?? [], true);
-            foreach ($images as $image) {
-                $imageName = "Etsy_{$image['listing_id']}_{$image['listing_image_id']}.jpg";
-                $asset = self::findImageByName($imageName);
-                if ($asset) {
-                    echo ".";
-                } else {
-                    try {
-                        $imageData = file_get_contents($image['url_fullxfull']);
-                    } catch (\Exception $e) {
-                        echo "Failed to get image data: " . $e->getMessage() . "\n";
-                        sleep(2);
-                        continue;
-                    }
-                    sleep(2);
-                    if ($imageData === false) {
-                        echo "-";
-                        continue;
-                    }
-                    $asset = new Asset\Image();
-                    $asset->setData($imageData);
-                    $asset->setFilename($imageName);
-                    $asset->setParent($imageFolder);
-                    try {
-                        $asset->save();
-                        echo "+";
-                    } catch (\Exception $e) {
-                        echo "Failed to save asset: " . $e->getMessage() . "\n";
-                        continue;
-                    }
-                }
-                $listingImageList[] = $asset;
-            }
-            $items = [];
-            foreach($listingImageList as $img){
-                $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
-                $advancedImage->setImage($img);
-                $items[] = $advancedImage;
-            }
-            $etsy->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
-            $etsy->save();        
-            echo "\n";
-        }
-    }    */
-/*
-    protected static function processAmazon()
-    {
-        echo "Loading Amazon objects...";
-        $cacheFolder = Utility::checkSetAssetPath('Image Cache');
-        $amazonFolder = Utility::checkSetAssetPath('Amazon', $cacheFolder);
-        $listObject = new AmazonVariantListing();
-        $listObject->setUnpublished(true);
-        $amazonList = $listObject->load();
-        echo "\n";
-        foreach ($amazonList as $amazon) {
-            echo "    Processing Amazon object: {$amazon->getId()}: ";
-            $summaries = json_decode($amazon->getSummaries() ?? [['asin'=>'UNKNOWN']], true);
-            $attributes = json_decode($amazon->getAttributes() ?? [], true);
-            $asin = $summaries[0]['asin'];
-            $imageFolder = Utility::checkSetAssetPath($asin, $amazonFolder);
-            $listingImageList = [];
-            foreach ($attributes as $key=>$value) {
-                if (strpos($key, 'image') !== false) {
-                    foreach ($value as $potentialImage) {
-                        if (isset($potentialImage['media_location'])) {
-                            $imageName = "Amazon_".str_replace(["https:", "+", "/", ".", "_", "jpg"], '', $potentialImage['media_location']).".jpg";
-                            $asset = self::findImageByName($imageName);
-                            if ($asset) {
-                                echo ".";
-                            } else {
-                                try {
-                                    $imageData = file_get_contents($potentialImage['media_location']);
-                                } catch (\Exception $e) {
-                                    echo "Failed to get image data: " . $e->getMessage() . "\n";
-                                    sleep(2);
-                                    continue;
-                                }
-                                sleep(1);
-                                if ($imageData === false) {
-                                    echo "-";
-                                    continue;
-                                }
-                                $asset = new Asset\Image();
-                                $asset->setData($imageData);
-                                $asset->setFilename($imageName);
-                                $asset->setParent($imageFolder);
-                                try {
-                                    $asset->save();
-                                    echo "+";
-                                } catch (\Exception $e) {
-                                    echo "Failed to save asset: " . $e->getMessage() . "\n";
-                                    continue;
-                                }
-                            }
-                            $listingImageList[] = $asset;
-                        }
-                    }
-                }
-            }
-            if (empty($listingImageList)) {
-                echo "No images found.\n";
-            } else {
-                $items = [];
-                foreach($listingImageList as $img){
-                    $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
-                    $advancedImage->setImage($img);
-                    $items[] = $advancedImage;
-                }
-                $amazon->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
-                $amazon->save();
-                echo "\n";
-            }
-        }
-    }*/
-
     protected static function findImageByName($imageName)
     {
         $assetList = new AssetListing();
         $assetList->setCondition("filename = ?", [$imageName]);
         $assetList->setLimit(1);
         return $assetList->current();
-    }
-
-    protected static function findImageByProperty($imageProperty, $propertyName): ?Asset
-    {
-        $db = Db::get();
-        if ($result = $db->fetchOne("SELECT cpath FROM properties WHERE `ctype` = 'asset' AND `name` LIKE ? AND `data` LIKE ? LIMIT 1", [$imageProperty, $propertyName])) {
-            return Asset::getByPath($result);
-        }
-        return null;
     }
 
     private static function getResponseFromDb($id, $fieldName)

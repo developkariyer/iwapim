@@ -11,6 +11,7 @@ use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
+use Pimcore\Model\DataObject\Folder;
 
 
 use App\Select\AmazonMerchantIdList;
@@ -73,17 +74,17 @@ class AmazonConnector implements MarketplaceConnectorInterface
         }
     }
 
-    protected function downloadAmazonReport($reportType, $forceDownload, $country)
+    protected function downloadAmazonReport($reportType, $forceDownload, $country): void
     {
-        $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
-        if (!in_array($reportType, array_keys($this->amazonReports))) {
-            throw new \Exception("Report Type $reportType is not in reportNames in AmazonConnector class");
+        $marketplaceKey = urlencode(string: strtolower(string: $this->marketplace->getKey()));
+        if (!in_array(needle: $reportType, haystack: array_keys($this->amazonReports))) {
+            throw new \Exception(message: "Report Type $reportType is not in reportNames in AmazonConnector class");
         }
         echo "        Downloading Report $reportType ";
         $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$reportType}_{$country}.csv";
         
-        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
-            $report = file_get_contents($filename);
+        if (!$forceDownload && file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
+            $report = file_get_contents(filename: $filename);
             echo "Using cached data ";
         } else {
             echo "Waiting Report ";
@@ -91,7 +92,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonMerchantIdList::$amazonMerchantIdList[$country]]));
             $reportId = $response->json()['reportId'];
             while (true) {
-                sleep(10);
+                sleep(seconds: 10);
                 echo ".";
                 $reportStatus = $reportsApi->getReport($reportId);
                 $processingStatus = $reportStatus->json()['processingStatus'];
@@ -101,58 +102,118 @@ class AmazonConnector implements MarketplaceConnectorInterface
             }
             $reportUrl = $reportsApi->getReportDocument($reportStatus->json()['reportDocumentId'] , $reportStatus->json()['reportType']);
             $url = $reportUrl->json()['url'];
-            $report = file_get_contents($url);
-            if (substr($report, 0, 2) === "\x1f\x8b") {
-                $report = gzdecode($report);
+            $report = file_get_contents(filename: $url);
+            if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
+                $report = gzdecode(data: $report);
             }
-            file_put_contents($filename, $report);
+            file_put_contents(filename: $filename, data: $report);
             echo "OK ";
         }
-        if (substr($report, 0, 2) === "\x1f\x8b") {
-            $report = gzdecode($report);
+        if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
+            $report = gzdecode(data: $report);
         }
-        if (substr($report, 0, 3) === "\xEF\xBB\xBF") {
-            $report = substr($report, 3);
+        if (substr(string: $report, offset: 0, length: 3) === "\xEF\xBB\xBF") {
+            $report = substr(string: $report, offset: 3);
         }
 
         $this->amazonReports[$reportType][$country] = $report;
     }
 
-    public function downloadAmazonSku($sku, $country)
+    public static function findUnboundAsins()
     {
-        echo " (download) ";
-        $marketplaceKey = urlencode(strtolower($this->marketplace->getKey()));
-        $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
-        //find at least 10 empty SKUs
-        $identifiers = [rawurlencode($sku)];
-        foreach ($this->listings[$country] as $sku=>$listing) {
-            if (empty($listing)) {
-                $identifiers[] = rawurlencode($sku);
+        $asins = [];
+        echo "Finding unbound ASINs ";
+        $folder = Folder::getById(231104);
+        $amazonVariants = $folder->getChildren();
+        echo count(value: $amazonVariants) . " listings ";
+        foreach ($amazonVariants as $amazonVariant) {
+            if (!$amazonVariant instanceof VariantProduct) {
+                continue;
             }
-            if (count($identifiers) >= 9) {
-                break;
+            $tmp = ['asin' => $amazonVariant->getUniqueMarketplaceId()];
+            foreach ($amazonVariant->getAmazonMarketplace() as $amazonMarketplace) {
+                $activeId = $anyId = null;
+                $amazonMarketplaceId = $anyId = $amazonMarketplace->getMarketplaceId();
+                if (!$amazonMarketplace instanceof AmazonMarketplace) {
+                    continue;
+                }
+                if ($amazonMarketplace->getStatus() === 'Active') {
+                    $activeId = $amazonMarketplaceId;
+                    if ($amazonMarketplaceId === 'US' || $amazonMarketplaceId === 'UK') {
+                        break;
+                    }
+                }
+            }
+            $country = $activeId ?? $anyId;
+            if (in_array(needle: $country, haystack: ['MX', 'BR'])) {
+                $country = 'US';
+            }
+            if (in_array(needle: $country, haystack: ['ES', 'FR', 'IT', 'DE', 'NL', 'SE', 'PL', 'SA', 'EG', 'TR', 'AE', 'IN'])) {
+                $country = 'UK';
+            }
+            if (in_array(needle: $country, haystack: ['SG', 'AU', 'JP'])) {
+                $country = 'AU';
+            }
+            if (empty($country) || !in_array(needle: $country, haystack: ['US', 'UK', 'AU', 'CA'])) {
+                continue;
+            }
+            $asins[] = [
+                'asin' => $amazonVariant->getUniqueMarketplaceId(),
+                'country' => $country,
+            ];
+        }
+        echo count(value: $asins) . " ASINs found.\n";
+        return $asins;
+    }
+
+    public static function downloadAsins(): void
+    {
+        $asins = self::findUnboundAsins();
+        $connectors = [
+            'US' => new AmazonConnector(marketplace: Marketplace::getById(149795)),
+            'UK' => new AmazonConnector(marketplace: Marketplace::getById(200568)),
+            'AU' => new AmazonConnector(marketplace: Marketplace::getById(200568)),
+            'CA' => new AmazonConnector(marketplace: Marketplace::getById(234692)),
+        ];
+        $buckets = [
+            'US' => [],
+            'UK' => [],
+            'AU' => [],
+            'CA' => [],
+        ];
+        while (!empty($asins)) {
+            $asin = array_pop($asins);
+            $buckets[$asin['country']][] = $asin['asin'];
+            if (count(value: $buckets[$asin['country']]) >= 10) {
+                $connectors[$asin['country']]->downloadAmazonAsins(asins: $buckets[$asin['country']], country: $asin['country']);
+                $buckets[$asin['country']] = [];
             }
         }
+        foreach ($buckets as $country=>$asins) {
+            if (!empty($asins)) {
+                $connectors[$country]->downloadAmazonAsins(asins: $asins, country: $country);
+            }
+        }
+    }
+
+    public function downloadAmazonAsins($asins, $country)
+    {
+        $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
         $response = $catalogApi->searchCatalogItems(
             marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
-            identifiers: $identifiers,
-            identifiersType: 'SKU',
+            identifiers: $asins,
+            identifiersType: 'ASIN',
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
-        //print_r($identifiers); exit;
-        //echo json_encode($response->json());exit;
-        sleep(1);
+        sleep(seconds: 1);
         $items = $response->json()['items'] ?? [];
+        $downloadedAsins = [];
         foreach ($items as $item) {
-            foreach ($item['identifiers'][0]['identifiers'] ?? [] as $identifier) {
-                if ($identifier['identifierType'] === 'SKU') {
-                    $this->listings[$country][$identifier['identifier']] = $item;
-                    file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$identifier['identifier']}_{$country}.json", json_encode($item));
-                }
-            }
+            $downloadedAsins[] = $item['asin'];
+            file_put_contents(filename: PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$item['asin']}.json", data: json_encode(value: $item));
         }
-        return $this->listings[$country][$sku];
+        echo "Downloaded ASINs ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
     }
 
     public function download($forceDownload = false)
