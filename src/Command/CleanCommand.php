@@ -13,6 +13,7 @@ use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
+use App\Utils\AmazonConnector;
 use App\Utils\Utility;
 
 #[AsCommand(
