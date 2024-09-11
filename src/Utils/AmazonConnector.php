@@ -217,8 +217,21 @@ class AmazonConnector implements MarketplaceConnectorInterface
         foreach ($items as $item) {
             $downloadedAsins[] = $item['asin'];
             file_put_contents(filename: PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$item['asin']}.json", data: json_encode(value: $item));
+            $this->storeJsonData($item);
         }
         echo "Asked ".implode(separator: ',', array: $asins)."; downloaded ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
+    }
+
+    protected function storeJsonData($item)
+    {
+        $db = \Pimcore\Db::get();
+        try {
+            $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) 
+                ON DUPLICATE KEY UPDATE json_data=?";
+            $db->query($sql, [$this->marketplace->getId(), $item['asin'], json_encode(value: $item), json_encode(value: $item)]);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
     }
 
     public function download($forceDownload = false): void
@@ -429,7 +442,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
             }
         }
     }
-
     protected function processFieldCollection($variantProduct, $listing, $country)
     {
         $collection = $variantProduct->getAmazonMarketplace();
