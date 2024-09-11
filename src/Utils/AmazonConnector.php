@@ -228,7 +228,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
         try {
             $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) 
                 ON DUPLICATE KEY UPDATE json_data=?";
-            $db->query($sql, [$this->marketplace->getId(), $item['asin'], json_encode(value: $item), json_encode(value: $item)]);
+            $smtm = $db->prepare($sql);
+            $smtm->execute([$this->marketplace->getId(), $item['asin'], json_encode($item), json_encode($item)]);
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
