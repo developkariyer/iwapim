@@ -440,7 +440,11 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         parent: Utility::checkSetPath('00 Yeni ASIN', $marketplaceFolder)
                     );
                 }
-                $this->processFieldCollection($variantProduct, $listing, $country);
+                if (empty($variantProduct->getMarketplace())) {
+                    $variantProduct->setMarketplace($this->marketplace);
+                    $variantProduct->save();
+                }
+                $this->processFieldCollection(variantProduct: $variantProduct, listing: $listing, country: $country);
                 echo $variantProduct->getId();
                 echo " OK\n";
             }
