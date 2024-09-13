@@ -42,7 +42,7 @@ class CleanCommand extends AbstractCommand
             self::traverseAssetFolder(Folder::getById(1));
         }
         if ($input->getOption('object')) {
-            self::traverseObjectFolders(ObjectFolder::getById(149861));
+            self::traverseObjectFolders(ObjectFolder::getById(172891));
         }
         if ($input->getOption('product-code')) {
             try {
