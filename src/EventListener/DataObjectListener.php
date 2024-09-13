@@ -127,6 +127,9 @@ class DataObjectListener implements EventSubscriberInterface
                 if ($object->getName()) {
                     $object->setName(null);
                 }
+                if ($object->getProductIdentifier()) {
+                    $object->setProductIdentifier(null);
+                }
 //                if (!($object->getVariationSize() || $object->getVariationColor())) {
 //                }
             }
