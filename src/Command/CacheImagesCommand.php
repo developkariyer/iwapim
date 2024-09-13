@@ -181,11 +181,11 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processBolCom($variant)
     {
-        echo "Processing Bol.com object: {$variant->getId()}: ";
         $json = self::getApiResponse($variant->getId());
         $listingImageList = [];
         $listingImageList[] = static::processImage($json['imageUrl2'] ?? '', static::$bolcomFolder);
         $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()}: ";
     }
 
     protected static function processImage($url, $parent, $oldFileName = '')
