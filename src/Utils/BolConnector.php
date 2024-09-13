@@ -332,7 +332,6 @@ class  BolConnector
             $placementKey = $this->productsUrl . $listing["ean"] . "/placement";
             if (isset($listing[$placementKey]["categories"]) && !empty($listing[$placementKey]["categories"])) {
                 $categoryName = $listing[$placementKey]["categories"][0]["categoryName"];
-               
             }
             else{
                 $decoded_response = $this->singleCurl($this->productsUrl,"/placement",$listing["ean"]);
@@ -356,6 +355,7 @@ class  BolConnector
                     }
                 }
             }
+
             // Bol Product Id
             $bolProductId = $listing[$this->productsUrl . $listing["ean"] . "/product-ids"]["bolProductId"];
             if (empty($bolProductId)) {
