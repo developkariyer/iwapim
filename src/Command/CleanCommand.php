@@ -117,6 +117,7 @@ class CleanCommand extends AbstractCommand
                             if (empty($product->getProductDimension1()) || empty($product->getProductDimension2())) {
                                 $product->setProductDimension1($width);
                                 $product->setProductDimension2($height);
+                                echo "Setting dimensions for {$product->getId()} to {$width}x{$height}\n";
                                 $dirty = true;
                             }
                         }
