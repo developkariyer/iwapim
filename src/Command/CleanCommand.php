@@ -101,7 +101,7 @@ class CleanCommand extends AbstractCommand
                         if ($product->checkProductCode()) {
                             $dirty = true;
                         }
-                        if ($product->checkIwasku(true)) {
+                        if ($product->checkIwasku()) {
                             $dirty = true;
                         }/*
                         foreach (Product::$level1NullFields as $field) {
