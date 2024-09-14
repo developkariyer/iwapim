@@ -106,7 +106,7 @@ class CleanCommand extends AbstractCommand
                         }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "\nLevel 1 product: {$product->getId()} {$field} is not null\n";
+                                echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
