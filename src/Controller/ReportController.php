@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Product;
-
+use Pimcore\Model\DataObject\Currency;
 
 class ReportController extends FrontendController
 {
@@ -23,10 +23,6 @@ class ReportController extends FrontendController
         $group = GroupProduct::getById($groupId);
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
-        //$marketplaceTypes = [];
-        //foreach ($group->getTargetMarketplace() as $mp) {
-        //    $marketplaceTypes[] = $mp->getType();
-        //}
         $productTwig = [];
         $modelTwig = [];
         foreach ($pricingModels as $pricingModel) {
@@ -43,10 +39,10 @@ class ReportController extends FrontendController
             }
             $prices = [];
             foreach ($product->getListingItems() as $listingItem) {
-                //$marketplace = $listingItem->getMarketplace();
-                //if (in_array($marketplace->getType(), $marketplaceTypes)) {
-                    $prices[] = number_format($listingItem->getSalePrice(), 2, '.', '');
-                //}
+                $prices[] = [
+                    'marketplace' => $listingItem->getMarketplace()->getKey(),
+                    'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency(), $listingItem->getSalePrice()), 2, '.', ''),
+                ];
             }
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
