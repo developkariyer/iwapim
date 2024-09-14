@@ -105,7 +105,7 @@ class CleanCommand extends AbstractCommand
                         }
                         break;
                     default:
-                        echo "?{$product->getId()} ";
+                        echo "?{$product->getId()}\n";
                         break;
                 }
                 if ($dirty) {
