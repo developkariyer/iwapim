@@ -13,7 +13,7 @@ class CostModel extends Concrete
             $costNode = $relationNode->getObject();            
             $totalCost = bcAdd(
                 $totalCost,
-                match ($costNode->getFactor()) {
+                match ($relationNode->getFactor()) {
                     'Beher Ürün' => bcmul(
                         $costNode->getUnitCost(), 
                         $relationNode->getSarf()
