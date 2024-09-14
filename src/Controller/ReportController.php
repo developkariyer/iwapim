@@ -45,20 +45,20 @@ class ReportController extends FrontendController
         foreach ($products as $product) {
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
-                'productCategory' => $product->getProductCategory(),
-                'productIdentifier' => $product->getProductIdentifier(),
-                'name' => $product->getName(),
+                'productCategory' => $product->getInheritedField('productCategory'),
+                'productIdentifier' => $product->getInheritedField('productIdentifier'),
+                'name' => $product->getInheritedField('name'),
                 'variationSize' => $product->getVariationSize(),
                 'variationColor' => $product->getVariationColor(),
-                'packageDimension1' => $product->getPackageDimension1(),
-                'packageDimension2' => $product->getPackageDimension2(),
-                'packageDimension3' => $product->getPackageDimension3(),
-                'packageWeight' => $product->getPackageWeight(),
+                'packageDimension1' => $product->getInheritedField('packageDimension1'),
+                'packageDimension2' => $product->getInheritedField('packageDimension2'),
+                'packageDimension3' => $product->getInheritedField('packageDimension3'),
+                'packageWeight' => $product->getInheritedField('packageWeight'),
                 'imageUrl' => $product->getImageUrl(),
                 'productCost' => $product->getProductCost(),
-                'productDimension1' => $product->getProductDimension1(),
-                'productDimension2' => $product->getProductDimension2(),
-                'productDimension3' => $product->getProductDimension3(),
+                'productDimension1' => $product->getInheritedField('productDimension1'),
+                'productDimension2' => $product->getInheritedField('productDimension2'),
+                'productDimension3' => $product->getInheritedField('productDimension3'),
             ];
         }
 
