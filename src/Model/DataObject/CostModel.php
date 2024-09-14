@@ -9,7 +9,10 @@ class CostModel extends Concrete
 {
     public function getCost($product)
     {
-        return "10.05";
+        $totalCost = '0.00';
+        foreach ($this->getCostNodes() as $costNode) {
+            error_log($costNode->getFactor());
+        }
     }
     
 }
