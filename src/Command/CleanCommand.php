@@ -110,7 +110,7 @@ class CleanCommand extends AbstractCommand
                                 $dirty = true;
                                 $product->set($field, null);
                             }
-                        }
+                        }*/
                         $size = $product->getVariationSize();
                         if (preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)cm$/', $size, $matches)) {
                             $width = $matches[1];
@@ -121,7 +121,7 @@ class CleanCommand extends AbstractCommand
                                 echo "Setting dimensions for {$product->getId()} to {$width}x{$height}\n";
                                 $dirty = true;
                             }
-                        }*/
+                        }
                         break;
                     default:
                         echo "?{$product->getId()}\n";
