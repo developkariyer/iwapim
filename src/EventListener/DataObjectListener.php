@@ -8,6 +8,8 @@ use Pimcore\Model\DataObject\ClassDefinition\CustomLayout;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Serial;
 use Pimcore\Model\DataObject\GroupProduct;
+use Pimcore\Model\DataObject\Data\Link;
+
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
@@ -129,7 +131,7 @@ class DataObjectListener implements EventSubscriberInterface
             $object->checkLabel();
         }
         if ($object instanceof GroupProduct) {
-            $object->setFrontendUrl(new \Pimcore\Model\DataObject\Data\ExternalUrl('https://iwa.web.tr/report/group/' . $object->getId()));
+            $object->setFrontendUrl(new Link('https://iwa.web.tr/report/group/' . $object->getId()));
         }
     }
 
