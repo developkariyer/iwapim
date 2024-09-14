@@ -42,9 +42,9 @@
                     <td>{{ product.name }}</td>
                     <td>{{ product.variationSize }}<br>{{ product.variationColor }}<br>{{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}kg</td>
                     <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
-                    <td>{{ product.productCost }}</td>
+                    <td class="text-end">{{ product.productCost }}</td>
                     {% for model in models %}
-                        <td>{{ product.models[model] }}</td>
+                        <td class="text-end">{{ product.models[model] }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
