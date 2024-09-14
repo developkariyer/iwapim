@@ -43,7 +43,7 @@ class ReportController extends FrontendController
                     'marketplace' => $listingItem->getMarketplace()->getKey(),
                     'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', '').
                         'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', '').'$)',
-                    'url' => $listingItem->getUrlLink(),
+                    'urlLink' => $listingItem->getUrlLink()->getHref(),
                 ];
             }
             $productTwig[] = [
