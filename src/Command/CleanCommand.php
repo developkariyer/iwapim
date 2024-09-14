@@ -89,7 +89,7 @@ class CleanCommand extends AbstractCommand
                     case 0:
                         echo "Found level 0 product: {$product->getId()}\n";
                         foreach (Product::$level0NullFields as $field) {
-                            if ($product->get($field) !== null) {
+                            if (!empty($product->get($field))) {
                                 echo "    {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
@@ -99,7 +99,7 @@ class CleanCommand extends AbstractCommand
                     case 1:
                         echo "Found level 1 product: {$product->getId()}\n";
                         foreach (Product::$level1NullFields as $field) {
-                            if ($product->get($field) !== null) {
+                            if (!empty($product->get($field))) {
                                 echo "    {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
