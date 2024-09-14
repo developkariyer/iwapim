@@ -78,12 +78,12 @@
 <script>
     $(document).ready(function() {
         var table = $('#example').DataTable({
-            dom: 'Bfrtip',  // Add Buttons to DOM
+            dom: 'lBfrtip',  // Add Buttons to DOM
             buttons: [
                 'colvis'  // Column Visibility Button
             ]
         });
-        console.log(table.buttons()); // Check if buttons are being initialized
+        console.log($.fn.dataTable.Buttons);
     
         // Define columns and IDs as key-value pairs
         var columns = {
