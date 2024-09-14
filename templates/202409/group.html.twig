@@ -16,8 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
 </head>
 <body>
-    <div class="container mx-sm-2">
-        <h1>{{ title }}</h1>
+    <h1>{{ title }}</h1>
     <table id="example" class="display table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>
@@ -52,7 +51,6 @@
             {% endfor %}
         </tbody>
     </table>
-    </div>
     <script>
         $(document).ready(function() {
             var table = $('#example').DataTable({
