@@ -58,6 +58,12 @@
             var table = $('#example').DataTable(
                 {
                     "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Hepsi"]],
+                    "order": [
+                        [1, 'asc'],  // Sort by column 1 (index 1)
+                        [2, 'asc'],  // Sort by column 2 (index 2)
+                        [4, 'asc'],  // Sort by column 4 (index 4)
+                        [5, 'asc']   // Sort by column 5 (index 5)
+                    ],
                 }
             );
         });
