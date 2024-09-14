@@ -40,7 +40,6 @@ class DataObjectListener implements EventSubscriberInterface
 
     protected function doModifyCustomLayouts(Product $object, GenericEvent $event)
     {
-        return;
         $level = $object->level();
         $data = $event->getArgument('data');
         if (empty($data['validLayouts'])) {
