@@ -28,16 +28,14 @@
 <table id="example" class="display table table-striped table-bordered" style="width:100%">
     <thead>
         <tr>
-            <th>IWASKU</select>
-            </th>
+            <th>IWASKU</th>
             <th>
                 <select id="productCategoryFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Kategori"></select>
             </th>
             <th>
                 <select id="productIdentifierFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Kod"></select>
             </th>
-            <th>Ürün Adı</select>
-            </th>
+            <th>Ürün Adı</th>
             <th>
                 <select id="variationSizeFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Ebat"></select>
             </th>
@@ -47,14 +45,10 @@
             <th>Ebatlar</select>
             </th>
             <th>Örnek Resim</th>
-            <th>Ürün Maliyeti</select>
-            </th>
-            <th>Dağıtım Modeli 1</select>
-            </th>
-            <th>Dağıtım Modeli 2</select>
-            </th>
-            <th>Dağıtım Modeli 3</select>
-            </th>
+            <th>Ürün Maliyeti</th>
+            <th>Dağıtım Modeli 1</th>
+            <th>Dağıtım Modeli 2</th>
+            <th>Dağıtım Modeli 3</th>
         </tr>
     </thead>
     <tbody>
@@ -85,6 +79,7 @@
                 'colvis'  // Column Visibility Button
             ]
         });
+        console.log(table.buttons()); // Check if buttons are being initialized
     
         // Define columns and IDs as key-value pairs
         var columns = {
