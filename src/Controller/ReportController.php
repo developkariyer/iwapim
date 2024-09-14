@@ -23,6 +23,10 @@ class ReportController extends FrontendController
         $group = GroupProduct::getById($groupId);
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
+        $marketplaceTypes = [];
+        foreach ($group->getTargetMarketplace() as $mp) {
+            $marketplaceTypes[] = $mp->getType();
+        }
         $productTwig = [];
         $modelTwig = [];
         foreach ($pricingModels as $pricingModel) {
@@ -36,6 +40,13 @@ class ReportController extends FrontendController
             foreach ($pricingModels as $pricingModel) {
                 $modelKey = $pricingModel->getKey();
                 $productModels[$modelKey] = 123;
+            }
+            $prices = [];
+            foreach ($product->getListingItems() as $listingItem) {
+                $marketplace = $listingItem->getMarketplace();
+                if (in_array($marketplace->getType(), $marketplaceTypes)) {
+                    $prices[] = $listingItem->getSalePrice();
+                }
             }
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
@@ -52,6 +63,7 @@ class ReportController extends FrontendController
                 'productCost' => $product->getProductCost(),
                 'models' => $productModels,
                 'bundleItems' => $product->getBundleItems(),
+                'prices' => $prices,
             ];
         }
         return $this->render(

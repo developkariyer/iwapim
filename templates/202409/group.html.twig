@@ -31,6 +31,7 @@
                 {% for model in models %}
                     <th>{{ model }}</th>
                 {% endfor %}
+                <th>Satış Fiyatı</th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +47,7 @@
                     {% for model in models %}
                         <td class="text-end">{{ product.models[model] }}</td>
                     {% endfor %}
+                    <td class="text-end">{% for price in product.prices %}<li>{{ price }}</li>{% endfor %}</td>
                 </tr>
             {% endfor %}
         </tbody>
