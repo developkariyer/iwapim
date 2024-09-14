@@ -46,30 +46,16 @@
             <th>
                 <select id="variationColorFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Renk"></select>
             </th>
-            <th>
-                <select id="packageDimension1Filter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="En"></select>
+            <th>Ebatlar</select>
             </th>
-            <th>
-                <select id="packageDimension2Filter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Boy"></select>
+            <th>Örnek Resim</th>
+            <th>Ürün Maliyeti</select>
             </th>
-            <th>
-                <select id="packageDimension3Filter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Yükseklik"></select>
+            <th>Dağıtım Modeli 1</select>
             </th>
-            <th>
-0                <select id="packageWeightFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Ağırlık"></select>
+            <th>Dağıtım Modeli 2</select>
             </th>
-            <th>Örnek Resim</th> <!-- No select for image -->
-            <th>
-                <select id="productCostFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Ürün Maliyeti"></select>
-            </th>
-            <th>
-                <select id="pricingModel1Filter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Dağıtım Modeli 1"></select>
-            </th>
-            <th>
-                <select id="pricingModel2Filter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Dağıtım Modeli 2"></select>
-            </th>
-            <th>
-                <select id="pricingModel3Filter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Dağıtım Modeli 3"></select>
+            <th>Dağıtım Modeli 3</select>
             </th>
         </tr>
     </thead>
@@ -82,10 +68,7 @@
                 <td>{{ product.name }}</td>
                 <td>{{ product.variationSize }}</td>
                 <td>{{ product.variationColor }}</td>
-                <td>{{ product.packageDimension1 }}</td>
-                <td>{{ product.packageDimension2 }}</td>
-                <td>{{ product.packageDimension3 }}</td>
-                <td>{{ product.packageWeight }}</td>
+                <td>{{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}gr</td>
                 <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px; max-height: 100px;"></td>
                 <td>{{ product.productCost }}</td>
                 <td>{{ product.productDimension1 }}</td>
@@ -113,14 +96,6 @@
             3: 'name', 
             4: 'variationSize', 
             5: 'variationColor', 
-            6: 'packageDimension1', 
-            7: 'packageDimension2', 
-            8: 'packageDimension3', 
-            9: 'packageWeight', 
-            11: 'productCost', 
-            12: 'pricingModel1', 
-            13: 'pricingModel2', 
-            14: 'pricingModel3'
         };
     
         // Populate the selectpicker dropdowns for each column
