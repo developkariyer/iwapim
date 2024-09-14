@@ -20,5 +20,5 @@ class Currency extends Concrete
         }
         return $amount;
     }
-    
+
 }
