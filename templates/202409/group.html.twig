@@ -16,52 +16,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
 </head>
 <body>
-
-<table id="example" class="display table table-striped table-bordered" style="width:100%">
-    <thead>
-        <tr>
-            <th>IWASKU</th>
-            <th>Kategori</th>
-            <th>Ürün Kodu</th>
-            <th>Ürün Adı</th>
-            <th>V.Ebat</th>
-            <th>V.Renk</th>
-            <th>Ölçüler</th>
-            <th>Örnek Resim</th>
-            <th>Ürün Maliyeti</th>
-            <th>Dağıtım Modeli 1</th>
-            <th>Dağıtım Modeli 2</th>
-            <th>Dağıtım Modeli 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in products %}
+    <table id="example" class="display table table-striped table-bordered" style="width:100%">
+        <thead>
             <tr>
-                <td>{{ product.iwasku }}</td>
-                <td>{{ product.productCategory }}</td>
-                <td>{{ product.productIdentifier }}</td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.variationSize }}</td>
-                <td>{{ product.variationColor }}</td>
-                <td>{{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}kg</td>
-                <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
-                <td>{{ product.productCost }}</td>
-                <td>{{ product.productDimension1 }}</td>
-                <td>{{ product.productDimension2 }}</td>
-                <td>{{ product.productDimension3 }}</td>
+                <th>IWASKU</th>
+                <th>Kategori</th>
+                <th>Ürün Kodu</th>
+                <th>Ürün Adı</th>
+                <th>V.Ebat</th>
+                <th>V.Renk</th>
+                <th>Ölçüler</th>
+                <th>Örnek Resim</th>
+                <th>Ürün Maliyeti</th>
+                <th>Dağıtım Modeli 1</th>
+                <th>Dağıtım Modeli 2</th>
+                <th>Dağıtım Modeli 3</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.iwasku }}</td>
+                    <td>{{ product.productCategory }}</td>
+                    <td>{{ product.productIdentifier }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.variationSize }}</td>
+                    <td>{{ product.variationColor }}</td>
+                    <td>{{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}kg</td>
+                    <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
+                    <td>{{ product.productCost }}</td>
+                    <td>{{ product.productDimension1 }}</td>
+                    <td>{{ product.productDimension2 }}</td>
+                    <td>{{ product.productDimension3 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<script>
-    $(document).ready(function() {
-        var table = $('#example').DataTable();
-    
-    });
-</script>
-    
-
-
+    <script>
+        $(document).ready(function() {
+            var table = $('#example').DataTable();
+        });
+    </script>
 </body>
 </html>
