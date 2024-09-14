@@ -36,7 +36,11 @@
         <tbody>
             {% for product in products %}
                 <tr>
-                    <td>{{ product.iwasku }}</td>
+                    <td>{{ product.iwasku }}
+                        {% for bundleItem in product.bundleItems %}
+                            <br><small>{{ bundleItem.iwasku }}</small>
+                        {% endfor %}
+                    </td>
                     <td>{{ product.productCategory }}</td>
                     <td>{{ product.productIdentifier }}</td>
                     <td>{{ product.name }}</td>

@@ -51,6 +51,7 @@ class ReportController extends FrontendController
                 'imageUrl' => $imageUrl,
                 'productCost' => $product->getProductCost(),
                 'models' => $productModels,
+                'bundleItems' => $product->getBundleItems(),
             ];
         }
         return $this->render(
