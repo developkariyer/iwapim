@@ -43,7 +43,9 @@ class ReportController extends FrontendController
 
         */
         foreach ($products as $product) {
-            $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : $product->getImageUrl();
+            if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
+                $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
+            }
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
                 'productCategory' => $product->getInheritedField('productCategory'),
