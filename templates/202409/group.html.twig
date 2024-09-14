@@ -28,9 +28,9 @@
                 <th>Ölçüler</th>
                 <th>Örnek Resim</th>
                 <th>Ürün Maliyeti</th>
-                <th>Dağıtım Modeli 1</th>
-                <th>Dağıtım Modeli 2</th>
-                <th>Dağıtım Modeli 3</th>
+                {% for model in models %}
+                    <th>{{ model.name }}</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>
@@ -45,9 +45,9 @@
                     <td>{{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}kg</td>
                     <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
                     <td>{{ product.productCost }}</td>
-                    <td>{{ product.productDimension1 }}</td>
-                    <td>{{ product.productDimension2 }}</td>
-                    <td>{{ product.productDimension3 }}</td>
+                    {% for model in models %}
+                        <td>{{ product.models[model.id] }}</td>
+                    {% endfor %}
                 </tr>
             {% endfor %}
         </tbody>

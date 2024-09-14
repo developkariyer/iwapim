@@ -24,27 +24,18 @@ class ReportController extends FrontendController
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
         $productTwig = [];
-        /*
-                        <td>{{ product.iwasku }}</td>
-                <td>{{ product.productCategory }}</td>
-                <td>{{ product.productIdentifier }}</td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.variationSize }}</td>
-                <td>{{ product.variationColor }}</td>
-                <td>{{ product.packageDimension1 }}</td>
-                <td>{{ product.packageDimension2 }}</td>
-                <td>{{ product.packageDimension3 }}</td>
-                <td>{{ product.packageWeight }}</td>
-                <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px; max-height: 100px;"></td>
-                <td>{{ product.productCost }}</td>
-                <td>{{ product.productDimension1 }}</td>
-                <td>{{ product.productDimension2 }}</td>
-                <td>{{ product.productDimension3 }}</td>
-
-        */
+        $modelTwig = [];
+        foreach ($pricingModels as $pricingModel) {
+            $modelTwig[] = $pricingModel->getKey();
+        }
         foreach ($products as $product) {
             if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
                 $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
+            }
+            $productModels = [];
+            foreach ($pricingModels as $pricingModel) {
+                $modelKey = $pricingModel->getKey();
+                $productModels[$modelKey] = 123;
             }
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
@@ -59,9 +50,7 @@ class ReportController extends FrontendController
                 'packageWeight' => $product->getInheritedField('packageWeight'),
                 'imageUrl' => $imageUrl,
                 'productCost' => $product->getProductCost(),
-                'productDimension1' => $product->getInheritedField('productDimension1'),
-                'productDimension2' => $product->getInheritedField('productDimension2'),
-                'productDimension3' => $product->getInheritedField('productDimension3'),
+                'models' => $productModels,
             ];
         }
 
@@ -69,6 +58,7 @@ class ReportController extends FrontendController
             '202409/group.html.twig', 
             [
                 'products' => $productTwig,
+                'models' => $modelTwig,
             ]
         );
     }
