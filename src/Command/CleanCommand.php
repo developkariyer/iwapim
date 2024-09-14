@@ -12,7 +12,7 @@ use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
-use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\DataObject;
 use App\Utils\AmazonConnector;
 use App\Utils\Utility;
 
@@ -74,6 +74,7 @@ class CleanCommand extends AbstractCommand
         $offset = 0;
 
         Product::setGetInheritedValues(false);
+        DataObject::setGetInheritedValues(false);
         while (true) {
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
