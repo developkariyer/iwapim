@@ -131,7 +131,9 @@ class DataObjectListener implements EventSubscriberInterface
             $object->checkLabel();
         }
         if ($object instanceof GroupProduct) {
-            $object->setFrontendUrl(new Link('https://iwa.web.tr/report/group/' . $object->getId()));
+            $l = new Link();
+            $l->setPath('https://iwa.web.tr/report/group/' . $object->getId());
+            $object->setFrontendUrl($l);
         }
     }
 
