@@ -31,7 +31,6 @@ class Product extends Concrete
         'variationColorList',
         'description',
         'technicals',
-        'album',
         'seoTitle',
         'seoDescription',
         'seoTitleEn',
