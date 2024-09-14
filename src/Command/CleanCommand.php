@@ -51,8 +51,6 @@ class CleanCommand extends AbstractCommand
                 self::fixProductCodes();
             } catch (\Exception $e) {
                 echo $e->getMessage();
-            } finally {
-                Product::setGetInheritedValues(true);
             }
         }
         if ($input->getOption('asin')) {
@@ -136,7 +134,6 @@ class CleanCommand extends AbstractCommand
             echo "\rProcessed {$offset}       ";
         }
         echo "Processed {$offset} items   \n";
-        Product::setGetInheritedValues(true);
     }
 
     private static function linkCheck()
