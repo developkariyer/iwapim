@@ -87,6 +87,9 @@ class CleanCommand extends AbstractCommand
                 $dirty = false;
                 switch ($product->level()) {
                     case 0:
+                        if ($product->checkProductCode()) {
+                            $dirty = true;
+                        }
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
