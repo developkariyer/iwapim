@@ -54,7 +54,7 @@ class ReportController extends FrontendController
                 'packageDimension2' => $product->getPackageDimension2(),
                 'packageDimension3' => $product->getPackageDimension3(),
                 'packageWeight' => $product->getPackageWeight(),
-                'imageUrl' => $product->getImage()->getThumbnail()->getUri(),
+                'imageUrl' => $product->getImageUrl()->getFullPath(),
                 'productCost' => $product->getProductCost(),
                 'productDimension1' => $product->getProductDimension1(),
                 'productDimension2' => $product->getProductDimension2(),
