@@ -29,18 +29,18 @@ class CostCalculator implements CalculatorClassInterface
         $bundleItems = $object->getBundleItems();
         if (!empty($bundleItems)) {
             foreach ($bundleItems as $bundleItem) {
-                $totalCost = bcadd($totalCost, $bundleItem->getProductCost(), 2);
+                $totalCost = bcadd($totalCost, $bundleItem->getProductCost(), 4);
             }
             return $totalCost;
         }
         foreach ($object->getParent()->getCostModelProduct() as $costModel) {
-            $totalCost = bcadd($totalCost, $costModel->getCost($object), 2);
+            $totalCost = bcadd($totalCost, $costModel->getCost($object), 4);
         }
         foreach ($object->getCostModelVariant() as $costModel) {
-            $totalCost = bcadd($totalCost, $costModel->getCost($object), 2);
+            $totalCost = bcadd($totalCost, $costModel->getCost($object), 4);
         }
     
-        return $totalCost;
+        return number_format($totalCost, 2, '.', '');
     }    
 
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string

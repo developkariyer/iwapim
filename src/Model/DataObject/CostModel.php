@@ -16,22 +16,24 @@ class CostModel extends Concrete
                 match ($relationNode->getFactor()) {
                     'Beher Ürün' => bcmul(
                         $costNode->getUnitCost(), 
-                        $relationNode->getSarf()
+                        $relationNode->getSarf(),
+                        4
                     ),
                     'Ebat m2' => bcmul(
                         $costNode->getunitCost(), 
-                        bcmul($relationNode->getSarf(), number_format($product->getArea(), 2, '.', ''))
+                        bcmul($relationNode->getSarf(), number_format($product->getArea(), 4, '.', ''), 4)
                     ),
                     'Ambalaj m2' => bcmul(
                         $costNode->getunitCost(),
-                        bcmul($relationNode->getSarf(), number_format($product->getPackageArea(), 2, '.', ''))
+                        bcmul($relationNode->getSarf(), number_format($product->getPackageArea(), 4, '.', ''), 4)
                     ),
                     'Kesim Detay' => bcmul(
                         $costNode->getunitCost(),
-                        bcmul($relationNode->getSarf(), number_format($product->getCutComplexity(), 2, '.', ''))
+                        bcmul($relationNode->getSarf(), number_format($product->getCutComplexity(), 4, '.', ''), 4)
                     ),
                     default => '0.00',
-                }
+                },
+                4
             );
         }
         return $totalCost;
