@@ -95,9 +95,14 @@ class Product extends Concrete
     public function checkIwasku($forced = false)
     {
         if ($forced || ($this->level() == 1 && $this->isPublished() && strlen($this->getIwasku() ?? '') != 12)) {
-            $pid = $this->getInheritedField("ProductIdentifier");
+            $pid = $this->getInheritedField("productIdentifier");
             $iwasku = str_pad(str_replace('-', '', $pid), 7, '0', STR_PAD_RIGHT);
-            $iwasku .= $this->getProductCode();
+            $productCode = $this->getProductCode();
+            if (strlen($productCode) != 5) {
+                $productCode = $this->generateUniqueCode(5);
+                $this->setProductCode($productCode);
+            }
+            $iwasku .= $productCode;
             $this->setIwasku($iwasku);
             return true;
         }
