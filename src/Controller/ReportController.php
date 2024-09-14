@@ -45,7 +45,7 @@ class ReportController extends FrontendController
             foreach ($product->getListingItems() as $listingItem) {
                 //$marketplace = $listingItem->getMarketplace();
                 //if (in_array($marketplace->getType(), $marketplaceTypes)) {
-                    $prices[] = $listingItem->getSalePrice();
+                    $prices[] = number_format($listingItem->getSalePrice(), 2, '.', '');
                 //}
             }
             $productTwig[] = [
