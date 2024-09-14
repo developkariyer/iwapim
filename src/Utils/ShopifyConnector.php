@@ -5,6 +5,7 @@ namespace App\Utils;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
+use App\Command\CacheImagesCommand;
 
 use App\Utils\Utility;
 
@@ -134,40 +135,30 @@ class ShopifyConnector implements MarketplaceConnectorInterface
         } while ($url);
     }
 
+    private static function getCachedImage($url)
+    {
+        $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
+        if ($imageAsset) {
+            return "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
+        }
+        return $url;
+    }
+
     private function getImage($listing, $mainListing) {
-        $image = "";
-        if (!empty($listing['image_id'])) {
-            $imageAsset = Utility::findImageByName("Shopify_{$listing['image_id']}.jpg");
-            if ($imageAsset) {
-                $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
+        $lastImage = "";
+        $images = $mainListing['images'] ?? [];
+        foreach ($images as $img) {
+            if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
+                return static::getCachedImage($img['src']);
+            } 
+            if (empty($lastImage)) {
+                $lastImage = static::getCachedImage($img['src']);
             }
         }
-        if (empty($image)) {
-            if (!empty($mainListing['image'])) {
-                $image = $mainListing['image']['src'];
-                $imageAsset = Utility::findImageByName("Shopify_{$mainListing['image']['id']}.jpg");
-                if ($imageAsset) {
-                    $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
-                }
-            } else {
-                $images = $mainListing['images'] ?? [];
-                foreach ($images as $img) {
-                    if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
-                        $imageAsset = Utility::findImageByName("Shopify_{$img['id']}.jpg");
-                        if ($imageAsset) {
-                            $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
-                            break;
-                        }
-                        $image = $img['src'];
-                        break;
-                    }
-                }
-            }
+        if (!empty($mainListing['image']['src'])) {
+            return static::getCachedImage($mainListing['image']['src']);
         }
-        if ($image) {
-            return new \Pimcore\Model\DataObject\Data\ExternalImage($image);
-        }
-        return null;
+        return $lastImage;
     }
 
     private function getUrlLink($listing, $mainListing)

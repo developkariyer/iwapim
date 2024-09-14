@@ -286,7 +286,7 @@ class CacheImagesCommand extends AbstractCommand
         return static::getResponseFromDb($id,'parentResponseJson');
     }
 
-    private static function createUniqueFileNameFromUrl($url)
+    public static function createUniqueFileNameFromUrl($url)
     {
         $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));        
         $hash = md5($url);
