@@ -128,12 +128,12 @@ class CleanCommand extends AbstractCommand
                         break;
                 }
                 if ($dirty) {
-                    echo "    Saving...\n";
+                    echo "Saving...\n";
                     $product->save();
                 }
             }
             $offset += $pageSize;
-            echo "Processed {$offset}    \r";
+            echo "\rProcessed {$offset}       ";
         }
         echo "Processed {$offset} items   \n";
         Product::setGetInheritedValues(true);
