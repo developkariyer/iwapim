@@ -14,19 +14,19 @@ class CostModel extends Concrete
                 $totalCost,
                 match ($costNode->getFactor()) {
                     'Beher Ürün' => bcmul(
-                        $costNode->getUnitPrice(), 
+                        $costNode->getUnitCost(), 
                         $costNode->getSarf()
                     ),
                     'Ebat m2' => bcmul(
-                        $costNode->getUnitPrice(), 
+                        $costNode->getunitCost(), 
                         bcmul($costNode->getSarf(), number_format($product->getArea(), 2, '.', ''))
                     ),
                     'Ambalaj m2' => bcmul(
-                        $costNode->getUnitPrice(),
+                        $costNode->getunitCost(),
                         bcmul($costNode->getSarf(), number_format($product->getPackageArea(), 2, '.', ''))
                     ),
                     'Kesim Detay' => bcmul(
-                        $costNode->getUnitPrice(),
+                        $costNode->getunitCost(),
                         bcmul($costNode->getSarf(), number_format($product->getCutComplexity(), 2, '.', ''))
                     ),
                     default => '0.00',
