@@ -419,7 +419,7 @@ class Product extends Concrete
         $dimension1 = $this->getProductDimension1();
         $dimension2 = $this->getProductDimension2();
         if ($dimension1 && $dimension2) {
-            return $dimension1 * $dimension2;
+            return $dimension1 * $dimension2 / 10000;
         }
         return 0;
     }
@@ -429,7 +429,7 @@ class Product extends Concrete
         $dimension1 = $this->getPackageDimension1();
         $dimension2 = $this->getPackageDimension2();
         if ($dimension1 && $dimension2) {
-            return $dimension1 * $dimension2;
+            return $dimension1 * $dimension2 / 10000;
         }
         return 0;
     }
