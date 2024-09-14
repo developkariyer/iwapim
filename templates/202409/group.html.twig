@@ -103,17 +103,8 @@
             0: 'iwasku', 
             1: 'productCategory', 
             2: 'productIdentifier', 
-            3: 'name', 
             4: 'variationSize', 
             5: 'variationColor', 
-            6: 'packageDimension1', 
-            7: 'packageDimension2', 
-            8: 'packageDimension3', 
-            9: 'packageWeight', 
-            11: 'productCost', 
-            12: 'pricingModel1', 
-            13: 'pricingModel2', 
-            14: 'pricingModel3'
         } %}
             table.column({{ columnIndex }}).data().unique().sort().each(function(d, j) {
                 $('#{{ columnId }}Filter').append('<option value="' + d + '">' + d + '</option>');
@@ -128,17 +119,8 @@
             0: 'iwasku', 
             1: 'productCategory', 
             2: 'productIdentifier', 
-            3: 'name', 
             4: 'variationSize', 
             5: 'variationColor', 
-            6: 'packageDimension1', 
-            7: 'packageDimension2', 
-            8: 'packageDimension3', 
-            9: 'packageWeight', 
-            11: 'productCost', 
-            12: 'pricingModel1', 
-            13: 'pricingModel2', 
-            14: 'pricingModel3'
         } %}
             $('#{{ columnId }}Filter').on('change', function() {
                 var selectedValues = $(this).val();
