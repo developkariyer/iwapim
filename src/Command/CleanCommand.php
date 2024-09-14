@@ -103,7 +103,7 @@ class CleanCommand extends AbstractCommand
                         }
                         if ($product->checkIwasku(true)) {
                             $dirty = true;
-                        }
+                        }/*
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
@@ -121,7 +121,7 @@ class CleanCommand extends AbstractCommand
                                 echo "Setting dimensions for {$product->getId()} to {$width}x{$height}\n";
                                 $dirty = true;
                             }
-                        }
+                        }*/
                         break;
                     default:
                         echo "?{$product->getId()}\n";
