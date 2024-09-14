@@ -110,9 +110,7 @@ class CleanCommand extends AbstractCommand
                 }
                 if ($dirty) {
                     echo "    Saving...\n";
-                    sleep(1);
-//                    $product->save();
-                    echo "s{$product->getId()} ";
+                    $product->save();
                 }
             }
             $offset += $pageSize;
