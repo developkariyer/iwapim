@@ -21,21 +21,12 @@
     <thead>
         <tr>
             <th>IWASKU</th>
-            <th>
-                <select id="productCategoryFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Kategori"></select>
-            </th>
-            <th>
-                <select id="productIdentifierFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Kod"></select>
-            </th>
+            <th>Kategori</th>
+            <th>Ürün Kodu</th>
             <th>Ürün Adı</th>
-            <th>
-                <select id="variationSizeFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Ebat"></select>
-            </th>
-            <th>
-                <select id="variationColorFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Renk"></select>
-            </th>
-            <th>Ebatlar</select>
-            </th>
+            <th>V.Ebat</th>
+            <th>V.Renk</th>
+            <th>Ölçüler</th>
             <th>Örnek Resim</th>
             <th>Ürün Maliyeti</th>
             <th>Dağıtım Modeli 1</th>
@@ -67,42 +58,6 @@
     $(document).ready(function() {
         var table = $('#example').DataTable();
     
-        // Define columns and IDs as key-value pairs
-        var columns = {
-            1: 'productCategory', 
-            2: 'productIdentifier', 
-            4: 'variationSize', 
-            5: 'variationColor', 
-        };
-    
-        // Populate the selectpicker dropdowns for each column
-        {% for columnIndex, columnId in {
-            1: 'productCategory', 
-            2: 'productIdentifier', 
-            4: 'variationSize', 
-            5: 'variationColor', 
-        } %}
-            table.column({{ columnIndex }}).data().unique().sort().each(function(d, j) {
-                $('#{{ columnId }}Filter').append('<option value="' + d + '">' + d + '</option>');
-            });
-        {% endfor %}
-    
-        // Refresh selectpicker after appending options
-        $('.selectpicker').selectpicker('refresh');
-    
-        // Handle filtering for all select elements
-        {% for columnIndex, columnId in {
-            1: 'productCategory', 
-            2: 'productIdentifier', 
-            4: 'variationSize', 
-            5: 'variationColor', 
-        } %}
-            $('#{{ columnId }}Filter').on('change', function() {
-                var selectedValues = $(this).val();
-                var searchTerm = selectedValues ? selectedValues.join('|') : '';
-                table.column({{ columnIndex }}).search(searchTerm, true, false).draw();
-            });
-        {% endfor %}
     });
 </script>
     
