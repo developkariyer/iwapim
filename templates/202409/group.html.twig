@@ -29,7 +29,7 @@
                 <th>Örnek Resim</th>
                 <th>Ürün Maliyeti</th>
                 {% for model in models %}
-                    <th>{{ model.name }}</th>
+                    <th>{{ model }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -46,7 +46,7 @@
                     <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
                     <td>{{ product.productCost }}</td>
                     {% for model in models %}
-                        <td>{{ product.models[model.id] }}</td>
+                        <td>{{ product.models[model] }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
