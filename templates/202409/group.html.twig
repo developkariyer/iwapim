@@ -55,7 +55,11 @@
 
     <script>
         $(document).ready(function() {
-            var table = $('#example').DataTable();
+            var table = $('#example').DataTable(
+                {
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Hepsi"]],
+                }
+            );
         });
     </script>
 </body>
