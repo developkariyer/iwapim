@@ -54,7 +54,7 @@ class ReportController extends FrontendController
                 'packageDimension2' => $product->getInheritedField('packageDimension2'),
                 'packageDimension3' => $product->getInheritedField('packageDimension3'),
                 'packageWeight' => $product->getInheritedField('packageWeight'),
-                'imageUrl' => $product->getImageUrl(),
+                'imageUrl' => $product->getImageUrl() ?? $product->getImage(),
                 'productCost' => $product->getProductCost(),
                 'productDimension1' => $product->getInheritedField('productDimension1'),
                 'productDimension2' => $product->getInheritedField('productDimension2'),
