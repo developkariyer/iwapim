@@ -53,7 +53,6 @@ class ReportController extends FrontendController
                 'models' => $productModels,
             ];
         }
-
         return $this->render(
             '202409/group.html.twig', 
             [

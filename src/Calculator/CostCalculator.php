@@ -26,6 +26,13 @@ class CostCalculator implements CalculatorClassInterface
     private function calculateProductCost(Product $object): string
     {
         $totalCost = '0.00';
+        $bundleItems = $object->getBundleItems();
+        if (!empty($bundleItems)) {
+            foreach ($bundleItems as $bundleItem) {
+                $totalCost = bcadd($totalCost, $bundleItem->getCost(), 2);
+            }
+            return $totalCost;
+        }
         foreach ($object->getParent()->getCostModelProduct() as $costModel) {
             $totalCost = bcadd($totalCost, $costModel->getCost($object), 2);
         }
