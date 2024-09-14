@@ -89,7 +89,7 @@ class CleanCommand extends AbstractCommand
                     case 0:
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "Level 0 product: {$product->getId()} {$field} is not null\n";
+                                echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
@@ -98,7 +98,7 @@ class CleanCommand extends AbstractCommand
                     case 1:
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "Level 1 product: {$product->getId()} {$field} is not null\n";
+                                echo "\nLevel 1 product: {$product->getId()} {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
@@ -116,7 +116,7 @@ class CleanCommand extends AbstractCommand
                 }
             }
             $offset += $pageSize;
-            echo "\nProcessed {$offset} ";
+            echo "Processed {$offset}    \r";
         }
         Product::setGetInheritedValues(true);
     }
