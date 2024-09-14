@@ -31,7 +31,7 @@ class CostCalculator implements CalculatorClassInterface
             foreach ($bundleItems as $bundleItem) {
                 $totalCost = bcadd($totalCost, $bundleItem->getProductCost(), 4);
             }
-            return $totalCost;
+            return number_format($totalCost, 2, '.', '');
         }
         foreach ($object->getParent()->getCostModelProduct() as $costModel) {
             $totalCost = bcadd($totalCost, $costModel->getCost($object), 4);
