@@ -8,20 +8,26 @@ use Pimcore\Model\DataObject\Currency\Listing;
 class Currency extends Concrete
 {
 
-
-    
-    public static function convertCurrency($fromCurrency, $amount, $toCurrency = null)
+    protected static function getCurrency($currencyCode)
     {
         $list = new Listing();
-        $list->setCondition('currencyCode = ?', $fromCurrency);
+        $list->setCondition('currencyCode = ?', $currencyCode);
         $list->setLimit(1);
-        $currencyObject = $list->current();
-        $amount = number_format($amount, 2, '.', '');
-        if ($currencyObject && bccomp($currencyObject->getRate(), '0', 2) > 0) {
-            $result = bcmul($amount, number_format($currencyObject->getRate(), 2, '.', ''), 2);
-            return $result;
+        return $list->current();
+    }
+    
+    public static function convertCurrency($fromCurrency, $amount, $toCurrency = 'TL')
+    {
+        if ($fromCurrency === $toCurrency) {
+            return $amount;
         }
-        return $amount;
+        $fm = static::getCurrency($fromCurrency);
+        $to = static::getCurrency($toCurrency);
+        if ($fm && $to && $fm->getRate() && $to->getRate()) {
+            $result = bcdiv(bcmul($amount, number_format($fm->getRate(), 2, '.', ''), 2), number_format($to->getRate(), 2, '.', ''), 2);
+            return $result;
+        } 
+        return "0.00";
     }
 
 }
