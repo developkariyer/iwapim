@@ -29,7 +29,7 @@ class CostCalculator implements CalculatorClassInterface
         $bundleItems = $object->getBundleItems();
         if (!empty($bundleItems)) {
             foreach ($bundleItems as $bundleItem) {
-                $totalCost = bcadd($totalCost, $bundleItem->getCost(), 2);
+                $totalCost = bcadd($totalCost, $bundleItem->getProductCost(), 2);
             }
             return $totalCost;
         }
