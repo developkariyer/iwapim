@@ -25,9 +25,7 @@
                 <th>Kategori</th>
                 <th>Ürün Kodu</th>
                 <th>Ürün Adı</th>
-                <th>V.Ebat</th>
-                <th>V.Renk</th>
-                <th>Ölçüler</th>
+                <th>Varyasyon</th>
                 <th>Örnek Resim</th>
                 <th>Ürün Maliyeti</th>
                 {% for model in models %}
@@ -42,9 +40,8 @@
                     <td>{{ product.productCategory }}</td>
                     <td>{{ product.productIdentifier }}</td>
                     <td>{{ product.name }}</td>
-                    <td>{{ product.variationSize }}</td>
-                    <td>{{ product.variationColor }}</td>
-                    <td>{{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}kg</td>
+                    <td>{{ product.variationSize }} - {{ product.variationColor }}<br>
+                        {{ product.packageDimension1 }}x{{ product.packageDimension2 }}x{{ product.packageDimension3 }}cm {{ product.packageWeight }}kg</td>
                     <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
                     <td>{{ product.productCost }}</td>
                     {% for model in models %}
