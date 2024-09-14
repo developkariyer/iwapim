@@ -47,7 +47,7 @@
                     {% for model in models %}
                         <td class="text-end">{{ product.models[model] }}</td>
                     {% endfor %}
-                    <td class="text-end">{% for price in product.prices %}{{ price.marketplace }}: {{ price.price }}<br>{% endfor %}</td>
+                    <td class="text-end"><small>{% for price in product.prices %}{{ price.marketplace }}: {{ price.price }}<br>{% endfor %}</small></td>
                 </tr>
             {% endfor %}
         </tbody>
