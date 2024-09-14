@@ -33,6 +33,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('product-code', null, InputOption::VALUE_NONE, 'If set, only new tags will be processed.')
             ->addOption('asin', null, InputOption::VALUE_NONE, 'If set, connections will be updated using Amazon ASIN values.')
             ->addOption('link-check', null, InputOption::VALUE_NONE, 'If set, VariantProuduct<->Product links will be tested.')
+            ->addOption('product-fix', null, InputOption::VALUE_NONE, 'If set, inherited fields will be reset for Products.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -61,7 +62,59 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('link-check')) {
             self::linkCheck();
         }
+        if ($input->getOption('product-fix')) {
+            self::fixProducts();
+        }
         return Command::SUCCESS;
+    }
+
+    private static function fixProducts()
+    {
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(true);
+        $pageSize = 50;
+        $offset = 0;
+
+        Product::setGetInheritedValues(false);
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            foreach ($products as $product) {
+                $dirty = false;
+                switch ($product->level()) {
+                    case 0:
+                        foreach (Product::$level0NullFields as $field) {
+                            if ($product->get($field) !== null) {
+                                $dirty = true;
+                                $product->set($field, null);
+                            }
+                        }
+                        break;
+                    case 1:
+                        foreach (Product::$level1NullFields as $field) {
+                            if ($product->get($field) !== null) {
+                                $dirty = true;
+                                $product->set($field, null);
+                            }
+                        }
+                        break;
+                    default:
+                        echo "?{$product->getId()} ";
+                        break;
+                }
+                if ($dirty) {
+//                    $product->save();
+                    echo "s{$product->getId()} ";
+                }
+            }
+            $offset += $pageSize;
+            echo "\nProcessed {$offset} ";
+        }
+        Product::setGetInheritedValues(true);
     }
 
     private static function linkCheck()

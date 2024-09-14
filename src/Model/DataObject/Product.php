@@ -13,6 +13,35 @@ class Product extends Concrete
     private static $recursiveCounter = 0;
     protected $assetPaths = [];
 
+    public static $level0NullFields = [
+        'variationSize',
+        'variationColor',
+        'iwasku',
+        'listingItems',
+        'brandItems',
+        'bundleItems',
+    ];
+
+    public static $level1NullFields = [
+        'productIdentifier',
+        'productCategory',
+        'name',
+        'nameEnglish',
+        'variationSizeList',
+        'variationColorList',
+        'description',
+        'technicals',
+        'album',
+        'seoTitle',
+        'seoDescription',
+        'seoTitleEn',
+        'seoDescriptionEn',
+        'seoKeywords',
+        'seoKeywordsEn',
+        'designFiles',
+        'rawFiles',
+    ];
+
     protected static $nullables = [
         'productIdentifier',
         'name',
