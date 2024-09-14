@@ -44,8 +44,8 @@ class ReportController extends FrontendController
                 $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                 $prices[] = [
                     'marketplace' => $listingItem->getMarketplace()->getKey(),
-                    'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', '').
-                        'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', '').'$)',
+                    'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',').
+                        'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
                     'urlLink' => $urlLink,
                 ];
             }
