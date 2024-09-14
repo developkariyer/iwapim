@@ -116,6 +116,7 @@ class CleanCommand extends AbstractCommand
             $offset += $pageSize;
             echo "Processed {$offset}    \r";
         }
+        echo "Processed {$offset} items   \n";
         Product::setGetInheritedValues(true);
     }
 
