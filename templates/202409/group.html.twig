@@ -28,8 +28,7 @@
 <table id="example" class="display table table-striped table-bordered" style="width:100%">
     <thead>
         <tr>
-            <th>
-                <select id="iwaskuFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="IWASKU"></select>
+            <th>IWASKU</select>
             </th>
             <th>
                 <select id="productCategoryFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Kategori"></select>
@@ -37,8 +36,7 @@
             <th>
                 <select id="productIdentifierFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Kod"></select>
             </th>
-            <th>
-                <select id="nameFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Ürün Adı"></select>
+            <th>Ürün Adı</select>
             </th>
             <th>
                 <select id="variationSizeFilter" class="selectpicker form-select-sm" multiple data-selected-text-format="count > 3" title="Ebat"></select>
@@ -90,17 +88,14 @@
     
         // Define columns and IDs as key-value pairs
         var columns = {
-            0: 'iwasku', 
             1: 'productCategory', 
             2: 'productIdentifier', 
-            3: 'name', 
             4: 'variationSize', 
             5: 'variationColor', 
         };
     
         // Populate the selectpicker dropdowns for each column
         {% for columnIndex, columnId in {
-            0: 'iwasku', 
             1: 'productCategory', 
             2: 'productIdentifier', 
             4: 'variationSize', 
@@ -116,7 +111,6 @@
     
         // Handle filtering for all select elements
         {% for columnIndex, columnId in {
-            0: 'iwasku', 
             1: 'productCategory', 
             2: 'productIdentifier', 
             4: 'variationSize', 
