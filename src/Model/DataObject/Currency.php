@@ -7,6 +7,9 @@ use Pimcore\Model\DataObject\Currency\Listing;
 
 class Currency extends Concrete
 {
+
+
+    
     public static function convertCurrency($fromCurrency, $amount, $toCurrency = null)
     {
         $list = new Listing();

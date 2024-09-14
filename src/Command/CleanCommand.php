@@ -103,6 +103,16 @@ class CleanCommand extends AbstractCommand
                                 $product->set($field, null);
                             }
                         }
+                        $size = $product->getVariationSize();
+                        if (preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)cm$/', $size, $matches)) {
+                            $width = $matches[1];
+                            $height = $matches[3];
+                            if (empty($product->getProductDimension1()) || empty($product->getProductDimension2())) {
+                                $product->setProductDimension1($width);
+                                $product->setProductDimension2($height);
+                                $dirty = true;
+                            }
+                        }
                         break;
                     default:
                         echo "?{$product->getId()}\n";
