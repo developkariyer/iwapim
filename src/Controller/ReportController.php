@@ -23,10 +23,10 @@ class ReportController extends FrontendController
         $group = GroupProduct::getById($groupId);
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
-        $marketplaceTypes = [];
-        foreach ($group->getTargetMarketplace() as $mp) {
-            $marketplaceTypes[] = $mp->getType();
-        }
+        //$marketplaceTypes = [];
+        //foreach ($group->getTargetMarketplace() as $mp) {
+        //    $marketplaceTypes[] = $mp->getType();
+        //}
         $productTwig = [];
         $modelTwig = [];
         foreach ($pricingModels as $pricingModel) {
