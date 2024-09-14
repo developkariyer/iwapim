@@ -39,11 +39,13 @@ class ReportController extends FrontendController
             }
             $prices = [];
             foreach ($product->getListingItems() as $listingItem) {
+                $urlLink = $listingItem->getUrlLink();
+                $urlLink = $urlLink ? $urlLink->getHref() : '';
                 $prices[] = [
                     'marketplace' => $listingItem->getMarketplace()->getKey(),
                     'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', '').
                         'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', '').'$)',
-                    'urlLink' => $listingItem->getUrlLink()->getHref(),
+                    'urlLink' => $urlLink,
                 ];
             }
             $productTwig[] = [
