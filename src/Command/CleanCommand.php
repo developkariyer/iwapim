@@ -96,6 +96,12 @@ class CleanCommand extends AbstractCommand
                         }
                         break;
                     case 1:
+                        if ($product->checkProductCode()) {
+                            $dirty = true;
+                        }
+                        if ($product->checkIwasku(true)) {
+                            $dirty = true;
+                        }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 echo "\nLevel 1 product: {$product->getId()} {$field} is not null\n";

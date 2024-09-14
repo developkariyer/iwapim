@@ -99,7 +99,9 @@ class Product extends Concrete
             $iwasku = str_pad(str_replace('-', '', $pid), 7, '0', STR_PAD_RIGHT);
             $iwasku .= $this->getProductCode();
             $this->setIwasku($iwasku);
+            return true;
         }
+        return false;
     }
 
     public function checkKey()
