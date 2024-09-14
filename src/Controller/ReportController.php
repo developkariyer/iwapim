@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Currency;
+use Pimcore\Model\DataObject\Data\Link;
 
 class ReportController extends FrontendController
 {
@@ -40,7 +41,7 @@ class ReportController extends FrontendController
             $prices = [];
             foreach ($product->getListingItems() as $listingItem) {
                 $urlLink = $listingItem->getUrlLink();
-                $urlLink = $urlLink ? $urlLink->getHref() : '';
+                $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                 $prices[] = [
                     'marketplace' => $listingItem->getMarketplace()->getKey(),
                     'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', '').
