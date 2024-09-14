@@ -7,6 +7,7 @@ use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\ClassDefinition\CustomLayout;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Serial;
+use Pimcore\Model\DataObject\GroupProduct;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
@@ -123,19 +124,12 @@ class DataObjectListener implements EventSubscriberInterface
             if ($object->getParent() instanceof Product) {
                 $object->nullify();
             }
-            if ($object->level() == 1) {
-                if ($object->getName()) {
-                    $object->setName(null);
-                }
-                if ($object->getProductIdentifier()) {
-                    $object->setProductIdentifier(null);
-                }
-//                if (!($object->getVariationSize() || $object->getVariationColor())) {
-//                }
-            }
         }
         if ($object instanceof Serial) {
             $object->checkLabel();
+        }
+        if ($object instanceof GroupProduct) {
+            $object->setFrontendUrl(new \Pimcore\Model\DataObject\Data\ExternalUrl('https://iwa.web.tr/report/group/' . $object->getId()));
         }
     }
 
