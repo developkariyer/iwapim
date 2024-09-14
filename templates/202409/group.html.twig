@@ -38,7 +38,7 @@
                 <tr>
                     <td>{{ product.iwasku }}<small>{% for bundleItem in product.bundleItems %}<li>{{ bundleItem.iwasku }}</li>{% endfor %}</small></td>
                     <td>{{ product.productCategory }}</td>
-                    <td>{{ product.productIdentifier }}<small>{% for bundleItem in product.bundleItems %}<br><li>{{ bundleItem.productIdentifier }}</li>{% endfor %}</small></td>
+                    <td>{{ product.productIdentifier }}<small>{% for bundleItem in product.bundleItems %}<li>{{ bundleItem.productIdentifier }}</li>{% endfor %}</small></td>
                     <td>{{ product.name }}</td>
                     <td>{{ product.variationSize }}<br>{{ product.variationColor }}<br>{{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg</td>
                     <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
