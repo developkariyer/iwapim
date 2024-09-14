@@ -6,6 +6,7 @@ use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Pimcore\Model\DataObject\GroupProduct;
 
 
 class ReportController extends FrontendController
@@ -17,7 +18,7 @@ class ReportController extends FrontendController
     public function groupAction(Request $request): Response
     {
         $groupId = $request->get('group_id');
-        $group = \Pimcore\Model\DataObject\ProductGroup::getById($groupId);
+        $group = GroupProduct::getById($groupId);
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
 
