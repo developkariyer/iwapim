@@ -57,6 +57,7 @@ class ReportController extends FrontendController
         return $this->render(
             '202409/group.html.twig', 
             [
+                'title' => $group->getKey(),
                 'products' => $productTwig,
                 'models' => $modelTwig,
             ]
