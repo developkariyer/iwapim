@@ -49,7 +49,9 @@
     </table>
     <script>
         var table = $('#example').DataTable({
-            fixedColumns: true,
+            fixedColumns: {
+                    leftColumns: 1 
+                },
             paging: false,
             scrollCollapse: true,
             scrollX: true,
