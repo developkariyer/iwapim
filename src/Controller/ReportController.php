@@ -103,7 +103,7 @@ class ReportController extends FrontendController
         $products = [];
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems'";
-        foreach ($db->fetchAll($sql) as $row) {
+        foreach ($db->fetchAllAssociative($sql) as $row) {
             $products[] = Product::getById($row['src_id']);
         }
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
