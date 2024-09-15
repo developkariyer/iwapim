@@ -17,7 +17,7 @@ class Currency extends Concrete
             case 'EUR':
                 $currencyCode = 'EURO';
                 break;
-            case 'UDS':
+            case 'USD':
                 $currencyCode = 'US DOLLAR';
                 break;
             case 'SEK':
