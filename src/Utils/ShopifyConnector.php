@@ -139,9 +139,11 @@ class ShopifyConnector implements MarketplaceConnectorInterface
     {
         $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
         if ($imageAsset) {
-            return "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
+            return new \Pimcore\Model\DataObject\Data\ExternalImage(
+                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath())
+            );
         }
-        return $url;
+        return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
     }
 
     private function getImage($listing, $mainListing) {
