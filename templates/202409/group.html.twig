@@ -1,6 +1,6 @@
 {% extends '202409/base.report.html.twig' %}
 {% block content %}
-    <table id="example" class="display nowrap table table-striped table-bordered table-responsive">
+    <table id="example" class="stripe row-border order-column" style="width:100%">
         <thead>
             <tr>
                 <th>IWASKU</th>
@@ -53,7 +53,7 @@
             paging: false,
             scrollCollapse: true,
             scrollX: true,
-            scrollY: 300
+            scrollY: true,
         });
     </script>
 {% endblock %}
