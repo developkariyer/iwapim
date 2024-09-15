@@ -48,10 +48,11 @@
         </tbody>
     </table>
     <script>
-        var table = $('#example').DataTable({
+        new DataTable('#example', {
             fixedColumns: {
-                    leftColumns: 1 
-                },
+                leftColumns: 1
+            },
+            fixedHeader: true,
             paging: false,
             scrollCollapse: true,
             scrollX: true,
