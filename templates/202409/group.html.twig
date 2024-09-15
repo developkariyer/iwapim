@@ -18,9 +18,9 @@
         <tbody>
             {% for product in products %}
                 <tr>
-                    <td>{{ product.iwasku }}<small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.iwasku }}{% endfor %}</i></small></td>
+                    <td><b>{{ product.iwasku }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.iwasku }}{% endfor %}</i></small></td>
                     <td>{{ product.productCategory }}</td>
-                    <td>{{ product.productIdentifier }}<small>{% for bundleItem in product.bundleItems %}<li>{{ bundleItem.productIdentifier }}</li>{% endfor %}</small></td>
+                    <td><b>{{ product.productIdentifier }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.productIdentifier }}{% endfor %}</i></small></td>
                     <td>{{ product.name }}<br>
                         <small>{{ product.variationSize }}<br>
                             {{ product.variationColor }}<br>
@@ -41,7 +41,7 @@
         $(document).ready(function() {
             var table = $('#example').DataTable({
                 "scrollX": true,
-                "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Hepsi"]],
+                "lengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Hepsi"]],
                 "pageLength": -1,
                 "order": [
                     [2, 'asc']
