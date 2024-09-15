@@ -18,7 +18,7 @@
         <tbody>
             {% for product in products %}
                 <tr>
-                    <td>{{ product.iwasku }}<small>{% for bundleItem in product.bundleItems %}<br>- {{ bundleItem.iwasku }}{% endfor %}</small></td>
+                    <td>{{ product.iwasku }}<small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.iwasku }}{% endfor %}</i></small></td>
                     <td>{{ product.productCategory }}</td>
                     <td>{{ product.productIdentifier }}<small>{% for bundleItem in product.bundleItems %}<li>{{ bundleItem.productIdentifier }}</li>{% endfor %}</small></td>
                     <td>{{ product.name }}<br>
