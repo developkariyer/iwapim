@@ -1,6 +1,6 @@
 {% extends '202409/base.report.html.twig' %}
 {% block content %}
-    <table id="example" class="display table table-striped table-bordered" style="width:100%">
+    <table id="example" class="display table table-striped table-bordered table-responsive">
         <thead>
             <tr>
                 <th>IWASKU</th>
@@ -40,6 +40,7 @@
     <script>
         $(document).ready(function() {
             var table = $('#example').DataTable({
+                "scrollX": true,
                 "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Hepsi"]],
                 "pageLength": -1,
                 "order": [

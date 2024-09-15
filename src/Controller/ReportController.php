@@ -99,6 +99,37 @@ class ReportController extends FrontendController
         if (!$product) {
             return $this->render('202409/cost.html.twig', ['title' => 'Product not found']);
         }
+        if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
+            $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
+        }
+        $prices = [];
+        foreach ($product->getListingItems() as $listingItem) {
+            $urlLink = $listingItem->getUrlLink();
+            $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
+            $prices[] = [
+                'marketplace' => $listingItem->getMarketplace()->getKey(),
+                'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',').
+                    'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
+                'urlLink' => $urlLink,
+            ];
+        }
+        $productTwig = [
+            'iwasku' => $product->getIwasku(),
+            'productCategory' => $product->getInheritedField('productCategory'),
+            'productIdentifier' => $product->getInheritedField('productIdentifier'),
+            'name' => $product->getInheritedField('name'),
+            'variationSize' => $product->getVariationSize(),
+            'variationColor' => $product->getVariationColor(),
+            'productDimension1' => $product->getInheritedField('productDimension1'),
+            'productDimension2' => $product->getInheritedField('productDimension2'),
+            'productDimension3' => $product->getInheritedField('productDimension3'),
+            'packageWeight' => $product->getInheritedField('packageWeight'),
+            'imageUrl' => $imageUrl,
+            'productCost' => $product->getProductCost(),
+            'bundleItems' => $product->getBundleItems(),
+            'prices' => $prices,
+        ];
+        
 
         return $this->render(
             '202409/cost.html.twig',
