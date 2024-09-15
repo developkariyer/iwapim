@@ -27,12 +27,6 @@ class ReportController extends FrontendController
      */
     public function groupAction(Request $request): Response
     {
-        file_put_contents('/var/www/iwapim/tmp/security.txt', print_r($this->security->getUser(), true));
-        $user = $this->security->getUser();
-        if (!$user) {
-            return $this->redirect('/admin/login');
-        }
-
         Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
