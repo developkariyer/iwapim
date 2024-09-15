@@ -101,12 +101,10 @@ class ReportController extends FrontendController
     {
         Product::setGetInheritedValues(true);
         $products = [];
-        $productListing = new Product\Listing();
-        foreach ($productListing as $product) {
-            if (!$product->level() || !$product->getListingItems()) {
-                continue;
-            }
-            $products[] = $product;
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems'";
+        foreach ($db->fetchAll($sql) as $row) {
+            $products[] = Product::getById($row['src_id']);
         }
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $pricingModels = [];
