@@ -28,239 +28,105 @@ class ReportController extends FrontendController
      */
     public function groupAction(Request $request): Response
     {
-        Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
-        $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
+        
         if (!$group) {
-            return $this->render('202409/group.html.twig', ['title' => 'Group not found','products' => [],'models' => [],]);
+            return $this->render('202409/group.html.twig', ['title' => 'Group not found', 'products' => [], 'models' => []]);
         }
+
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
+        
+        $productTwig = $this->prepareProductsData($products, $pricingModels);
+        $modelTwig = $this->prepareModelsData($pricingModels);
+
+        return $this->render('202409/group.html.twig', [
+            'title' => $group->getKey(),
+            'products' => $productTwig,
+            'models' => $modelTwig,
+            'markets' => array_keys(Marketplace::getMarketplaceListAsArrayKeys()),
+        ]);
+    }
+
+    private function prepareProductsData($products, $pricingModels)
+    {
+        $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $productTwig = [];
-        $modelTwig = [];
+
+        foreach ($products as $product) {
+            if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
+                $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
+            }
+
+            $productModels = $this->getProductModels($pricingModels, $product);
+            $prices = $this->getProductPrices($product, $priceTemplate);
+
+            $productTwig[] = [
+                'iwasku' => $product->getIwasku(),
+                'productCategory' => $product->getInheritedField('productCategory'),
+                'productIdentifier' => $product->getInheritedField('productIdentifier'),
+                'name' => $product->getInheritedField('name'),
+                'variationSize' => $product->getVariationSize(),
+                'variationColor' => $product->getVariationColor(),
+                'productDimension1' => $product->getInheritedField('productDimension1'),
+                'productDimension2' => $product->getInheritedField('productDimension2'),
+                'productDimension3' => $product->getInheritedField('productDimension3'),
+                'packageWeight' => $product->getInheritedField('packageWeight'),
+                'imageUrl' => $imageUrl,
+                'productCost' => $product->getProductCost(),
+                'models' => $productModels,
+                'bundleItems' => $product->getBundleItems(),
+                'prices' => $prices,
+            ];
+        }
+        return $productTwig;
+    }
+
+    private function prepareModelsData($pricingModels)
+    {
+        $modelTwig = [];    
         foreach ($pricingModels as $pricingModel) {
             $modelTwig[] = $pricingModel->getKey();
-        }
-        foreach ($products as $product) {
-            if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
-                $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
-            }
-            $productModels = [];
-            foreach ($pricingModels as $pricingModel) {
-                $modelKey = $pricingModel->getKey();
-                $productModels[$modelKey] = 123;
-            }
-            $prices = $priceTemplate;
-            foreach ($product->getListingItems() as $listingItem) {
-                if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
-                    continue;
-                } else {
-                    $urlLink = $listingItem->getUrlLink();
-                    $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-                    $prices[$listingItem->getMarketplace()->getKey()] = [
-                        'priceTL' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ','),
-                        'priceUS' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
-                        'urlLink' => $urlLink,
-                    ];
-                }
-            }
-            $productTwig[] = [
-                'iwasku' => $product->getIwasku(),
-                'productCategory' => $product->getInheritedField('productCategory'),
-                'productIdentifier' => $product->getInheritedField('productIdentifier'),
-                'name' => $product->getInheritedField('name'),
-                'variationSize' => $product->getVariationSize(),
-                'variationColor' => $product->getVariationColor(),
-                'productDimension1' => $product->getInheritedField('productDimension1'),
-                'productDimension2' => $product->getInheritedField('productDimension2'),
-                'productDimension3' => $product->getInheritedField('productDimension3'),
-                'packageWeight' => $product->getInheritedField('packageWeight'),
-                'imageUrl' => $imageUrl,
-                'productCost' => $product->getProductCost(),
-                'models' => $productModels,
-                'bundleItems' => $product->getBundleItems(),
-                'prices' => $prices,
-            ];
-        }
-        return $this->render(
-            '202409/group.html.twig', 
-            [
-                'title' => $group->getKey(),
-                'products' => $productTwig,
-                'models' => $modelTwig,
-                'markets' => array_keys($priceTemplate),
-            ]
-        );
+        }    
+        return $modelTwig;
     }
 
-    /**
-     * @Route("/report/connected", name="report_connected")
-     */
-    public function connectedAction(Request $request): Response
+    private function getProductModels($pricingModels, $product)
     {
-        Product::setGetInheritedValues(true);
-        $products = [];
-        $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems' LIMIT 5";
-        foreach ($db->fetchAllAssociative($sql) as $row) {
-            $products[] = Product::getById($row['src_id']);
-        }
-        $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
-        $pricingModels = [];
-        $productTwig = [];
-        $modelTwig = [];
-        foreach ($products as $product) {
-            if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
-                $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
-            }
-            $productModels = [];
-            foreach ($pricingModels as $pricingModel) {
-                $modelKey = $pricingModel->getKey();
-                $productModels[$modelKey] = 123;
-            }
-            $prices = $priceTemplate;
-            foreach ($product->getListingItems() as $listingItem) {
-                if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
-                    continue;
-                } else {
-                    $urlLink = $listingItem->getUrlLink();
-                    $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-                    $prices[$listingItem->getMarketplace()->getKey()] = [
-                        'priceTL' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ','),
-                        'priceUS' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
-                        'urlLink' => $urlLink,
-                    ];
-                }
-            }
-            $productTwig[] = [
-                'iwasku' => $product->getIwasku(),
-                'productCategory' => $product->getInheritedField('productCategory'),
-                'productIdentifier' => $product->getInheritedField('productIdentifier'),
-                'name' => $product->getInheritedField('name'),
-                'variationSize' => $product->getVariationSize(),
-                'variationColor' => $product->getVariationColor(),
-                'productDimension1' => $product->getInheritedField('productDimension1'),
-                'productDimension2' => $product->getInheritedField('productDimension2'),
-                'productDimension3' => $product->getInheritedField('productDimension3'),
-                'packageWeight' => $product->getInheritedField('packageWeight'),
-                'imageUrl' => $imageUrl,
-                'productCost' => $product->getProductCost(),
-                'models' => $productModels,
-                'bundleItems' => $product->getBundleItems(),
-                'prices' => $prices,
-            ];
-        }
-        return $this->render(
-            '202409/group.html.twig', 
-            [
-                'title' => 'Bağlanmış Ürünler',
-                'products' => $productTwig,
-                'models' => $modelTwig,
-                'markets' => array_keys($priceTemplate),
-            ]
-        );
+        $productModels = [];
+
+        foreach ($pricingModels as $pricingModel) {
+            $modelKey = $pricingModel->getKey();
+            $productModels[$modelKey] = 123; // Modify as per actual logic
+        }    
+        return $productModels;
     }
 
-    /**
-     * @Route("/report/product/{product_id}", name="report_product")
-     */
-    public function productAction(Request $request): Response
+    private function getProductPrices($product, $priceTemplate)
     {
-        Product::setGetInheritedValues(true);
-        $products = [];
-        $productId = $request->get('product_id');
-        $product = Product::getById($productId);
-        if (!$product) {
-            return $this->render('202409/group.html.twig', ['title' => 'Product not found','products' => [],'models' => [],]);
-        }
-        $title = $product->getKey();
-        $products = $product->getChildren();
-        $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
-        $pricingModels = [];
-        $productTwig = [];
-        $modelTwig = [];
-        foreach ($products as $product) {
-            if (!$product instanceof Product) {
+        foreach ($product->getListingItems() as $listingItem) {
+            if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
                 continue;
             }
-            if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
-                $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
-            }
-            $productModels = [];
-            foreach ($pricingModels as $pricingModel) {
-                $modelKey = $pricingModel->getKey();
-                $productModels[$modelKey] = 123;
-            }
-            $prices = $priceTemplate;
-            foreach ($product->getListingItems() as $listingItem) {
-                if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
-                    continue;
-                } else {
-                    $urlLink = $listingItem->getUrlLink();
-                    $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-                    $prices[$listingItem->getMarketplace()->getKey()] = [
-                        'priceTL' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ','),
-                        'priceUS' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
-                        'urlLink' => $urlLink,
-                    ];
-                }
-            }
-            $productTwig[] = [
-                'iwasku' => $product->getIwasku(),
-                'productCategory' => $product->getInheritedField('productCategory'),
-                'productIdentifier' => $product->getInheritedField('productIdentifier'),
-                'name' => $product->getInheritedField('name'),
-                'variationSize' => $product->getVariationSize(),
-                'variationColor' => $product->getVariationColor(),
-                'productDimension1' => $product->getInheritedField('productDimension1'),
-                'productDimension2' => $product->getInheritedField('productDimension2'),
-                'productDimension3' => $product->getInheritedField('productDimension3'),
-                'packageWeight' => $product->getInheritedField('packageWeight'),
-                'imageUrl' => $imageUrl,
-                'productCost' => $product->getProductCost(),
-                'models' => $productModels,
-                'bundleItems' => $product->getBundleItems(),
-                'prices' => $prices,
-            ];
-        }
-        return $this->render(
-            '202409/group.html.twig', 
-            [
-                'title' => $title,
-                'products' => $productTwig,
-                'models' => $modelTwig,
-                'markets' => array_keys($priceTemplate),
-            ]
-        );
-    }
-
-    /**
-     * @Route("/report/cost/{product_id}", name="report_cost")
-     */
-    public function costAction(Request $request): Response
-    {
-        Product::setGetInheritedValues(true);
-        $productId = $request->get('product_id');
-        $product = Product::getById($productId);
-        if (!$product) {
-            return $this->render('202409/cost.html.twig', ['title' => 'Product not found']);
-        }
-        if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
-            $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
-        }
-        $prices = [];
-        foreach ($product->getListingItems() as $listingItem) {
             $urlLink = $listingItem->getUrlLink();
             $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-            $prices[] = [
-                'marketplace' => $listingItem->getMarketplace()->getKey(),
-                'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',').
-                    'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
+            $priceTemplate[$listingItem->getMarketplace()->getKey()] = [
+                'priceTL' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ','),
+                'priceUS' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
                 'urlLink' => $urlLink,
             ];
         }
-        $productTwig = [
+        return $priceTemplate;
+    }
+
+    private function prepareSingleProductData($product)
+    {
+        if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
+            $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
+        }
+        $prices = $this->getProductPrices($product, []);
+        return [
             'iwasku' => $product->getIwasku(),
             'productCategory' => $product->getInheritedField('productCategory'),
             'productIdentifier' => $product->getInheritedField('productIdentifier'),
@@ -276,14 +142,75 @@ class ReportController extends FrontendController
             'bundleItems' => $product->getBundleItems(),
             'prices' => $prices,
         ];
-        
+    }
+ 
+    
+    /**
+     * @Route("/report/connected", name="report_connected")
+     */
+    public function connectedAction(): Response
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems' LIMIT 5";
+        $products = array_map(function ($row) {
+            return Product::getById($row['src_id']);
+        }, $db->fetchAllAssociative($sql));
 
-        return $this->render(
-            '202409/cost.html.twig',
-            [
-                'title' => $product->getKey(),
-            ]
-        );
+        $pricingModels = []; // Populate this as per your requirement
+        $productTwig = $this->prepareProductsData($products, $pricingModels);
+        $modelTwig = $this->prepareModelsData($pricingModels);
+
+        return $this->render('202409/group.html.twig', [
+            'title' => 'Bağlanmış Ürünler',
+            'products' => $productTwig,
+            'models' => $modelTwig,
+            'markets' => array_keys(Marketplace::getMarketplaceListAsArrayKeys()),
+        ]);
+    }
+
+    /**
+     * @Route("/report/product/{product_id}", name="report_product")
+     */
+    public function productAction(Request $request): Response
+    {
+        $productId = $request->get('product_id');
+        $product = Product::getById($productId);
+
+        if (!$product) {
+            return $this->render('202409/group.html.twig', ['title' => 'Product not found', 'products' => [], 'models' => []]);
+        }
+
+        $products = $product->getChildren();
+        $pricingModels = []; // Populate this as per your requirement
+        $productTwig = $this->prepareProductsData($products, $pricingModels);
+        $modelTwig = $this->prepareModelsData($pricingModels);
+
+        return $this->render('202409/group.html.twig', [
+            'title' => $product->getKey(),
+            'products' => $productTwig,
+            'models' => $modelTwig,
+            'markets' => array_keys(Marketplace::getMarketplaceListAsArrayKeys()),
+        ]);
+    }
+
+    /**
+     * @Route("/report/cost/{product_id}", name="report_cost")
+     */
+    public function costAction(Request $request): Response
+    {
+        $productId = $request->get('product_id');
+        $product = Product::getById($productId);
+
+        if (!$product) {
+            return $this->render('202409/cost.html.twig', ['title' => 'Product not found']);
+        }
+
+        $productTwig = $this->prepareSingleProductData($product);
+
+        return $this->render('202409/cost.html.twig', [
+            'title' => $product->getKey(),
+            'product' => $productTwig,
+        ]);
     }
 
 }
