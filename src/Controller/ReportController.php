@@ -14,6 +14,14 @@ use Pimcore\Model\DataObject\Data\Link;
 class ReportController extends FrontendController
 {
 
+    protected function checkAccess(Request $request): bool
+    {
+        $user = \Pimcore\Tool\Authentication::authenticateSession($request);
+        var_dump($user);
+
+        return $user->isAdmin();
+    }
+
     /**
      * @Route("/report/group/{group_id}", name="report_group")
      */
@@ -22,7 +30,7 @@ class ReportController extends FrontendController
         Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
-        if (!$group) {
+        if (!$this->checkAccess($request) || !$group) {
             return $this->render('202409/group.html.twig', ['title' => 'Group not found','products' => [],'models' => [],]);
         }
         $products = $group->getProducts();
