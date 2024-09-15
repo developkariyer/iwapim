@@ -167,7 +167,7 @@ class ShopifyConnector implements MarketplaceConnectorInterface
     {
         if (!empty($mainListing['handle']) && !empty($listing['id'])) {
             $l = new Link();
-            $l->setPath($this->marketplace->getMarketplaceUrl().'products/'.$mainListing['handle'].'/'.$listing['id']);
+            $l->setPath($this->marketplace->getMarketplaceUrl().'products/'.$mainListing['handle'].'/?variant='.$listing['id']);
             return $l;
         }
         return null;
