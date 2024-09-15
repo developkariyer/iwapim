@@ -24,7 +24,6 @@
                 <th>Kategori</th>
                 <th>Ürün Kodu</th>
                 <th>Ürün Adı</th>
-                <th>Varyasyon</th>
                 <th>Örnek Resim</th>
                 <th>Ürün Maliyeti</th>
                 {% for model in models %}
@@ -39,8 +38,12 @@
                     <td>{{ product.iwasku }}<small>{% for bundleItem in product.bundleItems %}<li>{{ bundleItem.iwasku }}</li>{% endfor %}</small></td>
                     <td>{{ product.productCategory }}</td>
                     <td>{{ product.productIdentifier }}<small>{% for bundleItem in product.bundleItems %}<li>{{ bundleItem.productIdentifier }}</li>{% endfor %}</small></td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.variationSize }}<br>{{ product.variationColor }}<br>{{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg</td>
+                    <td>{{ product.name }}<br>
+                        <small>{{ product.variationSize }}<br>
+                            {{ product.variationColor }}<br>
+                            {{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg
+                        </small>
+                    </td>
                     <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px;"></td>
                     <td class="text-end">{{ product.productCost }}</td>
                     {% for model in models %}
