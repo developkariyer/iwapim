@@ -36,7 +36,7 @@
                     {% endfor %}
                     {% for market in markets %}
                         {% if product.prices is defined and product.prices[market] is defined %}
-                            <td class="text-end">{{ product.prices[market] }}</td>
+                            <td class="text-end">{{ product.prices[market] | raw }}</td>
                         {% else %}
                             <td class="text-end">-</td>
                         {% endif %}
