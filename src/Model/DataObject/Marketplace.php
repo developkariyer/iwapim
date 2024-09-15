@@ -4,6 +4,7 @@ namespace App\Model\DataObject;
 
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Marketplace\Listing;
+use App\Select\AmazonMerchantIdList;
 
 class Marketplace extends Concrete
 {
