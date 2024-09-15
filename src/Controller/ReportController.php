@@ -113,6 +113,7 @@ class ReportController extends FrontendController
                         $urlLink = $amazonMarketplace->getUrlLink();
                         $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                         $fulfillment = $amazonMarketplace->getFulfillmentChannel() === 'DEFAULT' ? 'FBM' : 'FBA';
+                        $fulfillment.= "<br>{$amazonMarketplace->getSku()}";
                         $priceTL = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice()), 2, '.', ',');
                         $priceUS = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice(), 'US DOLLAR'), 2, '.', ',');
                         $price = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$fulfillment} {$priceUS}$'>{$priceTL}</a>";
