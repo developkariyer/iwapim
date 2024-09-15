@@ -174,6 +174,7 @@ class ReportController extends FrontendController
         if (!$product) {
             return $this->render('202409/group.html.twig', ['title' => 'Product not found','products' => [],'models' => [],]);
         }
+        $title = $product->getKey();
         $products = $product->getChildren();
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $pricingModels = [];
@@ -226,7 +227,7 @@ class ReportController extends FrontendController
         return $this->render(
             '202409/group.html.twig', 
             [
-                'title' => 'Bağlanmış Ürünler',
+                'title' => $title,
                 'products' => $productTwig,
                 'models' => $modelTwig,
                 'markets' => array_keys($priceTemplate),
