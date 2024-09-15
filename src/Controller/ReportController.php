@@ -112,9 +112,15 @@ class ReportController extends FrontendController
                     if ($amazonMarketplace->getStatus() === 'Active') {
                         $urlLink = $amazonMarketplace->getUrlLink();
                         $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
+                        $fulfillment = $amazonMarketplace->getFulfillmentChannel() === 'DEFAULT' ? 'FBM' : 'FBA';
                         $priceTL = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice()), 2, '.', ',');
                         $priceUS = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice(), 'US DOLLAR'), 2, '.', ',');
-                        $priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"] = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$priceUS}'>{$priceTL}</a>";
+                        $price = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$fulfillment} {$priceUS}$'>{$priceTL}</a>";
+                        if (isset($priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"])) {
+                            $priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"] .= "<br>{$price}";
+                        } else {
+                            $priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"] = $price;
+                        }
                     }
                 }
             } else {
@@ -122,7 +128,7 @@ class ReportController extends FrontendController
                 $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                 $priceTL = number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',');
                 $priceUS = number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',');
-                $priceTemplate[$listingItem->getMarketplace()->getKey()] = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$priceUS}'>{$priceTL}</a>";
+                $priceTemplate[$listingItem->getMarketplace()->getKey()] = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$priceUS}$'>{$priceTL}</a>";
             }
         }
         return $priceTemplate;
