@@ -12,7 +12,9 @@
                 {% for model in models %}
                     <th>{{ model }}</th>
                 {% endfor %}
-                <th>Satış Fiyatı</th>
+                {% for price in prices %}
+                    <th>{{ price }}</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>

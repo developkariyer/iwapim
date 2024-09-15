@@ -11,6 +11,7 @@ use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Currency;
+use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 
 class ReportController extends FrontendController
@@ -30,6 +31,7 @@ class ReportController extends FrontendController
         Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
+        $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         if (!$group) {
             return $this->render('202409/group.html.twig', ['title' => 'Group not found','products' => [],'models' => [],]);
         }
@@ -49,16 +51,20 @@ class ReportController extends FrontendController
                 $modelKey = $pricingModel->getKey();
                 $productModels[$modelKey] = 123;
             }
-            $prices = [];
+            $prices = $priceTemplate;
             foreach ($product->getListingItems() as $listingItem) {
-                $urlLink = $listingItem->getUrlLink();
-                $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-                $prices[] = [
-                    'marketplace' => $listingItem->getMarketplace()->getKey(),
-                    'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',').
-                        'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
-                    'urlLink' => $urlLink,
-                ];
+                if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
+
+                } else {
+                    $urlLink = $listingItem->getUrlLink();
+                    $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
+                    $prices[$listingItem->getMarketplace()->getKey()] = [
+                        'marketplace' => $listingItem->getMarketplace()->getKey(),
+                        'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',').
+                            'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
+                        'urlLink' => $urlLink,
+                    ];
+                }
             }
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
@@ -84,6 +90,7 @@ class ReportController extends FrontendController
                 'title' => $group->getKey(),
                 'products' => $productTwig,
                 'models' => $modelTwig,
+                'prices' => array_keys($priceTemplate),
             ]
         );
     }

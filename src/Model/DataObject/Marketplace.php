@@ -16,4 +16,19 @@ class Marketplace extends Concrete
         $marketplaces = $list->load();
         return $marketplaces;
     }    
+
+    public static function getMarketplaceListAsArrayKeys()
+    {
+        $marketplaces = self::getMarketplaceList();
+        $marketplacesArray = [];
+        foreach ($marketplaces as $marketplace) {
+            if ($marketplace->getMarketplaceType()!=='Amazon') {
+                $marketplacesArray[$marketplace->getKey()] = '';
+            }
+        }
+        foreach (array_keys(AmazonMerchantIdList::$amazonMerchantIdList) as $key) {
+            $marketplacesArray["Amazon_{$key}"] = '';
+        }
+        return $marketplacesArray;
+    }
 }
