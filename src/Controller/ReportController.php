@@ -107,15 +107,27 @@ class ReportController extends FrontendController
     {
         foreach ($product->getListingItems() as $listingItem) {
             if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
-                continue;
+                $collection = $listingItem->getAmazonMarketplace();
+                foreach ($collection as $amazonMarketplace) {
+                    if ($amazonMarketplace->getStatus() === 'Active') {
+                        $urlLink = $amazonMarketplace->getUrlLink();
+                        $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
+                        $priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"] = [
+                            'priceTL' => number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getPrice()), 2, '.', ','),
+                            'priceUS' => number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getPrice(), 'US DOLLAR'), 2, '.', ','),
+                            'urlLink' => $urlLink,
+                        ];
+                    }
+                }
+            } else {
+                $urlLink = $listingItem->getUrlLink();
+                $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
+                $priceTemplate[$listingItem->getMarketplace()->getKey()] = [
+                    'priceTL' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ','),
+                    'priceUS' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
+                    'urlLink' => $urlLink,
+                ];
             }
-            $urlLink = $listingItem->getUrlLink();
-            $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-            $priceTemplate[$listingItem->getMarketplace()->getKey()] = [
-                'priceTL' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ','),
-                'priceUS' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
-                'urlLink' => $urlLink,
-            ];
         }
         return $priceTemplate;
     }
