@@ -147,7 +147,7 @@ class ShopifyConnector implements MarketplaceConnectorInterface
     }
 
     private function getImage($listing, $mainListing) {
-        $lastImage = "";
+        $lastImage = null;
         $images = $mainListing['images'] ?? [];
         foreach ($images as $img) {
             if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
