@@ -22,6 +22,9 @@ class ReportController extends FrontendController
         Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
+        if (!$group) {
+            return $this->render('202409/group.html.twig', ['title' => 'Group not found','products' => [],'models' => [],]);
+        }
         $products = $group->getProducts();
         $pricingModels = $group->getPricingModels();
         $productTwig = [];
@@ -77,5 +80,24 @@ class ReportController extends FrontendController
         );
     }
 
+    /**
+     * @Route("/report/cost/{product_id}", name="report_cost")
+     */
+    public function costAction(Request $request): Response
+    {
+        Product::setGetInheritedValues(true);
+        $productId = $request->get('product_id');
+        $product = Product::getById($productId);
+        if (!$product) {
+            return $this->render('202409/cost.html.twig', ['title' => 'Product not found']);
+        }
+
+        return $this->render(
+            '202409/cost.html.twig',
+            [
+                'title' => $product->getKey(),
+            ]
+        );
+    }
 
 }
