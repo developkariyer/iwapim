@@ -113,8 +113,8 @@ class ReportController extends FrontendController
                         $urlLink = $amazonMarketplace->getUrlLink();
                         $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                         $priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"] = [
-                            'priceTL' => number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getPrice()), 2, '.', ','),
-                            'priceUS' => number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getPrice(), 'US DOLLAR'), 2, '.', ','),
+                            'priceTL' => number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice()), 2, '.', ','),
+                            'priceUS' => number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice(), 'US DOLLAR'), 2, '.', ','),
                             'urlLink' => $urlLink,
                         ];
                     }
