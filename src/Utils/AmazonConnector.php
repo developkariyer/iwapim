@@ -450,6 +450,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             }
         }
     }
+
     protected function processFieldCollection($variantProduct, $listing, $country)
     {
         $collection = $variantProduct->getAmazonMarketplace();
@@ -466,6 +467,23 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $amazonCollection->setTitle($this->getTitle($listing));
                 $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
                 $amazonCollection->setSalePrice($listing['price'] ?? 0);
+                $amazonCollection->setSaleCurrency(match ($country) {
+                    'CA' => 'CAD',
+                    'US' => 'USD',
+                    'MX' => 'MXN',
+                    'TR' => 'TRY',
+                    'UK' => 'GBP',
+                    'PL' => 'PLN',
+                    'SE' => 'SEK',
+                    'SA' => 'SAR',
+                    'EG' => 'EGP',
+                    'AE' => 'AED',
+                    'IN' => 'INR',
+                    'SG' => 'SGD',
+                    'AU' => 'AUD',
+                    'JP' => 'JPY',
+                    default => 'EURO',
+                });
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
                 $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
                 $amazonCollection->setStatus($listing['status'] ?? '');
@@ -482,6 +500,23 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $amazonCollection->setTitle($this->getTitle($listing));
             $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
             $amazonCollection->setSalePrice($listing['price'] ?? 0);
+            $amazonCollection->setSaleCurrency(match ($country) {
+                'CA' => 'CAD',
+                'US' => 'USD',
+                'MX' => 'MXN',
+                'TR' => 'TRY',
+                'UK' => 'GBP',
+                'PL' => 'PLN',
+                'SE' => 'SEK',
+                'SA' => 'SAR',
+                'EG' => 'EGP',
+                'AE' => 'AED',
+                'IN' => 'INR',
+                'SG' => 'SGD',
+                'AU' => 'AUD',
+                'JP' => 'JPY',
+                default => 'EURO',
+            });
             $amazonCollection->setSku($listing['seller-sku'] ?? '');
             $amazonCollection->setListingId($listing['listing-id'] ?? '');
             $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);

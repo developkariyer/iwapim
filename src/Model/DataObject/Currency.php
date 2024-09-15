@@ -10,8 +10,28 @@ class Currency extends Concrete
 
     protected static function getCurrency($currencyCode)
     {
+        switch ($currencyCode) {
+            case 'TRY':
+                $currencyCode = 'TL';
+                break;
+            case 'EUR':
+                $currencyCode = 'EURO';
+                break;
+            case 'UDS':
+                $currencyCode = 'US DOLLAR';
+                break;
+            case 'SEK':
+                $currencyCode = 'SWEDISH KRONA';
+                break;
+            case 'GBP':
+                $currencyCode = 'POUND STERLING';
+                break;
+            default:
+                break;
+        }
         $list = new Listing();
         $list->setCondition('currencyCode = ?', $currencyCode);
+        $list->setUnpublished(true);
         $list->setLimit(1);
         return $list->current();
     }
