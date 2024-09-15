@@ -54,14 +54,13 @@ class ReportController extends FrontendController
             $prices = $priceTemplate;
             foreach ($product->getListingItems() as $listingItem) {
                 if ($listingItem->getMarketplace()->getMarketplaceType() === 'Amazon') {
-
+                    continue;
                 } else {
                     $urlLink = $listingItem->getUrlLink();
                     $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                     $prices[$listingItem->getMarketplace()->getKey()] = [
-                        'marketplace' => $listingItem->getMarketplace()->getKey(),
                         'price' => number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',').
-                            'TL ('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
+                            'TL<br>('.number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',').'$)',
                         'urlLink' => $urlLink,
                     ];
                 }
@@ -90,7 +89,7 @@ class ReportController extends FrontendController
                 'title' => $group->getKey(),
                 'products' => $productTwig,
                 'models' => $modelTwig,
-                'prices' => array_keys($priceTemplate),
+                'markets' => array_keys($priceTemplate),
             ]
         );
     }

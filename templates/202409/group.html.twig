@@ -12,8 +12,8 @@
                 {% for model in models %}
                     <th>{{ model }}</th>
                 {% endfor %}
-                {% for price in prices %}
-                    <th>{{ price }}</th>
+                {% for market in markets %}
+                    <th>{{ market }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -34,10 +34,10 @@
                     {% for model in models %}
                         <td class="text-end">{{ product.models[model] }}</td>
                     {% endfor %}
-                    {% for price in prices %}
-                        {% if product.prices is defined and product.prices[price] is defined %}
+                    {% for market in markets %}
+                        {% if product.prices is defined and product.prices[market] is defined %}
                             <td class="text-end">
-                                <a href="{{ product.prices[price].urlLink }}" target="_blank">{{ product.prices[price].price }}</a>                                
+                                <a href="{{ product.prices[market].urlLink }}" target="_blank">{{ product.prices[market].price }}</a>                                
                             </td>
                         {% else %}
                             <td class="text-end">-</td>
