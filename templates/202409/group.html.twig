@@ -37,7 +37,7 @@
                     {% for market in markets %}
                         {% if product.prices is defined and product.prices[market] is defined and product.prices[market].urlLink is defined %}
                             <td class="text-end">
-                                <a href="{{ product.prices[market].urlLink }}" target="_blank">{{ product.prices[market].priceTL }}TL<br>{{ product.prices[market].priceUS }}$</a>                                
+                                <a href="{{ product.prices[market].urlLink }}" target="_blank" data-bs-toggle="tooltip" title="{{ product.prices[market].priceUS }}$">{{ product.prices[market].priceTL }}</a>                                
                             </td>
                         {% else %}
                             <td class="text-end">-</td>
