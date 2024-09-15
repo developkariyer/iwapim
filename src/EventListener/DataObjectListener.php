@@ -130,11 +130,6 @@ class DataObjectListener implements EventSubscriberInterface
         if ($object instanceof Serial) {
             $object->checkLabel();
         }
-        if ($object instanceof GroupProduct) {
-            $l = new Link();
-            $l->setPath('https://iwa.web.tr/report/group/' . $object->getId());
-            $object->setFrontendUrl($l);
-        }
     }
 
     public function onPostUpdate(DataObjectEvent $event)
@@ -177,6 +172,7 @@ class DataObjectListener implements EventSubscriberInterface
         $image_url = '';
         if ($object instanceof Product) {
             Product::setGetInheritedValues(false);
+            
             $image_url = self::traverseProducts($object);
             if (!empty($image_url)) {
                 $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
@@ -194,6 +190,16 @@ class DataObjectListener implements EventSubscriberInterface
             if ($object->level()>0) {
                 $object->setTechnicals(null);
             }
+            if ($object->level()==0) {
+                $l = new Link();
+                $l->setPath('https://iwa.web.tr/report/product/' . $object->getId());
+                $object->setReportLink($l);
+            }
+        }
+        if ($object instanceof GroupProduct) {
+            $l = new Link();
+            $l->setPath('https://iwa.web.tr/report/group/' . $object->getId());
+            $object->setFrontendUrl($l);
         }
     }
 
