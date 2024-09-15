@@ -102,7 +102,7 @@ class ReportController extends FrontendController
         Product::setGetInheritedValues(true);
         $products = [];
         $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems'";
+        $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems' LIMIT 500";
         foreach ($db->fetchAllAssociative($sql) as $row) {
             $products[] = Product::getById($row['src_id']);
         }
