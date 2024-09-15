@@ -15,25 +15,23 @@ use Pimcore\Model\DataObject\Data\Link;
 
 class ReportController extends FrontendController
 {
-/*    private $security;
+    private $security;
 
     public function __construct(Security $security)
     {
         $this->security = $security;
     }
 
-    protected function checkAccess(Request $request): bool
-    {
-        $user = \Pimcore\Tool\Authentication::authenticateSession($request);
-
-        return $user->isAdmin();
-    }
-*/
     /**
      * @Route("/report/group/{group_id}", name="report_group")
      */
     public function groupAction(Request $request): Response
     {
+        $user = $this->security->getUser();
+        if (!$user) {
+            return $this->redirect('/admin/login');
+        }
+
         Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
