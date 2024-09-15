@@ -48,15 +48,12 @@
         </tbody>
     </table>
     <script>
-        $(document).ready(function() {
-            var table = $('#example').DataTable({
-                "scrollX": true,
-                "lengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Hepsi"]],
-                "pageLength": -1,
-                "order": [
-                    [2, 'asc']
-                ]
-            });
+        var table = $('#example').DataTable({
+            fixedColumns: true,
+            paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            scrollY: 300
         });
     </script>
 {% endblock %}
