@@ -35,10 +35,9 @@
                         <td class="text-end">{{ product.models[model] }}</td>
                     {% endfor %}
                     {% for price in prices %}
-                        {% if product.price is defined and product.price[price] is defined %}
+                        {% if product.prices is defined and product.prices[price] is defined %}
                             <td class="text-end">
-                                <a href="{{ product.price[price].urlLink }}" target="_blank">{{ product.price[price].marketplace }}</a> 
-                                {{ product.price[price].price }}
+                                <a href="{{ product.prices[price].urlLink }}" target="_blank">{{ product.prices[price].price }}</a>                                
                             </td>
                         {% else %}
                             <td class="text-end">-</td>
