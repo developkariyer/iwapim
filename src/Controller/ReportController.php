@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
+
+use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Currency;
@@ -13,15 +15,20 @@ use Pimcore\Model\DataObject\Data\Link;
 
 class ReportController extends FrontendController
 {
+/*    private $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
 
     protected function checkAccess(Request $request): bool
     {
         $user = \Pimcore\Tool\Authentication::authenticateSession($request);
-        var_dump($user);
 
         return $user->isAdmin();
     }
-
+*/
     /**
      * @Route("/report/group/{group_id}", name="report_group")
      */
@@ -30,7 +37,7 @@ class ReportController extends FrontendController
         Product::setGetInheritedValues(true);
         $groupId = $request->get('group_id');
         $group = GroupProduct::getById($groupId);
-        if (!$this->checkAccess($request) || !$group) {
+        if (!$group) {
             return $this->render('202409/group.html.twig', ['title' => 'Group not found','products' => [],'models' => [],]);
         }
         $products = $group->getProducts();

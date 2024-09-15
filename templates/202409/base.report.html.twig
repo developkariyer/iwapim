@@ -1,3 +1,9 @@
+{% if not app.user %}
+    <script>
+        window.location.href = '{{ path('pimcore_admin_login') }}'; // Redirect to Pimcore backend login page
+    </script>
+    {% return %}
+{% endif %}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
