@@ -27,7 +27,7 @@ class OpenAIChat {
     // Function to translate product names and store translations incrementally in Turkish=English format
     public function translateProductName($productName) {
         // System prompt
-        $systemPrompt = 'Translate the given Turkish product names into English. For Islamic terms, always transliterate them (e.g., Ayetel Kürsi = Ayat al-Kursi, Er Rizku Al Allah = Ar-Rizqu Min Allah). Do not translate these terms into English. Only return the transliteration of religious terms and translations for the rest of the item name. Respond only with the translation and do not include any additional text or symbols. If already in English or French or any non-Turkish language, just return same input.';
+        $systemPrompt = 'Translate the given Turkish product names into English. For Islamic terms, always transliterate them (e.g., Ayetel Kürsi = Ayat al-Kursi, Er Rizku Al Allah = Ar-Rizqu Min Allah). Do not translate these terms into English. Only return the transliteration of religious terms and translations for the rest of the item name. Respond only with the translation and do not include any additional text or symbols. If all of input already in English or French or any non-Turkish language, just return same input. If partial, translate Turkish parts, transliterate Arabic parts.';
 
         // Prepare the message array with the system prompt
         $messages = [
