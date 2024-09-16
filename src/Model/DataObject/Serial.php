@@ -46,7 +46,7 @@ class Serial extends Concrete
             $qrfile = "{$product->getProductCode()}_{$this->getSerialNumber()}.pdf";
             $label = self::checkAsset($qrfile);
             if (!$label instanceof Asset) {
-                $label = PdfGenerator::generatePdf($qrcode, $qrlink, $product, $qrfile);
+                $label = PdfGenerator::generate2x5($qrcode, $qrlink, $product, $qrfile);
             }
             $this->setLabel($label);
         }

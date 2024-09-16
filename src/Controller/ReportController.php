@@ -23,32 +23,6 @@ class ReportController extends FrontendController
         $this->security = $security;
     }
 
-    /**
-     * @Route("/report/group/{group_id}", name="report_group")
-     */
-    public function groupAction(Request $request): Response
-    {
-        $groupId = $request->get('group_id');
-        $group = GroupProduct::getById($groupId);
-        
-        if (!$group) {
-            return $this->render('202409/group.html.twig', ['title' => 'Group not found', 'products' => [], 'models' => []]);
-        }
-
-        $products = $group->getProducts();
-        $pricingModels = $group->getPricingModels();
-        
-        $productTwig = $this->prepareProductsData($products, $pricingModels);
-        $modelTwig = $this->prepareModelsData($pricingModels);
-
-        return $this->render('202409/group.html.twig', [
-            'title' => $group->getKey(),
-            'products' => $productTwig,
-            'models' => $modelTwig,
-            'markets' => array_keys(Marketplace::getMarketplaceListAsArrayKeys()),
-        ]);
-    }
-
     private function prepareProductsData($products, $pricingModels)
     {
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
@@ -225,6 +199,57 @@ class ReportController extends FrontendController
         return $this->render('202409/cost.html.twig', [
             'title' => $product->getKey(),
             'product' => $productTwig,
+        ]);
+    }
+
+    /**
+     * @Route("/report/group/{group_id}", name="report_group")
+     */
+    public function groupAction(Request $request): Response
+    {
+        $groupId = $request->get('group_id');
+        $group = GroupProduct::getById($groupId);
+        
+        if (!$group) {
+            return $this->render('202409/group.html.twig', ['title' => 'Group not found', 'products' => [], 'models' => []]);
+        }
+
+        $products = $group->getProducts();
+        $pricingModels = $group->getPricingModels();
+        
+        $productTwig = $this->prepareProductsData($products, $pricingModels);
+        $modelTwig = $this->prepareModelsData($pricingModels);
+
+        return $this->render('202409/group.html.twig', [
+            'title' => $group->getKey(),
+            'products' => $productTwig,
+            'models' => $modelTwig,
+            'markets' => array_keys(Marketplace::getMarketplaceListAsArrayKeys()),
+        ]);
+    }
+
+    /**
+     * @Route("/report/sticker/{group_id}", name="report_sticker")
+     */
+    public function stickerAction(Request $request): Response
+    {
+        $groupId = $request->get('group_id');
+        $group = GroupProduct::getById($groupId);
+
+        if (!$group) {
+            return $this->render('202409/sticker.html.twig', ['title' => 'Group not found']);
+        }
+
+        $products = $group->getProducts();
+        $pricingModels = [];
+        $productTwig = $this->prepareProductsData($products, $pricingModels);
+        $modelTwig = [];
+
+        return $this->render('202409/group.html.twig', [
+            'title' => $group->getKey(),
+            'products' => $productTwig,
+            'models' => $modelTwig,
+            'markets' => [],
         ]);
     }
 
