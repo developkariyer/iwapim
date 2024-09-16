@@ -137,6 +137,7 @@ class ReportController extends FrontendController
             'productCost' => $showPrice ? $product->getProductCost() : '',
             'bundleItems' => $product->getBundleItems(),
             'prices' => $prices,
+            'sticker' => '',
         ];
     }
  

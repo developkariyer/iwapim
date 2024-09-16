@@ -23,7 +23,7 @@
                     <td><b>{{ product.productIdentifier }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.productIdentifier }}{% endfor %}</i></small></td>
                     <td><b>{{ product.iwasku }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.iwasku }}{% endfor %}</i></small></td>
                     <td>{{ product.productCategory }}</td>
-                    <td>{{ product.name }}<br>
+                    <td><a href="{{ product.sticker }}" target="_blank">{{ product.name }}</a><br>
                         <small>{{ product.variationSize }}<br>
                             {{ product.variationColor }}<br>
                             {{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg
