@@ -103,6 +103,10 @@ class CleanCommand extends AbstractCommand
                 }
                 $englishName = $openAI->translateProductName($product->getName());
                 if ($englishName) {
+                    if (strpos($englishName, '=') !== false) {
+                        $t = explode('=', $englishName);
+                        $englishName = trim($t[1]);
+                    }
                     $product->setNameEnglish($englishName);
                     $product->save();
                     echo "{$product->getName()} => {$englishName}\n";
