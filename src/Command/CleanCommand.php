@@ -79,7 +79,7 @@ class CleanCommand extends AbstractCommand
         $offset = 0;
 
         $openAI = new OpenAIChat($_ENV['OPENAI_SECRET']);
-        if (!$openAI->checkStatus()) {
+        if (!$openAI) {
             echo "OpenAI API is not available\n";
             return;
         }
