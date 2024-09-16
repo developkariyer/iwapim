@@ -53,9 +53,6 @@ class OpenAIChat {
         $response = $this->sendRequest($postData);
 
         // Debug the API response
-        echo "<pre>";
-        print_r($response); // Output the full response for debugging
-        echo "</pre>";
 
         // Check if the response contains the expected translation
         if (isset($response['choices'][0]['message']['content'])) {
@@ -67,6 +64,9 @@ class OpenAIChat {
             return $translation;
         }
 
+        echo "<pre>";
+        print_r($response); // Output the full response for debugging
+        echo "</pre>";
         return "Error: Unable to process the product name.";
     }
 
