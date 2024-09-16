@@ -8,6 +8,7 @@ use chillerlan\QRCode\Data\QRMatrix;
 use setasign\Fpdi\Fpdi;
 use App\Utils\Utility;
 use App\Utils\QRImageWithLogo;
+use Pimcore\Model\DataObject\Product;
 
 use Pimcore\Model\Asset;
 
