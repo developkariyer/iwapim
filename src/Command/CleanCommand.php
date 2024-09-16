@@ -95,11 +95,11 @@ class CleanCommand extends AbstractCommand
                 if ($product->level() == 1) {
                     echo "1";
                     continue;
-                }
+                }/*
                 if ($product->getNameEnglish()) {
                     echo ".";
                     continue;
-                }
+                }*/
                 $englishName = $openAI->translateProductName($product->getName());
                 if ($englishName) {
                     $product->setNameEnglish($englishName);
