@@ -73,24 +73,35 @@ class PdfGenerator
 
     public static function generate4x6(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
     {
-        $pdf = new Fpdi('L', 'mm', [60, 40]);
+        $pdf = new Fpdi('L', 'mm', [60, 40]); // Landscape mode, 60x40 mm page
         $pdf->SetAutoPageBreak(false); // Disable automatic page break
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->SetXY(0, 18);
-
-        $pdf->SetFont('Arial', 'B', 8);
-        $pdf->SetXY(20, 1);
-        $text = $product->getInheritedField("variationSize");
-        $text .= "\n".$product->getInheritedField("variationColor");
-        $text .= "\n".$product->getInheritedField("productIdentifier")." ".$product->getInheritedField("name");
-        $pdf->MultiCell(30, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C');
-        $pdf->Line(20, 1, 20, 24);
-
+        $pdf->SetFont('Arial', 'B', 12);
+    
+        // Set position for the IWASKU text
+        $pdf->SetXY(0, 2); // Adjusted Y position for better placement
+        $pdf->Cell(60, 10, "IWASKU: {$product->getIwasku()}", 0, 1, 'C'); // 'C' for center alignment, 1 for moving to the next line
+    
+        // Set the font and position for the product details (variation size, color, and identifier)
+        $pdf->SetFont('Arial', '', 10); // Slightly smaller font for product details
+        $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
+    
+        // Prepare text
+        $text = $product->getInheritedField("variationSize") . "\n";
+        $text .= $product->getInheritedField("variationColor") . "\n";
+        $text .= $product->getInheritedField("productIdentifier") . " " . $product->getInheritedField("name");
+    
+        // Adjusted width and height for the MultiCell
+        $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'L'); // Left align, adjusted width for proper wrapping
+    
+        // Draw a vertical line at a better position to separate content
+        $pdf->Line(30, 0, 30, 40); // Adjusted the line to be in the middle of the 60mm width
+    
+        // Output PDF to file
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
-
+    
         // Save PDF as Pimcore Asset
         $asset = new Asset\Document();
         $asset->setFilename($qrfile);
@@ -100,7 +111,8 @@ class PdfGenerator
         unlink($pdfFilePath); // Clean up the temporary PDF file
         $product->setSticker4x6($asset);
         $product->save();
+    
         return $asset;
     }
-
+    
 }
