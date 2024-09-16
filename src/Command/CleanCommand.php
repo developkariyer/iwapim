@@ -93,26 +93,25 @@ class CleanCommand extends AbstractCommand
             }
             foreach ($products as $product) {
                 if ($product->level() == 1) {
-                    echo "1";
                     continue;
-                }/*
+                }
                 if ($product->getNameEnglish()) {
-                    echo ".";
+                    echo "CACHED: {$product->getName()} => {$product->getNameEnglish()}\n";
                     continue;
-                }*/
+                }
                 $englishName = $openAI->translateProductName($product->getName());
                 if ($englishName) {
                     $product->setNameEnglish($englishName);
                     $product->save();
-                    echo "\n{$product->getName()} => {$englishName}\n";
+                    echo "{$product->getName()} => {$englishName}\n";
                 } else {
-                    echo "x {$product->getId()} ";
+                    echo "x {$product->getId()}\n";
                 }
             }
             $offset += $pageSize;
-            echo "\nProcessed {$offset}";
+            echo "Processed {$offset}\n";
         }
-        echo "\nFinished {$offset} items\n";
+        echo "Finished {$offset} items\n";
     }
 
     private static function fixProducts()
