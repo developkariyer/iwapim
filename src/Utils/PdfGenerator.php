@@ -77,20 +77,22 @@ class PdfGenerator
         $pdf->SetAutoPageBreak(false); // Disable automatic page break
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 13);
     
         // Set position for the IWASKU text
         $pdf->SetXY(0, 2); // Adjusted Y position for better placement
         $pdf->Cell(60, 10, "IWASKU: {$product->getIwasku()}", 0, 1, 'C'); // 'C' for center alignment, 1 for moving to the next line
     
         // Set the font and position for the product details (variation size, color, and identifier)
-        $pdf->SetFont('Arial', '', 10); // Slightly smaller font for product details
+        $pdf->SetFont('Arial', '', 11); // Slightly smaller font for product details
         $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
     
         // Prepare text
-        $text = $product->getInheritedField("productIdentifier") . " " . $product->getInheritedField("name") . "\n\n";
-        $text .= "S: " . $product->getInheritedField("variationSize") . "\n";
-        $text .= "C: " . $product->getInheritedField("variationColor");
+        $text = $product->getInheritedField("productIdentifier") . "\n";
+        $text .= $product->getInheritedField("nameEnglish") . "\n";
+        $text .= "(". $product->getInheritedField("name") . ")\n";
+        $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
+        $text .= "Color: " . $product->getInheritedField("variationColor");
     
         // Adjusted width and height for the MultiCell
         $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
