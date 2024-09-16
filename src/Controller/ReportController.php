@@ -23,7 +23,7 @@ class ReportController extends FrontendController
         $this->security = $security;
     }
 
-    private function prepareProductsData($products, $pricingModels)
+    private function prepareProductsData($products, $pricingModels, $showPrice = true)
     {
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $productTwig = [];
@@ -48,7 +48,7 @@ class ReportController extends FrontendController
                 'productDimension3' => $product->getInheritedField('productDimension3'),
                 'packageWeight' => $product->getInheritedField('packageWeight'),
                 'imageUrl' => $imageUrl,
-                'productCost' => $product->getProductCost(),
+                'productCost' => $showPrice ? $product->getProductCost() : '',
                 'models' => $productModels,
                 'bundleItems' => $product->getBundleItems(),
                 'prices' => $prices,
@@ -109,7 +109,7 @@ class ReportController extends FrontendController
         return $priceTemplate;
     }
 
-    private function prepareSingleProductData($product)
+    private function prepareSingleProductData($product, $showPrice = true)
     {
         if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
             $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
@@ -127,7 +127,7 @@ class ReportController extends FrontendController
             'productDimension3' => $product->getInheritedField('productDimension3'),
             'packageWeight' => $product->getInheritedField('packageWeight'),
             'imageUrl' => $imageUrl,
-            'productCost' => $product->getProductCost(),
+            'productCost' => $showPrice ? $product->getProductCost() : '',
             'bundleItems' => $product->getBundleItems(),
             'prices' => $prices,
         ];
@@ -242,7 +242,7 @@ class ReportController extends FrontendController
 
         $products = $group->getProducts();
         $pricingModels = [];
-        $productTwig = $this->prepareProductsData($products, $pricingModels);
+        $productTwig = $this->prepareProductsData($products, $pricingModels, false);
         $modelTwig = [];
 
         return $this->render('202409/group.html.twig', [
