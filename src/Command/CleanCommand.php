@@ -15,6 +15,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject;
 use App\Utils\AmazonConnector;
 use App\Utils\Utility;
+use App\Utils\OpenAIChat;
 
 #[AsCommand(
     name: 'app:clean',
@@ -34,6 +35,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('asin', null, InputOption::VALUE_NONE, 'If set, connections will be updated using Amazon ASIN values.')
             ->addOption('link-check', null, InputOption::VALUE_NONE, 'If set, VariantProuduct<->Product links will be tested.')
             ->addOption('product-fix', null, InputOption::VALUE_NONE, 'If set, inherited fields will be reset for Products.')
+            ->addOption('translate-ai', null, InputOption::VALUE_NONE, 'If set, AI translations will be processed.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -63,7 +65,50 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('product-fix')) {
             self::fixProducts();
         }
+        if ($input->getOption('translate-ai')) {
+            self::translateProductNames();
+        }
         return Command::SUCCESS;
+    }
+
+    private static function translateProductNames()
+    {
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(true);
+        $pageSize = 50;
+        $offset = 0;
+
+        $openAI = new OpenAIChat($_ENV['OPENAI_SECRET']);
+
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            foreach ($products as $product) {
+                if ($product->level() == 1) {
+                    echo "1";
+                    continue;
+                }
+                if ($product->getNameEnglish()) {
+                    echo ".";
+                    continue;
+                }
+                $englishName = $openAI->translateProductName($product->getName());
+                if ($englishName) {
+                    $product->setNameEnglish($englishName);
+                    $product->save();
+                    echo "s";
+                } else {
+                    echo "x {$product->getId()} ";
+                }
+            }
+            $offset += $pageSize;
+            echo "\nProcessed {$offset}";
+        }
+        echo "\nFinished {$offset} items\n";
     }
 
     private static function fixProducts()
