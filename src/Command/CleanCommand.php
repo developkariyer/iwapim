@@ -104,7 +104,7 @@ class CleanCommand extends AbstractCommand
                 if ($englishName) {
                     $product->setNameEnglish($englishName);
                     $product->save();
-                    echo "\nTranslated {$product->getName()} to {$englishName} in {$product->getId()}\n";
+                    echo "\n{$product->getName()} => {$englishName}\n";
                 } else {
                     echo "x {$product->getId()} ";
                 }
