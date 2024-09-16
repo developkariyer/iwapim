@@ -1,51 +1,55 @@
 {% extends '202409/base.report.html.twig' %}
 {% block content %}
-    <table id="example" class="table table-striped nowrap" style="width:100%">
-        <thead>
-            <tr>
-                <th>Ürün Kodu</th>
-                <th>IWASKU</th>
-                <th>Kategori</th>
-                <th>Ürün Adı</th>
-                <th>Örnek Resim</th>
-                <th>Ürün Maliyeti</th>
-                {% for model in models %}
-                    <th>{{ model }}</th>
-                {% endfor %}
-                {% for market in markets %}
-                    <th>{{ market }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in products %}
+    <div style="height: calc(100vh - 150px); overflow-y: auto;">
+        <table id="example" class="table table-striped nowrap" style="width:100%">
+            <thead>
                 <tr>
-                    <td><b>{{ product.productIdentifier }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.productIdentifier }}{% endfor %}</i></small></td>
-                    <td><b>{{ product.iwasku }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.iwasku }}{% endfor %}</i></small></td>
-                    <td>{{ product.productCategory }}</td>
-                    <td><a href="{{ product.sticker }}" target="_blank">{{ product.name }}</a><br>
-                        <small>{{ product.variationSize }}<br>
-                            {{ product.variationColor }}<br>
-                            {{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg
-                        </small>
-                    </td>
-                    <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px; max-height: 100px;"></td>
-                    <td class="text-end">{{ product.productCost }}</td>
+                    <th>Ürün Kodu</th>
+                    <th>IWASKU</th>
+                    <th>Kategori</th>
+                    <th>Ürün Adı</th>
+                    <th>Örnek Resim</th>
+                    <th>Ürün Maliyeti</th>
                     {% for model in models %}
-                        <td class="text-end">{{ product.models[model] }}</td>
+                        <th>{{ model }}</th>
                     {% endfor %}
                     {% for market in markets %}
-                        {% if product.prices is defined and product.prices[market] is defined %}
-                            <td class="text-end">{{ product.prices[market] | raw }}</td>
-                        {% else %}
-                            <td class="text-end">-</td>
-                        {% endif %}
+                        <th>{{ market }}</th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td><b>{{ product.productIdentifier }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.productIdentifier }}{% endfor %}</i></small></td>
+                        <td><b>{{ product.iwasku }}</b><small><i>{% for bundleItem in product.bundleItems %}<br>{{ bundleItem.iwasku }}{% endfor %}</i></small></td>
+                        <td>{{ product.productCategory }}</td>
+                        <td><a href="{{ product.sticker }}" target="_blank">{{ product.name }}</a><br>
+                            <small>{{ product.variationSize }}<br>
+                                {{ product.variationColor }}<br>
+                                {{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg
+                            </small>
+                        </td>
+                        <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px; max-height: 100px;"></td>
+                        <td class="text-end">{{ product.productCost }}</td>
+                        {% for model in models %}
+                            <td class="text-end">{{ product.models[model] }}</td>
+                        {% endfor %}
+                        {% for market in markets %}
+                            {% if product.prices is defined and product.prices[market] is defined %}
+                                <td class="text-end">{{ product.prices[market] | raw }}</td>
+                            {% else %}
+                                <td class="text-end">-</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     <script>
+        // Calculate available height dynamically
+        var availableHeight = window.innerHeight - 150;  // Adjust 150px based on header/footer height if needed
         new DataTable('#example', {
             fixedColumns: {
                 leftColumns: 1
@@ -54,7 +58,14 @@
             paging: false,
             scrollCollapse: true,
             scrollX: true,
-            scrollY: 800,
+            scrollY: availableHeight + "px",
+        });
+
+        // Adjust height on window resize
+        window.addEventListener('resize', function() {
+            var availableHeight = window.innerHeight - 150;
+            $('#example').DataTable().settings()[0].oScroll.sY = availableHeight + "px";
+            $('#example').DataTable().draw();
         });
     </script>
 {% endblock %}
