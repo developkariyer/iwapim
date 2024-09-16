@@ -88,12 +88,12 @@ class PdfGenerator
         $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
     
         // Prepare text
-        $text = $product->getInheritedField("productIdentifier") . " " . $product->getInheritedField("name") . "\n";
-        $text .= $product->getInheritedField("variationSize") . "\n";
-        $text .= $product->getInheritedField("variationColor");
+        $text = $product->getInheritedField("productIdentifier") . " " . $product->getInheritedField("name") . "\n\n";
+        $text .= "S: " . $product->getInheritedField("variationSize") . "\n";
+        $text .= "C: " . $product->getInheritedField("variationColor");
     
         // Adjusted width and height for the MultiCell
-        $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'L'); // Left align, adjusted width for proper wrapping
+        $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
     
         // Output PDF to file
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
