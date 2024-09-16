@@ -97,7 +97,7 @@ class CleanCommand extends AbstractCommand
                 }
                 if ($product->getNameEnglish()) {
                     if (strpos($product->getNameEnglish(), 'Error:') === false && strpos($product->getNameEnglish(), '=') === false) {
-                        echo "SKIPPED: {$product->getName()} => {$product->getNameEnglish()}\n";
+                        //echo "SKIPPED: {$product->getName()} => {$product->getNameEnglish()}\n";
                         continue;
                     }
                 }
