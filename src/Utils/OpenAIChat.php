@@ -5,43 +5,72 @@ namespace App\Utils;
 class OpenAIChat {
     private $apiKey;
     private $apiUrl;
+    private $previousTranslations = [
+        "Strafor = Styrofoam",
+        "Ayetel Kürsi = Ayat al-Kursi",
+        "Damla Allah ve Muhammed (sav) Lafzı Set = Drop Allah and Muhammad (PBUH) Inscription Set",
+        "Ayetel Kürsi Metal 3 Sıralı 4 Parça = Ayat al-Kursi Metal 3 Rows 4 Pieces",
+        "Besmele Yatay Sülüs Klasik = Basmala Horizontal Thuluth Classic",
+        "Kelime-i Tevhid Uzun Stil = Kelime-i Tevhid Long Style",
+        "Maşallah Tebarakallah Yatay = Mashallah Tabarakallah Horizontal",
+    ];
 
     public function __construct($apiKey) {
         $this->apiKey = $apiKey;
-        $this->apiUrl = "https://api.openai.com/v1/chat/completions"; // Correct chat-based endpoint
+        $this->apiUrl = "https://api.openai.com/v1/chat/completions"; // Correct endpoint for chat-based models
     }
 
+    // Function to translate product names and store translations incrementally in Turkish=English format
     public function translateProductName($productName) {
-        // Prepare request data for GPT-4o mini API (chat model)
+        // System prompt
+        $systemPrompt = 'Translate the given Turkish product names into English. Keep Islamic terms transliterated (e.g., Ayetel Kürsi = Ayat al-Kursi). Respond only with the translations in Turkish=English format.';
+
+        // Prepare the message array with the system prompt
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => $systemPrompt
+            ]
+        ];
+
+        // Add previous translations to the message array
+        foreach ($this->previousTranslations as $previousTranslation) {
+            $messages[] = ['role' => 'assistant', 'content' => $previousTranslation];
+        }
+
+        // Add the current product name in Turkish=English format
+        $messages[] = ['role' => 'user', 'content' => "$productName = "];
+
+        // Prepare request data for GPT-4o mini API
         $postData = [
             'model' => 'gpt-4o-mini', // Use GPT-4o mini model
-            'messages' => [
-                [
-                    'role' => 'system', 
-                    'content' => 'The following is a product name from our catalog. We sell wall art. Translate the given item name to English, but if the name contains Islamic terms (e.g., Ayetel Kürsi, Bismillah), transliterate them to the most common English form (e.g., Ayat al-Kursi, Bismillah). Translate the rest of the item name, such as the number of pieces, types, etc. Respond only with the translation, without any additional text or formatting.'
-                ],
-                [
-                    'role' => 'user', 
-                    'content' => $productName
-                ],
-            ],
+            'messages' => $messages,
             'max_tokens' => 150,
             'temperature' => 0.7
         ];
-    
+
         // Send the API request
         $response = $this->sendRequest($postData);
-    
-        // Check if the response contains the expected text
+
+        // Debug the API response
+        echo "<pre>";
+        print_r($response); // Output the full response for debugging
+        echo "</pre>";
+
+        // Check if the response contains the expected translation
         if (isset($response['choices'][0]['message']['content'])) {
-            return trim($response['choices'][0]['message']['content']);
+            $translation = trim($response['choices'][0]['message']['content']);
+
+            // Store the new translation in Turkish=English format
+            $this->previousTranslations[] = "$productName = $translation";
+
+            return $translation;
         }
-    
-        // Return an error message if the response is not as expected
+
         return "Error: Unable to process the product name.";
     }
-    
 
+    // Function to send the API request
     private function sendRequest($postData) {
         $ch = curl_init($this->apiUrl);
 
@@ -49,7 +78,7 @@ class OpenAIChat {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $this->apiKey
+            'Authorization: ' . 'Bearer ' . $this->apiKey
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
 
@@ -57,5 +86,10 @@ class OpenAIChat {
         curl_close($ch);
 
         return json_decode($response, true);
+    }
+
+    // Optional: Reset the stored translations (e.g., between sessions)
+    public function resetTranslations() {
+        $this->previousTranslations = [];
     }
 }
