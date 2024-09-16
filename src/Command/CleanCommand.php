@@ -96,8 +96,10 @@ class CleanCommand extends AbstractCommand
                     continue;
                 }
                 if ($product->getNameEnglish()) {
-                    echo "CACHED: {$product->getName()} => {$product->getNameEnglish()}\n";
-                    continue;
+                    if (strpos($product->getNameEnglish(), 'Error:') === false) {
+                        echo "SKIPPED: {$product->getName()} => {$product->getNameEnglish()}\n";
+                        continue;
+                    }
                 }
                 $englishName = $openAI->translateProductName($product->getName());
                 if ($englishName) {

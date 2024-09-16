@@ -61,13 +61,13 @@ class OpenAIChat {
             // Store the new translation in Turkish=English format
             $this->previousTranslations[] = "$productName = $translation";
 
+            usleep(500000);
             return $translation;
         }
-
         echo "<pre>";
         print_r($response); // Output the full response for debugging
         echo "</pre>";
-        return "Error: Unable to process the product name.";
+        throw new \Exception("Error: Unable to process the product name.");
     }
 
     // Function to send the API request
