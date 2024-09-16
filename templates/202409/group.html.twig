@@ -63,7 +63,7 @@
 
         // Adjust height on window resize
         window.addEventListener('resize', function() {
-            var availableHeight = window.innerHeight - 150;
+            var availableHeight = window.innerHeight;
             $('#example').DataTable().settings()[0].oScroll.sY = availableHeight + "px";
             $('#example').DataTable().draw();
         });
