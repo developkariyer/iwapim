@@ -13,6 +13,10 @@ class OpenAIChat {
         "Besmele Yatay Sülüs Klasik = Basmala Horizontal Thuluth Classic",
         "Kelime-i Tevhid Uzun Stil = Kelime-i Tevhid Long Style",
         "Maşallah Tebarakallah Yatay = Mashallah Tabarakallah Horizontal",
+        "Hadha Min Fadli Yatay (Neml 40) = Hadha Min Fadli Horizontal (An-Naml 40)",
+        "İnna Lillahi ve İnna İleyhi raciun = Inna Lillahi wa Inna Ilayhi Raji'un",
+        "La Hawla ve La Kuvvete illa Billahil Aliyyul Azim = La Hawla wa La Quwwata illa Billahil 'Aliyyul Azim",
+        "Er Rizku Al Allah = Er Rizqu Min Allah",
     ];
 
     public function __construct($apiKey) {
