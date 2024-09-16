@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Utils;
+
 class OpenAIChat {
     private $apiKey;
     private $apiUrl;
