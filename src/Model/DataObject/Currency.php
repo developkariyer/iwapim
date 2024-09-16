@@ -46,7 +46,8 @@ class Currency extends Concrete
         if ($fm && $to && $fm->getRate() && $to->getRate()) {
             $result = bcdiv(bcmul($amount, number_format($fm->getRate(), 2, '.', ''), 2), number_format($to->getRate(), 2, '.', ''), 2);
             return $result;
-        } 
+        }
+        error_log("Currency conversion failed. From: $fromCurrency To: $toCurrency");
         return "0.00";
     }
 
