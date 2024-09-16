@@ -2,6 +2,7 @@
 
 namespace App\Model\DataObject;
 
+use App\Utils\PdfGenerator;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Product\Listing;
 use App\Utils\Utility;
@@ -439,6 +440,11 @@ class Product extends Concrete
             return $dimension1 * $dimension2 / 10000;
         }
         return 0;
+    }
+
+    public function checkSticker4x6()
+    {
+        return PdfGenerator::generate4x6('', '',  $this, "{$this->getKey()}_4x6.pdf");
     }
 
 }

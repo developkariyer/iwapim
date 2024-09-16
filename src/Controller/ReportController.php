@@ -36,6 +36,12 @@ class ReportController extends FrontendController
             $productModels = $this->getProductModels($pricingModels, $product);
             $prices = $this->getProductPrices($product, $priceTemplate);
 
+            $sticker = $product->getSticker4x6();
+            if (!$sticker) {
+                $sticker = $product->checkSticker4x6();
+            }
+            $sticker = $sticker->getFullPath();
+
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
                 'productCategory' => $product->getInheritedField('productCategory'),
@@ -52,6 +58,7 @@ class ReportController extends FrontendController
                 'models' => $productModels,
                 'bundleItems' => $product->getBundleItems(),
                 'prices' => $prices,
+                'sticker' => $sticker,
             ];
         }
         return $productTwig;
