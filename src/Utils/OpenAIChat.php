@@ -64,6 +64,7 @@ class OpenAIChat {
 
             // Store the new translation in Turkish=English format
             $this->previousTranslations[] = "$productName = $translation";
+            $this->previousTranslations = array_unique($this->previousTranslations);
 
             usleep(500000);
             return $translation;
