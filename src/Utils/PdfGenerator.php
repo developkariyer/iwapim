@@ -84,7 +84,7 @@ class PdfGenerator
         $pdf->Cell(60, 10, "IWASKU: {$product->getIwasku()}", 0, 1, 'C'); // 'C' for center alignment, 1 for moving to the next line
     
         // Set the font and position for the product details (variation size, color, and identifier)
-        $pdf->SetFont('Arial', '', 11); // Slightly smaller font for product details
+        $pdf->SetFont('Arial', '', 10); // Slightly smaller font for product details
         $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
     
         // Prepare text
