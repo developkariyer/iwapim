@@ -36,10 +36,10 @@ class ReportController extends FrontendController
             $productModels = $this->getProductModels($pricingModels, $product);
             $prices = $this->getProductPrices($product, $priceTemplate);
 
-            $sticker = $product->getSticker4x6();
-            if (!$sticker) {
+            //$sticker = $product->getSticker4x6();
+            //if (!$sticker) {
                 $sticker = $product->checkSticker4x6();
-            }
+            //}
             $sticker = $sticker->getFullPath();
 
             $productTwig[] = [
