@@ -88,8 +88,7 @@ class PdfGenerator
         $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
     
         // Prepare text
-        $text = $product->getInheritedField("productIdentifier") . "\n";
-        $text .= $product->getInheritedField("nameEnglish") . "\n";
+        $text = $product->getInheritedField("productIdentifier") . " ". $product->getInheritedField("nameEnglish") . "\n";
         $text .= "(". $product->getInheritedField("name") . ")\n";
         $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
         $text .= "Color: " . $product->getInheritedField("variationColor");
