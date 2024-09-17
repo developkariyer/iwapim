@@ -9,7 +9,7 @@ use App\Utils\Utility;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
 {
-    protected static $marketplaceType = 'Shopify';
+    public static $marketplaceType = 'Shopify';
 
     public function download($forceDownload = false)
     {
