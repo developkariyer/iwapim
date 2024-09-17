@@ -22,7 +22,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
             empty($marketplace->getAccessToken()) ||
             empty($marketplace->getApiUrl())
         ) {
-            throw new \Exception("Marketplace is not published, is not Shopify or credentials are empty");
+            throw new \Exception("Marketplace is not published, is not ".static::$marketplaceType." or credentials are empty");
         }
         $this->marketplace = $marketplace;
         echo " initialiazed\n";
