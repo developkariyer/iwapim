@@ -14,6 +14,10 @@ class JsonRenderer implements DynamicTextLabelInterface
             return '';
         }
 
+        if ($object->getMarketplace()->getMarketplaceType() === 'Amazon') {
+            $data = $object->getUniqueMarketplaceId();
+        }
+
         $db = \Pimcore\Db::get();
         $response = $db->fetchOne('SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = ?', [$object->getId(), $data]);
         if (empty($response)) {
