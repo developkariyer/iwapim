@@ -10,7 +10,7 @@ use App\Utils\Utility;
 
 class EtsyConnector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Shopify';
+    public static $marketplaceType = 'Etsy';
 
     public function download($forceDownload = false)
     {
