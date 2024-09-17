@@ -19,7 +19,12 @@ class JsonRenderer implements DynamicTextLabelInterface
         if (empty($response)) {
             return '';
         }
-        $response = json_encode(json_decode($response), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $response = json_decode($response, true);
+        if (isset($response['body_html'])) {
+            $response['body_html'] = "NOT DISPLAYED IN IWAPIM";
+        }
+
+        $response = json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return "<pre>$response</pre>";
     }
 }
