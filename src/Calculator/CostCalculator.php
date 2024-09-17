@@ -6,12 +6,9 @@ use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\ClassDefinition\CalculatorClassInterface;
 use Pimcore\Model\DataObject\Data\CalculatedValue;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\CostModel;
-use Pimcore\Model\DataObject\Currency\Listing as CurrencyListing;
 
 class CostCalculator implements CalculatorClassInterface
 {
-
     public function compute(Concrete $object, CalculatedValue $context): string
     {
         if (!($object instanceof Product) || $object->level() !== 1) {
@@ -29,18 +26,21 @@ class CostCalculator implements CalculatorClassInterface
         $bundleItems = $object->getBundleItems();
         if (!empty($bundleItems)) {
             foreach ($bundleItems as $bundleItem) {
-                $totalCost = bcadd($totalCost, $bundleItem->getProductCost(), 4);
+                $bundleItemCost = $bundleItem->getProductCost() ?? '0.00';
+                $totalCost = bcadd($totalCost, $bundleItemCost, 4);
             }
-            return number_format($totalCost, 2, '.', '');
+            return number_format($totalCost, 4, '.', '');
         }
         foreach ($object->getParent()->getCostModelProduct() as $costModel) {
-            $totalCost = bcadd($totalCost, $costModel->getCost($object), 4);
+            $costModelCost = $costModel->getCost($object) ?? '0.00';
+            $totalCost = bcadd($totalCost, $costModelCost, 4);
         }
         foreach ($object->getCostModelVariant() as $costModel) {
-            $totalCost = bcadd($totalCost, $costModel->getCost($object), 4);
+            $costModelCost = $costModel->getCost($object) ?? '0.00';
+            $totalCost = bcadd($totalCost, $costModelCost, 4);
         }
     
-        return number_format($totalCost, 2, '.', '');
+        return number_format($totalCost, 4, '.', '');
     }    
 
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string

@@ -8,22 +8,9 @@ use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
 
-class EtsyConnector implements MarketplaceConnectorInterface
+class EtsyConnector extends MarketplaceConnectorAbstract
 {
-
-    private $marketplace = null;
-    private $listings = [];
-
-    public function __construct(Marketplace $marketplace)
-    {
-        if (!$marketplace instanceof Marketplace ||
-            !$marketplace->getPublished() ||
-            $marketplace->getMarketplaceType() !== 'Etsy'
-        ) {
-            throw new \Exception("Marketplace is not published, is not Etsy or credentials are empty");
-        }
-        $this->marketplace = $marketplace;
-    }
+    public static $marketplaceType = 'Shopify';
 
     public function download($forceDownload = false)
     {
@@ -42,11 +29,11 @@ class EtsyConnector implements MarketplaceConnectorInterface
 
     }
 
-    private function getImage($listing) {
+    protected function getImage($listing) {
         return null;
     }
 
-    private function getAttributes($listing) {
+    protected function getAttributes($listing) {
         if (!empty($listing['property_values'])) {
             return implode(
                 '_',
@@ -61,11 +48,11 @@ class EtsyConnector implements MarketplaceConnectorInterface
         return '';
     }
 
-    private function getSalePrice($listing, $type='exists') {
+    protected function getSalePrice($listing, $type='exists') {
         if (!empty($listing['offerings']) && !empty($listing['offerings'][0]['price'])) {
             return match ($type) {
-                'price' => number_format($listing['offerings'][0]['price']['amount'] / 100, 2, '.', ''), 
-                'currency'=> $listing['offerings'][0]['price']['currency_code'],
+                'price' => bcdiv((string) ($listing['offerings'][0]['price']['amount'] ?? '0'), '100', 4),
+                'currency'=> $listing['offerings'][0]['price']['currency_code'] ?? '', 
                 'exists' => true,
             };
         }

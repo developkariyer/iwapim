@@ -95,8 +95,8 @@ class ReportController extends FrontendController
                         $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
                         $fulfillment = $amazonMarketplace->getFulfillmentChannel() === 'DEFAULT' ? 'FBM' : 'FBA';
                         $fulfillment.= " ({$amazonMarketplace->getSku()})";
-                        $priceTL = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice()), 2, '.', ',');
-                        $priceUS = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice(), 'US DOLLAR'), 2, '.', ',');
+                        $priceTL = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice()), 4, '.', ',');
+                        $priceUS = number_format(Currency::convertCurrency($amazonMarketplace->getSaleCurrency() ?? 'US DOLLAR', $amazonMarketplace->getSalePrice(), 'US DOLLAR'), 4, '.', ',');
                         $price = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$fulfillment}:{$priceUS}$'>{$priceTL}</a>";
                         if (isset($priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"])) {
                             $priceTemplate["Amazon_{$amazonMarketplace->getMArketplaceId()}"] .= "<br>{$price}";
@@ -108,8 +108,8 @@ class ReportController extends FrontendController
             } else {
                 $urlLink = $listingItem->getUrlLink();
                 $urlLink = $urlLink instanceof Link ? $urlLink->getHref() : '';
-                $priceTL = number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 2, '.', ',');
-                $priceUS = number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 2, '.', ',');
+                $priceTL = number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice()), 4, '.', ',');
+                $priceUS = number_format(Currency::convertCurrency($listingItem->getSaleCurrency() ?? 'US DOLLAR', $listingItem->getSalePrice(), 'US DOLLAR'), 4, '.', ',');
                 $priceTemplate[$listingItem->getMarketplace()->getKey()] = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$priceUS}$'>{$priceTL}</a>";
             }
         }

@@ -5,6 +5,7 @@ namespace App\Calculator;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\ClassDefinition\CalculatorClassInterface;
 use Pimcore\Model\DataObject\Data\CalculatedValue;
+use Pimcore\Model\DataObject\Currency;
 
 class UnitCostCalculator implements CalculatorClassInterface
 {
@@ -20,10 +21,10 @@ class UnitCostCalculator implements CalculatorClassInterface
     protected static function unitCost($object): string
     {
         if ($object->isPublished()) {
-            $amount = ($object->getAmount() == 0) ? 1 : $object->getAmount();
-            $cost = static::convertCurrency($object->getCurrency(), $object->getCost() / $amount);
+            $amount = empty($object->getAmount()) ? 1 : $object->getAmount();
+            $cost = Currency::convertCurrency($object->getCurrency(), bcdiv($object->getCost(), $amount, 4));
             $cost += static::combinedCost($object);
-            return number_format($cost + 0, 2, '.', '');
+            return number_format($cost + 0, 4, '.', '');
         }
         return '';
     }
@@ -36,22 +37,10 @@ class UnitCostCalculator implements CalculatorClassInterface
             foreach ($combinedCosts as $combinedCost) {
                 $unitCost = $combinedCost->getObject()->getUnitCost();
                 $amount = $combinedCost->getAmount();
-                $cost += $unitCost * $amount;
+                $cost = bcadd($cost, bcmul($unitCost, $amount, 4), 4);
             }
         }
         return $cost;
-    }
-
-    protected static function convertCurrency($currency, $amount): float
-    {
-        $list = new \Pimcore\Model\DataObject\Currency\Listing();
-        $list->setCondition('currencyCode = ?', $currency);
-        $list->setLimit(1);
-        $currencyObject = $list->current();
-        if ($currencyObject && $currencyObject->getRate() > 0) {
-            return $amount * $currencyObject->getRate();
-        }
-        return $amount;
     }
 
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string

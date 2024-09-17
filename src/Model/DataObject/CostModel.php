@@ -9,27 +9,43 @@ class CostModel extends Concrete
     public function getCost($product): string
     {
         $totalCost = '0.00';
+
         foreach ($this->getCostNodes() as $relationNode) {
             $costNode = $relationNode->getObject();            
-            $totalCost = bcAdd(
+            $totalCost = bcadd(
                 $totalCost,
                 match ($relationNode->getFactor()) {
                     'Beher Ürün' => bcmul(
-                        $costNode->getUnitCost(), 
-                        $relationNode->getSarf(),
+                        (string) ($costNode->getUnitCost() ?? '0.00'), 
+                        (string) ($relationNode->getSarf() ?? '0.00'),
                         4
                     ),
                     'Ebat m2' => bcmul(
-                        $costNode->getunitCost(), 
-                        bcmul($relationNode->getSarf(), number_format($product->getArea(), 4, '.', ''), 4)
+                        (string) ($costNode->getunitCost()), 
+                        bcmul(
+                            (string) ($relationNode->getSarf() ?? '0.00'), 
+                            (string) ($product->getArea() ?? '0.00'),
+                            4
+                        ),
+                        4
                     ),
                     'Ambalaj m2' => bcmul(
-                        $costNode->getunitCost(),
-                        bcmul($relationNode->getSarf(), number_format($product->getPackageArea(), 4, '.', ''), 4)
+                        (string) ($costNode->getunitCost()),
+                        bcmul(
+                            (string) ($relationNode->getSarf() ?? '0.00'), 
+                            (string) ($product->getPackageArea() ?? '0.00'),
+                            4
+                        ),
+                        4
                     ),
                     'Kesim Detay' => bcmul(
-                        $costNode->getunitCost(),
-                        bcmul($relationNode->getSarf(), number_format($product->getCutComplexity(), 4, '.', ''), 4)
+                        (string) ($costNode->getunitCost()),
+                        bcmul(
+                            (string) ($relationNode->getSarf() ?? '0.00'), 
+                            (string) ($product->getCutComplexity() ?? '0.00'),
+                            4
+                        ),
+                        4
                     ),
                     default => '0.00',
                 },
@@ -38,5 +54,4 @@ class CostModel extends Concrete
         }
         return $totalCost;
     }
-
 }

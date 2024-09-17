@@ -2,32 +2,14 @@
 
 namespace App\Utils;
 
-use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
-use App\Command\CacheImagesCommand;
 
 use App\Utils\Utility;
 
-class ShopifyConnector implements MarketplaceConnectorInterface
+class ShopifyConnector extends MarketplaceConnectorAbstract
 {
-
-    private $marketplace = null;
-    private $listings = [];
-
-    public function __construct(Marketplace $marketplace)
-    {
-        if (!$marketplace instanceof Marketplace ||
-            !$marketplace->getPublished() ||
-            $marketplace->getMarketplaceType() !== 'Shopify' ||
-            empty($marketplace->getAccessToken()) ||
-            empty($marketplace->getApiUrl())
-        ) {
-            throw new \Exception("Marketplace is not published, is not Shopify or credentials are empty");
-        }
-        $this->marketplace = $marketplace;
-        echo " initialiazed\n";
-    }
+    protected static $marketplaceType = 'Shopify';
 
     public function download($forceDownload = false)
     {
@@ -135,18 +117,7 @@ class ShopifyConnector implements MarketplaceConnectorInterface
         } while ($url);
     }
 
-    private static function getCachedImage($url)
-    {
-        $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
-        if ($imageAsset) {
-            return new \Pimcore\Model\DataObject\Data\ExternalImage(
-                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath())
-            );
-        }
-        return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
-    }
-
-    private function getImage($listing, $mainListing) {
+    protected function getImage($listing, $mainListing) {
         $lastImage = null;
         $images = $mainListing['images'] ?? [];
         foreach ($images as $img) {
@@ -163,7 +134,7 @@ class ShopifyConnector implements MarketplaceConnectorInterface
         return $lastImage;
     }
 
-    private function getUrlLink($listing, $mainListing)
+    protected function getUrlLink($listing, $mainListing)
     {
         if (!empty($mainListing['handle']) && !empty($listing['id'])) {
             $l = new Link();
@@ -227,62 +198,3 @@ class ShopifyConnector implements MarketplaceConnectorInterface
     }
 
 }
-
-
-/*
-### **Areas of Concern and Recommendations**
-
-1. **Uncaught `curl_exec` Errors:**
-   - The code does not check whether `curl_exec($ch)` returns `false`, which can happen in case of a curl error. This could lead to unexpected behavior if the response is empty or invalid.
-     - **Recommendation:** Check the result of `curl_exec($ch)` and handle errors appropriately using `curl_error($ch)` to provide more detailed error handling.
-
-2. **Hardcoded API Version and URL:**
-   - The API version (`2024-01`, `2024-07`) is hardcoded, which reduces flexibility and requires code changes if the API version needs to be updated.
-     - **Recommendation:** Externalize the API version into a configuration or environment variable to make it easier to update.
-
-3. **File Handling and Security:**
-   - The temporary file is stored in a publicly accessible directory (`tmp/`) without any security measures. This could be a potential security risk if the file contains sensitive information.
-     - **Recommendation:** Use a more secure directory for storing temporary files, and ensure the file paths are sanitized and validated to prevent directory traversal attacks.
-
-4. **`json_decode` Without Error Handling:**
-   - The code uses `json_decode` without checking for errors, which can lead to issues if the JSON is malformed or if decoding fails.
-     - **Recommendation:** Add error handling after `json_decode` by checking `json_last_error()` and handling potential decoding errors.
-
-5. **Inconsistent Exception Handling:**
-   - While the constructor throws exceptions for certain conditions, other methods like `downloadOrders()` handle errors with echo statements rather than throwing exceptions. This inconsistency can make it harder to maintain or debug.
-     - **Recommendation:** Standardize error handling by either throwing exceptions or using a logging mechanism, and avoid using `echo` for error messages in production code.
-
-6. **Blocking Code with `do-while` Loops:**
-   - The `download` and `downloadOrders` methods use `do-while` loops that can block execution if the Shopify API is slow to respond, leading to potential performance bottlenecks.
-     - **Recommendation:** Implement timeout settings or consider breaking down these tasks into smaller chunks with asynchronous processing if possible.
-
-7. **Vulnerable to API Rate Limits:**
-   - The code does not handle potential rate-limiting issues that might arise when making multiple requests to the Shopify API. This could lead to temporary bans or throttling by Shopify.
-     - **Recommendation:** Implement logic to handle rate limits by checking response headers like `Retry-After` and pausing requests accordingly.
-
-8. **SQL Injection Risk:**
-   - The `downloadOrders()` method uses a raw SQL query with a placeholder for the `shopify_id`, which could potentially lead to SQL injection if the value is not properly validated (though it seems to be handled safely here).
-     - **Recommendation:** Always ensure that the inputs to SQL queries are validated or sanitized, or better yet, use parameterized queries or an ORM to handle database interactions.
-
-9. **Code Duplication:**
-   - The logic for handling `curl` responses is duplicated in both `download` and `downloadOrders` methods.
-     - **Recommendation:** Refactor the common `curl` logic into a reusable private method to reduce duplication and make the code easier to maintain.
-
-10. **Overuse of `null` Values:**
-    - The `url` is set to `null` in both `download` and `downloadOrders` methods after each loop iteration, which might not be necessary.
-      - **Recommendation:** Consider whether resetting `url` to `null` is essential. If not, remove it to simplify the code.
-
-11. **Lack of Type Declarations:**
-    - The class uses untyped parameters and properties (`$marketplace`, `$listings`, etc.), which can lead to type-related bugs.
-      - **Recommendation:** Use type hints and declare the types of class properties and method parameters to improve code safety and readability.
-
-12. **Lack of Robust Logging:**
-    - The code uses `echo` for logging, which is not suitable for production environments and makes it difficult to track or diagnose issues.
-      - **Recommendation:** Implement a logging system to capture important events, errors, and debug information.
-
-13. **Potential Overwrite of Files:**
-    - The method `downloadOrders()` uses a fixed file path (`tmp/`), which might lead to file overwrites if multiple processes are running concurrently.
-      - **Recommendation:** Use unique file names based on timestamp or a UUID to prevent overwrites and ensure each process has its own temporary file.
-
-Addressing these issues will help improve the reliability, security, and maintainability of the code.
-*/
