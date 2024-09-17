@@ -51,6 +51,11 @@
         // Calculate available height dynamically
         var availableHeight = window.innerHeight - 150;  // Adjust 150px based on header/footer height if needed
         new DataTable('#example', {
+            layout: {
+                topStart: {
+                    buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+                }
+            },
             fixedColumns: {
                 leftColumns: 1
             },
