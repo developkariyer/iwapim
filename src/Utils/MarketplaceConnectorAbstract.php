@@ -18,9 +18,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     {
         if (!$marketplace instanceof Marketplace ||
             !$marketplace->getPublished() ||
-            $marketplace->getMarketplaceType() !== static::$marketplaceType ||
-            empty($marketplace->getAccessToken()) ||
-            empty($marketplace->getApiUrl())
+            $marketplace->getMarketplaceType() !== static::$marketplaceType 
         ) {
             throw new \Exception("Marketplace is not published, is not ".static::$marketplaceType." or credentials are empty");
         }
