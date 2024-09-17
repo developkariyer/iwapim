@@ -19,6 +19,7 @@ class JsonRenderer implements DynamicTextLabelInterface
         if (empty($response)) {
             return '';
         }
+        $response = json_encode(json_decode($response), JSON_PRETTY_PRINT);
         return "<pre>$response</pre>";
     }
 }
