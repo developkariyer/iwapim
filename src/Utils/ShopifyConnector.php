@@ -212,7 +212,7 @@ class ShopifyConnector implements MarketplaceConnectorInterface
                         'uniqueMarketplaceId' => $listing['id'] ?? '',
                         'apiResponseJson' => json_encode($listing),
                         'parentResponseJson' => json_encode($parentResponseJson),
-                        'published' => true,
+                        'published' => ($mainListing['status'] ?? 'active') === 'active',
                     ],
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,
