@@ -26,8 +26,8 @@ class JsonRenderer implements DynamicTextLabelInterface
         if (isset($response['body_html'])) {
             $response['body_html'] = "NOT DISPLAYED IN IWAPIM";
         }
-        if (isset($response['product_description'])) {
-            $response['product_description'] = "NOT DISPLAYED IN IWAPIM";
+        if (isset($response['attributes']['product_description'])) {
+            $response['attributes']['product_description'] = "NOT DISPLAYED IN IWAPIM";
         }
 
         $response = json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
