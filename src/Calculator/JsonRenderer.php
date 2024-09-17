@@ -4,6 +4,7 @@ namespace App\Calculator;
 
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\ClassDefinition\Layout\DynamicTextLabelInterface;
 
 class JsonRenderer implements DynamicTextLabelInterface
 {
