@@ -7,6 +7,7 @@ use Pimcore\Model\DataObject\VariantProduct\Listing;
 use App\Utils\Utility;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Asset;
+use Carbon\Carbon;
 
 class VariantProduct extends Concrete
 {
@@ -124,6 +125,7 @@ class VariantProduct extends Concrete
         $this->setMarketplace($marketplace);
         $this->setParent($parent);
         $this->setPublished($variant['published'] ?? false);
+        $this->setLastUpdate(Carbon::now());
         try {
             $result = $this->save();
         } catch (\Throwable $e) {
