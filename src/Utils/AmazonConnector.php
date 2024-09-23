@@ -225,6 +225,17 @@ class AmazonConnector implements MarketplaceConnectorInterface
         echo "Asked ".implode(separator: ',', array: $asins)."; downloaded ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
     }
 
+    protected function retrieveJsonData($asin)
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT json_data FROM iwa_json_store WHERE field_name=?";
+        $result = $db->fetchAssociative($sql, [$asin]);
+        if ($result) {
+            return json_decode($result['json_data'], true);
+        }
+        return null;
+    }
+
     protected function storeJsonData($item)
     {
         $db = \Pimcore\Db::get();
@@ -393,13 +404,34 @@ class AmazonConnector implements MarketplaceConnectorInterface
         return trim($title);
     }
 
+    private function getFolder($asin): Folder
+    {
+        $folder = Utility::checkSetPath("Amazon", Utility::checkSetPath('Pazaryerleri'));
+
+        $json = $this->retrieveJsonData($asin);
+        if (!empty($json) && !empty($json['classifications'][0]['classifications'][0]['displayName'])) {
+            $folderTree = [];
+            $parent = $json['classifications'][0]['classifications'][0];
+            while (!empty($parent['displayName'])) {
+                $folderTree[] = $parent['displayName'];
+                $parent = $parent['parent'] ?? [];
+            }
+
+            while (!empty($folderTree)) {
+                $folder = Utility::checkSetPath(array_pop($folderTree), $folder);
+            }
+            return $folder;
+        }
+
+        return Utility::checkSetPath(
+            '00 Yeni ASIN',
+            $folder
+        );
+    }
+
+
     public function import($updateFlag, $importFlag)
     {
-        $marketplaceFolder = Utility::checkSetPath(
-            "Amazon",
-            Utility::checkSetPath('Pazaryerleri')
-        );
-
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             if (empty($this->listings[$country])) {
                 echo "Nothing to import in $country\n";
@@ -437,7 +469,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
                         marketplace: null,
-                        parent: Utility::checkSetPath('00 Yeni ASIN', $marketplaceFolder)
+                        parent: $this->getFolder($asin),
                     );
                 }
                 if (empty($variantProduct->getMarketplace())) {
