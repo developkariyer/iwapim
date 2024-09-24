@@ -68,17 +68,18 @@ class CleanCommand extends AbstractCommand
         // if ($input->getOption('translate-ai')) {
         //     self::translateProductNames();
         // }
-        $products = new Product\Listing();
-        
 
+        $products = new Product\Listing();
         $products->setCondition(
             "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
             ['', '', 1]);
+        
 
         foreach ($products as $product) {
             echo $product;
         }
-       
+        echo "Done\n";
+        
         return Command::SUCCESS;
     }
 
