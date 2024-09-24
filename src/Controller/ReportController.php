@@ -28,8 +28,10 @@ class ReportController extends FrontendController
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $productTwig = [];
 
+        $index = 0;
         foreach ($products as $product) {
-            error_log("Memory Usage before {$product->getKey()}: " . memory_get_usage());
+            $index++;
+            error_log("Memory Usage before {$product->getInheritedField('productIdentifier')} ($index): " . memory_get_usage());
             if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
                 $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
             }
@@ -65,7 +67,6 @@ class ReportController extends FrontendController
             unset($productModels);
             unset($prices);
             gc_collect_cycles();
-//            error_log("Memory Usage after {$product->getKey()}: " . memory_get_usage());
         }
         return $productTwig;
     }
