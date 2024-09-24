@@ -263,6 +263,10 @@ class ReportController extends FrontendController
         $productTwig = $this->prepareProductsData($products, $pricingModels, false);
         $modelTwig = [];
 
+        unset($products);
+        unset($pricingModels);
+        gc_collect_cycles();
+        usleep(500000);
         error_log("Memory Usage before rendering: " . memory_get_usage());
 
         return $this->render('202409/group.html.twig', [
