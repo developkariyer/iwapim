@@ -29,6 +29,16 @@ class VariantProduct extends Concrete
         return $list->load() ?: [];
     }
 
+    public static function findAsins($offset = 0, $limit = 100)
+    {
+        $list = new Listing();
+        $list->setCondition("field_name <> 'parentResponseJson' AND field_name <> 'apiResponseJson'");
+        $list->setUnpublished(true);
+        $list->setLimit($limit);
+        $list->setOffset($offset);
+        return $list->load() ?: [];
+    }
+
     /**
      * Finds a single object by a specific field.
      *

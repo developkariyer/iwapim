@@ -60,6 +60,10 @@ class ReportController extends FrontendController
                 'prices' => $prices,
                 'sticker' => $sticker,
             ];
+            unset($product);
+            unset($productModels);
+            unset($prices);
+            gc_collect_cycles();
         }
         return $productTwig;
     }
@@ -114,6 +118,7 @@ class ReportController extends FrontendController
                 $currencyORIG = $listingItem->getSaleCurrency();
                 $priceTemplate[$listingItem->getMarketplace()->getKey()] = "<a href='{$urlLink}' target='_blank' data-bs-toggle='tooltip' title='{$priceORIG}{$currencyORIG}'>{$priceTL}</a>";
             }
+            unset($listingItem);
         }
         return $priceTemplate;
     }
