@@ -21,6 +21,8 @@ class Product extends Concrete
         'listingItems',
         'brandItems',
         'bundleItems',
+        'wisersellId',
+        'wisersellJson',
     ];
 
     public static $level1NullFields = [
