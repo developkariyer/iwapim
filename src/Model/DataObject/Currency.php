@@ -10,6 +10,9 @@ class Currency extends Concrete
     protected static function getCurrency($currencyCode)
     {
         switch ($currencyCode) {
+            case 'CAD':
+                $currencyCode = 'CANADIAN DOLLAR';
+                break;
             case 'TRY':
                 $currencyCode = 'TL';
                 break;
