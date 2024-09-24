@@ -69,12 +69,12 @@ class CleanCommand extends AbstractCommand
         //     self::translateProductNames();
         // }
 
-        $products = new Product\Listing();
+        $listingObject = new Product\Listing();
         // $products->setCondition(
         //     "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
         //     ['', '', 1]);
         
-
+        $products = $listingObject->load();
         foreach ($products as $product) {
             var_dump($product);
         }
