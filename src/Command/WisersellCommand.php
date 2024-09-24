@@ -26,7 +26,7 @@ class WisersellCommand extends AbstractCommand
         // $products->setCondition(
         //     "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
         //     ['', '', 1]);
-        $listingObject->setLimit(10);
+        $listingObject->setLimit(200);
         $listingObject->setOffset(50);
         $products = $listingObject->load();
         foreach ($products as $product) {
