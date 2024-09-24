@@ -76,7 +76,7 @@ class CleanCommand extends AbstractCommand
         
 
         foreach ($products as $product) {
-            echo $product;
+            var_dump($product);
         }
         echo "Done\n";
         
