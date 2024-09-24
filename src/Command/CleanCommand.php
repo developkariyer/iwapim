@@ -76,8 +76,10 @@ class CleanCommand extends AbstractCommand
         
         $products = $listingObject->load();
         foreach ($products as $product) {
-            var_dump($product);
+            //var_dump($product);
+            echo $product;
         }
+
         echo "Done\n";
         
         return Command::SUCCESS;
