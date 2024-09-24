@@ -41,47 +41,34 @@ class CleanCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // if ($input->getOption('asset')) {
-        //     self::traverseAssetFolder(Folder::getById(1));
-        // }
-        // if ($input->getOption('object')) {
-        //     self::traverseObjectFolders(ObjectFolder::getById(172891));
-        // }
-        // if ($input->getOption('product-code')) {
-        //     try {
-        //         Product::setGetInheritedValues(false);
-        //         self::fixProductCodes();
-        //     } catch (\Exception $e) {
-        //         echo $e->getMessage();
-        //     }
-        // }
-        // if ($input->getOption('asin')) {
-        //     //self::transferAsins();
-        //     AmazonConnector::downloadAsins();
-        // }
-        // if ($input->getOption('link-check')) {
-        //     self::linkCheck();
-        // }
-        // if ($input->getOption('product-fix')) {
-        //     self::fixProducts();
-        // }
-        // if ($input->getOption('translate-ai')) {
-        //     self::translateProductNames();
-        // }
-
-        $listingObject = new Product\Listing();
-        // $products->setCondition(
-        //     "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
-        //     ['', '', 1]);
-        
-        $products = $listingObject->load();
-        foreach ($products as $product) {
-            //var_dump($product);
-            echo $product;
+        if ($input->getOption('asset')) {
+            self::traverseAssetFolder(Folder::getById(1));
         }
-
-        echo "Done\n";
-        
+        if ($input->getOption('object')) {
+            self::traverseObjectFolders(ObjectFolder::getById(172891));
+        }
+        if ($input->getOption('product-code')) {
+            try {
+                Product::setGetInheritedValues(false);
+                self::fixProductCodes();
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+            }
+        }
+        if ($input->getOption('asin')) {
+            //self::transferAsins();
+            AmazonConnector::downloadAsins();
+        }
+        if ($input->getOption('link-check')) {
+            self::linkCheck();
+        }
+        if ($input->getOption('product-fix')) {
+            self::fixProducts();
+        }
+        if ($input->getOption('translate-ai')) {
+            self::translateProductNames();
+        }
+    
         return Command::SUCCESS;
     }
 
