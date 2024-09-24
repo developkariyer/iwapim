@@ -70,9 +70,9 @@ class CleanCommand extends AbstractCommand
         // }
 
         $products = new Product\Listing();
-        $products->setCondition(
-            "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
-            ['', '', 1]);
+        // $products->setCondition(
+        //     "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
+        //     ['', '', 1]);
         
 
         foreach ($products as $product) {
