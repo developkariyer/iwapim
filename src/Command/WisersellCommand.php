@@ -22,20 +22,29 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $listingObject = new Product\Listing();
-        // $products->setCondition(
-        //     "iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?) AND o_published = ?",
-        //     ['', '', 1]);
-        $listingObject->setLimit(200);
-        $listingObject->setOffset(50);
-        $products = $listingObject->load();
-        foreach ($products as $product) {
-            //var_dump($product);
-            echo $product->getIwasku() . "\n";
-        }
-
-        echo "Done\n";
        
+       
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $pageSize = 50;
+        $offset = 0;
+
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+          
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                //var_dump($product);
+                $product->checkIwasku(true);
+                echo $product->getIwasku() . "\n";
+            }
+        }
         return Command::SUCCESS;
     }
 }
