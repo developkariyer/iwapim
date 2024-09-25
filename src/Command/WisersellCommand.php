@@ -24,7 +24,7 @@ class WisersellCommand extends AbstractCommand{
         $token = $this->getAccessToken();
         sleep(2);
         //$this->productSearch($token);
-        $this->addCategory($token, "cam");
+        $this->addCategory($token, ["metal"]);
         sleep(5);
         $this->getCategories($token);
 
@@ -168,11 +168,11 @@ class WisersellCommand extends AbstractCommand{
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
-    protected function addCategory($token,$category){
+    protected function addCategory($token,$categories){
         $url = "https://dev2.wisersell.com/restapi/category"; 
-        $data = [
-            "name" => $category
-        ];
+        $data = array_map(function($category) {
+            return ["name" => $category];
+        }, $categories);
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
