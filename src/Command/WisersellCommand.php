@@ -96,7 +96,8 @@ class WisersellCommand extends AbstractCommand{
                 if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
                     $wisersellId = $decodedResponse["rows"][0]['id'];
                     try {
-                        $product->setInheritedField("wisersellId", $wisersellId);
+                        $product->setWisersellId($wisersellId); 
+                        $product->save();
                         echo "WisersellId updated successfully: " . $wisersellId;
                     } catch (Exception $e) {
                         echo "Error occurred while updating WisersellId: " . $e->getMessage();
