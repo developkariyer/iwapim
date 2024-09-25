@@ -116,23 +116,27 @@ class PdfGenerator
 
     public static function generate4x6eu(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
     {
+        // Create PDF object
         $pdf = new Fpdi('L', 'mm', [60, 40]); 
         $pdf->SetAutoPageBreak(false); 
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
-        $pdf->SetFont('Arial', '', 6); // Set smaller font size for more text space
     
-        // Add the QR code (optional, depending on where you want it)
-//        $pdf->Image($qrcode, 2, 2, 10, 10); // Adjust the position and size as needed
+        // Use a font that supports Turkish characters
+        $pdf->AddFont('DejaVu','','DejaVuSansCondensed.ttf',true);
+        $pdf->SetFont('DejaVu', '', 8);
     
-        // Static Text: EU RP and Manufacturer Info
+        // Add QR code (optional)
+        //$pdf->Image($qrcode, 2, 2, 10, 10); // Adjust the position and size as needed
+    
+        // EU RP and Manufacturer Info
         $pdf->SetXY(12, 2);
         $pdf->MultiCell(48, 4, "EU RP: Emre Bedel\nresponsible@iwaconcept.com", 0, 'L');
-        
+    
         $pdf->SetXY(12, 12);
         $pdf->MultiCell(48, 4, "(Manifacture Sign): IWA Concept Ltd.Şti.\nAnkara/Türkiye\niwaconcept.com", 0, 'L');
     
-        // Add Product Info
+        // Product Information (PN and SN)
         $pdf->SetXY(0, 24);
         $pdf->Cell(60, 4, "PN: IA1230123456", 0, 1, 'C');
     
@@ -161,5 +165,5 @@ class PdfGenerator
         unlink($pdfFilePath); // Clean up the temporary PDF file
         return $asset;
     }
-    
+
 }
