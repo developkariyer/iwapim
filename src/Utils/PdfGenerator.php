@@ -116,25 +116,19 @@ class PdfGenerator
 
     public static function generate4x6eu(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
     {
-        // Create PDF object
         $pdf = new Fpdi('L', 'mm', [60, 40]); 
         $pdf->SetAutoPageBreak(false); 
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
-    
-        // Use a font that supports Turkish characters
         $pdf->SetFont('helvetica', '', 6);
     
-        // EU RP Information
         $pdf->SetXY(2, 2);
         $pdf->MultiCell(56, 4, mb_convert_encoding("EU RP: Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        // Placeholder for Factory Sign (place your factory sign PNG here)
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 10, 10, 10); // Adjust the position and size as needed
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 10, 8, 8); // Adjust the position and size as needed
     
-        // Manufacturer Information
         $pdf->SetXY(14, 10);
-        $pdf->MultiCell(44, 4, mb_convert_encoding("IWA Concept Ltd.Şti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->MultiCell(44, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
         // Product Information (PN and SN) - Left Aligned on the Same Line
         $pdf->SetXY(2, 24);
