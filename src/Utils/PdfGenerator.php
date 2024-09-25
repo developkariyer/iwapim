@@ -125,6 +125,7 @@ class PdfGenerator
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 28, 48, 12);
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/iwapim.png', 40, 2, 28, 28);
     
         $pdf->SetXY(10, 1.7);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
@@ -145,7 +146,7 @@ class PdfGenerator
 
         $pdf->SetFont('arial', 'B', 6);
         $pdf->SetXY(48, 28);
-        $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD", 'windows-1254', 'UTF-8'), 0, 'C');
+        $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD\nGPSR", 'windows-1254', 'UTF-8'), 0, 'C');
 
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
