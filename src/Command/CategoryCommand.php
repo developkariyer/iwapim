@@ -37,8 +37,11 @@ class CategoryCommand extends AbstractCommand{
             foreach($products as $product){
                 $parentPath = $product->getParent();
                 $pathParts = explode('/', $parentPath);
-                echo "\n Path Parts: ";
-                print_r($pathParts);
+                if (isset($pathParts[2])) {
+                    $secondIndex = $pathParts[2]; 
+                    $nameBeforeDash = explode('-', $secondIndex)[0];
+                    echo "\n İkinci indeksteki isim: " . $nameBeforeDash; 
+                }
             }
         }
         return Command::SUCCESS;
