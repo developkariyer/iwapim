@@ -123,7 +123,7 @@ class PdfGenerator
         $pdf->SetMargins(0, 0, 0);
     
         // Use a font that supports Turkish characters
-        $pdf->AddFont('DejaVu','','DejaVuSansCondensed.ttf',true);
+        $pdf->AddFont('DejaVu','',\PIMCORE_PROJECT_ROOT.'/src/Utils/DejaVuSansCondensed.ttf',true);
         $pdf->SetFont('DejaVu', '', 8);
     
         // Add QR code (optional)
