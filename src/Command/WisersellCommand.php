@@ -22,6 +22,7 @@ class WisersellCommand extends AbstractCommand{
     protected function execute(InputInterface $input, OutputInterface $output): int{
        
         $token = $this->getAccessToken();
+        sleep(2);
         $this->productSearch($token);
 
         // $listingObject = new Product\Listing();
