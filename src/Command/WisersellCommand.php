@@ -122,10 +122,10 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function productSearch($token){
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
-        $data = [
-            "page"=> 1,
-            "pageSize"=> 10
-        ];
+        // $data = [
+        //     "page"=> 1,
+        //     "pageSize"=> 10
+        // ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -134,7 +134,8 @@ class WisersellCommand extends AbstractCommand{
             'Accept: application/json',
             'Authorization: Bearer ' . $token
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+        curl_setopt($ch);
         $response = curl_exec($ch);
         if ($response === false) {
             $error = curl_error($ch);
