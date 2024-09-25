@@ -131,11 +131,11 @@ class PdfGenerator
     
         $pdf->SetXY(10, 11.6);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(1, 14);
+        $pdf->SetXY(1, 14.3);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
         $pdf->SetXY(1, 18);
-        $pdf->MultiCell(30, 2, mb_convert_encoding("PN: {$product->getInheritedField("productIdentifier")}\nSN: 20240000", 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->MultiCell(30, 2, mb_convert_encoding("PN: {$product->getInheritedField("iwasku")}\nSN: {$product->getInheritedField("productIdentifier")}", 'windows-1254', 'UTF-8'), 0, 'L');
     
         $text =  $product->getInheritedField("nameEnglish") . "\n";
         $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor");
