@@ -27,7 +27,7 @@ class WisersellCommand extends AbstractCommand
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
         $pageSize = 50;
         $offset = 0;
-        
+
         while (true) {
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
@@ -38,7 +38,7 @@ class WisersellCommand extends AbstractCommand
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
             foreach ($products as $product) {
-                    echo "iwasku değeri: " . $product->getIwasku();
+                    echo "\n iwasku değeri: " . $product->getIwasku();
             }
         }
         return Command::SUCCESS;
