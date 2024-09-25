@@ -6,7 +6,7 @@ use Pimcore\Model\DataObject\ClassDefinition\Data;
 use Pimcore\Model\DataObject\ClassDefinition\DynamicOptionsProvider\SelectOptionsProviderInterface;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
-use Pimcode\Model\DataObject\Category\Listing;
+use Pimcore\Model\DataObject\Category\Listing;
 
 class ProductCategory implements SelectOptionsProviderInterface
 {
@@ -17,7 +17,7 @@ class ProductCategory implements SelectOptionsProviderInterface
             return [];
         }
         $options = [];
-        
+
         $categories = new Listing();
         foreach ($categories->load() as $category) {
             if ($category->isPublished()) {
