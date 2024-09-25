@@ -123,7 +123,7 @@ class PdfGenerator
         $pdf->SetFont('Arial', '', 6); // Set smaller font size for more text space
     
         // Add the QR code (optional, depending on where you want it)
-        $pdf->Image($qrcode, 2, 2, 10, 10); // Adjust the position and size as needed
+//        $pdf->Image($qrcode, 2, 2, 10, 10); // Adjust the position and size as needed
     
         // Static Text: EU RP and Manufacturer Info
         $pdf->SetXY(12, 2);
