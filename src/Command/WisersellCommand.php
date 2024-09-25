@@ -21,9 +21,16 @@ class WisersellCommand extends AbstractCommand{
 
     protected function execute(InputInterface $input, OutputInterface $output): int{
        
-        //$token = $this->getAccessToken();
-        //sleep(2);
-        //$this->productSearch($token);
+        $token = $this->getAccessToken();
+        sleep(2);
+        $searchData = [
+            "code"=>"IA00500MRVE9",
+            "page"=> 0,
+            "pageSize"=> 10,
+        ];
+        $response = $this->productSearch($token,$searchData);
+        print_r($response);
+        
         //$this->addCategory($token, ["metal"]);
         //$this->getCategories($token);
 
@@ -55,36 +62,36 @@ class WisersellCommand extends AbstractCommand{
         // $this->productSearch($token);
 
 
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        $pageSize = 1;
-        $offset = 0;
+        // $listingObject = new Product\Listing();
+        // $listingObject->setUnpublished(false);
+        // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
+        // $pageSize = 1;
+        // $offset = 0;
 
-        while (true) {
-            $listingObject->setLimit($pageSize);
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
-            echo "\nProcessed {$offset} ";
-            $offset += $pageSize;
-            foreach ($products as $product) {
-                echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-                $token = $this->getAccessToken();
-                sleep(4);
-                $productData = [
-                    [
-                        "name" => $product->getInheritedField("name"),
-                        "code" => $product->getInheritedField("iwasku"),
-                        "categoryId" => 256
-                    ]
-                ];
-                $this->addProduct($token, $productData);
+        // while (true) {
+        //     $listingObject->setLimit($pageSize);
+        //     $listingObject->setOffset($offset);
+        //     $products = $listingObject->load();
+        //     if (empty($products)) {
+        //         break;
+        //     }
+        //     echo "\nProcessed {$offset} ";
+        //     $offset += $pageSize;
+        //     foreach ($products as $product) {
+        //         echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
+        //         $token = $this->getAccessToken();
+        //         sleep(4);
+        //         $productData = [
+        //             [
+        //                 "name" => $product->getInheritedField("name"),
+        //                 "code" => $product->getInheritedField("iwasku"),
+        //                 "categoryId" => 256
+        //             ]
+        //         ];
+        //         $this->addProduct($token, $productData);
 
-            }
-        }
+        //     }
+        // }
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -155,12 +162,8 @@ class WisersellCommand extends AbstractCommand{
         }
         return true;
     }
-    protected function productSearch($token){
+    protected function productSearch($token,$data){
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
-        $data = [
-            "page"=> 0,
-            "pageSize"=> 10
-        ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -180,6 +183,7 @@ class WisersellCommand extends AbstractCommand{
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
         }
+        return $response;
     }
     protected function getCategories($token){
         $url = "https://dev2.wisersell.com/restapi/category"; 
