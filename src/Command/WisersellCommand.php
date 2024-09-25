@@ -123,8 +123,7 @@ class WisersellCommand extends AbstractCommand{
         $token = json_decode($file_contents, true);
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
         $data = [
-            "page"=> 1,
-            "pageSize"=> 10
+            
         ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
