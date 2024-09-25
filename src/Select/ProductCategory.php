@@ -22,21 +22,20 @@ class ProductCategory implements SelectOptionsProviderInterface
         foreach ($listingObject->load() as $product) {
             if ($product->getLevel() === 0) {
                 $parentFolder = $product->getParent();
-                if ($parentFolder instanceof Folder) {
-                    $folderKey = $parentFolder->getKey();
-                    if (strpos($folderKey, '-') !== false) {
-                        $parts = explode('-', $folderKey);
-                        if (isset($parts[1])) {
-                            $category = trim($parts[1]); 
-                            if (!in_array($category, array_column($options, 'value'))) {
-                                $options[] = [
-                                    "key" => $category,
-                                    "value" => $category,
-                                ];
-                            }
+                $folderKey = $parentFolder->getKey();
+                if (strpos($folderKey, '-') !== false) {
+                    $parts = explode('-', $folderKey);
+                    if (isset($parts[1])) {
+                        $category = trim($parts[1]); 
+                        if (!in_array($category, array_column($options, 'value'))) {
+                            $options[] = [
+                                "key" => $category,
+                                "value" => $category,
+                            ];
                         }
                     }
                 }
+                
             }
         }
         return $options;
