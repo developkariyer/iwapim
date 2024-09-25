@@ -54,8 +54,9 @@ class WisersellCommand extends AbstractCommand
 
     protected function getAccessToken()
     {
-        $token_file = "../tmp/wisersell_access_token.json";
+        $token_file = "/tmp/wisersell_access_token.json";
         if (file_exists($token_file)) {
+            echo "Token file exists.";
             $token = json_decode(file_get_contents($token_file), true);
             if ($this->isTokenExpired($token['token'])) {
                 echo "Token expired. Fetching new token...";
