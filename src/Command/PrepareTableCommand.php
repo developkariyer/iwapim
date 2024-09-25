@@ -25,14 +25,14 @@ class PrepareTableCommand extends AbstractCommand
     protected static function transferOrdersFromShopifyOrderTable()
     {
         $shopifySql = "INSERT IGNORE INTO iwa_marketplace_orders_line_items (
-            unique_id, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
             created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
             discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR,created_date,total_price_tl,subtotal_price_tl)
         SELECT
-            CONCAT(CAST(shopify_id AS CHAR), '-', CAST(order_id AS CHAR)) AS unique_id,
+            'Shopify' AS marketplace_type,
             NULL AS marketplace_key,
             NULL AS product_code,
             NULL AS parent_product_code,
