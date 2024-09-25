@@ -26,11 +26,12 @@ class CategoryCommand extends AbstractCommand{
             if(count($products) == 0){
                 break;
             }
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
             foreach($products as $product){
                 echo $product->getParent();
 
             }
-            $offset += $pageSize;
         }
     }
 }
