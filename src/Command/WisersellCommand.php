@@ -89,29 +89,30 @@ class WisersellCommand extends AbstractCommand{
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
             foreach ($products as $product) {
-                echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-                $token = $this->getAccessToken();
-                sleep(4);
-                $searchData = [
-                    "code"=>$product->getInheritedField("iwasku"),
-                    "page"=> 0,
-                    "pageSize"=> 10,
-                ];
-                $response = $this->productSearch($token,$searchData);
-                $decodedResponse = json_decode($response, true);
-                if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
-                    $wisersellId = $decodedResponse["rows"][0]['id'];
-                    try {
-                        $product->setWisersellId($wisersellId); 
-                        $product->setWisersellJson($response);
-                        $product->save();
-                        echo "WisersellId updated successfully: " . $wisersellId;
-                    } catch (Exception $e) {
-                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
-                    }
-                } else {
-                    echo "'id' field not found or is empty in the API response.";
-                }
+                echo $product->getParent();
+                // echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
+                // $token = $this->getAccessToken();
+                // sleep(4);
+                // $searchData = [
+                //     "code"=>$product->getInheritedField("iwasku"),
+                //     "page"=> 0,
+                //     "pageSize"=> 10,
+                // ];
+                // $response = $this->productSearch($token,$searchData);
+                // $decodedResponse = json_decode($response, true);
+                // if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
+                //     $wisersellId = $decodedResponse["rows"][0]['id'];
+                //     try {
+                //         $product->setWisersellId($wisersellId); 
+                //         $product->setWisersellJson($response);
+                //         $product->save();
+                //         echo "WisersellId updated successfully: " . $wisersellId;
+                //     } catch (Exception $e) {
+                //         echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                //     }
+                // } else {
+                //     echo "'id' field not found or is empty in the API response.";
+                // }
                 
 
                 // $productData = [
