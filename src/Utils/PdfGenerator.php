@@ -124,7 +124,7 @@ class PdfGenerator
     
         // Use a font that supports Turkish characters
         //$pdf->AddFont('DejaVu','','DejaVuSansCondensed',true);
-        $pdf->SetFont('DejaVuSansCondensed', '', 8);
+        $pdf->SetFont('dejavu', '', 8);
     
         // Add QR code (optional)
         //$pdf->Image($qrcode, 2, 2, 10, 10); // Adjust the position and size as needed
