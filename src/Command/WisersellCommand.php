@@ -92,7 +92,6 @@ class WisersellCommand extends AbstractCommand{
                 ];
                 $response = $this->productSearch($token,$searchData);
                 $decodedResponse = json_decode($response, true);
-                $wisersellId = $decodedResponse["rows"][0]['id'];
                 if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
                     $wisersellId = $decodedResponse["rows"][0]['id'];
                     try {
