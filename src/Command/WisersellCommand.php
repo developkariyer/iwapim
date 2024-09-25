@@ -22,7 +22,33 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->getAccessToken();
+        //$this->getAccessToken();
+        $url = "https://dev2.wisersell.com/restapi/token"; 
+        $data = [
+            "email" => $_ENV['WISERSELL_DEV_USER'],
+            "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+        ];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            $result = json_decode($response, true);
+            if (isset($result['taken'])) {
+                echo "Bearer Token: " . $result['taken'] . "\n";
+            } else {
+                echo "Failed to get bearer token. Response: " . $response . "\n";
+                echo "Failed to get bearer token. result: " . $result . "\n";
+            }
+        }
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
         // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
@@ -104,7 +130,6 @@ class WisersellCommand extends AbstractCommand
             } else {
                 echo "Failed to get bearer token. Response: " . $response . "\n";
                 echo "Failed to get bearer token. result: " . $result . "\n";
-
             }
         } 
         curl_close($ch);
