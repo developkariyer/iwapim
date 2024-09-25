@@ -29,7 +29,9 @@ class WisersellCommand extends AbstractCommand{
             "pageSize"=> 10,
         ];
         $response = $this->productSearch($token,$searchData);
-        print_r($response);
+        $decodedResponse = json_decode($response, true);
+        $id = $decodedResponse["rows"][0]['id'];
+        print_r($id);
         
         //$this->addCategory($token, ["metal"]);
         //$this->getCategories($token);
