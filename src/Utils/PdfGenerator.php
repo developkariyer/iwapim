@@ -125,11 +125,15 @@ class PdfGenerator
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 32, 2, 10, 5);
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
     
-        $pdf->SetXY(10, 2);
-        $pdf->MultiCell(32, 2, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->SetXY(10, 1);
+        $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        $pdf->SetXY(32, 8);
-        $pdf->MultiCell(56, 4, mb_convert_encoding("Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->SetXY(40, 1);
+        $pdf->Cell(20, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
+        $pdf->SetXY(30, 8);
+        $pdf->Cell(20, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
+
+//        $pdf->MultiCell(56, 3, mb_convert_encoding("Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
         // Product Information (PN and SN) - Left Aligned on the Same Line
         $pdf->SetXY(2, 24);
