@@ -21,22 +21,22 @@ class CategoryCommand extends AbstractCommand{
     
     protected function execute(InputInterface $input, OutputInterface $output): int{
         echo "\nStarted";
+        // $listingObject = new Product\Listing();
+        // $pageSize = 50;
+        // $offset = 0;
+        // while(true){
+        //     $products = $listingObject->load($pageSize, $offset);
+        //     if(count($products) == 0){
+        //         break;
+        //     }
+        //     echo "\nProcessed {$offset} ";
+        //     $offset += $pageSize;
+        //     foreach($products as $product){
+        //         echo $product->getParent();
 
-        $listingObject = new Product\Listing();
-        $pageSize = 50;
-        $offset = 0;
-        while(true){
-            $products = $listingObject->load($pageSize, $offset);
-            if(count($products) == 0){
-                break;
-            }
-            echo "\nProcessed {$offset} ";
-            $offset += $pageSize;
-            foreach($products as $product){
-                echo $product->getParent();
-
-            }
-        }
+        //     }
+        // }
+        echo "\nStopped";
         return Command::SUCCESS;
     }
 }
