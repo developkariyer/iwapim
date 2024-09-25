@@ -8,10 +8,6 @@ use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Category\Listing;
 
-use Pimcore\Log\Logger;
-
-Logger::info("ProductCategory getOptions called with context: " . json_encode($context));
-
 
 class ProductCategory implements SelectOptionsProviderInterface{
     public function getOptions(array $context, Data $fieldDefinition = null): array{
