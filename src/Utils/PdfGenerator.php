@@ -123,22 +123,18 @@ class PdfGenerator
         $pdf->SetFont('helvetica', '', 6);
     
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 10, 5);
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
     
         $pdf->SetXY(10, 2);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
         $pdf->SetXY(12, 12);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(1, 18);
+        $pdf->SetXY(1, 17);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
-//        $pdf->MultiCell(56, 3, mb_convert_encoding("Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
-    
-        // Product Information (PN and SN) - Left Aligned on the Same Line
-        $pdf->SetXY(2, 24);
+        $pdf->SetXY(1, 20);
         $pdf->Cell(30, 4, mb_convert_encoding("PN: IA1230123456", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        
         $pdf->Cell(30, 4, mb_convert_encoding("SN: 12345", 'windows-1254', 'UTF-8'), 0, 1, 'L');
     
         // Product specific details
