@@ -144,8 +144,8 @@ class PdfGenerator
         $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
 
         $pdf->SetFont('arial', 'B', 6);
-        $pdf->SetXY(50, 28);
-        $pdf->MultiCell(10, 3, mb_convert_encoding("Complies\nwith\nGPSD", 'windows-1254', 'UTF-8'), 0, 'C');
+        $pdf->SetXY(48, 28);
+        $pdf->MultiCell(12, 3, mb_convert_encoding("Compliant\nwith\nGPSD", 'windows-1254', 'UTF-8'), 0, 'C');
 
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
