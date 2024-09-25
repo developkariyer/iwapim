@@ -35,8 +35,6 @@ class CategoryCommand extends AbstractCommand{
             $offset += $pageSize;
             foreach($products as $product){
                 echo "\n parent: ".$product->getParent();
-                echo "\n parent key: ".$product->getParent()->key();
-
 
             }
         }
