@@ -76,8 +76,8 @@ class WisersellCommand extends AbstractCommand{
                 sleep(2);
                 $productData = [
                     [
-                        "name" => $product->getName(),
-                        "code" => $product->getIwasku(),
+                        "name" => $product->getInheritedField("name"),
+                        "code" => $product->getInheritedField("iwasku"),
                         "categoryId" => 256
                     ]
                 ];
