@@ -23,8 +23,8 @@ class WisersellCommand extends AbstractCommand{
        
         $token = $this->getAccessToken();
         sleep(2);
-        $this->productSearch($token);
-
+        //$this->productSearch($token);
+        $this->getCategories($token);
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
         // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
@@ -122,10 +122,10 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function productSearch($token){
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
-        // $data = [
-        //     "page"=> 1,
-        //     "pageSize"=> 10
-        // ];
+        $data = [
+            "page"=> 0,
+            "pageSize"=> 10
+        ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -134,8 +134,27 @@ class WisersellCommand extends AbstractCommand{
             'Accept: application/json',
             'Authorization: Bearer ' . $token
         ]);
-
-        //curl_setopt($ch);
+        
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            echo "Response: " . $response . "\n";
+            $result = json_decode($response, true);
+            echo "Result: " . print_r($result, true) . "\n";
+        }
+    }
+    protected function getCategories($token){
+        $url = "https://dev2.wisersell.com/restapi/category"; 
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'Authorization: Bearer ' . $token
+        ]);
         $response = curl_exec($ch);
         if ($response === false) {
             $error = curl_error($ch);
