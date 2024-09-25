@@ -54,17 +54,21 @@ class WisersellCommand extends AbstractCommand
     
     protected function getAccessToken(){
         $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
-        if (file_exists($token_file)&&filesize($token_file) > 0) {
-            echo "Token file exists.";
-            $token = json_decode(file_get_contents($token_file), true);
-            if ($this->isTokenExpired($token['token'])||empty($token['token'])) {
-                $this->fetchToken();
-                echo "Token expired. Fetching new token...";
+        if (file_exists($token_file) && filesize($token_file) > 0) {
+            echo "Token file exists.\n";
+            $file_contents = file_get_contents($token_file);
+            $token = json_decode($file_contents, true);
+            if ($token === null || !isset($token['token'])) {
+                echo "Invalid token file content. Fetching new token...\n";
+                $this->fetchToken(); 
+            } elseif ($this->isTokenExpired($token['token'])) {
+                echo "Token expired. Fetching new token...\n";
+                $this->fetchToken(); 
             } else {
-                echo "Bearer Token: " . $token['token'];
+                echo "Bearer Token: " . $token['token'] . "\n";
             }
-        }else{
-            echo "Token file does not exist. Fetching new token...";
+        } else {
+            echo "Token file not found or empty. Fetching new token...\n";
             $this->fetchToken();
         }
     }
