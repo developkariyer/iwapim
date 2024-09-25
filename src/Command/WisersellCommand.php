@@ -75,7 +75,7 @@ class WisersellCommand extends AbstractCommand{
 
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
-        //$listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
         $pageSize = 1;
         $offset = 0;
                                                             
@@ -90,32 +90,28 @@ class WisersellCommand extends AbstractCommand{
             $offset += $pageSize;
             foreach ($products as $product) {
                 echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-
-                $parentFolder = $product->getParent();
-                echo "\n Parent Folder: " . $parentFolder;
-                echo "\n Parent Folder: " . $parentFolder->getKey();
-                // $token = $this->getAccessToken();
-                // sleep(4);
-                // $searchData = [
-                //     "code"=>$product->getInheritedField("iwasku"),
-                //     "page"=> 0,
-                //     "pageSize"=> 10,
-                // ];
-                // $response = $this->productSearch($token,$searchData);
-                // $decodedResponse = json_decode($response, true);
-                // if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
-                //     $wisersellId = $decodedResponse["rows"][0]['id'];
-                //     try {
-                //         $product->setWisersellId($wisersellId); 
-                //         $product->setWisersellJson($response);
-                //         $product->save();
-                //         echo "WisersellId updated successfully: " . $wisersellId;
-                //     } catch (Exception $e) {
-                //         echo "Error occurred while updating WisersellId: " . $e->getMessage();
-                //     }
-                // } else {
-                //     echo "'id' field not found or is empty in the API response.";
-                // }
+                $token = $this->getAccessToken();
+                sleep(4);
+                $searchData = [
+                    "code"=>$product->getInheritedField("iwasku"),
+                    "page"=> 0,
+                    "pageSize"=> 10,
+                ];
+                $response = $this->productSearch($token,$searchData);
+                $decodedResponse = json_decode($response, true);
+                if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
+                    $wisersellId = $decodedResponse["rows"][0]['id'];
+                    try {
+                        $product->setWisersellId($wisersellId); 
+                        $product->setWisersellJson($response);
+                        $product->save();
+                        echo "WisersellId updated successfully: " . $wisersellId;
+                    } catch (Exception $e) {
+                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                    }
+                } else {
+                    echo "'id' field not found or is empty in the API response.";
+                }
                 
 
                 // $productData = [
