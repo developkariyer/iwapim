@@ -38,7 +38,7 @@ class WisersellCommand extends AbstractCommand{
         // sleep(5);
         // $this->productSearch($token);
 
-        $this->deleteCategory($token, 256);
+        $this->deleteCategory($token, 257);
         sleep(5);
         $this->getCategories($token);
 
