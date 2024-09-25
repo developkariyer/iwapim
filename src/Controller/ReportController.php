@@ -48,7 +48,6 @@ class ReportController extends FrontendController
         $index = 0;
         foreach ($products as $product) {
             $index++;
-            error_log("Memory Usage before {$product->getInheritedField('productIdentifier')} ($index): " . memory_get_usage());
             if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
                 $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
             }
@@ -281,7 +280,6 @@ class ReportController extends FrontendController
         unset($pricingModels);
         gc_collect_cycles();
         usleep(500000);
-        error_log("Memory Usage before rendering: " . memory_get_usage());
 
         return $this->render('202409/group.html.twig', [
             'title' => $group->getKey(),
