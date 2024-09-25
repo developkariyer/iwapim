@@ -140,6 +140,8 @@ class WisersellCommand extends AbstractCommand{
             echo "cURL Error: $error";
         } else {
             echo "Response: " . $response . "\n";
+            $result = json_decode($response, true);
+            echo "Result: " . print_r($result, true) . "\n";
         }
     }
 }
