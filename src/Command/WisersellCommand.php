@@ -64,6 +64,10 @@ class WisersellCommand extends AbstractCommand
                 echo "Bearer Token: " . $token['token'];
             }
         }
+        else
+        {
+            echo "Token file does not exist. Fetching new token...";
+        }
         // } else {
         //     $this->fetchToken();
         // }
