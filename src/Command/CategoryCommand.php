@@ -27,7 +27,8 @@ class CategoryCommand extends AbstractCommand{
                 break;
             }
             foreach($products as $product){
-                $output->writeln($product->getProductCategory());
+                echo $product->getParent();
+                
             }
             $offset += $pageSize;
         }
