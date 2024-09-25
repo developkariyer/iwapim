@@ -20,6 +20,8 @@ use App\Model\DataObject\VariantProduct;
 class CategoryCommand extends AbstractCommand{
     
     protected function execute(InputInterface $input, OutputInterface $output): int{
+        echo "\nStarted";
+
         $listingObject = new Product\Listing();
         $pageSize = 50;
         $offset = 0;
