@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
+use App\Model\DataObject\VariantProduct;
 
 
 #[AsCommand(
@@ -17,6 +18,7 @@ use Pimcore\Model\DataObject\Product;
 )]
 
 class CategoryCommand extends AbstractCommand{
+    
     protected function execute(InputInterface $input, OutputInterface $output): int{
         $listingObject = new Product\Listing();
         $pageSize = 50;
@@ -33,5 +35,6 @@ class CategoryCommand extends AbstractCommand{
 
             }
         }
+        return Command::SUCCESS;
     }
 }
