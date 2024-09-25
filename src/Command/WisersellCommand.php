@@ -73,7 +73,7 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
                 $token = $this->getAccessToken();
-                sleep(2);
+                sleep(4);
                 $productData = [
                     [
                         "name" => $product->getInheritedField("name"),
