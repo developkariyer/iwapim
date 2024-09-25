@@ -14,7 +14,7 @@ use App\Model\DataObject\VariantProduct;
 
 #[AsCommand(
     name: 'app:wisersell',
-    description: 'Get product info'
+    description: 'connect wisersell api'
 )]
 
 class WisersellCommand extends AbstractCommand{
