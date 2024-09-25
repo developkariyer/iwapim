@@ -34,7 +34,7 @@ class CategoryCommand extends AbstractCommand{
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
             foreach($products as $product){
-                echo $product->getParent();
+                echo "\n parent: ".$product->getParent();
 
             }
         }
