@@ -130,7 +130,7 @@ class PdfGenerator
         $pdf->MultiCell(56, 4, mb_convert_encoding("EU RP: Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
         // Placeholder for Factory Sign (place your factory sign PNG here)
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 10, 10, 10); // Adjust the position and size as needed
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.svg', 2, 10, 10, 10); // Adjust the position and size as needed
     
         // Manufacturer Information
         $pdf->SetXY(14, 10);
