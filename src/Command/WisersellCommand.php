@@ -51,56 +51,54 @@ class WisersellCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-
-    protected function getAccessToken()
-    {
+    
+    protected function getAccessToken(){
         $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
         if (file_exists($token_file)) {
             echo "Token file exists.";
             $token = json_decode(file_get_contents($token_file), true);
             if ($this->isTokenExpired($token['token'])) {
+                $this->fetchToken();
                 echo "Token expired. Fetching new token...";
             } else {
                 echo "Bearer Token: " . $token['token'];
             }
-        }
-        else
-        {
+        }else{
             echo "Token file does not exist. Fetching new token...";
+            $this->fetchToken();
         }
-        // } else {
-        //     $this->fetchToken();
-        // }
-        // $url = "https://dev2.wisersell.com/restapi/token"; 
-        // $data = [
-        //     "email" => $_ENV['WISERSELL_DEV_USER'],
-        //     "password" => $_ENV['WISERSELL_DEV_PASSWORD']
-        // ];
-        // $ch = curl_init($url);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // curl_setopt($ch, CURLOPT_POST, true);
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        //     'Content-Type: application/json',
-        //     'Accept: application/json'
-        // ]);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        // $response = curl_exec($ch);
-        // if ($response === false) {
-        //     $error = curl_error($ch);
-        //     echo "cURL Error: $error";
-        // } else {
-        //     $result = json_decode($response, true);
-        //     if (isset($result['taken'])) {
-        //         echo "Bearer Token: " . $result['taken'];
-        //     } else {
-        //         echo "Failed to get bearer token. Response: " . $response;
-        //     }
-        // }
-        // curl_close($ch);
     }
-
-    protected function isTokenExpired($token)
-    {
+    protected function fetchToken(){
+        $url = "https://dev2.wisersell.com/restapi/token"; 
+        $data = [
+            "email" => $_ENV['WISERSELL_DEV_USER'],
+            "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+        ];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            $result = json_decode($response, true);
+            if (isset($result['taken'])) {
+                echo "Bearer Token: " . $result['taken'];
+                $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
+                file_put_contents($token_file, json_encode(['token' => $result['taken']]));
+            } else {
+                echo "Failed to get bearer token. Response: " . $response;
+            }
+        }
+        curl_close($ch);
+    }
+    protected function isTokenExpired($token){
         $tokenParts = explode('.', $token);
         if (count($tokenParts) === 3) {
             $payload = json_decode(base64_decode($tokenParts[1]), true);
