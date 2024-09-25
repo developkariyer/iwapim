@@ -39,9 +39,9 @@ class ReportController extends FrontendController
             $productModels = $this->getProductModels($pricingModels, $product);
             $prices = $this->getProductPrices($product, $priceTemplate);
 
-            $sticker = $product->getSticker4x6();
+            $sticker = $product->getSticker4x6iwasku();
             if (!$sticker) {
-                $sticker = $product->checkSticker4x6();
+                $sticker = $product->checkSticker4x6iwasku();
             }
             $sticker = $sticker->getFullPath();
 
