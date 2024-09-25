@@ -24,9 +24,19 @@ class WisersellCommand extends AbstractCommand{
         $token = $this->getAccessToken();
         sleep(2);
         //$this->productSearch($token);
-        $this->addCategory($token, ["metal"]);
+        //$this->addCategory($token, ["metal"]);
+        //$this->getCategories($token);
+
+        $productData = [
+            [
+                "name" => "Cam1",
+                "code" => "AXXXXXX",
+                "categoryId" => 256
+            ]
+        ];
+        $this->addProduct($token, $productData);
         sleep(5);
-        $this->getCategories($token);
+        $this->productSearch($token);
 
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
@@ -192,5 +202,29 @@ class WisersellCommand extends AbstractCommand{
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
+    protected function addProduct($token,$data)
+    {
+        $url = "https://dev2.wisersell.com/restapi/product"; 
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'Authorization: Bearer ' . $token
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            echo "Response: " . $response . "\n";
+            $result = json_decode($response, true);
+            echo "Result: " . print_r($result, true) . "\n";
+        }
+    }
+
 
 }
