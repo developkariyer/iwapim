@@ -33,9 +33,14 @@ class CategoryCommand extends AbstractCommand{
             }
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
+            
             foreach($products as $product){
                 echo "\n parent: ".$product->getParent();
-
+                $pathParts = explode('/', $parentPath);
+                if (count($pathParts) >= 2) {
+                    $desiredPart = $pathParts[0] . '/' . $pathParts[1];
+                    echo "\n parent: " . $desiredPart;
+                }
             }
         }
         return Command::SUCCESS;
