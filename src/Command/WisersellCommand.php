@@ -21,8 +21,8 @@ class WisersellCommand extends AbstractCommand{
 
     protected function execute(InputInterface $input, OutputInterface $output): int{
        
-        $this->getAccessToken();
-        $this->productSearch();
+        $token = $this->getAccessToken();
+        $this->productSearch($token);
 
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
@@ -70,6 +70,9 @@ class WisersellCommand extends AbstractCommand{
             echo "Token file not found or empty. Fetching new token...\n";
             $this->fetchToken();
         }
+        $file_contents = file_get_contents($token_file);
+        $token = json_decode($file_contents, true);
+        return $token['token'];
     }
     protected function fetchToken(){
         $url = "https://dev2.wisersell.com/restapi/token"; 
@@ -116,14 +119,11 @@ class WisersellCommand extends AbstractCommand{
         }
         return true;
     }
-    protected function productSearch()
-    {
-        $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
-        $file_contents = file_get_contents($token_file);
-        $token = json_decode($file_contents, true);
+    protected function productSearch($token){
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
         $data = [
-            
+            "page"=> 1,
+            "pageSize"=> 10
         ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -131,7 +131,7 @@ class WisersellCommand extends AbstractCommand{
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Accept: application/json',
-            'Authorization: Bearer ' . $token['token']
+            'Authorization: Bearer ' . $token
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         $response = curl_exec($ch);
