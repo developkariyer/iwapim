@@ -126,38 +126,32 @@ class PdfGenerator
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 28, 48, 12);
     
-        $pdf->SetXY(10, 2);
+        $pdf->SetXY(10, 1.7);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        $pdf->SetXY(12, 12);
+        $pdf->SetXY(10, 11.6);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(1, 17);
+        $pdf->SetXY(1, 13);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
-        $pdf->SetXY(1, 20);
-        $pdf->Cell(30, 4, mb_convert_encoding("PN: IA1230123456", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->Cell(30, 4, mb_convert_encoding("SN: 12345", 'windows-1254', 'UTF-8'), 0, 1, 'L');
+        $pdf->SetXY(1, 18);
+        $pdf->MultiCell(30, 3, mb_convert_encoding("PN: {$product->getInheritedField("productIdentifier")}\nSN: 20240000", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        // Product specific details
-        $text = $product->getInheritedField("productIdentifier") . " " . $product->getInheritedField("nameEnglish") . "\n";
-        $text .= "(" . $product->getInheritedField("name") . ")\n";
-        $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
-        $text .= "Color: " . $product->getInheritedField("variationColor");
+        $text =  $product->getInheritedField("nameEnglish") . "\n";
+        $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor");
+
+        $pdf->SetXY(1, 23);
+        $pdf->MultiCell(56, 3, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
     
-        $pdf->SetXY(2, 30);
-        $pdf->MultiCell(56, 4, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
-    
-        // Output PDF to file
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
     
-        // Save PDF as Pimcore Asset
         $asset = new Asset\Document();
         $asset->setFilename($qrfile);
         $asset->setData(file_get_contents($pdfFilePath));
         $asset->setParent(Utility::checkSetAssetPath('EU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
         $asset->save();
-        unlink($pdfFilePath); // Clean up the temporary PDF file
+        unlink($pdfFilePath);
         return $asset;
     }
     
