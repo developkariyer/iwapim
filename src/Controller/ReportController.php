@@ -33,9 +33,6 @@ class ReportController extends FrontendController
         }
         $getStickerMethod = "getSticker4x6{$stickerType}";
         $checkStickerMethod = "checkSticker4x6{$stickerType}";
-        if ($stickerType === 'eu') {
-            return $product->$checkStickerMethod()->getFullPath();
-        }
         $sticker = $product->$getStickerMethod();
         if (!$sticker) {
             $sticker = $product->$checkStickerMethod();

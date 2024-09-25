@@ -122,13 +122,13 @@ class PdfGenerator
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetFont('helvetica', '', 6);
     
-        $pdf->SetXY(2, 2);
-        $pdf->MultiCell(56, 4, mb_convert_encoding("EU RP: Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8); // Adjust the position and size as needed
     
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 10, 8, 8); // Adjust the position and size as needed
-    
-        $pdf->SetXY(14, 10);
+        $pdf->SetXY(10, 10);
         $pdf->MultiCell(44, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
+    
+//        $pdf->SetXY(2, 2);
+//        $pdf->MultiCell(56, 4, mb_convert_encoding("EU RP: Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
         // Product Information (PN and SN) - Left Aligned on the Same Line
         $pdf->SetXY(2, 24);
