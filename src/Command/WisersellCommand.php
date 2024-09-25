@@ -21,7 +21,8 @@ class WisersellCommand extends AbstractCommand{
 
     protected function execute(InputInterface $input, OutputInterface $output): int{
        
-        $this->getAccessToken();
+        //$this->getAccessToken();
+        $this->productSearch();
 
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
@@ -114,5 +115,30 @@ class WisersellCommand extends AbstractCommand{
             }
         }
         return true;
+    }
+    protected function productSearch()
+    {
+        $url = "https://dev2.wisersell.com/restapi/product/search"; 
+        $data = [
+            "page"=> 1,
+            "pageSize"=> 10
+        ];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'Authorization: Bearer ' . "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDgsIm9yZ2FuaXphdGlvbklkIjoxNSwiY29tcGFueUlkIjpudWxsLCJwZXJtaXNzaW9uIjpbMiwzLDQsNiw3LDgsOSwxMCwxMSwxMiwxMywxNiwyMCwyMSwyMiwyMywyNCwyNSwyNiwyNywyOCwyOSw1LDMwLDMxLDMyLDE4LDE3XSwiaWF0IjoxNzI3MjUwNjczLCJleHAiOjE3MjcyNTQyNzN9.2pO92EwcB6rutyx_9-6nBdNmmY9m1C8IjQtF7BLo33g"
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            $result = json_decode($response, true);
+            echo "Response: " . $response . "\n";
+        }
     }
 }
