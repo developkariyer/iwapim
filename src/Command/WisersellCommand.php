@@ -58,14 +58,14 @@ class WisersellCommand extends AbstractCommand
             echo "Token file exists.\n";
             $file_contents = file_get_contents($token_file);
             $token = json_decode($file_contents, true);
-            if ($token === null || !isset($token['taken'])) {
+            if ($token === null || !isset($token['token'])) {
                 echo "Invalid token file content. Fetching new token...\n";
                 $this->fetchToken(); 
-            } elseif ($this->isTokenExpired($token['taken'])) {
+            } elseif ($this->isTokenExpired($token['token'])) {
                 echo "Token expired. Fetching new token...\n";
                 $this->fetchToken(); 
             } else {
-                echo "Bearer Token: " . $token['taken'] . "\n";
+                echo "Bearer Token: " . $token['token'] . "\n";
             }
         } else {
             echo "Token file not found or empty. Fetching new token...\n";
@@ -96,7 +96,8 @@ class WisersellCommand extends AbstractCommand
                 unlink($token_file); 
                 echo "Old token file deleted.\n";
             }
-            file_put_contents($token_file, $response);
+            echo "New token fetched.\n";
+            file_put_contents($token_file, json_encode(['token' => $response['taken']], JSON_PRETTY_PRINT));
             echo "New token saved to file.\n";
         } 
         curl_close($ch);
