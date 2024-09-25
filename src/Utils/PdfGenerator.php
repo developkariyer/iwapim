@@ -71,7 +71,7 @@ class PdfGenerator
         return $asset;
     }
 
-    public static function generate4x6(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
+    public static function generate4x6iwasku(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
     {
         $pdf = new Fpdi('L', 'mm', [60, 40]); // Landscape mode, 60x40 mm page
         $pdf->SetAutoPageBreak(false); // Disable automatic page break
@@ -104,7 +104,7 @@ class PdfGenerator
         $asset = new Asset\Document();
         $asset->setFilename($qrfile);
         $asset->setData(file_get_contents($pdfFilePath));
-        $asset->setParent(Utility::checkSetAssetPath('Ürün', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
+        $asset->setParent(Utility::checkSetAssetPath('IWASKU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
         $asset->save();
         unlink($pdfFilePath); // Clean up the temporary PDF file
         return $asset;

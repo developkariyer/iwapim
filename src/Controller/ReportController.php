@@ -23,7 +23,24 @@ class ReportController extends FrontendController
         $this->security = $security;
     }
 
-    private function prepareProductsData($products, $pricingModels, $showPrice = true)
+    private static function stickerPath($stickerType, $product)
+    {
+        if (!in_array($stickerType, ['iwasku', 'eu'])) {
+            $stickerType = 'iwasku';
+        }
+        if (!$product instanceof Product) {
+            return '';
+        }
+        $getStickerMethod = "getSticker4x6{$stickerType}";
+        $checkStickerMethod = "checkSticker4x6{$stickerType}";
+        $sticker = $product->$getStickerMethod();
+        if (!$sticker) {
+            $sticker = $product->$checkStickerMethod();
+        }
+        return $sticker->getFullPath();
+    }
+
+    private function prepareProductsData($products, $pricingModels, $showPrice = true, $stickerType = 'iwasku')
     {
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $productTwig = [];
@@ -39,11 +56,7 @@ class ReportController extends FrontendController
             $productModels = $this->getProductModels($pricingModels, $product);
             $prices = $this->getProductPrices($product, $priceTemplate);
 
-            $sticker = $product->getSticker4x6iwasku();
-            if (!$sticker) {
-                $sticker = $product->checkSticker4x6iwasku();
-            }
-            $sticker = $sticker->getFullPath();
+            $sticker = self::stickerPath($stickerType, $product);
 
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
@@ -247,11 +260,12 @@ class ReportController extends FrontendController
     }
 
     /**
-     * @Route("/report/sticker/{group_id}", name="report_sticker")
+     * @Route("/report/sticker/{group_id}/{type}", name="report_sticker")
      */
     public function stickerAction(Request $request): Response
     {
         $groupId = $request->get('group_id');
+        $type = $request->get('type', 'iwasku');
         $group = GroupProduct::getById($groupId);
 
         if (!$group) {

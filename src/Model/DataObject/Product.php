@@ -446,7 +446,7 @@ class Product extends Concrete
 
     public function checkSticker4x6iwasku()
     {
-        $asset = PdfGenerator::generate4x6('', '',  $this, "{$this->getKey()}_4x6iwasku.pdf");
+        $asset = PdfGenerator::generate4x6iwasku('', '',  $this, "{$this->getKey()}_4x6iwasku.pdf");
         if ($asset) {
             $this->setSticker4x6iwasku($asset);
             $this->save();
@@ -456,7 +456,7 @@ class Product extends Concrete
 
     public function checkSticker4x6eu()
     {
-        $asset = PdfGenerator::generate4x6('', '',  $this, "{$this->getKey()}_4x6eu.pdf");
+        $asset = PdfGenerator::generate4x6eu('', '',  $this, "{$this->getKey()}_4x6eu.pdf");
         if ($asset) {
             $this->setSticker4x6eu($asset);
             $this->save();
