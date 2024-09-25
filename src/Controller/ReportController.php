@@ -260,7 +260,7 @@ class ReportController extends FrontendController
     }
 
     /**
-     * @Route("/report/sticker/{group_id}/{type}", name="report_sticker")
+     * @Route("/report/sticker/{group_id}/{type?iwasku}", name="report_sticker")
      */
     public function stickerAction(Request $request): Response
     {
