@@ -122,15 +122,15 @@ class PdfGenerator
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetFont('helvetica', '', 6);
     
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 32, 2, 10, 4);
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 10, 10, 5);
     
         $pdf->SetXY(10, 2);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        $pdf->SetXY(43, 3);
+        $pdf->SetXY(10, 10);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(30, 8);
+        $pdf->SetXY(2, 8);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
 //        $pdf->MultiCell(56, 3, mb_convert_encoding("Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
