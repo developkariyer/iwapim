@@ -30,7 +30,7 @@
                                 {{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg
                             </small>
                             {% for document in product.documents|default([]) %}
-                                
+                                <br><a href="{{ document.fullpath }}" target="_blank">{{ document.filename }}</a>
                             {% endfor %}
                         </td>
                         <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px; max-height: 100px;"></td>
