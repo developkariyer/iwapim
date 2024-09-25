@@ -12,6 +12,10 @@ class ProductCategory implements SelectOptionsProviderInterface
 {
     public function getOptions(array $context, Data $fieldDefinition = null): array
     {
+        $fieldname = $fieldDefinition->name ?? ($context["fieldname"] ?? ($context["object"]->getKey() ?? "unknown"));
+        if ($fieldname !== 'productCategory') {
+            return [];
+        }
         $options = [];
         $listingObject = new Listing();
         $listingObject->setUnpublished(false); 
