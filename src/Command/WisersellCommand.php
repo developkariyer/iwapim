@@ -207,7 +207,7 @@ class WisersellCommand extends AbstractCommand{
         }
     }
     protected function deleteCategory($token,$categoryId){
-        $url = "https://dev2.wisersell.com/restapi/category". $categoryId; 
+        $url = "https://dev2.wisersell.com/restapi/category/". $categoryId; 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
