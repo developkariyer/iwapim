@@ -127,7 +127,7 @@ class PdfGenerator
         $pdf->SetFont('helvetica', '', 6);
     
         // Add QR code (optional)
-        //$pdf->Image($qrcode, 2, 2, 10, 10); // Adjust the position and size as needed
+        $pdf->Image(self::generateQR($qrcode, $qrlink.'EU'), 2, 2, 10, 10); // Adjust the position and size as needed
     
         // EU RP and Manufacturer Info
         $pdf->SetXY(12, 2);
