@@ -27,16 +27,20 @@ class WisersellCommand extends AbstractCommand{
         //$this->addCategory($token, ["metal"]);
         //$this->getCategories($token);
 
-        $productData = [
-            [
-                "name" => "Cam1",
-                "code" => "AXXXXXX",
-                "categoryId" => 256
-            ]
-        ];
-        $this->addProduct($token, $productData);
+        // $productData = [
+        //     [
+        //         "name" => "Cam1",
+        //         "code" => "AXXXXXX",
+        //         "categoryId" => 256
+        //     ]
+        // ];
+        // $this->addProduct($token, $productData);
+        // sleep(5);
+        // $this->productSearch($token);
+
+        $this->deleteCategory($token, 256);
         sleep(5);
-        $this->productSearch($token);
+        $this->getCategories($token);
 
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
