@@ -103,6 +103,8 @@ class WisersellCommand extends AbstractCommand
                 echo "New token saved to file.\n";
             } else {
                 echo "Failed to get bearer token. Response: " . $response . "\n";
+                echo "Failed to get bearer token. result: " . $result . "\n";
+
             }
         } 
         curl_close($ch);
