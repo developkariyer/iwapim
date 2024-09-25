@@ -22,33 +22,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $url = "https://dev2.wisersell.com/restapi/token"; 
-        $data = [
-            "email" => $_ENV['WISERSELL_DEV_USER'],
-            "password" => $_ENV['WISERSELL_DEV_PASSWORD']
-        ];
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
-        } else {
-            $result = json_decode($response, true);
-            if (isset($result['token'])) {
-                echo "Bearer Token: " . $result['token'] . "\n";
-            } else {
-                echo "Failed to get bearer token. Response: " . $response . "\n";
-                echo "Failed to get bearer token. result: " . $result . "\n";
-            }
-        }
-        echo "\n\n\n\n\n\n**********\n\n\n\n\n\n";
+       
         $this->getAccessToken();
 
         // $listingObject = new Product\Listing();
@@ -127,11 +101,12 @@ class WisersellCommand extends AbstractCommand
                     unlink($token_file);
                     echo "Old token file deleted.\n";
                 }
-                file_put_contents($token_file, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
+                $token = $result['token'];
+                $formattedString = "{'token':'$token'}";
+                file_put_contents($token_file, $formattedString);
                 echo "New token saved to file.\n";
             } else {
                 echo "Failed to get bearer token. Response: " . $response . "\n";
-                echo "Failed to get bearer token. result: " . $result . "\n";
             }
         } 
         curl_close($ch);
