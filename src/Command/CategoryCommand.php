@@ -39,8 +39,8 @@ class CategoryCommand extends AbstractCommand{
                 $pathParts = explode('/', $parentPath);
                 if (isset($pathParts[2])) {
                     $secondIndex = $pathParts[2]; 
-                    $nameBeforeDash = explode('-', $secondIndex)[0];
-                    echo "\n İkinci indeksteki isim: " . $nameBeforeDash; 
+                    $productCode = explode('-', $secondIndex)[0];
+                    
                 }
             }
         }
