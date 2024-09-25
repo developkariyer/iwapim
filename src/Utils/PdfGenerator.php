@@ -131,7 +131,7 @@ class PdfGenerator
     
         $pdf->SetXY(10, 11.6);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(1, 14.3);
+        $pdf->SetXY(1, 14.5);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
         $pdf->SetXY(1, 18);
