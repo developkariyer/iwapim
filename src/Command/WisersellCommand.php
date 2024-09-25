@@ -92,7 +92,7 @@ class WisersellCommand extends AbstractCommand
             echo "cURL Error: $error";
         } else {
             $responseData = json_decode($response, true);
-            echo "Response: " . $responseData;
+            echo "Response: " . $response;
             // if (isset($responseData['taken'])) {
             //     echo "Bearer Token: " . $responseData['taken'];
             //     $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
