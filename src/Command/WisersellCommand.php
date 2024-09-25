@@ -22,7 +22,6 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$this->getAccessToken();
         $url = "https://dev2.wisersell.com/restapi/token"; 
         $data = [
             "email" => $_ENV['WISERSELL_DEV_USER'],
@@ -49,6 +48,9 @@ class WisersellCommand extends AbstractCommand
                 echo "Failed to get bearer token. result: " . $result . "\n";
             }
         }
+        echo "\n\n\n\n\n\n**********\n\n\n\n\n\n";
+        $this->getAccessToken();
+
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
         // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
@@ -118,14 +120,14 @@ class WisersellCommand extends AbstractCommand
             echo "cURL Error: $error";
         } else {
             $result = json_decode($response, true);
-            if (isset($result['taken'])) {
-                echo "Bearer Token: " . $result['taken'] . "\n";
+            if (isset($result['token'])) {
+                echo "Bearer Token: " . $result['token'] . "\n";
                 $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
                 if (file_exists($token_file)) {
                     unlink($token_file);
                     echo "Old token file deleted.\n";
                 }
-                file_put_contents($token_file, json_encode(['token' => $result['taken']], JSON_PRETTY_PRINT));
+                file_put_contents($token_file, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
                 echo "New token saved to file.\n";
             } else {
                 echo "Failed to get bearer token. Response: " . $response . "\n";
