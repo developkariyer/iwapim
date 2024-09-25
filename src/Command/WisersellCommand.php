@@ -58,14 +58,14 @@ class WisersellCommand extends AbstractCommand
             echo "Token file exists.\n";
             $file_contents = file_get_contents($token_file);
             $token = json_decode($file_contents, true);
-            if ($token === null || !isset($token['token'])) {
+            if ($token === null || !isset($token['taken'])) {
                 echo "Invalid token file content. Fetching new token...\n";
                 $this->fetchToken(); 
-            } elseif ($this->isTokenExpired($token['token'])) {
+            } elseif ($this->isTokenExpired($token['taken'])) {
                 echo "Token expired. Fetching new token...\n";
                 $this->fetchToken(); 
             } else {
-                echo "Bearer Token: " . $token['token'] . "\n";
+                echo "Bearer Token: " . $token['taken'] . "\n";
             }
         } else {
             echo "Token file not found or empty. Fetching new token...\n";
@@ -91,21 +91,14 @@ class WisersellCommand extends AbstractCommand
             $error = curl_error($ch);
             echo "cURL Error: $error";
         } else {
-            $responseData = json_decode($response, true);
-            echo "Response: " . $response;
-            // if (isset($responseData['taken'])) {
-            //     echo "Bearer Token: " . $responseData['taken'];
-            //     $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
-            //     if (file_exists($token_file)) {
-            //         unlink($token_file); 
-            //         echo "Old token file deleted.\n";
-            //     }
-            //     file_put_contents($token_file, json_encode(['token' => $responseData['taken']], JSON_PRETTY_PRINT));
-            //     echo "New token saved to file.\n";
-            // } else {
-            //     echo "Failed to get bearer token. Response: " . $response;
-            // }
-        }
+            $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
+            if (file_exists($token_file)) {
+                unlink($token_file); 
+                echo "Old token file deleted.\n";
+            }
+            file_put_contents($token_file, $response);
+            echo "New token saved to file.\n";
+        } 
         curl_close($ch);
     }
     protected function isTokenExpired($token){
