@@ -29,6 +29,9 @@
                                 {{ product.variationColor }}<br>
                                 {{ product.productDimension1 }}x{{ product.productDimension2 }}x{{ product.productDimension3 }}cm {{ product.packageWeight }}kg
                             </small>
+                            {% for document in product.documents|default([]) %}
+                                <br><a href="{{ document.url }}" target="_blank">{{ document.name }}</a>
+                            {% endfor %}
                         </td>
                         <td><img src="{{ product.imageUrl }}" alt="Product Image" style="max-width: 100px; max-height: 100px;"></td>
                         <td class="text-end">{{ product.productCost }}</td>

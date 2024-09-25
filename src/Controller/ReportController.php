@@ -74,6 +74,7 @@ class ReportController extends FrontendController
                 'bundleItems' => $product->getBundleItems(),
                 'prices' => $prices,
                 'sticker' => $sticker,
+                'documents' => $product->getInheritedField('technicals'),
             ];
             unset($product);
             unset($productModels);
@@ -160,6 +161,7 @@ class ReportController extends FrontendController
             'bundleItems' => $product->getBundleItems(),
             'prices' => $prices,
             'sticker' => '',
+            'documents' => $product->getInheritedField('technicals'),
         ];
     }
  
@@ -279,7 +281,6 @@ class ReportController extends FrontendController
         unset($products);
         unset($pricingModels);
         gc_collect_cycles();
-        usleep(500000);
 
         return $this->render('202409/group.html.twig', [
             'title' => $group->getKey(),
