@@ -444,9 +444,24 @@ class Product extends Concrete
         return 0;
     }
 
-    public function checkSticker4x6()
+    public function checkSticker4x6iwasku()
     {
-        return PdfGenerator::generate4x6('', '',  $this, "{$this->getKey()}_4x6.pdf");
+        $asset = PdfGenerator::generate4x6('', '',  $this, "{$this->getKey()}_4x6iwasku.pdf");
+        if ($asset) {
+            $this->setSticker4x6iwasku($asset);
+            $this->save();
+        }
+        return $asset;
+    }
+
+    public function checkSticker4x6eu()
+    {
+        $asset = PdfGenerator::generate4x6('', '',  $this, "{$this->getKey()}_4x6eu.pdf");
+        if ($asset) {
+            $this->setSticker4x6eu($asset);
+            $this->save();
+        }
+        return $asset;
     }
 
 }

@@ -107,9 +107,6 @@ class PdfGenerator
         $asset->setParent(Asset::getByPath('/Etiketler/Ürün')); // Ensure this folder exists in Pimcore
         $asset->save();
         unlink($pdfFilePath); // Clean up the temporary PDF file
-        $product->setSticker4x6($asset);
-        $product->save();
-    
         return $asset;
     }
     
