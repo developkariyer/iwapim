@@ -42,8 +42,8 @@ class WisersellCommand extends AbstractCommand
             echo "cURL Error: $error";
         } else {
             $result = json_decode($response, true);
-            if (isset($result['taken'])) {
-                echo "Bearer Token: " . $result['taken'] . "\n";
+            if (isset($result['token'])) {
+                echo "Bearer Token: " . $result['token'] . "\n";
             } else {
                 echo "Failed to get bearer token. Response: " . $response . "\n";
                 echo "Failed to get bearer token. result: " . $result . "\n";
