@@ -19,7 +19,7 @@ use Pimcore\Model\DataObject\Product;
 class CategoryCommand extends AbstractCommand{
     protected function execute(InputInterface $input, OutputInterface $output): int{
         $listingObject = new Product\Listing();
-        $pageSize = 1;
+        $pageSize = 50;
         $offset = 0;
         while(true){
             $products = $listingObject->load($pageSize, $offset);
@@ -28,7 +28,7 @@ class CategoryCommand extends AbstractCommand{
             }
             foreach($products as $product){
                 echo $product->getParent();
-                
+
             }
             $offset += $pageSize;
         }
