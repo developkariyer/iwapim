@@ -28,11 +28,11 @@ class WisersellCommand extends AbstractCommand{
         //$this->getCategories($token);
 
         $productData = [
-            [
-                "name" => "Cam1",
-                "code" => "AXXXXXX",
-                "categoryId" => 256
-            ]
+        
+            "name" => "Cam1",
+            "code" => "AXXXXXX",
+            "categoryId" => 256
+        
         ];
         $this->addProduct($token, $productData);
         sleep(5);
