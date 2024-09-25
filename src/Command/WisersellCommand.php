@@ -97,7 +97,7 @@ class WisersellCommand extends AbstractCommand{
                     $wisersellId = $decodedResponse["rows"][0]['id'];
                     try {
                         $product->setWisersellId($wisersellId); 
-                        $product->setWisersellJson($decodedResponse);
+                        $product->setWisersellJson($response);
                         $product->save();
                         echo "WisersellId updated successfully: " . $wisersellId;
                     } catch (Exception $e) {
