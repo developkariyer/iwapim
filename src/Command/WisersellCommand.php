@@ -87,24 +87,25 @@ class WisersellCommand extends AbstractCommand
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         $response = curl_exec($ch);
-        echo $response;
-        // if ($response === false) {
-        //     $error = curl_error($ch);
-        //     echo "cURL Error: $error";
-        // } else {
-        //     if (isset($response['token'])) {
-        //         echo "Bearer Token: " . $response['token'];
-        //         $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
-        //         if (file_exists($token_file)) {
-        //             unlink($token_file); 
-        //             echo "Old token file deleted.\n";
-        //         }
-        //         file_put_contents($token_file, $response);
-        //         echo "New token saved to file.\n";
-        //     } else {
-        //         echo "Failed to get bearer token. Response: " . $response;
-        //     }
-        // }
+        echo $responseData;
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            $responseData = json_decode($response, true);
+            if (isset($responseData['taken'])) {
+                echo "Bearer Token: " . $responseData['taken'];
+                $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
+                if (file_exists($token_file)) {
+                    unlink($token_file); 
+                    echo "Old token file deleted.\n";
+                }
+                file_put_contents($token_file, json_encode(['token' => $responseData['taken']], JSON_PRETTY_PRINT));
+                echo "New token saved to file.\n";
+            } else {
+                echo "Failed to get bearer token. Response: " . $response;
+            }
+        }
         curl_close($ch);
     }
     protected function isTokenExpired($token){
