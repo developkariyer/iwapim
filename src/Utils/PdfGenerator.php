@@ -123,34 +123,33 @@ class PdfGenerator
         $pdf->SetMargins(0, 0, 0);
     
         // Use a font that supports Turkish characters
-        //$pdf->AddFont('DejaVu','','DejaVuSansCondensed',true);
         $pdf->SetFont('helvetica', '', 6);
     
-        // Add QR code (optional)
-        $pdf->Image(self::generateQR($qrcode, $qrlink.'EU'), 2, 2, 10, 10); // Adjust the position and size as needed
+        // EU RP Information
+        $pdf->SetXY(2, 2);
+        $pdf->MultiCell(56, 4, mb_convert_encoding("EU RP: Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        // EU RP and Manufacturer Info
-        $pdf->SetXY(12, 2);
-        $pdf->MultiCell(48, 4, mb_convert_encoding("EU RP: Emre Bedel responsible@iwaconcept.com", 'windows-1252', 'UTF-8'), 0, 'L');
+        // Placeholder for Factory Sign (place your factory sign PNG here)
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 10, 10, 10); // Adjust the position and size as needed
     
-        $pdf->SetXY(12, 12);
-        $pdf->MultiCell(48, 4, mb_convert_encoding("Manifacture Sign: IWA Concept Ltd.Şti. Ankara/Türkiye iwaconcept.com", 'windows-1252', 'UTF-8'), 0, 'L');
+        // Manufacturer Information
+        $pdf->SetXY(14, 10);
+        $pdf->MultiCell(44, 4, mb_convert_encoding("IWA Concept Ltd.Şti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        // Product Information (PN and SN)
-        $pdf->SetXY(0, 24);
-        $pdf->Cell(60, 4, "PN: IA1230123456", 0, 1, 'C');
+        // Product Information (PN and SN) - Left Aligned on the Same Line
+        $pdf->SetXY(2, 24);
+        $pdf->Cell(30, 4, mb_convert_encoding("PN: IA1230123456", 'windows-1254', 'UTF-8'), 0, 0, 'L');
+        
+        $pdf->Cell(30, 4, mb_convert_encoding("SN: 12345", 'windows-1254', 'UTF-8'), 0, 1, 'L');
     
-        $pdf->SetXY(0, 28);
-        $pdf->Cell(60, 4, "SN: 12345", 0, 1, 'C');
-    
-        // Product specific details (existing code)
+        // Product specific details
         $text = $product->getInheritedField("productIdentifier") . " " . $product->getInheritedField("nameEnglish") . "\n";
         $text .= "(" . $product->getInheritedField("name") . ")\n";
         $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
         $text .= "Color: " . $product->getInheritedField("variationColor");
     
-        $pdf->SetXY(2, 34);
-        $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C');
+        $pdf->SetXY(2, 30);
+        $pdf->MultiCell(56, 4, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
     
         // Output PDF to file
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
@@ -165,5 +164,5 @@ class PdfGenerator
         unlink($pdfFilePath); // Clean up the temporary PDF file
         return $asset;
     }
-
+    
 }
