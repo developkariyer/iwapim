@@ -17,11 +17,9 @@ use App\Model\DataObject\VariantProduct;
     description: 'Get product info'
 )]
 
-class WisersellCommand extends AbstractCommand
-{
+class WisersellCommand extends AbstractCommand{
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(InputInterface $input, OutputInterface $output): int{
        
         $this->getAccessToken();
 
@@ -52,8 +50,6 @@ class WisersellCommand extends AbstractCommand
         // }
         return Command::SUCCESS;
     }
-
-    
     protected function getAccessToken(){
         $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
         if (file_exists($token_file) && filesize($token_file) > 0) {
