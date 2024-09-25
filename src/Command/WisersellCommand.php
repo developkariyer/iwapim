@@ -95,7 +95,12 @@ class WisersellCommand extends AbstractCommand
             if (isset($result['taken'])) {
                 echo "Bearer Token: " . $result['taken'];
                 $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
-                file_put_contents($token_file, json_encode(['token' => $result['taken']]));
+                if (file_exists($token_file)) {
+                    unlink($token_file); 
+                    echo "Old token file deleted.\n";
+                }
+                file_put_contents($token_file, json_encode(['token' => $result['taken']], JSON_PRETTY_PRINT));
+                echo "New token saved to file.\n";
             } else {
                 echo "Failed to get bearer token. Response: " . $response;
             }
