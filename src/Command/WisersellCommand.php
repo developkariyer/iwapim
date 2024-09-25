@@ -101,9 +101,7 @@ class WisersellCommand extends AbstractCommand
                     unlink($token_file);
                     echo "Old token file deleted.\n";
                 }
-                $token = $result['token'];
-                $formattedString = "{'token':'$token'}";
-                file_put_contents($token_file, $formattedString);
+                file_put_contents($token_file, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
                 echo "New token saved to file.\n";
             } else {
                 echo "Failed to get bearer token. Response: " . $response . "\n";
