@@ -135,7 +135,7 @@ class WisersellCommand extends AbstractCommand{
             'Authorization: Bearer ' . $token
         ]);
 
-        curl_setopt($ch);
+        //curl_setopt($ch);
         $response = curl_exec($ch);
         if ($response === false) {
             $error = curl_error($ch);
