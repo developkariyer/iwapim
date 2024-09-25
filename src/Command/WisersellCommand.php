@@ -21,8 +21,8 @@ class WisersellCommand extends AbstractCommand{
 
     protected function execute(InputInterface $input, OutputInterface $output): int{
        
-        $token = $this->getAccessToken();
-        sleep(2);
+        //$token = $this->getAccessToken();
+        //sleep(2);
         //$this->productSearch($token);
         //$this->addCategory($token, ["metal"]);
         //$this->getCategories($token);
@@ -41,17 +41,19 @@ class WisersellCommand extends AbstractCommand{
         // $this->deleteCategory($token, 257);
         // sleep(5);
         // $this->getCategories($token);
-        $productData = [
-            [
-                "id" => 182,
-                "name" => "Cam1 Edited",
-                "code" => "Edited Code",
-                "categoryId" => 256
-            ]
-        ];
-        $this->updateProduct($token, $productData);
-        sleep(5);
-        $this->productSearch($token);
+
+        // $productData = [
+        //     [
+        //         "id" => 182,
+        //         "name" => "Cam1 Edited",
+        //         "code" => "Edited Code",
+        //         "categoryId" => 256
+        //     ]
+        // ];
+        // $this->updateProduct($token, $productData);
+        // sleep(5);
+        // $this->productSearch($token);
+
 
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
@@ -59,25 +61,28 @@ class WisersellCommand extends AbstractCommand{
         // $pageSize = 50;
         // $offset = 0;
 
-        // while (true) {
-        //     $listingObject->setLimit($pageSize);
-        //     $listingObject->setOffset($offset);
-        //     $products = $listingObject->load();
-        //     if (empty($products)) {
-        //         break;
-        //     }
-        //     echo "\nProcessed {$offset} ";
-        //     $offset += $pageSize;
-        //     foreach ($products as $product) {
-        //             echo "\n iwasku değeri: " . $product->getIwasku();
-        //             get access token
-        //             search
-        //             if found
-        //                 update product
-        //             else
-        //                 create product
-        //     }
-        // }
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
+
+                // $productData = [
+                //     [
+                //         "name" => $product->getName(),
+                //         "code" => $product->getIwasku(),
+                //         "categoryId" => 256
+                //     ]
+                // ];
+
+            }
+        }
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
