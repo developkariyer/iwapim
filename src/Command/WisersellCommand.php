@@ -21,18 +21,20 @@ class WisersellCommand extends AbstractCommand{
 
     protected function execute(InputInterface $input, OutputInterface $output): int{
        
-        $token = $this->getAccessToken();
-        sleep(2);
-        $searchData = [
-            "code"=>"IA00500MRVE9",
-            "page"=> 0,
-            "pageSize"=> 10,
-        ];
-        $response = $this->productSearch($token,$searchData);
-        $decodedResponse = json_decode($response, true);
-        $id = $decodedResponse["rows"][0]['id'];
-        print_r($id);
+        // $token = $this->getAccessToken();
+        // sleep(2);
+        // $searchData = [
+        //     "code"=>"IA00500MRVE9",
+        //     "page"=> 0,
+        //     "pageSize"=> 10,
+        // ];
+        // $response = $this->productSearch($token,$searchData);
+        // $decodedResponse = json_decode($response, true);
+        // $id = $decodedResponse["rows"][0]['id'];
+
+
         
+
         //$this->addCategory($token, ["metal"]);
         //$this->getCategories($token);
 
@@ -64,36 +66,57 @@ class WisersellCommand extends AbstractCommand{
         // $this->productSearch($token);
 
 
-        // $listingObject = new Product\Listing();
-        // $listingObject->setUnpublished(false);
-        // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        // $pageSize = 1;
-        // $offset = 0;
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
+        $pageSize = 1;
+        $offset = 0;
+                                                            
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
+                $token = $this->getAccessToken();
+                sleep(4);
+                $searchData = [
+                    "code"=>$product->getInheritedField("iwasku"),
+                    "page"=> 0,
+                    "pageSize"=> 10,
+                ];
+                $response = $this->productSearch($token,$searchData);
+                $decodedResponse = json_decode($response, true);
+                $wisersellId = $decodedResponse["rows"][0]['id'];
+                if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
+                    $wisersellId = $decodedResponse["rows"][0]['id'];
+                    try {
+                        $product->setInheritedField("wisersellId", $wisersellId);
+                        echo "WisersellId updated successfully: " . $wisersellId;
+                    } catch (Exception $e) {
+                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                    }
+                } else {
+                    echo "'id' field not found or is empty in the API response.";
+                }
+                
 
-        // while (true) {
-        //     $listingObject->setLimit($pageSize);
-        //     $listingObject->setOffset($offset);
-        //     $products = $listingObject->load();
-        //     if (empty($products)) {
-        //         break;
-        //     }
-        //     echo "\nProcessed {$offset} ";
-        //     $offset += $pageSize;
-        //     foreach ($products as $product) {
-        //         echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-        //         $token = $this->getAccessToken();
-        //         sleep(4);
-        //         $productData = [
-        //             [
-        //                 "name" => $product->getInheritedField("name"),
-        //                 "code" => $product->getInheritedField("iwasku"),
-        //                 "categoryId" => 256
-        //             ]
-        //         ];
-        //         $this->addProduct($token, $productData);
+                // $productData = [
+                //     [
+                //         "name" => $product->getInheritedField("name"),
+                //         "code" => $product->getInheritedField("iwasku"),
+                //         "categoryId" => 256
+                //     ]
+                // ];
+                // $this->addProduct($token, $productData);
 
-        //     }
-        // }
+            }
+        }
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
