@@ -171,7 +171,7 @@ class WisersellCommand extends AbstractCommand{
     protected function addCategory($token,$category){
         $url = "https://dev2.wisersell.com/restapi/category"; 
         $data = [
-            "name" => $category
+            "name" => "Cam"
         ];
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
