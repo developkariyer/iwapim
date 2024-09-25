@@ -123,6 +123,7 @@ class PdfGenerator
         $pdf->SetFont('helvetica', '', 6);
     
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8); // Adjust the position and size as needed
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 42, 2, 8, 5); // Adjust the position and size as needed
     
         $pdf->SetXY(10, 2);
         $pdf->MultiCell(44, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
