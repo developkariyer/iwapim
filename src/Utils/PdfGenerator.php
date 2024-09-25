@@ -124,7 +124,7 @@ class PdfGenerator
     
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
         $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 1, 60, 15);
+        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 28, 48, 12);
     
         $pdf->SetXY(10, 2);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
