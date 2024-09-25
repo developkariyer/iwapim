@@ -131,17 +131,17 @@ class PdfGenerator
     
         $pdf->SetXY(10, 11.6);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(1, 13);
+        $pdf->SetXY(1, 14);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
         $pdf->SetXY(1, 18);
-        $pdf->MultiCell(30, 3, mb_convert_encoding("PN: {$product->getInheritedField("productIdentifier")}\nSN: 20240000", 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->MultiCell(30, 2, mb_convert_encoding("PN: {$product->getInheritedField("productIdentifier")}\nSN: 20240000", 'windows-1254', 'UTF-8'), 0, 'L');
     
         $text =  $product->getInheritedField("nameEnglish") . "\n";
         $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor");
 
         $pdf->SetXY(1, 23);
-        $pdf->MultiCell(56, 3, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
+        $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
     
         $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
