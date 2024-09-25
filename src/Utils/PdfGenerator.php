@@ -131,10 +131,10 @@ class PdfGenerator
     
         // EU RP and Manufacturer Info
         $pdf->SetXY(12, 2);
-        $pdf->MultiCell(48, 4, "EU RP: Emre Bedel\nresponsible@iwaconcept.com", 0, 'L');
+        $pdf->MultiCell(48, 4, mb_convert_encoding("EU RP: Emre Bedel responsible@iwaconcept.com", 'windows-1252', 'UTF-8'), 0, 'L');
     
         $pdf->SetXY(12, 12);
-        $pdf->MultiCell(48, 4, "(Manifacture Sign): IWA Concept Ltd.Şti.\nAnkara/Türkiye\niwaconcept.com", 0, 'L');
+        $pdf->MultiCell(48, 4, mb_convert_encoding("Manifacture Sign: IWA Concept Ltd.Şti. Ankara/Türkiye iwaconcept.com", 'windows-1252', 'UTF-8'), 0, 'L');
     
         // Product Information (PN and SN)
         $pdf->SetXY(0, 24);
