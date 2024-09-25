@@ -72,14 +72,16 @@ class WisersellCommand extends AbstractCommand{
             $offset += $pageSize;
             foreach ($products as $product) {
                 echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-
-                // $productData = [
-                //     [
-                //         "name" => $product->getName(),
-                //         "code" => $product->getIwasku(),
-                //         "categoryId" => 256
-                //     ]
-                // ];
+                $token = $this->getAccessToken();
+                sleep(2);
+                $productData = [
+                    [
+                        "name" => $product->getName(),
+                        "code" => $product->getIwasku(),
+                        "categoryId" => 256
+                    ]
+                ];
+                $this->addProduct($token, $productData);
 
             }
         }
