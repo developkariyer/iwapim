@@ -54,33 +54,55 @@ class WisersellCommand extends AbstractCommand
 
     protected function getAccessToken()
     {
-        
-        $url = "https://dev2.wisersell.com/restapi/token"; 
-        $data = [
-            "email" => $_ENV['WISERSELL_DEV_USER'],
-            "password" => $_ENV['WISERSELL_DEV_PASSWORD']
-        ];
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
-        } else {
-            $result = json_decode($response, true);
-            if (isset($result['taken'])) {
-                echo "Bearer Token: " . $result['taken'];
+        $token_file = "../tmp/wisersell_access_token.json";
+        if (file_exists($token_file)) {
+            $token = json_decode(file_get_contents($token_file), true);
+            if ($this->isTokenExpired($token['token'])) {
+                echo "Token expired. Fetching new token...";
             } else {
-                echo "Failed to get bearer token. Response: " . $response;
+                echo "Bearer Token: " . $token['token'];
             }
         }
-        curl_close($ch);
+        // } else {
+        //     $this->fetchToken();
+        // }
+        // $url = "https://dev2.wisersell.com/restapi/token"; 
+        // $data = [
+        //     "email" => $_ENV['WISERSELL_DEV_USER'],
+        //     "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+        // ];
+        // $ch = curl_init($url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Content-Type: application/json',
+        //     'Accept: application/json'
+        // ]);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        // $response = curl_exec($ch);
+        // if ($response === false) {
+        //     $error = curl_error($ch);
+        //     echo "cURL Error: $error";
+        // } else {
+        //     $result = json_decode($response, true);
+        //     if (isset($result['taken'])) {
+        //         echo "Bearer Token: " . $result['taken'];
+        //     } else {
+        //         echo "Failed to get bearer token. Response: " . $response;
+        //     }
+        // }
+        // curl_close($ch);
     }
 
+    protected function isTokenExpired($token)
+    {
+        $tokenParts = explode('.', $token);
+        if (count($tokenParts) === 3) {
+            $payload = json_decode(base64_decode($tokenParts[1]), true);
+            if (isset($payload['exp'])) {
+                return ($payload['exp'] < time());
+            }
+        }
+        return true;
+    }
 }
