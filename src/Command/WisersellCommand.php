@@ -118,6 +118,9 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function productSearch()
     {
+        $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
+        $file_contents = file_get_contents($token_file);
+        $token = json_decode($file_contents, true);
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
         $data = [
             "page"=> 1,
@@ -129,7 +132,7 @@ class WisersellCommand extends AbstractCommand{
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Accept: application/json',
-            'Authorization: Bearer ' . "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDgsIm9yZ2FuaXphdGlvbklkIjoxNSwiY29tcGFueUlkIjpudWxsLCJwZXJtaXNzaW9uIjpbMiwzLDQsNiw3LDgsOSwxMCwxMSwxMiwxMywxNiwyMCwyMSwyMiwyMywyNCwyNSwyNiwyNywyOCwyOSw1LDMwLDMxLDMyLDE4LDE3XSwiaWF0IjoxNzI3MjUwNjczLCJleHAiOjE3MjcyNTQyNzN9.2pO92EwcB6rutyx_9-6nBdNmmY9m1C8IjQtF7BLo33g"
+            'Authorization: Bearer ' . $token['token']
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         $response = curl_exec($ch);
@@ -137,7 +140,6 @@ class WisersellCommand extends AbstractCommand{
             $error = curl_error($ch);
             echo "cURL Error: $error";
         } else {
-            $result = json_decode($response, true);
             echo "Response: " . $response . "\n";
         }
     }
