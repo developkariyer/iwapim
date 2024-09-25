@@ -128,9 +128,9 @@ class PdfGenerator
         $pdf->SetXY(10, 2);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
     
-        $pdf->SetXY(10, 12);
+        $pdf->SetXY(12, 12);
         $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
-        $pdf->SetXY(2, 22);
+        $pdf->SetXY(1, 18);
         $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
 
 //        $pdf->MultiCell(56, 3, mb_convert_encoding("Emre Bedel\nresponsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
