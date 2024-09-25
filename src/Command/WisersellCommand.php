@@ -87,7 +87,7 @@ class WisersellCommand extends AbstractCommand
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         $response = curl_exec($ch);
-        echo $responseData;
+        //echo $responseData;
         if ($response === false) {
             $error = curl_error($ch);
             echo "cURL Error: $error";
