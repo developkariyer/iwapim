@@ -66,6 +66,13 @@ class WisersellCommand extends AbstractCommand{
         // $this->productSearch($token);
 
 
+        //**********************************/
+        //**search wisersell for iwasku*****/
+        //**add product to wisersell*****/
+        //**********************************/
+        
+
+
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
