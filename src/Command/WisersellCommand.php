@@ -22,8 +22,6 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-       
-       
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
@@ -56,5 +54,7 @@ class WisersellCommand extends AbstractCommand
             }
         }
         return Command::SUCCESS;
+
+        
     }
 }
