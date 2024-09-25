@@ -109,5 +109,44 @@ class PdfGenerator
         unlink($pdfFilePath); // Clean up the temporary PDF file
         return $asset;
     }
+
+    public static function generate4x6eu(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
+    {
+        $pdf = new Fpdi('L', 'mm', [60, 40]); // Landscape mode, 60x40 mm page
+        $pdf->SetAutoPageBreak(false); // Disable automatic page break
+        $pdf->AddPage();
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetFont('Arial', 'B', 13);
     
+        // Set position for the IWASKU text
+        $pdf->SetXY(0, 2); // Adjusted Y position for better placement
+        $pdf->Cell(60, 10, "IWASKU: {$product->getIwasku()}", 0, 1, 'C'); // 'C' for center alignment, 1 for moving to the next line
+    
+        // Set the font and position for the product details (variation size, color, and identifier)
+        $pdf->SetFont('Arial', '', 10); // Slightly smaller font for product details
+        $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
+    
+        // Prepare text
+        $text = $product->getInheritedField("productIdentifier") . " ". $product->getInheritedField("nameEnglish") . "\n";
+        $text .= "(". $product->getInheritedField("name") . ")\n";
+        $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
+        $text .= "Color: " . $product->getInheritedField("variationColor");
+    
+        // Adjusted width and height for the MultiCell
+        $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
+    
+        // Output PDF to file
+        $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        $pdf->Output($pdfFilePath, 'F');
+    
+        // Save PDF as Pimcore Asset
+        $asset = new Asset\Document();
+        $asset->setFilename($qrfile);
+        $asset->setData(file_get_contents($pdfFilePath));
+        $asset->setParent(Utility::checkSetAssetPath('EU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
+        $asset->save();
+        unlink($pdfFilePath); // Clean up the temporary PDF file
+        return $asset;
+    }
+
 }
