@@ -38,9 +38,20 @@ class WisersellCommand extends AbstractCommand{
         // sleep(5);
         // $this->productSearch($token);
 
-        $this->deleteCategory($token, 257);
+        // $this->deleteCategory($token, 257);
+        // sleep(5);
+        // $this->getCategories($token);
+        $productData = [
+            [
+                "id" => 182,
+                "name" => "Cam1 Edited",
+                "code" => "Edited Code",
+                "categoryId" => 256
+            ]
+        ];
+        $this->updateProduct($token, $productData);
         sleep(5);
-        $this->getCategories($token);
+        $this->productSearch($token);
 
         // $listingObject = new Product\Listing();
         // $listingObject->setUnpublished(false);
@@ -225,7 +236,6 @@ class WisersellCommand extends AbstractCommand{
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
         }
-
     }
     protected function addProduct($token,$data){
         $url = "https://dev2.wisersell.com/restapi/product"; 
@@ -249,6 +259,25 @@ class WisersellCommand extends AbstractCommand{
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
-
-
+    protected function updateProduct($token,$data){
+        $url = "https://dev2.wisersell.com/restapi/product"; 
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'Authorization: Bearer ' . $token
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            echo "cURL Error: $error";
+        } else {
+            echo "Response: " . $response . "\n";
+            $result = json_decode($response, true);
+            echo "Result: " . print_r($result, true) . "\n";
+        }
+    }
 }
