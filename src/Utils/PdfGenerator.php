@@ -65,7 +65,7 @@ class PdfGenerator
         $asset = new Asset\Document();
         $asset->setFilename($qrfile);
         $asset->setData(file_get_contents($pdfFilePath));
-        $asset->setParent(Asset::getByPath('/Etiketler/Ürün')); // Ensure this folder exists in Pimcore
+        $asset->setParent(Utility::checkSetAssetPath('Ürün', Utility::checkSetAssetPath('Etiketler'))); 
         $asset->save();
         unlink($pdfFilePath); // Clean up the temporary PDF file
         return $asset;
