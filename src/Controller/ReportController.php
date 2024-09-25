@@ -273,7 +273,7 @@ class ReportController extends FrontendController
 
         $products = $group->getProducts();
         $pricingModels = [];
-        $productTwig = $this->prepareProductsData($products, $pricingModels, false);
+        $productTwig = $this->prepareProductsData($products, $pricingModels, false, $type);
         $modelTwig = [];
 
         unset($products);
