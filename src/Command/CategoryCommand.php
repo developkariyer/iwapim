@@ -37,9 +37,9 @@ class CategoryCommand extends AbstractCommand{
             foreach($products as $product){
                 $parentPath = $product->getParent();
                 $pathParts = explode('/', $parentPath);
-                if (count($pathParts) >= 2) {
-                    $desiredPart = $pathParts[0] . '/' . $pathParts[1];
-                    echo "\n parent: " . $desiredPart;
+                if (isset($pathParts[0]) && $pathParts[0] === 'Ürünler' && count($pathParts) > 1) {
+                    $firstSubcategory = $pathParts[1]; 
+                    echo "\n İlk alt kategori: " . $firstSubcategory;
                 }
             }
         }
