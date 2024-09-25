@@ -25,6 +25,7 @@ class WisersellCommand extends AbstractCommand{
         sleep(2);
         //$this->productSearch($token);
         $this->addCategory($token, "metal");
+        sleep(5);
         $this->getCategories($token);
 
         // $listingObject = new Product\Listing();
