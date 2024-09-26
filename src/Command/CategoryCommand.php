@@ -69,19 +69,19 @@ class CategoryCommand extends AbstractCommand{
                     $productCode = explode('-', $secondIndex)[0];
                     if($productCode){
                         $productCategory = null;
-                        foreach ($categoryMapping as $codes => $category) {
-                            if (in_array($productCode, $codes)) {  
+                        foreach ($categoryMapping as $category => $codes) {
+                            if (in_array($productCode, $codes)) { 
                                 $productCategory = $category;
                                 break;
                             }
                         }
                         if ($productCategory) {
                             $product->setProductCategory($productCategory);  
-                            $product->save();
+                            $product->save(); 
                             echo "\nUpdated product ID: {$product->getId()} with category: {$productCategory}";
                         } else {
                             echo "\nProduct code {$productCode} not mapped to any category.";
-                        }    
+                        }
                     }
                     
                     //echo "\nProduct Code: {$productCode}";
