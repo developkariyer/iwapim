@@ -435,8 +435,13 @@ class WisersellCommand extends AbstractCommand{
                         $categoryId = $category->getWisersellCategoryId();
                     }
                 }
-                $variationSize = $product->getVariationSize() ?? null;
-                $variationColor = $product->getVariationColor() ?? null;
+                $variationSize = $product->getInheritedField("variationSize") ?? null;
+                $variationColor = $product->getInheritedField("variationColor") ?? null;
+                $length = $product->getInheritedField("packageDimension1") ?? null;
+                $height = $product->getInheritedField("packageDimension2") ?? null;
+                $width = $product->getInheritedField("packageDimension3") ?? null;
+                $weight = $product->getInheritedField("packageWeight") ?? null;
+                
 
                 echo "IWASKU: $iwasku\n";
                 echo "Product Name: $productName\n";
