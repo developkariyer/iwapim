@@ -33,8 +33,10 @@ class WisersellCommand extends AbstractCommand{
             $this->addCategoryByIwapim();
         }
 
-        $token = $this->getAccessToken();
-        $this->getCategories($token);
+        // $token = $this->getAccessToken();
+        // $this->getCategories($token);
+
+        
         // sleep(2);
         // $searchData = [
         //     "code"=>"IA00500MRVE9",
@@ -265,6 +267,7 @@ class WisersellCommand extends AbstractCommand{
         } else {
             echo "Response: " . $response . "\n";
             $result = json_decode($response, true);
+            return $result;
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
@@ -340,12 +343,50 @@ class WisersellCommand extends AbstractCommand{
         foreach ($categories as $category) {
             $data[] = $category->getCategory();
         }
-        $this->addCategory($token, $data);
+        $result = $this->addCategory($token, $data);
+        foreach ($result as $wisersellCategory) {
+            foreach ($categories as $category) {
+                if ($category->getCategory() === $wisersellCategory['name']) {
+                    $category->setWisersellCategoryId($wisersellCategory['id']);
+                    $category->save();
+                    break;
+                }
+            }
+        }
     }
     protected function addProductByIwapim(){
+
+        // urunu gerekli filtrelere gore getir
+        // urunun iwasku bilgisini al
+        // iwasku bilgisi ile wisersellde urun ara
+        // urun varsa urunun id sini al iwapim tarafinda kaydet donen urun bilgisini json olarak ve wisersellid olarak kaydet
+        // urun yoksa: 
+                // urunun category bilgisini al
+                // urunun category bilgisine gore wiserselldeki category id yi bul
+                // urunun diger bilgileri al
+                // urunu wisersellde olustur
+                // olusturulan urunun id sini iwapim tarafinda kaydet donnen urun bilgisini json olarak kaydet
+        
+                
+
+        
+
+
+
+
         $token = $this->getAccessToken();
         sleep(3);
         $listingObject = new Product\Listing();
+        $listingObject->setLimit(100);
+        $listingObject->setUnpublished(false);
+        $products = $listingObject->load();
+        foreach ($products as $product){
+            if ($product->level()==1) continue;
+            $iwasku = $product->getInheritedField("iwasku");
+            $categoryName = $product->getCategory();
+
+        }
+
 
     }
 }
