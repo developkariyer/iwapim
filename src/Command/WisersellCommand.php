@@ -334,6 +334,7 @@ class WisersellCommand extends AbstractCommand{
         foreach ($categories as $category) {
             $data[] = ["name" => $category->getCategory()];
         }
-        $this->addCategory($token, $data);
+        //$this->addCategory($token, $data);
+        print_r($data);
     }
 }
