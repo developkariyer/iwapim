@@ -22,7 +22,7 @@ class ProductAdminStyle extends AdminStyle
         if ($element instanceof Product) {
             switch ($element->level()) {
                 case 0:
-                    $this->elementIcon = '/custom/navyobject.svg';
+                    $this->elementIcon = '/bundles/pimcoreadmin/img/flat-color-icons/shop.svg';    //'/custom/navyobject.svg';
                     break;
                 case 1:
                     $this->elementIcon = (count($element->getListingItems())) ? '/custom/deployment.svg' : '/custom/object.svg';
