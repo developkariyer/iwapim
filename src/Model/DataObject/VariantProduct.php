@@ -125,7 +125,9 @@ class VariantProduct extends Concrete
             $key = $key ? $key+1 : 1;
         }
         $this->setKey(trim("$key_base$key"));
-        $this->setImageUrl($variant['imageUrl'] ?? null);
+        if (!empty($variant['imageUrl'])) {
+            $this->setImageUrl($variant['imageUrl']);
+        }
         $this->setUrlLink($variant['urlLink'] ?? null);
         $this->setSalePrice($variant['salePrice'] ?? '');
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
