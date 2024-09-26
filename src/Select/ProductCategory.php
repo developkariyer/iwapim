@@ -4,8 +4,6 @@ namespace App\Select;
 
 use Pimcore\Model\DataObject\ClassDefinition\Data;
 use Pimcore\Model\DataObject\ClassDefinition\DynamicOptionsProvider\SelectOptionsProviderInterface;
-use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Category\Listing;
 
 class ProductCategory implements SelectOptionsProviderInterface{
@@ -16,6 +14,8 @@ class ProductCategory implements SelectOptionsProviderInterface{
         }
         $options = [];
         $categories = new Listing();
+        $categories->setOrderKey('category');
+        $categories->setOrder('asc');
         foreach ($categories->load() as $category) {
             if ($category->isPublished()) {
                 $options[] = [
