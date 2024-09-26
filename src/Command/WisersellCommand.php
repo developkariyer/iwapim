@@ -382,28 +382,8 @@ class WisersellCommand extends AbstractCommand{
         }
     }
     protected function addProductByIwapim(){
-
-        // urunu gerekli filtrelere gore getir
-        // urunun iwasku bilgisini al
-        // iwasku bilgisi ile wisersellde urun ara
-        // urun varsa urunun id sini al iwapim tarafinda kaydet donen urun bilgisini json olarak ve wisersellid olarak kaydet
-        // urun yoksa: 
-                // urunun category bilgisini al
-                // urunun category bilgisine gore wiserselldeki category id yi bul
-                // urunun diger bilgileri al
-                // urunu wisersellde olustur
-                // olusturulan urunun id sini iwapim tarafinda kaydet donnen urun bilgisini json olarak kaydet
-        
-                
-
-        
-
-
-
-
         //$token = $this->getAccessToken();
         //sleep(3);
-
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
@@ -436,13 +416,10 @@ class WisersellCommand extends AbstractCommand{
                 }
                 $variationSize = $product->getInheritedField("variationSize") ?? null;
                 $variationColor = $product->getInheritedField("variationColor") ?? null;
-
                 $width = $product->getInheritedField("packageDimension1") ?? null;
                 $length = $product->getInheritedField("packageDimension2") ?? null;
                 $height = $product->getInheritedField("packageDimension3") ?? null;
                 $weight = $product->getInheritedField("packageWeight") ?? null;
-                
-
 
                 echo "IWASKU: $iwasku\n";
                 echo "Product Name: $productName\n";
@@ -454,8 +431,6 @@ class WisersellCommand extends AbstractCommand{
                 echo "Length: " . $length . "\n";
                 echo "Height: " . $height . "\n";
                 echo "Weight: " . $weight . "\n";
-
-            
                 echo "--------------------\n";
             }
         }
