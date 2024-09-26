@@ -24,7 +24,6 @@ class CategoryCommand extends AbstractCommand{
         $listingObject = new Product\Listing();
         $pageSize = 50;
         $offset = 0;
-        
         $categoryMapping = [
             'IM' => 'Metal',
             'CM' => 'Metal',
@@ -49,8 +48,6 @@ class CategoryCommand extends AbstractCommand{
             'ITS' => 'Tabletop',
             'KV' => 'Kanvas',
         ];
-
-
         while(true){
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
@@ -60,7 +57,6 @@ class CategoryCommand extends AbstractCommand{
             }
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
-
             foreach($products as $product){
                 $parentPath = $product->getParent();
                 $pathParts = explode('/', $parentPath);
@@ -78,7 +74,6 @@ class CategoryCommand extends AbstractCommand{
                             echo "\nProduct code {$productCode} not mapped to any category.";
                         }
                     }
-                    //echo "\nProduct Code: {$productCode}";
                 }
             }
         }
