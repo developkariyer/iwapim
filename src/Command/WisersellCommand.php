@@ -46,7 +46,7 @@ class WisersellCommand extends AbstractCommand{
         $productData = [
             [
                 "id" => 10,  
-                "name" => "Mobilya2",
+                "name" => "Mobilya3",
                 "code" => "AXXXXXX",
                 "weight" => 1.34,
                 "deci" => 1.34, 
@@ -61,8 +61,7 @@ class WisersellCommand extends AbstractCommand{
                     "aasss", 
                     
                 ],
-                "categoryId" => 285, 
-                
+                "categoryId" => 285
             ]
         ];
         $this->addProduct($token, $productData);        
@@ -337,7 +336,7 @@ class WisersellCommand extends AbstractCommand{
             $error = curl_error($ch);
             echo "cURL Error: $error";
         } else {
-            echo "Response: " . $response . "\n";
+            echo "Response: " . print_r($result, true) . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
         }
