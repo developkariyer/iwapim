@@ -36,8 +36,6 @@ class WisersellCommand extends AbstractCommand{
             $this->addProductByIwapim();
         }
         
-        
-
 
         // $token = $this->getAccessToken();
         // sleep(3);
