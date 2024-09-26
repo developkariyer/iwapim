@@ -41,7 +41,20 @@ class WisersellCommand extends AbstractCommand{
         
 
 
-
+        $token = $this->getAccessToken();
+        sleep(3);
+        $productData = [
+            [
+                "name" => "Mobilya",
+                "code" => "AXXXXXX",
+                "categoryId" => 285,
+                "weight" => 1.34,
+                "width" => 1.34,
+                "length" => 1.34,
+                "height" => 1.34,
+            ]
+        ];
+        $this->addProduct($token, $productData);        
 
         // sleep(2);
         // $searchData = [
