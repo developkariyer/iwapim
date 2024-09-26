@@ -33,10 +33,10 @@ class WisersellCommand extends AbstractCommand{
             $this->addCategoryByIwapim();
         }
 
-        // $token = $this->getAccessToken();
-        // $this->getCategories($token);
+        $token = $this->getAccessToken();
+        $this->getCategories($token);
 
-        
+
         // sleep(2);
         // $searchData = [
         //     "code"=>"IA00500MRVE9",
