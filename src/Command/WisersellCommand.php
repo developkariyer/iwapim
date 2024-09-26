@@ -425,7 +425,7 @@ class WisersellCommand extends AbstractCommand{
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
             foreach ($products as $product) {
-                if ($product->level()==1) continue;
+                if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
                 $productName = $product->getInheritedField("name"); 
 
@@ -443,6 +443,7 @@ class WisersellCommand extends AbstractCommand{
                 $length = $product->getInheritedField("packageDimension2") ?? null;
                 $height = $product->getInheritedField("packageDimension3") ?? null;
                 $weight = $product->getInheritedField("packageWeight") ?? null;
+                $desi = $product->getInheritedField("desi") ?? null;
 
 
                 echo "IWASKU: $iwasku\n";
@@ -455,6 +456,8 @@ class WisersellCommand extends AbstractCommand{
                 echo "Length: " . $length . "\n";
                 echo "Height: " . $height . "\n";
                 echo "Weight: " . $weight . "\n";
+                echo "Desi: " . $desi . "\n";
+
             
                 echo "--------------------\n";
             }
