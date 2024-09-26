@@ -437,11 +437,12 @@ class WisersellCommand extends AbstractCommand{
                 }
                 $variationSize = $product->getInheritedField("variationSize") ?? null;
                 $variationColor = $product->getInheritedField("variationColor") ?? null;
-                $length = $product->getInheritedField("packageDimension1") ?? null;
-                $height = $product->getInheritedField("packageDimension2") ?? null;
-                $width = $product->getInheritedField("packageDimension3") ?? null;
+
+                $width = $product->getInheritedField("packageDimension1") ?? null;
+                $length = $product->getInheritedField("packageDimension2") ?? null;
+                $height = $product->getInheritedField("packageDimension3") ?? null;
                 $weight = $product->getInheritedField("packageWeight") ?? null;
-                
+
 
                 echo "IWASKU: $iwasku\n";
                 echo "Product Name: $productName\n";
@@ -449,6 +450,11 @@ class WisersellCommand extends AbstractCommand{
                 echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
                 echo "Variation Size: " . $variationSize . "\n";
                 echo "Variation Color: " . $variationColor . "\n";
+                echo "Width: " . $width . "\n";
+                echo "Length: " . $length . "\n";
+                echo "Height: " . $height . "\n";
+                echo "Weight: " . $weight . "\n";
+            
                 echo "--------------------\n";
             }
         }
