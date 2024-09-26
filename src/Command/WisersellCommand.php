@@ -41,31 +41,31 @@ class WisersellCommand extends AbstractCommand{
         
 
 
-        $token = $this->getAccessToken();
-        sleep(3);
-        $productData = [
-            [
-                "id" => 10,  
-                "name" => "Mobilya3",
-                "code" => "AXXXXXX",
-                "weight" => 1.34,
-                "deci" => 1.34, 
-                "width" => 1.34,
-                "length" => 1.34,
-                "height" => 1.34,
-                "extradata" => [
-                    "color" => "gray"  
-                ],
-                "arrsku" => [
-                    "AXSSW", 
-                    "aasss", 
+        // $token = $this->getAccessToken();
+        // sleep(3);
+        // $productData = [
+        //     [
+        //         "id" => 10,  
+        //         "name" => "Mobilya3",
+        //         "code" => "AXXXXXX",
+        //         "weight" => 1.34,
+        //         "deci" => 1.34, 
+        //         "width" => 1.34,
+        //         "length" => 1.34,
+        //         "height" => 1.34,
+        //         "extradata" => [
+        //             "color" => "gray"  
+        //         ],
+        //         "arrsku" => [
+        //             "AXSSW", 
+        //             "aasss", 
                     
-                ],
-                "categoryId" => 285,
-                "subproducts" => []
-            ]
-        ];
-        $this->addProduct($token, $productData);        
+        //         ],
+        //         "categoryId" => 285,
+        //         "subproducts" => []
+        //     ]
+        // ];
+        // $this->addProduct($token, $productData);        
 
         // sleep(2);
         // $searchData = [
@@ -427,6 +427,7 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 $iwasku = $product->getInheritedField("iwasku");
                 $productName = $product->getInheritedField("name"); 
+
                 $categoryName = $product->getProductCategory();
                 $categoryId = null;
                 foreach($categories as $category){
@@ -434,11 +435,13 @@ class WisersellCommand extends AbstractCommand{
                         $categoryId = $category->getWisersellCategoryId();
                     }
                 }
+                $variationSizeList[] = $product->getVariationSizeList();
 
                 echo "IWASKU: $iwasku\n";
                 echo "Product Name: $productName\n";
                 echo "Category Name: $categoryName\n";
                 echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
+                echo "Variation Size List: " . print_r($variationSizeList, true) . "\n";
                 echo "--------------------\n";
             }
         }
