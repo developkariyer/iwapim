@@ -336,7 +336,7 @@ class WisersellCommand extends AbstractCommand{
             $error = curl_error($ch);
             echo "cURL Error: $error";
         } else {
-            echo "Response: " . print_r($result, true) . "\n";
+            echo "Response: " . print_r($response, true) . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
         }
