@@ -14,7 +14,7 @@ use App\Model\DataObject\VariantProduct;
 
 #[AsCommand(
     name: 'app:category',
-    description: 'product category'
+    description: 'set product category'
 )]
 
 class CategoryCommand extends AbstractCommand{
@@ -57,7 +57,8 @@ class CategoryCommand extends AbstractCommand{
             }
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
-            foreach($products as $product){
+            foreach ($products as $product){
+                if ($product->level()==1) continue;
                 $parentPath = $product->getParent();
                 $pathParts = explode('/', $parentPath);
                 if (isset($pathParts[2])) {
@@ -68,7 +69,6 @@ class CategoryCommand extends AbstractCommand{
                             $productCategory = $categoryMapping[$productCode];
                             $product->setProductCategory($productCategory);
                             $product->save();
-                            
                             echo "\nUpdated product ID: {$product->getId()} with category: {$productCategory}";
                         } else {
                             echo "\nProduct code {$productCode} not mapped to any category.";
