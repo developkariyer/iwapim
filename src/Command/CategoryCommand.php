@@ -24,6 +24,33 @@ class CategoryCommand extends AbstractCommand{
         $listingObject = new Product\Listing();
         $pageSize = 50;
         $offset = 0;
+        
+        $categoryMapping = [
+            'IM' => 'Metal',
+            'CM' => 'Metal',
+            'CMS' => 'Metal',
+            'IMS' => 'Metal',
+            'SC' => 'Cam',
+            'SCS' => 'Cam',
+            'CT' => 'Cam',
+            'IA' => 'Ahsap',
+            'IAS' => 'Ahsap',
+            'TA' => 'Ahsap',
+            'TAS' => 'Ahsap',
+            'TT' => 'Ahsap',
+            'AHM' => 'Mobilya',
+            'CA' => 'Harita',
+            'CAS' => 'Harita',
+            'CMA' => 'Harita',
+            'DS' => 'Alsat',
+            'IJ' => 'Taki',
+            'KUL' => 'Kulube',
+            'IT' => 'Tabletop',
+            'ITS' => 'Tabletop',
+            'KV' => 'Kanvas',
+        ];
+
+
         while(true){
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
@@ -40,6 +67,14 @@ class CategoryCommand extends AbstractCommand{
                 if (isset($pathParts[2])) {
                     $secondIndex = $pathParts[2]; 
                     $productCode = explode('-', $secondIndex)[0];
+                    // if($productCode){
+                        
+    
+                    // }
+                    echo "\nProduct Code: {$productCode}";
+
+
+                    //$product->setProductCategory($productCode);
                     
                 }
             }
