@@ -332,9 +332,8 @@ class WisersellCommand extends AbstractCommand{
         $categories = $listingObject->load();
         $data = [];
         foreach ($categories as $category) {
-            $data[] = ["name" => $category->getCategory()];
+            $data[] = $category->getCategory();
         }
-        //$this->addCategory($token, $data);
-        print_r($data);
+        $this->addCategory($token, $data);
     }
 }
