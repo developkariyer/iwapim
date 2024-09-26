@@ -115,7 +115,6 @@ class AmazonConnector implements MarketplaceConnectorInterface
         if (substr(string: $report, offset: 0, length: 3) === "\xEF\xBB\xBF") {
             $report = substr(string: $report, offset: 3);
         }
-
         $this->amazonReports[$reportType][$country] = $report;
     }
 
@@ -124,44 +123,59 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $asins = [];
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
-        $folder = Folder::getById(231104);
-        $amazonVariants = $folder->getChildren();
-        echo count(value: $amazonVariants) . " listings ";
-        foreach ($amazonVariants as $amazonVariant) {
-            if (!$amazonVariant instanceof VariantProduct) {
-                continue;
+        $pageSize = 50;
+        $offset = 0;
+        while(true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $variantProducts = $listingObject->load();
+            if (empty($variantProducts)) {
+                break;
             }
-            $tmp = ['asin' => $amazonVariant->getUniqueMarketplaceId()];
-            foreach ($amazonVariant->getAmazonMarketplace() as $amazonMarketplace) {
-                $activeId = $anyId = null;
-                $amazonMarketplaceId = $anyId = $amazonMarketplace->getMarketplaceId();
-                if (!$amazonMarketplace instanceof AmazonMarketplace) {
+            foreach ($variantProducts as $variantProduct) {
+                if (!$variantProduct instanceof VariantProduct) {
+                    echo "Not a variant product\n";
                     continue;
                 }
-                if ($amazonMarketplace->getStatus() === 'Active') {
-                    $activeId = $amazonMarketplaceId;
-                    if ($amazonMarketplaceId === 'US' || $amazonMarketplaceId === 'UK') {
-                        break;
+                if (!$variantProduct->getMarketplace() instanceof Marketplace) {
+                    echo "No marketplace\n";
+                    continue;
+                }
+                if ($variantProduct->getMarketplace()->getMarketplaceType() !== 'Amazon') {
+                    continue;
+                }
+                echo ".";
+                foreach ($variantProduct->getAmazonMarketplace() as $amazonMarketplace) {
+                    $activeId = $anyId = null;
+                    $amazonMarketplaceId = $anyId = $amazonMarketplace->getMarketplaceId();
+                    if (!$amazonMarketplace instanceof AmazonMarketplace) {
+                        continue;
+                    }
+                    if ($amazonMarketplace->getStatus() === 'Active') {
+                        $activeId = $amazonMarketplaceId;
+                        if ($amazonMarketplaceId === 'US' || $amazonMarketplaceId === 'UK') {
+                            break;
+                        }
                     }
                 }
+                $country = $activeId ?? $anyId;
+                if (in_array(needle: $country, haystack: ['MX', 'BR'])) {
+                    $country = 'US';
+                }
+                if (in_array(needle: $country, haystack: ['ES', 'FR', 'IT', 'DE', 'NL', 'SE', 'PL', 'SA', 'EG', 'TR', 'AE', 'IN'])) {
+                    $country = 'UK';
+                }
+                if (in_array(needle: $country, haystack: ['SG', 'AU', 'JP'])) {
+                    $country = 'AU';
+                }
+                if (empty($country) || !in_array(needle: $country, haystack: ['US', 'UK', 'AU', 'CA'])) {
+                    continue;
+                }
+                $asins[] = [
+                    'asin' => $variantProduct->getUniqueMarketplaceId(),
+                    'country' => $country,
+                ];
             }
-            $country = $activeId ?? $anyId;
-            if (in_array(needle: $country, haystack: ['MX', 'BR'])) {
-                $country = 'US';
-            }
-            if (in_array(needle: $country, haystack: ['ES', 'FR', 'IT', 'DE', 'NL', 'SE', 'PL', 'SA', 'EG', 'TR', 'AE', 'IN'])) {
-                $country = 'UK';
-            }
-            if (in_array(needle: $country, haystack: ['SG', 'AU', 'JP'])) {
-                $country = 'AU';
-            }
-            if (empty($country) || !in_array(needle: $country, haystack: ['US', 'UK', 'AU', 'CA'])) {
-                continue;
-            }
-            $asins[] = [
-                'asin' => $amazonVariant->getUniqueMarketplaceId(),
-                'country' => $country,
-            ];
         }
         $asins = array_unique(array: $asins, flags: SORT_REGULAR);
         return $asins;
