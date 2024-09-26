@@ -37,7 +37,7 @@ class WisersellCommand extends AbstractCommand{
         if($input->getOption('product')){
             $this->addProductByIwapim();
         }
-
+        echo "Finished\n";
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
@@ -57,14 +57,10 @@ class WisersellCommand extends AbstractCommand{
                     $categoryId = $category->getWisersellCategoryId();
                 }
             }
-            echo "Product Details:\n";
-            echo "IWASKU: ";
-            print_r($iwasku);
-            echo "Category Name: ";
-            print_r($categoryName);
-            echo "Category ID: ";
-            print_r($categoryId !== null ? $categoryId : 'Not found');
-            echo "--------------------\n"; // Ayrım için
+            echo "IWASKU: $iwasku\n";
+            echo "Category Name: $categoryName\n";
+            echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
+            echo "--------------------\n";
         }
 
         // sleep(2);
