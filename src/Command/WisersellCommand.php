@@ -37,6 +37,7 @@ class WisersellCommand extends AbstractCommand{
 
         
         //$token = $this->getAccessToken();
+        $token="";
         $this->addCategoryByIwapim($token);
         // sleep(2);
         // $this->addCategory($token, ["metal"]);
