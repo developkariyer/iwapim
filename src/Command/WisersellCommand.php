@@ -163,7 +163,7 @@ class WisersellCommand extends AbstractCommand{
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
-        $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
+        $token_file = PIMCORE_PROJECT_ROOT."/tmp/wisersell_access_token.json";
         if (file_exists($token_file) && filesize($token_file) > 0) {
             echo "Token file exists.\n";
             $file_contents = file_get_contents($token_file);
@@ -207,7 +207,7 @@ class WisersellCommand extends AbstractCommand{
             $result = json_decode($response, true);
             if (isset($result['token'])) {
                 echo "Bearer Token: " . $result['token'] . "\n";
-                $token_file = "/var/www/iwapim/tmp/wisersell_access_token.json";
+                $token_file = PIMCORE_PROJECT_ROOT."/tmp/wisersell_access_token.json";
                 if (file_exists($token_file)) {
                     unlink($token_file);
                     echo "Old token file deleted.\n";
