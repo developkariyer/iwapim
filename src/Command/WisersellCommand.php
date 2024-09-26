@@ -36,13 +36,10 @@ class WisersellCommand extends AbstractCommand{
 
 
         
-        //$token = $this->getAccessToken();
-        $token="";
+        $token = $this->getAccessToken();
         $this->addCategoryByIwapim($token);
-        // sleep(2);
-        // $this->addCategory($token, ["metal"]);
-        // sleep(2);
-        // $this->getCategories($token);
+        sleep(2);
+        $this->getCategories($token);
 
         // $productData = [
         //     [
@@ -337,7 +334,6 @@ class WisersellCommand extends AbstractCommand{
         foreach ($categories as $category) {
             $data[] = ["name" => $category->getCategory()];
         }
-
-        echo "Data: " . print_r($data, true) . "\n";
+        $this->addCategory($token, $data);
     }
 }
