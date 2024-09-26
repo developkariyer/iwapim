@@ -37,10 +37,10 @@ class WisersellCommand extends AbstractCommand{
         if($input->getOption('product')){
             $this->addProductByIwapim();
         }
-        echo "Finished\n";
-        $listingCategories = new Category\Listing();
-        $listingCategories->setUnpublished(false);
-        $categories = $listingCategories->load();
+        
+        // $listingCategories = new Category\Listing();
+        // $listingCategories->setUnpublished(false);
+        // $categories = $listingCategories->load();
 
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
@@ -52,11 +52,11 @@ class WisersellCommand extends AbstractCommand{
             $iwasku = $product->getInheritedField("iwasku");
             $categoryName = $product->getProductCategory();
             $categoryId = null;
-            foreach($categories as $category){
-                if($category->getCategory() == $categoryName){
-                    $categoryId = $category->getWisersellCategoryId();
-                }
-            }
+            // foreach($categories as $category){
+            //     if($category->getCategory() == $categoryName){
+            //         $categoryId = $category->getWisersellCategoryId();
+            //     }
+            // }
             echo "IWASKU: $iwasku\n";
             echo "Category Name: $categoryName\n";
             echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
