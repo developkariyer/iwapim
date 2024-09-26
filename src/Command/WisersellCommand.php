@@ -21,8 +21,17 @@ use Pimcore\Model\DataObject\Category;
 
 class WisersellCommand extends AbstractCommand{
 
+    protected function configure()
+    {
+        $this
+            ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
+            ;
+    }
     protected function execute(InputInterface $input, OutputInterface $output): int{
-       
+        
+        if ($input->getOption('category')) {
+            $this->addCategoryByIwapim();
+        }
         // $token = $this->getAccessToken();
         // sleep(2);
         // $searchData = [
@@ -33,13 +42,6 @@ class WisersellCommand extends AbstractCommand{
         // $response = $this->productSearch($token,$searchData);
         // $decodedResponse = json_decode($response, true);
         // $id = $decodedResponse["rows"][0]['id'];
-
-
-        
-        $token = $this->getAccessToken();
-        $this->addCategoryByIwapim($token);
-        sleep(5);
-        $this->getCategories($token);
 
         // $productData = [
         //     [
@@ -327,7 +329,9 @@ class WisersellCommand extends AbstractCommand{
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
-    protected function addCategoryByIwapim($token){
+    protected function addCategoryByIwapim(){
+        $token = $this->getAccessToken();
+        sleep(3);
         $listingObject = new Category\Listing();
         $categories = $listingObject->load();
         $data = [];
