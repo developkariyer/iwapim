@@ -122,7 +122,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
     public static function findUnboundAsins()
     {
         $asins = [];
-        echo "Finding unbound ASINs ";
+        $listingObject = new VariantProduct\Listing();
+        $listingObject->setUnpublished(true);
         $folder = Folder::getById(231104);
         $amazonVariants = $folder->getChildren();
         echo count(value: $amazonVariants) . " listings ";
@@ -163,13 +164,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
             ];
         }
         $asins = array_unique(array: $asins, flags: SORT_REGULAR);
-        echo count(value: $asins) . " ASINs found.\n";
         return $asins;
     }
 
     public static function downloadAsins(): void
     {
+        echo "Finding unbound ASINs ";
         $asins = self::findUnboundAsins();
+        echo count(value: $asins) . " ASINs found.\n";
         $connectors = [
             'US' => new AmazonConnector(marketplace: Marketplace::getById(149795)),
             'UK' => new AmazonConnector(marketplace: Marketplace::getById(200568)),
@@ -416,19 +418,16 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $folderTree[] = $parent['displayName'];
                 $parent = $parent['parent'] ?? [];
             }
-
             while (!empty($folderTree)) {
                 $folder = Utility::checkSetPath(array_pop($folderTree), $folder);
             }
             return $folder;
         }
-
         return Utility::checkSetPath(
             '00 Yeni ASIN',
             $folder
         );
     }
-
 
     public function import($updateFlag, $importFlag)
     {
@@ -452,26 +451,23 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     echo " Empty ASIN\n";
                     continue;
                 }
-                $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin, unpublished: true);
-                if (!$variantProduct) {
-                    $variantProduct = VariantProduct::addUpdateVariant(
-                        variant: [
-                            'imageUrl' => null,
-                            'urlLink' => $this->getUrlLink($listing, $country),
-                            'salePrice' => 0,
-                            'saleCurrency' => '',
-                            'title' => $this->getTitle($listing),
-                            'attributes' => $this->getAttributes($listing),
-                            'uniqueMarketplaceId' => $asin,
-                            'apiResponseJson' => json_encode([]),
-                            'published' => true,
-                        ],
-                        importFlag: $importFlag,
-                        updateFlag: $updateFlag,
-                        marketplace: null,
-                        parent: $this->getFolder($asin),
-                    );
-                }
+                $variantProduct = VariantProduct::addUpdateVariant(
+                    variant: [
+                        'imageUrl' => null,
+                        'urlLink' => $this->getUrlLink($listing, $country),
+                        'salePrice' => 0,
+                        'saleCurrency' => '',
+                        'title' => $this->getTitle($listing),
+                        'attributes' => $this->getAttributes($listing),
+                        'uniqueMarketplaceId' => $asin,
+                        'apiResponseJson' => json_encode([]),
+                        'published' => true,
+                    ],
+                    importFlag: $importFlag,
+                    updateFlag: $updateFlag,
+                    marketplace: null,
+                    parent: $this->getFolder($asin),
+                );
                 if (empty($variantProduct->getMarketplace())) {
                     $variantProduct->setMarketplace($this->marketplace);
                     $variantProduct->save();
@@ -557,7 +553,12 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $newCollection->add($amazonCollection);
         }
         $variantProduct->setAmazonMarketplace($newCollection);
-        $variantProduct->setPublished($active);
+        if ($active) {
+            $variantProduct->setPublished(true);
+        } else {
+            $variantProduct->setPublished(false);
+            $variantProduct->setTitle('(Parent or Inactive) '.$variantProduct->getTitle());
+        }
         $variantProduct->save();
     }
 

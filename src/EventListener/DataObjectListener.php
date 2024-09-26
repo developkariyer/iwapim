@@ -197,10 +197,18 @@ class DataObjectListener implements EventSubscriberInterface
             }
         }
         if ($object instanceof GroupProduct) {
-            $l = new Link();
-            $l->setPath('https://iwa.web.tr/report/group/' . $object->getId());
-            $object->setFrontendUrl($l);
+            $object->setFrontendUrl(self::generateLink('https://iwa.web.tr/report/group/' . $object->getId()));
+            $object->setIwaskuStickers(self::generateLink('https://iwa.web.tr/report/sticker/' . $object->getId() . '/iwasku'));
+            $object->setEuStickers(self::generateLink('https://iwa.web.tr/report/sticker/' . $object->getId() . '/eu'));
+            $object->setUsStickers(self::generateLink('https://iwa.web.tr/report/sticker/' . $object->getId() . '/us'));
         }
+    }
+
+    protected static function generateLink($url)
+    {
+        $l = new Link();
+        $l->setPath($url);
+        return $l;
     }
 
 }
