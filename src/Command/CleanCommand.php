@@ -68,6 +68,7 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('translate-ai')) {
             self::translateProductNames();
         }
+    
         return Command::SUCCESS;
     }
 
