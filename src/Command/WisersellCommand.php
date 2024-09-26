@@ -435,13 +435,13 @@ class WisersellCommand extends AbstractCommand{
                         $categoryId = $category->getWisersellCategoryId();
                     }
                 }
-                $variationSizeList[] = $product->getVariationSizeList() ?: [];
+                $variationSize = $product->getVariationSize();
 
                 echo "IWASKU: $iwasku\n";
                 echo "Product Name: $productName\n";
                 echo "Category Name: $categoryName\n";
                 echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
-                echo "Variation Size List: " . print_r($variationSizeList, true) . "\n";
+                echo "Variation Size List: " . $variationSize . "\n";
                 echo "--------------------\n";
             }
         }
