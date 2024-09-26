@@ -32,7 +32,9 @@ class WisersellCommand extends AbstractCommand{
         if ($input->getOption('category')) {
             $this->addCategoryByIwapim();
         }
-        // $token = $this->getAccessToken();
+
+        $token = $this->getAccessToken();
+        $this->getCategories($token);
         // sleep(2);
         // $searchData = [
         //     "code"=>"IA00500MRVE9",
@@ -339,5 +341,11 @@ class WisersellCommand extends AbstractCommand{
             $data[] = $category->getCategory();
         }
         $this->addCategory($token, $data);
+    }
+    protected function addProductByIwapim(){
+        $token = $this->getAccessToken();
+        sleep(3);
+        $listingObject = new Product\Listing();
+
     }
 }
