@@ -61,7 +61,8 @@ class WisersellCommand extends AbstractCommand{
                     "aasss", 
                     
                 ],
-                "categoryId" => 285
+                "categoryId" => 285,
+                "subproducts" => []
             ]
         ];
         $this->addProduct($token, $productData);        
