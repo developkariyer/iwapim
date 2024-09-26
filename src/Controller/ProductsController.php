@@ -35,7 +35,7 @@ class ProductsController extends FrontendController
     public function apiAction(Request $request): Response
     {
         if (!$request->cookies->get('id_token')) {
-            return [];
+            return $this->json([]);
         }
         $search = trim(str_replace('  ', ' ',$request->get('q')));
         if (empty($search) || strlen($search) < 3) {

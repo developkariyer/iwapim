@@ -23,7 +23,24 @@ class ReportController extends FrontendController
         $this->security = $security;
     }
 
-    private function prepareProductsData($products, $pricingModels, $showPrice = true)
+    private static function stickerPath($stickerType, $product)
+    {
+        if (!in_array($stickerType, ['iwasku', 'eu'])) {
+            $stickerType = 'iwasku';
+        }
+        if (!$product instanceof Product) {
+            return '';
+        }
+        $getStickerMethod = "getSticker4x6{$stickerType}";
+        $checkStickerMethod = "checkSticker4x6{$stickerType}";
+        $sticker = $product->$getStickerMethod();
+        if (!$sticker) {
+            $sticker = $product->$checkStickerMethod();
+        }
+        return $sticker->getFullPath();
+    }
+
+    private function prepareProductsData($products, $pricingModels, $showPrice = true, $stickerType = 'iwasku')
     {
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $productTwig = [];
@@ -31,7 +48,6 @@ class ReportController extends FrontendController
         $index = 0;
         foreach ($products as $product) {
             $index++;
-            error_log("Memory Usage before {$product->getInheritedField('productIdentifier')} ($index): " . memory_get_usage());
             if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
                 $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
             }
@@ -39,11 +55,7 @@ class ReportController extends FrontendController
             $productModels = $this->getProductModels($pricingModels, $product);
             $prices = $this->getProductPrices($product, $priceTemplate);
 
-            $sticker = $product->getSticker4x6();
-            if (!$sticker) {
-                $sticker = $product->checkSticker4x6();
-            }
-            $sticker = $sticker->getFullPath();
+            $sticker = self::stickerPath($stickerType, $product);
 
             $productTwig[] = [
                 'iwasku' => $product->getIwasku(),
@@ -62,6 +74,7 @@ class ReportController extends FrontendController
                 'bundleItems' => $product->getBundleItems(),
                 'prices' => $prices,
                 'sticker' => $sticker,
+                'documents' => $product->getInheritedField('technicals'),
             ];
             unset($product);
             unset($productModels);
@@ -148,6 +161,7 @@ class ReportController extends FrontendController
             'bundleItems' => $product->getBundleItems(),
             'prices' => $prices,
             'sticker' => '',
+            'documents' => $product->getInheritedField('technicals'),
         ];
     }
  
@@ -247,11 +261,12 @@ class ReportController extends FrontendController
     }
 
     /**
-     * @Route("/report/sticker/{group_id}", name="report_sticker")
+     * @Route("/report/sticker/{group_id}/{type?iwasku}", name="report_sticker")
      */
     public function stickerAction(Request $request): Response
     {
         $groupId = $request->get('group_id');
+        $type = $request->get('type', 'iwasku');
         $group = GroupProduct::getById($groupId);
 
         if (!$group) {
@@ -260,14 +275,12 @@ class ReportController extends FrontendController
 
         $products = $group->getProducts();
         $pricingModels = [];
-        $productTwig = $this->prepareProductsData($products, $pricingModels, false);
+        $productTwig = $this->prepareProductsData($products, $pricingModels, false, $type);
         $modelTwig = [];
 
         unset($products);
         unset($pricingModels);
         gc_collect_cycles();
-        usleep(500000);
-        error_log("Memory Usage before rendering: " . memory_get_usage());
 
         return $this->render('202409/group.html.twig', [
             'title' => $group->getKey(),
