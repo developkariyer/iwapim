@@ -441,7 +441,7 @@ class WisersellCommand extends AbstractCommand{
                 $length = $product->getInheritedField("packageDimension2") ?? null;
                 $height = $product->getInheritedField("packageDimension3") ?? null;
                 $weight = $product->getInheritedField("packageWeight") ?? null;
-                $desi = $product->getInheritedField("desi5000") ?? null;
+                
 
 
                 echo "IWASKU: $iwasku\n";
@@ -454,7 +454,6 @@ class WisersellCommand extends AbstractCommand{
                 echo "Length: " . $length . "\n";
                 echo "Height: " . $height . "\n";
                 echo "Weight: " . $weight . "\n";
-                echo "Desi: " . $desi . "\n";
 
             
                 echo "--------------------\n";
