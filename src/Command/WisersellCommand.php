@@ -45,13 +45,24 @@ class WisersellCommand extends AbstractCommand{
         sleep(3);
         $productData = [
             [
-                "name" => "Mobilya",
+                "id" => 10,  
+                "name" => "Mobilya2",
                 "code" => "AXXXXXX",
-                "categoryId" => 285,
                 "weight" => 1.34,
+                "deci" => 1.34, 
                 "width" => 1.34,
                 "length" => 1.34,
                 "height" => 1.34,
+                "extradata" => [
+                    "color" => "gray"  
+                ],
+                "arrsku" => [
+                    "AXSSW", 
+                    "aasss", 
+                    
+                ],
+                "categoryId" => 285, 
+                
             ]
         ];
         $this->addProduct($token, $productData);        
@@ -312,7 +323,6 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function addProduct($token,$data){
         $url = "https://dev2.wisersell.com/restapi/product"; 
-        
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
