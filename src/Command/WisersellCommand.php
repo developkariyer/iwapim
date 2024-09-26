@@ -25,6 +25,8 @@ class WisersellCommand extends AbstractCommand{
     {
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
+            ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
+
             ;
     }
     protected function execute(InputInterface $input, OutputInterface $output): int{
@@ -32,10 +34,9 @@ class WisersellCommand extends AbstractCommand{
         if ($input->getOption('category')) {
             $this->addCategoryByIwapim();
         }
-
-        $token = $this->getAccessToken();
-        $this->getCategories($token);
-
+        if($input->getOption('product')){
+            $this->addProductByIwapim();
+        }
 
         // sleep(2);
         // $searchData = [
@@ -374,16 +375,32 @@ class WisersellCommand extends AbstractCommand{
 
 
 
-        $token = $this->getAccessToken();
-        sleep(3);
+        //$token = $this->getAccessToken();
+        //sleep(3);
+
+        $listingCategories = new Category\Listing();
+        $listingCategories->setUnpublished(false);
+        $categories = $listingCategories->load();
+
         $listingObject = new Product\Listing();
-        $listingObject->setLimit(100);
         $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
+        $listingObject->setLimit(5);
         $products = $listingObject->load();
         foreach ($products as $product){
             if ($product->level()==1) continue;
             $iwasku = $product->getInheritedField("iwasku");
-            $categoryName = $product->getCategory();
+            $categoryName = $product->getProductCategory();
+            $categoryId = null;
+            foreach($categories as $category){
+                if($category->getCategory() == $categoryName){
+                    $categoryId = $category->getWisersellCategoryId();
+                }
+            }
+            echo "IWASKU: $iwasku\n";
+            echo "Category Name: $categoryName\n";
+            echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
+            echo "--------------------\n";
 
         }
 
