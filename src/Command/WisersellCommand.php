@@ -38,6 +38,31 @@ class WisersellCommand extends AbstractCommand{
             $this->addProductByIwapim();
         }
 
+        $listingCategories = new Category\Listing();
+        $listingCategories->setUnpublished(false);
+        $categories = $listingCategories->load();
+
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
+        $listingObject->setLimit(5);
+        $products = $listingObject->load();
+        foreach ($products as $product){
+            if ($product->level()==1) continue;
+            $iwasku = $product->getInheritedField("iwasku");
+            $categoryName = $product->getProductCategory();
+            $categoryId = null;
+            foreach($categories as $category){
+                if($category->getCategory() == $categoryName){
+                    $categoryId = $category->getWisersellCategoryId();
+                }
+            }
+            echo "IWASKU: $iwasku\n";
+            echo "Category Name: $categoryName\n";
+            echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
+            echo "--------------------\n";
+        }
+
         // sleep(2);
         // $searchData = [
         //     "code"=>"IA00500MRVE9",
