@@ -452,8 +452,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                     echo " Empty ASIN\n";
                     continue;
                 }
-                $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin, unpublished: true);
-                if (!$variantProduct) {
+                //$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $asin, unpublished: true);
+                //if (!$variantProduct) {
                     $variantProduct = VariantProduct::addUpdateVariant(
                         variant: [
                             'imageUrl' => null,
@@ -471,7 +471,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                         marketplace: null,
                         parent: $this->getFolder($asin),
                     );
-                }
+                //}
                 if (empty($variantProduct->getMarketplace())) {
                     $variantProduct->setMarketplace($this->marketplace);
                     $variantProduct->save();
