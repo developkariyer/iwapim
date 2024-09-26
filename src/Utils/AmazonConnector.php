@@ -557,7 +557,12 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $newCollection->add($amazonCollection);
         }
         $variantProduct->setAmazonMarketplace($newCollection);
-        $variantProduct->setPublished($active);
+        if ($active) {
+            $variantProduct->setPublished(true);
+        } else {
+            $variantProduct->setPublished(false);
+            $variantProduct->setTitle('(Parent or Inactive) '.$variantProduct->getTitle());
+        }
         $variantProduct->save();
     }
 
