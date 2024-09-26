@@ -12,8 +12,6 @@ use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
 
-
-
 #[AsCommand(
     name: 'app:wisersell',
     description: 'connect wisersell api'

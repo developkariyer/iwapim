@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 
-
 #[AsCommand(
     name: 'app:category',
     description: 'set product category'

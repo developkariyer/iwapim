@@ -8,7 +8,6 @@ use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Category\Listing;
 
-
 class ProductCategory implements SelectOptionsProviderInterface{
     public function getOptions(array $context, Data $fieldDefinition = null): array{
         $fieldname = $fieldDefinition->name ?? ($context["fieldname"] ?? ($context["object"]->getKey() ?? "unknown"));
