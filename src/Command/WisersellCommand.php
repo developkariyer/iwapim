@@ -10,6 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\Category;
+
 
 
 #[AsCommand(
@@ -34,9 +36,12 @@ class WisersellCommand extends AbstractCommand{
 
 
         
-
-        //$this->addCategory($token, ["metal"]);
-        //$this->getCategories($token);
+        //$token = $this->getAccessToken();
+        $this->addCategoryByIwapim($token);
+        // sleep(2);
+        // $this->addCategory($token, ["metal"]);
+        // sleep(2);
+        // $this->getCategories($token);
 
         // $productData = [
         //     [
@@ -73,58 +78,58 @@ class WisersellCommand extends AbstractCommand{
         
 
 
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        $pageSize = 1;
-        $offset = 0;
+        // $listingObject = new Product\Listing();
+        // $listingObject->setUnpublished(false);
+        // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
+        // $pageSize = 1;
+        // $offset = 0;
                                                             
-        while (true) {
-            $listingObject->setLimit($pageSize);
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
-            echo "\nProcessed {$offset} ";
-            $offset += $pageSize;
-            foreach ($products as $product) {
-                echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-                $token = $this->getAccessToken();
-                sleep(4);
-                $searchData = [
-                    "code"=>$product->getInheritedField("iwasku"),
-                    "page"=> 0,
-                    "pageSize"=> 10,
-                ];
-                $response = $this->productSearch($token,$searchData);
-                $decodedResponse = json_decode($response, true);
-                if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
-                    $wisersellId = $decodedResponse["rows"][0]['id'];
-                    try {
-                        $product->setWisersellId($wisersellId); 
-                        $product->setWisersellJson($response);
-                        $product->save();
-                        echo "WisersellId updated successfully: " . $wisersellId;
-                    } catch (Exception $e) {
-                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
-                    }
-                } else {
-                    echo "'id' field not found or is empty in the API response.";
-                }
+        // while (true) {
+        //     $listingObject->setLimit($pageSize);
+        //     $listingObject->setOffset($offset);
+        //     $products = $listingObject->load();
+        //     if (empty($products)) {
+        //         break;
+        //     }
+        //     echo "\nProcessed {$offset} ";
+        //     $offset += $pageSize;
+        //     foreach ($products as $product) {
+        //         echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
+        //         $token = $this->getAccessToken();
+        //         sleep(4);
+        //         // $searchData = [
+        //         //     "code"=>$product->getInheritedField("iwasku"),
+        //         //     "page"=> 0,
+        //         //     "pageSize"=> 10,
+        //         // ];
+        //         //$response = $this->productSearch($token,$searchData);
+        //         // $decodedResponse = json_decode($response, true);
+        //         // if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
+        //         //     $wisersellId = $decodedResponse["rows"][0]['id'];
+        //         //     try {
+        //         //         $product->setWisersellId($wisersellId); 
+        //         //         $product->setWisersellJson($response);
+        //         //         $product->save();
+        //         //         echo "WisersellId updated successfully: " . $wisersellId;
+        //         //     } catch (Exception $e) {
+        //         //         echo "Error occurred while updating WisersellId: " . $e->getMessage();
+        //         //     }
+        //         // } else {
+        //         //     echo "'id' field not found or is empty in the API response.";
+        //         // }
                 
 
-                // $productData = [
-                //     [
-                //         "name" => $product->getInheritedField("name"),
-                //         "code" => $product->getInheritedField("iwasku"),
-                //         "categoryId" => 256
-                //     ]
-                // ];
-                // $this->addProduct($token, $productData);
+        //         // $productData = [
+        //         //     [
+        //         //         "name" => $product->getInheritedField("name"),
+        //         //         "code" => $product->getInheritedField("iwasku"),
+        //         //         "categoryId" => 256
+        //         //     ]
+        //         // ];
+        //         // $this->addProduct($token, $productData);
 
-            }
-        }
+        //     }
+        // }
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -323,5 +328,15 @@ class WisersellCommand extends AbstractCommand{
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
         }
+    }
+    protected function addCategoryByIwapim($token){
+        $listingObject = new Category\Listing();
+        $categories = $listingObject->load();
+        $data = [];
+        foreach ($categories as $category) {
+            $data[] = ["name" => $category->getName()];
+        }
+
+        echo "Data: " . print_r($data, true) . "\n";
     }
 }
