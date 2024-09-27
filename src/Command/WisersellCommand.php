@@ -426,38 +426,40 @@ class WisersellCommand extends AbstractCommand{
             if (empty($products)) {
                 break;
             }
-
             foreach ($products as $product) {
                 if ($product->level() == 1) {
                     $iwasku = $product->getInheritedField("iwasku");
-                    $iwaskuList[$iwasku] = $product; // iwasku ve ürün nesnesini diziye ekle
+                    $iwaskuList[$iwasku] = $product;
                 }
             }
             $offset += $pageSize;
         }
-
         foreach ($this->listings as $listing) {
             $iwasku = $listing['code'];
             if (isset($iwaskuList[$iwasku])) {
-                $product = $iwaskuList[$iwasku];
+                $products = $iwaskuList[$iwasku]; 
+                $count = count($products); 
+                if ($count > 1) {
+                    echo "\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n";
+                }
                 echo "Product found: " . $iwasku . "\n";
                 try {
                     if ($product->getWisersellId() != $listing['id']) {
                         echo "\n!WisersellId Güncellenmeli\n";
-                        echo "Product WisersellId: " . $product->getWisersellId() . "\n";
-                        echo "Listing WisersellId: " . $listing['id'] . "\n";
+                        echo "\nProduct WisersellId: " . $product->getWisersellId() . "\n";
+                        echo "\nListing WisersellId: " . $listing['id'] . "\n";
                         $product->setWisersellId($listing['id']);
                         $product->setWisersellJson(json_encode($listing));
                         $product->save();
-                        echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id'];
+                        echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id']."\n";
                     } else {
                         echo "\n WisersellId Güncelleme Gerektirmiyor\n: " . $listing['id'];
                     }
                 } catch (Exception $e) {
-                    echo "\n Error occurred while updating WisersellId: " . $e->getMessage();
+                    echo "\n Error occurred while updating WisersellId: " . $e->getMessage()."\n";
                 }
             } else {
-                echo "Hata: '{$iwasku}' kodu bulunamadı. Manuel olarak eklenmiş ürün tespit edildi.\n";
+                echo "\nHata: '{$iwasku}' kodu bulunamadı. Manuel olarak eklenmiş ürün tespit edildi.\n";
             }
         }
 
