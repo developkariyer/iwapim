@@ -484,8 +484,9 @@ class WisersellCommand extends AbstractCommand{
 
                 sleep(3);
                 $response = $this->control($token,$product,$iwasku);
-                
+
                 if($response['count']===0) {
+                    echo "response count====0\n";
                     $productName = $product->getInheritedField("name"); 
                     $categoryName = $product->getProductCategory();
                     $categoryId = null;
