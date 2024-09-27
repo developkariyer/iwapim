@@ -361,38 +361,38 @@ class WisersellCommand extends AbstractCommand{
         }
     }
     protected function control($token,$payload,$key){
-        // $apiCategories = $this->getCategories($token); 
-        // $apiCategoryMap = [];
-        // foreach ($apiCategories as $categoryApi) {
-        //     $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
-        // }
-        // $newCategories = [];
-        // foreach ($data as $category) {
-        //     if (isset($apiCategoryMap[$category])) {
-        //         $categoryId = $apiCategoryMap[$category];
-        //         $category->setWisersellCategoryId($categoryId);
-        //         if ($category->save()) {
-        //             echo "Kategori güncellendi: " . $category->getCategory() . "\n";
-        //         } else {
-        //             echo "Kategori kaydedilirken bir hata oluştu: " . $category->getCategory() . "\n";
-        //         }
-        //     } else {
-        //         echo "Yeni Kategori Eklenecek: $category\n";
-        //         $newCategories[] = $category;
-        //     }
-        // }
-        // return $newCategories;
+        $apiCategories = $this->getCategories($token); 
+        $apiCategoryMap = [];
+        foreach ($apiCategories as $categoryApi) {
+            $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
+        }
+        $newCategories = [];
+        foreach ($data as $category) {
+            if (isset($apiCategoryMap[$category])) {
+                $categoryId = $apiCategoryMap[$category];
+                $category->setWisersellCategoryId($categoryId);
+                if ($category->save()) {
+                    echo "Kategori güncellendi: " . $category->getCategory() . "\n";
+                } else {
+                    echo "Kategori kaydedilirken bir hata oluştu: " . $category->getCategory() . "\n";
+                }
+            } else {
+                echo "Yeni Kategori Eklenecek: $category\n";
+                $newCategories[] = $category;
+            }
+        }
+        return $newCategories;
 
 
-        $searchData = [
-            "code"=>$key,
-            "page"=> 0,
-            "pageSize"=> 10,
-        ];
-        $response = $this->productSearch($token,$searchData);
-        echo $response;
+        // $searchData = [
+        //     "code"=>$key,
+        //     "page"=> 0,
+        //     "pageSize"=> 10,
+        // ];
+        // $response = $this->productSearch($token,$searchData);
+        // echo $response;
 
-        return $response;
+        // return $response;
         //$payload->setField()
 
         // varsa wisersellid ve wiserselljson kaydet
