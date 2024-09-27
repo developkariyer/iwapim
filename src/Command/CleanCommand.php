@@ -166,7 +166,7 @@ class CleanCommand extends AbstractCommand
                         }
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
+//                                echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
@@ -181,7 +181,7 @@ class CleanCommand extends AbstractCommand
                         }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
+//                                echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
@@ -193,7 +193,6 @@ class CleanCommand extends AbstractCommand
                             if (empty($product->getProductDimension1()) || empty($product->getProductDimension2())) {
                                 $product->setProductDimension1($width);
                                 $product->setProductDimension2($height);
-                                echo "Setting dimensions for {$product->getId()} to {$width}x{$height}\n";
                                 $dirty = true;
                             }
                         }
