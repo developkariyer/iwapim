@@ -19,7 +19,7 @@ use App\Utils\OpenAIChat;
 
 #[AsCommand(
     name: 'app:clean',
-    description: 'Fix tags for imported objects!'
+    description: 'Fix many things!'
 )]
 class CleanCommand extends AbstractCommand
 {
@@ -36,6 +36,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('link-check', null, InputOption::VALUE_NONE, 'If set, VariantProuduct<->Product links will be tested.')
             ->addOption('product-fix', null, InputOption::VALUE_NONE, 'If set, inherited fields will be reset for Products.')
             ->addOption('translate-ai', null, InputOption::VALUE_NONE, 'If set, AI translations will be processed.')
+            ->addOption('unpublish', null, InputOption::VALUE_NONE, 'If set, variantProducts not updated in last 3 days will be unpublished.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -68,8 +69,27 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('translate-ai')) {
             self::translateProductNames();
         }
+        if ($input->getOption('unpublish')) {
+            self::unpublishOlderVariantProducts();
+        }
     
         return Command::SUCCESS;
+    }
+
+    private static function unpublishOlderVariantProducts()
+    {
+        $listingObject = new VariantProduct\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 3 DAY");
+        $listingObject->load();
+        $totalCount = $listingObject->getTotalCount();
+        $index = 0;
+        foreach ($listingObject as $variant) {
+            $index++;
+            echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
+            $variant->setPublished(false);
+            $variant->save();
+        }
     }
 
     private static function translateProductNames()

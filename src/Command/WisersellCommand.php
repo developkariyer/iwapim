@@ -392,5 +392,6 @@ class WisersellCommand extends AbstractCommand{
                 }
             }
 //        }
+        }
     }
 }

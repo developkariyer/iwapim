@@ -22,7 +22,7 @@ class ProductAdminStyle extends AdminStyle
         if ($element instanceof Product) {
             switch ($element->level()) {
                 case 0:
-                    $this->elementIcon = '/custom/navyobject.svg';
+                    $this->elementIcon = '/custom/product.svg';
                     break;
                 case 1:
                     $this->elementIcon = (count($element->getListingItems())) ? '/custom/deployment.svg' : '/custom/object.svg';
@@ -70,9 +70,11 @@ class ProductAdminStyle extends AdminStyle
         }
         if ($this->element instanceof VariantProduct) {
             $config = parent::getElementQtipConfig();
+            $config['text'] = '';
             if ($this->element->getImageUrl()) {
-                $config['text'] = "<br><img src='{$this->element->getImageUrl()->getUrl()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";
+                $config['text'] .= "<br><img src='{$this->element->getImageUrl()->getUrl()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";
             }
+            $config['text'] .= "<br>{$this->element->getUniqueMarketplaceId()}<br>{$this->element->getAttributes()}";
             return $config;
         }
         return parent::getElementQtipConfig();
