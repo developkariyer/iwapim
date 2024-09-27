@@ -458,7 +458,7 @@ class WisersellCommand extends AbstractCommand{
             } 
             else{
                 $product = $this->iwapimListings[$iwasku];
-                echo "\nProduct found: " . $product . "\n";
+                print_r($product);
             }
                 
 
