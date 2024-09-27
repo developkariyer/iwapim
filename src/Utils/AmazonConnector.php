@@ -583,7 +583,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $variantProduct->setPublished(true);
         } else {
             $variantProduct->setPublished(false);
-            $variantProduct->setTitle('(Parent or Inactive) '.$variantProduct->getTitle());
+            $variantProduct->setKey(Utility::sanitizeVariable('(Parent or Inactive) '.$variantProduct->getKey(), 250));
         }
         $variantProduct->save();
     }
