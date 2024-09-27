@@ -40,6 +40,7 @@ class WisersellCommand extends AbstractCommand{
         $token = $this->getAccessToken();
         // $this->getCategories($token);
         //$this->productSearch($token,[]);
+        $this->deleteCategory($token,292);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -156,7 +157,6 @@ class WisersellCommand extends AbstractCommand{
         $data = array_map(function($category) {
             return ["name" => $category];
         }, $categories);
-
         $client = HttpClient::create();
         $response = $client->request('POST', $url, [
             'json' => $data,
@@ -179,22 +179,19 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function deleteCategory($token,$categoryId){
         $url = "https://dev2.wisersell.com/restapi/category/". $categoryId; 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authorization: Bearer ' . $token
+        $client = Httpclient::create();
+        $response = $client->request('DELETE', $url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
         ]);
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $responseContent = $response->getContent();
+            echo "Response: " . $responseContent . "\n";
         } else {
-            echo "Response: " . $response . "\n";
-            $result = json_decode($response, true);
-            echo "Result: " . print_r($result, true) . "\n";
+            echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
     protected function addProduct($token,$data){
