@@ -456,9 +456,11 @@ class WisersellCommand extends AbstractCommand{
             if (empty($iwasku)) {
                 echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
             } 
-            else
+            else{
                 $product = $this->iwapimListings[$iwasku];
-          
+                echo "\nProduct found: " . $product . "\n";
+            }
+                
 
             // if (empty($iwasku)) {
             //     echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
