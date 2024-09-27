@@ -429,7 +429,7 @@ class WisersellCommand extends AbstractCommand{
         }
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
-        echo "count listings: ".count($this->listings);
+        echo "count listings: ".count($this->listings)."\n";
         
     }
 
