@@ -26,6 +26,7 @@ class WisersellCommand extends AbstractCommand{
     public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
+        parent::__construct();
     }
 
    
