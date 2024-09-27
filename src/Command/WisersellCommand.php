@@ -414,35 +414,31 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function controlWisersellProduct(){
         $this->downloadWisersellProduct();
-        foreach ($this->listings as $listing ) {
-                echo "listing : " . $listing['code'] . "\n";
-            
+        
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $pageSize = 50;
+        $offset = 0;
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                if ($product->level()!=1) continue;
+                $iwasku = $product->getInheritedField("iwasku");
+                foreach ($this->listings as $listing ) {
+                    if ($listing['code'] === $iwasku) {
+                        echo "Product found: " . $iwasku . "\n";
+                        break;
+                    }
+                }
+            }
         }
-        // $listingObject = new Product\Listing();
-        // $listingObject->setUnpublished(false);
-        // $pageSize = 50;
-        // $offset = 0;
-        // while (true) {
-        //     $listingObject->setLimit($pageSize);
-        //     $listingObject->setOffset($offset);
-        //     $products = $listingObject->load();
-        //     if (empty($products)) {
-        //         break;
-        //     }
-        //     echo "\nProcessed {$offset} ";
-        //     $offset += $pageSize;
-        //     foreach ($products as $product) {
-        //         if ($product->level()!=1) continue;
-        //         $iwasku = $product->getInheritedField("iwasku");
-        //         sleep(3);
-        //         foreach ($this->listings as $listing ) {
-        //             if ($listing['code'] === $iwasku) {
-        //                 echo "Product found: " . $iwasku . "\n";
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
 
 
         return null;
