@@ -450,7 +450,7 @@ class WisersellCommand extends AbstractCommand{
     protected function controlWisersellProduct(){
         $this->downloadWisersellProduct();
         $this->downloadIwapimProduct();
-        print_r($this->wisersellListings);
+        print_r($this->iwapimListings);
         foreach ($this->wisersellListings as $listing) {
             $iwasku = $listing['code'];
             $id = $listing['id'];
