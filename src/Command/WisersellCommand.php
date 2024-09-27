@@ -487,7 +487,7 @@ class WisersellCommand extends AbstractCommand{
 
                 if($response['count']===0) {
                     $productName = $product->getInheritedField("name"); 
-                    $categoryName = $product->getProductCategory();
+                    $categoryName = $product->getInheritedField("productCategory");
                     $categoryId = null;
                     echo "Product Category Name: $categoryName\n";
                     foreach($categories as $category){
