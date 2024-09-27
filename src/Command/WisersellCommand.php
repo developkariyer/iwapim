@@ -486,7 +486,6 @@ class WisersellCommand extends AbstractCommand{
                 $response = $this->control($token,$product,$iwasku);
 
                 if($response['count']===0) {
-                    echo "response count====0\n";
                     $productName = $product->getInheritedField("name"); 
                     $categoryName = $product->getProductCategory();
                     $categoryId = null;
@@ -495,7 +494,7 @@ class WisersellCommand extends AbstractCommand{
                             $categoryId = $category->getWisersellCategoryId();
                         }
                     }
-                    if($categoryId==null) continue;
+                    //if($categoryId==null) continue;
                     $variationSize = $product->getInheritedField("variationSize") ?? null;
                     $variationColor = $product->getInheritedField("variationColor") ?? null;
                     $width = $product->getInheritedField("packageDimension1") ?? null;
