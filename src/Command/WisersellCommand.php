@@ -464,8 +464,13 @@ class WisersellCommand extends AbstractCommand{
                     $iwasku =  $this->iwapimListings[$code]['iwasku'];
                     $listingObject = new Product\Listing();
                     $listingObject->setCondition("iwasku = ?", $iwasku); 
+                    $listingObject->setLimit(1);
                     $products = $listingObject->load();
-                    $product = $products[0];
+                    if (!empty($products)) {
+                        $product = $products[0];
+                    } else {
+                        echo "Ürün bulunamadı.\n";
+                    }
                     try {
                         if ($product->getWisersellId() != $listing['id'] ) {
                             echo "\n!WisersellId Güncellenmeli\n";
