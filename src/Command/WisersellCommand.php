@@ -416,7 +416,8 @@ class WisersellCommand extends AbstractCommand{
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
         $listingObject->setUnpublished(false);
         $pageSize = 50;
-        $offset = 0;
+        $offset = 0;    
+        $count = 0;
         while (true) {
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
@@ -426,8 +427,7 @@ class WisersellCommand extends AbstractCommand{
             }
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
-            $count = 0;
-
+            
             foreach ($products as $product) {
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
@@ -437,7 +437,6 @@ class WisersellCommand extends AbstractCommand{
                         if ($count > 1) {
                             //throw new Exception("\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n");
                             echo "\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n";
-                            
                         }
                         echo "Product found: " . $iwasku . "\n";
                         try {
@@ -449,9 +448,11 @@ class WisersellCommand extends AbstractCommand{
                                 $product->setWisersellJson(json_encode($listing));
                                 $product->save();
                                 echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id'];
+                                break;
                             }
                             else{
                                 echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
+                                break;
                             }
 
                         } catch (Exception $e) {
@@ -460,12 +461,12 @@ class WisersellCommand extends AbstractCommand{
                     }
 
                 }
-                // if ($count === 0) {
-                //     //throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
-                //     echo "Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
-                //     continue;
-                // }
+               
             }
+        }
+        if ($count === 0) {
+            //throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
+            echo "Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
         }
 
 
