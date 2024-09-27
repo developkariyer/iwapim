@@ -400,37 +400,40 @@ class WisersellCommand extends AbstractCommand{
 
     }
 
-    protected function categoryControl($token,$data){
-        $apiCategories = $this->getCategories($token); 
+    protected function categoryControl($token, $data) {
+        $apiCategories = $this->getCategories($token);
         $apiCategoryMap = [];
-        foreach ($apiCategories as $categoryApi) {
-            $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
+        foreach ($apiCategories as $apiCategory) {
+            $apiCategoryMap[$apiCategory["name"]] = $apiCategory["id"];
+        }
+        $listingObject = new Category\Listing();
+        $categories = $listingObject->load(); 
+        $pimcoreCategoryMap = [];
+        foreach ($categories as $pimcoreCategory) {
+            $pimcoreCategoryMap[$pimcoreCategory->getCategory()] = $pimcoreCategory;
         }
         $newCategories = [];
-        foreach ($data as $category) {
-            if (isset($apiCategoryMap[$category])) {
-                $categoryId = $apiCategoryMap[$category];
-                $listingObject = new Category\Listing();
-                $categories = $listingObject->load();
-
-                foreach ($apiCategories as $wisersellCategory) {
-                    foreach ($categories as $category) {
-                        if ($category->getCategory() === $wisersellCategory['name']) {
-                            $category->setWisersellCategoryId($wisersellCategory['id']);
-                            $category->save();
-                            break;
-                        }
-                    }
+        foreach ($data as $categoryName) {
+            if (isset($apiCategoryMap[$categoryName])) {
+                $categoryId = $apiCategoryMap[$categoryName];
+                if (isset($pimcoreCategoryMap[$categoryName])) {
+                    $pimcoreCategory = $pimcoreCategoryMap[$categoryName];
+                    $pimcoreCategory->setWisersellCategoryId($categoryId);
+                    $pimcoreCategory->save();
+                    echo "Kategori güncellendi: " . $categoryName . "\n";
+                } else {
+                    echo "Kategori bulunamadı, eklenmesi gerekiyor: $categoryName\n";
+                    $newCategories[] = $categoryName;
                 }
-                echo "Kategori güncellendi: " . $category . "\n";
             } else {
-                echo "Yeni Kategori Eklenecek: $category\n";
-                $newCategories[] = $category;
-                
+                echo "API'de bulunmayan yeni kategori: $categoryName\n";
+                $newCategories[] = $categoryName;
             }
         }
+    
         return $newCategories;
-    }   
+    }
+      
     protected function addCategoryByIwapim(){
         $token = $this->getAccessToken();
         sleep(3);
