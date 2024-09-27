@@ -410,9 +410,17 @@ class WisersellCommand extends AbstractCommand{
         foreach ($data as $category) {
             if (isset($apiCategoryMap[$category])) {
                 $categoryId = $apiCategoryMap[$category];
+                $listingObject = new Category\Listing();
+                $categories = $listingObject->load();
 
-                
-
+                foreach ($categories as $category) {
+                    if ($category->getCategory() === $category) {
+                        $category->setWisersellCategoryId($categoryId);
+                        $category->save();
+                        break;
+                    }
+                }
+                echo "Kategori güncellendi: " . $category . "\n";
             } else {
                 echo "Yeni Kategori Eklenecek: $category\n";
                 $newCategories[] = $category;
