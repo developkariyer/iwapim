@@ -324,11 +324,9 @@ class WisersellCommand extends AbstractCommand{
                     $length = $product->getInheritedField("packageDimension2") ?? null;
                     $height = $product->getInheritedField("packageDimension3") ?? null;
                     $weight = $product->getInheritedField("packageWeight") ?? null;
-                    $extraData = [
-                        [
-                            "variationSize" => $variationSize,
-                            "variationColor" => $variationColor
-                        ]
+                    $extraData = [                        
+                        "variationSize" => $variationSize,
+                        "variationColor" => $variationColor
                     ];
                     $productData = [
                         [
