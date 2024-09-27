@@ -413,11 +413,13 @@ class WisersellCommand extends AbstractCommand{
                 $listingObject = new Category\Listing();
                 $categories = $listingObject->load();
 
-                foreach ($categories as $category) {
-                    if ($category->getCategory() === $category) {
-                        $category->setWisersellCategoryId($categoryId);
-                        $category->save();
-                        break;
+                foreach ($apiCategories as $wisersellCategory) {
+                    foreach ($categories as $category) {
+                        if ($category->getCategory() === $wisersellCategory['name']) {
+                            $category->setWisersellCategoryId($wisersellCategory['id']);
+                            $category->save();
+                            break;
+                        }
                     }
                 }
                 echo "Kategori güncellendi: " . $category . "\n";
