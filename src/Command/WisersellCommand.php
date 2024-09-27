@@ -19,13 +19,13 @@ use Pimcore\Model\DataObject\Category;
 
 class WisersellCommand extends AbstractCommand{
 
-    protected function configure()
-    {
+    protected function configure() {
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
 
             ;
+        $this->controlProduct();
     }
     protected function execute(InputInterface $input, OutputInterface $output): int{
         
@@ -393,6 +393,42 @@ class WisersellCommand extends AbstractCommand{
             }
         }
     }
+
+    protected function controlProduct(){
+        $filenamejson =  PIMCORE_PROJECT_ROOT. 'tmp/wisersell.json';
+        if (!$forceDownload && file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
+            $contentJson = file_get_contents($filenamejson);
+            $this->listings = json_decode($contentJson, true);          
+            echo "Using cached data ";
+        }
+        else {
+            $token = $this->getAccessToken();
+            $this->listings = [];
+            $page = 0;
+            $pageSize = 100;
+            $searchData = [
+                "page" => $page,
+                "pageSize" => 100
+            ];
+            $response = $this->productSearch($token,$searchData);
+            $this->listings = $response['rows'];
+            while ($response['count'] > 0) {
+                $page++;
+                $searchData = [
+                    "page" => $page,
+                    "pageSize" => 100
+                ];
+                $response = $this->productSearch($token,$searchData);
+                $this->listings = array_merge($this->listings, $response['rows']);
+            }  
+            file_put_contents($filenamejson, json_encode($this->listings));
+        }
+        $jsonListings = json_encode($this->listings);
+        file_put_contents($filenamejson, $jsonListings);
+        echo "count listings: ".count($this->listings);
+        
+    }
+
 
 
 
