@@ -467,7 +467,7 @@ class WisersellCommand extends AbstractCommand{
             else if($iwaskuList[$iwasku]['control'] === true) {
                 echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
             }             
-            else {
+            else if(!isset($iwaskuList[$iwasku]) || empty($iwaskuList[$iwasku])) {
                 echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak eklenmis ürün tespit edildi.\n";
             }
         }
