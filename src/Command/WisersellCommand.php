@@ -38,21 +38,8 @@ class WisersellCommand extends AbstractCommand{
             $this->addProductByIwapim();
         }
         $token = $this->getAccessToken();
-        //$this->getCategories($token);
-        //$this->productSearch($token,[]);
-        $extraData = [
-                "variationSize" => 5,
-                "variationColor" => "Black"
-        ];
-        $productData = [
-            [
-                "name" => "Test Product",
-                "categoryId" => 291,
-                "extradata"=> $extraData,
-                "subproducts" => []
-            ]
-        ];
-        $this->addProduct($token,$productData);
+
+        $this->controlProduct();
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -189,7 +176,6 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-   
     protected function addProduct($token,$data){
         $url = "https://dev2.wisersell.com/restapi/product"; 
         $client = HttpClient::create();
@@ -387,8 +373,6 @@ class WisersellCommand extends AbstractCommand{
             }
         }
     }
-
-
     protected function controlProduct(){
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
