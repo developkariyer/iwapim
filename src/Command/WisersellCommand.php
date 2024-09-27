@@ -460,7 +460,7 @@ class WisersellCommand extends AbstractCommand{
 
                 }
                 if ($count === 0) {
-                    throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
+                    //throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
                     echo "Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
                     
                 }
