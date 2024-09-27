@@ -87,10 +87,10 @@ class CleanCommand extends AbstractCommand
         foreach ($listingObject as $variant) {
             $index++;
             echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
-//            $variant->setPublished(false);
-//            $variant->save();
+            $variant->setPublished(false);
+            $variant->save();
         }
-}
+    }
 
     private static function translateProductNames()
     {
