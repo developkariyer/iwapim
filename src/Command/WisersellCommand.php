@@ -416,22 +416,21 @@ class WisersellCommand extends AbstractCommand{
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
         $listingObject->setUnpublished(false);
         $pageSize = 50;
-        $offset = 0;    
-        $count = 0;
-        while (true) {
-            $listingObject->setLimit($pageSize);
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
-            echo "\nProcessed {$offset} ";
-            $offset += $pageSize;
-            
-            foreach ($products as $product) {
-                if ($product->level()!=1) continue;
-                $iwasku = $product->getInheritedField("iwasku");
-                foreach ($this->listings as $listing) {
+        $offset = 0;
+        foreach ($this->listings as $listing) {
+            $count = 0;
+            while (true) {
+                $listingObject->setLimit($pageSize);
+                $listingObject->setOffset($offset);
+                $products = $listingObject->load();
+                if (empty($products)) {
+                    break;
+                }
+                echo "\nProcessed {$offset} ";
+                $offset += $pageSize;
+                foreach ($products as $product) {
+                    if ($product->level()!=1) continue;
+                    $iwasku = $product->getInheritedField("iwasku");
                     if ($listing['code'] === $iwasku) {
                         $count++; 
                         if ($count > 1) {
@@ -448,26 +447,75 @@ class WisersellCommand extends AbstractCommand{
                                 $product->setWisersellJson(json_encode($listing));
                                 $product->save();
                                 echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id'];
-                                break;
                             }
                             else{
                                 echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
-                                break;
                             }
-
                         } catch (Exception $e) {
                             echo "\n Error occurred while updating WisersellId: " . $e->getMessage();
                         }
                     }
-
                 }
-               
             }
+            if ($count === 0) {
+                //throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
+                $code = $listing['code'];
+                echo "Hata: '{$codea}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
+            }
+
         }
-        if ($count === 0) {
-            //throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
-            echo "Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
-        }
+
+
+
+        // while (true) {
+        //     $listingObject->setLimit($pageSize);
+        //     $listingObject->setOffset($offset);
+        //     $products = $listingObject->load();
+        //     if (empty($products)) {
+        //         break;
+        //     }
+        //     echo "\nProcessed {$offset} ";
+        //     $offset += $pageSize;
+        //     foreach ($products as $product) {
+        //         if ($product->level()!=1) continue;
+        //         $iwasku = $product->getInheritedField("iwasku");
+        //         $count = 0;
+        //         foreach ($this->listings as $listing) {
+        //             if ($listing['code'] === $iwasku) {
+        //                 $count++; 
+        //                 if ($count > 1) {
+        //                     //throw new Exception("\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n");
+        //                     echo "\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n";
+                            
+        //                 }
+        //                 echo "Product found: " . $iwasku . "\n";
+        //                 try {
+        //                     if($product->getWisersellId() != $listing['id']){
+        //                         echo "\n!WiserselId Guncellenmeli\n";
+        //                         echo "Product WisersellId: " . $product->getWisersellId() . "\n";
+        //                         echo "Listing WisersellId: " . $listing['id'] . "\n";
+        //                         $product->setWisersellId($listing['id']); 
+        //                         $product->setWisersellJson(json_encode($listing));
+        //                         $product->save();
+        //                         echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id'];
+        //                     }
+        //                     else{
+        //                         echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
+        //                     }
+
+        //                 } catch (Exception $e) {
+        //                     echo "\n Error occurred while updating WisersellId: " . $e->getMessage();
+        //                 }
+        //             }
+
+        //         }
+        //         // if ($count === 0) {
+        //         //     //throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
+        //         //     echo "Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
+        //         //     continue;
+        //         // }
+        //     }
+        // }
 
 
         return null;
