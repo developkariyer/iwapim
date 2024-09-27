@@ -200,6 +200,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             'AU' => [],
             'CA' => [],
         ];
+        $missings = [];
         while (!empty($asins)) {
             $asin = array_pop($asins);
             $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$asin['asin']}.json";
@@ -211,18 +212,21 @@ class AmazonConnector implements MarketplaceConnectorInterface
             }
             $buckets[$asin['country']][] = $asin['asin'];
             if (count(value: $buckets[$asin['country']]) >= 10) {
-                $connectors[$asin['country']]->downloadAmazonAsins(asins: $buckets[$asin['country']], country: $asin['country']);
+                $missing = $connectors[$asin['country']]->downloadAmazonAsins(asins: $buckets[$asin['country']], country: $asin['country']);
+                $missings = array_merge($missings, $missing);
                 $buckets[$asin['country']] = [];
             }
         }
         foreach ($buckets as $country=>$asins) {
             if (!empty($asins)) {
-                $connectors[$country]->downloadAmazonAsins(asins: $asins, country: $country);
+                $missing = $connectors[$country]->downloadAmazonAsins(asins: $asins, country: $country);
+                $missings = array_merge($missings, $missing);
             }
         }
+        echo "********** Missing ASINs: ".implode(separator: ',', array: $missings)."\n";
     }
 
-    public function downloadAmazonAsins($asins, $country): void
+    public function downloadAmazonAsins($asins, $country)
     {
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
         $response = $catalogApi->searchCatalogItems(
@@ -241,6 +245,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $this->storeJsonData($item);
         }
         echo "Asked ".implode(separator: ',', array: $asins)."; downloaded ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
+        return array_diff($asins, $downloadedAsins);
     }
 
     protected function retrieveJsonData($asin)
