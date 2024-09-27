@@ -35,131 +35,6 @@ class WisersellCommand extends AbstractCommand{
         if($input->getOption('product')){
             $this->addProductByIwapim();
         }
-        
-
-        // $token = $this->getAccessToken();
-        // sleep(3);
-        // $productData = [
-        //     [
-        //         "id" => 10,  
-        //         "name" => "Mobilya3",
-        //         "code" => "AXXXXXX",
-        //         "weight" => 1.34,
-        //         "deci" => 1.34, 
-        //         "width" => 1.34,
-        //         "length" => 1.34,
-        //         "height" => 1.34,
-        //         "extradata" => [
-        //             "color" => "gray"  
-        //         ],
-        //         "arrsku" => [
-        //             "AXSSW", 
-        //             "aasss", 
-                    
-        //         ],
-        //         "categoryId" => 285,
-        //         "subproducts" => []
-        //     ]
-        // ];
-        // $this->addProduct($token, $productData);        
-
-        // sleep(2);
-        // $searchData = [
-        //     "code"=>"IA00500MRVE9",
-        //     "page"=> 0,
-        //     "pageSize"=> 10,
-        // ];
-        // $response = $this->productSearch($token,$searchData);
-        // $decodedResponse = json_decode($response, true);
-        // $id = $decodedResponse["rows"][0]['id'];
-
-        // $productData = [
-        //     [
-        //         "name" => "Cam1",
-        //         "code" => "AXXXXXX",
-        //         "categoryId" => 256
-        //     ]
-        // ];
-        // $this->addProduct($token, $productData);
-        // sleep(5);
-        // $this->productSearch($token);
-
-        // $this->deleteCategory($token, 257);
-        // sleep(5);
-        // $this->getCategories($token);
-
-        // $productData = [
-        //     [
-        //         "id" => 182,
-        //         "name" => "Cam1 Edited",
-        //         "code" => "Edited Code",
-        //         "categoryId" => 256
-        //     ]
-        // ];
-        // $this->updateProduct($token, $productData);
-        // sleep(5);
-        // $this->productSearch($token);
-
-
-        //**********************************/
-        //**search wisersell for iwasku*****/
-        //**add product to wisersell*****/
-        //**********************************/
-        
-
-
-        // $listingObject = new Product\Listing();
-        // $listingObject->setUnpublished(false);
-        // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        // $pageSize = 1;
-        // $offset = 0;
-                                                            
-        // while (true) {
-        //     $listingObject->setLimit($pageSize);
-        //     $listingObject->setOffset($offset);
-        //     $products = $listingObject->load();
-        //     if (empty($products)) {
-        //         break;
-        //     }
-        //     echo "\nProcessed {$offset} ";
-        //     $offset += $pageSize;
-        //     foreach ($products as $product) {
-        //         echo "\n iwasku değeri: " . $product->getInheritedField("iwasku");
-        //         $token = $this->getAccessToken();
-        //         sleep(4);
-        //         // $searchData = [
-        //         //     "code"=>$product->getInheritedField("iwasku"),
-        //         //     "page"=> 0,
-        //         //     "pageSize"=> 10,
-        //         // ];
-        //         //$response = $this->productSearch($token,$searchData);
-        //         // $decodedResponse = json_decode($response, true);
-        //         // if (isset($decodedResponse["rows"][0]['id']) && !empty($decodedResponse["rows"][0]['id'])) {
-        //         //     $wisersellId = $decodedResponse["rows"][0]['id'];
-        //         //     try {
-        //         //         $product->setWisersellId($wisersellId); 
-        //         //         $product->setWisersellJson($response);
-        //         //         $product->save();
-        //         //         echo "WisersellId updated successfully: " . $wisersellId;
-        //         //     } catch (Exception $e) {
-        //         //         echo "Error occurred while updating WisersellId: " . $e->getMessage();
-        //         //     }
-        //         // } else {
-        //         //     echo "'id' field not found or is empty in the API response.";
-        //         // }
-                
-
-        //         // $productData = [
-        //         //     [
-        //         //         "name" => $product->getInheritedField("name"),
-        //         //         "code" => $product->getInheritedField("iwasku"),
-        //         //         "categoryId" => 256
-        //         //     ]
-        //         // ];
-        //         // $this->addProduct($token, $productData);
-
-        //     }
-        // }
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -250,8 +125,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Response: " . $response . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
         }
-        return $response;
     }
     protected function getCategories($token){
         $url = "https://dev2.wisersell.com/restapi/category"; 
@@ -270,6 +145,7 @@ class WisersellCommand extends AbstractCommand{
             echo "Response: " . $response . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
         }
     }
     protected function addCategory($token,$categories){
@@ -336,6 +212,7 @@ class WisersellCommand extends AbstractCommand{
             echo "Response: " . print_r($response, true) . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
         }
     }
     protected function updateProduct($token,$data){
@@ -359,6 +236,45 @@ class WisersellCommand extends AbstractCommand{
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
+    protected function productControl($token,$key){
+        $searchData = [
+            "code"=>$key,
+            "page"=> 0,
+            "pageSize"=> 10,
+        ];
+        $response = $this->productSearch($token,$searchData);
+        return $response;
+    }
+    protected function categoryControl($token, $data) {
+        $apiCategories = $this->getCategories($token);
+        $apiCategoryMap = [];
+        foreach ($apiCategories as $apiCategory) {
+            $apiCategoryMap[$apiCategory["name"]] = $apiCategory["id"];
+        }
+        $listingObject = new Category\Listing();
+        $categories = $listingObject->load(); 
+        $pimcoreCategoryMap = [];
+        foreach ($categories as $pimcoreCategory) {
+            $pimcoreCategoryMap[$pimcoreCategory->getCategory()] = $pimcoreCategory;
+        }
+        $newCategories = [];
+        foreach ($data as $categoryName) {
+            if (isset($apiCategoryMap[$categoryName])) {
+                $categoryId = $apiCategoryMap[$categoryName];
+                if (isset($pimcoreCategoryMap[$categoryName])) {
+                    $pimcoreCategory = $pimcoreCategoryMap[$categoryName];
+                    $pimcoreCategory->setWisersellCategoryId($categoryId);
+                    $pimcoreCategory->save();
+                    echo "Category updated: " . $categoryName . "\n";
+                }
+            } else {
+                echo "New Category Detected: $categoryName\n";
+                $newCategories[] = $categoryName;
+            }
+        }
+        return $newCategories;
+    }
+     
     protected function addCategoryByIwapim(){
         $token = $this->getAccessToken();
         sleep(3);
@@ -368,24 +284,28 @@ class WisersellCommand extends AbstractCommand{
         foreach ($categories as $category) {
             $data[] = $category->getCategory();
         }
-        $result = $this->addCategory($token, $data);
-        foreach ($result as $wisersellCategory) {
-            foreach ($categories as $category) {
-                if ($category->getCategory() === $wisersellCategory['name']) {
-                    $category->setWisersellCategoryId($wisersellCategory['id']);
-                    $category->save();
-                    break;
+        $newCategories = $this->categoryControl($token,$data);    
+        sleep(3);
+        if(!empty($newCategories)){
+            $result = $this->addCategory($token, $newCategories);
+            foreach ($result as $wisersellCategory) {
+                foreach ($categories as $category) {
+                    if ($category->getCategory() === $wisersellCategory['name']) {
+                        $category->setWisersellCategoryId($wisersellCategory['id']);
+                        $category->save();
+                        echo "Category Saved: " . $category->getCategory() . "\n";
+                        break;
+                    }
                 }
             }
-        }
+        }    
     }
     protected function addProductByIwapim(){
-        //$token = $this->getAccessToken();
-        //sleep(3);
+        $token = $this->getAccessToken();
+        sleep(3);
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
-
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
@@ -403,36 +323,74 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
-                $productName = $product->getInheritedField("name"); 
-
-                $categoryName = $product->getProductCategory();
-                $categoryId = null;
-                foreach($categories as $category){
-                    if($category->getCategory() == $categoryName){
-                        $categoryId = $category->getWisersellCategoryId();
+                sleep(3);
+                $response = $this->productControl($token,$iwasku);
+                if($response['count']===0) {
+                    $productName = $product->getInheritedField("name"); 
+                    $categoryName = $product->getInheritedField("productCategory");
+                    $categoryId = null;
+                    foreach($categories as $category){
+                        if($category->getCategory() == $categoryName){
+                            $categoryId = $category->getWisersellCategoryId();
+                            break;
+                        }
+                    }
+                    if($categoryId==null) continue;
+                    $variationSize = $product->getInheritedField("variationSize") ?? null;
+                    $variationColor = $product->getInheritedField("variationColor") ?? null;
+                    $width = $product->getInheritedField("packageDimension1") ?? null;
+                    $length = $product->getInheritedField("packageDimension2") ?? null;
+                    $height = $product->getInheritedField("packageDimension3") ?? null;
+                    $weight = $product->getInheritedField("packageWeight") ?? null;
+                    $extraData = [
+                        [
+                            "variationSize" => $variationSize,
+                            "variationColor" => $variationColor
+                        ]
+                    ];
+                    $productData = [
+                        [
+                            "name" => $productName,
+                            "code" => $iwasku,
+                            "categoryId" => $categoryId,
+                            "weight" => $weight,
+                            "width" => $width,
+                            "length" => $length,
+                            "height" => $height,
+                            "extradata"=> $extraData,
+                            "subproducts" => []
+                        ]
+                    ];
+                    sleep(2);
+                    $result = $this->addProduct($token, $productData);
+                    if(isset($result[0]['id'])){
+                        $wisersellId = $result[0]['id'];
+                        try {
+                            $product->setWisersellId($wisersellId); 
+                            $product->setWisersellJson(json_encode($result));
+                            $product->save();
+                            echo "WisersellId updated successfully: " . $wisersellId;
+                        } catch (Exception $e) {
+                            echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                        }
+                        echo "New Product added successfully\n";
+                    } else {
+                        echo "'id' field not found or is empty in the API response.";
                     }
                 }
-                $variationSize = $product->getInheritedField("variationSize") ?? null;
-                $variationColor = $product->getInheritedField("variationColor") ?? null;
-                $width = $product->getInheritedField("packageDimension1") ?? null;
-                $length = $product->getInheritedField("packageDimension2") ?? null;
-                $height = $product->getInheritedField("packageDimension3") ?? null;
-                $weight = $product->getInheritedField("packageWeight") ?? null;
-
-                echo "IWASKU: $iwasku\n";
-                echo "Product Name: $productName\n";
-                echo "Category Name: $categoryName\n";
-                echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
-                echo "Variation Size: " . $variationSize . "\n";
-                echo "Variation Color: " . $variationColor . "\n";
-                echo "Width: " . $width . "\n";
-                echo "Length: " . $length . "\n";
-                echo "Height: " . $height . "\n";
-                echo "Weight: " . $weight . "\n";
-                echo "--------------------\n";
+                else {
+                    echo "\n\n\n!!!!!!!!!!!!!!UPDATED PRODUCT!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
+                    $wisersellId = $response['rows'][0]['id'];
+                    try {
+                        $product->setWisersellId($wisersellId); 
+                        $product->setWisersellJson(json_encode($response));
+                        $product->save();
+                        echo "WisersellId updated successfully: " . $wisersellId;
+                    } catch (Exception $e) {
+                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                    }
+                }
             }
         }
-
-
     }
 }
