@@ -420,17 +420,13 @@ class WisersellCommand extends AbstractCommand{
                     $pimcoreCategory = $pimcoreCategoryMap[$categoryName];
                     $pimcoreCategory->setWisersellCategoryId($categoryId);
                     $pimcoreCategory->save();
-                    echo "Kategori güncellendi: " . $categoryName . "\n";
-                } else {
-                    echo "Kategori bulunamadı, eklenmesi gerekiyor: $categoryName\n";
-                    $newCategories[] = $categoryName;
+                    echo "Category updated: " . $categoryName . "\n";
                 }
             } else {
-                echo "API'de bulunmayan yeni kategori: $categoryName\n";
+                echo "New Category Detected: $categoryName\n";
                 $newCategories[] = $categoryName;
             }
         }
-    
         return $newCategories;
     }
       
@@ -452,6 +448,7 @@ class WisersellCommand extends AbstractCommand{
                     if ($category->getCategory() === $wisersellCategory['name']) {
                         $category->setWisersellCategoryId($wisersellCategory['id']);
                         $category->save();
+                        echo "Category Saved: " . $category->getCategory() . "\n";
                         break;
                     }
                 }
