@@ -428,7 +428,6 @@ class WisersellCommand extends AbstractCommand{
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
             foreach ($products as $product) {
-                if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
                 sleep(3);
                 foreach ($listing as $this->listings) {
@@ -437,8 +436,6 @@ class WisersellCommand extends AbstractCommand{
                         break;
                     }
                 }
-
-                
             }
         }
 
