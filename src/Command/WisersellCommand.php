@@ -429,22 +429,25 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 if ($product->level() == 1) {
                     $iwasku = $product->getInheritedField("iwasku");
-                    $iwaskuList[$iwasku] = $product;
+                    $iwaskuList[$iwasku] = [
+                        'product' => $product,
+                        'control' => false
+                    ];
                 }
             }
             $offset += $pageSize;
         }
         foreach ($this->listings as $listing) {
             $iwasku = $listing['code'];
-            if (isset($iwaskuList[$iwasku])) {
-                $products = $iwaskuList[$iwasku]; 
-                $count = count($products); 
-                if ($count > 1) {
-                    echo "\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n";
-                }
-                echo "Product found: " . $iwasku . "\n";
+            if (empty($iwasku)) {
+                $id = $listing['id'];
+                echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
+            } 
+            else if (isset($iwaskuList[$iwasku]) && $iwaskuList[$iwasku]['control'] === false) {
+                $product = $iwaskuList[$iwasku];
+                echo "\nProduct found: " . $iwasku . "\n";
                 try {
-                    if ($product->getWisersellId() != $listing['id']) {
+                    if ($product->getWisersellId() != $listing['id'] ) {
                         echo "\n!WisersellId Güncellenmeli\n";
                         echo "\nProduct WisersellId: " . $product->getWisersellId() . "\n";
                         echo "\nListing WisersellId: " . $listing['id'] . "\n";
@@ -453,17 +456,20 @@ class WisersellCommand extends AbstractCommand{
                         $product->save();
                         echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id']."\n";
                     } else {
-                        echo "\n WisersellId Güncelleme Gerektirmiyor\n: " . $listing['id'];
+                        echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
                     }
+                    $iwaskuList[$iwasku]['control'] = true;
                 } catch (Exception $e) {
                     echo "\n Error occurred while updating WisersellId: " . $e->getMessage()."\n";
                 }
-            } else {
-                echo "\nHata: '{$iwasku}' kodu bulunamadı. Manuel olarak eklenmiş ürün tespit edildi.\n";
+            }
+            else if($iwaskuList[$iwasku]['control'] === true) {
+                echo "\nHata: '{$iwasku}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
+            }             
+            else {
+                echo "\nHata: '{$iwasku}' Wisersel Id numarasina sahip [Manuel] olarak eklenmis ürün tespit edildi.\n";
             }
         }
-
-
 
         // foreach ($this->listings as $listing) {
         //     $count = 0;
