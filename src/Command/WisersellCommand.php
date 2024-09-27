@@ -444,7 +444,7 @@ class WisersellCommand extends AbstractCommand{
                 echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
             } 
             else if (isset($iwaskuList[$iwasku]) && $iwaskuList[$iwasku]['control'] === false) {
-                $product = $iwaskuList[$iwasku];
+                $product = $iwaskuList[$iwasku]['product'];
                 echo "\nProduct found: " . $iwasku . "\n";
                 try {
                     if ($product->getWisersellId() != $listing['id'] ) {
