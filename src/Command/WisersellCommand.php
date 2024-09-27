@@ -38,7 +38,7 @@ class WisersellCommand extends AbstractCommand{
             $this->addProductByIwapim();
         }
         $token = $this->getAccessToken();
-        $this->getCategories($token);
+        //$this->getCategories($token);
         //$this->productSearch($token,[]);
         $extraData = [
                 "variationSize" => 5,
@@ -47,8 +47,9 @@ class WisersellCommand extends AbstractCommand{
         $productData = [
             [
                 "name" => "Test Product",
-                "categoryId" => 285,
+                "categoryId" => 291,
                 "extradata"=> $extraData,
+                "subproducts" => []
             ]
         ];
         sleep(3);
