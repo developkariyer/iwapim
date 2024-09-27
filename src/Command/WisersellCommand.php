@@ -405,10 +405,10 @@ class WisersellCommand extends AbstractCommand{
             $token = $this->getAccessToken();
             $this->listings = [];
             $page = 0;
-            $pageSize = 100;
+            $pageSize = 3;
             $searchData = [
                 "page" => $page,
-                "pageSize" => 100
+                "pageSize" => $pageSize
             ];
             $response = $this->productSearch($token,$searchData);
             sleep(2);
@@ -417,11 +417,13 @@ class WisersellCommand extends AbstractCommand{
                 $page++;
                 $searchData = [
                     "page" => $page,
-                    "pageSize" => 100
+                    "pageSize" => $pageSize
                 ];
                 $response = $this->productSearch($token,$searchData);
                 sleep(2);
                 $this->listings = array_merge($this->listings, $response['rows']);
+                if(count($response['rows'])<$pageSize)
+                    break;
             }  
             file_put_contents($filenamejson, json_encode($this->listings));
         }
