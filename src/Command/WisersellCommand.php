@@ -22,7 +22,8 @@ use Exception;
 
 class WisersellCommand extends AbstractCommand{
    
-    private $listings = [];
+    private $wisersellListings = [];
+    private $iwapimListings = [];
     protected function configure() {
 
         $this
@@ -377,12 +378,12 @@ class WisersellCommand extends AbstractCommand{
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
-            $this->listings = json_decode($contentJson, true);          
+            $this->wisersellListings = json_decode($contentJson, true);          
             echo "Using cached data ";
         }
         else {
             $token = $this->getAccessToken();
-            $this->listings = [];
+            $this->wisersellListings = [];
             $page = 0;
             $pageSize = 3;
             $searchData = [
@@ -391,7 +392,7 @@ class WisersellCommand extends AbstractCommand{
             ];
             $response = $this->productSearch($token,$searchData);
             sleep(2);
-            $this->listings = $response['rows'];
+            $this->wisersellListings = $response['rows'];
             while ($response['count'] > 0) {
                 $page++;
                 $searchData = [
@@ -400,44 +401,81 @@ class WisersellCommand extends AbstractCommand{
                 ];
                 $response = $this->productSearch($token,$searchData);
                 sleep(2);
-                $this->listings = array_merge($this->listings, $response['rows']);
+                $this->wisersellListings = array_merge($this->wisersellListings, $response['rows']);
                 if(count($response['rows'])<$pageSize)
                     break;
             }  
-            file_put_contents($filenamejson, json_encode($this->listings));
         }
-        $jsonListings = json_encode($this->listings);
+        $jsonListings = json_encode($this->wisersellListings);
         file_put_contents($filenamejson, $jsonListings);
-        echo "count listings: ".count($this->listings)."\n";
+        echo "count listings: ".count($this->wisersellListings)."\n";
+    }
+    protected function downloadIwapimProduct(){
+        $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/iwapimproduct.json';
+        if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
+            $contentJson = file_get_contents($filenamejson);
+            $this->iwapimListings = json_decode($contentJson, true);          
+            echo "Using cached data ";
+        }
+        else {
+            $listingObject = new Product\Listing();
+            $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
+            $listingObject->setUnpublished(false);
+            $pageSize = 50;
+            $offset = 0;
+            while (true) {
+                $listingObject->setLimit($pageSize);
+                $listingObject->setOffset($offset);
+                $products = $listingObject->load();
+                echo "\nProcessed {$offset} ";
+                if (empty($products)) {
+                    break;
+                }
+                foreach ($products as $product) {
+                    if ($product->level() == 1) {
+                        $iwasku = $product->getInheritedField("iwasku");
+                        $this->iwapimListings[$iwasku] = [
+                            'product' => $product,
+                            'control' => false
+                        ];
+                    }
+                }
+                $offset += $pageSize;
+            }
+        }
+        $jsonListings = json_encode($this->iwapimListings);
+        file_put_contents($filenamejson, $jsonListings);
+        echo "count listings: ".count($this->iwapimListings)."\n";
     }
     protected function controlWisersellProduct(){
         $this->downloadWisersellProduct();
-        $listingObject = new Product\Listing();
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
-        $listingObject->setUnpublished(false);
-        $iwaskuList = [];
-        $pageSize = 50;
-        $offset = 0;
-        while (true) {
-            $listingObject->setLimit($pageSize);
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            echo "\nProcessed {$offset} ";
-            if (empty($products)) {
-                break;
-            }
-            foreach ($products as $product) {
-                if ($product->level() == 1) {
-                    $iwasku = $product->getInheritedField("iwasku");
-                    $iwaskuList[$iwasku] = [
-                        'product' => $product,
-                        'control' => false
-                    ];
-                }
-            }
-            $offset += $pageSize;
-        }
-        foreach ($this->listings as $listing) {
+        $this->downloadIwapimProduct();
+        // $listingObject = new Product\Listing();
+        // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
+        // $listingObject->setUnpublished(false);
+        // $iwaskuList = [];
+        // $pageSize = 50;
+        // $offset = 0;
+        // while (true) {
+        //     $listingObject->setLimit($pageSize);
+        //     $listingObject->setOffset($offset);
+        //     $products = $listingObject->load();
+        //     echo "\nProcessed {$offset} ";
+        //     if (empty($products)) {
+        //         break;
+        //     }
+        //     foreach ($products as $product) {
+        //         if ($product->level() == 1) {
+        //             $iwasku = $product->getInheritedField("iwasku");
+        //             $iwaskuList[$iwasku] = [
+        //                 'product' => $product,
+        //                 'control' => false
+        //             ];
+        //         }
+        //     }
+        //     $offset += $pageSize;
+        // }
+        foreach ($this->wisersellListings as $listing) {
             $iwasku = $listing['code'];
             $id = $listing['id'];
 
