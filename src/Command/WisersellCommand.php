@@ -453,7 +453,7 @@ class WisersellCommand extends AbstractCommand{
         foreach ($this->wisersellListings as $listing) {
             $iwasku = $listing['code'];
             $id = $listing['id'];
-            $product = $this->iwapimListings[$iwasku]['product'];
+            $product = $this->iwapimListings[$iwasku];
           
 
             // if (empty($iwasku)) {
