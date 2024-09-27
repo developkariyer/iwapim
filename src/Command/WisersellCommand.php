@@ -436,7 +436,7 @@ class WisersellCommand extends AbstractCommand{
                 }
                 $found = false;
                 foreach ($this->listings as $listing) {
-                    if ($listing['code'] === $iwasku) {
+                    if ($listing['code'] == $iwasku) {
                         echo "Product found: " . $iwasku . "\n";
                         $found = true;
                         break; 
