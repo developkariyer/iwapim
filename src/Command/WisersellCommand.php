@@ -493,7 +493,7 @@ class WisersellCommand extends AbstractCommand{
                     foreach($categories as $category){
                         echo "Category Name: " . $category->getCategory() . "\n";
                         if($category->getCategory() == $categoryName){
-                            $categoryId = $category->getInheritedField("wisersellCategoryId");
+                            $categoryId = $category->getWisersellCategoryId();
                             echo "Category ID: " . $categoryId . "\n";
                             break;
                         }
