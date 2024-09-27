@@ -30,14 +30,14 @@ class DataObjectListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [
+        return [/*
             'pimcore.dataobject.preDelete' => 'onPreDelete',
             'pimcore.dataobject.preAdd' => 'onPreAdd',
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
             'pimcore.dataobject.postUpdate' => 'onPostUpdate',
             'pimcore.dataobject.postLoad' => 'onPostLoad',
             'pimcore.admin.resolve.elementAdminStyle' => 'onResolveElementAdminStyle',
-            'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
+            'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',*/
         ];
     }
 
