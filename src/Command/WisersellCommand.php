@@ -39,7 +39,7 @@ class WisersellCommand extends AbstractCommand{
         }
         $token = $this->getAccessToken();
         // $this->getCategories($token);
-        $this->productSearch($token);
+        $this->productSearch($token,[]);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
