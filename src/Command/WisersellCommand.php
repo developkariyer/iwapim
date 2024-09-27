@@ -390,7 +390,7 @@ class WisersellCommand extends AbstractCommand{
             "pageSize"=> 10,
         ];
         $response = $this->productSearch($token,$searchData);
-        echo $response;
+        print_r($response);
 
         // return $response;
         //$payload->setField()
