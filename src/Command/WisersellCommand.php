@@ -431,13 +431,18 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 $iwasku = $product->getInheritedField("iwasku");
                 foreach ($this->listings as $listing) {
-                    print_r($listing);
-                    // if ($listing['code'] === $iwasku) {
-                    //     echo "Product found: " . $iwasku . "\n";
-                    //     $product->setWisersellId($listing['id']); 
-                    //     $product->setWisersellJson(json_encode($result));
-                    //     break; 
-                    // }
+                    if ($listing['code'] === $iwasku) {
+                        echo "Product found: " . $iwasku . "\n";
+                        try {
+                            $product->setWisersellId($listing['id']); 
+                            $product->setWisersellJson(json_encode($listing));
+                            $product->save();
+                            echo "WisersellId updated successfully: " . $wisersellId;
+                        } catch (Exception $e) {
+                            echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                        }
+                        break; 
+                    }
                 }
             }
         }
