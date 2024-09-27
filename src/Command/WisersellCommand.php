@@ -406,11 +406,13 @@ class WisersellCommand extends AbstractCommand{
         foreach ($apiCategories as $categoryApi) {
             $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
         }
-        $newCategories = [];
+        $newCategoryIds = [];
         foreach ($data as $category) {
             if (isset($apiCategoryMap[$category])) {
                 $categoryId = $apiCategoryMap[$category];
-            
+                
+                
+
             } else {
                 echo "Yeni Kategori Eklenecek: $category\n";
                 $newCategories[] = $category;
@@ -428,6 +430,7 @@ class WisersellCommand extends AbstractCommand{
             $data[] = $category->getCategory();
         }
         $newCategories = $this->categoryControl($token,$data);    
+        sleep(3);
         if(!empty($newCategories)){
             $result = $this->addCategory($token, $data);
             foreach ($result as $wisersellCategory) {
