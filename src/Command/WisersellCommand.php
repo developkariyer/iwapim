@@ -480,7 +480,7 @@ class WisersellCommand extends AbstractCommand{
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
 
-
+                sleep(2);
                 $response = $this->control($token,$product,$iwasku);
 
 
