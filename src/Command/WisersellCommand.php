@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
-use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 
 #[AsCommand(
@@ -166,7 +166,7 @@ class WisersellCommand extends AbstractCommand{
             return $result;
         }
     }
-    protected function getCategories($token){
+    protected function getCategories($token,HttpClientInterface $client){
         $url = "https://dev2.wisersell.com/restapi/category";
         $client = HttpClient::create();
         $response = $client->request('GET', $url, [
