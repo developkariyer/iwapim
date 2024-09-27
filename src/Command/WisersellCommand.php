@@ -414,8 +414,8 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function controlWisersellProduct(){
         $this->downloadWisersellProduct();
-        
         $listingObject = new Product\Listing();
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
         $listingObject->setUnpublished(false);
         $pageSize = 50;
         $offset = 0;
