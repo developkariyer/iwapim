@@ -458,7 +458,7 @@ class WisersellCommand extends AbstractCommand{
             }
             else{
                 if(!isset($this->iwapimListings[$code]) || empty($this->iwapimListings[$code])) {
-                    echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak eklenmis ürün tespit edildi.\n";
+                    echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak [code] eklenmis ürün tespit edildi.\n";
                 }
                 else if (isset($this->iwapimListings[$code]) && $this->iwapimListings[$code]['control'] === false) {
                     $iwasku =  $this->iwapimListings[$code]['iwasku'];
