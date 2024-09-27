@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
-use Symfony\Component\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpClient\HttpClient;
 
 
 #[AsCommand(
@@ -20,15 +20,6 @@ use Symfony\Component\HttpClient\HttpClientInterface;
 )]
 
 class WisersellCommand extends AbstractCommand{
-
-    private $client;
-
-    public function __construct(HttpClientInterface $client)
-    {
-        $this->client = $client;
-        parent::__construct();
-    }
-
    
     protected function configure() {
 
