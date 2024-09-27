@@ -80,7 +80,6 @@ class CleanCommand extends AbstractCommand
     {
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
-        $listingObject->setLimit(50);
         $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 3 DAY");
         $listingObject->load();
         $totalCount = $listingObject->getTotalCount();
