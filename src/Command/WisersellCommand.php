@@ -426,10 +426,11 @@ class WisersellCommand extends AbstractCommand{
             }
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
+            $count = 0;
+
             foreach ($products as $product) {
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
-                $count = 0;
                 foreach ($this->listings as $listing) {
                     if ($listing['code'] === $iwasku) {
                         $count++; 
