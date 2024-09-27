@@ -450,39 +450,14 @@ class WisersellCommand extends AbstractCommand{
     protected function controlWisersellProduct(){
         $this->downloadWisersellProduct();
         $this->downloadIwapimProduct();
-        // $listingObject = new Product\Listing();
-        // $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
-        // $listingObject->setUnpublished(false);
-        // $iwaskuList = [];
-        // $pageSize = 50;
-        // $offset = 0;
-        // while (true) {
-        //     $listingObject->setLimit($pageSize);
-        //     $listingObject->setOffset($offset);
-        //     $products = $listingObject->load();
-        //     echo "\nProcessed {$offset} ";
-        //     if (empty($products)) {
-        //         break;
-        //     }
-        //     foreach ($products as $product) {
-        //         if ($product->level() == 1) {
-        //             $iwasku = $product->getInheritedField("iwasku");
-        //             $iwaskuList[$iwasku] = [
-        //                 'product' => $product,
-        //                 'control' => false
-        //             ];
-        //         }
-        //     }
-        //     $offset += $pageSize;
-        // }
         foreach ($this->wisersellListings as $listing) {
             $iwasku = $listing['code'];
             $id = $listing['id'];
 
-            // if (empty($iwasku)) {
-            //     echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
-            // } 
-            if (isset($this->iwapimListings[$iwasku]) && $this->iwapimListings[$iwasku]['control'] === false) {
+            if (empty($iwasku)) {
+                echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
+            } 
+            else if (isset($this->iwapimListings[$iwasku]) && $this->iwapimListings[$iwasku]['control'] === false) {
                 $product = $this->iwapimListings[$iwasku]['product'];
                 echo "\nProduct found: " . $iwasku . "\n";
                 try {
