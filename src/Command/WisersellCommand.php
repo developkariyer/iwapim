@@ -25,7 +25,6 @@ class WisersellCommand extends AbstractCommand{
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
 
             ;
-        $this->controlProduct();
     }
     protected function execute(InputInterface $input, OutputInterface $output): int{
         
@@ -35,6 +34,7 @@ class WisersellCommand extends AbstractCommand{
         if($input->getOption('product')){
             $this->addProductByIwapim();
         }
+        $this->getAccessToken();
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -66,34 +66,67 @@ class WisersellCommand extends AbstractCommand{
             "email" => $_ENV['WISERSELL_DEV_USER'],
             "password" => $_ENV['WISERSELL_DEV_PASSWORD']
         ];
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json'
+        $client = HttpClient::create();
+        $response = $client->request('POST', $url, [
+            'json' => $data,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
-        } else {
-            $result = json_decode($response, true);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $result = $response->toArray(); 
             if (isset($result['token'])) {
                 echo "Bearer Token: " . $result['token'] . "\n";
-                $token_file = PIMCORE_PROJECT_ROOT."/tmp/wisersell_access_token.json";
-                if (file_exists($token_file)) {
-                    unlink($token_file);
+                $tokenFile = PIMCORE_PROJECT_ROOT . "/tmp/wisersell_access_token.json";
+                if (file_exists($tokenFile)) {
+                    unlink($tokenFile);
                     echo "Old token file deleted.\n";
                 }
-                file_put_contents($token_file, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
+                file_put_contents($tokenFile, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
                 echo "New token saved to file.\n";
             } else {
-                echo "Failed to get bearer token. Response: " . $response . "\n";
+                echo "Failed to get bearer token. Response: " . json_encode($result) . "\n";
             }
-        } 
-        curl_close($ch);
+        } else {
+            echo "Failed to make request. HTTP Status Code: $statusCode\n";
+        }
+        
+
+        // $url = "https://dev2.wisersell.com/restapi/token"; 
+        // $data = [
+        //     "email" => $_ENV['WISERSELL_DEV_USER'],
+        //     "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+        // ];
+        // $ch = curl_init($url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Content-Type: application/json',
+        //     'Accept: application/json'
+        // ]);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        // $response = curl_exec($ch);
+        // if ($response === false) {
+        //     $error = curl_error($ch);
+        //     echo "cURL Error: $error";
+        // } else {
+        //     $result = json_decode($response, true);
+        //     if (isset($result['token'])) {
+        //         echo "Bearer Token: " . $result['token'] . "\n";
+        //         $token_file = PIMCORE_PROJECT_ROOT."/tmp/wisersell_access_token.json";
+        //         if (file_exists($token_file)) {
+        //             unlink($token_file);
+        //             echo "Old token file deleted.\n";
+        //         }
+        //         file_put_contents($token_file, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
+        //         echo "New token saved to file.\n";
+        //     } else {
+        //         echo "Failed to get bearer token. Response: " . $response . "\n";
+        //     }
+        // } 
+        // curl_close($ch);
     }
     protected function isTokenExpired($token){
         $tokenParts = explode('.', $token);
@@ -393,6 +426,7 @@ class WisersellCommand extends AbstractCommand{
             }
         }
     }
+
 
     protected function controlProduct(){
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
