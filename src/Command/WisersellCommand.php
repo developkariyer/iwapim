@@ -447,12 +447,18 @@ class WisersellCommand extends AbstractCommand{
                                 $product->save();
                                 echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id'];
                             }
+                            else{
+                                echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
+                            }
 
                         } catch (Exception $e) {
                             echo "\n Error occurred while updating WisersellId: " . $e->getMessage();
                         }
                     }
 
+                }
+                if ($count === 0) {
+                    throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
                 }
             }
         }
