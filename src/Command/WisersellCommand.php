@@ -53,7 +53,7 @@ class WisersellCommand extends AbstractCommand{
             ]
         ];
         sleep(3);
-        $this->updateProduct($token,$productData);
+        $this->updateProduct($token,$productData,235);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -213,9 +213,9 @@ class WisersellCommand extends AbstractCommand{
             return $result;
         }
     }
-    protected function updateProduct($token,$data){
+    protected function updateProduct($token,$data,$id){
         $client = Httpclient::create();
-        $response = $client->request('PUT', 'https://dev2.wisersell.com/restapi/product', [
+        $response = $client->request('PUT', 'https://dev2.wisersell.com/restapi/product/'.$id, [
             'json' => $data,
             'headers' => [
                 'Content-Type' => 'application/json',
