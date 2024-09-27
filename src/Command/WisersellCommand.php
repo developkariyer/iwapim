@@ -39,7 +39,7 @@ class WisersellCommand extends AbstractCommand{
             $this->addProductByIwapim();
         }
         $token = $this->getAccessToken();
-        $this->getCategories($token);
+        $this->getCategories($token,$client);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -305,7 +305,7 @@ class WisersellCommand extends AbstractCommand{
         return $response;
     }
     protected function categoryControl($token, $data) {
-        $apiCategories = $this->getCategories($token);
+        $apiCategories = $this->getCategories($token,$client);
         $apiCategoryMap = [];
         foreach ($apiCategories as $apiCategory) {
             $apiCategoryMap[$apiCategory["name"]] = $apiCategory["id"];
