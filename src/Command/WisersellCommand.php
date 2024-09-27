@@ -422,6 +422,7 @@ class WisersellCommand extends AbstractCommand{
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
             $products = $listingObject->load();
+            echo "\nProcessed {$offset} ";
             if (empty($products)) {
                 break;
             }
