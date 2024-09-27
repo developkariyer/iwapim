@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
-use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Client\HttpClient;
 
 #[AsCommand(
     name: 'app:wisersell',
