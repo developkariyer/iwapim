@@ -79,7 +79,7 @@ class CleanCommand extends AbstractCommand
     private static function unpublishOlderVariantProducts()
     {
         $listingObject = new VariantProduct\Listing();
-        $listingObject->setUnpublished(true);
+        $listingObject->setUnpublished(false);
         $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 3 DAY");
         $listingObject->load();
         $totalCount = $listingObject->getTotalCount();
