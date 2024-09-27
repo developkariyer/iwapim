@@ -469,7 +469,7 @@ class WisersellCommand extends AbstractCommand{
                     if (!empty($products)) {
                         $product = $products[0];
                     } else {
-                        echo "Ürün bulunamadı.\n";
+                        echo "Ürün bulunamadi.\n";
                     }
                     try {
                         if ($product->getWisersellId() != $listing['id'] ) {
@@ -481,7 +481,7 @@ class WisersellCommand extends AbstractCommand{
                             $product->save();
                             echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id']."\n";
                         } else {
-                            echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
+                            echo "\n WisersellId Guncelleme Gerektirmiyor: " . $listing['id']."\n";
                         }
                         $this->iwapimListings[$code]['control'] = true;
                     } catch (Exception $e) {
@@ -491,7 +491,6 @@ class WisersellCommand extends AbstractCommand{
                 else if($this->iwapimListings[$code]['control'] === true) {
                     echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
                 }             
-               
             }
         }
 
