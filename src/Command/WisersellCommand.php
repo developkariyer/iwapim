@@ -184,6 +184,7 @@ class WisersellCommand extends AbstractCommand{
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
+                'Bearer' => 'Bearer ' . $token,
             ],
         ]);
         $statusCode = $response->getStatusCode();
