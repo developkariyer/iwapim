@@ -21,6 +21,7 @@ use Symfony\Component\HttpClient\HttpClient;
 
 class WisersellCommand extends AbstractCommand{
    
+    private $listings = [];
     protected function configure() {
 
         $this
@@ -409,6 +410,8 @@ class WisersellCommand extends AbstractCommand{
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->listings)."\n";
+        echo "\nListing array\n";
+        print_r($this->listings);
         
     }
 
