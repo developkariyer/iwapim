@@ -274,7 +274,7 @@ class WisersellCommand extends AbstractCommand{
         }
         return $newCategories;
     }
-     
+
     protected function addCategoryByIwapim(){
         $token = $this->getAccessToken();
         sleep(3);
@@ -391,7 +391,5 @@ class WisersellCommand extends AbstractCommand{
                     }
                 }
             }
-//        }
         }
     }
-}
