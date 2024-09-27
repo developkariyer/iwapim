@@ -439,11 +439,12 @@ class WisersellCommand extends AbstractCommand{
         }
         foreach ($this->listings as $listing) {
             $iwasku = $listing['code'];
-            if (empty($iwasku)) {
-                $id = $listing['id'];
-                echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
-            } 
-            else if (isset($iwaskuList[$iwasku]) && $iwaskuList[$iwasku]['control'] === false) {
+            $id = $listing['id'];
+
+            // if (empty($iwasku)) {
+            //     echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
+            // } 
+            if (isset($iwaskuList[$iwasku]) && $iwaskuList[$iwasku]['control'] === false) {
                 $product = $iwaskuList[$iwasku]['product'];
                 echo "\nProduct found: " . $iwasku . "\n";
                 try {
@@ -464,10 +465,10 @@ class WisersellCommand extends AbstractCommand{
                 }
             }
             else if($iwaskuList[$iwasku]['control'] === true) {
-                echo "\nHata: '{$iwasku}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
+                echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
             }             
             else {
-                echo "\nHata: '{$iwasku}' Wisersel Id numarasina sahip [Manuel] olarak eklenmis ürün tespit edildi.\n";
+                echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak eklenmis ürün tespit edildi.\n";
             }
         }
 
