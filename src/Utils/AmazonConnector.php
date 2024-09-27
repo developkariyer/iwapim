@@ -129,6 +129,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
             $variantProducts = $listingObject->load();
+            $offset+=$pageSize;
             if (empty($variantProducts)) {
                 break;
             }
