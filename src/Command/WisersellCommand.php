@@ -434,7 +434,9 @@ class WisersellCommand extends AbstractCommand{
                     if ($listing['code'] === $iwasku) {
                         $count++; 
                         if ($count > 1) {
-                            throw new Exception("\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n");
+                            //throw new Exception("\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n");
+                            echo "\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n";
+                            
                         }
                         echo "Product found: " . $iwasku . "\n";
                         try {
@@ -459,6 +461,8 @@ class WisersellCommand extends AbstractCommand{
                 }
                 if ($count === 0) {
                     throw new Exception("Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n");
+                    echo "Hata: '{$iwasku}' kodu bulunamadi.Manuel olarak eklenmiş  ürün tespit edildi.\n";
+                    
                 }
             }
         }
