@@ -429,19 +429,30 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
+                $count = 0;
                 foreach ($this->listings as $listing) {
                     if ($listing['code'] === $iwasku) {
+                        $count++; 
+                        if ($count > 1) {
+                            throw new Exception("\n !Hata: Repeating code='{$iwasku}' - bu kod birden fazla ürünle eşleşiyor.\n");
+                        }
                         echo "Product found: " . $iwasku . "\n";
                         try {
-                            $product->setWisersellId($listing['id']); 
-                            $product->setWisersellJson(json_encode($listing));
-                            $product->save();
-                            echo "WisersellId updated successfully: " . $listing['id'];
+                            if($product->getWisersellId() != $listing['id']){
+                                echo "\n!WiserselId Guncellenmeli\n";
+                                echo "Product WisersellId: " . $product->getWisersellId() . "\n";
+                                echo "Listing WisersellId: " . $listing['id'] . "\n";
+                                $product->setWisersellId($listing['id']); 
+                                $product->setWisersellJson(json_encode($listing));
+                                $product->save();
+                                echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id'];
+                            }
+
                         } catch (Exception $e) {
-                            echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                            echo "\n Error occurred while updating WisersellId: " . $e->getMessage();
                         }
-                        break; 
                     }
+
                 }
             }
         }
