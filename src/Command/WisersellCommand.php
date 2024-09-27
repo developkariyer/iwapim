@@ -458,7 +458,7 @@ class WisersellCommand extends AbstractCommand{
             }
             else{
                 $iwasku =  $this->iwapimListings[$code]['iwasku'];
-                if (isset($this->iwapimListings[$iwasku]) && $this->iwapimListings[$iwasku]['control'] === false) {
+                if (isset($this->iwapimListings[$code]) && $this->iwapimListings[$code]['control'] === false) {
                     $listingObject = new Product\Listing();
                     $listingObject->setCondition("iwasku = ?", $iwasku); 
                     $products = $listingObject->load();
@@ -475,15 +475,15 @@ class WisersellCommand extends AbstractCommand{
                         } else {
                             echo "\n WisersellId Guncelleme Gerektirmiyor\n: " . $listing['id'];
                         }
-                        $this->iwapimListings[$iwasku]['control'] = true;
+                        $this->iwapimListings[$code]['control'] = true;
                     } catch (Exception $e) {
                         echo "\n Error occurred while updating WisersellId: " . $e->getMessage()."\n";
                     }
                 }
-                else if($this->iwapimListings[$iwasku]['control'] === true) {
+                else if($this->iwapimListings[$code]['control'] === true) {
                     echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
                 }             
-                else if(!isset($this->iwapimListings[$iwasku]) || empty($this->iwapimListings[$iwasku])) {
+                else if(!isset($this->iwapimListings[$code]) || empty($this->iwapimListings[$code])) {
                     echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak eklenmis ürün tespit edildi.\n";
                 }
             }
