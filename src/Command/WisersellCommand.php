@@ -40,7 +40,6 @@ class WisersellCommand extends AbstractCommand{
         $token = $this->getAccessToken();
         // $this->getCategories($token);
         //$this->productSearch($token,[]);
-        $this->deleteCategory($token,292);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -177,24 +176,7 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function deleteCategory($token,$categoryId){
-        $url = "https://dev2.wisersell.com/restapi/category/". $categoryId; 
-        $client = Httpclient::create();
-        $response = $client->request('PUT', $url, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Bearer' => 'Bearer ' . $token,
-            ],
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $responseContent = $response->getContent();
-            echo "Response: " . $responseContent . "\n";
-        } else {
-            echo "Request failed. HTTP Status Code: $statusCode\n";
-        }
-    }
+   
     protected function addProduct($token,$data){
         $url = "https://dev2.wisersell.com/restapi/product"; 
         $ch = curl_init($url);
