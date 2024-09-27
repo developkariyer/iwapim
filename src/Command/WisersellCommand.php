@@ -309,15 +309,15 @@ class WisersellCommand extends AbstractCommand{
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        $pageSize = 50;
+        $pageSize = 10;
         $offset = 0;
-        while (true) {
+        //while (true) {
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
             $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
+        //    if (empty($products)) {
+        //        break;
+        //    }
             echo "\nProcessed {$offset} ";
             $offset += $pageSize;
             foreach ($products as $product) {
@@ -391,6 +391,6 @@ class WisersellCommand extends AbstractCommand{
                     }
                 }
             }
-        }
+//        }
     }
 }
