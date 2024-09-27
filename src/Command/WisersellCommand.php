@@ -524,6 +524,7 @@ class WisersellCommand extends AbstractCommand{
                             "subproducts" => []
                         ]
                     ];
+                    sleep(2);
                     $result = $this->addProduct($token, $productData);
                     if(isset($result[0]['id'])){
                         $wisersellId = $result[0]['id'];
