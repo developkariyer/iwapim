@@ -52,8 +52,7 @@ class WisersellCommand extends AbstractCommand{
                 "subproducts" => []
             ]
         ];
-        sleep(3);
-        $this->updateProduct($token,$productData,235);
+        $this->addProduct($token,$productData);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -193,24 +192,24 @@ class WisersellCommand extends AbstractCommand{
    
     protected function addProduct($token,$data){
         $url = "https://dev2.wisersell.com/restapi/product"; 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authorization: Bearer ' . $token
+        $client = HttpClient::create();
+        $response = $client->request('POST', $url, [
+            'json' => $data,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ],
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
-        } else {
-            echo "Response: " . print_r($response, true) . "\n";
-            $result = json_decode($response, true);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $responseContent = $response->getContent();
+            echo "Response: " . $responseContent . "\n";
+            $result = $response->toArray();
             echo "Result: " . print_r($result, true) . "\n";
             return $result;
+        } else {
+            echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
     protected function updateProduct($token,$data,$id){
