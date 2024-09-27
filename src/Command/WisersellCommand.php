@@ -484,17 +484,13 @@ class WisersellCommand extends AbstractCommand{
 
                 sleep(3);
                 $response = $this->control($token,$product,$iwasku);
-
                 if($response['count']===0) {
                     $productName = $product->getInheritedField("name"); 
                     $categoryName = $product->getInheritedField("productCategory");
                     $categoryId = null;
-                    echo "Product Category Name: $categoryName\n";
                     foreach($categories as $category){
-                        echo "Category Name: " . $category->getCategory() . "\n";
                         if($category->getCategory() == $categoryName){
                             $categoryId = $category->getWisersellCategoryId();
-                            echo "Category ID: " . $categoryId . "\n";
                             break;
                         }
                     }
@@ -542,6 +538,7 @@ class WisersellCommand extends AbstractCommand{
                     }
                 }
                 else {
+                    echo "\n\n\n!!!!!!!!!!!!!!UPDATED PRODUCT!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
                     $wisersellId = $response['rows'][0]['id'];
                     try {
                         $product->setWisersellId($wisersellId); 
