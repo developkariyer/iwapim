@@ -411,6 +411,7 @@ class WisersellCommand extends AbstractCommand{
                 "pageSize" => 100
             ];
             $response = $this->productSearch($token,$searchData);
+            sleep(2);
             $this->listings = $response['rows'];
             while ($response['count'] > 0) {
                 $page++;
@@ -419,6 +420,7 @@ class WisersellCommand extends AbstractCommand{
                     "pageSize" => 100
                 ];
                 $response = $this->productSearch($token,$searchData);
+                sleep(2);
                 $this->listings = array_merge($this->listings, $response['rows']);
             }  
             file_put_contents($filenamejson, json_encode($this->listings));
