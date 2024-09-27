@@ -39,7 +39,7 @@ class WisersellCommand extends AbstractCommand{
         }
         $token = $this->getAccessToken();
         // $this->getCategories($token);
-        $this->productSearch($token,[]);
+        //$this->productSearch($token,[]);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -156,24 +156,25 @@ class WisersellCommand extends AbstractCommand{
         $data = array_map(function($category) {
             return ["name" => $category];
         }, $categories);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authorization: Bearer ' . $token
+
+        $client = HttpClient::create();
+        $response = $client->request('POST', $url, [
+            'json' => $data,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ],
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
-        } else {
-            echo "Response: " . $response . "\n";
-            $result = json_decode($response, true);
-            return $result;
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $responseContent = $response->getContent();
+            echo "Response: " . $responseContent . "\n";
+            $result = $response->toArray();
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
+        } else {
+            echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
     protected function deleteCategory($token,$categoryId){
@@ -249,7 +250,7 @@ class WisersellCommand extends AbstractCommand{
         return $response;
     }
     protected function categoryControl($token, $data) {
-        $apiCategories = $this->getCategories($token,$client);
+        $apiCategories = $this->getCategories($token);
         $apiCategoryMap = [];
         foreach ($apiCategories as $apiCategory) {
             $apiCategoryMap[$apiCategory["name"]] = $apiCategory["id"];
