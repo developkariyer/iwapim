@@ -133,6 +133,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (empty($variantProducts)) {
                 break;
             }
+            echo "Processing $offset\n";
             foreach ($variantProducts as $variantProduct) {
                 if (!$variantProduct instanceof VariantProduct) {
                     echo "Not a variant product\n";
