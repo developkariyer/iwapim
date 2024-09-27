@@ -415,7 +415,7 @@ class WisersellCommand extends AbstractCommand{
     protected function controlWisersellProduct(){
         $this->downloadWisersellProduct();
         foreach ($this->listings as $listing ) {
-                echo "listing : " . $listing . "\n";
+                echo "listing : " . $listing['code'] . "\n";
             
         }
         // $listingObject = new Product\Listing();
