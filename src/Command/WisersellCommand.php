@@ -536,6 +536,7 @@ class WisersellCommand extends AbstractCommand{
                         } catch (Exception $e) {
                             echo "Error occurred while updating WisersellId: " . $e->getMessage();
                         }
+                        echo "New Product added successfully\n";
                     } else {
                         echo "'id' field not found or is empty in the API response.";
                     }
