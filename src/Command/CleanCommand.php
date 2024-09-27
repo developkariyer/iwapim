@@ -83,8 +83,11 @@ class CleanCommand extends AbstractCommand
         $listingObject->setLimit(50);
         $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 3 DAY");
         $listingObject->load();
+        $totalCount = $listingObject->getTotalCount();
+        $index = 0;
         foreach ($listingObject as $variant) {
-            echo "Unpublishing: {$variant->getId()} {$variant->getKey()}\n";
+            $index++;
+            echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
 //            $variant->setPublished(false);
 //            $variant->save();
         }
