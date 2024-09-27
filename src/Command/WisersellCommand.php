@@ -414,11 +414,6 @@ class WisersellCommand extends AbstractCommand{
         echo "-------------------------\n\n\n\n\n";
         foreach ($this->listings as $listing) {
             echo "code: ".$listing['code']."\n";
-            echo "name: ".$listing['name']."\n";
-            echo "category: ".$listing['category']."\n";
-            echo "price: ".$listing['price']."\n";
-            echo "stock: ".$listing['stock']."\n";
-            echo "-------------------------\n\n\n\n\n";
         }
     }
     protected function controlWisersellProduct($key){
