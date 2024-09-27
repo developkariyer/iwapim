@@ -180,7 +180,7 @@ class WisersellCommand extends AbstractCommand{
     protected function deleteCategory($token,$categoryId){
         $url = "https://dev2.wisersell.com/restapi/category/". $categoryId; 
         $client = Httpclient::create();
-        $response = $client->request('DELETE', $url, [
+        $response = $client->request('PUT', $url, [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
