@@ -40,6 +40,18 @@ class WisersellCommand extends AbstractCommand{
         $token = $this->getAccessToken();
         // $this->getCategories($token);
         //$this->productSearch($token,[]);
+        $extraData = [
+                "variationSize" => 5,
+                "variationColor" => "Black"
+        ];
+        $productData = [
+            [
+                "name" => "Test Product",
+                "categoryId" => 285,
+                "extradata"=> $extraData,
+            ]
+        ];
+        $this->updateProduct($token,$productData);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -200,24 +212,21 @@ class WisersellCommand extends AbstractCommand{
         }
     }
     protected function updateProduct($token,$data){
-        $url = "https://dev2.wisersell.com/restapi/product"; 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authorization: Bearer ' . $token
+        $client = Httpclient::create();
+        $response = $client->request('PUT', 'https://dev2.wisersell.com/restapi/product', [
+            'json' => $data,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ],
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $responseContent = $response->getContent();
+            echo "Response: " . $responseContent . "\n";
         } else {
-            echo "Response: " . $response . "\n";
-            $result = json_decode($response, true);
-            echo "Result: " . print_r($result, true) . "\n";
+            echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
     protected function productControl($token,$key){
