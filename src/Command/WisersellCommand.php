@@ -362,29 +362,6 @@ class WisersellCommand extends AbstractCommand{
         }
     }
     protected function control($token,$payload,$key){
-        // $apiCategories = $this->getCategories($token); 
-        // $apiCategoryMap = [];
-        // foreach ($apiCategories as $categoryApi) {
-        //     $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
-        // }
-        // $newCategories = [];
-        // foreach ($data as $category) {
-        //     if (isset($apiCategoryMap[$category])) {
-        //         $categoryId = $apiCategoryMap[$category];
-        //         $category->setWisersellCategoryId($categoryId);
-        //         if ($category->save()) {
-        //             echo "Kategori güncellendi: " . $category->getCategory() . "\n";
-        //         } else {
-        //             echo "Kategori kaydedilirken bir hata oluştu: " . $category->getCategory() . "\n";
-        //         }
-        //     } else {
-        //         echo "Yeni Kategori Eklenecek: $category\n";
-        //         $newCategories[] = $category;
-        //     }
-        // }
-        // return $newCategories;
-
-
         $searchData = [
             "code"=>$key,
             "page"=> 0,
@@ -392,16 +369,7 @@ class WisersellCommand extends AbstractCommand{
         ];
         $response = $this->productSearch($token,$searchData);
         return $response;
-        //print_r($response);
-
-        // return $response;
-        //$payload->setField()
-
-        // varsa wisersellid ve wiserselljson kaydet
-        // yoksa olustur kaydet.
-
     }
-
     protected function categoryControl($token, $data) {
         $apiCategories = $this->getCategories($token);
         $apiCategoryMap = [];
@@ -463,7 +431,6 @@ class WisersellCommand extends AbstractCommand{
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
-
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
@@ -481,7 +448,6 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
-
                 sleep(3);
                 $response = $this->control($token,$product,$iwasku);
                 if($response['count']===0) {
@@ -549,18 +515,6 @@ class WisersellCommand extends AbstractCommand{
                         echo "Error occurred while updating WisersellId: " . $e->getMessage();
                     }
                 }
-
-                // echo "IWASKU: $iwasku\n";
-                // echo "Product Name: $productName\n";
-                // echo "Category Name: $categoryName\n";
-                // echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
-                // echo "Variation Size: " . $variationSize . "\n";
-                // echo "Variation Color: " . $variationColor . "\n";
-                // echo "Width: " . $width . "\n";
-                // echo "Length: " . $length . "\n";
-                // echo "Height: " . $height . "\n";
-                // echo "Weight: " . $weight . "\n";
-                // echo "--------------------\n";
             }
         }
     }
