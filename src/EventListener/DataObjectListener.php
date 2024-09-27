@@ -184,9 +184,9 @@ class DataObjectListener implements EventSubscriberInterface
                 $object->setVariationColorList(null);
             }
             if ($object->level()==0) {
-                [$sizes, $colors] = $object->listVariations();
-                $object->setVariationSizeList(implode("\n", $sizes));
-                $object->setVariationColorList(implode("\n", $colors));
+                //[$sizes, $colors] = $object->listVariations();
+                //$object->setVariationSizeList(implode("\n", $sizes));
+                //$object->setVariationColorList(implode("\n", $colors));
 
                 $l = new Link();
                 $l->setPath('https://iwa.web.tr/report/product/' . $object->getId());
