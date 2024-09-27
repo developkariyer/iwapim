@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
-use Symfony\Component\Http\Client\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(
     name: 'app:wisersell',
@@ -20,7 +20,12 @@ use Symfony\Component\Http\Client\HttpClient;
 
 class WisersellCommand extends AbstractCommand{
 
+    public function __construct(
+        private HttpClientInterface $client,
+    ) {
+    }
     protected function configure() {
+
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
@@ -165,8 +170,8 @@ class WisersellCommand extends AbstractCommand{
     }
     protected function getCategories($token){
         $url = "https://dev2.wisersell.com/restapi/category";
-        $client = HttpClient::create();
-        $response = $client->request('GET', $url, [
+        //$client = HttpClient::create();
+        $response = $this->client->request('GET', $url, [
         'headers' => [
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
