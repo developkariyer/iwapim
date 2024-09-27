@@ -337,6 +337,7 @@ class WisersellCommand extends AbstractCommand{
             echo "Response: " . print_r($response, true) . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
         }
     }
     protected function updateProduct($token,$data){
@@ -390,7 +391,8 @@ class WisersellCommand extends AbstractCommand{
             "pageSize"=> 10,
         ];
         $response = $this->productSearch($token,$searchData);
-        print_r($response);
+        return $response;
+        //print_r($response);
 
         // return $response;
         //$payload->setField()
@@ -482,46 +484,68 @@ class WisersellCommand extends AbstractCommand{
 
                 sleep(2);
                 $response = $this->control($token,$product,$iwasku);
-
-
                 
-
-
-
-                $productName = $product->getInheritedField("name"); 
-                $categoryName = $product->getProductCategory();
-                $categoryId = null;
-                foreach($categories as $category){
-                    if($category->getCategory() == $categoryName){
-                        $categoryId = $category->getWisersellCategoryId();
+                if($response['count']===0) {
+                    $productName = $product->getInheritedField("name"); 
+                    $categoryName = $product->getProductCategory();
+                    $categoryId = null;
+                    foreach($categories as $category){
+                        if($category->getCategory() == $categoryName){
+                            $categoryId = $category->getWisersellCategoryId();
+                        }
+                    }
+                    if($categoryId==null) continue;
+                    $variationSize = $product->getInheritedField("variationSize") ?? null;
+                    $variationColor = $product->getInheritedField("variationColor") ?? null;
+                    $width = $product->getInheritedField("packageDimension1") ?? null;
+                    $length = $product->getInheritedField("packageDimension2") ?? null;
+                    $height = $product->getInheritedField("packageDimension3") ?? null;
+                    $weight = $product->getInheritedField("packageWeight") ?? null;
+                    $extraData = [
+                        [
+                            "variationSize" => $variationSize,
+                            "variationColor" => $variationColor
+                        ]
+                    ];
+                    $productData = [
+                        [
+                            "name" => $productName,
+                            "code" => $iwasku,
+                            "categoryId" => $categoryId,
+                            "weight" => $weight,
+                            "width" => $width,
+                            "length" => $length,
+                            "height" => $height,
+                            "extradata"=> $extraData,
+                            "subproducts" => []
+                        ]
+                    ];
+                    $result = $this->addProduct($token, $productData);
+                    if(isset($result[0]['id'])){
+                        $wisersellId = $result[0]['id'];
+                        try {
+                            $product->setWisersellId($wisersellId); 
+                            $product->setWisersellJson(json_encode($result));
+                            $product->save();
+                            echo "WisersellId updated successfully: " . $wisersellId;
+                        } catch (Exception $e) {
+                            echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                        }
+                    } else {
+                        echo "'id' field not found or is empty in the API response.";
                     }
                 }
-                if($categoryId==null) continue;
-                $variationSize = $product->getInheritedField("variationSize") ?? null;
-                $variationColor = $product->getInheritedField("variationColor") ?? null;
-                $width = $product->getInheritedField("packageDimension1") ?? null;
-                $length = $product->getInheritedField("packageDimension2") ?? null;
-                $height = $product->getInheritedField("packageDimension3") ?? null;
-                $weight = $product->getInheritedField("packageWeight") ?? null;
-                $extraData = [
-                    [
-                        "variationSize" => $variationSize,
-                        "variationColor" => $variationColor
-                    ]
-                ];
-                $productData = [
-                    [
-                        "name" => $productName,
-                        "code" => $iwasku,
-                        "categoryId" => $categoryId,
-                        "weight" => $weight,
-                        "width" => $width,
-                        "length" => $length,
-                        "height" => $height,
-                        "extradata"=> $extraData,
-                        "subproducts" => []
-                    ]
-                ];
+                else {
+                    $wisersellId = $response['rows'][0]['id'];
+                    try {
+                        $product->setWisersellId($wisersellId); 
+                        $product->setWisersellJson(json_encode($response));
+                        $product->save();
+                        echo "WisersellId updated successfully: " . $wisersellId;
+                    } catch (Exception $e) {
+                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
+                    }
+                }
 
                 // echo "IWASKU: $iwasku\n";
                 // echo "Product Name: $productName\n";
