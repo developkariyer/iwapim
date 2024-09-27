@@ -447,8 +447,8 @@ class WisersellCommand extends AbstractCommand{
         }    
     }
     protected function addProductByIwapim(){
-        //$token = $this->getAccessToken();
-        //sleep(3);
+        $token = $this->getAccessToken();
+        sleep(3);
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
