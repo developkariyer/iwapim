@@ -36,8 +36,8 @@ class DataObjectListener implements EventSubscriberInterface
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
             //'pimcore.dataobject.postUpdate' => 'onPostUpdate',
             //'pimcore.dataobject.postLoad' => 'onPostLoad',
-            //'pimcore.admin.resolve.elementAdminStyle' => 'onResolveElementAdminStyle',
-            //'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
+            'pimcore.admin.resolve.elementAdminStyle' => 'onResolveElementAdminStyle',
+            'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
         ];
     }
 
