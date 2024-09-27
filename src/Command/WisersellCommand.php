@@ -21,6 +21,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WisersellCommand extends AbstractCommand{
 
+    private $client;
+
+    public function __construct(HttpClientInterface $client)
+    {
+        $this->client = $client;
+    }
+
    
     protected function configure() {
 
@@ -39,7 +46,7 @@ class WisersellCommand extends AbstractCommand{
             $this->addProductByIwapim();
         }
         $token = $this->getAccessToken();
-        $this->getCategories($token,$client);
+        $this->getCategories($token);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -166,7 +173,7 @@ class WisersellCommand extends AbstractCommand{
             return $result;
         }
     }
-    protected function getCategories($token,HttpClientInterface $client){
+    protected function getCategories($token){
         $url = "https://dev2.wisersell.com/restapi/category";
         $client = HttpClient::create();
         $response = $client->request('GET', $url, [
