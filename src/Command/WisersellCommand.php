@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
+use Symfony\Component\HttpClient\HttpClient;
 
 #[AsCommand(
     name: 'app:wisersell',
@@ -34,7 +35,8 @@ class WisersellCommand extends AbstractCommand{
         if($input->getOption('product')){
             $this->addProductByIwapim();
         }
-        $this->getAccessToken();
+        $token = $this->getAccessToken();
+        $this->getCategories($token);
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -162,24 +164,45 @@ class WisersellCommand extends AbstractCommand{
         }
     }
     protected function getCategories($token){
-        $url = "https://dev2.wisersell.com/restapi/category"; 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authorization: Bearer ' . $token
+        $url = "https://dev2.wisersell.com/restapi/category";
+        $client = HttpClient::create();
+        $response = $client->request('GET', $url, [
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $token,
+        ],
         ]);
-        $response = curl_exec($ch);
-        if ($response === false) {
-            $error = curl_error($ch);
-            echo "cURL Error: $error";
-        } else {
-            echo "Response: " . $response . "\n";
-            $result = json_decode($response, true);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $responseContent = $response->getContent();
+            echo "Response: " . $responseContent . "\n";
+            $result = $response->toArray();
             echo "Result: " . print_r($result, true) . "\n";
             return $result;
+        } else {
+            echo "Request failed. HTTP Status Code: $statusCode\n";
         }
+
+
+        // $url = "https://dev2.wisersell.com/restapi/category"; 
+        // $ch = curl_init($url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Content-Type: application/json',
+        //     'Accept: application/json',
+        //     'Authorization: Bearer ' . $token
+        // ]);
+        // $response = curl_exec($ch);
+        // if ($response === false) {
+        //     $error = curl_error($ch);
+        //     echo "cURL Error: $error";
+        // } else {
+        //     echo "Response: " . $response . "\n";
+        //     $result = json_decode($response, true);
+        //     echo "Result: " . print_r($result, true) . "\n";
+        //     return $result;
+        // }
     }
     protected function addCategory($token,$categories){
         $url = "https://dev2.wisersell.com/restapi/category"; 
