@@ -489,12 +489,14 @@ class WisersellCommand extends AbstractCommand{
                     $productName = $product->getInheritedField("name"); 
                     $categoryName = $product->getProductCategory();
                     $categoryId = null;
+                    echo "Product Category Name: $categoryName\n";
                     foreach($categories as $category){
+                        echo "Category Name: " . $category->getCategory() . "\n";
                         if($category->getCategory() == $categoryName){
                             $categoryId = $category->getWisersellCategoryId();
                         }
                     }
-                    //if($categoryId==null) continue;
+                    if($categoryId==null) continue;
                     $variationSize = $product->getInheritedField("variationSize") ?? null;
                     $variationColor = $product->getInheritedField("variationColor") ?? null;
                     $width = $product->getInheritedField("packageDimension1") ?? null;
