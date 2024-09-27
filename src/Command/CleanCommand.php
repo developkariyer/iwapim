@@ -178,14 +178,14 @@ class CleanCommand extends AbstractCommand
                         }
                         if ($product->checkIwasku()) {
                             $dirty = true;
-                        }/*
+                        }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
-                        }*/
+                        }
                         $size = $product->getVariationSize();
                         if (preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)cm$/', $size, $matches)) {
                             $width = $matches[1];

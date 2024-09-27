@@ -19,13 +19,17 @@ use App\Utils\Utility;
 
 class AmazonConnector implements MarketplaceConnectorInterface
 {
-    private array $amazonReports = [
+    private array $amazonCountryReports = [
 //        'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
         'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
-        'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
+        //'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
                 //'GET_AFN_INVENTORY_DATA' => [],
         //'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
         //'GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA' => [],
+    ];
+
+    private array $amazonReports = [
+        'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
     ];
 
     private $amazonSellerConnector = null;
@@ -78,7 +82,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     protected function downloadAmazonReport($reportType, $forceDownload, $country): void
     {
         $marketplaceKey = urlencode(string: strtolower(string: $this->marketplace->getKey()));
-        if (!in_array(needle: $reportType, haystack: array_keys($this->amazonReports))) {
+        if (!in_array(needle: $reportType, haystack: array_keys($this->amazonCountryReports))) {
             throw new \Exception(message: "Report Type $reportType is not in reportNames in AmazonConnector class");
         }
         echo "        Downloading Report $reportType ";
@@ -116,7 +120,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         if (substr(string: $report, offset: 0, length: 3) === "\xEF\xBB\xBF") {
             $report = substr(string: $report, offset: 3);
         }
-        $this->amazonReports[$reportType][$country] = $report;
+        $this->amazonCountryReports[$reportType][$country] = $report;
     }
 
     public static function findUnboundAsins()
@@ -277,7 +281,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     {
         foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
             echo "\n  Downloading Amazon reports for $country\n";
-            foreach (array_keys($this->amazonReports) as $reportType) {
+            foreach (array_keys($this->amazonCountryReports) as $reportType) {
                 $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $country);
             }
             $this->getListings(country: $country);
@@ -356,7 +360,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     public function getListings($country)
     {
         $listings = [];
-        foreach ($this->amazonReports as $reportType=>$report) {
+        foreach ($this->amazonCountryReports as $reportType=>$report) {
             if (empty($report[$country])) {
                 throw new \Exception("Report is empty. Did you first call download() method to populate reports?");
             }
