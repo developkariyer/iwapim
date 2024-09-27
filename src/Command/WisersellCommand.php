@@ -454,7 +454,11 @@ class WisersellCommand extends AbstractCommand{
             $iwasku = $listing['code'];
             $id = $listing['id'];
             $product = $this->iwapimListings[$iwasku]['product'];
-            echo $product->getWisersellId();
+            if (is_object($product)) {
+                echo $product->getWisersellId();
+            } else {
+                echo "Hata: \$product bir nesne değil, bir " . gettype($product) . ".";
+            }
 
             // if (empty($iwasku)) {
             //     echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
