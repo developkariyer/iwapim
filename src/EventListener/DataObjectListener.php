@@ -32,10 +32,10 @@ class DataObjectListener implements EventSubscriberInterface
     {
         return [
             'pimcore.dataobject.preDelete' => 'onPreDelete',
-            //'pimcore.dataobject.preAdd' => 'onPreAdd',
+            'pimcore.dataobject.preAdd' => 'onPreAdd',
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
-            //'pimcore.dataobject.postUpdate' => 'onPostUpdate',
-            //'pimcore.dataobject.postLoad' => 'onPostLoad',
+            'pimcore.dataobject.postUpdate' => 'onPostUpdate',
+            'pimcore.dataobject.postLoad' => 'onPostLoad',
             'pimcore.admin.resolve.elementAdminStyle' => 'onResolveElementAdminStyle',
             'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
         ];
@@ -172,13 +172,12 @@ class DataObjectListener implements EventSubscriberInterface
         $image_url = '';
         if ($object instanceof Product) {
             Product::setGetInheritedValues(false);
-            
-            $image_url = self::traverseProducts($object);
+            /*$image_url = self::traverseProducts($object);
             if (!empty($image_url)) {
                 $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
             } else {
                 $object->setImageUrl(null);
-            }
+            }*/
             if (!$object->getParent() instanceof Product) {
                 [$sizes, $colors] = $object->listVariations();
                 $object->setVariationSizeList(implode("\n", $sizes));
