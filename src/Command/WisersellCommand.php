@@ -14,6 +14,7 @@ use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
 
 
+
 #[AsCommand(
     name: 'app:wisersell',
     description: 'connect wisersell api'
@@ -40,7 +41,7 @@ class WisersellCommand extends AbstractCommand{
         }
         $token = $this->getAccessToken();
 
-        $this->controlProduct();
+        $this->downloadWisersellProduct();
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -374,7 +375,7 @@ class WisersellCommand extends AbstractCommand{
             }
         }
     }
-    protected function controlProduct(){
+    protected function downloadWisersellProduct(){
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
@@ -410,9 +411,48 @@ class WisersellCommand extends AbstractCommand{
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->listings)."\n";
-        echo "\nListing array\n";
-        print_r($this->listings);
-        
+        echo "-------------------------\n\n\n\n\n";
+        foreach ($this->listings as $listing) {
+            echo "code: ".$listing['code']."\n";
+            echo "name: ".$listing['name']."\n";
+            echo "category: ".$listing['category']."\n";
+            echo "price: ".$listing['price']."\n";
+            echo "stock: ".$listing['stock']."\n";
+            echo "-------------------------\n\n\n\n\n";
+        }
+    }
+    protected function controlWisersellProduct($key){
+
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $pageSize = 50;
+        $offset = 0;
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            echo "\nProcessed {$offset} ";
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                if ($product->level()!=1) continue;
+                $iwasku = $product->getInheritedField("iwasku");
+                sleep(3);
+
+                
+            }
+        }
+
+
+
+        foreach ($this->listings as $listing) {
+            if ($listing['code'] === $key) {
+                return $listing;
+            }
+        }
+        return null;
     }
 
 
