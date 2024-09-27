@@ -250,8 +250,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Response: " . $response . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
         }
-        return $response;
     }
     protected function getCategories($token){
         $url = "https://dev2.wisersell.com/restapi/category"; 
@@ -270,6 +270,7 @@ class WisersellCommand extends AbstractCommand{
             echo "Response: " . $response . "\n";
             $result = json_decode($response, true);
             echo "Result: " . print_r($result, true) . "\n";
+            return $result;
         }
     }
     protected function addCategory($token,$categories){
@@ -359,6 +360,69 @@ class WisersellCommand extends AbstractCommand{
             echo "Result: " . print_r($result, true) . "\n";
         }
     }
+    protected function control($token,$payload,$key){
+        // $apiCategories = $this->getCategories($token); 
+        // $apiCategoryMap = [];
+        // foreach ($apiCategories as $categoryApi) {
+        //     $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
+        // }
+        // $newCategories = [];
+        // foreach ($data as $category) {
+        //     if (isset($apiCategoryMap[$category])) {
+        //         $categoryId = $apiCategoryMap[$category];
+        //         $category->setWisersellCategoryId($categoryId);
+        //         if ($category->save()) {
+        //             echo "Kategori güncellendi: " . $category->getCategory() . "\n";
+        //         } else {
+        //             echo "Kategori kaydedilirken bir hata oluştu: " . $category->getCategory() . "\n";
+        //         }
+        //     } else {
+        //         echo "Yeni Kategori Eklenecek: $category\n";
+        //         $newCategories[] = $category;
+        //     }
+        // }
+        // return $newCategories;
+
+
+        $searchData = [
+            "code"=>$key,
+            "page"=> 0,
+            "pageSize"=> 10,
+        ];
+        $response = $this->productSearch($token,$searchData);
+        echo $response;
+
+        return $response;
+        //$payload->setField()
+
+        // varsa wisersellid ve wiserselljson kaydet
+        // yoksa olustur kaydet.
+
+    }
+
+    protected function categoryControl($token,$data){
+        $apiCategories = $this->getCategories($token); 
+        $apiCategoryMap = [];
+        foreach ($apiCategories as $categoryApi) {
+            $apiCategoryMap[$categoryApi["name"]] = $categoryApi["id"];
+        }
+        $newCategories = [];
+        foreach ($data as $category) {
+            if (isset($apiCategoryMap[$category])) {
+                $categoryId = $apiCategoryMap[$category];
+                $category->setWisersellCategoryId($categoryId);
+                if ($category->save()) {
+                    echo "Kategori güncellendi: " . $category->getCategory() . "\n";
+                } else {
+                    echo "Kategori kaydedilirken bir hata oluştu: " . $category->getCategory() . "\n";
+                }
+            } else {
+                echo "Yeni Kategori Eklenecek: $category\n";
+                $newCategories[] = $category;
+            }
+        }
+        return $newCategories;
+    }   
     protected function addCategoryByIwapim(){
         $token = $this->getAccessToken();
         sleep(3);
@@ -368,16 +432,19 @@ class WisersellCommand extends AbstractCommand{
         foreach ($categories as $category) {
             $data[] = $category->getCategory();
         }
-        $result = $this->addCategory($token, $data);
-        foreach ($result as $wisersellCategory) {
-            foreach ($categories as $category) {
-                if ($category->getCategory() === $wisersellCategory['name']) {
-                    $category->setWisersellCategoryId($wisersellCategory['id']);
-                    $category->save();
-                    break;
+        $newCategories = $this->categoryControl($token,$data);    
+        if(!empty($newCategories)){
+            $result = $this->addCategory($token, $data);
+            foreach ($result as $wisersellCategory) {
+                foreach ($categories as $category) {
+                    if ($category->getCategory() === $wisersellCategory['name']) {
+                        $category->setWisersellCategoryId($wisersellCategory['id']);
+                        $category->save();
+                        break;
+                    }
                 }
             }
-        }
+        }    
     }
     protected function addProductByIwapim(){
         //$token = $this->getAccessToken();
@@ -403,8 +470,16 @@ class WisersellCommand extends AbstractCommand{
             foreach ($products as $product) {
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
-                $productName = $product->getInheritedField("name"); 
 
+
+                $response = $this->control($token,$product,$iwasku);
+
+
+                
+
+
+
+                $productName = $product->getInheritedField("name"); 
                 $categoryName = $product->getProductCategory();
                 $categoryId = null;
                 foreach($categories as $category){
@@ -412,28 +487,45 @@ class WisersellCommand extends AbstractCommand{
                         $categoryId = $category->getWisersellCategoryId();
                     }
                 }
+                if($categoryId==null) continue;
                 $variationSize = $product->getInheritedField("variationSize") ?? null;
                 $variationColor = $product->getInheritedField("variationColor") ?? null;
                 $width = $product->getInheritedField("packageDimension1") ?? null;
                 $length = $product->getInheritedField("packageDimension2") ?? null;
                 $height = $product->getInheritedField("packageDimension3") ?? null;
                 $weight = $product->getInheritedField("packageWeight") ?? null;
+                $extraData = [
+                    [
+                        "variationSize" => $variationSize,
+                        "variationColor" => $variationColor
+                    ]
+                ];
+                $productData = [
+                    [
+                        "name" => $productName,
+                        "code" => $iwasku,
+                        "categoryId" => $categoryId,
+                        "weight" => $weight,
+                        "width" => $width,
+                        "length" => $length,
+                        "height" => $height,
+                        "extradata"=> $extraData,
+                        "subproducts" => []
+                    ]
+                ];
 
-                echo "IWASKU: $iwasku\n";
-                echo "Product Name: $productName\n";
-                echo "Category Name: $categoryName\n";
-                echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
-                echo "Variation Size: " . $variationSize . "\n";
-                echo "Variation Color: " . $variationColor . "\n";
-                echo "Width: " . $width . "\n";
-                echo "Length: " . $length . "\n";
-                echo "Height: " . $height . "\n";
-                echo "Weight: " . $weight . "\n";
-                echo "--------------------\n";
+                // echo "IWASKU: $iwasku\n";
+                // echo "Product Name: $productName\n";
+                // echo "Category Name: $categoryName\n";
+                // echo "Category ID: " . ($categoryId !== null ? $categoryId : 'Not found') . "\n";
+                // echo "Variation Size: " . $variationSize . "\n";
+                // echo "Variation Color: " . $variationColor . "\n";
+                // echo "Width: " . $width . "\n";
+                // echo "Length: " . $length . "\n";
+                // echo "Height: " . $height . "\n";
+                // echo "Weight: " . $weight . "\n";
+                // echo "--------------------\n";
             }
         }
-
-        
-
     }
 }
