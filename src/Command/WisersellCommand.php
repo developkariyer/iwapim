@@ -410,7 +410,7 @@ class WisersellCommand extends AbstractCommand{
         foreach ($data as $category) {
             if (isset($apiCategoryMap[$category])) {
                 $categoryId = $apiCategoryMap[$category];
-                
+
                 
 
             } else {
@@ -432,7 +432,7 @@ class WisersellCommand extends AbstractCommand{
         $newCategories = $this->categoryControl($token,$data);    
         sleep(3);
         if(!empty($newCategories)){
-            $result = $this->addCategory($token, $data);
+            $result = $this->addCategory($token, $newCategories);
             foreach ($result as $wisersellCategory) {
                 foreach ($categories as $category) {
                     if ($category->getCategory() === $wisersellCategory['name']) {
