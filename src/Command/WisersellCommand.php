@@ -430,20 +430,11 @@ class WisersellCommand extends AbstractCommand{
             $offset += $pageSize;
             foreach ($products as $product) {
                 $iwasku = $product->getInheritedField("iwasku");
-                if ($iwasku === null) {
-                    echo "Missing iwasku for product ID: " . $product->getId() . "\n";
-                    continue; 
-                }
-                $found = false;
                 foreach ($this->listings as $listing) {
-                    if ($listing['code'] == $iwasku) {
+                    if ($listing['code'] === $iwasku) {
                         echo "Product found: " . $iwasku . "\n";
-                        $found = true;
                         break; 
                     }
-                }
-                if (!$found) {
-                    echo "No matching code for iwasku: " . $iwasku . "\n";
                 }
             }
         }
