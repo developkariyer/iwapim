@@ -395,7 +395,7 @@ class WisersellCommand extends AbstractCommand{
     }
 
     protected function controlProduct(){
-        $filenamejson =  PIMCORE_PROJECT_ROOT. 'tmp/wisersell.json';
+        $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
             $this->listings = json_decode($contentJson, true);          
