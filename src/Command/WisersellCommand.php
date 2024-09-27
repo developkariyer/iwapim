@@ -436,7 +436,7 @@ class WisersellCommand extends AbstractCommand{
                             $product->setWisersellId($listing['id']); 
                             $product->setWisersellJson(json_encode($listing));
                             $product->save();
-                            echo "WisersellId updated successfully: " . $wisersellId;
+                            echo "WisersellId updated successfully: " . $listing['id'];
                         } catch (Exception $e) {
                             echo "Error occurred while updating WisersellId: " . $e->getMessage();
                         }
