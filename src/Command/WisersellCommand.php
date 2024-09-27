@@ -453,9 +453,10 @@ class WisersellCommand extends AbstractCommand{
         foreach ($this->wisersellListings as $listing) {
             $code = $listing['code'];
             $id = $listing['id'];
-            $iwasku =  $this->iwapimListings['iwasku'];
-            $product = VariantProduct::findOneByField("iwasku", $iwasku);
-            print_r($product);
+            print_r($this->iwapimListings);
+            // $iwasku =  $this->iwapimListings['iwasku'];
+            // $product = VariantProduct::findOneByField("iwasku", $iwasku);
+            // print_r($product);
                 
 
             // if (empty($iwasku)) {
