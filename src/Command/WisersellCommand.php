@@ -41,7 +41,7 @@ class WisersellCommand extends AbstractCommand{
         }
         $token = $this->getAccessToken();
 
-        $this->downloadWisersellProduct();
+        $this->controlWisersellProduct();
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
@@ -411,13 +411,9 @@ class WisersellCommand extends AbstractCommand{
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->listings)."\n";
-        echo "-------------------------\n\n\n\n\n";
-        foreach ($this->listings as $listing) {
-            echo "code: ".$listing['code']."\n";
-        }
     }
-    protected function controlWisersellProduct($key){
-
+    protected function controlWisersellProduct(){
+        $this->downloadWisersellProduct();
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $pageSize = 50;
@@ -435,18 +431,18 @@ class WisersellCommand extends AbstractCommand{
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
                 sleep(3);
+                foreach ($listing as $this->listings) {
+                    if ($listings['code'] === $iwasku) {
+                        echo "Product found: " . $iwasku . "\n";
+                        break;
+                    }
+                }
 
                 
             }
         }
 
 
-
-        foreach ($this->listings as $listing) {
-            if ($listing['code'] === $key) {
-                return $listing;
-            }
-        }
         return null;
     }
 
