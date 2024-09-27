@@ -434,7 +434,7 @@ class WisersellCommand extends AbstractCommand{
                 foreach ($products as $product) {
                     if ($product->level() == 1) {
                         $iwasku = $product->getInheritedField("iwasku");
-                        $this->iwapimListings[$iwasku] = [
+                        $this->iwapimListings[$iwasku] = (object) [
                             'product' => $product,
                             'control' => false
                         ];
@@ -454,11 +454,7 @@ class WisersellCommand extends AbstractCommand{
             $iwasku = $listing['code'];
             $id = $listing['id'];
             $product = $this->iwapimListings[$iwasku]['product'];
-            if (is_object($product)) {
-                echo $product->getWisersellId();
-            } else {
-                echo "Hata: \$product bir nesne değil, bir " . gettype($product) . ".";
-            }
+          
 
             // if (empty($iwasku)) {
             //     echo "\nHata: Wisersell {$id} degerine sahip urunun  'code' değeri bos. Bu urun atlaniyor.\n";
