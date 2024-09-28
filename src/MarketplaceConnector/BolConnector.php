@@ -82,6 +82,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
         curl_close($curl);
         $this->marketplace->setBolJwtToken($this->accessToken);
+        $this->marketplace->save();
     }
 
   
