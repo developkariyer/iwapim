@@ -148,6 +148,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     protected function getListings($report)
     {
+        $sleep = 200000;
         $rows = array_map('str_getcsv', explode("\n", trim($report)));
         $headers = array_shift($rows);
         $this->listings = [];
@@ -158,14 +159,19 @@ class BolConnector extends MarketplaceConnectorAbstract
                 echo "Downloading $ean ";
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadExtra(static::$catalogProductsUrl, 'GET', $ean);
+                usleep($sleep);
                 $this->listings[$ean]['assets'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/assets", ['usage' => 'IMAGE']);
+                usleep($sleep);
                 $this->listings[$ean]['placement'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/placement");
+                usleep($sleep);
                 $this->listings[$ean]['commission'] = $this->downloadExtra(static::$commissionUrl, 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
+                usleep($sleep);
                 $this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/product-ids");
-                //$this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
+                usleep($sleep);
                 Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings[$ean]));
-                usleep(1000000);
+                usleep($sleep);
                 echo "OK\n";
+                usleep($sleep);
             }
         }
     }
