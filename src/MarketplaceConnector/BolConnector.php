@@ -64,6 +64,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
         if ($report === false) {
             echo "Requesting offer report from Bol.com\n";
+            $this->prepareToken();
             $response = $this->httpClient->request('POST', static::$offerExportUrl, [
                 'json' => [
                     'format' => 'CSV'
@@ -112,7 +113,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             $entityId = $decodedResponse['entityId'] ?? [];
             print_r($decodedResponse);
             if (!empty($entityId)) {
-                $response = $this->httpClient->request('GET', static::$productsUrl . $entityId);
+                $response = $this->httpClient->request('GET', static::$offerExportUrl . $entityId);
                 if ($response->getStatusCode() !== 200) {
                     throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
                 }
