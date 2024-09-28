@@ -148,6 +148,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 echo "Failed to get catalog product for $ean:".$response->getContent()."\n";
                 continue;
             }
+            echo "Catalog product for $ean downloaded\n";
             $decodedResponse = json_decode($response->getContent(), true);
             $this->listings[$ean]['catalog'] = $decodedResponse;
             usleep(250000);
@@ -165,6 +166,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 echo "Failed to get assets for $ean:".$response->getContent()."\n";
                 continue;
             }
+            echo "Assets for $ean downloaded\n";
             $decodedResponse = json_decode($response->getContent(), true);
             $this->listings[$ean]['assets'] = $decodedResponse;
             usleep(250000);
