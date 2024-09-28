@@ -83,11 +83,10 @@ class BolConnector extends MarketplaceConnectorAbstract
                     break;
                 case 'FAILURE':
                     throw new \Exception('Failed to get offer report from Bol.com');
-                    break;
                 case 'TIMEOUT':
                     throw new \Exception('Timeout while getting offer report from Bol.com');
-                    break;
             }
+            print_r($decodedResponse);
             while (!$status) {
                 echo "  Waiting for report...\n";
                 sleep(2);
