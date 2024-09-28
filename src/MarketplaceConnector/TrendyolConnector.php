@@ -1,34 +1,14 @@
 <?php
 
-namespace App\Utils;
+namespace App\MarketplaceConnector;
 
-use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
 
-class TrendyolConnector implements MarketplaceConnectorInterface
+class TrendyolConnector extends MarketplaceConnectorAbstract
 {
-
-    private $marketplace = null;
-    private $listings = [];
-
-    public function __construct(Marketplace $marketplace)
-    {
-        if (!$marketplace instanceof Marketplace ||
-            !$marketplace->getPublished() ||
-            $marketplace->getMarketplaceType() !== 'Trendyol' ||
-            empty($marketplace->getTrendyolApiKey()) ||
-            empty($marketplace->getTrendyolApiSecret()) ||
-            empty($marketplace->getTrendyolSellerId()) ||
-            empty($marketplace->getTrendyolToken())
-        ) {
-            throw new \Exception("Marketplace is not published, is not Trendyol or credentials are empty");
-        }
-        $this->marketplace = $marketplace;
-    }
-
     public function download($forceDownload = false)
     {
         $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
@@ -71,30 +51,10 @@ class TrendyolConnector implements MarketplaceConnectorInterface
 
     public function downloadInventory()
     {
-
     }
 
     public function downloadOrders()
     {
-        
-    }
-
-    private function getImage($listing) {
-        $image = $listing['images'][0]['url'] ?? '';
-        if (!empty($image)) {
-            $imageAsset = Utility::findImageByName("Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image).".jpg");
-            if ($imageAsset) {
-                $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
-            }
-            return new \Pimcore\Model\DataObject\Data\ExternalImage($image);
-        }
-        return null;
-    }
-
-    private function getUrlLink($listing) {
-        $l = new Link();
-        $l->setPath($listing['productUrl'] ?? '');
-        return $l;
     }
 
     private function getAttributes($listing) {
@@ -137,8 +97,8 @@ class TrendyolConnector implements MarketplaceConnectorInterface
             }
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => $this->getImage($listing),
-                    'urlLink' => $this->getUrlLink($listing),
+                    'imageUrl' => $this->getCachedImage($listing['images'][0]['url'] ?? ''),
+                    'urlLink' => $this->getUrlLink($listing['productUrl'] ?? ''),
                     'salePrice' => $listing['salePrice'] ?? 0,
                     'saleCurrency' => 'TL',
                     'title' => $listing['title'] ?? '',

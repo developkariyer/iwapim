@@ -2,7 +2,7 @@
 
 
 /*
-
+This code runs in remote Etsy workstations only. Put here for reference.
 
 <?php
 

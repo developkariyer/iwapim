@@ -1,43 +1,51 @@
 <?php
 
-namespace App\Utils;
+namespace App\MarketplaceConnector;
 
-use SellingPartnerApi\SellingPartnerApi;
-use SellingPartnerApi\Enums\Endpoint;
-use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
+use Symfony\Component\HttpClient\HttpClient;
 
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
+use App\MarketplaceConnector\MarketplaceConnectorAbstract;
 
 
-class  BolConnector
+class BolConnector extends MarketplaceConnectorAbstract
 {
-    private $marketplace = null;
-    private $listings = [];
     private $listingsInfo = [];
     private $accessToken = "";
     private $offerExportUrl = "https://api.bol.com/retailer/offers/export/";
     private $processStatusUrl = "https://api.bol.com/shared/process-status/";
     private $productsUrl  = "https://api.bol.com/retailer/products/";
     private $productDetailUrl = "https://api.bol.com/retailer/content/catalog-products/";
+    private $httpClient = null;
 
     public function __construct(Marketplace $marketplace)
     {
-        if (!$marketplace instanceof Marketplace ||
-            !$marketplace->getPublished() ||
-            $marketplace->getMarketplaceType() !== 'Bol.com' ||
-            empty($marketplace->getBolClientId()) ||
-            empty($marketplace->getBolSecret())
-        ) {
-            throw new \Exception("Marketplace is not published, is not Amazon or credentials are empty");
+        function checkTokenValidity($token) {
+            $tokenParts = explode(".", $token);
+            $tokenHeader = base64_decode($tokenParts[0]);
+            $tokenPayload = base64_decode($tokenParts[1]);
+            $jwtHeader = json_decode($tokenHeader, true);
+            $jwtPayload = json_decode($tokenPayload, true);
+            $currentTimestamp = time();
+            if ($jwtPayload['exp'] < $currentTimestamp) {
+                return false;
+            }
+            return true;
         }
-        $this->marketplace = $marketplace;
+
+        parent::__construct($marketplace);
+
+        //$this->httpClient = new HttpClient();
+
+        //if (!checkTokenValidity($marketplace->getBolJwtToken())) {
+        //    $this->getAccessToken();
+        //}
+
     }
-
-
 
     // Create Access Token
     private function getAccessToken()
@@ -46,14 +54,12 @@ class  BolConnector
         $credentials = $this->marketplace->getBolClientId() . ':' . $this->marketplace->getBolSecret();
         $encoded_credentials = base64_encode($credentials);
 
-        // Headers
         $headers = [
-            'Authorization: Basic ' . $encoded_credentials,
+            "Authorization: Basic $encoded_credentials",
             'Accept: application/json'
         ];
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $apiUrl);
+        $curl = curl_init($apiUrl);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -74,63 +80,49 @@ class  BolConnector
             }
         }
         curl_close($curl);
+        $this->marketplace->setBolJwtToken($this->accessToken);
     }
 
   
     public function download($forceDownload = false)
     {
-
         $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.csv';
         $filenamejson = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
-
         if (!$forceDownload && file_exists($filename) && file_exists($filenamejson) && filemtime($filename) > time() - 86400) {
-
             $csvContent = file_get_contents($filename);
             $contentJson = file_get_contents($filenamejson);
             $this->listings = json_decode($contentJson, true);          
             echo "Using cached data ";
-
-
         } else {   
             $this->listings = [];
             $entityId = "";
-
-            // get access token
             $this->getAccessToken();
-
-            // offer post csv
             $headers = [
                 'Authorization: Bearer ' . $this->accessToken,
                 'Accept: application/vnd.retailer.v10+json',
                 'Content-Type: application/vnd.retailer.v10+json'
             ];
             $postData = json_encode(['format' => 'CSV']);
-
             $this->addProductInfo($this->offerExportUrl,"",$headers,"POST",$postData);
             $status = "";
             $processStatusId= "";
-            foreach ($this->listings as $listingArray) 
-            {
+            foreach ($this->listings as $listingArray) {
                 if (isset($listingArray[$this->offerExportUrl])) {
                     $status = $listingArray[$this->offerExportUrl]['status'] ?? null;
                     $processStatusId = $listingArray[$this->offerExportUrl]['processStatusId'] ?? null;
                     echo "Status: " . $status . "\n";
                 }
             }
-
-            do{
+            do {
                 $this->addProductInfo($this->processStatusUrl,"",$headers,"GET",null,false,$processStatusId);
-                foreach ($this->listings as $listingArray) 
-                {
+                foreach ($this->listings as $listingArray) {
                     if (isset($listingArray[$this->processStatusUrl.$processStatusId])) {
                         $status = $listingArray[$this->processStatusUrl.$processStatusId]['status'] ?? null;
                         echo "Status: " . $status . "\n";
                     }
                 }
-                if($status === 'SUCCESS')
-                {
-                    foreach ($this->listings as $listingArray) 
-                    {
+                if ($status === 'SUCCESS') {
+                    foreach ($this->listings as $listingArray) {
                         if (isset($listingArray[$this->processStatusUrl.$processStatusId])) {
                             $entityId = $listingArray[$this->processStatusUrl.$processStatusId]['entityId'] ?? null;
                             echo "entityId: " . $entityId . "\n";
@@ -139,8 +131,7 @@ class  BolConnector
                     break;
                 }
                 sleep(5);
-            }while($status !== 'SUCCESS');
-
+            } while ($status !== 'SUCCESS');
             
             //get offers 
             $headers = [
@@ -167,10 +158,9 @@ class  BolConnector
         $jsonListings = json_encode($this->listings);
         file_put_contents($filenamejson, $jsonListings);
 
-
         echo "count listings: ".count($this->listings);
         
-        return  count($this->listings);
+        return count($this->listings);
     }
 
     private function addProductInfo($url,$urlEnd="",$headers,$method,$postData=null,$boolEan=false,$processStatusId=null,$entityId=null,$csv=false)
@@ -189,37 +179,29 @@ class  BolConnector
             $control = true;
         }
         $firstElementSkipped = false;
-        foreach ($this->listings as &$listing) 
-        {
+        foreach ($this->listings as &$listing) {
             if (!$firstElementSkipped && $boolEan) {
                 $firstElementSkipped = true; 
                 continue;
             }
             $urlFunction = "";
-            if($boolEan)
-                $urlFunction = $url.$listing["ean"].$urlEnd;
-            else if($processStatusId)
-                $urlFunction = $url.$processStatusId;
-            else if($entityId)
-                $urlFunction = $url.$entityId;
-            else
-                $urlFunction = $url;
+            if ($boolEan) $urlFunction = $url.$listing["ean"].$urlEnd;
+            elseif ($processStatusId) $urlFunction = $url.$processStatusId;
+            elseif ($entityId) $urlFunction = $url.$entityId;
+            else $urlFunction = $url;
     
-
             $ch = curl_init($urlFunction);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
             // Post metodunu kontrol et
-            if($method == "POST")
-            {
+            if ($method === "POST") {
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
             }
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if($csv)
-            {
+            if ($csv) {
                 $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.csv';
                 echo $response;
                 file_put_contents($filename, $response);
@@ -237,17 +219,11 @@ class  BolConnector
             if (curl_errno($ch)) {
                 echo 'Curl error: ' . curl_error($ch);
             } else {
-                $decoded_response = json_decode($response, true);   
-                if ($decoded_response) {
-                    $listing[$urlFunction] = $decoded_response;
-                } else {
-                    $listing[$urlFunction] = null;
-                }                
+                $listing[$urlFunction] = json_decode($response, true);
             }
             curl_close($ch);
             sleep(1);
-            if($control)
-                break;
+            if($control) break;
         }
     }
 
@@ -282,32 +258,12 @@ class  BolConnector
         if (!empty($listing['attributes']) && is_array($listing['attributes'])) {
             $values = array_filter(array_map(function($value) {
                 return is_string($value) ? str_replace(' ', '', $value) : '';
-            }, $listing['attributes']));
-            
+            }, $listing['attributes']));            
             if (!empty($values)) {
                 return implode('-', $values);
             }
         }
         return '';
-    }
-
-
-    private function getUrlLink($listing) {
-        $l = new Link();
-        $l->setPath($listing["url"] ?? '');
-        return $l;
-    }
-
-    private function getImage($listing) {
-        $image = $listing['imageUrl'] ?? '';
-        if (!empty($image)) {
-            $imageAsset = Utility::findImageByName("Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image).".jpg");
-            if ($imageAsset) {
-                $image = "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath());
-            }
-            return new \Pimcore\Model\DataObject\Data\ExternalImage($image);
-        }
-        return null;
     }
 
     private function parseListing() 
@@ -450,8 +406,8 @@ class  BolConnector
                 }
                 VariantProduct::addUpdateVariant(
                     variant: [
-                        'imageUrl' => $this->getImage($listing['listing']),
-                        'urlLink' => $this->getUrlLink($listing['listing']),
+                        'imageUrl' => $this->getCachedImage($listing['imageUrl'] ?? ''),
+                        'urlLink' => $this->getUrlLink($listing["url"] ?? ''),
                         'salePrice' => $listing['listing']['bundlePricesPrice'] ?? 0,
                         'saleCurrency' => 'EUR',
                         'title' => $title,
@@ -514,6 +470,9 @@ class  BolConnector
 
     }
 
+    public function downloadInventory()
+    {
 
+    }
 
 }

@@ -2,9 +2,9 @@
 
 namespace App\Model\DataObject;
 
+use App\MarketplaceConnector\AmazonConstants;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Marketplace\Listing;
-use App\Select\AmazonMerchantIdList;
 
 class Marketplace extends Concrete
 {
@@ -27,7 +27,7 @@ class Marketplace extends Concrete
                 $marketplacesArray[$marketplace->getKey()] = '';
             }
         }
-        foreach (array_keys(AmazonMerchantIdList::$amazonMerchantIdList) as $key) {
+        foreach (array_keys(AmazonConstants::amazonMerchantIdList) as $key) {
             $marketplacesArray["Amazon_{$key}"] = '';
         }
         return $marketplacesArray;

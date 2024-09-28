@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace App\MarketplaceConnector;
 
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
@@ -13,61 +13,45 @@ use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
 use Pimcore\Model\DataObject\Folder;
 
-
-use App\Select\AmazonMerchantIdList;
+use App\Constants\AmazonConstants;
 use App\Utils\Utility;
 
-class AmazonConnector implements MarketplaceConnectorInterface
+class AmazonConnector  extends MarketplaceConnectorAbstract
 {
+    public static $marketplaceType = 'Amazon';
+
     private array $amazonCountryReports = [
 //        'GET_FLAT_FILE_OPEN_LISTINGS_DATA' => [],
         'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
         //'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
                 //'GET_AFN_INVENTORY_DATA' => [],
-        //'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
         //'GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA' => [],
     ];
 
     private array $amazonReports = [
         'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
+        'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
     ];
 
     private $amazonSellerConnector = null;
     private $countryCodes = [];
     private $mainCountry = null;
-    private $marketplace = null;
-    private $listings = [];
 
-    public function __construct(Marketplace $marketplace)
+    public function __construct(Marketplace $marketplace) 
     {
-        if (!$marketplace instanceof Marketplace ||
-            !$marketplace->getPublished() ||
-            $marketplace->getMarketplaceType() !== 'Amazon' ||
-            empty($marketplace->getClientId()) ||
-            empty($marketplace->getClientSecret()) ||
-            empty($marketplace->getRefreshToken())
-        ) {
-            throw new \Exception("Marketplace is not published, is not Amazon or credentials are empty");
-        }
+        parent::__construct($marketplace);
 
-        $countryCodes = $marketplace->getMerchantIds() ?? [];
-        if (!empty($countryCodes)) {
-            $missingCodes = array_diff($countryCodes, array_keys(AmazonMerchantIdList::$amazonMerchantIdList));
-            if (!empty($missingCodes)) {
-                $missingCodesStr = implode(', ', $missingCodes);
-                throw new \Exception("The following country codes are not in merchantIdList in AmazonConnector class: $missingCodesStr");
-            }
+        $this->countryCodes = $marketplace->getMerchantIds() ?? [];
+        if (!AmazonConstants::checkCountryCodes($this->countryCodes)) {
+            throw new \Exception("Country codes are not valid");
         }
-
         $this->mainCountry = $marketplace->getMainMerchant();
         $endpoint = match ($this->mainCountry) {
-            "CA","US","MX","BR" => Endpoint::NA,
-            "SG","AU","JP" => Endpoint::FE,
-            default => Endpoint::EU,
+            "CA", "US", "MX", "BR" => Endpoint::NA,
+            "SG", "AU", "JP", "IN" => Endpoint::FE,
+            "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" => Endpoint::EU,
+            default => Endpoint::NA,
         };
-
-        $this->marketplace = $marketplace;
-        $this->countryCodes = $countryCodes;
         $this->amazonSellerConnector = SellingPartnerApi::seller(
             clientId: $marketplace->getClientId(),
             clientSecret: $marketplace->getClientSecret(),
@@ -86,15 +70,16 @@ class AmazonConnector implements MarketplaceConnectorInterface
             throw new \Exception(message: "Report Type $reportType is not in reportNames in AmazonConnector class");
         }
         echo "        Downloading Report $reportType ";
-        $filename = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}_{$reportType}_{$country}.csv";
-        
-        if (!$forceDownload && file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
-            $report = file_get_contents(filename: $filename);
-            echo "Using cached data ";
+        $report = Utility::getCustomCache(
+            "{$reportType}_{$country}.csv", 
+            PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}"
+        );
+        if ($report === true && !$forceDownload) {
+            echo "(Cached) ";
         } else {
             echo "Waiting Report ";
             $reportsApi = $this->amazonSellerConnector->reportsV20210630();
-            $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonMerchantIdList::$amazonMerchantIdList[$country]]));
+            $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonConstants::amazonMerchantIdList[$country]]));
             $reportId = $response->json()['reportId'];
             while (true) {
                 sleep(seconds: 10);
@@ -111,7 +96,11 @@ class AmazonConnector implements MarketplaceConnectorInterface
             if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
                 $report = gzdecode(data: $report);
             }
-            file_put_contents(filename: $filename, data: $report);
+            Utility::setCustomCache(
+                "{$reportType}_{$country}.csv",
+                PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}",
+                $report
+            );
             echo "OK ";
         }
         if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
@@ -211,7 +200,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$asin['asin']}.json";
             if (file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
                 $item = json_decode(file_get_contents(filename: $filename), true);
-                $connectors[$asin['country']]->storeJsonData($item);
+                Utility::storeJsonData($connectors[$asin['country']]->marketplace->getId(), $item['asin'], $item);
                 echo ".";
                 continue;
             }
@@ -235,7 +224,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     {
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
         $response = $catalogApi->searchCatalogItems(
-            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+            marketplaceIds: [AmazonConstants::amazonMerchantIdList[$country]],
             identifiers: $asins,
             identifiersType: 'ASIN',
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
@@ -246,35 +235,15 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $downloadedAsins = [];
         foreach ($items as $item) {
             $downloadedAsins[] = $item['asin'];
-            file_put_contents(filename: PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$item['asin']}.json", data: json_encode(value: $item));
-            $this->storeJsonData($item);
+            Utility::setCustomCache(
+                "{$item['asin']}.json", 
+                PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/ASINS', 
+                json_encode($item)
+            );
+            Utility::storeJsonData($this->marketplace->getId(), $item['asin'], $item);
         }
         echo "Asked ".implode(separator: ',', array: $asins)."; downloaded ".implode(separator: ',', array: $downloadedAsins)." from {$country}\n";
         return array_diff($asins, $downloadedAsins);
-    }
-
-    protected function retrieveJsonData($asin)
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "SELECT json_data FROM iwa_json_store WHERE field_name=?";
-        $result = $db->fetchAssociative($sql, [$asin]);
-        if ($result) {
-            return json_decode($result['json_data'], true);
-        }
-        return null;
-    }
-
-    protected function storeJsonData($item)
-    {
-        $db = \Pimcore\Db::get();
-        try {
-            $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) 
-                ON DUPLICATE KEY UPDATE json_data=?";
-            $smtm = $db->prepare($sql);
-            $smtm->execute([$this->marketplace->getId(), $item['asin'], json_encode($item), json_encode($item)]);
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
     }
 
     public function download($forceDownload = false): void
@@ -290,8 +259,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
     }
 
     public function downloadOrders(): void
-    {
-        
+    {        
     }
 
     public function downloadInventory(): void
@@ -309,8 +277,8 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 do {
                     $response = $inventoryApi->getInventorySummaries(
                         granularityType: 'Marketplace',
-                        granularityId: AmazonMerchantIdList::$amazonMerchantIdList[$country],
-                        marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
+                        granularityId: AmazonConstants::amazonMerchantIdList[$country],
+                        marketplaceIds: [AmazonConstants::amazonMerchantIdList[$country]],
                         details: true,
                         nextToken: $nextToken
                     );
@@ -378,49 +346,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $this->listings[$country] =  $listings;
     }
 
-    private function getImage($listing) {
-        $image = $listing['summaries'][0]['mainImage']['link'] ?? '';
-        if (!empty($image)) {
-            return new \Pimcore\Model\DataObject\Data\ExternalImage($image);
-        }
-        return null;
-    }
-
-    private function getUrlLink($listing, $country) {
-        $amazonWebsites = [
-            'CA' => 'https://www.amazon.ca',       // Canada
-            'US' => 'https://www.amazon.com',      // United States
-            'MX' => 'https://www.amazon.com.mx',   // Mexico
-            'BR' => 'https://www.amazon.com.br',   // Brazil
-            'ES' => 'https://www.amazon.es',       // Spain
-            'UK' => 'https://www.amazon.co.uk',    // United Kingdom
-            'FR' => 'https://www.amazon.fr',       // France
-            'NL' => 'https://www.amazon.nl',       // Netherlands
-            'BE' => 'https://www.amazon.com.be',   // Belgium
-            'DE' => 'https://www.amazon.de',       // Germany
-            'IT' => 'https://www.amazon.it',       // Italy
-            'SE' => 'https://www.amazon.se',       // Sweden
-            //'' => '',      // South Africa
-            'PL' => 'https://www.amazon.pl',       // Poland
-            'SA' => 'https://www.amazon.sa',       // Saudi Arabia
-            'EG' => 'https://www.amazon.eg',       // Egypt
-            'TR' => 'https://www.amazon.com.tr',   // Turkey
-            'AE' => 'https://www.amazon.ae',       // United Arab Emirates
-            'IN' => 'https://www.amazon.in',       // India
-            'SG' => 'https://www.amazon.sg',       // Singapore
-            'AU' => 'https://www.amazon.com.au',   // Australia
-            'JP' => 'https://www.amazon.co.jp',    // Japan
-        ];
-        
-        $l = new Link();
-        $l->setPath($amazonWebsites[$country].'/dp/' . ($listing['asin1'] ?? ''));
-        return $l;
-    }
-
     private function getAttributes($listing) {
         $title = $listing['item-name'];
         if (preg_match('/\(([^()]*)\)[^\(]*$/', $title, $matches)) {
-
             return trim($matches[1]);
         }
         return '';    
@@ -428,15 +356,14 @@ class AmazonConnector implements MarketplaceConnectorInterface
 
     private function getTitle($listing)
     {
-        $title = str_replace('('.$this->getAttributes($listing).')', '', $listing['item-name'] ?? '');
-        return trim($title);
+        return trim(str_replace('('.$this->getAttributes($listing).')','',$listing['item-name'] ?? ''));
     }
 
     private function getFolder($asin): Folder
     {
         $folder = Utility::checkSetPath("Amazon", Utility::checkSetPath('Pazaryerleri'));
 
-        $json = $this->retrieveJsonData($asin);
+        $json = Utility::retrieveJsonData($asin);
         if (!empty($json) && !empty($json['classifications'][0]['classifications'][0]['displayName'])) {
             $folderTree = [];
             $parent = $json['classifications'][0]['classifications'][0];
@@ -480,7 +407,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $variantProduct = VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => null,
-                        'urlLink' => $this->getUrlLink($listing, $country),
+                        'urlLink' => $this->getUrlLink(AmazonConstants::amazonWebsites[$country].'/dp/' . ($listing['asin1'] ?? '')),
                         'salePrice' => 0,
                         'saleCurrency' => '',
                         'title' => $this->getTitle($listing),
@@ -519,25 +446,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
                 $found = true;
                 $amazonCollection->setMarketplaceId($country);
                 $amazonCollection->setTitle($this->getTitle($listing));
-                $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
+                $amazonCollection->setUrlLink($this->getUrlLink(AmazonConstants::amazonWebsites[$country].'/dp/' . ($listing['asin1'] ?? '')));
                 $amazonCollection->setSalePrice($listing['price'] ?? 0);
-                $amazonCollection->setSaleCurrency(match ($country) {
-                    'CA' => 'CAD',
-                    'US' => 'USD',
-                    'MX' => 'MXN',
-                    'TR' => 'TRY',
-                    'UK' => 'GBP',
-                    'PL' => 'PLN',
-                    'SE' => 'SEK',
-                    'SA' => 'SAR',
-                    'EG' => 'EGP',
-                    'AE' => 'AED',
-                    'IN' => 'INR',
-                    'SG' => 'SGD',
-                    'AU' => 'AUD',
-                    'JP' => 'JPY',
-                    default => 'EURO',
-                });
+                $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
                 $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
                 $amazonCollection->setStatus($listing['status'] ?? '');
@@ -552,25 +463,9 @@ class AmazonConnector implements MarketplaceConnectorInterface
             $amazonCollection = new AmazonMarketplace();
             $amazonCollection->setMarketplaceId($country);
             $amazonCollection->setTitle($this->getTitle($listing));
-            $amazonCollection->setUrlLink($this->getUrlLink($listing, $country));
+            $amazonCollection->setUrlLink($this->getUrlLink(AmazonConstants::amazonWebsites[$country].'/dp/' . ($listing['asin1'] ?? '')));
             $amazonCollection->setSalePrice($listing['price'] ?? 0);
-            $amazonCollection->setSaleCurrency(match ($country) {
-                'CA' => 'CAD',
-                'US' => 'USD',
-                'MX' => 'MXN',
-                'TR' => 'TRY',
-                'UK' => 'GBP',
-                'PL' => 'PLN',
-                'SE' => 'SEK',
-                'SA' => 'SAR',
-                'EG' => 'EGP',
-                'AE' => 'AED',
-                'IN' => 'INR',
-                'SG' => 'SGD',
-                'AU' => 'AUD',
-                'JP' => 'JPY',
-                default => 'EURO',
-            });
+            $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
             $amazonCollection->setSku($listing['seller-sku'] ?? '');
             $amazonCollection->setListingId($listing['listing-id'] ?? '');
             $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
@@ -618,7 +513,7 @@ class AmazonConnector implements MarketplaceConnectorInterface
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $listingItem = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
-            marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList['MX']],
+            marketplaceIds: [AmazonConstants::amazonMerchantIdList['MX']],
             sku: rawurlencode("09-JWOX-4994"),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
