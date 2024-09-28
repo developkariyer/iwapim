@@ -150,6 +150,14 @@ class CacheImagesCommand extends AbstractCommand
     {
         $json = $variant->jsonRead('apiResponseJson');
         $parentJson = $variant->jsonRead('parentResponseJson');
+        if ($variant->getId() === 189879) {
+            echo "----------------------------------------\n";
+            print_r($json);
+            echo "----------------------------------------\n";
+            print_r($parentJson);
+            echo "----------------------------------------\n";
+            exit;
+        }
         $variantProperty = [];
         $listingImageList = [];
         foreach ($json['property_values'] ?? [] as $property) {
