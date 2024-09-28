@@ -61,7 +61,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOfferReport()
     {
-        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()");
+        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
         if ($report === false) {
             echo "Requesting offer report from Bol.com\n";
             $response = $this->httpClient->request('POST', static::$offerExportUrl, [
@@ -113,7 +113,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
             }
             $report = $this->httpClient->request('GET', $reportLink)->getContent();
-            Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()", $report);
+            Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
         }
         return $report;
     }
