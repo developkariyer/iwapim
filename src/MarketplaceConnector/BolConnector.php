@@ -112,10 +112,13 @@ class BolConnector extends MarketplaceConnectorAbstract
             $entityId = $decodedResponse['entityId'] ?? [];
             print_r($decodedResponse);
             if (!empty($entityId)) {
-                $report = file_get_contents("https://api.bol.com/retailer/offers/export/{$entityId}");
-                if ($report === false) {
-                    throw new \Exception('Failed to get offer report from Bol.com');
+                $response = $this->httpClient->request('GET', static::$productsUrl . $entityId, [
+                    'headers' => []
+                ]);
+                if ($response->getStatusCode() !== 200) {
+                    throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
                 }
+                $report = $response->getContent();
                 Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
             }
         }
