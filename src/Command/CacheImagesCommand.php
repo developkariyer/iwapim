@@ -153,8 +153,11 @@ class CacheImagesCommand extends AbstractCommand
         $variantProperty = [];
         $listingImageList = [];
         if ($variant->getId() === 189879) {
+            echo "----------------------------------------\n";
             print_r($json);
+            echo "----------------------------------------\n";
             print_r($parentJson);
+            echo "----------------------------------------\n";
             exit;
         }
         foreach ($json['property_values'] ?? [] as $property) {
