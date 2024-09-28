@@ -101,7 +101,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 switch ($decodedResponse['status'] ?? '') {
                     case 'SUCCESS':
                         $status = true;
-                        $reportLink = $decodedResponse['links'][0]['href'] ?? '';
                         break;
                     case 'PENDING':
                         $status = false;
@@ -114,7 +113,11 @@ class BolConnector extends MarketplaceConnectorAbstract
             }
             $entityId = $decodedResponse['entityId'] ?? [];
             if (!empty($entityId)) {
-                $response = $this->httpClient->request('GET', static::$offerExportUrl . $processStatusId);
+                $response = $this->httpClient->request('GET', static::$offerExportUrl . $entityId, [
+                    'headers' => [
+                        'Accept' => 'application/vnd.retailer.v10+csv', // The correct Accept header
+                    ]
+                ]);
                 if ($response->getStatusCode() !== 200) {
                     throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
                 }
