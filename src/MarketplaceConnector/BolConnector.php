@@ -129,6 +129,8 @@ class BolConnector extends MarketplaceConnectorAbstract
             return null;
         }
         echo "Assets $usage for $ean downloaded\n";
+        print_r($response);
+        exit;
         return json_decode($response->getContent(), true);
     }
 
