@@ -97,7 +97,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processTrendyol($variant)
     {
-        $json = self::getApiResponse($variant->getId());
+        $json = $variant->jsonRead('apiResponseJson');
         $listingImageList = [];
         foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
@@ -126,7 +126,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processShopify($variant)
     {
-        $parentJson = self::getParentResponse($variant->getId());
+        $parentJson = $variant->jsonRead('parentResponseJson');
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
         $variantImage = null;
@@ -149,8 +149,8 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processEtsy($variant)
     {
-        $json = self::getApiResponse($variant->getId());
-        $parentJson = self::getParentResponse($variant->getId());
+        $json = $variant->jsonRead('apiResponseJson');
+        $parentJson = $variant->jsonRead('parentResponseJson');
         $variantProperty = [];
         $listingImageList = [];
         foreach ($json['property_values'] ?? [] as $property) {
@@ -175,13 +175,17 @@ class CacheImagesCommand extends AbstractCommand
                 $variantImageObj = $imgProcessed;
             }
         }
+        if (!empty($listingImageList)) {
+            $img = reset($listingImageList);
+            $variant->setImageUrl(Utility::getCachedImage($img->getFullPath()));
+        }
         $variant->fixImageCache($listingImageList, $variantImageObj);
         echo "{$variant->getId()} ";        
     }
 
     protected static function processBolCom($variant)
     {
-        $json = self::getApiResponse($variant->getId());
+        $json = $variant->jsonRead('apiResponseJson');
         $listingImageList = [];
         foreach ($json['assets']['assets'] ?? [] as $asset) {
             foreach ($asset['variants'] ?? [] as $assetVariant) {
@@ -275,26 +279,6 @@ class CacheImagesCommand extends AbstractCommand
         $assetList->setCondition("filename = ?", [$imageName]);
         $assetList->setLimit(1);
         return $assetList->current();
-    }
-
-    private static function getResponseFromDb($id, $fieldName)
-    {
-        $db = \Pimcore\Db::get();
-        $response = $db->fetchOne('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=? LIMIT 1', [$id, $fieldName]);
-        if (empty($response)) {
-            return [];
-        }
-        return json_decode($response, true);
-    }
-
-    private static function getApiResponse($id)
-    {
-        return static::getResponseFromDb($id, 'apiResponseJson');
-    }
-
-    private static function getParentResponse($id)
-    {
-        return static::getResponseFromDb($id,'parentResponseJson');
     }
 
     public static function createUniqueFileNameFromUrl($url)
