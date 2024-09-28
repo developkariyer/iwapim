@@ -106,12 +106,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                         break;
                     case 'FAILURE':
                         throw new \Exception('Failed to get offer report from Bol.com');
-                        break;
                     case 'TIMEOUT':
                         throw new \Exception('Timeout while getting offer report from Bol.com');
-                        break;
                 }
             }
+            print_r($decodedResponse);
             $report = $this->httpClient->request('GET', $reportLink)->getContent();
             Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
         }
