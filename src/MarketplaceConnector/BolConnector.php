@@ -135,40 +135,6 @@ class BolConnector extends MarketplaceConnectorAbstract
         return json_decode($response->getContent(), true);
     }
 
-    protected function downloadAsset($ean, $usage)
-    {
-        $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['query' => ['usage' => $usage]]);
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to get assets for $ean:".$response->getContent()."\n";
-            return null;
-        }
-        echo "Assets ";
-        $content = json_decode($response->getContent(), true);
-        return $content['assets'] ?? $content;
-    }
-
-    protected function downloadCatalog($ean)
-    {
-        $response = $this->httpClient->request('GET', static::$catalogProductsUrl . $ean);
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to get catalog product for $ean:".$response->getContent()."\n";
-            return null;
-        }
-        echo "Catalog ";
-        return json_decode($response->getContent(), true);
-    }
-
-    protected function downloadPlacement($ean)
-    {
-        $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/placement');
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to get placement for $ean:".$response->getContent()."\n";
-            return null;
-        }
-        echo "Placement ";
-        return json_decode($response->getContent(), true);
-    }
-
     protected function downloadForecast($offerId)
     {
         $response = $this->httpClient->request('GET', static::$insightsForecastUrl, ['query' => ['offer-id' => $offerId, 'weeks-ahead' => 6]]);
@@ -177,17 +143,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             return null;
         }
         echo "Forecast ";
-        return json_decode($response->getContent(), true);
-    }
-
-    protected function downloadCommission($ean, $price)
-    {
-        $response = $this->httpClient->request('GET', static::$commissionUrl . $ean, ['query' => ['condition' => 'NEW', 'unit-price' => $price]]);
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to get commission for $ean:".$response->getContent()."\n";
-            return null;
-        }
-        echo "Commission ";
         return json_decode($response->getContent(), true);
     }
 
@@ -206,6 +161,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $this->listings[$ean]['assets'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/assets", ['usage' => 'IMAGE']);
                 $this->listings[$ean]['placement'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/placement");
                 $this->listings[$ean]['commission'] = $this->downloadExtra(static::$commissionUrl, 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
+                $this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/product-ids");
+                $this->listings[$ean]['product-detail'] = $this->downloadExtra(static::$productsUrl, 'GET', $ean);
                 //$this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
                 Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings[$ean]));
                 usleep(1000000);
@@ -213,7 +170,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             }
         }
     }
-
 
     public function download($forceDownload = false)
     {
