@@ -194,7 +194,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $this->listings[$ean]['catalog'] = $this->downloadCatalog($ean);
                 $this->listings[$ean]['assets'] = $this->downloadAsset($ean, 'IMAGE');
                 $this->listings[$ean]['placement'] = $this->downloadPlacement($ean);
-                $this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
+                //$this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
                 $this->listings[$ean]['commission'] = $this->downloadCommission($ean, $rowData['bundlePricesPrice']);
                 usleep(1250000);
                 echo "OK\n";
