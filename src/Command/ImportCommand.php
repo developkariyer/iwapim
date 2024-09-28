@@ -177,7 +177,7 @@ class ImportCommand extends AbstractCommand
 
         try {
             if ($input->getOption('test')) {
-                $marketplace = Marketplace::getMarketplaceById(199128);
+                $marketplace = Marketplace::getById(199128);
                 $connector = new BolConnector($marketplace);
                 $connector->downloadOfferReport();
                 return Command::SUCCESS;
