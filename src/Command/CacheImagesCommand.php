@@ -148,8 +148,8 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processEtsy($variant)
     {
-        $json = $variant->jsonRead('apiResponseJson');
-        $parentJson = $variant->jsonRead('parentResponseJson');
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
         if ($variant->getId() === 189879) {
             echo "----------------------------------------\n";
             print_r($json);
