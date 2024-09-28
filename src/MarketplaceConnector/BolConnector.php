@@ -26,7 +26,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function __construct(Marketplace $marketplace)
     {
         parent::__construct($marketplace);
-        $this->httpClient = new HttpClient::create();
+        $this->httpClient = HttpClient::create();
         $this->prepareToken();
     }
 
