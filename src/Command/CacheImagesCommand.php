@@ -33,11 +33,12 @@ class CacheImagesCommand extends AbstractCommand
     {
         $this
 //            ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'The marketplace to import from.')
-            ->addOption('skip-amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
-            ->addOption('skip-etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be skipped.')
-            ->addOption('skip-shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
-            ->addOption('skip-bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
-            ->addOption('skip-trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be skipped.');
+            ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be processed.')
+            ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be processed.')
+            ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
+            ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
+            ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be processed.')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -71,19 +72,19 @@ class CacheImagesCommand extends AbstractCommand
                 }
                 switch ($variantType) {
                     case 'Amazon':
-                        if (!$input->getOption('skip-amazon')) self::processAmazon(variant: $variant);
+                        if ($input->getOption('amazon') || $input->getOption('all')) self::processAmazon(variant: $variant);
                         break;
                     case 'Etsy':
-                        if (!$input->getOption('skip-etsy')) self::processEtsy($variant);
+                        if ($input->getOption('etsy') || $input->getOption('all')) self::processEtsy($variant);
                         break;
                     case 'Shopify':
-                        if (!$input->getOption('skip-shopify')) self::processShopify($variant);
+                        if ($input->getOption('shopify') || $input->getOption('all')) self::processShopify($variant);
                         break;
                     case 'Trendyol':
-                        if (!$input->getOption('skip-trendyol')) self::processTrendyol($variant);
+                        if ($input->getOption('trendyol') || $input->getOption('all')) self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
-                        if (!$input->getOption('skip-bolcom')) self::processBolCom($variant);
+                        if ($input->getOption('bolcom') || $input->getOption('all')) self::processBolCom($variant);
                         break;
                     default:
                         break;
