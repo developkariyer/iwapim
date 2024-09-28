@@ -121,6 +121,29 @@ class BolConnector extends MarketplaceConnectorAbstract
         return $report;
     }
 
+    protected function downloadAsset($ean, $usage)
+    {
+        $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['query' => ['usage' => $usage]]);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to get assets for $ean:".$response->getContent()."\n";
+            return null;
+        }
+        echo "Assets $usage for $ean downloaded\n";
+        return json_decode($response->getContent(), true);
+    }
+
+    protected function downloadCatalog($ean)
+    {
+        $response = $this->httpClient->request('GET', static::$catalogProductsUrl . $ean);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to get catalog product for $ean:".$response->getContent()."\n";
+            return null;
+        }
+        echo "Catalog info for $ean downloaded\n";
+        return json_decode($response->getContent(), true);
+    }
+
+
     protected function getListings($report)
     {
         $rows = array_map('str_getcsv', explode("\n", trim($report)));
@@ -131,43 +154,10 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
                 $this->listings[$ean] = $rowData;
+                $this->listings[$ean]['catalog'] = $this->downloadCatalog($ean);
+                $this->listings[$ean]['images'] = $this->downloadAsset($ean, 'IMAGE');
+                usleep(500000);
             }
-        }
-    }
-
-    protected function downloadCatalog()
-    {
-        foreach (array_keys($this->listings) as $ean) {
-            if (empty($ean)) {
-                continue;
-            }
-            $response = $this->httpClient->request('GET', static::$catalogProductsUrl . $ean);
-            if ($response->getStatusCode() !== 200) {
-                echo "Failed to get catalog product for $ean:".$response->getContent()."\n";
-                continue;
-            }
-            echo "Catalog product for $ean downloaded\n";
-            $decodedResponse = json_decode($response->getContent(), true);
-            $this->listings[$ean]['catalog'] = $decodedResponse;
-            usleep(500000);
-        }
-    }
-
-    protected function downloadAssets()
-    {
-        foreach (array_keys($this->listings) as $ean) {
-            if (empty($ean)) {
-                continue;
-            }
-            $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['query' => ['usage' => 'IMAGE']]);
-            if ($response->getStatusCode() !== 200) {
-                echo "Failed to get assets for $ean:".$response->getContent()."\n";
-                continue;
-            }
-            echo "Assets for $ean downloaded\n";
-            $decodedResponse = json_decode($response->getContent(), true);
-            $this->listings[$ean]['assets'] = $decodedResponse;
-            usleep(500000);
         }
     }
 
