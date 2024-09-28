@@ -2,7 +2,6 @@
 
 namespace App\Utils;
 
-use Normalizer;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\Asset\Folder as AssetFolder;
 use Pimcore\Model\Asset\Listing as AssetListing;
@@ -180,5 +179,21 @@ class Utility
             echo $e->getMessage();
         }
     }
+
+    public static function checkJwtTokenValidity($token) 
+    {
+        $tokenParts = explode(".", $token);
+        if (count($tokenParts) !== 3) {
+            return false;
+        }
+        $tokenPayload = base64_decode($tokenParts[1]);
+        $jwtPayload = json_decode($tokenPayload, true);
+        $currentTimestamp = time() + 60;
+        if ($jwtPayload['exp'] < $currentTimestamp) {
+            return false;
+        }
+        return true;
+    }
+
 
 }

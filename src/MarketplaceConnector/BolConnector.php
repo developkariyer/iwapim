@@ -3,9 +3,9 @@
 namespace App\MarketplaceConnector;
 
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 
 use Pimcore\Model\DataObject\Marketplace;
-use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Utils\Utility;
@@ -15,79 +15,114 @@ use App\MarketplaceConnector\MarketplaceConnectorAbstract;
 class BolConnector extends MarketplaceConnectorAbstract
 {
     private $listingsInfo = [];
-    private $accessToken = "";
-    private $offerExportUrl = "https://api.bol.com/retailer/offers/export/";
-    private $processStatusUrl = "https://api.bol.com/shared/process-status/";
-    private $productsUrl  = "https://api.bol.com/retailer/products/";
-    private $productDetailUrl = "https://api.bol.com/retailer/content/catalog-products/";
+    private static $loginTokenUrl = "https://login.bol.com/token?grant_type=client_credentials";
+    private static $offerExportUrl = "/retailer/offers/export/"; // https://api.bol.com
+    private static $processStatusUrl = "/shared/process-status/";
+    private static $productsUrl  = "/retailer/products/";
+    private static $catalogProductsUrl = "/retailer/content/catalog-products/"; //$productDetailUrl
     private $httpClient = null;
     public static $marketplaceType = 'Bol.com';
 
     public function __construct(Marketplace $marketplace)
     {
-        function checkTokenValidity($token) {
-            $tokenParts = explode(".", $token);
-            $tokenHeader = base64_decode($tokenParts[0]);
-            $tokenPayload = base64_decode($tokenParts[1]);
-            $jwtHeader = json_decode($tokenHeader, true);
-            $jwtPayload = json_decode($tokenPayload, true);
-            $currentTimestamp = time();
-            if ($jwtPayload['exp'] < $currentTimestamp) {
-                return false;
-            }
-            return true;
-        }
-
         parent::__construct($marketplace);
-
-        //$this->httpClient = new HttpClient();
-
-        //if (!checkTokenValidity($marketplace->getBolJwtToken())) {
-        //    $this->getAccessToken();
-        //}
-
+        $this->httpClient = new HttpClient::create();
+        $this->prepareToken();
     }
 
-    // Create Access Token
-    private function getAccessToken()
+    protected function setHttpClientAuthorization()
     {
-        $apiUrl = "https://login.bol.com/token?grant_type=client_credentials";
-        $credentials = $this->marketplace->getBolClientId() . ':' . $this->marketplace->getBolSecret();
-        $encoded_credentials = base64_encode($credentials);
-
-        $headers = [
-            "Authorization: Basic $encoded_credentials",
-            'Accept: application/json'
-        ];
-
-        $curl = curl_init($apiUrl);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($curl);
-
-        if (curl_errno($curl)) {
-            echo 'Curl error: ' . curl_error($curl);
-        } else {
-            $decoded_response = json_decode($response, true);
-
-            // access token
-            if (isset($decoded_response['access_token'])) {
-                //echo 'Access Token: ' . $decoded_response['access_token'];
-                $this->accessToken = $decoded_response['access_token'];
-            } else {
-                echo 'Anahtar bulunamadi!';
-            }
-        }
-        curl_close($curl);
-        $this->marketplace->setBolJwtToken($this->accessToken);
-        $this->marketplace->save();
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://api.bol.com/', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getBolJwtToken(),
+                'Accept' => 'application/vnd.retailer.v10+json',
+                'Content-Type' => 'application/vnd.retailer.v10+json'
+            ],
+        ]);         
     }
 
-  
+    protected function prepareToken()
+    {
+        if (!Utility::checkJwtTokenValidity($this->marketplace->getBolJwtToken())) {
+            $response = $this->httpClient->request('POST', static::$loginTokenUrl, [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getBolClientId()}:{$this->marketplace->getBolSecret()}"),
+                    'Accept' => 'application/json'
+                ]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get JWT token from Bol.com');
+            }
+            $decodedResponse = json_decode($response->getContent(), true);
+            $this->marketplace->setBolJwtToken($decodedResponse['access_token']);
+            $this->setHttpClientAuthorization();
+        } 
+    }
+
+    public function downloadOfferReport()
+    {
+        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()");
+        if ($report === false) {
+            echo "Requesting offer report from Bol.com\n";
+            $response = $this->httpClient->request('POST', static::$offerExportUrl, [
+                'json' => [
+                    'format' => 'CSV'
+                ]
+            ]);
+            if ($response->getStatusCode() !== 202) {
+                throw new \Exception('Failed to get offer report from Bol.com');
+            }
+            $decodedResponse = json_decode($response->getContent(), true);
+            $processStatusId = $decodedResponse['processStatusId'];
+            switch ($decodedResponse['status']) {
+                case 'SUCCESS':
+                    $status = true;
+                    break;
+                case 'PENDING':
+                    $status = false;
+                    break;
+                case 'FAILURE':
+                    throw new \Exception('Failed to get offer report from Bol.com');
+                    break;
+                case 'TIMEOUT':
+                    throw new \Exception('Timeout while getting offer report from Bol.com');
+                    break;
+            }
+            while (!$status) {
+                echo "  Waiting for report...\n";
+                sleep(2);
+                $response = $this->httpClient->request('GET', static::$processStatusUrl . $processStatusId);
+                if ($response->getStatusCode() !== 200) {
+                    throw new \Exception('Failed to get offer report from Bol.com');
+                }
+                $decodedResponse = json_decode($response->getContent(), true);
+                switch ($decodedResponse['status']) {
+                    case 'SUCCESS':
+                        $status = true;
+                        $reportLink = $decodedResponse['links'][0]['href'] ?? '';
+                        break;
+                    case 'PENDING':
+                        $status = false;
+                        break;
+                    case 'FAILURE':
+                        throw new \Exception('Failed to get offer report from Bol.com');
+                        break;
+                    case 'TIMEOUT':
+                        throw new \Exception('Timeout while getting offer report from Bol.com');
+                        break;
+                }
+            }
+            $report = $this->httpClient->request('GET', $reportLink)->getContent();
+            Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()", $report);
+        }
+        return $report;
+    }
+
     public function download($forceDownload = false)
     {
+        
+
+
         $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.csv';
         $filenamejson = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
         if (!$forceDownload && file_exists($filename) && file_exists($filenamejson) && filemtime($filename) > time() - 86400) {
