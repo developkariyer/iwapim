@@ -155,12 +155,6 @@ class VariantProduct extends Concrete
 
     public function fixImageCache(array $listingImageList, $variantImage = null)
     {
-        if ($this->getId() === 189879) {
-            echo "fixImageCache: {$this->getId()}\n";
-            print_r($listingImageList);
-            print_r($variantImage);
-            exit;
-        }
         if (empty($listingImageList)) {
             return;
         }

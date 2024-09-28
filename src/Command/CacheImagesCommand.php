@@ -150,14 +150,6 @@ class CacheImagesCommand extends AbstractCommand
     {
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
-        if ($variant->getId() === 189879) {
-            echo "----------------------------------------\n";
-            print_r($json);
-            echo "----------------------------------------\n";
-            print_r($parentJson);
-            echo "----------------------------------------\n";
-            exit;
-        }
         $variantProperty = [];
         $listingImageList = [];
         foreach ($json['property_values'] ?? [] as $property) {
@@ -174,25 +166,15 @@ class CacheImagesCommand extends AbstractCommand
         }
         $variantImageObj = null;
         foreach ($parentJson["images"] ?? [] as $image) {
-            if ($variant->getId() === 189879) print_r($image);
             $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder);
             $listingImageList[] = $imgProcessed;
             if ($myVariantImage === $image['listing_image_id']) {
                 $variantImageObj = $imgProcessed;
             }
         }
-        if ($variant->getId() === 189879) print_r($listingImageList);
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList, $variantImageObj);
         echo "{$variant->getId()} ";        
-        if ($variant->getId() === 189879) {
-            echo "----------------------------------------\n";
-            print_r($json);
-            echo "----------------------------------------\n";
-            print_r($parentJson);
-            echo "----------------------------------------\n";
-            exit;
-        }
     }
 
     protected static function processBolCom($variant)
