@@ -115,7 +115,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (!empty($entityId)) {
                 $response = $this->httpClient->request('GET', static::$offerExportUrl . $entityId, [
                     'headers' => [
-                        'Accept' => 'text/csv',
+                        'Accept' => 'application/vnd.retailer.v10+json', // Use the API's required Accept header format
                     ]
                 ]);
                 if ($response->getStatusCode() !== 200) {
