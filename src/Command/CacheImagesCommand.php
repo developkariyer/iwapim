@@ -174,10 +174,6 @@ class CacheImagesCommand extends AbstractCommand
                 $variantImageObj = $imgProcessed;
             }
         }
-        if (!empty($listingImageList)) {
-            $img = reset($listingImageList);
-            $variant->setImageUrl(Utility::getCachedImage($img->getFullPath()));
-        }
         $variant->fixImageCache($listingImageList, $variantImageObj);
         echo "{$variant->getId()} ";        
     }
