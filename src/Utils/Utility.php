@@ -195,5 +195,21 @@ class Utility
         return true;
     }
 
+    public static function getCachedImage($url)
+    {
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+        if (strpos($url, 'iwa.web.tr') !== false) {
+            return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+        }
+        $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
+        if ($imageAsset) {
+            return new \Pimcore\Model\DataObject\Data\ExternalImage(
+                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath())
+            );
+        }
+        return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+    }
 
 }

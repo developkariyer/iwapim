@@ -122,14 +122,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $images = $mainListing['images'] ?? [];
         foreach ($images as $img) {
             if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
-                return static::getCachedImage($img['src']);
+                return Utility::getCachedImage($img['src']);
             } 
             if (empty($lastImage)) {
-                $lastImage = static::getCachedImage($img['src']);
+                $lastImage = Utility::getCachedImage($img['src']);
             }
         }
         if (!empty($mainListing['image']['src'])) {
-            return static::getCachedImage($mainListing['image']['src']);
+            return Utility::getCachedImage($mainListing['image']['src']);
         }
         return $lastImage;
     }

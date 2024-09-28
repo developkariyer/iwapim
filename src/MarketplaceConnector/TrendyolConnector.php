@@ -97,7 +97,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             }
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => $this->getCachedImage($listing['images'][0]['url'] ?? ''),
+                    'imageUrl' => Utility::getCachedImage($listing['images'][0]['url'] ?? ''),
                     'urlLink' => $this->getUrlLink($listing['productUrl'] ?? ''),
                     'salePrice' => $listing['salePrice'] ?? 0,
                     'saleCurrency' => 'TL',

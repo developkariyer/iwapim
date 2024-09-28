@@ -191,7 +191,7 @@ class CacheImagesCommand extends AbstractCommand
                 $img = static::processImage($assetVariant['url'], static::$bolcomFolder);
                 $listingImageList[] = $img;
                 if (($asset['usage'] ?? '') === 'PRIMARY') {
-                    $variant->setImageUrl($img->getFullPath());
+                    $variant->setImageUrl(Utility::getCachedImage($img->getFullPath()));
                 }
             }
         }
