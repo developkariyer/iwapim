@@ -19,7 +19,10 @@ class BolConnector extends MarketplaceConnectorAbstract
     private static $offerExportUrl = "/retailer/offers/export/"; // https://api.bol.com
     private static $processStatusUrl = "/shared/process-status/";
     private static $productsUrl  = "/retailer/products/";
-    private static $catalogProductsUrl = "/retailer/content/catalog-products/"; //$productDetailUrl
+    private static $catalogProductsUrl = "/retailer/content/catalog-products/";
+    private static $commissionUrl = "/retailer/commission/";
+    private static $insightsForecastUrl = "/retailer/insights/sales-forecast/";
+
     private $httpClient = null;
     public static $marketplaceType = 'Bol.com';
 
@@ -116,7 +119,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             $report = $response->getContent();
             Utility::setCustomCache('OFFERS_EXPORT_REPORT.cvs', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
         } else {
-            echo "Using cached data\n";
+            echo "Using cached report\n";
         }
         return $report;
     }
@@ -128,7 +131,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Failed to get assets for $ean:".$response->getContent()."\n";
             return null;
         }
-        echo "Assets $usage for $ean downloaded\n";
+        echo "Assets ";
         $content = json_decode($response->getContent(), true);
         return $content['assets'] ?? $content;
     }
@@ -140,7 +143,40 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Failed to get catalog product for $ean:".$response->getContent()."\n";
             return null;
         }
-        echo "Catalog info for $ean downloaded\n";
+        echo "Catalog ";
+        return json_decode($response->getContent(), true);
+    }
+
+    protected function downloadPlacement($ean)
+    {
+        $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/placement');
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to get placement for $ean:".$response->getContent()."\n";
+            return null;
+        }
+        echo "Placement ";
+        return json_decode($response->getContent(), true);
+    }
+
+    protected function downloadForecast($offerId)
+    {
+        $response = $this->httpClient->request('GET', static::$insightsForecastUrl, ['query' => ['offer-id' => $offerId, 'weeks-ahead' => 6]]);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to get forecast for $offerId:".$response->getContent()."\n";
+            return null;
+        }
+        echo "Forecast ";
+        return json_decode($response->getContent(), true);
+    }
+
+    protected function downloadCommission($ean, $price)
+    {
+        $response = $this->httpClient->request('GET', static::$commissionUrl . $ean, ['query' => ['condition' => 'NEW', 'unit-price' => $price]]);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to get commission for $ean:".$response->getContent()."\n";
+            return null;
+        }
+        echo "Commission ";
         return json_decode($response->getContent(), true);
     }
 
@@ -153,13 +189,19 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (count($row) === count($headers)) {
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
+                echo "Downloading $ean ";
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadCatalog($ean);
                 $this->listings[$ean]['assets'] = $this->downloadAsset($ean, 'IMAGE');
+                $this->listings[$ean]['placement'] = $this->downloadPlacement($ean);
+                $this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
+                $this->listings[$ean]['commission'] = $this->downloadCommission($ean, $rowData['bundlePricesPrice']);
                 usleep(1250000);
+                echo "OK\n";
             }
         }
     }
+
 
     public function download($forceDownload = false)
     {
@@ -168,7 +210,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             $this->getListings($this->downloadOfferReport($forceDownload));
             Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
         } else {
-            echo "Using cached data\n";
+            echo "Using cached listings\n";
         }
         foreach ($this->listings as $ean => $listing) {
             Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($listing));
