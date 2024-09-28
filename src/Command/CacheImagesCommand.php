@@ -98,7 +98,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processTrendyol($variant)
     {
-        $json = $variant->jsonRead('apiResponseJson');
+        $json = json_decode($variant->jsonRead('apiResponseJson'));
         $listingImageList = [];
         foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
@@ -110,7 +110,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processAmazon($variant)
     {
-        $json = $variant->jsonRead('apiResponseJson');
+        $json = json_decode($variant->jsonRead('apiResponseJson'));
         $listingImageList = [];
         foreach ($json['images'][0]['images'] ?? [] as $image) {
             if ($image['height'] < 1000) {
@@ -125,7 +125,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processShopify($variant)
     {
-        $parentJson = $variant->jsonRead('parentResponseJson');
+        $parentJson = json_decode($variant->jsonRead('parentResponseJson'));
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
         $variantImage = null;
@@ -179,7 +179,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processBolCom($variant)
     {
-        $json = $variant->jsonRead('apiResponseJson');
+        $json = json_decode($variant->jsonRead('apiResponseJson'));
         $listingImageList = [];
         foreach ($json['assets']['assets'] ?? [] as $asset) {
             foreach ($asset['variants'] ?? [] as $assetVariant) {
