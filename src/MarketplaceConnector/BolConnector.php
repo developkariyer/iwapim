@@ -124,6 +124,17 @@ class BolConnector extends MarketplaceConnectorAbstract
         return $report;
     }
 
+    protected function downloadExtra($apiEndPoint, $type, $parameter, $query = [])
+    {
+        $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
+            return null;
+        }
+        echo "{$apiEndPoint}{$parameter} ";
+        return json_decode($response->getContent(), true);
+    }
+
     protected function downloadAsset($ean, $usage)
     {
         $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['query' => ['usage' => $usage]]);
@@ -191,11 +202,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $ean = $rowData['ean'];
                 echo "Downloading $ean ";
                 $this->listings[$ean] = $rowData;
-                $this->listings[$ean]['catalog'] = $this->downloadCatalog($ean);
-                $this->listings[$ean]['assets'] = $this->downloadAsset($ean, 'IMAGE');
-                $this->listings[$ean]['placement'] = $this->downloadPlacement($ean);
+                $this->listings[$ean]['catalog'] = $this->downloadExtra(static::$catalogProductsUrl, 'GET', $ean);
+                $this->listings[$ean]['assets'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/assets", ['usage' => 'IMAGE']);
+                $this->listings[$ean]['placement'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/placement");
+                $this->listings[$ean]['commission'] = $this->downloadExtra(static::$commissionUrl, 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
                 //$this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
-                $this->listings[$ean]['commission'] = $this->downloadCommission($ean, $rowData['bundlePricesPrice']);
                 Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings[$ean]));
                 usleep(1000000);
                 echo "OK\n";
