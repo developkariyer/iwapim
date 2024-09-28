@@ -184,11 +184,11 @@ class CacheImagesCommand extends AbstractCommand
         $json = self::getApiResponse($variant->getId());
         $listingImageList = [];
         foreach ($json['assets']['assets'] ?? [] as $asset) {
-            foreach ($asset['variants'] ?? [] as $variant) {
-                if (($variant['size'] ?? '') === 'small') {
+            foreach ($asset['variants'] ?? [] as $assetVariant) {
+                if (($assetVariant['size'] ?? '') === 'small') {
                     continue;
                 }
-                $img = static::processImage($variant['url'], static::$bolcomFolder);
+                $img = static::processImage($assetVariant['url'], static::$bolcomFolder);
                 $listingImageList[] = $img;
                 if (($asset['usage'] ?? '') === 'PRIMARY') {
                     $variant->setImageUrl($img->getFullPath());
