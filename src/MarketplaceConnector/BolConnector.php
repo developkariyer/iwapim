@@ -74,8 +74,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get offer report from Bol.com');
             }
             $decodedResponse = json_decode($response->getContent(), true);
-            $processStatusId = $decodedResponse['processStatusId'];
-            switch ($decodedResponse['status']) {
+            print_r($decodedResponse);
+            switch ($decodedResponse['status'] ?? '') {
                 case 'SUCCESS':
                     $status = true;
                     break;
@@ -87,16 +87,18 @@ class BolConnector extends MarketplaceConnectorAbstract
                 case 'TIMEOUT':
                     throw new \Exception('Timeout while getting offer report from Bol.com');
             }
-            print_r($decodedResponse);
+            $processStatusId = $decodedResponse['processStatusId'] ?? '';
+            $statusUrl = $decodedResponse['links'][0]['href'] ?? static::$processStatusUrl . $processStatusId;
             while (!$status) {
                 echo "  Waiting for report...\n";
                 sleep(2);
-                $response = $this->httpClient->request('GET', static::$processStatusUrl . $processStatusId);
+                $response = $this->httpClient->request('GET', $statusUrl);
                 if ($response->getStatusCode() !== 200) {
                     throw new \Exception('Failed to get offer report from Bol.com');
                 }
                 $decodedResponse = json_decode($response->getContent(), true);
-                switch ($decodedResponse['status']) {
+                print_r($decodedResponse);
+                switch ($decodedResponse['status'] ?? '') {
                     case 'SUCCESS':
                         $status = true;
                         $reportLink = $decodedResponse['links'][0]['href'] ?? '';
@@ -111,7 +113,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
             }
             $entityId = $decodedResponse['entityId'] ?? [];
-            print_r($decodedResponse);
             if (!empty($entityId)) {
                 $response = $this->httpClient->request('GET', static::$offerExportUrl . $processStatusId);
                 if ($response->getStatusCode() !== 200) {
