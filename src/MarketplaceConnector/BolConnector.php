@@ -156,7 +156,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadCatalog($ean);
                 $this->listings[$ean]['images'] = $this->downloadAsset($ean, 'IMAGE');
-                usleep(750000);
+                usleep(1250000);
             }
         }
     }
