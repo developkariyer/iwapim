@@ -109,9 +109,16 @@ class BolConnector extends MarketplaceConnectorAbstract
                         throw new \Exception('Timeout while getting offer report from Bol.com');
                 }
             }
+            $entityId = $decodedResponse['entityId'] ?? [];
             print_r($decodedResponse);
-            $report = $this->httpClient->request('GET', $reportLink)->getContent();
-            Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
+            if (!empty($entityId)) {
+                $response = $this->httpClient->request('GET', static::offerExportUrl . $entityId);
+                if ($response->getStatusCode() !== 200) {
+                    throw new \Exception('Failed to get offer report from Bol.com');
+                }
+                $report = $response->getContent();
+                Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
+            }
         }
         return $report;
     }
