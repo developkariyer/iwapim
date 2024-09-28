@@ -108,11 +108,7 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processAmazon($variant)
     {
-        $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$variant->getUniqueMarketplaceId()}.json";
-        if (!file_exists($filename)) {
-            return;
-        }
-        $json = json_decode(json: file_get_contents(filename: $filename) ?? [], associative: true) ?? [];
+        $json = $variant->jsonRead('apiResponseJson');
         $listingImageList = [];
         foreach ($json['images'][0]['images'] ?? [] as $image) {
             if ($image['height'] < 1000) {
