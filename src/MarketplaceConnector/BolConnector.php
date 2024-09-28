@@ -161,7 +161,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (empty($ean)) {
                 continue;
             }
-            $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['json' => ['usage' => 'IMAGE']]);
+            $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['query' => ['usage' => 'IMAGE']]);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to get assets for $ean:".$response->getContent()."\n";
                 continue;
