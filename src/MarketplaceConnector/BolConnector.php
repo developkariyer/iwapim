@@ -118,6 +118,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         'Accept' => 'application/vnd.retailer.v10+csv', // The correct Accept header
                     ]
                 ]);
+                echo static::$offerExportUrl . $entityId . "\n";
                 if ($response->getStatusCode() !== 200) {
                     throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
                 }
