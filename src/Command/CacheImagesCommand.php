@@ -52,7 +52,7 @@ class CacheImagesCommand extends AbstractCommand
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 150;
-        $offset = 0;
+        $offset = 20000;
 
         while (true) {
             $listingObject->setLimit($pageSize);
