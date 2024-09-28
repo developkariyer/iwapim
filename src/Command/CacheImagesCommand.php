@@ -166,7 +166,7 @@ class CacheImagesCommand extends AbstractCommand
         }
         $variantImageObj = null;
         foreach ($parentJson["images"] ?? [] as $image) {
-            if ($variant->getId() === 189879) echo $image['listing_image_id'] . "\n";
+            if ($variant->getId() === 189879) print_r($image);
             $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder);
             $listingImageList[] = $imgProcessed;
             if ($myVariantImage === $image['listing_image_id']) {
