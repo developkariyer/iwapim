@@ -59,22 +59,33 @@ class BolConnector extends MarketplaceConnectorAbstract
         } 
     }
 
-    public function downloadOfferReport()
+    protected function requestOfferReport()
     {
-        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
-        if ($report === false) {
-            echo "Requesting offer report from Bol.com\n";
-            $this->prepareToken();
-            $response = $this->httpClient->request('POST', static::$offerExportUrl, [
-                'json' => [
-                    'format' => 'CSV'
-                ]
-            ]);
-            if ($response->getStatusCode() !== 202) {
+        $this->prepareToken();
+        $response = $this->httpClient->request('POST', static::$offerExportUrl, ['json' => ['format' => 'CSV']]);
+        if ($response->getStatusCode() !== 202) {
+            throw new \Exception('Failed to get offer report from Bol.com');
+        }
+        $decodedResponse = json_decode($response->getContent(), true);
+        if ($decodedResponse['status'] !== 'SUCCESS' && $decodedResponse['status'] !== 'PENDING') {
+            throw new \Exception('Failed to get offer report from Bol.com');
+        }
+        return $decodedResponse;
+    }
+
+    protected function reportStatus($decodedResponse)
+    {
+        $status = $decodedResponse['status'] === 'SUCCESS';
+        $statusUrl = $decodedResponse['links'][0]['href'] ?? static::$processStatusUrl . ($decodedResponse['processStatusId'] ?? '');
+
+        while (!$status) {
+            echo "  Waiting for report...\n";
+            sleep(2);
+            $response = $this->httpClient->request('GET', $statusUrl);
+            if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed to get offer report from Bol.com');
             }
             $decodedResponse = json_decode($response->getContent(), true);
-            print_r($decodedResponse);
             switch ($decodedResponse['status'] ?? '') {
                 case 'SUCCESS':
                     $status = true;
@@ -82,56 +93,94 @@ class BolConnector extends MarketplaceConnectorAbstract
                 case 'PENDING':
                     $status = false;
                     break;
-                case 'FAILURE':
-                    throw new \Exception('Failed to get offer report from Bol.com');
-                case 'TIMEOUT':
-                    throw new \Exception('Timeout while getting offer report from Bol.com');
+                default: throw new \Exception('Failed to get offer report from Bol.com: '. $response->getContent());
             }
-            $processStatusId = $decodedResponse['processStatusId'] ?? '';
-            $statusUrl = $decodedResponse['links'][0]['href'] ?? static::$processStatusUrl . $processStatusId;
-            while (!$status) {
-                echo "  Waiting for report...\n";
-                sleep(2);
-                $response = $this->httpClient->request('GET', $statusUrl);
-                if ($response->getStatusCode() !== 200) {
-                    throw new \Exception('Failed to get offer report from Bol.com');
-                }
-                $decodedResponse = json_decode($response->getContent(), true);
-                print_r($decodedResponse);
-                switch ($decodedResponse['status'] ?? '') {
-                    case 'SUCCESS':
-                        $status = true;
-                        break;
-                    case 'PENDING':
-                        $status = false;
-                        break;
-                    case 'FAILURE':
-                        throw new \Exception('Failed to get offer report from Bol.com');
-                    case 'TIMEOUT':
-                        throw new \Exception('Timeout while getting offer report from Bol.com');
-                }
+        }
+        if (empty($decodedResponse['entityId'])) {
+            throw new \Exception('Failed to get offer report from Bol.com.');
+        }
+        return $decodedResponse['entityId'] ?? [];
+    }
+
+    protected function downloadOfferReport($forceDownload = false)
+    {
+        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.cvs', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
+        if ($report === false || $forceDownload) {
+            echo "Requesting offer report from Bol.com\n";
+            $entityId = $this->reportStatus($this->requestOfferReport());
+            $response = $this->httpClient->request('GET', static::$offerExportUrl . $entityId);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
             }
-            $entityId = $decodedResponse['entityId'] ?? [];
-            if (!empty($entityId)) {
-                $response = $this->httpClient->request('GET', static::$offerExportUrl . $entityId, [
-                    'headers' => [
-                        'Accept' => 'application/vnd.retailer.v10+csv', // The correct Accept header
-                    ]
-                ]);
-                echo static::$offerExportUrl . $entityId . "\n";
-                if ($response->getStatusCode() !== 200) {
-                    throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
-                }
-                $report = $response->getContent();
-                Utility::setCustomCache('OFFERS_EXPORT_REPORT', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
-            }
+            $report = $response->getContent();
+            Utility::setCustomCache('OFFERS_EXPORT_REPORT.cvs', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
+        } else {
+            echo "Using cached data\n";
         }
         return $report;
     }
 
+    protected function getListings($report)
+    {
+        $rows = array_map('str_getcsv', explode("\n", trim($report)));
+        $headers = array_shift($rows);
+        $this->listings = [];
+        foreach ($rows as $row) {
+            if (count($row) === count($headers)) {
+                $rowData = array_combine($headers, $row);
+                $ean = $rowData['ean'];
+                $this->listings[$ean] = $rowData;
+            }
+        }
+    }
+
+    protected function downloadCatalog()
+    {
+        foreach (array_keys($this->listings) as $ean) {
+            if (empty($ean)) {
+                continue;
+            }
+            $response = $this->httpClient->request('GET', static::$catalogProductsUrl . $ean);
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to get catalog product for $ean:".$response->getContent()."\n";
+                continue;
+            }
+            $decodedResponse = json_decode($response->getContent(), true);
+            $this->listings[$ean]['catalog'] = $decodedResponse;
+            usleep(250000);
+        }
+    }
+
+    protected function downloadAssets()
+    {
+        foreach (array_keys($this->listings) as $ean) {
+            if (empty($ean)) {
+                continue;
+            }
+            $response = $this->httpClient->request('GET', static::$productsUrl . $ean . '/assets', ['json' => ['usage' => 'IMAGE']]);
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to get assets for $ean:".$response->getContent()."\n";
+                continue;
+            }
+            $decodedResponse = json_decode($response->getContent(), true);
+            $this->listings[$ean]['assets'] = $decodedResponse;
+            usleep(250000);
+        }
+    }
+
     public function download($forceDownload = false)
     {
-        
+        $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}"), true);
+        if (empty($this->listings) || $forceDownload) {
+            $this->getListings($this->downloadOfferReport($forceDownload));
+            $this->downloadCatalog();
+            Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
+        } else {
+            echo "Using cached data\n";
+        }
+        return;
+
+
 
 
         $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.csv';
