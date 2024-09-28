@@ -179,9 +179,16 @@ class BolConnector extends MarketplaceConnectorAbstract
         if (empty($this->listings) || $forceDownload) {
             $this->getListings($this->downloadOfferReport($forceDownload));
             $this->downloadCatalog();
+            $this->downloadAssets();
             Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
         } else {
             echo "Using cached data\n";
+        }
+        foreach ($this->listings as $ean => $listing) {
+            if (empty($ean)) {
+                continue;
+            }
+            Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($listing));
         }
         return;
 
