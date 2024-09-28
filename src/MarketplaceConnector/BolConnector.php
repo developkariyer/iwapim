@@ -162,7 +162,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $this->listings[$ean]['placement'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/placement");
                 $this->listings[$ean]['commission'] = $this->downloadExtra(static::$commissionUrl, 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
                 $this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$productsUrl, 'GET', "$ean/product-ids");
-                $this->listings[$ean]['product-detail'] = $this->downloadExtra(static::$productsUrl, 'GET', $ean);
                 //$this->listings[$ean]['sales-forecast'] = $this->downloadForecast($rowData['offerId']);
                 Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings[$ean]));
                 usleep(1000000);
