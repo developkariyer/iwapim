@@ -136,7 +136,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     }
 
     protected function downloadForecast($offerId)
-    {
+    {   // not used for the moment
         $response = $this->httpClient->request('GET', static::$insightsForecastUrl, ['query' => ['offer-id' => $offerId, 'weeks-ahead' => 6]]);
         if ($response->getStatusCode() !== 200) {
             echo "Failed to get forecast for $offerId:".$response->getContent()."\n";
@@ -152,11 +152,14 @@ class BolConnector extends MarketplaceConnectorAbstract
         $rows = array_map('str_getcsv', explode("\n", trim($report)));
         $headers = array_shift($rows);
         $this->listings = [];
+        $totalCount = count($rows);
+        $index = 0;
         foreach ($rows as $row) {
+            $index++;
             if (count($row) === count($headers)) {
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
-                echo "Downloading $ean ";
+                echo "($index/$totalCount) Downloading $ean ";
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadExtra(static::$catalogProductsUrl, 'GET', $ean);
                 usleep($sleep);
@@ -185,89 +188,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         } else {
             echo "Using cached listings\n";
         }
-        foreach ($this->listings as $ean => $listing) {
-            Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($listing));
-        }
         return;
-
-
-
-
-        $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.csv';
-        $filenamejson = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
-        if (!$forceDownload && file_exists($filename) && file_exists($filenamejson) && filemtime($filename) > time() - 86400) {
-            $csvContent = file_get_contents($filename);
-            $contentJson = file_get_contents($filenamejson);
-            $this->listings = json_decode($contentJson, true);          
-            echo "Using cached data ";
-        } else {   
-            $this->listings = [];
-            $entityId = "";
-            $this->getAccessToken();
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v10+json',
-                'Content-Type: application/vnd.retailer.v10+json'
-            ];
-            $postData = json_encode(['format' => 'CSV']);
-            $this->addProductInfo($this->offerExportUrl,"",$headers,"POST",$postData);
-            $status = "";
-            $processStatusId= "";
-            foreach ($this->listings as $listingArray) {
-                if (isset($listingArray[$this->offerExportUrl])) {
-                    $status = $listingArray[$this->offerExportUrl]['status'] ?? null;
-                    $processStatusId = $listingArray[$this->offerExportUrl]['processStatusId'] ?? null;
-                    echo "Status: " . $status . "\n";
-                }
-            }
-            do {
-                $this->addProductInfo($this->processStatusUrl,"",$headers,"GET",null,false,$processStatusId);
-                foreach ($this->listings as $listingArray) {
-                    if (isset($listingArray[$this->processStatusUrl.$processStatusId])) {
-                        $status = $listingArray[$this->processStatusUrl.$processStatusId]['status'] ?? null;
-                        echo "Status: " . $status . "\n";
-                    }
-                }
-                if ($status === 'SUCCESS') {
-                    foreach ($this->listings as $listingArray) {
-                        if (isset($listingArray[$this->processStatusUrl.$processStatusId])) {
-                            $entityId = $listingArray[$this->processStatusUrl.$processStatusId]['entityId'] ?? null;
-                            echo "entityId: " . $entityId . "\n";
-                        }
-                    }
-                    break;
-                }
-                sleep(5);
-            } while ($status !== 'SUCCESS');
-            
-            //get offers 
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v9+csv'
-            ];
-            $this->addProductInfo($this->offerExportUrl,"",$headers,"GET",null,false,null,$entityId,true);
-            
-            print_r($this->listings);
-            $headers = [
-                'Authorization: Bearer ' . $this->accessToken,
-                'Accept: application/vnd.retailer.v10+json',
-            ];
-
-            //product ids
-            $this->addProductInfo($this->productsUrl,"/product-ids",$headers,"GET",null,true);
-            // product detail
-            $this->addProductInfo($this->productDetailUrl,"",$headers,"GET",null,true);
-            // product assets
-            $this->addProductInfo($this->productsUrl,"/assets",$headers,"GET",null,true);
-            // product placement
-            $this->addProductInfo($this->productsUrl,"/placement",$headers,"GET",null,true);
-        }
-        $jsonListings = json_encode($this->listings);
-        file_put_contents($filenamejson, $jsonListings);
-
-        echo "count listings: ".count($this->listings);
-        
-        return count($this->listings);
     }
 
     private function addProductInfo($url,$urlEnd="",$headers,$method,$postData=null,$boolEan=false,$processStatusId=null,$entityId=null,$csv=false)
