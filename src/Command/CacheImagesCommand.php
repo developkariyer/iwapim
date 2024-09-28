@@ -105,6 +105,7 @@ class CacheImagesCommand extends AbstractCommand
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
     }
 
     protected static function processAmazon($variant)
@@ -119,6 +120,7 @@ class CacheImagesCommand extends AbstractCommand
         }
         $listingImageList = array_unique(array: $listingImageList);
         $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
     }
 
     protected static function processShopify($variant)
