@@ -113,11 +113,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             $entityId = $decodedResponse['entityId'] ?? [];
             print_r($decodedResponse);
             if (!empty($entityId)) {
-                $response = $this->httpClient->request('GET', static::$offerExportUrl . $entityId, [
-                    'headers' => [
-                        'Accept' => 'application/vnd.retailer.v10+json', // Use the API's required Accept header format
-                    ]
-                ]);
+                $response = $this->httpClient->request('GET', static::$offerExportUrl . $processStatusId);
                 if ($response->getStatusCode() !== 200) {
                     throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
                 }
