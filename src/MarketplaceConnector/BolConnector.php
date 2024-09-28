@@ -238,6 +238,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                     'saleCurrency' => 'EUR',
                     'title' => $this->getAttribute($listing, ['Title']),
                     'attributes' => $this->getAttribute($listing, ['Dropdown Size HxWxL', 'Colour']),
+                    'quantity' => $listing['correctedStock'] ?? 0,
                     'uniqueMarketplaceId' => $listing['product-ids']['bolProductId'] ?? '',
                     'apiResponseJson' => json_encode($listing),
                     'published' => $listing['catalog']['published'] ?? false,

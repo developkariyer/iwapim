@@ -133,6 +133,7 @@ class VariantProduct extends Concrete
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
+        $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
         $this->setParent($parent);
