@@ -67,7 +67,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             throw new \Exception('Failed to get offer report from Bol.com');
         }
         $decodedResponse = json_decode($response->getContent(), true);
-        print_r($decodedResponse);
         if ($decodedResponse['status'] !== 'SUCCESS' && $decodedResponse['status'] !== 'PENDING') {
             throw new \Exception('Failed to get offer report from Bol.com');
         }
@@ -87,7 +86,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get offer report from Bol.com');
             }
             $decodedResponse = json_decode($response->getContent(), true);
-            print_r($decodedResponse);
             switch ($decodedResponse['status'] ?? '') {
                 case 'SUCCESS':
                     $status = true;
