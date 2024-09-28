@@ -129,8 +129,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             return null;
         }
         echo "Assets $usage for $ean downloaded\n";
-        print_r($response->getContent());
-        exit;
         return json_decode($response->getContent(), true);
     }
 
@@ -145,7 +143,6 @@ class BolConnector extends MarketplaceConnectorAbstract
         return json_decode($response->getContent(), true);
     }
 
-
     protected function getListings($report)
     {
         $rows = array_map('str_getcsv', explode("\n", trim($report)));
@@ -157,7 +154,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $ean = $rowData['ean'];
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadCatalog($ean);
-                $this->listings[$ean]['images'] = $this->downloadAsset($ean, 'IMAGE');
+                $this->listings[$ean]['assets'] = $this->downloadAsset($ean, 'IMAGE');
                 usleep(1250000);
             }
         }
