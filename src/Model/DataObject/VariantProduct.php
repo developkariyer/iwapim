@@ -92,7 +92,7 @@ class VariantProduct extends Concrete
     public function jsonRead($fieldName)
     {
         $db = \Pimcore\Db::get();
-        return $db->fetchOne("SELECT json FROM iwa_json_store WHERE object_id = ? AND field_name = ?", [$this->getId(), $fieldName]);
+        return $db->fetchOne("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = ?", [$this->getId(), $fieldName]);
     }
 
     public function jsonWrite($fieldName, $data)
