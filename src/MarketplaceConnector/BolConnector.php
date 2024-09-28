@@ -151,7 +151,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Catalog product for $ean downloaded\n";
             $decodedResponse = json_decode($response->getContent(), true);
             $this->listings[$ean]['catalog'] = $decodedResponse;
-            usleep(250000);
+            usleep(500000);
         }
     }
 
@@ -169,7 +169,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Assets for $ean downloaded\n";
             $decodedResponse = json_decode($response->getContent(), true);
             $this->listings[$ean]['assets'] = $decodedResponse;
-            usleep(250000);
+            usleep(500000);
         }
     }
 
