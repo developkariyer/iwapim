@@ -21,6 +21,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     private $productsUrl  = "https://api.bol.com/retailer/products/";
     private $productDetailUrl = "https://api.bol.com/retailer/content/catalog-products/";
     private $httpClient = null;
+    public static $marketplaceType = 'Bol.com';
 
     public function __construct(Marketplace $marketplace)
     {
