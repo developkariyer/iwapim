@@ -152,17 +152,11 @@ class CacheImagesCommand extends AbstractCommand
         $parentJson = $variant->jsonRead('parentResponseJson');
         $variantProperty = [];
         $listingImageList = [];
-        if ($variant->getId() === 192071) {
-//            print_r($json);
-            print_r($parentJson);
-            exit;
-        }
         foreach ($json['property_values'] ?? [] as $property) {
             foreach ($property['value_ids'] ?? [] as $valueId) {
                 $variantProperty[] = "{$property['property_id']}_{$valueId}";
             }
         }
-
         $myVariantImage = null;
         foreach ($parentJson['variation_images'] ?? [] as $variationImage) {
             if (in_array("{$variationImage['property_id']}_{$variationImage['value_id']}", $variantProperty)) {
@@ -170,15 +164,15 @@ class CacheImagesCommand extends AbstractCommand
                 break;
             }
         }
-
         $variantImageObj = null;
         foreach ($parentJson["images"] ?? [] as $image) {
-            $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder, "Etsy_{$image['listing_id']}_{$image['listing_image_id']}.jpg");
-            $listingImageList[$image['listing_image_id']] = $imgProcessed;
+            $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder);
+            $listingImageList[] = $imgProcessed;
             if ($myVariantImage === $image['listing_image_id']) {
                 $variantImageObj = $imgProcessed;
             }
         }
+        $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList, $variantImageObj);
         echo "{$variant->getId()} ";        
     }
