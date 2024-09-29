@@ -2,7 +2,7 @@
 
 namespace App\MarketplaceConnector;
 
-use SellingPartner\SellingPartnerApi;
+use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 
