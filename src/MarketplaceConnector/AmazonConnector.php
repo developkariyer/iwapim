@@ -125,6 +125,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $response = $catalogApi->searchCatalogItems(
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
             identifiers: array_keys($this->asinBucket),
+            identifiersType: 'ASIN',
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
