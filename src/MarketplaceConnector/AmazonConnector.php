@@ -170,7 +170,13 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 $rowData = array_combine($header, $data);
                 $asin = $rowData['asin1'] ?? '';
                 echo "($index/$totalCount) Downloading $asin ... ";
-                $this->listings[$asin] = $rowData;
+                if (empty($listings[$asin][$this->mainCountry])) {
+                    if (empty($this->listings[$asin])) {
+                        $this->listings[$asin] = [];
+                    }
+                    $this->listings[$asin][$this->mainCountry] = [];
+                }
+                $this->listings[$asin][$this->mainCountry][] = $rowData;
                 $this->addToAsinBucket($asin, $forceDownload);
                 echo "OK\n";
             }
