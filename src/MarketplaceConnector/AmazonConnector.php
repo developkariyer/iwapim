@@ -68,9 +68,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             "{$reportType}_{$country}.csv", 
             PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}"
         );
-        if ($report === true && !$forceDownload) {
-            echo "(Cached) ";
-        } else {
+        if ($report === false || $forceDownload) {
             echo "Waiting Report ";
             $reportsApi = $this->amazonSellerConnector->reportsV20210630();
             $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonConstants::amazonMerchant[$country]['id']]));
