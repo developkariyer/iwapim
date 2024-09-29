@@ -121,6 +121,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
     protected function downloadAsinsInBucket()
     {
+        if (empty($this->asinBucket)) {
+            return;
+        }
         $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
         $response = $catalogApi->searchCatalogItems(
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
