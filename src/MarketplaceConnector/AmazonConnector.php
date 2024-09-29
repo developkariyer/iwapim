@@ -62,7 +62,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
     protected function downloadAmazonReport($reportType, $forceDownload, $country)
     {
-        $marketplaceKey = urlencode(string: strtolower(string: $this->marketplace->getKey()));
+        $marketplaceKey = urlencode( $this->marketplace->getKey());
         echo "        Downloading Report $reportType ";
         $report = Utility::getCustomCache(
             "{$reportType}_{$country}.csv", 
