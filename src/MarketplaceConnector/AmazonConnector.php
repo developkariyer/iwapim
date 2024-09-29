@@ -136,8 +136,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $items = $response->json()['items'] ?? [];
         foreach ($items as $item) {
             $asin = $item['asin'] ?? '';
-            Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($item));
             $this->listings[$asin]['catalog'] = $item;
+            Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($item));
         }
         sleep(1);
     }
@@ -145,6 +145,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     protected function addToAsinBucket($asin, $forceDownload = false)
     {
         $item = Utility::getCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()));
+        $item = json_decode($item, true);
         if (empty($item) || $forceDownload) {
             $this->asinBucket[$asin] = 1;
             if (count($this->asinBucket) >= 10) {
