@@ -74,10 +74,10 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonConstants::amazonMerchant[$country]['id']]));
             $reportId = $response->json()['reportId'];
             while (true) {
-                sleep(5);
+                sleep(10);
                 $reportStatus = $reportsApi->getReport($reportId);
                 $processingStatus = $reportStatus->json()['processingStatus'];
-                if ($processingStatus === 'DONE') {
+                if ($processingStatus == 'DONE') {
                     break;
                 }
             }
