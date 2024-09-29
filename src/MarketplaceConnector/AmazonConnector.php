@@ -129,10 +129,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
-        // log output to console
-        print_r($response->json());
         $this->asinBucket = [];
-        $items = $response->json()['payload']['items'] ?? [];
+        $items = $response->json()['items'] ?? [];
         foreach ($items as $item) {
             $asin = $item['asin'] ?? '';
             Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($item));
