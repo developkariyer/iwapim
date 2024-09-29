@@ -177,7 +177,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                     $this->listings[$asin][$this->mainCountry] = [];
                 }
                 $this->listings[$asin][$this->mainCountry][] = $rowData;
-                $this->addToAsinBucket($asin, $forceDownload);
+                if (empty($this->listings[$asin]['catalog'])) {
+                    $this->addToAsinBucket($asin, $forceDownload);
+                }
                 echo "OK\n";
             }
         }
