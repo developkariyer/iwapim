@@ -12,7 +12,7 @@ use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
 use Pimcore\Model\DataObject\Folder;
 
-use App\Constants\AmazonConstants;
+use App\MarketplaceConnector\AmazonConstants;
 use App\Utils\Utility;
 
 class AmazonConnector  extends MarketplaceConnectorAbstract
