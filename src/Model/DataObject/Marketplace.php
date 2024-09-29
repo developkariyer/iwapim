@@ -27,7 +27,7 @@ class Marketplace extends Concrete
                 $marketplacesArray[$marketplace->getKey()] = '';
             }
         }
-        foreach (array_keys(AmazonConstants::amazonMerchantIdList) as $key) {
+        foreach (array_keys(AmazonConstants::amazonMerchant) as $key) {
             $marketplacesArray["Amazon_{$key}"] = '';
         }
         return $marketplacesArray;

@@ -51,7 +51,7 @@ class CacheImagesCommand extends AbstractCommand
         static::$bolcomFolder = Utility::checkSetAssetPath('Bol.com', static::$cacheFolder);
 
         $listingObject = new VariantProduct\Listing();
-        $listingObject->setUnpublished(true);
+        $listingObject->setUnpublished(false);
         $pageSize = 150;
         $offset = 0;
 
@@ -217,8 +217,6 @@ class CacheImagesCommand extends AbstractCommand
                     echo 'R';
                 }
             }
-        } 
-        if (!$asset) {
             try {
                 $imageData = file_get_contents($url);
                 echo "D";

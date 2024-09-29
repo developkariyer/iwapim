@@ -13,7 +13,7 @@ class AmazonMerchantIdList implements SelectOptionsProviderInterface
     public function getOptions(array $context, Data $fieldDefinition = null): array
     {
         $idList = [];
-        foreach (AmazonConstants::amazonMerchantIdList as $key=>$value) {
+        foreach (AmazonConstants::amazonMerchant as $key=>$value) {
             $idList[] = [
                 'key' => $key,
                 'value' => $key,
