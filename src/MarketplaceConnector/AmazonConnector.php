@@ -15,7 +15,7 @@ use Pimcore\Model\DataObject\Folder;
 use App\MarketplaceConnector\AmazonConstants;
 use App\Utils\Utility;
 
-class AmazonConnector  extends MarketplaceConnectorAbstract
+class AmazonConnector extends MarketplaceConnectorAbstract
 {
     public static $marketplaceType = 'Amazon';
 
