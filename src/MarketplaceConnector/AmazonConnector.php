@@ -153,18 +153,16 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
     public function getListings($forceDownload = false)
     {
-        $rows = array_map('str_getcsv', explode("\n", trim($this->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA'])));
-        $headers = array_shift($rows);
+        $lines = explode("\n", mb_convert_encoding(trim($this->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']), 'UTF-8', 'UTF-8'));
+        $header = str_getcsv(array_shift($lines), "\t");
         $this->listings = [];
-        $totalCount = count($rows);
+        $totalCount = count($lines);
         $index = 0;
-        foreach ($rows as $row) {
+        foreach ($lines as $line) {
             $index++;
-            if (empty(array_filter($row))) {
-                continue;
-            }    
-            if (count($row) === count($headers)) {
-                $rowData = array_combine($headers, $row);
+            $data = str_getcsv($line, "\t");
+            if (count($header) == count($data)) {
+                $rowData = array_combine($header, $data);
                 $asin = $rowData['asin1'] ?? '';
                 echo "($index/$totalCount) Downloading $asin ... ";
                 $this->listings[$asin] = $rowData;
