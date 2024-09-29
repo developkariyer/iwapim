@@ -93,6 +93,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 $report
             );
             echo "OK ";
+        } else {
+            echo "Cached ";
         }
         if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
             $report = gzdecode(data: $report);
