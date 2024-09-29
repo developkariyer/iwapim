@@ -185,6 +185,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $this->getListings($forceDownload);
             Utility::setCustomCache("AMAZON_LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         }
+        foreach ($this->listings as $asin=>$listing) {
+            Utility::setCustomCache("{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/tmp", json_encode($listing));
+        }
     }
 
     private function getAttributes($listing) {
