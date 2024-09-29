@@ -153,18 +153,6 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function download($forceDownload = false)
-    {
-        $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}"), true);
-        if (empty($this->listings) || $forceDownload) {
-            $this->getListings($this->downloadOfferReport($forceDownload));
-            Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
-        } else {
-            echo "Using cached listings\n";
-        }
-        return;
-    }
-
     protected function getAttribute($listing, $id)
     {
         $retval = '';
@@ -218,6 +206,18 @@ class BolConnector extends MarketplaceConnectorAbstract
             );
         }
         return $folder;
+    }
+
+    public function download($forceDownload = false)
+    {
+        $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (empty($this->listings) || $forceDownload) {
+            $this->getListings($this->downloadOfferReport($forceDownload));
+            Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
+        } else {
+            echo "Using cached listings\n";
+        }
+        return;
     }
 
     public function import($updateFlag, $importFlag)
