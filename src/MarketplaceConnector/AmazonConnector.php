@@ -129,6 +129,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->marketplace->getMerchantId(),
         );
+        // log output to console
+        print_r($response->json());
         $this->asinBucket = [];
         $items = $response->json()['payload']['items'] ?? [];
         foreach ($items as $item) {
