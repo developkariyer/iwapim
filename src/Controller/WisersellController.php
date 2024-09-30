@@ -29,7 +29,7 @@ class WisersellController extends FrontendController
                 'width' => $row['packageDimension1'] ?? $row['productDimension1'],
                 'height' => $row['packageDimension2'] ?? $row['productDimension2'],
                 'length' => $row['packageDimension3'] ?? $row['productDimension3'],
-                'category' => $row['category'],
+                'category' => $row['productCategory'],
             ];
             $table[] = $trow;
         }
