@@ -7,8 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 use Pimcore\Controller\FrontendController;
-use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Marketplace;
 
 class WisersellController extends FrontendController
 { 
