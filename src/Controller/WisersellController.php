@@ -38,7 +38,7 @@ LEFT JOIN
 LEFT JOIN 
     object_query_product parent_oqp ON o.parentId = parent_oqp.oo_id
 WHERE 
-    oqp.iwasku IS NOT NULL
+    oqp.iwasku IS NOT NULL AND oqp.name NOT LIKE 'XX%'
 ORDER BY 
     oqp.iwasku ASC;";
         $rows = $db->fetchAllAssociative($sql);
