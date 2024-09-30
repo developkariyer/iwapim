@@ -31,7 +31,11 @@ class ProductAdminStyle extends AdminStyle
             }
         }
         if ($element instanceof VariantProduct) {
-            $this->elementIcon = (count($this->element->getMainProduct())) ? '/bundles/pimcoreadmin/img/flat-color-icons/accept_database.svg' : '/bundles/pimcoreadmin/img/flat-color-icons/list.svg';
+            $this->elementIcon = match (count($this->element->getMainProduct())) {
+                0 => '/custom/listing.svg',
+                1 => '/custom/listing_ok.svg',
+                default => '/custom/listing_fail.svg',
+            };
         }
     }
 
