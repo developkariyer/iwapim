@@ -46,9 +46,11 @@ class WisersellCommand extends AbstractCommand
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://dev2.wisersell.com/restapi/', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/vnd.retailer.v10+json',
-                'Content-Type' => 'application/vnd.retailer.v10+json'
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+
             ],
+
         ]); 
     }
     protected function configure() {
@@ -75,7 +77,6 @@ class WisersellCommand extends AbstractCommand
         ];
         //$this->productSearch($data);
         //$this->getCategories();
-        sleep(3);
 
         //$token = $this->getAccessToken();
         // $data = ["test111"];
@@ -91,7 +92,6 @@ class WisersellCommand extends AbstractCommand
             ]
         ];
         $this->addProduct($productData);
-        
         return Command::SUCCESS;
     }
     protected function getAccessToken()
@@ -222,6 +222,7 @@ class WisersellCommand extends AbstractCommand
     }
     protected function addProduct($data)
     {
+        print_r($data);
         $result = $this->request(self::$apiUrl['product'], 'POST', '', $data);
         print_r($result);
         // $url = "https://dev2.wisersell.com/restapi/product"; 
