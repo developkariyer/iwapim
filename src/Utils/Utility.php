@@ -2,7 +2,6 @@
 
 namespace App\Utils;
 
-use Normalizer;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\Asset\Folder as AssetFolder;
 use Pimcore\Model\Asset\Listing as AssetListing;
@@ -40,7 +39,6 @@ class Utility
         return $sanitized;
     }
     
-
     public static function checkSetPath($name, $parent = null) 
     {
         $targetPath = $parent ? $parent->getFullPath()."/$name" : "/$name";
@@ -128,4 +126,90 @@ class Utility
         $str = preg_replace("/[^$safeChars]/", '', $str);
         return str_replace("  ", " ", $str);
     }
+
+    public static function getSetCustomCache($filename, $cachePath, $stringToCache = null, $expiration = 86400)
+    {
+        $cachePath = rtrim($cachePath, '/');
+        if (!is_dir($cachePath)) {
+            if (!mkdir($cachePath, 0777, true)) {
+                $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
+            }
+        }
+        $cacheFile = "$cachePath/$filename";
+        if ($stringToCache) {
+            file_put_contents($cacheFile, $stringToCache);
+            return true;
+        } else {
+            if (file_exists($cacheFile) && filemtime($cacheFile) > time()-$expiration) {
+                return file_get_contents($cacheFile);
+            }
+        }
+        return false;
+    }
+
+    public static function getCustomCache($filename, $cachePath, $expiration = 86400)
+    {
+        return static::getSetCustomCache($filename, $cachePath, null, $expiration);
+    }
+
+    public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400)
+    {
+        return static::getSetCustomCache($filename, $cachePath, $stringToCache, $expiration);
+    }
+
+    public static function retrieveJsonData($fieldName)
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT json_data FROM iwa_json_store WHERE field_name=?";
+        $result = $db->fetchAssociative($sql, [$fieldName]);
+        if ($result) {
+            return json_decode($result['json_data'], true);
+        }
+        return null;
+    }
+
+    public static function storeJsonData($objectId, $fieldName, $data)
+    {
+        $db = \Pimcore\Db::get();
+        try {
+            $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) 
+                ON DUPLICATE KEY UPDATE json_data=?";
+            $db->query($sql, [$objectId, $fieldName, json_encode($data), json_encode($data)]);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    public static function checkJwtTokenValidity($token) 
+    {
+        $tokenParts = explode(".", $token);
+        if (count($tokenParts) !== 3) {
+            return false;
+        }
+        $tokenPayload = base64_decode($tokenParts[1]);
+        $jwtPayload = json_decode($tokenPayload, true);
+        $currentTimestamp = time() + 60;
+        if ($jwtPayload['exp'] < $currentTimestamp) {
+            return false;
+        }
+        return true;
+    }
+
+    public static function getCachedImage($url)
+    {
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+        if (strpos($url, 'iwa.web.tr') !== false) {
+            return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+        }
+        $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
+        if ($imageAsset) {
+            return new \Pimcore\Model\DataObject\Data\ExternalImage(
+                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath())
+            );
+        }
+        return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+    }
+
 }

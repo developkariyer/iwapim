@@ -13,6 +13,7 @@ use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use App\Utils\Utility;
 use Exception;
 
 
@@ -27,6 +28,8 @@ class WisersellCommand extends AbstractCommand
     private $wisersellListings = [];
     private $iwapimListings = [];
 
+    private static $apiServer = 'https://dev2.wisersell.com/restapi/';
+
     private static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
@@ -40,19 +43,7 @@ class WisersellCommand extends AbstractCommand
         $this->httpClient = HttpClient::create();
         $this->prepareToken();     
     }
-    protected function prepareToken()
-    {
-        $token = $this->getAccessToken();
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://dev2.wisersell.com/restapi/', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
 
-            ],
-
-        ]); 
-    }
     protected function configure() {
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
@@ -60,6 +51,7 @@ class WisersellCommand extends AbstractCommand
             ->addOption('control', null, InputOption::VALUE_NONE, 'Control wisersell product')
             ;
     }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('category')) {
@@ -79,89 +71,72 @@ class WisersellCommand extends AbstractCommand
         //$this->getCategories();
 
         //$token = $this->getAccessToken();
-        // $data = ["test111"];
-        // $this->addCategory($data);
-        // sleep(3);
+        $data = ["test111"];
+        $this->addCategory($data);
+        sleep(3);
         
         // $this->getCategories();
-        $productData = [
-            [
-                "name" => "testurun1",
-                "categoryId" => 285,
-                "subproducts" => []
-            ]
-        ];
-        $this->addProduct($productData);
+        // $productData = [
+        //     [
+        //         "name" => "testurun1",
+        //         "categoryId" => 285,
+        //         "subproducts" => []
+        //     ]
+        // ];
+        // $this->addProduct($productData);
         return Command::SUCCESS;
     }
+
+    protected function prepareToken()
+    {
+        $token = $this->getAccessToken();
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, static::$apiServer, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+
+            ],
+
+        ]); 
+    }
+
     protected function getAccessToken()
     {
-        $token_file = PIMCORE_PROJECT_ROOT."/tmp/wisersell_access_token.json";
-        if (file_exists($token_file) && filesize($token_file) > 0) {
-            echo "Token file exists.\n";
-            $file_contents = file_get_contents($token_file);
-            $token = json_decode($file_contents, true);
-            if ($token === null || !isset($token['token'])) {
-                echo "Invalid token file content. Fetching new token...\n";
-                $this->fetchToken(); 
-            } elseif ($this->isTokenExpired($token['token'])) {
-                echo "Token expired. Fetching new token...\n";
-                $this->fetchToken(); 
-            } else {
-                echo "Bearer Token: " . $token['token'] . "\n";
-            }
-        } else {
-            echo "Token file not found or empty. Fetching new token...\n";
-            $this->fetchToken();
+        $token = json_decode(Utility::getCustomCache('wisersell_access_token.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
+        if (Utility::checkJwtTokenValidity($token['token'] ?? '')) {
+            echo "Bearer Token: " . $token['token'] . "\n";
+            return $token['token'];
         }
-        $file_contents = file_get_contents($token_file);
-        $token = json_decode($file_contents, true);
-        return $token['token'];
+        echo "Token file not found or empty. Fetching new token...\n";
+        return $this->fetchToken();
     }
+
     protected function fetchToken()
     {
         $url = "https://dev2.wisersell.com/restapi/token"; 
-        $data = [
-            "email" => $_ENV['WISERSELL_DEV_USER'],
-            "password" => $_ENV['WISERSELL_DEV_PASSWORD']
-        ];
         $client = HttpClient::create();
         $response = $client->request('POST', $url, [
-            'json' => $data,
+            'json' => [
+                "email" => $_ENV['WISERSELL_DEV_USER'],
+                "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+            ],
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ],
         ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $result = $response->toArray(); 
-            if (isset($result['token'])) {
-                echo "Bearer Token: " . $result['token'] . "\n";
-                $tokenFile = PIMCORE_PROJECT_ROOT . "/tmp/wisersell_access_token.json";
-                if (file_exists($tokenFile)) {
-                    unlink($tokenFile);
-                    echo "Old token file deleted.\n";
-                }
-                file_put_contents($tokenFile, json_encode(['token' => $result['token']], JSON_PRETTY_PRINT));
-                echo "New token saved to file.\n";
-            } else {
-                echo "Failed to get bearer token. Response: " . json_encode($result) . "\n";
-            }
-        } else {
-            echo "Failed to make request. HTTP Status Code: $statusCode\n";
+        if ($response->getStatusCode() !== 200) {
+            throw new Exception("Failed to get bearer token. HTTP Status Code: {$response->getContent()}");
         }
-    }
-    protected function isTokenExpired($token)
-    {
-        $tokenParts = explode('.', $token);
-        if (count($tokenParts) === 3) {
-            $payload = json_decode(base64_decode($tokenParts[1]), true);
-            if (isset($payload['exp'])) {
-                return ($payload['exp'] < time());
-            }
+        $result = $response->toArray(); 
+        if (empty($result['token'])) {
+            throw new Exception("Failed to get bearer token. Response: " . json_encode($result));
         }
-        return true;
+        echo "Bearer Token: " . $result['token'] . "\n";
+        Utility::setCustomCache('wisersell_access_token.json', PIMCORE_PROJECT_ROOT . '/tmp', json_encode($result));
+        echo "New token saved to file.\n";
+        return $result['token'];
     }
 
     protected function request($apiEndPoint, $type, $parameter, $json = [])
@@ -175,17 +150,20 @@ class WisersellCommand extends AbstractCommand
         echo "{$apiEndPoint}{$parameter} ";
         return json_decode($response->getContent(), true);
     }
+
     protected function productSearch($data)
     {
         $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
         print_r($result);
        
     }
+
     protected function getCategories()
     {
         $result = $this->request(self::$apiUrl['category'], 'GET', '');
         print_r($result);
     }
+
     protected function addCategory($categories)
     {
         $data = array_map(function($category) {
@@ -220,6 +198,7 @@ class WisersellCommand extends AbstractCommand
         //     echo "Request failed. HTTP Status Code: $statusCode\n";
         // }
     }
+
     protected function addProduct($data)
     {
         print_r($data);
