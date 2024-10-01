@@ -106,6 +106,7 @@ class CleanCommand extends AbstractCommand
                 }
                 $product->setBundleProducts($bundleProducts);
                 $product->save();
+                exit;
             }
             $offset += $pageSize;
             echo "Processed {$offset}\n";
