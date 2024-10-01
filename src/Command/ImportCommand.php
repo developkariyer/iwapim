@@ -12,11 +12,11 @@ use Pimcore\Model\DataObject\Marketplace;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\EventListener\DataObjectListener;
-use App\Utils\AmazonConnector;
-use App\Utils\ShopifyConnector;
-use App\Utils\EtsyConnector;
-use App\Utils\TrendyolConnector;
-use App\Utils\BolConnector;
+use App\MarketplaceConnector\AmazonConnector;
+use App\MarketplaceConnector\ShopifyConnector;
+use App\MarketplaceConnector\EtsyConnector;
+use App\MarketplaceConnector\TrendyolConnector;
+use App\MarketplaceConnector\BolConnector;
 
 
 #[AsCommand(
@@ -68,6 +68,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
             ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
             ->addOption('asins', null, InputOption::VALUE_NONE, 'Downloads ASINs from Amazon.')
+            ->addOption('test', null, InputOption::VALUE_NONE, 'Test command.')
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
     
@@ -129,10 +130,6 @@ class ImportCommand extends AbstractCommand
         // - bcmath fonksiyonlarını kullan
         // - veritabanında decimal kullan
         // - önce 100 ile çarp, işlemini yap, round et, 100'e böl
-        
-
-
-
     }
 
     protected static function prepareShopifyLineItems()
@@ -179,6 +176,12 @@ class ImportCommand extends AbstractCommand
         $this->removeListeners();
 
         try {
+            if ($input->getOption('test')) {
+                $marketplace = Marketplace::getById(199128);
+                $connector = new BolConnector($marketplace);
+                $connector->downloadOfferReport();
+                return Command::SUCCESS;
+            }
             if ($input->getOption('list')) {
                 return self::listMarketplaces();
             }

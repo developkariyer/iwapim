@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Utils;
+namespace App\MarketplaceConnector;
 
-use App\Utils\MarketplaceConnectorInterface;
+use App\MarketplaceConnector\MarketplaceConnectorInterface;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Command\CacheImagesCommand;
+use Pimcore\Model\DataObject\Data\Link;
 
 
 abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInterface
@@ -23,18 +24,16 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
             throw new \Exception("Marketplace is not published, is not ".static::$marketplaceType." or credentials are empty");
         }
         $this->marketplace = $marketplace;
-        echo " initialiazed\n";
     }
 
-    protected static function getCachedImage($url)
+    protected function getUrlLink($url)
     {
-        $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
-        if ($imageAsset) {
-            return new \Pimcore\Model\DataObject\Data\ExternalImage(
-                "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath())
-            );
+        if (empty($url)) {
+            return null;
         }
-        return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+        $l = new Link();
+        $l->setPath($url);
+        return $l;
     }
 
 }

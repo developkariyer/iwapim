@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace App\MarketplaceConnector;
 
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
@@ -122,26 +122,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $images = $mainListing['images'] ?? [];
         foreach ($images as $img) {
             if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
-                return static::getCachedImage($img['src']);
+                return Utility::getCachedImage($img['src']);
             } 
             if (empty($lastImage)) {
-                $lastImage = static::getCachedImage($img['src']);
+                $lastImage = Utility::getCachedImage($img['src']);
             }
         }
         if (!empty($mainListing['image']['src'])) {
-            return static::getCachedImage($mainListing['image']['src']);
+            return Utility::getCachedImage($mainListing['image']['src']);
         }
         return $lastImage;
-    }
-
-    protected function getUrlLink($listing, $mainListing)
-    {
-        if (!empty($mainListing['handle']) && !empty($listing['id'])) {
-            $l = new Link();
-            $l->setPath($this->marketplace->getMarketplaceUrl().'products/'.$mainListing['handle'].'/?variant='.$listing['id']);
-            return $l;
-        }
-        return null;
     }
 
     public function import($updateFlag, $importFlag)
@@ -175,7 +165,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => $this->getImage($listing, $mainListing),
-                        'urlLink' => $this->getUrlLink($listing, $mainListing),
+                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
                         'salePrice' => $listing['price'] ?? '',
                         'saleCurrency' => $this->marketplace->getCurrency(),
                         'attributes' => $listing['title'] ?? '',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace App\MarketplaceConnector;
 
 use Pimcore\Model\DataObject\Marketplace;
 

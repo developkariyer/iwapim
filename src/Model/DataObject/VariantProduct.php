@@ -92,11 +92,7 @@ class VariantProduct extends Concrete
     public function jsonRead($fieldName)
     {
         $db = \Pimcore\Db::get();
-        try {
-            return $db->fetchOne("SELECT json FROM iwa_json_store WHERE object_id = ? AND field_name = ?", [$this->getId(), $fieldName]);
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $db->fetchOne("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = ?", [$this->getId(), $fieldName]);
     }
 
     public function jsonWrite($fieldName, $data)
@@ -133,6 +129,7 @@ class VariantProduct extends Concrete
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
+        $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
         $this->setParent($parent);
@@ -141,18 +138,7 @@ class VariantProduct extends Concrete
         try {
             $result = $this->save();
         } catch (\Throwable $e) {
-            echo "\n**************************************************\n";
-            print_r($variant);
-            echo "\n**************************************************\n";
-            echo "0:{$marketplace->getKey()} {$variant['title']} \n";
-            echo "1:".$variant['attributes'] ?? ''; echo "\n";
-            echo "2:".Utility::sanitizeVariable("{$marketplace->getKey()} {$variant['title']}",250); echo "\n";
-            echo "3:".Utility::sanitizeVariable($variant['attributes'],250); echo "\n";
-            echo "4:".Utility::sanitizeVariable("{$marketplace->getKey()} {$variant['title']} {$variant['attributes']}",250); echo "\n";
-            echo "\n**************************************************\n";
-            echo "Key: ".trim("$key_base$key");
             echo "Error: {$e->getMessage()}\n";
-            echo "\n**************************************************\n";
             return false;
         }
         if ($result) {

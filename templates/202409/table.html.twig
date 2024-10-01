@@ -1,0 +1,46 @@
+{% extends '202409/base.report.html.twig' %}
+{% block content %}
+    <div style="height: calc(100vh); overflow-y: auto;">
+        <table id="example" class="table table-striped nowrap" style="width:100%">
+            <thead>
+                <tr>
+                {% for thead in theads %}
+                    <th>{{ thead }}</th>
+                {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in table %}
+                <tr>
+                {% for cell in row %}
+                    <td>{{ cell }}</td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        var availableHeight = window.innerHeight - 150;
+        new DataTable('#example', {
+            layout: {
+                topStart: {
+                    buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+                }
+            },
+            fixedColumns: {
+                leftColumns: 1
+            },
+            fixedHeader: true,
+            paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            scrollY: availableHeight + "px",
+        });
+        window.addEventListener('resize', function() {
+            var availableHeight = window.innerHeight;
+            $('#example').DataTable().settings()[0].oScroll.sY = availableHeight + "px";
+            $('#example').DataTable().draw();
+        });
+    </script>
+{% endblock %}

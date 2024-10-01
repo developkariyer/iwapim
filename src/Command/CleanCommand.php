@@ -13,7 +13,7 @@ use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject;
-use App\Utils\AmazonConnector;
+use App\MarketplaceConnector\AmazonConnector;
 use App\Utils\Utility;
 use App\Utils\OpenAIChat;
 
@@ -37,6 +37,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('product-fix', null, InputOption::VALUE_NONE, 'If set, inherited fields will be reset for Products.')
             ->addOption('translate-ai', null, InputOption::VALUE_NONE, 'If set, AI translations will be processed.')
             ->addOption('unpublish', null, InputOption::VALUE_NONE, 'If set, variantProducts not updated in last 3 days will be unpublished.')
+            ->addOption('bundle-fix', null, InputOption::VALUE_NONE, 'If set, bundle products will be fixed.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -72,8 +73,47 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('unpublish')) {
             self::unpublishOlderVariantProducts();
         }
-    
+        if ($input->getOption('bundle-fix')) {
+            self::fixBundledProducts();
+        }
         return Command::SUCCESS;
+    }
+
+    private static function fixBundledProducts()
+    {
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(true);
+        $pageSize = 50;
+        $offset = 1600;
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            foreach ($products as $product) {
+                $bundleItems = $product->getBundleItems();
+                if (empty($bundleItems)) {
+                    continue;
+                }
+                echo "Found: {$product->getId()} {$product->getKey()}\n";
+                $bundleProducts = [];
+                $product->setBundleProducts([]);
+                $product->save();
+                echo "Cleared bundle products\n";
+                foreach ($bundleItems as $bundleItem) {
+                    $newBundleItem = new DataObject\Data\ObjectMetadata('metadata', ['amount'],  $bundleItem);
+//                    $newBundleItem->setAmount(1);
+                    $bundleProducts[] = $newBundleItem;
+                }
+                $product->setBundleProducts($bundleProducts);
+                $product->save();
+                exit;
+            }
+            $offset += $pageSize;
+            echo "Processed {$offset}\n";
+        }
     }
 
     private static function unpublishOlderVariantProducts()
@@ -166,7 +206,7 @@ class CleanCommand extends AbstractCommand
                         }
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
+//                                echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
@@ -178,14 +218,14 @@ class CleanCommand extends AbstractCommand
                         }
                         if ($product->checkIwasku()) {
                             $dirty = true;
-                        }/*
+                        }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
-                                echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
+//                                echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
-                        }*/
+                        }
                         $size = $product->getVariationSize();
                         if (preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)cm$/', $size, $matches)) {
                             $width = $matches[1];
@@ -193,7 +233,6 @@ class CleanCommand extends AbstractCommand
                             if (empty($product->getProductDimension1()) || empty($product->getProductDimension2())) {
                                 $product->setProductDimension1($width);
                                 $product->setProductDimension2($height);
-                                echo "Setting dimensions for {$product->getId()} to {$width}x{$height}\n";
                                 $dirty = true;
                             }
                         }

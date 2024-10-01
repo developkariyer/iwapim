@@ -33,11 +33,12 @@ class CacheImagesCommand extends AbstractCommand
     {
         $this
 //            ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'The marketplace to import from.')
-            ->addOption('skip-amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be skipped.')
-            ->addOption('skip-etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be skipped.')
-            ->addOption('skip-shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
-            ->addOption('skip-bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be skipped.')
-            ->addOption('skip-trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be skipped.');
+            ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be processed.')
+            ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be processed.')
+            ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
+            ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
+            ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be processed.')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -50,7 +51,7 @@ class CacheImagesCommand extends AbstractCommand
         static::$bolcomFolder = Utility::checkSetAssetPath('Bol.com', static::$cacheFolder);
 
         $listingObject = new VariantProduct\Listing();
-        $listingObject->setUnpublished(true);
+        $listingObject->setUnpublished(false);
         $pageSize = 150;
         $offset = 0;
 
@@ -71,48 +72,45 @@ class CacheImagesCommand extends AbstractCommand
                 }
                 switch ($variantType) {
                     case 'Amazon':
-                        if (!$input->getOption('skip-amazon')) self::processAmazon(variant: $variant);
+                        if ($input->getOption('amazon') || $input->getOption('all')) self::processAmazon(variant: $variant);
                         break;
                     case 'Etsy':
-                        if (!$input->getOption('skip-etsy')) self::processEtsy($variant);
+                        if ($input->getOption('etsy') || $input->getOption('all')) self::processEtsy($variant);
                         break;
                     case 'Shopify':
-                        if (!$input->getOption('skip-shopify')) self::processShopify($variant);
+                        if ($input->getOption('shopify') || $input->getOption('all')) self::processShopify($variant);
                         break;
                     case 'Trendyol':
-                        if (!$input->getOption('skip-trendyol')) self::processTrendyol($variant);
+                        if ($input->getOption('trendyol') || $input->getOption('all')) self::processTrendyol($variant);
                         break;
                     case 'Bol.com':
-                        if (!$input->getOption('skip-bolcom')) self::processBolCom($variant);
+                        if ($input->getOption('bolcom') || $input->getOption('all')) self::processBolCom($variant);
                         break;
                     default:
                         break;
                 }
             }
             $offset += $pageSize;
-            echo "\nProcessed {$offset} of {$totalCount} ";
+            echo "\nProcessed {$offset} of {$totalCount}\n";
         }
         return Command::SUCCESS;
     }
 
     protected static function processTrendyol($variant)
     {
-        $json = self::getApiResponse($variant->getId());
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
         foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
     }
 
     protected static function processAmazon($variant)
     {
-        $filename = PIMCORE_PROJECT_ROOT."/tmp/marketplaces/Amazon_ASIN_{$variant->getUniqueMarketplaceId()}.json";
-        if (!file_exists($filename)) {
-            return;
-        }
-        $json = json_decode(json: file_get_contents(filename: $filename) ?? [], associative: true) ?? [];
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
         foreach ($json['images'][0]['images'] ?? [] as $image) {
             if ($image['height'] < 1000) {
@@ -122,11 +120,12 @@ class CacheImagesCommand extends AbstractCommand
         }
         $listingImageList = array_unique(array: $listingImageList);
         $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
     }
 
     protected static function processShopify($variant)
     {
-        $parentJson = self::getParentResponse($variant->getId());
+        $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
         $variantImage = null;
@@ -149,8 +148,8 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processEtsy($variant)
     {
-        $json = self::getApiResponse($variant->getId());
-        $parentJson = self::getParentResponse($variant->getId());
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
         $variantProperty = [];
         $listingImageList = [];
         foreach ($json['property_values'] ?? [] as $property) {
@@ -158,7 +157,6 @@ class CacheImagesCommand extends AbstractCommand
                 $variantProperty[] = "{$property['property_id']}_{$valueId}";
             }
         }
-
         $myVariantImage = null;
         foreach ($parentJson['variation_images'] ?? [] as $variationImage) {
             if (in_array("{$variationImage['property_id']}_{$variationImage['value_id']}", $variantProperty)) {
@@ -166,24 +164,35 @@ class CacheImagesCommand extends AbstractCommand
                 break;
             }
         }
-
         $variantImageObj = null;
         foreach ($parentJson["images"] ?? [] as $image) {
-            $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder, "Etsy_{$image['listing_id']}_{$image['listing_image_id']}.jpg");
-            $listingImageList[$image['listing_image_id']] = $imgProcessed;
+            $imgProcessed = static::processImage($image['url_fullxfull'] ?? '', static::$etsyFolder);
+            $listingImageList[] = $imgProcessed;
             if ($myVariantImage === $image['listing_image_id']) {
                 $variantImageObj = $imgProcessed;
             }
         }
+        $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList, $variantImageObj);
         echo "{$variant->getId()} ";        
     }
 
     protected static function processBolCom($variant)
     {
-        $json = self::getApiResponse($variant->getId());
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
-        $listingImageList[] = static::processImage($json['imageUrl2'] ?? '', static::$bolcomFolder);
+        foreach ($json['assets']['assets'] ?? [] as $asset) {
+            foreach ($asset['variants'] ?? [] as $assetVariant) {
+                if (($assetVariant['size'] ?? '') === 'small') {
+                    continue;
+                }
+                $img = static::processImage($assetVariant['url'], static::$bolcomFolder);
+                $listingImageList[] = $img;
+                if (($asset['usage'] ?? '') === 'PRIMARY') {
+                    $variant->setImageUrl(Utility::getCachedImage($img->getFullPath()));
+                }
+            }
+        }
         $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()}: ";
     }
@@ -208,8 +217,6 @@ class CacheImagesCommand extends AbstractCommand
                     echo 'R';
                 }
             }
-        } 
-        if (!$asset) {
             try {
                 $imageData = file_get_contents($url);
                 echo "D";
@@ -264,26 +271,6 @@ class CacheImagesCommand extends AbstractCommand
         $assetList->setCondition("filename = ?", [$imageName]);
         $assetList->setLimit(1);
         return $assetList->current();
-    }
-
-    private static function getResponseFromDb($id, $fieldName)
-    {
-        $db = \Pimcore\Db::get();
-        $response = $db->fetchOne('SELECT json_data FROM iwa_json_store WHERE object_id=? AND field_name=? LIMIT 1', [$id, $fieldName]);
-        if (empty($response)) {
-            return [];
-        }
-        return json_decode($response, true);
-    }
-
-    private static function getApiResponse($id)
-    {
-        return static::getResponseFromDb($id, 'apiResponseJson');
-    }
-
-    private static function getParentResponse($id)
-    {
-        return static::getResponseFromDb($id,'parentResponseJson');
     }
 
     public static function createUniqueFileNameFromUrl($url)

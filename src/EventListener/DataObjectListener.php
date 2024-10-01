@@ -172,25 +172,24 @@ class DataObjectListener implements EventSubscriberInterface
         $image_url = '';
         if ($object instanceof Product) {
             Product::setGetInheritedValues(false);
-            
-            $image_url = self::traverseProducts($object);
-            if (!empty($image_url)) {
-                $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
-            } else {
-                $object->setImageUrl(null);
+//            if (!$object->getImageUrl() instanceof \Pimcore\Model\DataObject\Data\ExternalImage) {
+                $image_url = self::traverseProducts($object);
+                if (!empty($image_url)) {
+                    $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
+                } else {
+                    $object->setImageUrl(null);
+                }
+//            }
+            if ($object->level()>0) {
+                $object->setTechnicals(null);
+                $object->setVariationSizeList(null);
+                $object->setVariationColorList(null);
             }
-            if (!$object->getParent() instanceof Product) {
+            if ($object->level()==0) {
                 [$sizes, $colors] = $object->listVariations();
                 $object->setVariationSizeList(implode("\n", $sizes));
                 $object->setVariationColorList(implode("\n", $colors));
-            } else {
-                $object->setVariationSizeList('');
-                $object->setVariationColorList('');
-            }
-            if ($object->level()>0) {
-                $object->setTechnicals(null);
-            }
-            if ($object->level()==0) {
+
                 $l = new Link();
                 $l->setPath('https://iwa.web.tr/report/product/' . $object->getId());
                 $object->setReportLink($l);
