@@ -355,45 +355,6 @@ class WisersellCommand extends AbstractCommand
         echo "count listings: ".count($this->wisersellListings)."\n";
     }
 
-    protected function downloadIwapimProduct()
-    {
-        $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/iwapimproduct.json';
-        if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
-            $contentJson = file_get_contents($filenamejson);
-            $this->iwapimListings = json_decode($contentJson, true);          
-            echo "Using cached data ";
-        }
-        else {
-            $listingObject = new Product\Listing();
-            $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
-            $listingObject->setUnpublished(false);
-            $pageSize = 50;
-            $offset = 0;
-            while (true) {
-                $listingObject->setLimit($pageSize);
-                $listingObject->setOffset($offset);
-                $products = $listingObject->load();
-                echo "\nProcessed {$offset} ";
-                if (empty($products)) {
-                    break;
-                }
-                foreach ($products as $product) {
-                    if ($product->level() == 1) {
-                        $iwasku = $product->getInheritedField("iwasku");
-                        $this->iwapimListings[$iwasku] = [
-                            'iwasku' => $iwasku,
-                            'control' => false
-                        ];
-                    }
-                }
-                $offset += $pageSize;
-            }
-        }
-        $jsonListings = json_encode($this->iwapimListings);
-        file_put_contents($filenamejson, $jsonListings);
-        echo "count listings: ".count($this->iwapimListings)."\n";
-    }
-
     protected function controlWisersellProduct()
     {
         $this->downloadWisersellProduct();
