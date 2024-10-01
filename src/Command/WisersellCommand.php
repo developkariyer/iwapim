@@ -317,11 +317,11 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
-    protected function downloadWisersellProduct()
+    protected function downloadWisersellProduct($forceDownload = false)
     {
         $this->prepareToken();
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
-        if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
+        if (!$forceDownload && file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
             $this->wisersellListings = json_decode($contentJson, true);          
             echo "Using cached data ";
@@ -354,7 +354,6 @@ class WisersellCommand extends AbstractCommand
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->wisersellListings)."\n";
     }
-
 
     protected function controlWisersellProduct()
     {
