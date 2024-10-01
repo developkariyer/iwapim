@@ -73,8 +73,8 @@ class WisersellCommand extends AbstractCommand
             "page"=> 0,
             "pageSize"=> 10,
         ];
-        $this->productSearch($data);
-
+        //$this->productSearch($data);
+        $this->getCategories();
         return Command::SUCCESS;
     }
     protected function getAccessToken()
@@ -183,27 +183,29 @@ class WisersellCommand extends AbstractCommand
         //     echo "Request failed. HTTP Status Code: $statusCode\n";
         // }
     }
-    protected function getCategories($token)
+    protected function getCategories()
     {
-        $url = "https://dev2.wisersell.com/restapi/category";
-        $client = HttpClient::create();
-        $response = $client->request('GET', $url, [
-        'headers' => [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $token,
-        ],
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $responseContent = $response->getContent();
-            echo "Response: " . $responseContent . "\n";
-            $result = $response->toArray();
-            echo "Result: " . print_r($result, true) . "\n";
-            return $result;
-        } else {
-            echo "Request failed. HTTP Status Code: $statusCode\n";
-        }
+        $result = $this->request(self::$apiUrl['category'], 'GET', '');
+        print_r($result);
+        // $url = "https://dev2.wisersell.com/restapi/category";
+        // $client = HttpClient::create();
+        // $response = $client->request('GET', $url, [
+        // 'headers' => [
+        //     'Content-Type' => 'application/json',
+        //     'Accept' => 'application/json',
+        //     'Authorization' => 'Bearer ' . $token,
+        // ],
+        // ]);
+        // $statusCode = $response->getStatusCode();
+        // if ($statusCode === 200) {
+        //     $responseContent = $response->getContent();
+        //     echo "Response: " . $responseContent . "\n";
+        //     $result = $response->toArray();
+        //     echo "Result: " . print_r($result, true) . "\n";
+        //     return $result;
+        // } else {
+        //     echo "Request failed. HTTP Status Code: $statusCode\n";
+        // }
     }
     protected function addCategory($token,$categories)
     {
