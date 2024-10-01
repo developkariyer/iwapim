@@ -73,7 +73,7 @@ class WisersellCommand extends AbstractCommand
             "page"=> 0,
             "pageSize"=> 10,
         ];
-        $this->productSearch($token,$data);
+        $this->productSearch($data);
 
         return Command::SUCCESS;
     }
@@ -158,7 +158,7 @@ class WisersellCommand extends AbstractCommand
         echo "{$apiEndPoint}{$parameter} ";
         return json_decode($response->getContent(), true);
     }
-    protected function productSearch($token,$data)
+    protected function productSearch($data)
     {
         $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
         print_r($result);
