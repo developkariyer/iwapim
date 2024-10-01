@@ -75,8 +75,12 @@ class WisersellCommand extends AbstractCommand
         ];
         //$this->productSearch($data);
         //$this->getCategories();
-        //$this->addCategory(["test1"]);
         sleep(3);
+
+        $token = getAccessToken();
+        $this->addCategory($token,["test1"]);
+        sleep(3);
+        
         $this->getCategories();
         
         return Command::SUCCESS;
@@ -173,34 +177,38 @@ class WisersellCommand extends AbstractCommand
         $result = $this->request(self::$apiUrl['category'], 'GET', '');
         print_r($result);
     }
-    protected function addCategory($categories)
+    protected function addCategory($token,$categories)
     {
+        // $data = array_map(function($category) {
+        //     return ["name" => $category];
+        // }, $categories);
+        // $result = $this->request(self::$apiUrl['category'], 'POST', '', $data);
+        // print_r($result);
+
+
+        $url = "https://dev2.wisersell.com/restapi/category"; 
         $data = array_map(function($category) {
             return ["name" => $category];
         }, $categories);
-        $result = $this->request(self::$apiUrl['category'], 'POST', '', $data);
-        print_r($result);
-        // $url = "https://dev2.wisersell.com/restapi/category"; 
-       
-        // $client = HttpClient::create();
-        // $response = $client->request('POST', $url, [
-        //     'json' => $data,
-        //     'headers' => [
-        //         'Content-Type' => 'application/json',
-        //         'Accept' => 'application/json',
-        //         'Authorization' => 'Bearer ' . $token,
-        //     ],
-        // ]);
-        // $statusCode = $response->getStatusCode();
-        // if ($statusCode === 200) {
-        //     $responseContent = $response->getContent();
-        //     echo "Response: " . $responseContent . "\n";
-        //     $result = $response->toArray();
-        //     echo "Result: " . print_r($result, true) . "\n";
-        //     return $result;
-        // } else {
-        //     echo "Request failed. HTTP Status Code: $statusCode\n";
-        // }
+        $client = HttpClient::create();
+        $response = $client->request('POST', $url, [
+            'json' => $data,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ],
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 200) {
+            $responseContent = $response->getContent();
+            echo "Response: " . $responseContent . "\n";
+            $result = $response->toArray();
+            echo "Result: " . print_r($result, true) . "\n";
+            return $result;
+        } else {
+            echo "Request failed. HTTP Status Code: $statusCode\n";
+        }
     }
     protected function addProduct($token,$data)
     {
