@@ -67,7 +67,10 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('control')){
             $this->controlWisersellProduct();
         }
-
+        $data = [
+            "page"=> 0,
+            "pageSize"=> 10,
+        ];
         $this->productSearch($token,$data);
 
         return Command::SUCCESS;
