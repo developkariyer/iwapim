@@ -99,6 +99,8 @@ class CleanCommand extends AbstractCommand
                 }
                 echo "Found: {$product->getId()} {$product->getKey()}\n";
                 $bundleProducts = [];
+                $product->setBundleProducts([]);
+                $product->save();
                 foreach ($bundleItems as $bundleItem) {
                     $newBundleItem = new DataObject\Data\ObjectMetadata('metadata', ['amount'],  $bundleItem);
                     $newBundleItem->setAmount(1);
