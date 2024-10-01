@@ -436,7 +436,7 @@ class WisersellCommand extends AbstractCommand
                         echo "\n Error occurred while updating WisersellId: " . $e->getMessage()."\n";
                     }
                 }
-                if($this->iwapimListings[$code]['control'] === true) {
+                else {
                     echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
                 }             
             }
