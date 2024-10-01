@@ -77,7 +77,7 @@ class WisersellCommand extends AbstractCommand
         //$this->getCategories();
         sleep(3);
 
-        $token = getAccessToken();
+        $token = $this->getAccessToken();
         $this->addCategory($token,["test1"]);
         sleep(3);
         
