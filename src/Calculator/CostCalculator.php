@@ -23,10 +23,11 @@ class CostCalculator implements CalculatorClassInterface
     private function calculateProductCost(Product $object): string
     {
         $totalCost = '0.00';
-        $bundleItems = []; //$object->getBundleItems();
-        if (!empty($bundleItems)) {
+        $bundleItems = $object->getBundleProducts();
+        if (is_iterable($bundleItems)) {
             foreach ($bundleItems as $bundleItem) {
-                $bundleItemCost = $bundleItem->getProductCost() ?? '0.00';
+                $product = $bundleItem->getObject();
+                $bundleItemCost = $product->getProductCost() ?? '0.00';
                 $totalCost = bcadd($totalCost, $bundleItemCost, 4);
             }
             return number_format($totalCost, 4, '.', '');
