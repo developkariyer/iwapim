@@ -265,7 +265,7 @@ class WisersellCommand extends AbstractCommand
                 if ($product->level()!=1) continue;
                 $iwasku = $product->getInheritedField("iwasku");
                 sleep(3);
-                $response = $this->productControl($token,$iwasku);
+                $response = $this->productControl($iwasku);
                 if($response['count']===0) {
                     $productName = $product->getInheritedField("name"); 
                     $categoryName = $product->getInheritedField("productCategory");
