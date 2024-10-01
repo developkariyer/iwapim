@@ -29,7 +29,7 @@ class WisersellCommand extends AbstractCommand{
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
-
+            ->addOption('control', null, InputOption::VALUE_NONE, 'Control wisersell product')
             ;
     }
     protected function execute(InputInterface $input, OutputInterface $output): int{
@@ -40,9 +40,9 @@ class WisersellCommand extends AbstractCommand{
         if($input->getOption('product')){
             $this->addProductByIwapim();
         }
-        $token = $this->getAccessToken();
-
-        $this->controlWisersellProduct();
+        if($input->getOption('control')){
+            $this->controlWisersellProduct();
+        }
         return Command::SUCCESS;
     }
     protected function getAccessToken(){
