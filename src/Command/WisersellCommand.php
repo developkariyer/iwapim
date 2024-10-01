@@ -67,6 +67,9 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('control')){
             $this->controlWisersellProduct();
         }
+
+        $this->productSearch($token,$data);
+
         return Command::SUCCESS;
     }
     protected function getAccessToken()
