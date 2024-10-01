@@ -27,23 +27,29 @@ class WisersellCommand extends AbstractCommand
     private $iwapimListings = [];
 
     private static $apiUrl = [
+        'productSearch' => 'product/search',
+        'category' => 'category',
+        'product'=> 'product',
     ];
     private $httpClient = null;
 
     public function __construct()
     {
+        $this->httpClient = HttpClient::create();
+        $this->prepareToken();     
+    }
+    protected function prepareToken()
+    {
+        $token = $this->getAccessToken();
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://dev2.wisersell.com/restapi/', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getBolJwtToken(),
+                'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/vnd.retailer.v10+json',
                 'Content-Type' => 'application/vnd.retailer.v10+json'
             ],
-        ]);      
+        ]); 
     }
-
-
     protected function configure() {
-
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
@@ -52,7 +58,6 @@ class WisersellCommand extends AbstractCommand
     }
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        
         if ($input->getOption('category')) {
             $this->addCategoryByIwapim();
         }
@@ -134,11 +139,9 @@ class WisersellCommand extends AbstractCommand
         return true;
     }
 
-    protected function request($apiEndPoint, $type, $parameter, $query = [])
+    protected function request($apiEndPoint, $type, $parameter, $json = [])
     {
-        $token = $this->getAccessToken();
-        $client = HttpClient::create();
-        $response = $client->request($type, $apiEndPoint . $parameter,['query' => $query]);
+        $response = $this->httpClient->request($type, $apiEndPoint . $parameter,['json' => $json]);
         $statusCode = $response->getStatusCode();
         if ($response->getStatusCode() !== 200) {
             echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
@@ -147,31 +150,30 @@ class WisersellCommand extends AbstractCommand
         echo "{$apiEndPoint}{$parameter} ";
         return json_decode($response->getContent(), true);
     }
-    
-    
-
     protected function productSearch($token,$data)
     {
-        $url = "https://dev2.wisersell.com/restapi/product/search"; 
-        $client = HttpClient::create();
-        $response = $client->request('POST', $url, [
-            'json' => $data,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $token,
-            ],
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $responseContent = $response->getContent();
-            echo "Response: " . $responseContent . "\n";
-            $result = $response->toArray();
-            echo "Result: " . print_r($result, true) . "\n";
-            return $result;
-        } else {
-            echo "Request failed. HTTP Status Code: $statusCode\n";
-        }
+        $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
+        print_r($result);
+        // $url = "https://dev2.wisersell.com/restapi/product/search"; 
+        // $client = HttpClient::create();
+        // $response = $client->request('POST', $url, [
+        //     'json' => $data,
+        //     'headers' => [
+        //         'Content-Type' => 'application/json',
+        //         'Accept' => 'application/json',
+        //         'Authorization' => 'Bearer ' . $token,
+        //     ],
+        // ]);
+        // $statusCode = $response->getStatusCode();
+        // if ($statusCode === 200) {
+        //     $responseContent = $response->getContent();
+        //     echo "Response: " . $responseContent . "\n";
+        //     $result = $response->toArray();
+        //     echo "Result: " . print_r($result, true) . "\n";
+        //     return $result;
+        // } else {
+        //     echo "Request failed. HTTP Status Code: $statusCode\n";
+        // }
     }
     protected function getCategories($token)
     {
