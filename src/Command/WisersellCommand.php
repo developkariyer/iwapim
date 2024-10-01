@@ -234,7 +234,7 @@ class WisersellCommand extends AbstractCommand
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        $pageSize = 10;
+        $pageSize = 100;
         $offset = 0;
         while (true) {
             $listingObject->setLimit($pageSize);
@@ -382,7 +382,7 @@ class WisersellCommand extends AbstractCommand
             $product->setWisersellId($listing['id']);
             $product->setWisersellJson(json_encode($listing));
             $product->save();
-            echo "WisersellId updated successfully: " . $listing['id']."\n";            
+            echo "WisersellId updated successfully: " . $listing['id']."\n";
         }
     }
     
