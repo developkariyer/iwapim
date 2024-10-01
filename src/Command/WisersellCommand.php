@@ -20,10 +20,28 @@ use Exception;
     description: 'connect wisersell api'
 )]
 
-class WisersellCommand extends AbstractCommand{
+class WisersellCommand extends AbstractCommand
+{
    
     private $wisersellListings = [];
     private $iwapimListings = [];
+
+    private static $apiUrl = [
+    ];
+    private $httpClient = null;
+
+    public function __construct()
+    {
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://dev2.wisersell.com/restapi/', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getBolJwtToken(),
+                'Accept' => 'application/vnd.retailer.v10+json',
+                'Content-Type' => 'application/vnd.retailer.v10+json'
+            ],
+        ]);      
+    }
+
+
     protected function configure() {
 
         $this
@@ -32,7 +50,8 @@ class WisersellCommand extends AbstractCommand{
             ->addOption('control', null, InputOption::VALUE_NONE, 'Control wisersell product')
             ;
     }
-    protected function execute(InputInterface $input, OutputInterface $output): int{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         
         if ($input->getOption('category')) {
             $this->addCategoryByIwapim();
@@ -45,7 +64,8 @@ class WisersellCommand extends AbstractCommand{
         }
         return Command::SUCCESS;
     }
-    protected function getAccessToken(){
+    protected function getAccessToken()
+    {
         $token_file = PIMCORE_PROJECT_ROOT."/tmp/wisersell_access_token.json";
         if (file_exists($token_file) && filesize($token_file) > 0) {
             echo "Token file exists.\n";
@@ -68,7 +88,8 @@ class WisersellCommand extends AbstractCommand{
         $token = json_decode($file_contents, true);
         return $token['token'];
     }
-    protected function fetchToken(){
+    protected function fetchToken()
+    {
         $url = "https://dev2.wisersell.com/restapi/token"; 
         $data = [
             "email" => $_ENV['WISERSELL_DEV_USER'],
@@ -101,7 +122,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Failed to make request. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function isTokenExpired($token){
+    protected function isTokenExpired($token)
+    {
         $tokenParts = explode('.', $token);
         if (count($tokenParts) === 3) {
             $payload = json_decode(base64_decode($tokenParts[1]), true);
@@ -111,7 +133,25 @@ class WisersellCommand extends AbstractCommand{
         }
         return true;
     }
-    protected function productSearch($token,$data){
+
+    protected function request($apiEndPoint, $type, $parameter, $query = [])
+    {
+        $token = $this->getAccessToken();
+        $client = HttpClient::create();
+        $response = $client->request($type, $apiEndPoint . $parameter,['query' => $query]);
+        $statusCode = $response->getStatusCode();
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
+            return null;
+        }
+        echo "{$apiEndPoint}{$parameter} ";
+        return json_decode($response->getContent(), true);
+    }
+    
+    
+
+    protected function productSearch($token,$data)
+    {
         $url = "https://dev2.wisersell.com/restapi/product/search"; 
         $client = HttpClient::create();
         $response = $client->request('POST', $url, [
@@ -133,7 +173,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function getCategories($token){
+    protected function getCategories($token)
+    {
         $url = "https://dev2.wisersell.com/restapi/category";
         $client = HttpClient::create();
         $response = $client->request('GET', $url, [
@@ -154,7 +195,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function addCategory($token,$categories){
+    protected function addCategory($token,$categories)
+    {
         $url = "https://dev2.wisersell.com/restapi/category"; 
         $data = array_map(function($category) {
             return ["name" => $category];
@@ -179,7 +221,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function addProduct($token,$data){
+    protected function addProduct($token,$data)
+    {
         $url = "https://dev2.wisersell.com/restapi/product"; 
         $client = HttpClient::create();
         $response = $client->request('POST', $url, [
@@ -201,7 +244,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function updateProduct($token,$data,$id){
+    protected function updateProduct($token,$data,$id)
+    {
         $client = Httpclient::create();
         $response = $client->request('PUT', 'https://dev2.wisersell.com/restapi/product/'.$id, [
             'json' => $data,
@@ -219,7 +263,8 @@ class WisersellCommand extends AbstractCommand{
             echo "Request failed. HTTP Status Code: $statusCode\n";
         }
     }
-    protected function productControl($token,$key){
+    protected function productControl($token,$key)
+    {
         $searchData = [
             "code"=>$key,
             "page"=> 0,
@@ -228,7 +273,8 @@ class WisersellCommand extends AbstractCommand{
         $response = $this->productSearch($token,$searchData);
         return $response;
     }
-    protected function categoryControl($token, $data) {
+    protected function categoryControl($token, $data)
+    {
         $apiCategories = $this->getCategories($token);
         $apiCategoryMap = [];
         foreach ($apiCategories as $apiCategory) {
@@ -257,7 +303,8 @@ class WisersellCommand extends AbstractCommand{
         }
         return $newCategories;
     }
-    protected function addCategoryByIwapim(){
+    protected function addCategoryByIwapim()
+    {
         $token = $this->getAccessToken();
         sleep(3);
         $listingObject = new Category\Listing();
@@ -282,7 +329,8 @@ class WisersellCommand extends AbstractCommand{
             }
         }    
     }
-    protected function addProductByIwapim(){
+    protected function addProductByIwapim()
+    {
         $token = $this->getAccessToken();
         sleep(3);
         $listingCategories = new Category\Listing();
@@ -373,7 +421,8 @@ class WisersellCommand extends AbstractCommand{
             }
         }
     }
-    protected function downloadWisersellProduct(){
+    protected function downloadWisersellProduct()
+    {
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
@@ -409,7 +458,8 @@ class WisersellCommand extends AbstractCommand{
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->wisersellListings)."\n";
     }
-    protected function downloadIwapimProduct(){
+    protected function downloadIwapimProduct()
+    {
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/iwapimproduct.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
@@ -446,7 +496,8 @@ class WisersellCommand extends AbstractCommand{
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->iwapimListings)."\n";
     }
-    protected function controlWisersellProduct(){
+    protected function controlWisersellProduct()
+    {
         $this->downloadWisersellProduct();
         $this->downloadIwapimProduct();
         foreach ($this->wisersellListings as $listing) {
