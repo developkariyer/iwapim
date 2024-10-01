@@ -76,6 +76,8 @@ class WisersellCommand extends AbstractCommand
         //$this->productSearch($data);
         //$this->getCategories();
         $this->addCategory(["test1"]);
+        $this->getCategories();
+        
         return Command::SUCCESS;
     }
     protected function getAccessToken()
