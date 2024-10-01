@@ -84,7 +84,7 @@ class CleanCommand extends AbstractCommand
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
-        $offset = 1600;
+        $offset = 0;
         while (true) {
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
