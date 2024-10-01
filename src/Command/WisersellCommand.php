@@ -71,9 +71,9 @@ class WisersellCommand extends AbstractCommand
         //$this->getCategories();
 
         //$token = $this->getAccessToken();
-        $data = ["test111"];
-        $this->addCategory($data);
-        sleep(3);
+        // $data = ["test111"];
+        // $this->addCategory($data);
+        // sleep(3);
         
         // $this->getCategories();
         // $productData = [
@@ -148,20 +148,19 @@ class WisersellCommand extends AbstractCommand
             return null;
         }
         echo "{$apiEndPoint}{$parameter} ";
-        return json_decode($response->getContent(), true);
+        return $response;
     }
 
     protected function productSearch($data)
     {
         $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
-        print_r($result);
-       
+        return $result->toArray();
     }
 
     protected function getCategories()
     {
         $result = $this->request(self::$apiUrl['category'], 'GET', '');
-        print_r($result);
+        return $result->toArray();
     }
 
     protected function addCategory($categories)
@@ -170,91 +169,26 @@ class WisersellCommand extends AbstractCommand
             return ["name" => $category];
         }, $categories);
         $result = $this->request(self::$apiUrl['category'], 'POST', '', $data);
-        print_r($result);
-
-
-
-        // $url = "https://dev2.wisersell.com/restapi/category"; 
-        // $data = array_map(function($category) {
-        //     return ["name" => $category];
-        // }, $categories);
-        // $client = HttpClient::create();
-        // $response = $client->request('POST', $url, [
-        //     'json' => $data,
-        //     'headers' => [
-        //         'Content-Type' => 'application/json',
-        //         'Accept' => 'application/json',
-        //         'Authorization' => 'Bearer ' . $token,
-        //     ],
-        // ]);
-        // $statusCode = $response->getStatusCode();
-        // if ($statusCode === 200) {
-        //     $responseContent = $response->getContent();
-        //     echo "Response: " . $responseContent . "\n";
-        //     $result = $response->toArray();
-        //     echo "Result: " . print_r($result, true) . "\n";
-        //     return $result;
-        // } else {
-        //     echo "Request failed. HTTP Status Code: $statusCode\n";
-        // }
+        return $result->toArray();
     }
 
     protected function addProduct($data)
     {
         print_r($data);
         $result = $this->request(self::$apiUrl['product'], 'POST', '', $data);
-        print_r($result);
-        // $url = "https://dev2.wisersell.com/restapi/product"; 
-        // $client = HttpClient::create();
-        // $response = $client->request('POST', $url, [
-        //     'json' => $data,
-        //     'headers' => [
-        //         'Content-Type' => 'application/json',
-        //         'Accept' => 'application/json',
-        //         'Authorization' => 'Bearer ' . $token,
-        //     ],
-        // ]);
-        // $statusCode = $response->getStatusCode();
-        // if ($statusCode === 200) {
-        //     $responseContent = $response->getContent();
-        //     echo "Response: " . $responseContent . "\n";
-        //     $result = $response->toArray();
-        //     echo "Result: " . print_r($result, true) . "\n";
-        //     return $result;
-        // } else {
-        //     echo "Request failed. HTTP Status Code: $statusCode\n";
-        // }
+        return $result->toArray();
     }
-    protected function updateProduct($token,$data,$id)
-    {
-        $client = Httpclient::create();
-        $response = $client->request('PUT', 'https://dev2.wisersell.com/restapi/product/'.$id, [
-            'json' => $data,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $token,
-            ],
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $responseContent = $response->getContent();
-            echo "Response: " . $responseContent . "\n";
-        } else {
-            echo "Request failed. HTTP Status Code: $statusCode\n";
-        }
-    }
-    protected function productControl($token,$key)
+    protected function productControl($key)
     {
         $searchData = [
             "code"=>$key,
             "page"=> 0,
             "pageSize"=> 10,
         ];
-        $response = $this->productSearch($token,$searchData);
+        $response = $this->productSearch($searchData);
         return $response;
     }
-    protected function categoryControl($token, $data)
+    protected function categoryControl($data)
     {
         $apiCategories = $this->getCategories($token);
         $apiCategoryMap = [];
@@ -286,18 +220,16 @@ class WisersellCommand extends AbstractCommand
     }
     protected function addCategoryByIwapim()
     {
-        $token = $this->getAccessToken();
-        sleep(3);
         $listingObject = new Category\Listing();
         $categories = $listingObject->load();
         $data = [];
         foreach ($categories as $category) {
             $data[] = $category->getCategory();
         }
-        $newCategories = $this->categoryControl($token,$data);    
+        $newCategories = $this->categoryControl($data);    
         sleep(3);
         if(!empty($newCategories)){
-            $result = $this->addCategory($token, $newCategories);
+            $result = $this->addCategory($newCategories);
             foreach ($result as $wisersellCategory) {
                 foreach ($categories as $category) {
                     if ($category->getCategory() === $wisersellCategory['name']) {
@@ -312,8 +244,6 @@ class WisersellCommand extends AbstractCommand
     }
     protected function addProductByIwapim()
     {
-        $token = $this->getAccessToken();
-        sleep(3);
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
@@ -371,7 +301,7 @@ class WisersellCommand extends AbstractCommand
                         ]
                     ];
                     sleep(2);
-                    $result = $this->addProduct($token, $productData);
+                    $result = $this->addProduct($productData);
                     if(isset($result[0]['id'])){
                         $wisersellId = $result[0]['id'];
                         try {
@@ -411,7 +341,6 @@ class WisersellCommand extends AbstractCommand
             echo "Using cached data ";
         }
         else {
-            $token = $this->getAccessToken();
             $this->wisersellListings = [];
             $page = 0;
             $pageSize = 3;
@@ -419,7 +348,7 @@ class WisersellCommand extends AbstractCommand
                 "page" => $page,
                 "pageSize" => $pageSize
             ];
-            $response = $this->productSearch($token,$searchData);
+            $response = $this->productSearch($searchData);
             sleep(2);
             $this->wisersellListings = $response['rows'];
             while ($response['count'] > 0) {
@@ -428,7 +357,7 @@ class WisersellCommand extends AbstractCommand
                     "page" => $page,
                     "pageSize" => $pageSize
                 ];
-                $response = $this->productSearch($token,$searchData);
+                $response = $this->productSearch($searchData);
                 sleep(2);
                 $this->wisersellListings = array_merge($this->wisersellListings, $response['rows']);
                 if(count($response['rows'])<$pageSize)
