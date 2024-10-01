@@ -400,6 +400,7 @@ class WisersellCommand extends AbstractCommand
         $this->downloadIwapimProduct();
         $iwaskuControlArray = [];
         foreach ($this->wisersellListings as $listing) {
+            echo "WID: {$listing['id']} => IWASKU: {$listing['code']}\n";
             if (empty($listing['code'])) {
                 echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun code icermiyor.\n";
                 continue;
