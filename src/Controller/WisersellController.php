@@ -53,8 +53,7 @@ class WisersellController extends FrontendController
      * @Route("/wisersell/connections/{type}", name="wisersell_orders")
      */
     public function connectionAction(Request $request, $type): Response
-    {
-        
+    {        
         $db = \Pimcore\Db::get();
         $sql = "SELECT oqp.name, oqp.iwasku, oqp.packageWeight, oqp.productWeight, oqp.packageDimension1, oqp.packageDimension2, oqp.packageDimension3, oqp.productDimension1, 
             oqp.productDimension2, oqp.productDimension3, oqp.variationSize, oqp.variationColor, COALESCE(oqp.productCategory, parent_oqp.productCategory) AS productCategory
