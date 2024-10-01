@@ -401,26 +401,27 @@ class WisersellCommand extends AbstractCommand
         $iwaskuControlArray = [];
         foreach ($this->wisersellListings as $listing) {
             if (empty($listing['code'])) {
-                echo "\nHata: '{$listing['id']}' Wisersel Id numarasina sahip urun code icermiyor.\n";
+                echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun code icermiyor.\n";
                 continue;
             }
             if (isset($iwaskuControlArray[$listing['code']])) {
-                echo "\nHata: '{$listing['id']}' Wisersel Id numarasina sahip urun aynı zamanda {$iwaskuControlArray[$listing['code']]} code tekrar ediyor.\n";
+                echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun aynı zamanda {$iwaskuControlArray[$listing['code']]} code tekrar ediyor.\n";
                 continue;
             }
             $iwaskuControlArray[$listing['code']] = $listing['id'];
             $product = Product::findByField('iwasku', $listing['code']);
             if (empty($product)) {
-                echo "\nHata: '{$listing['id']}' Wisersel Id numarasina sahip urun pimde yok.\n";
+                echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun pimde yok.\n";
                 continue;
             }
+            echo "WID: {$listing['id']} => IWASKU: {$listing['code']} => Stored WID: {$product->getWisersellId()}\n";
             if ($product->getWisersellId() == $listing['id']) {
                 continue;
             }
             $product->setWisersellId($listing['id']);
             $product->setWisersellJson(json_encode($listing));
             $product->save();
-            echo "\n WisersellId updated successfully: " . $listing['id']."\n";            
+            echo "WisersellId updated successfully: " . $listing['id']."\n";            
         }
     }
     
