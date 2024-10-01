@@ -44,7 +44,8 @@ class WisersellCommand extends AbstractCommand
         $this->prepareToken();     
     }
 
-    protected function configure() {
+    protected function configure() 
+    {
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
@@ -63,27 +64,6 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('control')){
             $this->controlWisersellProduct();
         }
-        $data = [
-            "page"=> 0,
-            "pageSize"=> 10,
-        ];
-        //$this->productSearch($data);
-        //$this->getCategories();
-
-        //$token = $this->getAccessToken();
-        // $data = ["test111"];
-        // $this->addCategory($data);
-        // sleep(3);
-        
-        // $this->getCategories();
-        // $productData = [
-        //     [
-        //         "name" => "testurun1",
-        //         "categoryId" => 285,
-        //         "subproducts" => []
-        //     ]
-        // ];
-        // $this->addProduct($productData);
         return Command::SUCCESS;
     }
 
@@ -95,9 +75,7 @@ class WisersellCommand extends AbstractCommand
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-
             ],
-
         ]); 
     }
 
@@ -178,6 +156,7 @@ class WisersellCommand extends AbstractCommand
         $result = $this->request(self::$apiUrl['product'], 'POST', '', $data);
         return $result->toArray();
     }
+
     protected function productControl($key)
     {
         $searchData = [
@@ -188,6 +167,7 @@ class WisersellCommand extends AbstractCommand
         $response = $this->productSearch($searchData);
         return $response;
     }
+
     protected function categoryControl($data)
     {
         $apiCategories = $this->getCategories();
@@ -218,8 +198,10 @@ class WisersellCommand extends AbstractCommand
         }
         return $newCategories;
     }
+
     protected function addCategoryByIwapim()
     {
+        $this->prepareToken();
         $listingObject = new Category\Listing();
         $categories = $listingObject->load();
         $data = [];
@@ -242,8 +224,10 @@ class WisersellCommand extends AbstractCommand
             }
         }    
     }
+
     protected function addProductByIwapim()
     {
+        $this->prepareToken();
         $listingCategories = new Category\Listing();
         $listingCategories->setUnpublished(false);
         $categories = $listingCategories->load();
@@ -332,8 +316,10 @@ class WisersellCommand extends AbstractCommand
             }
         }
     }
+
     protected function downloadWisersellProduct()
     {
+        $this->prepareToken();
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
         if ( file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
             $contentJson = file_get_contents($filenamejson);
@@ -343,7 +329,7 @@ class WisersellCommand extends AbstractCommand
         else {
             $this->wisersellListings = [];
             $page = 0;
-            $pageSize = 3;
+            $pageSize = 100;
             $searchData = [
                 "page" => $page,
                 "pageSize" => $pageSize
@@ -368,6 +354,7 @@ class WisersellCommand extends AbstractCommand
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->wisersellListings)."\n";
     }
+
     protected function downloadIwapimProduct()
     {
         $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/iwapimproduct.json';
@@ -406,6 +393,7 @@ class WisersellCommand extends AbstractCommand
         file_put_contents($filenamejson, $jsonListings);
         echo "count listings: ".count($this->iwapimListings)."\n";
     }
+
     protected function controlWisersellProduct()
     {
         $this->downloadWisersellProduct();
@@ -455,4 +443,5 @@ class WisersellCommand extends AbstractCommand
         }
         return null;
     }
+    
 }
