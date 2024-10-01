@@ -72,7 +72,6 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('unpublish')) {
             self::unpublishOlderVariantProducts();
         }
-    
         return Command::SUCCESS;
     }
 

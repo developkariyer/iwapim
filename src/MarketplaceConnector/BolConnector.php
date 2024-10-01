@@ -75,7 +75,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
         while (!$status) {
             echo "  Waiting for report...\n";
-            sleep(2);
+            sleep(5);
             $response = $this->httpClient->request('GET', $statusUrl);
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed to get offer report from Bol.com');
@@ -99,7 +99,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     protected function downloadOfferReport($forceDownload = false)
     {
-        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.cvs', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
+        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
         if ($report === false || $forceDownload) {
             echo "Requesting offer report from Bol.com\n";
             $entityId = $this->reportStatus($this->requestOfferReport());
@@ -108,7 +108,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
             }
             $report = $response->getContent();
-            Utility::setCustomCache('OFFERS_EXPORT_REPORT.cvs', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
+            Utility::setCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
         } else {
             echo "Using cached report\n";
         }

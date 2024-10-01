@@ -81,7 +81,7 @@ class WisersellController extends FrontendController
         }
 
         return $this->render('202409/table.html.twig', [
-            'title' => 'Wisersell Product List - ' . $type,
+            'title' => "Wisersell Product List - $type",
             'theads' => array_keys($table[0]),
             'table' => $table,
         ]);

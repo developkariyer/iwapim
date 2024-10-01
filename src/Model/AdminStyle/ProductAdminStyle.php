@@ -32,7 +32,7 @@ class ProductAdminStyle extends AdminStyle
         }
         if ($element instanceof VariantProduct) {
             $this->elementIcon = match (count($this->element->getMainProduct())) {
-                0 => '/custom/listing.svg',
+                0 => '/bundles/pimcoreadmin/img/flat-color-icons/list.svg', //'/custom/listing.svg',
                 1 => '/custom/listing_ok.svg',
                 default => '/custom/listing_fail.svg',
             };
