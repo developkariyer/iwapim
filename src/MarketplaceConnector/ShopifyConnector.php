@@ -67,7 +67,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $db = \Pimcore\Db::get();
         // find biggest id for this shop
-        $sql = "SELECT MAX(order_id) FROM iwa_shopify_orders WHERE shopify_id = ?";
+        $sql = "SELECT MAX(order_id) FROM iwa_marketplace_orders WHERE marketplace_id = ?";
         $maxId = $db->fetchOne($sql, [$this->marketplace->getId()]);
         if (!$maxId) {
             $maxId = 0;
@@ -76,7 +76,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $apiUrl = $this->marketplace->getApiUrl();
         $apiVersion = '2024-07';
         $url = "https://{$apiUrl}/admin/api/{$apiVersion}/orders.json?status=any&since_id=".($maxId+1);
-        $sql = "INSERT INTO iwa_shopify_orders (shopify_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+        $sql = "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)";
         do {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);

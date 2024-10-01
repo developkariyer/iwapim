@@ -103,8 +103,8 @@ class CleanCommand extends AbstractCommand
                 $product->save();
                 echo "Cleared bundle products\n";
                 foreach ($bundleItems as $bundleItem) {
-                    $newBundleItem = new DataObject\Data\ObjectMetadata('metadata', ['amount'],  $bundleItem);
-//                    $newBundleItem->setAmount(1);
+                    $newBundleItem = new DataObject\Data\ObjectMetadata('bundleProducts', ['amount'],  $bundleItem);
+                    $newBundleItem->setAmount(1);
                     $bundleProducts[] = $newBundleItem;
                 }
                 $product->setBundleProducts($bundleProducts);
