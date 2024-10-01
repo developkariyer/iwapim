@@ -355,10 +355,10 @@ class WisersellCommand extends AbstractCommand
         echo "count listings: ".count($this->wisersellListings)."\n";
     }
 
+
     protected function controlWisersellProduct()
     {
         $this->downloadWisersellProduct();
-        $this->downloadIwapimProduct();
         $iwaskuControlArray = [];
         foreach ($this->wisersellListings as $listing) {
             echo "WID: {$listing['id']} => IWASKU: {$listing['code']}\n";
