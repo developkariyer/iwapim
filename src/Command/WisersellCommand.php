@@ -74,7 +74,8 @@ class WisersellCommand extends AbstractCommand
             "pageSize"=> 10,
         ];
         //$this->productSearch($data);
-        $this->getCategories();
+        //$this->getCategories();
+        $this->addCategory(["test1"]);
         return Command::SUCCESS;
     }
     protected function getAccessToken()
@@ -162,7 +163,22 @@ class WisersellCommand extends AbstractCommand
     {
         $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
         print_r($result);
-        // $url = "https://dev2.wisersell.com/restapi/product/search"; 
+       
+    }
+    protected function getCategories()
+    {
+        $result = $this->request(self::$apiUrl['category'], 'GET', '');
+        print_r($result);
+    }
+    protected function addCategory($categories)
+    {
+        $data = array_map(function($category) {
+            return ["name" => $category];
+        }, $categories);
+        $result = $this->request(self::$apiUrl['category'], 'POST', '', $data);
+        print_r($result);
+        // $url = "https://dev2.wisersell.com/restapi/category"; 
+       
         // $client = HttpClient::create();
         // $response = $client->request('POST', $url, [
         //     'json' => $data,
@@ -182,56 +198,6 @@ class WisersellCommand extends AbstractCommand
         // } else {
         //     echo "Request failed. HTTP Status Code: $statusCode\n";
         // }
-    }
-    protected function getCategories()
-    {
-        $result = $this->request(self::$apiUrl['category'], 'GET', '');
-        print_r($result);
-        // $url = "https://dev2.wisersell.com/restapi/category";
-        // $client = HttpClient::create();
-        // $response = $client->request('GET', $url, [
-        // 'headers' => [
-        //     'Content-Type' => 'application/json',
-        //     'Accept' => 'application/json',
-        //     'Authorization' => 'Bearer ' . $token,
-        // ],
-        // ]);
-        // $statusCode = $response->getStatusCode();
-        // if ($statusCode === 200) {
-        //     $responseContent = $response->getContent();
-        //     echo "Response: " . $responseContent . "\n";
-        //     $result = $response->toArray();
-        //     echo "Result: " . print_r($result, true) . "\n";
-        //     return $result;
-        // } else {
-        //     echo "Request failed. HTTP Status Code: $statusCode\n";
-        // }
-    }
-    protected function addCategory($token,$categories)
-    {
-        $url = "https://dev2.wisersell.com/restapi/category"; 
-        $data = array_map(function($category) {
-            return ["name" => $category];
-        }, $categories);
-        $client = HttpClient::create();
-        $response = $client->request('POST', $url, [
-            'json' => $data,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $token,
-            ],
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $responseContent = $response->getContent();
-            echo "Response: " . $responseContent . "\n";
-            $result = $response->toArray();
-            echo "Result: " . print_r($result, true) . "\n";
-            return $result;
-        } else {
-            echo "Request failed. HTTP Status Code: $statusCode\n";
-        }
     }
     protected function addProduct($token,$data)
     {
