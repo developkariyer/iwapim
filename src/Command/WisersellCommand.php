@@ -75,7 +75,7 @@ class WisersellCommand extends AbstractCommand
         ];
         //$this->productSearch($data);
         //$this->getCategories();
-        $this->addCategory(["test1"]);
+        //$this->addCategory(["test1"]);
         sleep(3);
         $this->getCategories();
         
