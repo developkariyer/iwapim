@@ -36,6 +36,7 @@ class WisersellCommand extends AbstractCommand
 
     public function __construct()
     {
+        $parent = parent::__construct();
         $this->httpClient = HttpClient::create();
         $this->prepareToken();     
     }
