@@ -190,7 +190,7 @@ class WisersellCommand extends AbstractCommand
     }
     protected function categoryControl($data)
     {
-        $apiCategories = $this->getCategories($token);
+        $apiCategories = $this->getCategories();
         $apiCategoryMap = [];
         foreach ($apiCategories as $apiCategory) {
             $apiCategoryMap[$apiCategory["name"]] = $apiCategory["id"];
