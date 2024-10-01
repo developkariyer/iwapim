@@ -24,12 +24,9 @@ use Exception;
 
 class WisersellCommand extends AbstractCommand
 {
-   
     private $wisersellListings = [];
     private $iwapimListings = [];
-
     private static $apiServer = 'https://dev2.wisersell.com/restapi/';
-
     private static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
