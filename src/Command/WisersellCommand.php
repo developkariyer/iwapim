@@ -404,11 +404,11 @@ class WisersellCommand extends AbstractCommand
             if (empty($code)) {
                 echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun code icermiyor.\n";
             }
-            else{
+            else {
                 if(!isset($this->iwapimListings[$code]) || empty($this->iwapimListings[$code])) {
                     echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak [code] eklenmis ürün tespit edildi.\n";
                 }
-                else if (isset($this->iwapimListings[$code]) && $this->iwapimListings[$code]['control'] === false) {
+                if (isset($this->iwapimListings[$code]) && $this->iwapimListings[$code]['control'] === false) {
                     $iwasku =  $this->iwapimListings[$code]['iwasku'];
                     $listingObject = new Product\Listing();
                     $listingObject->setCondition("iwasku = ?", $iwasku); 
@@ -436,7 +436,7 @@ class WisersellCommand extends AbstractCommand
                         echo "\n Error occurred while updating WisersellId: " . $e->getMessage()."\n";
                     }
                 }
-                else if($this->iwapimListings[$code]['control'] === true) {
+                if($this->iwapimListings[$code]['control'] === true) {
                     echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
                 }             
             }
