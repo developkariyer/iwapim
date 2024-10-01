@@ -398,50 +398,30 @@ class WisersellCommand extends AbstractCommand
     {
         $this->downloadWisersellProduct();
         $this->downloadIwapimProduct();
+        $iwaskuControlArray = [];
         foreach ($this->wisersellListings as $listing) {
-            $code = $listing['code'];
-            $id = $listing['id'];
-            if (empty($code)) {
-                echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun code icermiyor.\n";
+            if (empty($listing['code'])) {
+                echo "\nHata: '{$listing['id']}' Wisersel Id numarasina sahip urun code icermiyor.\n";
+                continue;
             }
-            else {
-                if(!isset($this->iwapimListings[$code]) || empty($this->iwapimListings[$code])) {
-                    echo "\nHata: '{$id}' Wisersel Id numarasina sahip [Manuel] olarak [code] eklenmis ürün tespit edildi.\n";
-                }
-                if (isset($this->iwapimListings[$code]) && $this->iwapimListings[$code]['control'] === false) {
-                    $iwasku =  $this->iwapimListings[$code]['iwasku'];
-                    $listingObject = new Product\Listing();
-                    $listingObject->setCondition("iwasku = ?", $iwasku); 
-                    $listingObject->setLimit(1);
-                    $products = $listingObject->load();
-                    if (!empty($products)) {
-                        $product = $products[0];
-                    } else {
-                        echo "Ürün bulunamadi.\n";
-                    }
-                    try {
-                        if ($product->getWisersellId() != $listing['id'] ) {
-                            echo "\n!WisersellId Güncellenmeli\n";
-                            echo "\nProduct WisersellId: " . $product->getWisersellId() . "\n";
-                            echo "\nListing WisersellId: " . $listing['id'] . "\n";
-                            $product->setWisersellId($listing['id']);
-                            $product->setWisersellJson(json_encode($listing));
-                            $product->save();
-                            echo "\n WisersellId and WisersellJson updated successfully: " . $listing['id']."\n";
-                        } else {
-                            echo "\n WisersellId Guncelleme Gerektirmiyor: " . $listing['id']."\n";
-                        }
-                        $this->iwapimListings[$code]['control'] = true;
-                    } catch (Exception $e) {
-                        echo "\n Error occurred while updating WisersellId: " . $e->getMessage()."\n";
-                    }
-                }
-                else {
-                    echo "\nHata: '{$id}' Wisersel Id numarasina sahip urun daha onceden eslestirilmis urun ile tekrar eslestirilmis.   \n";
-                }             
+            if (isset($iwaskuControlArray[$listing['code']])) {
+                echo "\nHata: '{$listing['id']}' Wisersel Id numarasina sahip urun aynı zamanda {$iwaskuControlArray[$listing['code']]} code tekrar ediyor.\n";
+                continue;
             }
+            $iwaskuControlArray[$listing['code']] = $listing['id'];
+            $product = Product::findByField('iwasku', $listing['code']);
+            if (empty($product)) {
+                echo "\nHata: '{$listing['id']}' Wisersel Id numarasina sahip urun pimde yok.\n";
+                continue;
+            }
+            if ($product->getWisersellId() == $listing['id']) {
+                continue;
+            }
+            $product->setWisersellId($listing['id']);
+            $product->setWisersellJson(json_encode($listing));
+            $product->save();
+            echo "\n WisersellId updated successfully: " . $listing['id']."\n";            
         }
-        return null;
     }
     
 }
