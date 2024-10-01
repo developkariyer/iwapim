@@ -78,11 +78,19 @@ class WisersellCommand extends AbstractCommand
         sleep(3);
 
         //$token = $this->getAccessToken();
-        $data = ["test111"];
-        $this->addCategory($data);
-        sleep(3);
+        // $data = ["test111"];
+        // $this->addCategory($data);
+        // sleep(3);
         
-        $this->getCategories();
+        // $this->getCategories();
+        $productData = [
+            [
+                "name" => "testurun1",
+                "categoryId" => 285,
+                "subproducts" => []
+            ]
+        ];
+        $this->addProduct($productData);
         
         return Command::SUCCESS;
     }
@@ -212,28 +220,30 @@ class WisersellCommand extends AbstractCommand
         //     echo "Request failed. HTTP Status Code: $statusCode\n";
         // }
     }
-    protected function addProduct($token,$data)
+    protected function addProduct($data)
     {
-        $url = "https://dev2.wisersell.com/restapi/product"; 
-        $client = HttpClient::create();
-        $response = $client->request('POST', $url, [
-            'json' => $data,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $token,
-            ],
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode === 200) {
-            $responseContent = $response->getContent();
-            echo "Response: " . $responseContent . "\n";
-            $result = $response->toArray();
-            echo "Result: " . print_r($result, true) . "\n";
-            return $result;
-        } else {
-            echo "Request failed. HTTP Status Code: $statusCode\n";
-        }
+        $result = $this->request(self::$apiUrl['product'], 'POST', '', $data);
+        print_r($result);
+        // $url = "https://dev2.wisersell.com/restapi/product"; 
+        // $client = HttpClient::create();
+        // $response = $client->request('POST', $url, [
+        //     'json' => $data,
+        //     'headers' => [
+        //         'Content-Type' => 'application/json',
+        //         'Accept' => 'application/json',
+        //         'Authorization' => 'Bearer ' . $token,
+        //     ],
+        // ]);
+        // $statusCode = $response->getStatusCode();
+        // if ($statusCode === 200) {
+        //     $responseContent = $response->getContent();
+        //     echo "Response: " . $responseContent . "\n";
+        //     $result = $response->toArray();
+        //     echo "Result: " . print_r($result, true) . "\n";
+        //     return $result;
+        // } else {
+        //     echo "Request failed. HTTP Status Code: $statusCode\n";
+        // }
     }
     protected function updateProduct($token,$data,$id)
     {
