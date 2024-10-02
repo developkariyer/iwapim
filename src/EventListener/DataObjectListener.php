@@ -168,8 +168,9 @@ class DataObjectListener implements EventSubscriberInterface
         $dependencies = $dependencyObject->getRequiredBy();
         foreach ($dependencies as $dependency) {
             error_log(print_r($dependency, true));
-            if ($dependency instanceof Product) {
-                $image = self::traverseProducts($dependency);
+            if ($dependency['type'] == 'object') {
+                $object = Product::getById($dependency['id']);
+                $image = self::traverseProducts($object);
                 if (!empty($image)) {
                     return $image;
                 }
