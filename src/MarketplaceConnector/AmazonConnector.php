@@ -394,15 +394,25 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             return AmazonConstants::amazonMerchant[$country]['id'];
         }, $this->countryCodes);
         $marketplaceIds[] = AmazonConstants::amazonMerchant[$this->mainCountry]['id'];
-        $orders = $ordersApi->getOrders(
-            createdAfter: $lastUpdateAt,
-            marketplaceIds: $marketplaceIds,
-        );
-        $orders = $orders->json();
-        $orderIds = array_map(function($order) {
-            return $order['AmazonOrderId'];
-        }, $orders['payload']['Orders']);
-        echo "Orders: ".count($orderIds)."\n";
+
+        $orderIds = [];
+        $nextToken = null;
+    
+        do {
+            $orders = $nextToken ? $ordersApi->getOrders(nextToken: $nextToken) : $ordersApi->getOrders(createdAfter: $lastUpdateAt, marketplaceIds: $marketplaceIds);
+            $orders = $orders->json();
+            $pageOrderIds = array_map(function($order) {
+                return $order['AmazonOrderId'];
+            }, $orders['payload']['Orders']);
+            $orderIds = array_merge($orderIds, $pageOrderIds);
+            echo "Total Orders so far: " . count($orderIds) . "\n";
+            $nextToken = $orders['payload']['NextToken'] ?? null;
+            usleep(500000);
+        } while ($nextToken);
+        $orderIds = array_unique($orderIds);
+        $orderIds = array_filter($orderIds);
+        echo "Final total orders: " . count($orderIds) . "\n";
+    
         $db->beginTransaction();
         try {
             foreach ($orderIds as $orderId) {
