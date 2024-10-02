@@ -257,10 +257,10 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $asin=>$listing) {
             $index++;
-            echo "($index/$total) Processing $asin ...";
             if (empty($listing) || empty($listing[$this->mainCountry]) || !is_array($listing[$this->mainCountry])) {
                 continue;
             }
+            echo "($index/$total) Processing $asin ...";
             $mainListings = $listing[$this->mainCountry];
             $mainListing = reset($mainListings);
             $variantProduct = VariantProduct::addUpdateVariant(
@@ -280,6 +280,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 marketplace: $this->marketplace,
                 parent: $this->getFolder($asin),
             );
+            $variantProduct->save();
             foreach ($mainListings as $mainListing) {
                 echo "{$this->mainCountry} ";
                 $this->processFieldCollection($variantProduct, $mainListing, $this->mainCountry);
