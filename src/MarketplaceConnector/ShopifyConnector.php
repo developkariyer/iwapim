@@ -98,14 +98,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'since_id' => $maxId], 'orders');
         $sql = "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)";
         $db->beginTransaction();
-        foreach ($orders as $order) {
-            try {
-                $db->executeUpdate($sql, [$this->marketplace->getId(), $order['id'], json_encode($order)]);
-                $db->commit();
-            } catch (\Exception $e) {
-                $db->rollBack();
-                echo "Error: " . $e->getMessage() . "\n";
+        try {
+            foreach ($orders as $order) {
+                $db->executeStatement($sql, [$this->marketplace->getId(), $order['id'], json_encode($order)]);
             }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            echo "Error: " . $e->getMessage() . "\n";
         }
     }
 
