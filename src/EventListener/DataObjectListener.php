@@ -167,7 +167,6 @@ class DataObjectListener implements EventSubscriberInterface
         $dependencyObject = Dependency::getBySourceId($object->getId(), 'object');
         $dependencies = $dependencyObject->getRequiredBy();
         foreach ($dependencies as $dependency) {
-            error_log(print_r($dependency, true));
             if ($dependency['type'] == 'object') {
                 $object = Product::getById($dependency['id']);
                 if ($object instanceof Product) {
