@@ -156,32 +156,42 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function getListings($forceDownload = false)
+    protected function processListingReport($country, $report)
     {
-        $lines = explode("\n", mb_convert_encoding(trim($this->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']), 'UTF-8', 'UTF-8'));
+        $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
         $header = str_getcsv(array_shift($lines), "\t");
-        $this->listings = [];
-        $totalCount = count($lines);
-        $index = 0;
         foreach ($lines as $line) {
-            $index++;
             $data = str_getcsv($line, "\t");
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
                 $asin = $rowData['asin1'] ?? '';
-                echo "($index/$totalCount) Downloading $asin ... ";
-                if (empty($listings[$asin][$this->mainCountry])) {
+                if (empty($listings[$asin][$country])) {
                     if (empty($this->listings[$asin])) {
                         $this->listings[$asin] = [];
                     }
-                    $this->listings[$asin][$this->mainCountry] = [];
+                    $this->listings[$asin][$country] = [];
                 }
-                $this->listings[$asin][$this->mainCountry][] = $rowData;
-                if (empty($this->listings[$asin]['catalog'])) {
-                    $this->addToAsinBucket($asin, $forceDownload);
-                }
-                echo "OK\n";
+                $this->listings[$asin][$country][] = $rowData;
             }
+        }
+    }
+
+    public function getListings($forceDownload = false)
+    {
+        $this->processListingReport($this->mainCountry, $this->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
+        foreach ($this->countryCodes as $country) {
+            $this->processListingReport($country, $this->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
+        }
+
+        $totalCount = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $asin=>$listing) {
+            $index++;
+            if (empty($listing[$this->mainCountry])) {
+                continue;
+            }
+            echo "($index/$totalCount) Downloading $asin ...\n";
+            $this->addToAsinBucket($asin, $forceDownload);
         }
         $this->downloadAsinsInBucket();
     }
