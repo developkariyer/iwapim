@@ -159,25 +159,30 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     protected function processListingReport($country, $report)
     {
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
-        echo count($lines)." lines ";
-        exit;
         $header = str_getcsv(array_shift($lines), "\t");
         foreach ($lines as $line) {
             $data = str_getcsv($line, "\t");
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
                 $asin = $rowData['asin1'] ?? '';
-                if (empty($listings[$asin][$country])) {
+                if (isset($this->listings[$asin])) {
+                    echo "ASIN $asin has been encountered before.\n";
+                }
+                if (empty($this->listings[$asin][$country])) {
                     if (empty($this->listings[$asin])) {
                         $this->listings[$asin] = [];
                     }
-                    $this->listings[$asin][$country] = [];
+                    $this->listings[$asin][$country] = [];  // Initialize country array
                 }
                 $this->listings[$asin][$country][] = $rowData;
+                if (count($this->listings[$asin][$country]) > 1) {
+                    echo "ASIN $asin has multiple listings in $country.\n";
+                    exit;
+                }
             }
         }
     }
-
+    
     public function getListings($forceDownload = false)
     {
         $this->processListingReport($this->mainCountry, $this->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
