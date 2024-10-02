@@ -28,6 +28,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
         'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
         'GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_GENERAL' => [],
+        'GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE' => [],
     ];
 
     private $amazonSellerConnector = null;
