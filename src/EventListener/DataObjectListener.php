@@ -163,7 +163,7 @@ class DataObjectListener implements EventSubscriberInterface
                     return $image;
                 }
             }
-        }
+        }/*
         $dependencies = Dependency::getDependencies($object);
         foreach ($dependencies as $dependency) {
             if ($dependency instanceof Product) {
@@ -172,7 +172,7 @@ class DataObjectListener implements EventSubscriberInterface
                     return $image;
                 }
             }
-        }
+        }*/
         return "";
     }
 
