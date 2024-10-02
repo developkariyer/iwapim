@@ -45,7 +45,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             usleep(200000);
             $data = array_merge($data, json_decode($response->getContent(), true));
             $headers = $response->getHeaders(false);
-            $links = explode(',', $headers['Link'][0]);
+            $links = $headers;
             $nextLink = null;
             foreach ($links as $link) {
                 if (preg_match('/<([^>]+)>;\s*rel="next"/', $link, $matches)) {
