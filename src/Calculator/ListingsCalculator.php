@@ -15,7 +15,7 @@ class ListingsCalculator implements CalculatorClassInterface
         if ($object instanceof Product) {
             return count($object->getListingItems());
         }
-        return "";
+        return "0";
     }
 
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string
