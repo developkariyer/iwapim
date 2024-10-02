@@ -281,14 +281,14 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 parent: $this->getFolder($asin),
             );*/
             foreach ($listing as $country=>$countryListings) {
+                if ($country === 'catalog') {
+                    continue;
+                }
                 if (count($countryListings) > 1) {
                     echo "$country : ".count($countryListings);
                     exit;
                 }
                 foreach ($countryListings as $countryListing) {
-                    if ($country === 'catalog') {
-                        continue;
-                    }
                     echo "$country ";
                 //    $this->processFieldCollection($variantProduct, $countryListing, $country);
                 }
