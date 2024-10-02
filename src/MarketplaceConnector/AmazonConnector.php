@@ -286,7 +286,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             }
             foreach ($listing as $country=>$countryListings) {
                 foreach ($countryListings as $countryListing) {
-                    if ($country === 'catalog') {
+                    if ($country === 'catalog' || $country === $this->mainCountry) {
                         continue;
                     }
                     echo "$country ";
