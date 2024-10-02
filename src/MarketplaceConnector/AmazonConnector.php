@@ -198,11 +198,11 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false): void
     {
-        $this->listings = json_Decode(Utility::getCustomCache("AMAZON_LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (empty($this->listings) || $forceDownload) {
             $this->downloadAllReports($forceDownload);
             $this->getListings($forceDownload);
-            Utility::setCustomCache("AMAZON_LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+            Utility::setCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         }
         foreach ($this->listings as $asin=>$listing) {
             Utility::setCustomCache("{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/tmp/".urlencode($this->marketplace->getKey()), json_encode($listing));
