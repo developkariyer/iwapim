@@ -263,7 +263,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             echo "($index/$total) Processing $asin ...";
             $mainListings = $listing[$this->mainCountry];
             $mainListing = reset($mainListings);
-            $variantProduct = VariantProduct::addUpdateVariant(
+            /*$variantProduct = VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => null,
                     'urlLink' => $this->getUrlLink(AmazonConstants::amazonMerchant[$this->mainCountry]['url']."/dp/$asin"),
@@ -279,17 +279,21 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $this->getFolder($asin),
-            );
+            );*/
             foreach ($listing as $country=>$countryListings) {
+                if (count($countryListings) > 1) {
+                    echo "$country ";
+                    exit;
+                }
                 foreach ($countryListings as $countryListing) {
                     if ($country === 'catalog') {
                         continue;
                     }
                     echo "$country ";
-                    $this->processFieldCollection($variantProduct, $countryListing, $country);
+                //    $this->processFieldCollection($variantProduct, $countryListing, $country);
                 }
             }
-            echo "{$variantProduct->getId()} ";
+            //echo "{$variantProduct->getId()} ";
             echo " OK\n";
         }
     }
