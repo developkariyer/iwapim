@@ -13,7 +13,7 @@ class ListingsCalculator implements CalculatorClassInterface
     public function compute(Concrete $object, CalculatedValue $context): string
     {
         if ($object instanceof Product) {
-            return count($object->getListingItems());
+            return count($object->getListingItems() ?? []);
         }
         return "0";
     }
