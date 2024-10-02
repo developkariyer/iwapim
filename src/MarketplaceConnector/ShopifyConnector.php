@@ -23,13 +23,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (strpos($this->apiUrl, 'https://') === false) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, $this->apiUrl, [
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ]
-        ]);
     }
     
     protected function getFromShopifyApi($method, $parameter, $query = [], $key = null)
@@ -38,7 +31,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $nextLink = "{$this->apiUrl}/{$parameter}";
         while ($nextLink) {
             $response = $this->httpClient->request($method, $nextLink, [
-                'query' => $query
+                'query' => $query,
+                'headers' => [
+                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ]
             ]);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
