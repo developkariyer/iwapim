@@ -3,7 +3,6 @@
 namespace App\MarketplaceConnector;
 
 use Pimcore\Model\DataObject\VariantProduct;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 
 use App\Utils\Utility;
