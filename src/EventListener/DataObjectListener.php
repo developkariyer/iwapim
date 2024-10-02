@@ -163,16 +163,6 @@ class DataObjectListener implements EventSubscriberInterface
                 }
             }
         }
-        $bundleItems = $object->getBundleProducts();
-        foreach ($bundleItems as $bundleItem) {
-            $bundleProduct = $bundleItem->getObject();
-            if ($bundleProduct instanceof Product) {
-                $image = self::traverseProducts($bundleItem);
-                if (!empty($image)) {
-                    return $image;
-                }
-            }
-        }
         return "";
     }
 
