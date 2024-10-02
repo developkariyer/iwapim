@@ -257,7 +257,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $asin=>$listing) {
             $index++;
-            echo "($index/$total) Processing id $asin ...";
+            echo "($index/$total) Processing $asin ...";
             if (empty($listing) || empty($listing[$this->mainCountry]) || !is_array($listing[$this->mainCountry])) {
                 continue;
             }
@@ -290,7 +290,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                     $this->processFieldCollection($variantProduct, $countryListing, $country);
                 }
             }
-            echo $variantProduct->getId();
+            echo "{$variantProduct->getId()} ";
             echo " OK\n";
             exit;
         }
@@ -298,7 +298,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
     protected function processFieldCollection($variantProduct, $listing, $country)
     {
-        echo $listing['listing-id'];
+//        echo $listing['listing-id'];
         $collection = $variantProduct->getAmazonMarketplace();
         $newCollection = new Fieldcollection();
         $found = false;
