@@ -286,6 +286,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             }
             foreach ($listing as $country=>$countryListings) {
                 foreach ($countryListings as $countryListing) {
+                    if ($country === 'catalog') {
+                        continue;
+                    }
                     echo "$country ";
                     $this->processFieldCollection($variantProduct, $countryListing, $country);
                 }
