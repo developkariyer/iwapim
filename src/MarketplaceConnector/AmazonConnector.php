@@ -282,7 +282,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             );*/
             foreach ($listing as $country=>$countryListings) {
                 if (count($countryListings) > 1) {
-                    echo "$country ";
+                    echo "$country : ".count($countryListings);
                     exit;
                 }
                 foreach ($countryListings as $countryListing) {
