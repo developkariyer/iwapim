@@ -399,7 +399,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $nextToken = null;
     
         do {
-            $orders = $nextToken ? $ordersApi->getOrders(nextToken: $nextToken) : $ordersApi->getOrders(createdAfter: $lastUpdateAt, marketplaceIds: $marketplaceIds);
+            $orders = $nextToken ? $ordersApi->getOrdersByNextToken(nextToken: $nextToken) : $ordersApi->getOrders(createdAfter: $lastUpdateAt, marketplaceIds: $marketplaceIds);
             $orders = $orders->json();
             $pageOrderIds = array_map(function($order) {
                 return $order['AmazonOrderId'];
