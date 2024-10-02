@@ -3,7 +3,6 @@
 namespace App\MarketplaceConnector;
 
 use Pimcore\Model\DataObject\VariantProduct;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 
 use App\Utils\Utility;
@@ -24,7 +23,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (strpos($this->apiUrl, 'https://') === false) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
-        $this->httpClient = ScopingHttpClient::forBaseUri(HttpClient::create(), $this->apiUrl, [
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, $this->apiUrl, [
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken()
             ]
