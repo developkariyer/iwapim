@@ -12,6 +12,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
 {
     public $marketplace = null;
     public $listings = [];
+    public $httpClient = null;
 
     public static $marketplaceType = '';
 
@@ -24,6 +25,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
             throw new \Exception("Marketplace is not published, is not ".static::$marketplaceType." or credentials are empty");
         }
         $this->marketplace = $marketplace;
+        $this->httpClient = HttpClient::create();
     }
 
     protected function getUrlLink($url)

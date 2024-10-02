@@ -19,15 +19,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         'catalogProductsUrl' => "/retailer/content/catalog-products/",
         'commissionUrl' => "/retailer/commission/",
     ];
-    private $httpClient = null;
     public static $marketplaceType = 'Bol.com';
-
-    public function __construct(Marketplace $marketplace)
-    {
-        parent::__construct($marketplace);
-        $this->httpClient = HttpClient::create();
-        $this->prepareToken();
-    }
 
     protected function prepareToken()
     {
@@ -70,6 +62,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     protected function reportStatus($decodedResponse)
     {
+        $this->prepareToken();
         $status = $decodedResponse['status'] === 'SUCCESS';
         $statusUrl = $decodedResponse['links'][0]['href'] ?? static::$apiUrl['processStatusUrl'] . ($decodedResponse['processStatusId'] ?? '');
 
@@ -99,6 +92,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     protected function downloadOfferReport($forceDownload = false)
     {
+        $this->prepareToken();
         $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
         if ($report === false || $forceDownload) {
             echo "Requesting offer report from Bol.com\n";
@@ -120,7 +114,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
         if ($response->getStatusCode() !== 200) {
-            echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
+            echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
             return null;
         }
         echo "{$apiEndPoint}{$parameter} ";
@@ -210,14 +204,15 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (empty($this->listings) || $forceDownload) {
-            $this->getListings($this->downloadOfferReport($forceDownload));
-            Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
-        } else {
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
+            return;
         }
-        return;
+        $this->getListings(
+            $this->downloadOfferReport($forceDownload)
+        );
+        Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
     }
 
     public function import($updateFlag, $importFlag)

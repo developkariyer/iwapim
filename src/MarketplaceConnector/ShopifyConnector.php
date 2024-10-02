@@ -2,8 +2,9 @@
 
 namespace App\MarketplaceConnector;
 
-use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 
 use App\Utils\Utility;
 
@@ -11,51 +12,65 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 {
     public static $marketplaceType = 'Shopify';
 
-    public function download($forceDownload = false)
+    private $apiUrl = null;
+
+    public function __construct($marketplace)
     {
-        $filename = 'tmp/'.urlencode($this->marketplace->getKey()).'.json';
-        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
-            $this->listings = json_decode(file_get_contents($filename), true);
-            echo "Using cached data\n";
-        } else {
-            $accessToken = $this->marketplace->getAccessToken();
-            $apiUrl = $this->marketplace->getApiUrl();
-            $apiVersion = '2024-01';
-            $limit = 50;
-            $this->listings = [];
-            $url = "https://{$apiUrl}/admin/api/{$apiVersion}/products.json?limit={$limit}";
-            do {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_HEADER, 1);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    "X-Shopify-Access-Token: $accessToken"
-                ]);
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                if ($httpCode !== 200) {
-                    echo "Error: $httpCode\n";
-                    curl_close($ch);
+        parent::__construct($marketplace);
+        $this->apiUrl = trim($this->marketplace->getApiUrl(), characters: "/ \n\r\t");
+        if (empty($this->apiUrl)) {
+            throw new \Exception("API URL is not set for Shopify marketplace {$this->marketplace->getKey()}");
+        }
+        if (strpos($this->apiUrl, 'https://') === false) {
+            $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
+        }
+        $this->httpClient = ScopingHttpClient::forBaseUri(HttpClient::create(), $this->apiUrl, [
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken()
+            ]
+        ]);
+    }
+    
+    protected function getFromShopifyApi($method, $parameter, $query = [], $key = null)
+    {
+        $data = [];
+        $nextLink = "{$this->apiUrl}/{$parameter}";
+        while ($nextLink) {
+            $response = $this->httpClient->request($method, $nextLink, [
+                'query' => $query
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to $method $nextLink: {$response->getContent()}\n";
+                return null;
+            }
+            usleep(200000);
+            $data = array_merge($data, json_decode($response->getContent(), true));
+            $headers = $response->getHeaders(false);
+            $links = explode(',', $headers['Link'][0]);
+            $nextLink = null;
+            foreach ($links as $link) {
+                if (preg_match('/<([^>]+)>;\s*rel="next"/', $link, $matches)) {
+                    $nextLink = $matches[1];
                     break;
                 }
-                $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-                $header = substr($response, 0, $headerSize);
-                $body = substr($response, $headerSize);
-                $data = json_decode($body, true);
-                $products = $data['products'];
-                $this->listings = array_merge($this->listings, $products);
-                $url = null;
-                if (preg_match('/<([^>]+)>;\s*rel="next"/', $header, $matches)) {
-                    $url = $matches[1];
-                }
-                curl_close($ch);
-                echo ".";
-                sleep(1);
-            } while ($url);
-            file_put_contents($filename, json_encode($this->listings));    
+            }
         }
-        return count($this->listings);
+        return $key ? $data[$key] : $data;
+    }
+
+    public function download($forceDownload = false)
+    {
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!(empty($this->listings) || $forceDownload)) {
+            echo "Using cached listings\n";
+            return;
+        }
+        $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+        }
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     public function downloadInventory()
@@ -72,49 +87,18 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (!$maxId) {
             $maxId = 0;
         }
-        $accessToken = $this->marketplace->getAccessToken();
-        $apiUrl = $this->marketplace->getApiUrl();
-        $apiVersion = '2024-07';
-        $url = "https://{$apiUrl}/admin/api/{$apiVersion}/orders.json?status=any&since_id=".($maxId+1);
+        $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'since_id' => $maxId], 'orders');
         $sql = "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)";
-        do {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                "X-Shopify-Access-Token: $accessToken"
-            ]);
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if ($httpCode !== 200) {
-                echo "Error: $httpCode\n";
-                curl_close($ch);
-                break;
-            }
-            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-            $header = substr($response, 0, $headerSize);
-            $body = substr($response, $headerSize);
-            $data = json_decode($body, true);
-            $orders = $data['orders'];
+        $db->beginTransaction();
+        foreach ($orders as $order) {
             try {
-                $db->beginTransaction();
-                foreach ($orders as $order) {
-                    $db->executeUpdate($sql, [$this->marketplace->getId(), $order['id'], json_encode($order)]);
-                }
+                $db->executeUpdate($sql, [$this->marketplace->getId(), $order['id'], json_encode($order)]);
                 $db->commit();
             } catch (\Exception $e) {
                 $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
             }
-            $url = null;
-            if (preg_match('/<([^>]+)>;\s*rel="next"/', $header, $matches)) {
-                $url = $matches[1];
-            }
-            curl_close($ch);
-            echo ".".count($orders);
-            sleep(1);
-        } while ($url);
+        }
     }
 
     protected function getImage($listing, $mainListing) {
