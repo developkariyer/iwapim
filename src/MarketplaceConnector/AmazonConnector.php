@@ -290,6 +290,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             }
             echo $variantProduct->getId();
             echo " OK\n";
+            exit;
         }
     }
 
