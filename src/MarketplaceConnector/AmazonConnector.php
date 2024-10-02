@@ -407,6 +407,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $orderIds = array_merge($orderIds, $pageOrderIds);
             echo "Total Orders so far: " . count($orderIds) . "\n";
             $nextToken = $orders['payload']['NextToken'] ?? null;
+            $response = $ordersApi->getResponse();  // Fetch the HTTP response
+            $rateLimit = $response  ->getHeader('x-amzn-RateLimit-Limit');
+            print_r($rateLimit);
             usleep(500000);
         } while ($nextToken);
         $orderIds = array_unique($orderIds);
