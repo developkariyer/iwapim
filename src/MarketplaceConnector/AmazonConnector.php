@@ -318,6 +318,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
                 $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
+                $amazonCollection->setMarketplace($this->marketplace);
                 $amazonCollection->setStatus($listing['status'] ?? '');
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
             }
@@ -335,6 +336,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
             $amazonCollection->setSku($listing['seller-sku'] ?? '');
             $amazonCollection->setListingId($listing['listing-id'] ?? '');
+            $amazonCollection->setMarketplace($this->marketplace);
             $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
             $amazonCollection->setStatus($listing['status'] ?? '');
             $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
