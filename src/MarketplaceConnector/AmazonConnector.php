@@ -397,6 +397,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
         $orderIds = [];
         $nextToken = null;
+        $burst = 0;
     
         do {
             $orders = $nextToken ? $ordersApi->getOrders(nextToken: $nextToken, marketplaceIds: $marketplaceIds) : $ordersApi->getOrders(createdAfter: $lastUpdateAt, marketplaceIds: $marketplaceIds);
@@ -407,7 +408,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $orderIds = array_merge($orderIds, $pageOrderIds);
             echo "Total Orders so far: " . count($orderIds) . "\n";
             $nextToken = $orders['payload']['NextToken'] ?? null;
-            sleep(2);
+            $burst++;
+            sleep($burst>20 ? 60 : 1);
         } while ($nextToken);
         $orderIds = array_unique($orderIds);
         $orderIds = array_filter($orderIds);
