@@ -165,9 +165,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
                 $asin = $rowData['asin1'] ?? '';
-                if (isset($this->listings[$asin])) {
-                    echo "ASIN $asin has been encountered before.\n";
-                }
                 if (empty($this->listings[$asin][$country])) {
                     if (empty($this->listings[$asin])) {
                         $this->listings[$asin] = [];
@@ -175,10 +172,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                     $this->listings[$asin][$country] = [];  // Initialize country array
                 }
                 $this->listings[$asin][$country][] = $rowData;
-                if (count($this->listings[$asin][$country]) > 1) {
-                    echo "ASIN $asin has multiple listings in $country.\n";
-                    exit;
-                }
             }
         }
     }
@@ -265,6 +258,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         foreach ($this->listings as $asin=>$listing) {
             $index++;
             if (empty($listing) || empty($listing[$this->mainCountry]) || !is_array($listing[$this->mainCountry])) {
+                echo "($index/$total) $asin is empty in {$this->mainCountry}\n";
                 continue;
             }
             echo "($index/$total) Processing $asin ...";
