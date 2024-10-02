@@ -40,4 +40,13 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         return $l;
     }
 
+    protected function getLatestOrderUpdate()
+    {
+        $db = \Pimcore\Db::get();
+        return $db->fetchOne(
+            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+    }
+
 }

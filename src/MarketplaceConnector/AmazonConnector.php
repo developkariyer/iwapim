@@ -386,7 +386,44 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     }
 
     public function downloadOrders(): void
-    {        
+    {
+        $db = \Pimcore\Db::get();
+        $lastUpdateAt = $this->getLatestOrderUpdate();
+        $ordersApi = $this->amazonSellerConnector->ordersV0();
+        $marketplaceIds = array_map(function($country) {
+            return AmazonConstants::amazonMerchant[$country]['id'];
+        }, $this->countryCodes);
+        $marketplaceIds[] = AmazonConstants::amazonMerchant[$this->mainCountry]['id'];
+        $orders = $ordersApi->getOrders(
+            createdAfter: $lastUpdateAt,
+            marketplaceIds: $marketplaceIds,
+        );
+        $orders = $orders->json();
+        $orderIds = array_map(function($order) {
+            return $order['AmazonOrderId'];
+        }, $orders['payload']['orders']);
+        echo "Orders: ".count($orderIds)."\n";
+        $db->beginTransaction();
+        try {
+            foreach ($orderIds as $orderId) {
+                echo "    $orderId\n";
+                $order = $ordersApi->getOrder(orderId: $orderId);
+                $order = $order->json();
+                $db->executeStatement(
+                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                    [
+                        $this->marketplace->getId(),
+                        $order['payload']['AmazonOrderId'],
+                        json_encode($order['payload']),
+                    ]
+                );
+                usleep(500000);
+            }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            echo $e->getMessage();
+        }
     }
 
     public function downloadInventory(): void
