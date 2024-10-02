@@ -401,7 +401,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $orders = $orders->json();
         $orderIds = array_map(function($order) {
             return $order['AmazonOrderId'];
-        }, $orders['payload']['orders']);
+        }, $orders['payload']['Orders']);
         echo "Orders: ".count($orderIds)."\n";
         $db->beginTransaction();
         try {
