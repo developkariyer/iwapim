@@ -159,6 +159,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     protected function processListingReport($country, $report)
     {
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
+        echo count($lines)." lines ";
+        exit;
         $header = str_getcsv(array_shift($lines), "\t");
         foreach ($lines as $line) {
             $data = str_getcsv($line, "\t");
