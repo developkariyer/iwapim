@@ -44,7 +44,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             usleep(200000);
             $newData = $key ? ($response->getContent()[$key] ?? []) : $response->getContent();
-            $data = array_merge($data, json_decode($newData, true));
+            $data = array_merge($data, $newData);
             $headers = $response->getHeaders(false);
             $links = $headers['link'] ?? [];
             $nextLink = null;
