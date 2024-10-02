@@ -407,10 +407,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $orderIds = array_merge($orderIds, $pageOrderIds);
             echo "Total Orders so far: " . count($orderIds) . "\n";
             $nextToken = $orders['payload']['NextToken'] ?? null;
-            $response = $ordersApi->getResponse();  // Fetch the HTTP response
-            $rateLimit = $response  ->getHeader('x-amzn-RateLimit-Limit');
-            print_r($rateLimit);
-            usleep(500000);
+            sleep(2);
         } while ($nextToken);
         $orderIds = array_unique($orderIds);
         $orderIds = array_filter($orderIds);
@@ -430,7 +427,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                         json_encode($order['payload']),
                     ]
                 );
-                usleep(500000);
+                sleep(2);
             }
             $db->commit();
         } catch (\Exception $e) {
