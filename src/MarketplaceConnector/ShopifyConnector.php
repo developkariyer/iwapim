@@ -53,6 +53,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     break;
                 }
             }
+            echo ".";
         }
         return $key ? $data[$key] : $data;
     }
