@@ -29,15 +29,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
+        $firstRunHeaders = [
+            'query' => $query,
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ]
+        ];
         while ($nextLink) {
-            $response = $this->httpClient->request($method, $nextLink, [
-                'query' => $query,
-                'headers' => [
-                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ]
-            ]);
+            $response = $this->httpClient->request($method, $nextLink, $firstRunHeaders);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
@@ -54,6 +55,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     break;
                 }
             }
+            $firstRunHeaders = [];
             echo ".";
         }
         return $data;
