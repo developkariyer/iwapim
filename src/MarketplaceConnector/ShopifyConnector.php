@@ -25,7 +25,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, $this->apiUrl, [
             'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken()
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
             ]
         ]);
     }
@@ -44,7 +46,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             usleep(200000);
             $newData = json_decode($response->getContent(), true);
-            print_r(array_keys($newData));
             $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
             $headers = $response->getHeaders(false);
             $links = $headers['link'] ?? [];
@@ -83,7 +84,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function downloadOrders()
     {
         $db = \Pimcore\Db::get();
-        // find biggest id for this shop
         $sql = "SELECT MAX(order_id) FROM iwa_marketplace_orders WHERE marketplace_id = ?";
         $maxId = $db->fetchOne($sql, [$this->marketplace->getId()]);
         if (!$maxId) {
