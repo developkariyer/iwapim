@@ -247,51 +247,49 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
-            if (empty($this->listings[$country])) {
-                echo "Nothing to import in $country\n";
-            } else {
-                echo "Importing $country\n";
+        if (empty($this->listings)) {
+            echo "Nothing to import in {$this->mainCountry}\n";
+            return;
+        } else {
+            echo "Importing {$this->mainCountry}\n";
+        }
+        $total = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $asin=>$listing) {
+            $index++;
+            echo "($index/$total) Processing id $asin ...";
+            if (empty($listing) || empty($listing[$this->mainCountry]) || !is_array($listing[$this->mainCountry])) {
+                continue;
             }
-            $total = count($this->listings[$country]);
-            $index = 0;
-            foreach ($this->listings[$country] as $listing) {
-                $index++;
-                echo "($index/$total) Processing id {$listing['listing-id']} ...";
-                if (empty($listing)) {
-                    echo " Empty\n";
-                    continue;
-                }
-                $asin = $listing['asin1'] ?? '';
-                if (empty($asin)) {
-                    echo " Empty ASIN\n";
-                    continue;
-                }
-                $variantProduct = VariantProduct::addUpdateVariant(
-                    variant: [
-                        'imageUrl' => null,
-                        'urlLink' => $this->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')),
-                        'salePrice' => 0,
-                        'saleCurrency' => '',
-                        'title' => $this->getTitle($listing),
-                        'attributes' => $this->getAttributes($listing),
-                        'uniqueMarketplaceId' => $asin,
-                        'apiResponseJson' => json_encode([]),
-                        'published' => true,
-                    ],
-                    importFlag: $importFlag,
-                    updateFlag: $updateFlag,
-                    marketplace: null,
-                    parent: $this->getFolder($asin),
-                );
-                if (empty($variantProduct->getMarketplace())) {
-                    $variantProduct->setMarketplace($this->marketplace);
-                    $variantProduct->save();
-                }
-                $this->processFieldCollection(variantProduct: $variantProduct, listing: $listing, country: $country);
-                echo $variantProduct->getId();
-                echo " OK\n";
+            $mainListings = $listing[$this->mainCountry];
+            $mainListing = reset($mainListings);
+            $variantProduct = VariantProduct::addUpdateVariant(
+                variant: [
+                    'imageUrl' => null,
+                    'urlLink' => $this->getUrlLink(AmazonConstants::amazonMerchant[$this->mainCountry]['url']."/dp/$asin"),
+                    'salePrice' => 0,
+                    'saleCurrency' => '',
+                    'title' => $this->getTitle($mainListing),
+                    'attributes' => $this->getAttributes($mainListing),
+                    'uniqueMarketplaceId' => $asin,
+                    'apiResponseJson' => json_encode($listing),
+                    'published' => true,
+                ],
+                importFlag: $importFlag,
+                updateFlag: $updateFlag,
+                marketplace: $this->marketplace,
+                parent: $this->getFolder($asin),
+            );
+            foreach ($mainListings as $mainListing) {
+                $this->processFieldCollection($variantProduct, $mainListing, $this->mainCountry);
             }
+            foreach ($listing as $country=>$countryListings) {
+                foreach ($countryListings as $countryListing) {
+                    $this->processFieldCollection($variantProduct, $countryListing, $country);
+                }
+            }
+            echo $variantProduct->getId();
+            echo " OK\n";
         }
     }
 
