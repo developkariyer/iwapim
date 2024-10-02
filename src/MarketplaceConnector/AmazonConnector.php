@@ -280,13 +280,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 marketplace: $this->marketplace,
                 parent: $this->getFolder($asin),
             );
-            foreach ($mainListings as $mainListing) {
-                echo "{$this->mainCountry} ";
-                $this->processFieldCollection($variantProduct, $mainListing, $this->mainCountry);
-            }
             foreach ($listing as $country=>$countryListings) {
                 foreach ($countryListings as $countryListing) {
-                    if ($country === 'catalog' || $country === $this->mainCountry) {
+                    if ($country === 'catalog') {
                         continue;
                     }
                     echo "$country ";
