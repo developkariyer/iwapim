@@ -280,7 +280,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 marketplace: $this->marketplace,
                 parent: $this->getFolder($asin),
             );
-            $variantProduct->save();
             foreach ($mainListings as $mainListing) {
                 echo "{$this->mainCountry} ";
                 $this->processFieldCollection($variantProduct, $mainListing, $this->mainCountry);
@@ -296,7 +295,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             }
             echo "{$variantProduct->getId()} ";
             echo " OK\n";
-            exit;
         }
     }
 
