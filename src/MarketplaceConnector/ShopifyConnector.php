@@ -90,17 +90,19 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function downloadOrders()
     {
         $db = \Pimcore\Db::get();
-        $sql = "SELECT MAX(order_id) FROM iwa_marketplace_orders WHERE marketplace_id = ?";
-        $maxId = $db->fetchOne($sql, [$this->marketplace->getId()]);
-        if (!$maxId) {
-            $maxId = 0;
-        }
-        $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'since_id' => $maxId], 'orders');
-        $sql = "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+        $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'orders');
         $db->beginTransaction();
         try {
             foreach ($orders as $order) {
-                $db->executeStatement($sql, [$this->marketplace->getId(), $order['id'], json_encode($order)]);
+                $db->executeStatement(
+                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                    [$this->marketplace->getId(), $order['id'],
+                    json_encode($order)]
+                );
             }
             $db->commit();
         } catch (\Exception $e) {
