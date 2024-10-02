@@ -297,6 +297,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     protected function processFieldCollection($variantProduct, $listing, $country)
     {
         print_r($listing);
+        echo $listing['listing-id'];
         $collection = $variantProduct->getAmazonMarketplace();
         $newCollection = new Fieldcollection();
         $found = false;
