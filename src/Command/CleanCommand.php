@@ -81,6 +81,7 @@ class CleanCommand extends AbstractCommand
 
     private static function fixBundledProducts()
     {
+        return; // does not work anymore, bundleItems field is deleted.
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(true);
         $pageSize = 50;
