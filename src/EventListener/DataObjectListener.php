@@ -9,7 +9,7 @@ use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Serial;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Data\Link;
-use Pimcore\Model\Element\Dependency;
+use Pimcore\Model\Dependency;
 
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
@@ -163,16 +163,18 @@ class DataObjectListener implements EventSubscriberInterface
                     return $image;
                 }
             }
-        }/*
-        $dependencies = Dependency::getDependencies($object);
+        }
+        $dependencyObject = Dependency::getBySourceId($object->getId());
+        $dependencies = $dependencyObject->getRequiredBy();
         foreach ($dependencies as $dependency) {
+            error_log(get_class($dependency));
             if ($dependency instanceof Product) {
                 $image = self::traverseProducts($dependency);
                 if (!empty($image)) {
                     return $image;
                 }
             }
-        }*/
+        }
         return "";
     }
 
