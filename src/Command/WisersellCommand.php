@@ -77,6 +77,7 @@ class WisersellCommand extends AbstractCommand
             echo "Adding to PIM... ";
             $category = new Category();
             $category->setKey($wisersellCategory['name']);
+            $category->setParent(Utility::checkSetPath('Kategoriler', Utility::checkSetPath('Ayarlar')));
             $category->setCategory($wisersellCategory['name']);
             $category->setWisersellCategoryId($wisersellCategory['id']);
             $category->save();
