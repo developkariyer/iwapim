@@ -306,6 +306,7 @@ class WisersellCommand extends AbstractCommand
     protected function getPimCategories()
     {
         $listingObject = new Category\Listing();
+        $listingObject->setUnpublished(true);
         $categories = $listingObject->load();
         $this->categoryList = [];
         foreach ($categories as $category) {
