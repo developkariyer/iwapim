@@ -144,7 +144,7 @@ class WisersellCommand extends AbstractCommand
 
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != '' AND (wisersellId IS NULL OR wisersellId = '')");
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
         $pageSize = 50;
         $offset = 0;
         $productBucket = [];
