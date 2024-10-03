@@ -112,13 +112,13 @@ class WisersellCommand extends AbstractCommand
                 "page" => $page,
                 "pageSize" => $pageSize
             ]);
+            echo json_encode($response);
+            exit;
             $wisersellProducts = array_merge($wisersellProducts, $response);
             $page++;
             echo "Loaded ".($page*$pageSize)." products from Wisersell\n";
         } while (count($response) == $pageSize);
         $this->wisersellProducts = [];
-        print_r($wisersellProducts);
-        exit;
         foreach ($wisersellProducts as $product) {
             $this->wisersellProducts[$product['id']] = $product;
         }
