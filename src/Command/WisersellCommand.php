@@ -72,18 +72,18 @@ class WisersellCommand extends AbstractCommand
         $response = $this->request('store', 'GET', '');
         foreach ($response->toArray() as $store) {
             echo "Processing {$store['name']} {$store['id']}... ";
-            switch ($store['source']['name']) {
-                case 'Etsy':
-                    $marketplace = Marketplace::findByField('shopId', $store['shopId'] );
-                    if ($marketplace instanceof Marketplace) {
-                        $marketplace->setWisersellStoreId($store['id']);
-                        $marketplace->save();
-                        echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
-                    } else {
-                        echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
-                    }
-                    break;
-                default: echo "Store {$store['name']} ({$store['id']}) is not supported by PIM\n";
+            $marketplace = match ($store['source']['name']) {
+                'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
+                'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
+                'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
+                default => null
+            };
+            if ($marketplace instanceof Marketplace) {
+                $marketplace->setWisersellStoreId($store['id']);
+                $marketplace->save();
+                echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
+            } else {
+                echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
             }
         }
     }
