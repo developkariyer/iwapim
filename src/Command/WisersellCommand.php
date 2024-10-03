@@ -36,13 +36,6 @@ class WisersellCommand extends AbstractCommand
     private $httpClient = null;
     protected $categoryList = [];
 
-    public function __construct()
-    {
-        $parent = parent::__construct();
-        $this->httpClient = HttpClient::create();
-        $this->prepareToken();     
-    }
-
     protected function configure() 
     {
         $this
@@ -53,6 +46,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->httpClient = HttpClient::create();
         if ($input->getOption('category')) {
             $this->syncCategories();
         }
