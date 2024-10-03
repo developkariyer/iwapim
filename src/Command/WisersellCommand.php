@@ -305,7 +305,7 @@ class WisersellCommand extends AbstractCommand
             echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
             return null;
         }
-        usleep(2000000);
+        usleep(1000000);
         return $response;
     }
 
