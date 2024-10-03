@@ -147,9 +147,11 @@ class WisersellCommand extends AbstractCommand
             if ($productValue !== $wisersellProduct[$wisersellKey]) {
                 if ($productValue > 0) {
                     $wisersellProduct[$wisersellKey] = $productValue;
+                    echo "{$productField}< ";
                     $updateWisersell = true;
                 } else {
                     $product->$setMethod($wisersellProduct[$wisersellKey]);
+                    echo "{$productField}> ";
                     $updatePim = true;
                 }
             }
@@ -157,6 +159,7 @@ class WisersellCommand extends AbstractCommand
 
         if ($product->getInheritedField('name') !== $wisersellProduct['name']) {
             $wisersellProduct['name'] = $product->getInheritedField('name');
+            echo "name ";
             $updateWisersell = true;
         }
 
@@ -170,10 +173,12 @@ class WisersellCommand extends AbstractCommand
 
         if ($product->getVariationSize() !== $size) {
             $wisersellProduct['extradata']['Size'] = $product->getVariationSize();
+            echo "size ";
             $updateWisersell = true;
         }
         if ($product->getVariationColor() !== $color) {
             $wisersellProduct['extradata']['Color'] = $product->getVariationColor();
+            echo "color ";
             $updateWisersell = true;
         }
         if ($updateWisersell) {
