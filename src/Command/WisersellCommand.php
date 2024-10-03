@@ -207,9 +207,9 @@ class WisersellCommand extends AbstractCommand
         $this->getPimCategories();
         $productData = [];
         foreach ($productBucket as $product) {
-            $category = $this->categoryList[$product->getProductCategory()] ?? $this->categoryList['Diğer'];
+            $category = $this->categoryList[$product->getInheritedField('productCategory')] ?? $this->categoryList['Diğer'];
             $productData[] = [
-                "name" => $product->getName(),
+                "name" => $product->getInheritedField('name'),
                 "code" => $product->getIwasku(),
                 "categoryId" => $category->getWisersellCategoryId(),
                 "weight" => $product->getInheritedField("packageWeight"),
