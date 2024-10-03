@@ -112,9 +112,7 @@ class WisersellCommand extends AbstractCommand
                 "page" => $page,
                 "pageSize" => $pageSize
             ]);
-            echo json_encode($response);
-            exit;
-            $wisersellProducts = array_merge($wisersellProducts, $response);
+            $wisersellProducts = array_merge($wisersellProducts, $response['rows']);
             $page++;
             echo "Loaded ".($page*$pageSize)." products from Wisersell\n";
         } while (count($response) == $pageSize);
