@@ -33,6 +33,7 @@ class WisersellCommand extends AbstractCommand
         'productSearch' => 'product/search',
         'category' => 'category',
         'product'=> 'product',
+        'store' => 'store'
     ];
     private $httpClient = null;
     protected $categoryList = [];
