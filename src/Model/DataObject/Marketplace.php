@@ -32,4 +32,14 @@ class Marketplace extends Concrete
         }
         return $marketplacesArray;
     }
+
+    public static function findByField($field, $value)
+    {
+        $list = new Listing();
+        $list->setCondition("`$field` = ?", [$value]);
+        $list->setUnpublished(true);
+        $list->setLimit(1);
+        return $list->current();
+    }
+
 }
