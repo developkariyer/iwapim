@@ -242,7 +242,7 @@ class WisersellCommand extends AbstractCommand
         }
         foreach ($this->wisersellProducts as $wisersellProduct) {
             echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM ERROR... ";
-            $product = Product::getByField('wisersellId', $wisersellProduct['id']);
+            $product = Product::FindByField('wisersellId', $wisersellProduct['id']);
             if (!$product instanceof Product) {
                 $product = new Product();
                 $product->setParent(Product::getById(242819)); // Wisersell Error Product!!!!
