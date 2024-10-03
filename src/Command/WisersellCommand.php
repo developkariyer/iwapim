@@ -197,15 +197,15 @@ class WisersellCommand extends AbstractCommand
         $this->syncCategories();
         $this->loadWisersellProducts($forceDownload);
         echo "Syncing Products...\n";
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
         $pageSize = 50;
         $offset = 0;
         $productBucket = [];
         $subProductBucket = [];
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
+        $listingObject->setLimit($pageSize);
         while (true) {
-            $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
             $products = $listingObject->load();
             if (empty($products)) {
@@ -227,10 +227,10 @@ class WisersellCommand extends AbstractCommand
                 if (count($product->getBundleProducts())) {
                     $subProductBucket[] = $product;
                     echo "Added to subProductBucket\n";
-                    continue;
+                } else {
+                    $productBucket[$product->getIwasku()] = $product;
+                    echo "Added to productBucket (".count($productBucket).")\n";
                 }
-                $productBucket[$product->getIwasku()] = $product;
-                echo "Added to productBucket (".count($productBucket).")\n";
                 if (count($productBucket) >= 100) {
                     $this->addProductBucketToWisersell($productBucket);
                     $productBucket = [];
@@ -241,10 +241,18 @@ class WisersellCommand extends AbstractCommand
         if (!empty($productBucket)) {
             $this->addProductBucketToWisersell($productBucket);
         }
+        if (!empty($this->wisersellProducts)) {
+            $this->addWisersellErrorProductsToPim();
+        }
+    }
+
+    protected function addWisersellErrorProductsToPim()
+    {
         foreach ($this->wisersellProducts as $wisersellProduct) {
             echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM ERROR... ";
-            $product = Product::FindByField('wisersellId', $wisersellProduct['id']);
+            $product = Product::findByField('wisersellId', $wisersellProduct['id']);
             if (!$product instanceof Product) {
+                echo "New ";
                 $product = new Product();
             }
             $product->setParent(Folder::getById(242818)); // Wisersell Error Product!!!!
