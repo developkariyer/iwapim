@@ -74,7 +74,7 @@ class WisersellCommand extends AbstractCommand
             echo "Processing {$store['name']} {$store['id']}... ";
             switch ($store['source']['name']) {
                 case 'Etsy':
-                    $marketplace = Marketplace::findByField('shopId', $store['id'] );
+                    $marketplace = Marketplace::findByField('shopId', $store['shopId'] );
                     if ($marketplace instanceof Marketplace) {
                         $marketplace->setWisersellStoreId($store['id']);
                         $marketplace->save();
