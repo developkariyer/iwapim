@@ -117,6 +117,8 @@ class WisersellCommand extends AbstractCommand
             echo "Loaded ".($page*$pageSize)." products from Wisersell\n";
         } while (count($response) == $pageSize);
         $this->wisersellProducts = [];
+        print_r($wisersellProducts);
+        exit;
         foreach ($wisersellProducts as $product) {
             $this->wisersellProducts[$product['id']] = $product;
         }
