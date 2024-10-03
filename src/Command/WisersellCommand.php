@@ -144,7 +144,7 @@ class WisersellCommand extends AbstractCommand
 
         $updateField = function ($productField, $setMethod, $wisersellKey) use ($product, &$wisersellProduct, &$updateWisersell, &$updatePim) {
             $productValue = $product->getInheritedField($productField);
-            if ($productValue !== $wisersellProduct[$wisersellKey]) {
+            if ($productValue != $wisersellProduct[$wisersellKey]) {
                 if ($productValue > 0) {
                     $wisersellProduct[$wisersellKey] = $productValue;
                     echo "{$productField}< ";
