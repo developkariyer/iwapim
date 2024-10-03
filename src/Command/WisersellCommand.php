@@ -223,10 +223,7 @@ class WisersellCommand extends AbstractCommand
                 "subproducts" => []
             ];
         }
-        echo "\n".json_encode($productData)."\n";
         $result = $this->addProduct($productData);
-        echo json_encode($result)."\n";
-        exit;
         foreach ($result as $response) {
             if (isset($response['id']) && isset($productBucket[$response['code']])) {
                 $productBucket[$response['code']]->setWisersellId($response['id']);
