@@ -309,7 +309,7 @@ class WisersellCommand extends AbstractCommand
             echo "Bearer Token: " . $token['token'] . "\n";
             return $token['token'];
         }
-        echo "Token file not found or empty. Fetching new token...\n";
+        echo "Token file not found or empty or expired. Fetching new token...\n";
         return $this->fetchToken();
     }
 
