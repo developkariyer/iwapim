@@ -235,6 +235,7 @@ class WisersellCommand extends AbstractCommand
             }
         }
         echo "Added ".count($result)." products to Wisersell\n";
+        sleep(1);
     }
 
     protected function prepareToken()
