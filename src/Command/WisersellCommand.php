@@ -42,17 +42,19 @@ class WisersellCommand extends AbstractCommand
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
+            ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell products')
             ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->httpClient = HttpClient::create();
+        $forceDownload = $input->getOption('download', false);
         if ($input->getOption('category')) {
             $this->syncCategories();
         }
         if($input->getOption('product')){
-            $this->syncProducts();
+            $this->syncProducts($forceDownload);
         }
         return Command::SUCCESS;
     }
@@ -97,10 +99,10 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
-    protected function loadWisersellProducts()
+    protected function loadWisersellProducts($forceDownload = false)
     {
         $this->wisersellProducts = json_decode(Utility::getCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
-        if (!empty($this->wisersellProducts)) {
+        if (!(empty($this->wisersellProducts) || $forceDownload)) {
             echo "Loaded Wisersell Products from cache\n";
             return;
         }
@@ -133,10 +135,10 @@ class WisersellCommand extends AbstractCommand
         return null;
     }
 
-    protected function syncProducts()
+    protected function syncProducts($forceDownload = false)
     {
         $this->syncCategories();
-        $this->loadWisersellProducts();
+        $this->loadWisersellProducts($forceDownload);
         echo "Syncing Products...\n";
 
         $listingObject = new Product\Listing();
