@@ -290,7 +290,6 @@ class WisersellCommand extends AbstractCommand
 
     protected function addProduct($data)
     {
-        print_r($data);
         $result = $this->request(self::$apiUrl['product'], 'POST', '', $data);
         return $result->toArray();
     }
