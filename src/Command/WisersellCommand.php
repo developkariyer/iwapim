@@ -223,6 +223,7 @@ class WisersellCommand extends AbstractCommand
                 "subproducts" => []
             ];
         }
+        echo "\n".json_encode($productData)."\n";
         $result = $this->addProduct($productData);
         echo json_encode($result)."\n";
         exit;
