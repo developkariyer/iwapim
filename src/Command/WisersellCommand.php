@@ -45,7 +45,7 @@ class WisersellCommand extends AbstractCommand
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell products')
-            ->addOption('list-stores', null, InputOption::VALUE_NONE, 'List all stores')
+            ->addOption('store', null, InputOption::VALUE_NONE, 'List all stores')
             ;
     }
 
@@ -60,20 +60,30 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('product')){
             $this->syncProducts($forceDownload);
         }
-        if($input->getOption('list-stores')){
-            $this->listStores();
+        if($input->getOption('store')){
+            $this->syncStores();
         }
         return Command::SUCCESS;
     }
 
-    protected function listStores()
+    protected function syncStores()
     {
-        $this->prepareToken();
         $response = $this->request('store', 'GET', '');
         $stores = $response->toArray();
-        print_r($stores);
         foreach ($stores as $store) {
-            echo "Store: {$store['name']} ({$store['id']})\n";
+            switch ($store['source']['name'] ?? '') {
+                case 'Etsy':
+                    $marketplace = Marketplace::findByField('shopId', $store['id']);
+                    if ($marketplace instanceof Marketplace) {
+                        $marketplace->setWisersellStoreId($store['id']);
+                        $marketplace->save();
+                        echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
+                    } else {
+                        echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
+                    }
+                    break;
+                default: echo "Store {$store['name']} ({$store['id']}) is not supported by PIM\n";
+            }
         }
     }
 
@@ -337,7 +347,7 @@ class WisersellCommand extends AbstractCommand
     {
         $token = json_decode(Utility::getCustomCache('wisersell_access_token.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
         if (Utility::checkJwtTokenValidity($token['token'] ?? '')) {
-            echo "Bearer Token: " . $token['token'] . "\n";
+            echo "Token valid\n";
             return $token['token'];
         }
         echo "Token file not found or empty or expired. Fetching new token...\n";
