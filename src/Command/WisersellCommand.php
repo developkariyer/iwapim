@@ -136,12 +136,58 @@ class WisersellCommand extends AbstractCommand
         return null;
     }
 
+    protected function compareUpdateWisersellProduct($id, $product)
+    {
+        $wisersellProduct = $this->wisersellProducts[$id];
+        $updateWisersell = false;
+        $updatePim = false;
+
+        $updateField = function ($productField, $setMethod, $wisersellKey) use ($product, &$wisersellProduct, &$updateWisersell, &$updatePim) {
+            $productValue = $product->getInheritedField($productField);
+            if ($productValue !== $wisersellProduct[$wisersellKey]) {
+                if ($productValue > 0) {
+                    $wisersellProduct[$wisersellKey] = $productValue;
+                    $updateWisersell = true;
+                } else {
+                    $product->$setMethod($wisersellProduct[$wisersellKey]);
+                    $updatePim = true;
+                }
+            }
+        };
+
+        if ($product->getInheritedField('name') !== $wisersellProduct['name']) {
+            $wisersellProduct['name'] = $product->getInheritedField('name');
+            $updateWisersell = true;
+        }
+
+        $updateField('packageWeight', 'setPackageWeight', 'weight');
+        $updateField('packageDimension1', 'setPackageDimension1', 'width');
+        $updateField('packageDimension2', 'setPackageDimension2', 'length');
+        $updateField('packageDimension3', 'setPackageDimension3', 'height');
+
+        if ($product->getVariationSize() !== $wisersellProduct['extradata']['Size']) {
+            $wisersellProduct['extradata']['Size'] = $product->getVariationSize();
+            $updateWisersell = true;
+        }
+        if ($product->getVariationColor() !== $wisersellProduct['extradata']['Color']) {
+            $wisersellProduct['extradata']['Color'] = $product->getVariationColor();
+            $updateWisersell = true;
+        }
+        if ($updateWisersell) {
+            echo "Updating Wisersell... ";
+            $this->request(self::$apiUrl['product'], 'PUT', "/{$id}", $wisersellProduct);
+        }
+        if ($updatePim) {
+            echo "Updating PIM... ";
+            $product->save();
+        }
+    }
+
     protected function syncProducts($forceDownload = false)
     {
         $this->syncCategories();
         $this->loadWisersellProducts($forceDownload);
         echo "Syncing Products...\n";
-
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
@@ -163,13 +209,8 @@ class WisersellCommand extends AbstractCommand
                 }
                 echo "Processing {$product->getIwasku()}... ";
                 if ($id = $this->searchIwaskuInWisersellProducts($product->getIwasku())) {
-                    echo "Found in Wisersell... ";
-                    if ($id != $product->getWisersellId()) {
-                        $product->setWisersellId($id);
-                        $product->setWisersellJson(json_encode($this->wisersellProducts[$id]));
-                        $product->save();
-                        echo "Updated PIM... ";
-                    }
+                    echo "Found in Wisersell, comparing... ";
+                    $this->compareUpdateWisersellProduct($id, $product);
                     unset($this->wisersellProducts[$id]);
                     echo "Done\n";
                     continue;
@@ -196,7 +237,7 @@ class WisersellCommand extends AbstractCommand
             $product = new Product();
             $product->setPublished(false);
             $product->setParent(Product::getById(242819)); // Wisersell Error Product!!!!
-            $product->setKey($wisersellProduct['name']);
+            $product->setKey($wisersellProduct['id']);
             $product->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
             $product->setWisersellJson(json_encode($wisersellProduct));
             $product->setWisersellId($wisersellProduct['id']);
