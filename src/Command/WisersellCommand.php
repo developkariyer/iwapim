@@ -70,11 +70,11 @@ class WisersellCommand extends AbstractCommand
     protected function syncStores()
     {
         $response = $this->request('store', 'GET', '');
-        $stores = $response->toArray();
-        foreach ($stores as $store) {
+        foreach ($response->toArray() as $store) {
+            echo "Processing {$store['name']} {$store['id']}... ";
             switch ($store['source']['name'] ?? '') {
                 case 'Etsy':
-                    $marketplace = Marketplace::findByField('shopId', $store['id']);
+                    $marketplace = Marketplace::getByShopId('shopId', $store['id'] );
                     if ($marketplace instanceof Marketplace) {
                         $marketplace->setWisersellStoreId($store['id']);
                         $marketplace->save();
