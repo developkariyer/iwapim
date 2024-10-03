@@ -25,6 +25,7 @@ use Exception;
 class WisersellCommand extends AbstractCommand
 {
     private $wisersellListings = [];
+    protected $wisersellProducts = [];
     private $iwapimListings = [];
     private static $apiServer = 'https://dev2.wisersell.com/restapi/';
     private static $apiUrl = [
@@ -33,6 +34,7 @@ class WisersellCommand extends AbstractCommand
         'product'=> 'product',
     ];
     private $httpClient = null;
+    protected $categoryList = [];
 
     public function __construct()
     {
@@ -46,22 +48,171 @@ class WisersellCommand extends AbstractCommand
         $this
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
-            ->addOption('control', null, InputOption::VALUE_NONE, 'Control wisersell product')
             ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('category')) {
-            $this->addCategoryByIwapim();
+            $this->syncCategories();
         }
         if($input->getOption('product')){
-            $this->addProductByIwapim();
-        }
-        if($input->getOption('control')){
-            $this->controlWisersellProduct();
+            $this->syncProducts();
         }
         return Command::SUCCESS;
+    }
+
+    protected function syncCategories()
+    {
+        $wisersellCategories = $this->getWisersellCategories();
+        $pimCategories = $this->getPimCategories();
+        foreach ($wisersellCategories as $wisersellCategory) {
+            if (isset($pimCategories[$wisersellCategory['name']])) {
+                $pimCategory = $pimCategories[$wisersellCategory['name']];
+                if ($pimCategory->getWisersellCategoryId() != $wisersellCategory['id']) {
+                    $pimCategory->setWisersellCategoryId($wisersellCategory['id']);
+                    $pimCategory->save();
+                }
+                unset($pimCategories[$wisersellCategory['name']]);
+                continue;
+            } 
+            $category = new Category();
+            $category->setKey($wisersellCategory['name']);
+            $category->setCategory($wisersellCategory['name']);
+            $category->setWisersellCategoryId($wisersellCategory['id']);
+            $category->save();
+        }
+        foreach ($pimCategories as $pimCategory) {
+            $response = $this->addCategoryToWisersell($pimCategory->getCategory());
+            if (isset($response['id'])) {
+                $pimCategory->setWisersellCategoryId($response['id']);
+                $pimCategory->save();
+            }
+        }
+    }
+
+    protected function loadWisersellProducts()
+    {
+        $this->wisersellProducts = json_decode(Utility::getCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
+        if (!empty($this->wisersellProducts)) {
+            return;
+        }
+        $wisersellProducts = [];
+        $pageSize = 100;
+        do {
+            $page = 0;
+            $response = $this->getWisersellProduct([
+                "page" => $page,
+                "pageSize" => $pageSize
+            ]);
+            $wisersellProducts = array_merge($wisersellProducts, $response);
+            $page++;
+        } while (count($response) == $pageSize);
+        $this->wisersellProducts = [];
+        foreach ($wisersellProducts as $product) {
+            $this->wisersellProducts[$product['id']] = $product;
+        }
+        Utility::setCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp', json_encode($this->wisersellProducts));
+    }
+
+    protected function searchIwaskuInWisersellProducts($iwasku) {
+        foreach ($this->wisersellProducts as $product) {
+            if ($product['code'] === $iwasku) {
+                return $product['id'];
+            }
+        }
+        return null;
+    }
+
+    protected function syncProducts()
+    {
+        $this->syncCategories();
+        $this->loadWisersellProducts();
+
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != '' AND (wisersellId IS NULL OR wisersellId = '')");
+        $pageSize = 100;
+        $offset = 0;
+        $productBucket = [];
+        $subProductBucket = [];
+        while (true) {
+            $listingObject->setLimit($pageSize);
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                if ($product->level() != 1) {
+                    continue;
+                }
+                if ($id = $this->searchIwaskuInWisersellProducts($product->getIwasku())) {
+                    if ($id != $product->getWisersellId()) {
+                        $product->setWisersellId($id);
+                        $product->setWisersellJson(json_encode($this->wisersellProducts[$id]));
+                        $product->save();
+                    }
+                    unset($this->wisersellProducts[$id]);
+                    continue;
+                }
+                if (count($product->getBundleProducts())) {
+                    $subProductBucket[] = $product;
+                    continue;
+                }
+                $productBucket[$product->getIwasku()] = $product;
+                if (count($productBucket) >= 100) {
+                    $this->addProductBucketToWisersell($productBucket);
+                    $productBucket = [];
+                }
+            }
+            echo "\nProcessed {$offset} ";
+        }
+        if (!empty($productBucket)) {
+            $this->addProductBucketToWisersell($productBucket);
+        }
+        foreach ($this->wisersellProducts as $wisersellProduct) {
+            $product = new Product();
+            $product->setPublished(false);
+            $product->setParent(242819); // Wisersell Error Product!!!!
+            $product->setKey($wisersellProduct['name']);
+            $product->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
+            $product->setWisersellJson(json_encode($wisersellProduct));
+            $product->setWisersellId($wisersellProduct['id']);
+            $product->save();
+        }
+    }
+
+    protected function addProductBucketToWisersell($productBucket)
+    {
+        $this->getPimCategories();
+        $productData = [];
+        foreach ($productBucket as $product) {
+            $category = $this->categoryList[$product->getProductCategory()] ?? $this->categoryList['Diğer'];
+            $productData[] = [
+                "name" => $product->getName(),
+                "code" => $product->getIwasku(),
+                "categoryId" => $category->getWisersellCategoryId(),
+                "weight" => $product->getInheritedField("packageWeight"),
+                "width" => $product->getInheritedField("packageDimension1"),
+                "length" => $product->getInheritedField("packageDimension2"),
+                "height" => $product->getInheritedField("packageDimension3"),
+                "extradata" => [
+                    "Size" => $product->getVariationSize(),
+                    "Color" => $product->getVariationColor()
+                ],
+                "subproducts" => []
+            ];
+        }
+        $result = $this->addProduct($productData);
+        foreach ($result as $response) {
+            if (isset($response['id']) && isset($productBucket[$response['code']])) {
+                $productBucket[$response['code']]->setWisersellId($response['id']);
+                $productBucket[$response['code']]->setWisersellJson(json_encode($response));
+                $productBucket[$response['code']]->save();
+            }
+        }
     }
 
     protected function prepareToken()
@@ -69,7 +220,7 @@ class WisersellCommand extends AbstractCommand
         $token = $this->getAccessToken();
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, static::$apiServer, [
             'headers' => [
-                'Authorization' => 'Bearer ' . $token,
+                'Authorization' => "Bearer $token",
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ],
@@ -114,39 +265,6 @@ class WisersellCommand extends AbstractCommand
         return $result['token'];
     }
 
-    protected function request($apiEndPoint, $type, $parameter, $json = [])
-    {
-        $response = $this->httpClient->request($type, $apiEndPoint . $parameter,['json' => $json]);
-        $statusCode = $response->getStatusCode();
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
-            return null;
-        }
-        echo "{$apiEndPoint}{$parameter} ";
-        return $response;
-    }
-
-    protected function productSearch($data)
-    {
-        $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
-        return $result->toArray();
-    }
-
-    protected function getCategories()
-    {
-        $result = $this->request(self::$apiUrl['category'], 'GET', '');
-        return $result->toArray();
-    }
-
-    protected function addCategory($categories)
-    {
-        $data = array_map(function($category) {
-            return ["name" => $category];
-        }, $categories);
-        $result = $this->request(self::$apiUrl['category'], 'POST', '', $data);
-        return $result->toArray();
-    }
-
     protected function addProduct($data)
     {
         print_r($data);
@@ -154,233 +272,46 @@ class WisersellCommand extends AbstractCommand
         return $result->toArray();
     }
 
-    protected function productControl($key)
+    protected function request($apiEndPoint, $type, $parameter, $json = [])
     {
-        $searchData = [
-            "code"=>$key,
-            "page"=> 0,
-            "pageSize"=> 10,
-        ];
-        $response = $this->productSearch($searchData);
+        $this->prepareToken();
+        $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to {$type} {$apiEndPoint}{$parameter}:".$response->getContent()."\n";
+            return null;
+        }
+        echo "{$apiEndPoint}{$parameter} ";
+        usleep(500000);
         return $response;
     }
 
-    protected function categoryControl($data)
+    protected function getPimCategories()
     {
-        $apiCategories = $this->getCategories();
-        $apiCategoryMap = [];
-        foreach ($apiCategories as $apiCategory) {
-            $apiCategoryMap[$apiCategory["name"]] = $apiCategory["id"];
-        }
-        $listingObject = new Category\Listing();
-        $categories = $listingObject->load(); 
-        $pimcoreCategoryMap = [];
-        foreach ($categories as $pimcoreCategory) {
-            $pimcoreCategoryMap[$pimcoreCategory->getCategory()] = $pimcoreCategory;
-        }
-        $newCategories = [];
-        foreach ($data as $categoryName) {
-            if (isset($apiCategoryMap[$categoryName])) {
-                $categoryId = $apiCategoryMap[$categoryName];
-                if (isset($pimcoreCategoryMap[$categoryName])) {
-                    $pimcoreCategory = $pimcoreCategoryMap[$categoryName];
-                    $pimcoreCategory->setWisersellCategoryId($categoryId);
-                    $pimcoreCategory->save();
-                    echo "Category updated: " . $categoryName . "\n";
-                }
-            } else {
-                echo "New Category Detected: $categoryName\n";
-                $newCategories[] = $categoryName;
-            }
-        }
-        return $newCategories;
-    }
-
-    protected function addCategoryByIwapim()
-    {
-        $this->prepareToken();
         $listingObject = new Category\Listing();
         $categories = $listingObject->load();
-        $data = [];
+        $this->categoryList = [];
         foreach ($categories as $category) {
-            $data[] = $category->getCategory();
+            $this->categoryList[$category->getCategory()] = $category;
         }
-        $newCategories = $this->categoryControl($data);    
-        sleep(3);
-        if(!empty($newCategories)){
-            $result = $this->addCategory($newCategories);
-            foreach ($result as $wisersellCategory) {
-                foreach ($categories as $category) {
-                    if ($category->getCategory() === $wisersellCategory['name']) {
-                        $category->setWisersellCategoryId($wisersellCategory['id']);
-                        $category->save();
-                        echo "Category Saved: " . $category->getCategory() . "\n";
-                        break;
-                    }
-                }
-            }
-        }    
+        return $this->categoryList;
     }
 
-    protected function addProductByIwapim()
+    protected function getWisersellCategories()
     {
-        $this->prepareToken();
-        $listingCategories = new Category\Listing();
-        $listingCategories->setUnpublished(false);
-        $categories = $listingCategories->load();
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ? AND (wisersellId IS NULL OR wisersellId = ?)", ['', '']);
-        $pageSize = 100;
-        $offset = 0;
-        while (true) {
-            $listingObject->setLimit($pageSize);
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
-            echo "\nProcessed {$offset} ";
-            $offset += $pageSize;
-            foreach ($products as $product) {
-                if ($product->level()!=1) continue;
-                $iwasku = $product->getInheritedField("iwasku");
-                sleep(3);
-                $response = $this->productControl($iwasku);
-                if($response['count']===0) {
-                    $productName = $product->getInheritedField("name"); 
-                    $categoryName = $product->getInheritedField("productCategory");
-                    $categoryId = null;
-                    foreach($categories as $category){
-                        if($category->getCategory() == $categoryName){
-                            $categoryId = $category->getWisersellCategoryId();
-                            break;
-                        }
-                    }
-                    if($categoryId==null) continue;
-                    $variationSize = $product->getInheritedField("variationSize") ?? null;
-                    $variationColor = $product->getInheritedField("variationColor") ?? null;
-                    $width = $product->getInheritedField("packageDimension1") ?? null;
-                    $length = $product->getInheritedField("packageDimension2") ?? null;
-                    $height = $product->getInheritedField("packageDimension3") ?? null;
-                    $weight = $product->getInheritedField("packageWeight") ?? null;
-                    $extraData = [                        
-                        "variationSize" => $variationSize,
-                        "variationColor" => $variationColor
-                    ];
-                    $productData = [
-                        [
-                            "name" => $productName,
-                            "code" => $iwasku,
-                            "categoryId" => $categoryId,
-                            "weight" => $weight,
-                            "width" => $width,
-                            "length" => $length,
-                            "height" => $height,
-                            "extradata"=> $extraData,
-                            "subproducts" => []
-                        ]
-                    ];
-                    sleep(2);
-                    $result = $this->addProduct($productData);
-                    if(isset($result[0]['id'])){
-                        $wisersellId = $result[0]['id'];
-                        try {
-                            $product->setWisersellId($wisersellId); 
-                            $product->setWisersellJson(json_encode($result));
-                            $product->save();
-                            echo "WisersellId updated successfully: " . $wisersellId;
-                        } catch (Exception $e) {
-                            echo "Error occurred while updating WisersellId: " . $e->getMessage();
-                        }
-                        echo "New Product added successfully\n";
-                    } else {
-                        echo "'id' field not found or is empty in the API response.";
-                    }
-                }
-                else {
-                    echo "\n\n\n!!!!!!!!!!!!!!UPDATED PRODUCT!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
-                    $wisersellId = $response['rows'][0]['id'];
-                    try {
-                        $product->setWisersellId($wisersellId); 
-                        $product->setWisersellJson(json_encode($response));
-                        $product->save();
-                        echo "WisersellId updated successfully: " . $wisersellId;
-                    } catch (Exception $e) {
-                        echo "Error occurred while updating WisersellId: " . $e->getMessage();
-                    }
-                }
-            }
-        }
+        $result = $this->request(self::$apiUrl['category'], 'GET', '');
+        return $result->toArray(); // array of ['id', 'name']
     }
 
-    protected function downloadWisersellProduct($forceDownload = false)
+    protected function addCategoryToWisersell($category)
     {
-        $this->prepareToken();
-        $filenamejson =  PIMCORE_PROJECT_ROOT. '/tmp/wisersell.json';
-        if (!$forceDownload && file_exists($filenamejson) && filemtime($filenamejson) > time() - 86400) {
-            $contentJson = file_get_contents($filenamejson);
-            $this->wisersellListings = json_decode($contentJson, true);          
-            echo "Using cached data ";
-        }
-        else {
-            $this->wisersellListings = [];
-            $page = 0;
-            $pageSize = 100;
-            $searchData = [
-                "page" => $page,
-                "pageSize" => $pageSize
-            ];
-            $response = $this->productSearch($searchData);
-            sleep(2);
-            $this->wisersellListings = $response['rows'];
-            while ($response['count'] > 0) {
-                $page++;
-                $searchData = [
-                    "page" => $page,
-                    "pageSize" => $pageSize
-                ];
-                $response = $this->productSearch($searchData);
-                sleep(2);
-                $this->wisersellListings = array_merge($this->wisersellListings, $response['rows']);
-                if(count($response['rows'])<$pageSize)
-                    break;
-            }  
-        }
-        $jsonListings = json_encode($this->wisersellListings);
-        file_put_contents($filenamejson, $jsonListings);
-        echo "count listings: ".count($this->wisersellListings)."\n";
+        $result = $this->request(self::$apiUrl['category'], 'POST', '', ['name' => $category]);
+        return $result->toArray();
     }
 
-    protected function controlWisersellProduct()
+    protected function getWisersellProduct($data)
     {
-        $this->downloadWisersellProduct();
-        $iwaskuControlArray = [];
-        foreach ($this->wisersellListings as $listing) {
-            echo "WID: {$listing['id']} => IWASKU: {$listing['code']}\n";
-            if (empty($listing['code'])) {
-                echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun code icermiyor.\n";
-                continue;
-            }
-            if (isset($iwaskuControlArray[$listing['code']])) {
-                echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun aynı zamanda {$iwaskuControlArray[$listing['code']]} code tekrar ediyor.\n";
-                continue;
-            }
-            $iwaskuControlArray[$listing['code']] = $listing['id'];
-            $product = Product::findByField('iwasku', $listing['code']);
-            if (empty($product)) {
-                echo "Hata: '{$listing['id']}' Wisersel Id numarasina sahip urun pimde yok.\n";
-                continue;
-            }
-            echo "WID: {$listing['id']} => IWASKU: {$listing['code']} => Stored WID: {$product->getWisersellId()}\n";
-            if ($product->getWisersellId() == $listing['id']) {
-                continue;
-            }
-            $product->setWisersellId($listing['id']);
-            $product->setWisersellJson(json_encode($listing));
-            $product->save();
-            echo "WisersellId updated successfully: " . $listing['id']."\n";
-        }
+        $result = $this->request(self::$apiUrl['productSearch'], 'POST', '', $data);
+        return $result->toArray();
     }
-    
+
 }
