@@ -180,7 +180,7 @@ class WisersellCommand extends AbstractCommand
                     continue;
                 }
                 $productBucket[$product->getIwasku()] = $product;
-                echo "Added to productBucket\n";
+                echo "Added to productBucket (".count($productBucket).")\n";
                 if (count($productBucket) >= 100) {
                     $this->addProductBucketToWisersell($productBucket);
                     $productBucket = [];
