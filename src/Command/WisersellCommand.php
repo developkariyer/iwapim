@@ -44,6 +44,7 @@ class WisersellCommand extends AbstractCommand
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell products')
+            ->addOption('list-stores', null, InputOption::VALUE_NONE, 'List all stores')
             ;
     }
 
@@ -51,13 +52,28 @@ class WisersellCommand extends AbstractCommand
     {
         $this->httpClient = HttpClient::create();
         $forceDownload = $input->getOption('download', false);
+
         if ($input->getOption('category')) {
             $this->syncCategories();
         }
         if($input->getOption('product')){
             $this->syncProducts($forceDownload);
         }
+        if($input->getOption('list-stores')){
+            $this->listStores();
+        }
         return Command::SUCCESS;
+    }
+
+    protected function listStores()
+    {
+        $this->prepareToken();
+        $response = $this->request('store', 'GET', '');
+        $stores = $response->toArray();
+        print_r($stores);
+        foreach ($stores as $store) {
+            echo "Store: {$store['name']} ({$store['id']})\n";
+        }
     }
 
     protected function syncCategories()
