@@ -181,14 +181,14 @@ class WisersellCommand extends AbstractCommand
                 $productBucket[$product->getIwasku()] = $product;
                 echo "Added to productBucket\n";
                 if (count($productBucket) >= 50) {
-                    $this->addProductBucketToWisersell($productBucket);
+                    //$this->addProductBucketToWisersell($productBucket);
                     $productBucket = [];
                 }
             }
             echo "\nProcessed {$offset} ";
         }
         if (!empty($productBucket)) {
-            $this->addProductBucketToWisersell($productBucket);
+            //$this->addProductBucketToWisersell($productBucket);
         }
         foreach ($this->wisersellProducts as $wisersellProduct) {
             echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM... ";
