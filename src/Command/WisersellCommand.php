@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\Folder;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
@@ -245,8 +246,8 @@ class WisersellCommand extends AbstractCommand
             $product = Product::FindByField('wisersellId', $wisersellProduct['id']);
             if (!$product instanceof Product) {
                 $product = new Product();
-                $product->setParent(Product::getById(242819)); // Wisersell Error Product!!!!
             }
+            $product->setParent(Folder::getById(242818)); // Wisersell Error Product!!!!
             $product->setPublished(false);
             $product->setKey($wisersellProduct['id']);
             $product->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
