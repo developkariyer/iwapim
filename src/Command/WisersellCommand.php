@@ -230,22 +230,26 @@ class WisersellCommand extends AbstractCommand
                     $productBucket = [];
                 }
             }
-            echo "\nProcessed {$offset} ";
+            echo "\nProcessed {$offset}\n";
         }
         if (!empty($productBucket)) {
             $this->addProductBucketToWisersell($productBucket);
         }
         foreach ($this->wisersellProducts as $wisersellProduct) {
-            echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM... ";
-            $product = new Product();
+            echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM ERROR... ";
+            $product = Product::getByField('wisersellId', $wisersellProduct['id']);
+            if (!$product instanceof Product) {
+                $product = new Product();
+                $product->setParent(Product::getById(242819)); // Wisersell Error Product!!!!
+            }
             $product->setPublished(false);
-            $product->setParent(Product::getById(242819)); // Wisersell Error Product!!!!
             $product->setKey($wisersellProduct['id']);
             $product->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
             $product->setWisersellJson(json_encode($wisersellProduct));
             $product->setWisersellId($wisersellProduct['id']);
             $product->save();
-            echo "Done\n";
+            echo $product->getId();
+            echo " Done\n";
         }
     }
 
