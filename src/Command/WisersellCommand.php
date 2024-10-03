@@ -108,8 +108,8 @@ class WisersellCommand extends AbstractCommand
         }
         $wisersellProducts = [];
         $pageSize = 100;
+        $page = 0;
         do {
-            $page = 0;
             $response = $this->getWisersellProduct([
                 "page" => $page,
                 "pageSize" => $pageSize
