@@ -35,6 +35,7 @@ class WisersellCommand extends AbstractCommand
     ];
     private $httpClient = null;
     protected $categoryList = [];
+    protected $wisersellToken = null;
 
     protected function configure() 
     {
@@ -235,7 +236,11 @@ class WisersellCommand extends AbstractCommand
 
     protected function prepareToken()
     {
+        if (!empty($this->wisersellToken) && Utility::checkJwtTokenValidity($this->wisersellToken)) {
+            return;
+        }
         $token = $this->getAccessToken();
+        $this->wisersellToken = $token;
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, static::$apiServer, [
             'headers' => [
                 'Authorization' => "Bearer $token",
@@ -299,7 +304,7 @@ class WisersellCommand extends AbstractCommand
             return null;
         }
         echo "{$apiEndPoint}{$parameter} ";
-        usleep(500000);
+        usleep(2000000);
         return $response;
     }
 
