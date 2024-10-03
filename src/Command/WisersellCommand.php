@@ -87,8 +87,8 @@ class WisersellCommand extends AbstractCommand
         foreach ($pimCategories as $pimCategory) {
             echo "Adding to {$pimCategory->getCategory()} to Wisersell... ";
             $response = $this->addCategoryToWisersell($pimCategory->getCategory());
-            if (isset($response['id'])) {
-                $pimCategory->setWisersellCategoryId($response['id']);
+            if (isset($response[0]['id'])) {
+                $pimCategory->setWisersellCategoryId($response[0]['id']);
                 $pimCategory->save();
             } else {
                 echo "Failed to add category to Wisersell: " . json_encode($response) . "\n";
@@ -328,7 +328,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function addCategoryToWisersell($category)
     {
-        $result = $this->request(self::$apiUrl['category'], 'POST', '', ['name' => $category]);
+        $result = $this->request(self::$apiUrl['category'], 'POST', '', [['name' => $category]]);
         return $result->toArray();
     }
 
