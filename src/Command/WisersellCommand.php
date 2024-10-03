@@ -64,30 +64,40 @@ class WisersellCommand extends AbstractCommand
 
     protected function syncCategories()
     {
+        echo "Syncing Categories...\n";
         $wisersellCategories = $this->getWisersellCategories();
         $pimCategories = $this->getPimCategories();
         foreach ($wisersellCategories as $wisersellCategory) {
+            echo "Processing {$wisersellCategory['name']}... ";
             if (isset($pimCategories[$wisersellCategory['name']])) {
                 $pimCategory = $pimCategories[$wisersellCategory['name']];
                 if ($pimCategory->getWisersellCategoryId() != $wisersellCategory['id']) {
                     $pimCategory->setWisersellCategoryId($wisersellCategory['id']);
+                    echo "Updated PIM... ";
                     $pimCategory->save();
                 }
                 unset($pimCategories[$wisersellCategory['name']]);
+                echo "Done\n";
                 continue;
             } 
+            echo "Adding to PIM... ";
             $category = new Category();
             $category->setKey($wisersellCategory['name']);
             $category->setCategory($wisersellCategory['name']);
             $category->setWisersellCategoryId($wisersellCategory['id']);
             $category->save();
+            echo "Done\n";
         }
         foreach ($pimCategories as $pimCategory) {
+            echo "Adding to {$pimCategory->getCategory()} to Wisersell... ";
             $response = $this->addCategoryToWisersell($pimCategory->getCategory());
             if (isset($response['id'])) {
                 $pimCategory->setWisersellCategoryId($response['id']);
                 $pimCategory->save();
+            } else {
+                echo "Failed to add category to Wisersell: " . json_encode($response) . "\n";
             }
+            echo "Done\n";
         }
     }
 
@@ -95,6 +105,7 @@ class WisersellCommand extends AbstractCommand
     {
         $this->wisersellProducts = json_decode(Utility::getCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
         if (!empty($this->wisersellProducts)) {
+            echo "Loaded Wisersell Products from cache\n";
             return;
         }
         $wisersellProducts = [];
@@ -113,6 +124,7 @@ class WisersellCommand extends AbstractCommand
             $this->wisersellProducts[$product['id']] = $product;
         }
         Utility::setCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp', json_encode($this->wisersellProducts));
+        echo "Loaded Wisersell Products\n";
     }
 
     protected function searchIwaskuInWisersellProducts($iwasku) {
@@ -128,6 +140,7 @@ class WisersellCommand extends AbstractCommand
     {
         $this->syncCategories();
         $this->loadWisersellProducts();
+        echo "Syncing Products...\n";
 
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
@@ -148,20 +161,26 @@ class WisersellCommand extends AbstractCommand
                 if ($product->level() != 1) {
                     continue;
                 }
+                echo "Processing {$product->getIwasku()}... ";
                 if ($id = $this->searchIwaskuInWisersellProducts($product->getIwasku())) {
+                    echo "Found in Wisersell... ";
                     if ($id != $product->getWisersellId()) {
                         $product->setWisersellId($id);
                         $product->setWisersellJson(json_encode($this->wisersellProducts[$id]));
                         $product->save();
+                        echo "Updated PIM... ";
                     }
                     unset($this->wisersellProducts[$id]);
+                    echo "Done\n";
                     continue;
                 }
                 if (count($product->getBundleProducts())) {
                     $subProductBucket[] = $product;
+                    echo "Added to subProductBucket\n";
                     continue;
                 }
                 $productBucket[$product->getIwasku()] = $product;
+                echo "Added to productBucket\n";
                 if (count($productBucket) >= 100) {
                     $this->addProductBucketToWisersell($productBucket);
                     $productBucket = [];
@@ -173,6 +192,7 @@ class WisersellCommand extends AbstractCommand
             $this->addProductBucketToWisersell($productBucket);
         }
         foreach ($this->wisersellProducts as $wisersellProduct) {
+            echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM... ";
             $product = new Product();
             $product->setPublished(false);
             $product->setParent(242819); // Wisersell Error Product!!!!
@@ -181,6 +201,7 @@ class WisersellCommand extends AbstractCommand
             $product->setWisersellJson(json_encode($wisersellProduct));
             $product->setWisersellId($wisersellProduct['id']);
             $product->save();
+            echo "Done\n";
         }
     }
 
@@ -213,6 +234,7 @@ class WisersellCommand extends AbstractCommand
                 $productBucket[$response['code']]->save();
             }
         }
+        echo "Added ".count($result)." products to Wisersell\n";
     }
 
     protected function prepareToken()
