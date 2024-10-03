@@ -195,7 +195,7 @@ class WisersellCommand extends AbstractCommand
             echo "Adding Wisersell Product {$wisersellProduct['name']} to PIM... ";
             $product = new Product();
             $product->setPublished(false);
-            $product->setParent(242819); // Wisersell Error Product!!!!
+            $product->setParent(Product::getById(242819)); // Wisersell Error Product!!!!
             $product->setKey($wisersellProduct['name']);
             $product->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
             $product->setWisersellJson(json_encode($wisersellProduct));
