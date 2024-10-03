@@ -165,11 +165,14 @@ class WisersellCommand extends AbstractCommand
         $updateField('packageDimension2', 'setPackageDimension2', 'length');
         $updateField('packageDimension3', 'setPackageDimension3', 'height');
 
-        if ($product->getVariationSize() !== $wisersellProduct['extradata']['Size']) {
+        $size = $wisersellProduct['extradata']['Size'] ?? '';
+        $color = $wisersellProduct['extradata']['Color'] ?? '';
+
+        if ($product->getVariationSize() !== $size) {
             $wisersellProduct['extradata']['Size'] = $product->getVariationSize();
             $updateWisersell = true;
         }
-        if ($product->getVariationColor() !== $wisersellProduct['extradata']['Color']) {
+        if ($product->getVariationColor() !== $color) {
             $wisersellProduct['extradata']['Color'] = $product->getVariationColor();
             $updateWisersell = true;
         }
