@@ -117,13 +117,13 @@ class WisersellCommand extends AbstractCommand
             $wisersellProducts = array_merge($wisersellProducts, $response['rows']);
             $page++;
             echo "Loaded ".($page*$pageSize)." products from Wisersell\n";
-        } while (count($response) == $pageSize);
+        } while (count($response['rows']) == $pageSize);
         $this->wisersellProducts = [];
         foreach ($wisersellProducts as $product) {
             $this->wisersellProducts[$product['id']] = $product;
         }
         Utility::setCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp', json_encode($this->wisersellProducts));
-        echo "Loaded ".count($this->wisersellProducts)." from Wisersell\n";
+        echo "Loaded ".count($this->wisersellProducts)." products from Wisersell\n";
         sleep(1);
     }
 
