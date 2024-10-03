@@ -72,9 +72,9 @@ class WisersellCommand extends AbstractCommand
         $response = $this->request('store', 'GET', '');
         foreach ($response->toArray() as $store) {
             echo "Processing {$store['name']} {$store['id']}... ";
-            switch ($store['source']['name'] ?? '') {
+            switch ($store['source']['name']) {
                 case 'Etsy':
-                    $marketplace = Marketplace::getByShopId('shopId', $store['id'] );
+                    $marketplace = Marketplace::getByShopId($store['id'] );
                     if ($marketplace instanceof Marketplace) {
                         $marketplace->setWisersellStoreId($store['id']);
                         $marketplace->save();
