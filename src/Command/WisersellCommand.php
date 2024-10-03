@@ -113,6 +113,7 @@ class WisersellCommand extends AbstractCommand
             ]);
             $wisersellProducts = array_merge($wisersellProducts, $response);
             $page++;
+            echo "Loaded {$page} products from Wisersell\n";
         } while (count($response) == $pageSize);
         $this->wisersellProducts = [];
         foreach ($wisersellProducts as $product) {
