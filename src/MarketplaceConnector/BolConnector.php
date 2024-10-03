@@ -18,6 +18,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         'productsUrl' => "/retailer/products/",
         'catalogProductsUrl' => "/retailer/content/catalog-products/",
         'commissionUrl' => "/retailer/commission/",
+        'orders' => 'https://api.bol.com/retailer/orders/'
     ];
     public static $marketplaceType = 'Bol.com';
 
@@ -249,6 +250,36 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        $db = \Pimcore\Db::get();
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m-%d')) FROM iwa_marketplace_orders WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+        $page = 1;
+        do {
+            $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
+            $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
+            $orders = $data['orders'];
+            try {
+                $db->beginTransaction();
+                foreach ($orders as $order) {
+                    $db->executeStatement(
+                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        [
+                            $this->marketplace->getId(),
+                            $order['orderId'],
+                            json_encode($order)
+                        ]
+                    );
+                }
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            $page++;
+            sleep(2);
+        } while(count($orders) == 50);
     }
 
     public function downloadInventory()
