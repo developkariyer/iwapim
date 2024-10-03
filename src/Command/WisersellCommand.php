@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
+use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
@@ -152,7 +153,6 @@ class WisersellCommand extends AbstractCommand
         }
         Utility::setCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp', json_encode($this->wisersellProducts));
         echo "Loaded ".count($this->wisersellProducts)." products from Wisersell\n";
-        sleep(1);
     }
 
     protected function searchIwaskuInWisersellProducts($iwasku) {
@@ -324,7 +324,6 @@ class WisersellCommand extends AbstractCommand
             }
         }
         echo "Added ".count($result)." products to Wisersell\n";
-        sleep(1);
     }
 
     protected function prepareToken()
@@ -375,7 +374,6 @@ class WisersellCommand extends AbstractCommand
         if (empty($result['token'])) {
             throw new Exception("Failed to get bearer token. Response: " . json_encode($result));
         }
-        echo "Bearer Token: " . $result['token'] . "\n";
         Utility::setCustomCache('wisersell_access_token.json', PIMCORE_PROJECT_ROOT . '/tmp', json_encode($result));
         echo "New token saved to file.\n";
         return $result['token'];
