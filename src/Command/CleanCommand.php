@@ -38,7 +38,8 @@ class CleanCommand extends AbstractCommand
             ->addOption('translate-ai', null, InputOption::VALUE_NONE, 'If set, AI translations will be processed.')
             ->addOption('unpublish', null, InputOption::VALUE_NONE, 'If set, variantProducts not updated in last 3 days will be unpublished.')
             ->addOption('bundle-fix', null, InputOption::VALUE_NONE, 'If set, bundle products will be fixed.')
-            ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
+            ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.')
+->addOption('nonlisted', null, InputOption::VALUE_NONE, 'If set, nonlisted products in Shopify marketplace will be unpublished.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
