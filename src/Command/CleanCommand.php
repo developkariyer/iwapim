@@ -127,10 +127,11 @@ class CleanCommand extends AbstractCommand
         $index = 0;
         foreach ($listingObject as $variant) {
             $index++;
-            echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
-            if ($variant->getMarketplace()->getMarketplaceType()!=="Shopify") continue;
+            if ($variant->getMarketplace()->getMarketplaceType()==="Shopify") {
+           echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
             $variant->setPublished(false);
             $variant->save();
+} else echo $index;
         }
     }
 
