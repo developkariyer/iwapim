@@ -282,7 +282,8 @@ class WisersellCommand extends AbstractCommand
                 echo "New ";
                 $product = new Product();
             }
-            $product->setParent(Folder::getById(242818)); // Wisersell Error Product!!!!
+            $product->setParent(Utility::checkSetPath("WISERSELL ERROR",Utility::checkSetPath('Ürünler'))); // Wisersell Error Product!!!!
+            //$product->setParent(Folder::getById(242818)); // Wisersell Error Product!!!!
             $product->setPublished(false);
             $product->setKey($wisersellProduct['id']);
             $product->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
