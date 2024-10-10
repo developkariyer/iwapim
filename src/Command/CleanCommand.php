@@ -77,6 +77,9 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('bundle-fix')) {
             self::fixBundledProducts();
         }
+if ($input->getOption('nonlisted')) {
+        self::unpublishNonlisted();
+    }
         return Command::SUCCESS;
     }
 
