@@ -5,6 +5,7 @@ namespace App\Utils;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\Asset\Folder as AssetFolder;
 use Pimcore\Model\Asset\Listing as AssetListing;
+use App\Command\CacheImagesCommand;
 
 class Utility
 {
