@@ -38,8 +38,7 @@ class CleanCommand extends AbstractCommand
             ->addOption('translate-ai', null, InputOption::VALUE_NONE, 'If set, AI translations will be processed.')
             ->addOption('unpublish', null, InputOption::VALUE_NONE, 'If set, variantProducts not updated in last 3 days will be unpublished.')
             ->addOption('bundle-fix', null, InputOption::VALUE_NONE, 'If set, bundle products will be fixed.')
-            ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.')
-->addOption('nonlisted', null, InputOption::VALUE_NONE, 'If set, nonlisted products in Shopify marketplace will be unpublished.');
+            ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -77,9 +76,6 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('bundle-fix')) {
             self::fixBundledProducts();
         }
-if ($input->getOption('nonlisted')) {
-        self::unpublishNonlisted();
-    }
         return Command::SUCCESS;
     }
 
@@ -121,35 +117,11 @@ if ($input->getOption('nonlisted')) {
         }
     }
 
-private static function unpublishNonlisted()
-{
-    $listingObject = new VariantProduct\Listing();
-    $listingObject->setUnpublished(false);
-    $listingObject->load();
-    $now = new \DateTime();
-    $totalCount = $listingObject->getTotalCount();
-    $index = 0;
-
-    foreach ($listingObject as $variant) {
-        echo "Processing nonlisted: {$variant->getId()} ";
-        if ($variant->getMarketplace() && $variant->getMarketplace()->getMarketplaceType() === 'Shopify') {
-            echo "unpublishing";
-            $lastUpdated = $variant->getLastUpdated();
-            $interval = $now->diff($lastUpdated);
-            if ($interval->h > 36) {
-                $variant->setPublished(false);
-                $variant->save();
-            }
-        }
-        echo "\n";
-    }
-}
-
     private static function unpublishOlderVariantProducts()
     {
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 3 DAY");
+        $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 1 DAY");
         $listingObject->load();
         $totalCount = $listingObject->getTotalCount();
         $index = 0;
