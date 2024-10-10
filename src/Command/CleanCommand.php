@@ -121,6 +121,30 @@ if ($input->getOption('nonlisted')) {
         }
     }
 
+private static function unpublishNonlisted()
+{
+    $listingObject = new VariantProduct\Listing();
+    $listingObject->setUnpublished(false);
+    $listingObject->load();
+    $now = new \DateTime();
+    $totalCount = $listingObject->getTotalCount();
+    $index = 0;
+
+    foreach ($listingObject as $variant) {
+        echo "Processing nonlisted: {$variant->getId()} ";
+        if ($variant->getMarketplace() && $variant->getMarketplace()->getMarketplaceType() === 'Shopify') {
+            echo "unpublishing";
+            $lastUpdated = $variant->getLastUpdated();
+            $interval = $now->diff($lastUpdated);
+            if ($interval->h > 36) {
+                $variant->setPublished(false);
+                $variant->save();
+            }
+        }
+        echo "\n";
+    }
+}
+
     private static function unpublishOlderVariantProducts()
     {
         $listingObject = new VariantProduct\Listing();
