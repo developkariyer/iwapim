@@ -141,7 +141,7 @@ class WisersellCommand extends AbstractCommand
                         "productId" => $productId,
                         "storeProductId" => $storeProductId,
                         "variantCode" => $variantCode,
-                        "variantStr" => ""
+                        "variantStr" => $variantStr
                 ];
                 $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
                 print_r($response->getContent());
