@@ -72,6 +72,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function syncStores()
     {
+        $this->storeList = [];
         $response = $this->request('store', 'GET', '');
         foreach ($response->toArray() as $store) {
             echo "Processing {$store['name']} {$store['id']}... ";
@@ -84,7 +85,7 @@ class WisersellCommand extends AbstractCommand
             if ($marketplace instanceof Marketplace) {
                 $marketplace->setWisersellStoreId($store['id']);
                 $marketplace->save();
-                $storeList[] = $marketplace;
+                $this->storeList[] = $marketplace;
                 echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
             } else {
                 echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
