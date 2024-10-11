@@ -40,6 +40,7 @@ class WisersellCommand extends AbstractCommand
     private $httpClient = null;
     protected $categoryList = [];
     protected $wisersellToken = null;
+    protected $storeList = [];
 
     protected function configure() 
     {
@@ -83,6 +84,7 @@ class WisersellCommand extends AbstractCommand
             if ($marketplace instanceof Marketplace) {
                 $marketplace->setWisersellStoreId($store['id']);
                 $marketplace->save();
+                $storeList[] = $marketplace;
                 echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
             } else {
                 echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
@@ -92,20 +94,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function getMarketPlaces()
     {
-        $response = $this->request('store','GET','');
-        foreach ($response->toArray() as $store) {
-            $marketplace = match ($store['source']['name']) {
-                'Etsy' => Marketplace::findByField('wisersellStoreId', $store['id'] ),
-                'Amazon' => Marketplace::findByField('wisersellStoreId', $store['id'] ),
-                'Trendyol' => Marketplace::findByField('wisersellStoreId', $store['id'] ),
-                default => null
-            };
-            if ($marketplace instanceof Marketplace) {
-                echo "Marketplace {$store['source']['name']} {$store['id']} found in PIM\n";
-
-               
-            } 
-        }
+        
     }
 
     protected function syncCategories()
