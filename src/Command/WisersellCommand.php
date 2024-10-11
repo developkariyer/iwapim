@@ -127,23 +127,6 @@ class WisersellCommand extends AbstractCommand
                     $productId = $mainProduct->getWisersellId();
                     $shopId = $marketplace->getShopId();
                     $variantStr = $variantProduct->getTitle();
-                    $searchData = [
-                        "shopIds" =>[$shopId],
-                        "productIds" => [$productId]
-                    ];
-                    $response = $this->request(self::$apiUrl['listingSearch'], 'POST', $searchData);
-                    $control = false;
-                    if ($response->getStatusCode() === 200) {
-                        if ($control)
-                            continue;
-                        $listings = $response->toArray();
-                        foreach ($listings as $listing) {
-                            if ($listing['storeproductid'] === $storeProductId) {
-                                $control = true;
-                                break;
-                            }
-                        }
-                    }
                     $listingData = [
                         "shopId" => $shopId,
                         "productId" => $productId,
