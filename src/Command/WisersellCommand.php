@@ -146,7 +146,7 @@ class WisersellCommand extends AbstractCommand
                     ]
                 ];
                 $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
-                print_r($listingData);
+                print_r($response->getContent());
                 break;
             }
             break;
