@@ -100,7 +100,7 @@ class WisersellCommand extends AbstractCommand
         }
         
         foreach ($this->storeList as $marketplace) {
-            $variantProducts = $marketplace->getVariantProducts();
+            $variantProducts = $marketplace->getVariantProduct();
             if (!empty($variantProducts)) {
                 foreach ($variantProducts as $variantProduct) {
                     echo "Processing variant product: " . $variantProduct->getTitle();
