@@ -101,6 +101,7 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
+        $listingBucket = [];
         foreach ($this->storeList as $marketplace) {
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
@@ -123,6 +124,14 @@ class WisersellCommand extends AbstractCommand
                 }
                 //$shopId = $marketplace->getWisersellStoreId();
                 $shopId = $marketplace->getShopId();
+                $shopId = match ($marketplaceType) {
+                    'Etsy' => $marketplace->getShopId(),
+                    //'Amazon' => $marketplace->getMerchantId(),
+                    //'Trendyol' => $marketplace->getTrendyolSellerId(),
+                    //'Shopify' => $marketplace->getShopifyStoreId(),  
+                };
+
+
                 if (!$shopId) {
                     echo "Shop id not found for variant product: " .$id;
                     continue;
@@ -137,25 +146,34 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
-                $listingData[] = [
+                $listingData = [
                         "shopId" => $shopId,
                         "productId" => $productId,
                         "storeProductId" => $storeProductId,
                         "variantCode" => $variantCode,
-                        "variantStr" => ""
+                        "variantStr" => $variantStr
                 ];
-                $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
-                print_r($response->getContent());
-                $responseContent = $response->getContent();  
-                $responseArray = json_decode($responseContent, true); 
-                if ($response->getStatusCode() === 200) {
-                    $variantProduct->setWisersellVariantCode($responseArray['completed']['code']);
-                    $variantProduct->save();
-                    echo "Relation added for variant product: " .$id;
-                }
+                $listingBucket[] = $listingData;
+                if (count($listingBucket) >= 100) {
+                    $this->addListingBucketToWisersell($listingBucket);
+                    $listingBucket = [];
+                } 
                 break;
             }
             break;
+        }
+    }
+
+    protected function addListingBucketToWisersell($listingBucket)
+    {
+        $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
+        print_r($response->getContent());
+        $responseContent = $response->getContent();  
+        $responseArray = json_decode($responseContent, true); 
+        if ($response->getStatusCode() === 200) {
+            $variantProduct->setWisersellVariantCode($responseArray['completed']['code']);
+            $variantProduct->save();
+            echo "Relation added for variant product: " .$id;
         }
     }
 
