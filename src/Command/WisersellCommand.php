@@ -110,9 +110,7 @@ class WisersellCommand extends AbstractCommand
                     echo "Main product not found for variant product: " .$id;
                     continue;
                 }
-                print_r($mainProduct);
-                return;
-                /*$productId = $mainProduct->getWisersellId();
+                $productId = $mainProduct->getWisersellId();
                 $variantStr = $variantProduct->getTitle();
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => $variantProduct->getUniqueMarketplaceId(),
@@ -147,8 +145,9 @@ class WisersellCommand extends AbstractCommand
                     "variantStr" => $variantStr
                 ];
                 $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
-                return;*/
+                break;
             }
+            break;
         }
     }
 
