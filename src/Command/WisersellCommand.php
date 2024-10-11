@@ -105,6 +105,7 @@ class WisersellCommand extends AbstractCommand
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
                 $marketplaceType = $marketplace->getMarketPlaceType();
+
                 if ($marketplaceType === 'etsy') {
                     $storeProductId = $variantProduct->getUniqueMarketplaceId();
                     $parentJson = $variantProduct->getParentJson();
@@ -131,6 +132,8 @@ class WisersellCommand extends AbstractCommand
                     ];
                     $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
                 }
+              
+                
 
                 
             }
