@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
+use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Marketplace\Listing;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
@@ -91,7 +92,6 @@ class WisersellCommand extends AbstractCommand
 
     protected function getMarketPlaces()
     {
-        $marketplaces = [];
         $listingObject = new Marketplace\Listing();
         $listingObject->setUnpublished(false);
         $marketplaces = $listingObject->load();
