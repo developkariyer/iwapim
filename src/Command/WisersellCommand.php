@@ -149,7 +149,7 @@ class WisersellCommand extends AbstractCommand
                 $responseContent = $response->getContent();  
                 $responseArray = json_decode($responseContent, true); 
                 if ($response->getStatusCode() === 200) {
-                    $variantProduct->setWisersellVariantCode($responseArray['code']);
+                    $variantProduct->setWisersellVariantCode($responseArray['completed']['code']);
                     $variantProduct->save();
                     echo "Relation added for variant product: " .$id;
                 }
