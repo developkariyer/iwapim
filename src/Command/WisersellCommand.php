@@ -35,7 +35,9 @@ class WisersellCommand extends AbstractCommand
         'productSearch' => 'product/search',
         'category' => 'category',
         'product'=> 'product',
-        'store' => 'store'
+        'store' => 'store',
+        'listingSearch' => 'listing/search',
+        'listing' => 'listing'
     ];
     private $httpClient = null;
     protected $categoryList = [];
@@ -105,31 +107,56 @@ class WisersellCommand extends AbstractCommand
             $this->syncStores();
         }
         foreach ($this->storeList as $marketplace) {
-            // SQL
-            $variantProduct = VariantProduct::getById(1);
-            $marketplaceType = $marketplace->getMarketPlaceType();
-            if ($marketplaceType == 'etsy') {
-                $storeProductId = $variantProduct->getUniqueMarketplaceId();
-                $parentJson = $this->variantProduct->getParentJson();
-                $variantCode =  $this->parseJson($parentJson,"listing_id");
-                if (!$variantCode) {
-                    echo "Variant code not found in parent json: " .$storeProductId;
-                    continue;
-                }
-                $mainProduct = $variantProduct->getMainProduct();
-                if (!$mainProduct) {
-                    echo "Main product not found for variant product: " .$storeProductId;
-                    continue;
-                }
-                $productId = $mainProduct->getWisersellId();
-                $shopId = $marketplace->getShopId();
-                $variantStr = $variantProduct->getTitle();
-                // Listing Search With ProductId && ShopId
-                // Control response storeProductId
-                // If not exist create new listing
-                // If exist update listing
+            foreach ($marketplace->getVariantProductIds() as $id) {
+                $variantProduct = VariantProduct::getById($id);
+                $marketplaceType = $marketplace->getMarketPlaceType();
+                if ($marketplaceType === 'etsy') {
+                    $storeProductId = $variantProduct->getUniqueMarketplaceId();
+                    $parentJson = $variantProduct->getParentJson();
+                    $decodedJson = json_decode($parentJson, true);
+                    $variantCode =  $decodedJson["listing_id"];
+                    if (!$variantCode) {
+                        echo "Variant code not found in parent json: " .$storeProductId;
+                        continue;
+                    }
+                    $mainProduct = $variantProduct->getMainProduct();
+                    if (!$mainProduct) {
+                        echo "Main product not found for variant product: " .$storeProductId;
+                        continue;
+                    }
+                    $productId = $mainProduct->getWisersellId();
+                    $shopId = $marketplace->getShopId();
+                    $variantStr = $variantProduct->getTitle();
+                    $searchData = [
+                        "shopIds" =>[$shopId],
+                        "productIds" => [$productId]
+                    ];
+                    $response = $this->request(self::$apiUrl['listingSearch'], 'POST', $searchData);
+                    $control = false;
+                    if ($response->getStatusCode() === 200) {
+                        if ($control)
+                            continue;
+                        $listings = $response->toArray();
+                        foreach ($listings as $listing) {
+                            if ($listing['storeproductid'] === $storeProductId) {
+                                $control = true;
+                                break;
+                            }
+                        }
+                    }
+                    $listingData = [
+                        "shopId" => $shopId,
+                        "productId" => $productId,
+                        "storeProductId" => $storeProductId,
+                        "variantCode" => $variantCode,
+                        "variantStr" => $variantStr
+                    ];
+                    $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
 
+                }
+                
             }
+            
         }
         /*$pageSize = 50;
         $offset = 0;
