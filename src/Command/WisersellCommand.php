@@ -115,8 +115,7 @@ class WisersellCommand extends AbstractCommand
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => $variantProduct->getUniqueMarketplaceId(),
                     'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
-                    //'shopify' => $variantProduct->getShopifyVariantCode(),  
-
+                    //'Shopify' => $variantProduct->getShopifyVariantCode(),  
                 };
                 if (!$storeProductId) {
                     echo "Store product id not found for variant product: " .$id;
@@ -129,22 +128,24 @@ class WisersellCommand extends AbstractCommand
                 }
                 $variantCode = match ($marketplaceType) {
                     'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    //'amazon' => $variantProduct->getAmazonVariantCode(),
+                    'Amazon' => null,
                     //'shopify' => $variantProduct->getShopifyVariantCode(),  
                     
                 };
-                if (!$variantCode) {
+                if (!$variantCode && $marketplaceType !== 'Amazon') {
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
                 $listingData = [
-                    "shopId" => $shopId,
-                    "productId" => $productId,
-                    "storeProductId" => $storeProductId,
-                    "variantCode" => $variantCode,
-                    "variantStr" => $variantStr
+                    [
+                        "shopId" => $shopId,
+                        "productId" => $productId,
+                        "storeProductId" => $storeProductId,
+                        "variantCode" => $variantCode,
+                        "variantStr" => $variantStr
+                    ]
                 ];
-                //$response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
+                $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
                 print_r($listingData);
                 break;
             }
