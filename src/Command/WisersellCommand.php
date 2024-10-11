@@ -105,32 +105,33 @@ class WisersellCommand extends AbstractCommand
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
                 $marketplaceType = $marketplace->getMarketPlaceType();
-                if ($marketplaceType === 'etsy') {
-                    $storeProductId = $variantProduct->getUniqueMarketplaceId();
-                    $parentJson = $variantProduct->getParentJson();
-                    $decodedJson = json_decode($parentJson, true);
-                    $variantCode =  $decodedJson["listing_id"];
-                    if (!$variantCode) {
-                        echo "Variant code not found in parent json: " .$storeProductId;
-                        continue;
-                    }
-                    $mainProduct = $variantProduct->getMainProduct();
-                    if (!$mainProduct) {
-                        echo "Main product not found for variant product: " .$storeProductId;
-                        continue;
-                    }
-                    $productId = $mainProduct->getWisersellId();
-                    $shopId = $marketplace->getShopId();
-                    $variantStr = $variantProduct->getTitle();
-                    $listingData = [
-                        "shopId" => $shopId,
-                        "productId" => $productId,
-                        "storeProductId" => $storeProductId,
-                        "variantCode" => $variantCode,
-                        "variantStr" => $variantStr
-                    ];
-                    $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
-                }
+                echo "Processing {$variantProduct->getTitle()}... ";
+                // if ($marketplaceType === 'etsy') {
+                //     $storeProductId = $variantProduct->getUniqueMarketplaceId();
+                //     $parentJson = $variantProduct->getParentJson();
+                //     $decodedJson = json_decode($parentJson, true);
+                //     $variantCode =  $decodedJson["listing_id"];
+                //     if (!$variantCode) {
+                //         echo "Variant code not found in parent json: " .$storeProductId;
+                //         continue;
+                //     }
+                //     $mainProduct = $variantProduct->getMainProduct();
+                //     if (!$mainProduct) {
+                //         echo "Main product not found for variant product: " .$storeProductId;
+                //         continue;
+                //     }
+                //     $productId = $mainProduct->getWisersellId();
+                //     $shopId = $marketplace->getShopId();
+                //     $variantStr = $variantProduct->getTitle();
+                //     $listingData = [
+                //         "shopId" => $shopId,
+                //         "productId" => $productId,
+                //         "storeProductId" => $storeProductId,
+                //         "variantCode" => $variantCode,
+                //         "variantStr" => $variantStr
+                //     ];
+                //     $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
+                // }
 
                 
             }
