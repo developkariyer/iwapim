@@ -166,7 +166,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function addListingBucketToWisersell($listingBucket)
     {
-        $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
+        $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
         print_r($response->getContent());
         $responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
