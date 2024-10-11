@@ -170,13 +170,9 @@ class WisersellCommand extends AbstractCommand
         print_r($response->getContent());
         $responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $responseArray['storeProductId']);
         if ($response->getStatusCode() === 200) {
-            foreach ($responseArray['completed'] as $completed) {
-                $variantProduct = VariantProduct::getById($completed['variantId']);
-                $variantProduct->setWisersellListingId($completed['id']);
-                $variantProduct->save();
-                echo "Relation added for variant product: " .$completed['variantId'];
-            }
+            
         }
         
     }
