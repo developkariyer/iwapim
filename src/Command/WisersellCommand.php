@@ -114,7 +114,7 @@ class WisersellCommand extends AbstractCommand
                 $variantStr = $variantProduct->getTitle();
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => $variantProduct->getUniqueMarketplaceId(),
-                    'Amazon' =>  json_decode($variantProduct->getApiResponseJson(), true)["asin"] ?? null,
+                    'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
                     //'shopify' => $variantProduct->getShopifyVariantCode(),  
 
                 };
@@ -127,8 +127,8 @@ class WisersellCommand extends AbstractCommand
                     echo "Shop id not found for variant product: " .$id;
                     continue;
                 }
-                /*$variantCode = match ($marketplaceType) {
-                    'Etsy' => json_decode($variantProduct->getParentResponseJson(), true)["listing_id"] ?? null,
+                $variantCode = match ($marketplaceType) {
+                    'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
                     //'amazon' => $variantProduct->getAmazonVariantCode(),
                     //'shopify' => $variantProduct->getShopifyVariantCode(),  
                     
@@ -136,12 +136,12 @@ class WisersellCommand extends AbstractCommand
                 if (!$variantCode) {
                     echo "Variant code not found for variant product: " .$id;
                     continue;
-                }*/
+                }
                 $listingData = [
                     "shopId" => $shopId,
                     "productId" => $productId,
                     "storeProductId" => $storeProductId,
-                   // "variantCode" => $variantCode,
+                    "variantCode" => $variantCode,
                     "variantStr" => $variantStr
                 ];
                 //$response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
