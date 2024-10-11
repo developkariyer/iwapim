@@ -99,12 +99,7 @@ class WisersellCommand extends AbstractCommand
             $this->syncStores();
         }
         foreach ($this->storeList as $marketplace) {
-            $variantProducts = VariantProduct::findByField('marketplace', $marketplace->relationId());
-            if (!empty($variantProducts)) {
-                foreach ($variantProducts as $variantProduct) {
-                    echo "- Variant Product Title: " . $variantProduct->getTitle() . "\n";
-                }
-            }
+            
         }
     }
 
