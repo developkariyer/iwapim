@@ -64,6 +64,7 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('store')){
             $this->syncStores();
         }
+        $this->getMarketPlaces();
         return Command::SUCCESS;
     }
 
@@ -86,6 +87,15 @@ class WisersellCommand extends AbstractCommand
                 echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
             }
         }
+    }
+
+    protected function getMarketPlaces()
+    {
+        $marketplaces = [];
+        $listingObject = new Marketplace\Listing();
+        $listingObject->setUnpublished(false);
+        $marketplaces = $listingObject->load();
+        print_r($marketplaces);
     }
 
     protected function syncCategories()
