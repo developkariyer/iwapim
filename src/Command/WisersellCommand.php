@@ -94,8 +94,8 @@ class WisersellCommand extends AbstractCommand
     {
         $response = $this->request('store','GET','');
         foreach ($response->toArray() as $store) {
-            echo "Processing {$store['category']['name']} {$store['id']}... ";
-            
+            //echo "Processing {$store['category']['name']} {$store['id']}... ";
+            print_r($store);
         }
     }
 
