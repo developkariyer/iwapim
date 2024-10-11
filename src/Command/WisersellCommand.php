@@ -95,12 +95,6 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
-    protected function parseJson($json,$field)
-    {
-        $data = json_decode($json, true);
-        return $data[$field] ?? null;
-    }
-
     protected function syncRelations()
     {
         if(empty($this->storeList)) {
