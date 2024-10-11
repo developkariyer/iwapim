@@ -98,8 +98,25 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
+        
         foreach ($this->storeList as $marketplace) {
             print_r($marketplace);
+            $variantProducts = new VariantProduct\Listing();
+            $variantProducts->setCondition("marketplace = {$marketplace}");
+            $variantProducts->setLimit(100);
+            $offset = 0;
+            while (true) {
+                $variantProducts->setOffset($offset);
+                $products = $variantProducts->load();
+                if (empty($products)) {
+                    break;
+                }
+                $offset += 100;
+                foreach ($products as $product) {
+                    echo "Processing {$product->getIwasku()}... ";
+                
+                }
+            }
         }
     }
 
