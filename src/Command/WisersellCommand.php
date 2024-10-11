@@ -99,10 +99,7 @@ class WisersellCommand extends AbstractCommand
             $this->syncStores();
         }
         foreach ($this->storeList as $marketplace) {
-            $variantProducts = $marketplace->getRelated('marketplace');
-            foreach ($variantProducts as $variantProduct) {
-                print_r($variantProduct);
-            }
+            print_r($marketplace);
         }
     }
 
