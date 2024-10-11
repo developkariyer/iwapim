@@ -98,6 +98,7 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
+        print_r($this->storeList);
     }
 
     protected function syncCategories()
