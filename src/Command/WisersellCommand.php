@@ -66,7 +66,7 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('store')){
             $this->syncStores();
         }
-        $this->getMarketPlaces();
+        $this->syncRelations();
         return Command::SUCCESS;
     }
 
@@ -93,9 +93,11 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
-    protected function getMarketPlaces()
+    protected function syncRelations()
     {
-        
+        if(empty($this->storeList)) {
+            $this->syncStores();
+        }
     }
 
     protected function syncCategories()
