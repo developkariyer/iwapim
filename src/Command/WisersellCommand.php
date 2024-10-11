@@ -92,10 +92,11 @@ class WisersellCommand extends AbstractCommand
 
     protected function getMarketPlaces()
     {
-        $listingObject = new Marketplace\Listing();
-        $listingObject->setUnpublished(false);
-        $marketplaces = $listingObject->load();
-        print_r($marketplaces);
+        $response = $this->request('store','GET','');
+        foreach ($response->toArray() as $store) {
+            echo "Processing {$store['category']['name']} {$store['id']}... ";
+            
+        }
     }
 
     protected function syncCategories()
