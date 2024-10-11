@@ -95,19 +95,41 @@ class WisersellCommand extends AbstractCommand
 
     protected function syncRelations()
     {
-        if(empty($this->storeList)) {
+        /*if(empty($this->storeList)) {
             $this->syncStores();
         }
-        
-        foreach ($this->storeList as $marketplace) {
-            $variantProducts = $marketplace->getVariantProducts();
-            // if (!empty($variantProducts)) {
-            //     foreach ($variantProducts as $variantProduct) {
-            //         echo "Processing variant product: " . $variantProduct->getTitle();
-            //     }
-            // }
-         
+        $pageSize = 50;
+        $offset = 0;
+        $variantProductObject = new VariantProduct\Listing();
+        $variantProductObject->setUnpublished(false);
+        $variantProductObject->setLimit($pageSize);
+        while (true) {
+            $variantProductObject->setOffset($offset);
+            $variantProducts = $variantProductObject->load();
+            if (empty($variantProducts)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($variantProducts as $variantProduct) {
+                $marketplace = $variantProduct->getMarketPlace();
+                if (!$marketplace instanceof Marketplace) {
+                    continue;
+                }
+                echo "Processing {$variantProduct->getTitle()}... ";
+                
+            }
         }
+        */
+
+        // foreach ($this->storeList as $marketplace) {
+        //     $variantProducts = $marketplace->getVariantProducts();
+        //     // if (!empty($variantProducts)) {
+        //     //     foreach ($variantProducts as $variantProduct) {
+        //     //         echo "Processing variant product: " . $variantProduct->getTitle();
+        //     //     }
+        //     // }
+         
+        // }
     }
 
     protected function syncCategories()
