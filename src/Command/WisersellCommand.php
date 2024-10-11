@@ -98,6 +98,17 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
+        foreach ($this->storeList as $marketplace) {
+            $variantProducts = VariantProduct::getList([
+                'condition' => 'marketplace = ?',
+                'params' => [$marketplace]
+            ]);
+            if (!empty($variantProducts)) {
+                foreach ($variantProducts as $variantProduct) {
+                    echo "- Variant Product Title: " . $variantProduct->getTitle() . "\n";
+                }
+            }
+        }
     }
 
     protected function syncCategories()
