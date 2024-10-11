@@ -42,4 +42,13 @@ class Marketplace extends Concrete
         return $list->current();
     }
 
+    public static function getVariantProductIds()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT 1 as id";
+        $result = $db->fetchAllAssociative($sql);
+        $ids = array_column($result, 'id');
+        return $ids;
+    }
+
 }
