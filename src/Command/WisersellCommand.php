@@ -10,12 +10,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
-use App\Model\DataObject\Marketplace;
+//use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Marketplace\Listing;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 use Exception;
 
@@ -130,7 +131,7 @@ class WisersellCommand extends AbstractCommand
                     ];
                     $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
                 }
-                
+
                 
             }
             
