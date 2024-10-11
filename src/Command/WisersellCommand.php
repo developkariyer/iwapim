@@ -101,7 +101,6 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
-        $listingBucket = [];
         foreach ($this->storeList as $marketplace) {
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
@@ -146,36 +145,50 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
-                $listingData = [
+                $listingData[] = [
                         "shopId" => $shopId,
                         "productId" => $productId,
                         "storeProductId" => $storeProductId,
                         "variantCode" => $variantCode,
                         "variantStr" => $variantStr
                 ];
-                $listingBucket[] = $listingData;
-                if (count($listingBucket) >= 100) {
-                    $this->addListingBucketToWisersell($listingBucket);
-                    $listingBucket = [];
-                } 
+
+                $code = $variantProduct->getWisersellVariantCode();
+                if (!isset($code)) {
+                    $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
+                    print_r($response->getContent());
+                    $responseContent = $response->getContent();  
+                    $responseArray = json_decode($responseContent, true); 
+                    if ($response->getStatusCode() === 200) {
+                        $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
+                        $variantProduct->save();
+                    }
+                    continue;
+                }
+                $updateData = [
+                    "shopId" => $shopId,
+                    "productId" => $productId,
+                ];
+                $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
+                print_r($response->getContent());
                 break;
             }
             break;
         }
     }
 
-    protected function addListingBucketToWisersell($listingBucket)
-    {
-        $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
-        print_r($response->getContent());
-        $responseContent = $response->getContent();  
-        $responseArray = json_decode($responseContent, true); 
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $responseArray['storeProductId']);
-        if ($response->getStatusCode() === 200) {
+    // protected function addListingBucketToWisersell($listingBucket)
+    // {
+    //     $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
+    //     print_r($response->getContent());
+    //     $responseContent = $response->getContent();  
+    //     $responseArray = json_decode($responseContent, true); 
+    //     $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $responseArray['storeProductId']);
+    //     if ($response->getStatusCode() === 200) {
             
-        }
+    //     }
         
-    }
+    // }
 
     protected function syncCategories()
     {
