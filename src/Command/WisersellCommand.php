@@ -154,22 +154,17 @@ class WisersellCommand extends AbstractCommand
                 ];
 
                 $code = $variantProduct->getWisersellVariantCode();
+                $response="";
                 if (!isset($code)) {
                     $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
-                    print_r($response->getContent());
-                    $responseContent = $response->getContent();  
-                    $responseArray = json_decode($responseContent, true); 
-                    if ($response->getStatusCode() === 200) {
-                        $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
-                        $variantProduct->save();
-                    }
-                    continue;
+                }
+                else {
+                    $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
                 }
                 $updateData = [
                     "shopId" => $shopId,
                     "productId" => $productId,
                 ];
-                $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
                 print_r($response->getContent());
                 $responseContent = $response->getContent();  
                 $responseArray = json_decode($responseContent, true); 
