@@ -102,15 +102,8 @@ class WisersellCommand extends AbstractCommand
             };
             if ($marketplace instanceof Marketplace) {
                 echo "Marketplace {$store['source']['name']} {$store['id']} found in PIM\n";
-                $variantProducts = $marketplace->getRelatedObjects('marketplace');
-                if (!empty($variantProducts)) {
-                    echo "Variant Products for Marketplace {$store['source']['name']}:\n";
-                    foreach ($variantProducts as $variantProduct) {
-                        echo "- Variant Product Title: " . $variantProduct->getTitle() . "\n";
-                    }
-                } else {
-                    echo "No Variant Products found for Marketplace {$store['source']['name']}.\n";
-                }
+
+               
             } 
         }
     }
