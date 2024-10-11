@@ -102,9 +102,8 @@ class WisersellCommand extends AbstractCommand
             };
             if ($marketplace instanceof Marketplace) {
                 echo "Marketplace {$store['source']['name']} {$store['id']} found in PIM\n";
-            } else {
-                echo "Marketplace {$store['source']['name']} {$store['id']} not found in PIM\n";
-            }
+                print_r($marketplace);
+            } 
         }
     }
 
