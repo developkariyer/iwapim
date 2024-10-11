@@ -136,7 +136,7 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
-                $listingData = [
+                $listingData[] = [
                         "shopId" => $shopId,
                         "productId" => $productId,
                         "storeProductId" => $storeProductId,
