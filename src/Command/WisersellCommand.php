@@ -105,7 +105,6 @@ class WisersellCommand extends AbstractCommand
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
                 $marketplaceType = $marketplace->getMarketPlaceType();
-                
                 $mainProduct = $variantProduct->getMainProduct();
                 if (!$mainProduct) {
                     echo "Main product not found for variant product: " .$id;
@@ -113,9 +112,8 @@ class WisersellCommand extends AbstractCommand
                 }
                 $productId = $mainProduct->getWisersellId();
                 $variantStr = $variantProduct->getTitle();
-
                 $storeProductId = match ($marketplaceType) {
-                    'etsy' => json_decode($variantProduct->getParentJson(), true)["listing_id"] ?? null,
+                    'Etsy' => $variantProduct->getUniqueMarketplaceId(),
                     //'shopify' => $variantProduct->getShopifyVariantCode(),  
                     //'amazon' => $variantProduct->getAmazonVariantCode()
                 };
@@ -123,82 +121,34 @@ class WisersellCommand extends AbstractCommand
                     echo "Store product id not found for variant product: " .$id;
                     continue;
                 }
-                
-
-
-
-
-
-
-
-
-
-
-                if ($marketplaceType === 'etsy') {
-                    $storeProductId = $variantProduct->getUniqueMarketplaceId();
-                    $parentJson = $variantProduct->getParentJson();
-                    $decodedJson = json_decode($parentJson, true);
-                    $variantCode =  $decodedJson["listing_id"];
-                    if (!$variantCode) {
-                        echo "Variant code not found in parent json: " .$storeProductId;
-                        continue;
-                    }
-                    $mainProduct = $variantProduct->getMainProduct();
-                    if (!$mainProduct) {
-                        echo "Main product not found for variant product: " .$storeProductId;
-                        continue;
-                    }
-                    $productId = $mainProduct->getWisersellId();
-                    $shopId = $marketplace->getShopId();
-                    $variantStr = $variantProduct->getTitle();
-                    $listingData = [
-                        "shopId" => $shopId,
-                        "productId" => $productId,
-                        "storeProductId" => $storeProductId,
-                        "variantCode" => $variantCode,
-                        "variantStr" => $variantStr
-                    ];
-                    $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
-                }
-              
-                
-
-                
-            }
-            
-        }
-        /*$pageSize = 50;
-        $offset = 0;
-        $variantProductObject = new VariantProduct\Listing();
-        $variantProductObject->setUnpublished(false);
-        $variantProductObject->setLimit($pageSize);
-        while (true) {
-            $variantProductObject->setOffset($offset);
-            $variantProducts = $variantProductObject->load();
-            if (empty($variantProducts)) {
-                break;
-            }
-            $offset += $pageSize;
-            foreach ($variantProducts as $variantProduct) {
-                $marketplace = $variantProduct->getMarketPlace();
-                if (!$marketplace instanceof Marketplace) {
+                $shopId = match ($marketplaceType) {
+                    'Etsy' => $marketplace->getShopId(),
+                    //'shopify' => $variantProduct->getShopifyVariantCode(),  
+                    //'amazon' => $variantProduct->getAmazonVariantCode()
+                };
+                if (!$shopId) {
+                    echo "Shop id not found for variant product: " .$id;
                     continue;
                 }
-                echo "Processing {$variantProduct->getTitle()}... ";
-                
+                $variantCode = match ($marketplaceType) {
+                    'Etsy' => json_decode($variantProduct->getParentJson(), true)["listing_id"] ?? null,
+                    //'shopify' => $variantProduct->getShopifyVariantCode(),  
+                    //'amazon' => $variantProduct->getAmazonVariantCode()
+                };
+                if (!$variantCode) {
+                    echo "Variant code not found for variant product: " .$id;
+                    continue;
+                }
+                $listingData = [
+                    "shopId" => $shopId,
+                    "productId" => $productId,
+                    "storeProductId" => $storeProductId,
+                    "variantCode" => $variantCode,
+                    "variantStr" => $variantStr
+                ];
+                $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
             }
-        }*/
-        
-
-        // foreach ($this->storeList as $marketplace) {
-        //     $variantProducts = $marketplace->getVariantProducts();
-        //     // if (!empty($variantProducts)) {
-        //     //     foreach ($variantProducts as $variantProduct) {
-        //     //         echo "Processing variant product: " . $variantProduct->getTitle();
-        //     //     }
-        //     // }
-         
-        // }
+        }
     }
 
     protected function syncCategories()
