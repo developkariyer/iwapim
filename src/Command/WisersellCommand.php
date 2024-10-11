@@ -121,7 +121,8 @@ class WisersellCommand extends AbstractCommand
                     echo "Store product id not found for variant product: " .$id;
                     continue;
                 }
-                $shopId = $marketplace->getWisersellStoreId();
+                //$shopId = $marketplace->getWisersellStoreId();
+                $shopId = $marketplace->getShopId();
                 if (!$shopId) {
                     echo "Shop id not found for variant product: " .$id;
                     continue;
