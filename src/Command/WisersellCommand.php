@@ -147,6 +147,13 @@ class WisersellCommand extends AbstractCommand
                 ];
                 $response = $this->request(self::$apiUrl['listing'], 'POST', $listingData);
                 print_r($response->getContent());
+                $responseContent = $response->getContent();  
+                $responseArray = json_decode($responseContent, true); 
+                if ($response->getStatusCode() === 200) {
+                    $variantProduct->setWisersellVariantCode($responseArray['code']);
+                    $variantProduct->save();
+                    echo "Relation added for variant product: " .$id;
+                }
                 break;
             }
             break;
