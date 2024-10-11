@@ -154,6 +154,10 @@ class WisersellCommand extends AbstractCommand
                 ];
 
                 $code = $variantProduct->getWisersellVariantCode();
+                $updateData = [
+                    "shopId" => $shopId,
+                    "productId" => $productId,
+                ];
                 $response="";
                 if (!isset($code)) {
                     $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
@@ -161,10 +165,7 @@ class WisersellCommand extends AbstractCommand
                 else {
                     $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
                 }
-                $updateData = [
-                    "shopId" => $shopId,
-                    "productId" => $productId,
-                ];
+                
                 print_r($response->getContent());
                 $responseContent = $response->getContent();  
                 $responseArray = json_decode($responseContent, true); 
