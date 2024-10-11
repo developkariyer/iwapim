@@ -110,7 +110,7 @@ class WisersellCommand extends AbstractCommand
                     echo "Main product not found for variant product: " .$id;
                     continue;
                 }
-                $productId = $mainProduct->getWisersellId();
+                $productId = $mainProduct[0]->getWisersellId();
                 $variantStr = $variantProduct->getTitle();
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => $variantProduct->getUniqueMarketplaceId(),
