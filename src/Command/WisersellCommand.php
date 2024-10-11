@@ -175,7 +175,6 @@ class WisersellCommand extends AbstractCommand
                         $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
                         $variantProduct->save();
                     }
-                    
                 }
                 $count++;
                 if ($count ==2) {
