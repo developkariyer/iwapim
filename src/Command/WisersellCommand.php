@@ -93,12 +93,45 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
+    protected function parseJson($json,$field)
+    {
+        $data = json_decode($json, true);
+        return $data[$field] ?? null;
+    }
+
     protected function syncRelations()
     {
-        /*if(empty($this->storeList)) {
+        if(empty($this->storeList)) {
             $this->syncStores();
         }
-        $pageSize = 50;
+        foreach ($this->storeList as $marketplace) {
+            // SQL
+            $variantProduct = VariantProduct::getById(1);
+            $marketplaceType = $marketplace->getMarketPlaceType();
+            if ($marketplaceType == 'etsy') {
+                $storeProductId = $variantProduct->getUniqueMarketplaceId();
+                $parentJson = $this->variantProduct->getParentJson();
+                $variantCode =  $this->parseJson($parentJson,"listing_id");
+                if (!$variantCode) {
+                    echo "Variant code not found in parent json: " .$storeProductId;
+                    continue;
+                }
+                $mainProduct = $variantProduct->getMainProduct();
+                if (!$mainProduct) {
+                    echo "Main product not found for variant product: " .$storeProductId;
+                    continue;
+                }
+                $productId = $mainProduct->getWisersellId();
+                $shopId = $marketplace->getShopId();
+                $variantStr = $variantProduct->getTitle();
+                // Listing Search With ProductId && ShopId
+                // Control response storeProductId
+                // If not exist create new listing
+                // If exist update listing
+
+            }
+        }
+        /*$pageSize = 50;
         $offset = 0;
         $variantProductObject = new VariantProduct\Listing();
         $variantProductObject->setUnpublished(false);
@@ -118,8 +151,8 @@ class WisersellCommand extends AbstractCommand
                 echo "Processing {$variantProduct->getTitle()}... ";
                 
             }
-        }
-        */
+        }*/
+        
 
         // foreach ($this->storeList as $marketplace) {
         //     $variantProducts = $marketplace->getVariantProducts();
