@@ -99,14 +99,26 @@ class WisersellCommand extends AbstractCommand
             $this->syncStores();
         }
         foreach ($this->storeList as $marketplace) {
-            $variantProducts = VariantProduct::getList([
-                'condition' => 'marketplace = ?',
-                'params' => [$marketplace]
-            ]);
-            if (!empty($variantProducts)) {
-                foreach ($variantProducts as $variantProduct) {
-                    echo "- Variant Product Title: " . $variantProduct->getTitle() . "\n";
+            if ($marketplace !== null) {
+                $variantProducts = VariantProduct::getList([
+                    'condition' => 'marketplace = ?',
+                    'params' => [$marketplace]
+                ]);
+        
+                if (!empty($variantProducts)) {
+                    foreach ($variantProducts as $variantProduct) {
+                        $title = $variantProduct->getTitle();
+                        if ($title !== null) {
+                            echo "- Variant Product Title: " . ucfirst($title) . "\n";
+                        } else {
+                            echo "- Variant Product Title: (No title available)\n";
+                        }
+                    }
+                } else {
+                    echo "No variant products found for marketplace: " . ($marketplace->getName() ?? 'Unknown') . "\n";
                 }
+            } else {
+                echo "Marketplace is null, skipping...\n";
             }
         }
     }
