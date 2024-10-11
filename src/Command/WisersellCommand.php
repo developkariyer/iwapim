@@ -165,7 +165,6 @@ class WisersellCommand extends AbstractCommand
                 else {
                     $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
                 }
-                
                 print_r($response->getContent());
                 $responseContent = $response->getContent();  
                 $responseArray = json_decode($responseContent, true); 
