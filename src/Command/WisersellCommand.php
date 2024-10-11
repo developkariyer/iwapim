@@ -105,6 +105,34 @@ class WisersellCommand extends AbstractCommand
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
                 $marketplaceType = $marketplace->getMarketPlaceType();
+                
+                $mainProduct = $variantProduct->getMainProduct();
+                if (!$mainProduct) {
+                    echo "Main product not found for variant product: " .$id;
+                    continue;
+                }
+                $productId = $mainProduct->getWisersellId();
+                $variantStr = $variantProduct->getTitle();
+
+                $storeProductId = match ($marketplaceType) {
+                    'etsy' => json_decode($variantProduct->getParentJson(), true)["listing_id"] ?? null,
+                    //'shopify' => $variantProduct->getShopifyVariantCode(),  
+                    //'amazon' => $variantProduct->getAmazonVariantCode()
+                };
+                if (!$storeProductId) {
+                    echo "Store product id not found for variant product: " .$id;
+                    continue;
+                }
+                
+
+
+
+
+
+
+
+
+
 
                 if ($marketplaceType === 'etsy') {
                     $storeProductId = $variantProduct->getUniqueMarketplaceId();
