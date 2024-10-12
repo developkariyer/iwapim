@@ -173,6 +173,7 @@ class WisersellCommand extends AbstractCommand
                 ];
                 //print_r($listingData);
                 echo json_encode($listingData);
+                echo "\n\n";
                 $code = $variantProduct->getWisersellVariantCode();
                 $updateData = [
                     "shopId" => $shopId,
@@ -189,6 +190,7 @@ class WisersellCommand extends AbstractCommand
                 }
                 $responseContent = $response->getContent();  
                 print_r($responseContent);
+                echo "\n\n";
                 $responseArray = json_decode($responseContent, true); 
                 if ($response->getStatusCode() === 200) {
                     if (!empty($responseArray['completed'])) {
