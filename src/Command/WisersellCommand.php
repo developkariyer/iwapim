@@ -172,7 +172,6 @@ class WisersellCommand extends AbstractCommand
                         "variantStr" => ""
                 ];
               
-                $listingData = [];
                 $code = $variantProduct->getWisersellVariantCode();
                 $updateData = [
                     "shopId" => $shopId,
@@ -195,6 +194,7 @@ class WisersellCommand extends AbstractCommand
                         $variantProduct->save();
                     }
                 }
+                $listingData = [];
                 $count++;
                 if ($count ==4) {
                     break;
