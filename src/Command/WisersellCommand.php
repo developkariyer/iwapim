@@ -186,8 +186,8 @@ class WisersellCommand extends AbstractCommand
                 else {
                     $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
                 }
-                print_r($response->getContent());
                 $responseContent = $response->getContent();  
+                print_r($responseContent);
                 $responseArray = json_decode($responseContent, true); 
                 if ($response->getStatusCode() === 200) {
                     if (!empty($responseArray['complated'])) {
