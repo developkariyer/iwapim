@@ -40,7 +40,7 @@ class WisersellCommand extends AbstractCommand
         'product'=> 'product',
         'store' => 'store',
         'listingSearch' => 'listing/search',
-        'listing' => 'listing'
+        'listing' => 'listing/'
     ];
     private $httpClient = null;
     protected $categoryList = [];
@@ -184,7 +184,7 @@ class WisersellCommand extends AbstractCommand
                 }
                 else {
                     echo "PUT";
-                    $response = $this->request(self::$apiUrl['listing'], 'PUT/',$code,$updateData);
+                    $response = $this->request(self::$apiUrl['listing'], 'PUT',$code,$updateData);
                 }
                 $responseContent = $response->getContent();  
                 print_r($responseContent);
