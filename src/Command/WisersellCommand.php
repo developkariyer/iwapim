@@ -175,7 +175,7 @@ class WisersellCommand extends AbstractCommand
                 $jsonListingData = json_encode($listingData);
                 print_r($jsonListingData);
                 //$response = $this->request(self::$apiUrl['listing'], 'POST','', $jsonListingData);
-                $response = $this->httpClient->request("POST", self::$apiUrl['listing'], ['json' => $listingData]);
+                $response = $this->httpClient->request("POST", self::$apiUrl['listing'], ['body' => $listingData]);
                 print_r($response->getContent());
                 $listingData = [];
                 // $code = $variantProduct->getWisersellVariantCode();
