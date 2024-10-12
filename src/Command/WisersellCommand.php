@@ -164,6 +164,10 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
+                var_dump($storeProductId); // Verinin tipini gösterir
+                var_dump($productId);
+                var_dump($shopId);
+                var_dump($variantCode);
                 $listingData[] = [
                         "storeProductId" => strval($storeProductId),
                         "productId" => $productId,
