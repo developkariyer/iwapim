@@ -164,23 +164,6 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
-
-                echo "\n"; 
-                echo "Store Product ID:\n";
-                var_dump($storeProductId); 
-                echo "\n"; 
-
-                echo "Shop ID:\n";
-                var_dump($shopId); 
-                echo "\n"; 
-
-                echo "Variant Code:\n";
-                var_dump($variantCode); 
-                echo "\n"; 
-
-                echo "Product ID:\n";
-                var_dump($productId); 
-                echo "\n";               
                 $listingData[] = [
                         "storeProductId" => $storeProductId,
                         "productId" =>(int) $productId,
@@ -188,32 +171,30 @@ class WisersellCommand extends AbstractCommand
                         "variantCode" => (string)$variantCode,
                         "variantStr" => ""
                 ];
-                echo json_encode($listingData);
-                $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
-                print_r($response->getContent());
+              
                 $listingData = [];
-                // $code = $variantProduct->getWisersellVariantCode();
-                // $updateData = [
-                //     "shopId" => $shopId,
-                //     "productId" => $productId,
-                // ];
-                // $response="";
-                // if (!isset($code)) {
-                //     $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
-                //     echo "POST";
-                // }
-                // else {
-                //     $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
-                // }
-                // print_r($response->getContent());
-                // $responseContent = $response->getContent();  
-                // $responseArray = json_decode($responseContent, true); 
-                // if ($response->getStatusCode() === 200) {
-                //     if (!empty($responseArray['complated'])) {
-                //         $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
-                //         $variantProduct->save();
-                //     }
-                // }
+                $code = $variantProduct->getWisersellVariantCode();
+                $updateData = [
+                    "shopId" => $shopId,
+                    "productId" => $productId,
+                ];
+                $response="";
+                if (!isset($code)) {
+                    $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
+                    echo "POST";
+                }
+                else {
+                    $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
+                }
+                print_r($response->getContent());
+                $responseContent = $response->getContent();  
+                $responseArray = json_decode($responseContent, true); 
+                if ($response->getStatusCode() === 200) {
+                    if (!empty($responseArray['complated'])) {
+                        $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
+                        $variantProduct->save();
+                    }
+                }
                 $count++;
                 if ($count ==4) {
                     break;
