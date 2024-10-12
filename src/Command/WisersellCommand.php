@@ -172,28 +172,30 @@ class WisersellCommand extends AbstractCommand
                         "variantStr" => ""
                 ];
                 print_r($listingData);
-                $code = $variantProduct->getWisersellVariantCode();
-                $updateData = [
-                    "shopId" => $shopId,
-                    "productId" => $productId,
-                ];
-                $response="";
-                if (!isset($code)) {
-                    $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
-                    echo "POST";
-                }
-                else {
-                    $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
-                }
+                $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
                 print_r($response->getContent());
-                $responseContent = $response->getContent();  
-                $responseArray = json_decode($responseContent, true); 
-                if ($response->getStatusCode() === 200) {
-                    if (!empty($responseArray['complated'])) {
-                        $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
-                        $variantProduct->save();
-                    }
-                }
+                // $code = $variantProduct->getWisersellVariantCode();
+                // $updateData = [
+                //     "shopId" => $shopId,
+                //     "productId" => $productId,
+                // ];
+                // $response="";
+                // if (!isset($code)) {
+                //     $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
+                //     echo "POST";
+                // }
+                // else {
+                //     $response = $this->request(self::$apiUrl['listing'], 'PUT',$updateData);
+                // }
+                // print_r($response->getContent());
+                // $responseContent = $response->getContent();  
+                // $responseArray = json_decode($responseContent, true); 
+                // if ($response->getStatusCode() === 200) {
+                //     if (!empty($responseArray['complated'])) {
+                //         $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
+                //         $variantProduct->save();
+                //     }
+                // }
                 $count++;
                 if ($count ==3) {
                     break;
