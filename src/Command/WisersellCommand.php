@@ -117,6 +117,7 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
+        $count = 0;
         foreach ($this->storeList as $marketplace) {
             foreach ($marketplace->getVariantProductIds() as $id) {
                 $variantProduct = VariantProduct::getById($id);
@@ -191,7 +192,10 @@ class WisersellCommand extends AbstractCommand
                         $variantProduct->save();
                     }
                 }
-                break;
+                $count++;
+                if ($count ==3) {
+                    break;
+                }
             }
             break;
         }
