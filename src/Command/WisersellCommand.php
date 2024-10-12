@@ -176,7 +176,7 @@ class WisersellCommand extends AbstractCommand
                 $code = $variantProduct->getWisersellVariantCode();
                 $updateData = [
                     "shopId" => $shopId,
-                    "productId" => $productId,
+                    "productId" => (int) $productId,
                 ];
                 $response="";
                 if (!isset($code)) {
