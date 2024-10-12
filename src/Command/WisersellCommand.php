@@ -174,7 +174,6 @@ class WisersellCommand extends AbstractCommand
                 ];
                 $jsonOutput = json_encode($listingData, JSON_PRETTY_PRINT);
 
-                header('Content-Type: application/json'); 
                 echo $jsonOutput;
                 // print_r($listingData);
                 // $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
