@@ -32,6 +32,8 @@ class WisersellCommand extends AbstractCommand
     protected $wisersellProducts = [];
     private $iwapimListings = [];
     private static $apiServer = '';
+    private static $email = '';
+    private static $password = '';
     private static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
@@ -64,9 +66,13 @@ class WisersellCommand extends AbstractCommand
 
         if ($input->getOption('dev')) {
             static::$apiServer = 'https://dev2.wisersell.com/restapi/';
+            static::$email = $_ENV['WISERSELL_DEV_USER'];
+            static::$password = $_ENV['WISERSELL_DEV_PASSWORD'];
         }
         if ($input->getOption('prod')) {
             static::$apiServer = 'https://www.wisersell.com/restapi/';
+            static::$email = $_ENV['WISERSELL_PROD_USER'];
+            static::$password = $_ENV['WISERSELL_PROD_PASSWORD'];
         }
 
         if ($input->getOption('category')) {
@@ -476,12 +482,12 @@ class WisersellCommand extends AbstractCommand
 
     protected function fetchToken()
     {
-        $url = "https://dev2.wisersell.com/restapi/token"; 
+        //$url = "https://dev2.wisersell.com/restapi/token"; 
         $client = HttpClient::create();
-        $response = $client->request('POST', $url, [
+        $response = $client->request('POST', static::$apiServer.'token', [
             'json' => [
-                "email" => $_ENV['WISERSELL_DEV_USER'],
-                "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+                "email" => static::$email,
+                "password" => static::$password
             ],
             'headers' => [
                 'Content-Type' => 'application/json',
