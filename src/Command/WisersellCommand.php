@@ -172,7 +172,7 @@ class WisersellCommand extends AbstractCommand
                         "storeProductId" => $storeProductId,
                         "productId" => (int)$productId,
                         "shopId" => $shopId,
-                        "variantCode" => strval($variantCode),
+                        "variantCode" => (string)$variantCode,
                         "variantStr" => ""
                 ];
                 print_r($listingData);
