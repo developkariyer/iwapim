@@ -171,7 +171,8 @@ class WisersellCommand extends AbstractCommand
                         "variantCode" => (string)$variantCode,
                         "variantStr" => ""
                 ];
-                print_r($listingData);
+                //print_r($listingData);
+                echo json_decode($listingData);
                 $code = $variantProduct->getWisersellVariantCode();
                 $updateData = [
                     "shopId" => $shopId,
