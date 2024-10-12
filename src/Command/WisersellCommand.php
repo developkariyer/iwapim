@@ -198,7 +198,7 @@ class WisersellCommand extends AbstractCommand
                 //     }
                 // }
                 $count++;
-                if ($count ==3) {
+                if ($count ==4) {
                     break;
                 }
             }
