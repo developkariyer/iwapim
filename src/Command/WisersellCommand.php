@@ -160,7 +160,6 @@ class WisersellCommand extends AbstractCommand
                     'Amazon' => null,
                     'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
                     'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
-                    
                 };
                 if (!$variantCode && $marketplaceType !== 'Amazon') {
                     echo "Variant code not found for variant product: " .$id;
