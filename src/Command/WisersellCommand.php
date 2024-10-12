@@ -173,7 +173,7 @@ class WisersellCommand extends AbstractCommand
                 ];
                 print_r($listingData);
                 $response = $this->httpClient->request('POST', self::$apiUrl['listing'], [
-                    'data' => $listingData, // Burada JSON, XML veya herhangi bir veri olabilir
+                    'data' => $listingData, 
                     'headers' => [
                         'Content-Type' => 'application/json', 
                     ]
