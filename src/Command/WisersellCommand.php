@@ -165,12 +165,22 @@ class WisersellCommand extends AbstractCommand
                     continue;
                 }
 
+                echo "Store Product ID:\n";
                 var_dump($storeProductId); 
+                echo "\n"; 
+                
+                echo "Shop ID:\n";
                 var_dump($shopId);
-                $variantCode = (string)$variantCode;
-                $productId = (int)$productId;
-                var_dump($variantCode);
-                var_dump($productId);
+                echo "\n"; 
+                
+                echo "Variant Code:\n";
+                var_dump($variantCode); 
+                echo "\n"; 
+                
+                echo "Product ID:\n";
+                var_dump($productId); 
+                echo "\n";
+
                 $listingData[] = [
                         "storeProductId" => $storeProductId,
                         "productId" => $productId,
