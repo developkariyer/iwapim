@@ -164,7 +164,7 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
-                $listingData[] = [
+                $listingData = [
                         "shopId" => $shopId,
                         "productId" => $productId,
                         "storeProductId" => $storeProductId,
@@ -174,7 +174,7 @@ class WisersellCommand extends AbstractCommand
                 print_r($listingData);
                 $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
                 print_r($response->getContent());
-                $listingData = [];
+                //$listingData = [];
                 // $code = $variantProduct->getWisersellVariantCode();
                 // $updateData = [
                 //     "shopId" => $shopId,
