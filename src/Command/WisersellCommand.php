@@ -133,7 +133,7 @@ class WisersellCommand extends AbstractCommand
                 //$variantStr = $variantProduct->getTitle();
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => $variantProduct->getUniqueMarketplaceId(),
-                    'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
+                    //'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
                     //'Shopify' => $variantProduct->getShopifyVariantCode(),  
                 };
                 if (!$storeProductId) {
@@ -156,7 +156,7 @@ class WisersellCommand extends AbstractCommand
                 }
                 $variantCode = match ($marketplaceType) {
                     'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    'Amazon' => null,
+                    //'Amazon' => null,
                     //'shopify' => $variantProduct->getShopifyVariantCode(),  
                     
                 };
