@@ -31,7 +31,7 @@ class WisersellCommand extends AbstractCommand
     private $wisersellListings = [];
     protected $wisersellProducts = [];
     private $iwapimListings = [];
-    private static $apiServer = 'https://www.wisersell.com/restapi/';
+    private static $apiServer = '';
     private static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
@@ -48,6 +48,8 @@ class WisersellCommand extends AbstractCommand
     protected function configure() 
     {
         $this
+            ->addOption('dev',null, InputOption::VALUE_NONE, 'Development mode')
+            ->addOption('prod',null, InputOption::VALUE_NONE, 'Production mode')
             ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
             ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell products')
@@ -60,6 +62,13 @@ class WisersellCommand extends AbstractCommand
         $this->httpClient = HttpClient::create();
         $forceDownload = $input->getOption('download', false);
 
+        if ($input->getOption('dev')) {
+            static::$apiServer = 'https://dev2.wisersell.com/restapi/';
+        }
+        if ($input->getOption('prod')) {
+            static::$apiServer = 'https://www.wisersell.com/restapi/';
+        }
+
         if ($input->getOption('category')) {
             $this->syncCategories();
         }
@@ -69,6 +78,7 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('store')){
             $this->syncStores();
         }
+
         //$this->syncRelations();
         return Command::SUCCESS;
     }
@@ -466,12 +476,12 @@ class WisersellCommand extends AbstractCommand
 
     protected function fetchToken()
     {
-        $url = "https://www.wisersell.com/restapi/token"; 
+        $url = "https://dev2.wisersell.com/restapi/token"; 
         $client = HttpClient::create();
         $response = $client->request('POST', $url, [
             'json' => [
-                "email" => $_ENV['WISERSELL_PROD_USER'],
-                "password" => $_ENV['WISERSELL_PROD_PASSWORD']
+                "email" => $_ENV['WISERSELL_DEV_USER'],
+                "password" => $_ENV['WISERSELL_DEV_PASSWORD']
             ],
             'headers' => [
                 'Content-Type' => 'application/json',
