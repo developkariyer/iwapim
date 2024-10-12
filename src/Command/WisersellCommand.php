@@ -132,9 +132,10 @@ class WisersellCommand extends AbstractCommand
                 $productId = $mainProduct[0]->getWisersellId();
                 //$variantStr = $variantProduct->getTitle();
                 $storeProductId = match ($marketplaceType) {
-                    'Etsy' => $variantProduct->getUniqueMarketplaceId(),
-                    //'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
-                    //'Shopify' => $variantProduct->getShopifyVariantCode(),  
+                    'Etsy' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],
+                    'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
+                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],  
+                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"],
                 };
                 if (!$storeProductId) {
                     echo "Store product id not found for variant product: " .$id;
@@ -144,9 +145,9 @@ class WisersellCommand extends AbstractCommand
                 $shopId = $marketplace->getShopId();
                 $shopId = match ($marketplaceType) {
                     'Etsy' => $marketplace->getShopId(),
-                    //'Amazon' => $marketplace->getMerchantId(),
-                    //'Trendyol' => $marketplace->getTrendyolSellerId(),
+                    'Amazon' => $marketplace->getMerchantId(),
                     //'Shopify' => $marketplace->getShopifyStoreId(),  
+                    'Trendyol' => $marketplace->getTrendyolSellerId(),
                 };
 
 
@@ -156,8 +157,9 @@ class WisersellCommand extends AbstractCommand
                 }
                 $variantCode = match ($marketplaceType) {
                     'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    //'Amazon' => null,
-                    //'shopify' => $variantProduct->getShopifyVariantCode(),  
+                    'Amazon' => null,
+                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
+                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
                     
                 };
                 if (!$variantCode && $marketplaceType !== 'Amazon') {
