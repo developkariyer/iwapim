@@ -128,7 +128,7 @@ class WisersellCommand extends AbstractCommand
                     continue;
                 }
                 $productId = $mainProduct[0]->getWisersellId();
-                $variantStr = $variantProduct->getTitle();
+                //$variantStr = $variantProduct->getTitle();
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => $variantProduct->getUniqueMarketplaceId(),
                     'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
@@ -167,7 +167,7 @@ class WisersellCommand extends AbstractCommand
                         "productId" => $productId,
                         "storeProductId" => $storeProductId,
                         "variantCode" => $variantCode,
-                        "variantStr" => $variantStr
+                        "variantStr" => ""
                 ];
                 print_r($listingData);
                 $code = $variantProduct->getWisersellVariantCode();
