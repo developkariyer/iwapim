@@ -31,7 +31,7 @@ class WisersellCommand extends AbstractCommand
     private $wisersellListings = [];
     protected $wisersellProducts = [];
     private $iwapimListings = [];
-    private static $apiServer = 'https://dev2.wisersell.com/restapi/';
+    private static $apiServer = 'https://www.wisersell.com/restapi/';
     private static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
@@ -466,12 +466,12 @@ class WisersellCommand extends AbstractCommand
 
     protected function fetchToken()
     {
-        $url = "https://dev2.wisersell.com/restapi/token"; 
+        $url = "https://www.wisersell.com/restapi/token"; 
         $client = HttpClient::create();
         $response = $client->request('POST', $url, [
             'json' => [
-                "email" => $_ENV['WISERSELL_DEV_USER'],
-                "password" => $_ENV['WISERSELL_DEV_PASSWORD']
+                "email" => $_ENV['WISERSELL_PROD_USER'],
+                "password" => $_ENV['WISERSELL_PROD_PASSWORD']
             ],
             'headers' => [
                 'Content-Type' => 'application/json',
