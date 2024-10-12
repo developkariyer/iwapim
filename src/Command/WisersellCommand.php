@@ -164,15 +164,18 @@ class WisersellCommand extends AbstractCommand
                     echo "Variant code not found for variant product: " .$id;
                     continue;
                 }
+
                 var_dump($storeProductId); 
-                var_dump($productId);
                 var_dump($shopId);
+                $variantCode = (string)$variantCode;
+                $productId = (int)$productId;
                 var_dump($variantCode);
+                var_dump($productId);
                 $listingData[] = [
                         "storeProductId" => $storeProductId,
-                        "productId" => (int)$productId,
+                        "productId" => $productId,
                         "shopId" => $shopId,
-                        "variantCode" => (string)$variantCode,
+                        "variantCode" => $variantCode,
                         "variantStr" => ""
                 ];
                 print_r($listingData);
