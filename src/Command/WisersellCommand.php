@@ -156,7 +156,7 @@ class WisersellCommand extends AbstractCommand
                 $pageSize = 100;
                 $page = 0;
                 $searchData = [  
-                    "shopId" => $store['shopId'],
+                    "shopIds" => [$store['shopId']],
                     "page" => $page,
                     "pageSize" => $pageSize
                 ];
