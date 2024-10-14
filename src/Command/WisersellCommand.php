@@ -118,7 +118,9 @@ class WisersellCommand extends AbstractCommand
     protected function searchAndUpdateVariantProducts($responseArray)
     {
         foreach ($responseArray['rows'] as $row) {
-            $variantProduct = VariantProduct::findByField('wisersellVariantCode', $row['code']);
+            //$variantProduct = VariantProduct::findByField('wisersellVariantCode', $row['code']);
+            $variantProduct = VariantProduct::findByField('uniqueMarketplaceId', $row['storeproductid']);
+
             echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
