@@ -6,7 +6,7 @@ use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\ClassDefinition\CalculatorClassInterface;
 use Pimcore\Model\DataObject\Data\CalculatedValue;
 
-class DesiCalculator implements CalculatorClassInterface
+class WisersellCodeCalculator implements CalculatorClassInterface
 {
     public function compute(Concrete $object, CalculatedValue $context): string
     {
