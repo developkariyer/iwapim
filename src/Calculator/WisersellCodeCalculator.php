@@ -28,7 +28,6 @@ class WisersellCodeCalculator implements CalculatorClassInterface
         };
         $variantCode = match ($marketplaceType) {
             'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
-            'Amazon' => null,
             'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
             'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
         };
