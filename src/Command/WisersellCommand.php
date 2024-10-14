@@ -116,6 +116,7 @@ class WisersellCommand extends AbstractCommand
                 echo "uniqueMarketplaceId: " . $object->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
+                echo "Marketplace Type: " . $marketplaceType . "\n";
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],
                     'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
