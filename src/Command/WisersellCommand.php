@@ -136,6 +136,7 @@ class WisersellCommand extends AbstractCommand
                 $hash = hash('sha1', $data);
                 $object->setCalculatedWisersellCode($hash);
             }
+            $offset += $limit;
         }
     }
 
