@@ -119,7 +119,7 @@ class WisersellCommand extends AbstractCommand
     {
         foreach ($responseArray['rows'] as $row) {
             $variantProduct = VariantProduct::findByField('wisersellVariantCode', $row['code']);
-            echo "Processing {$row['code']}... /n";
+            echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
                 echo $variantProduct->getWisersellVariantCode()."\n";
