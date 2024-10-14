@@ -37,7 +37,7 @@ class WisersellCodeCalculator implements CalculatorClassInterface
             'Amazon' => $marketplaceObject->getMerchantId(),
             //'Shopify' => $marketplace->getShopifyStoreId(),  
             'Trendyol' => $marketplaceObject->getTrendyolSellerId(),
-            default => null
+            default => ""
         };
         $data = "";
         if($marketplaceType !== 'Amazon') {
@@ -47,7 +47,7 @@ class WisersellCodeCalculator implements CalculatorClassInterface
             $data = "{$storeId}_{$storeProductId}";
         }
         $hash = hash('sha1', $data);
-        return $hash;
+        return number_format($hash);
     }
 
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string
