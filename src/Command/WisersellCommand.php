@@ -157,13 +157,14 @@ class WisersellCommand extends AbstractCommand
             if ($marketplace instanceof Marketplace) {
                 $pageSize = 100;
                 $page = 0;
-                $searchData = [  
-                    "shopIds" => [$store['shopId']],
-                    "page" => $page,
-                    "pageSize" => $pageSize
-                ];
-                echo json_encode($searchData);
                 do {
+                    $searchData = [  
+                        "shopIds" => [$store['shopId']],
+                        "page" => $page,
+                        "pageSize" => $pageSize
+                    ];
+                    echo json_encode($searchData);
+
                     $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
                     print_r($response->getContent()."\n");
 
