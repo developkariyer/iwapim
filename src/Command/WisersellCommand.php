@@ -123,12 +123,14 @@ class WisersellCommand extends AbstractCommand
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
                 echo $variantProduct->getWisersellVariantCode()."\n";
-                echo "\nUpdating PIM... \n";
             }
 
             /*if ($variantProduct instanceof VariantProduct) {
-                $variantProduct->setWisersellVariantCode($row['wisersellVariantCode']);
-                $variantProduct->save();
+                if ($variantProduct->getWisersellVariantCode() != $row['code']) {
+                    echo "Updating PIM... \n";
+                    $variantProduct->setWisersellVariantCode($row['code']);
+                    $variantProduct->save();
+                }
             }*/
         }
     }
