@@ -133,7 +133,11 @@ class WisersellCommand extends AbstractCommand
                     'Amazon' => $marketplaceObject->getMerchantId(),
                     //'Shopify' => $marketplace->getShopifyStoreId(),  
                     'Trendyol' => $marketplaceObject->getTrendyolSellerId(),
+                    default => null
                 };
+                if ($storeId === null) {
+                    continue; 
+                }
                 $data = "";
                 if($marketplaceType !== 'Amazon') {
                     $data = "{$storeId}_{$storeProductId}_{$variantCode}";
