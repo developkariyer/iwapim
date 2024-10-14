@@ -171,7 +171,6 @@ class WisersellCommand extends AbstractCommand
                     foreach ($responseArray['rows'] as $row) {
                         $this->wisersellCodes[$row['code']] =  $row;
                     }
-
                     //$this->searchAndUpdateVariantProducts($responseArray);
                     $page++;
                     echo "Loaded ".($page*$pageSize)." listing from Wisersell\n";
