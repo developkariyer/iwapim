@@ -322,10 +322,10 @@ class WisersellCommand extends AbstractCommand
                     }
                 }
                 $listingData = [];
-                /*$count++;
+                $count++;
                 if ($count ==4) {
                     break;
-                }*/
+                }
             }
             break;
         }
