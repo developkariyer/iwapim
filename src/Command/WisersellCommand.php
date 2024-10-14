@@ -12,7 +12,7 @@ use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
 //use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Marketplace\Listing;
-use App\Model\DataObject\VariantProduct;
+//use App\Model\DataObject\VariantProduct;
 use App\Model\DataObject\VariantProduct\Listing as VariantListing; 
 use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
