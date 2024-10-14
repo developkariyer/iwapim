@@ -128,6 +128,7 @@ class WisersellCommand extends AbstractCommand
             };
             if ($marketplace instanceof Marketplace) {
                $searchData = [  
+                    "shopId" => $store['id'],
                     "page" => $page,
                     "pageSize" => $pageSize
                 ];
