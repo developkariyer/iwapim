@@ -124,6 +124,9 @@ class WisersellCommand extends AbstractCommand
                 echo "\nFound in PIM... \n";
                 echo $variantProduct->getWisersellVariantCode()."\n";
             }
+            else {
+                echo "\nNot found in PIM... \n";
+            }
 
             /*if ($variantProduct instanceof VariantProduct) {
                 if ($variantProduct->getWisersellVariantCode() != $row['code']) {
