@@ -123,15 +123,15 @@ class WisersellCommand extends AbstractCommand
                     'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
                 };
                 $variantCode = match ($marketplaceType) {
-                    'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
-                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
+                    'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
+                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
+                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
                 };
                 $storeId = match ($marketplaceType) {
-                    'Etsy' => $marketplace->getShopId(),
-                    'Amazon' => $marketplace->getMerchantId(),
+                    'Etsy' => $marketplaceObject->getShopId(),
+                    'Amazon' => $marketplaceObject->getMerchantId(),
                     //'Shopify' => $marketplace->getShopifyStoreId(),  
-                    'Trendyol' => $marketplace->getTrendyolSellerId(),
+                    'Trendyol' => $marketplaceObject->getTrendyolSellerId(),
                 };
                 $data = "";
                 if($marketplaceType !== 'Amazon') {
