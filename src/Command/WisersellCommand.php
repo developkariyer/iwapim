@@ -116,17 +116,6 @@ class WisersellCommand extends AbstractCommand
                 echo "uniqueMarketplaceId: " . $object->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
-                $storeProductId = match ($marketplaceType) {
-                    'Etsy' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],
-                    'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
-                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
-                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
-                };
-                $variantCode = match ($marketplaceType) {
-                    'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
-                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
-                };
                 $storeId = match ($marketplaceType) {
                     'Etsy' => $marketplaceObject->getShopId(),
                     'Amazon' => $marketplaceObject->getMerchantId(),
@@ -137,6 +126,19 @@ class WisersellCommand extends AbstractCommand
                 if ($storeId === null) {
                     continue; 
                 }
+                $storeProductId = match ($marketplaceType) {
+                    'Etsy' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],
+                    'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
+                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
+                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
+                    default => null
+                };
+                $variantCode = match ($marketplaceType) {
+                    'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
+                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
+                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
+                };
+                
                 $data = "";
                 if($marketplaceType !== 'Amazon') {
                     $data = "{$storeId}_{$storeProductId}_{$variantCode}";
