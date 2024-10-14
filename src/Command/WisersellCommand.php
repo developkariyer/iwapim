@@ -114,6 +114,14 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
+    protected function syncCode()
+    {
+        if(empty($this->storeList)) {
+            $this->syncStores();
+        }
+        
+    }
+
     protected function syncRelations()
     {
         if(empty($this->storeList)) {
