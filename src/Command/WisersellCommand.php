@@ -119,7 +119,7 @@ class WisersellCommand extends AbstractCommand
     {
         $response = $this->request('store','GET','');   
         foreach ($response->toArray() as $store) {
-            echo "Processing {$store['name']} {$store['id']}... ";
+            echo "Processing {$store['name']} {$store['id']}...  \n";
             $marketplace = match ($store['source']['name']) {
                 'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
                 'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
