@@ -57,6 +57,7 @@ class WisersellCommand extends AbstractCommand
             ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell products')
             ->addOption('store', null, InputOption::VALUE_NONE, 'List all stores')
             ->addOption('relation', null, InputOption::VALUE_NONE, 'Sync relations')
+            ->addOption('code', null, InputOption::VALUE_NONE, 'Sync code')
             ;
     }
 
@@ -88,7 +89,9 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('relation')) {
             $this->syncRelations();
         }
-        $this->syncCode();
+        if($input->getOption('code')) {
+            $this->syncCode();
+        }
         return Command::SUCCESS;
     }
 
