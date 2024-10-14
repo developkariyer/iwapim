@@ -11,12 +11,12 @@ class WisersellCodeCalculator implements CalculatorClassInterface
     public function compute(Concrete $object, CalculatedValue $context): string
     {
         return match ($context->getFieldname()) {
-            'calculatedWisersellCode ' => $this->calculateDesi($object),
+            'calculatedWisersellCode ' => $this->calculateWisersellCode($object),
             default => '',
         };
     }
 
-    private function calculateDesi(Concrete $object): string
+    private function calculateWisersellCode(Concrete $object): string
     {
         $marketplaceObject = $object->getMarketplace();
         $marketplaceType = $marketplaceObject->getMarketplaceType();
