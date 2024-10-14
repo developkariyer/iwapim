@@ -37,6 +37,7 @@ class WisersellCodeCalculator implements CalculatorClassInterface
             'Amazon' => $marketplaceObject->getMerchantId(),
             //'Shopify' => $marketplace->getShopifyStoreId(),  
             'Trendyol' => $marketplaceObject->getTrendyolSellerId(),
+            default => null
         };
         $data = "";
         if($marketplaceType !== 'Amazon') {
