@@ -88,6 +88,7 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('relation')) {
             $this->syncRelations();
         }
+        $this->syncCode();
         return Command::SUCCESS;
     }
 
