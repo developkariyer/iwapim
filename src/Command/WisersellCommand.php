@@ -219,7 +219,7 @@ class WisersellCommand extends AbstractCommand
                     continue;
                 }
                 $listingData[] = [
-                        "storeProductId" => $storeProductId,
+                        "storeproductid" => $storeProductId,
                         "productId" =>(int) $productId,
                         "shopId" => $shopId,
                         "variantCode" => (string)$variantCode,
