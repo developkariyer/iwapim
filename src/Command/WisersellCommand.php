@@ -13,6 +13,7 @@ use Pimcore\Model\DataObject\Folder;
 //use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Marketplace\Listing;
 use App\Model\DataObject\VariantProduct;
+use App\Model\DataObject\VariantProduct\Listing as VariantListing; 
 use Pimcore\Model\DataObject\Category;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -102,7 +103,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function calculateWisersellCode()
     {
-        $variantObject = new VariantProduct\Listing();
+        $variantObject = new VariantListing();
         $pageSize = 50;
         $offset = 0;
         $variantObject->setLimit($pageSize);
