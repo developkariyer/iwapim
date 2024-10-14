@@ -224,7 +224,7 @@ class WisersellCommand extends AbstractCommand
                         "productId" =>(int) $productId,
                         "shopId" => $shopId,
                         "variantCode" => (string)$variantCode,
-                        "variantStr" => ""
+                        "variantStr" => (string)$variantCode
                 ];
                 echo json_encode($listingData);
                 echo "\n\n";
