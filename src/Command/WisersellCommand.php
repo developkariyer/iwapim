@@ -131,7 +131,6 @@ class WisersellCommand extends AbstractCommand
                     'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
                     'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
                     'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
-                    default => null
                 };
                 $variantCode = match ($marketplaceType) {
                     'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
