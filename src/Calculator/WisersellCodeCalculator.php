@@ -26,11 +26,13 @@ class WisersellCodeCalculator implements CalculatorClassInterface
             'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
             'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
             'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
+            default => ""
         };
         $variantCode = match ($marketplaceType) {
             'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
             'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
             'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
+            default => ""
         };
         $storeId = match ($marketplaceType) {
             'Etsy' => $marketplaceObject->getShopId(),
