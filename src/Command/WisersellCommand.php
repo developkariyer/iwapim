@@ -101,7 +101,6 @@ class WisersellCommand extends AbstractCommand
         $variantObject = new VariantProduct\Listing();
         $limit = 50; 
         $offset = 0;
-
         while (true) {
             $variantObject->setLimit($limit);
             $variantObject->setOffset($offset);
@@ -134,15 +133,9 @@ class WisersellCommand extends AbstractCommand
                     $data = "{$storeId}_{$storeProductId}";
                 }
                 $hash = hash('sha1', $data);
-            
+                $object->setCalculatedWisersellCode($hash);
             }
         }
-
-
-
-
-        
-        
     }
 
     protected function syncStores()
