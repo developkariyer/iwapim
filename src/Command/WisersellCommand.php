@@ -115,6 +115,24 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
+    protected function searchAndUpdateVariantProducts($responseArray)
+    {
+        foreach ($responseArray['rows'] as $row) {
+            $variantProduct = VariantProduct::findByField('wisersellVariantCode', $row['code']);
+            echo "Processing {$row['code']}... /n";
+            if ($variantProduct instanceof VariantProduct) {
+                echo "\nFound in PIM... \n";
+                echo $variantProduct->getWisersellVariantCode()."\n";
+                echo "\nUpdating PIM... \n";
+            }
+
+            /*if ($variantProduct instanceof VariantProduct) {
+                $variantProduct->setWisersellVariantCode($row['wisersellVariantCode']);
+                $variantProduct->save();
+            }*/
+        }
+    }
+
     protected function syncCode()
     {
         $response = $this->request('store','GET','');   
@@ -136,8 +154,9 @@ class WisersellCommand extends AbstractCommand
                 ];
                 do {
                     $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
-                    $responseArray = $response->toArray();
                     print_r($response->getContent()."\n");
+                    $responseArray = $response->toArray();
+                    $this->searchAndUpdateVariantProducts($responseArray);
                     $page++;
                     echo "Loaded ".($page*$pageSize)." listing from Wisersell\n";
                 } while (count($responseArray['rows']) == $pageSize);
