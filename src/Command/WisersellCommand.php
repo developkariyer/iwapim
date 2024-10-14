@@ -157,6 +157,7 @@ class WisersellCommand extends AbstractCommand
                     "page" => $page,
                     "pageSize" => $pageSize
                 ];
+                echo json_decode($searchData);
                 do {
                     $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
                     print_r($response->getContent()."\n");
