@@ -96,6 +96,55 @@ class WisersellCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    protected function calculateWisersellCode()
+    {
+        $variantObject = new VariantProduct\Listing();
+        $limit = 50; 
+        $offset = 0;
+
+        while (true) {
+            $variantObject->setLimit($limit);
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            foreach ($results as $object) {
+                $marketplaceObject = $object->getMarketplace();
+                $marketplaceType = $marketplaceObject->getMarketplaceType();
+                $storeProductId = match ($marketplaceType) {
+                    'Etsy' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],
+                    'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
+                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
+                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
+                };
+                $variantCode = match ($marketplaceType) {
+                    'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
+                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
+                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
+                };
+                $storeId = match ($marketplaceType) {
+                    'Etsy' => $marketplace->getShopId(),
+                    'Amazon' => $marketplace->getMerchantId(),
+                    //'Shopify' => $marketplace->getShopifyStoreId(),  
+                    'Trendyol' => $marketplace->getTrendyolSellerId(),
+                };
+                $data = "";
+                if($marketplaceType !== 'Amazon') {
+                    $data = "{$storeId}_{$storeProductId}_{$variantCode}";
+                }
+                else {
+                    $data = "{$storeId}_{$storeProductId}";
+                }
+                $hash = hash('sha1', $data);
+            
+            }
+        }
+
+
+
+
+        
+        
+    }
+
     protected function syncStores()
     {
         $this->storeList = [];
