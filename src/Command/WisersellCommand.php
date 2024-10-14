@@ -233,18 +233,19 @@ class WisersellCommand extends AbstractCommand
                     "shopId" => $shopId,
                     "productId" => (int) $productId,
                 ];
-                $response="";
-                if (!isset($code)) {
+                //$response="";
+                $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
+                /*if (!isset($code)) {
                     echo "POST";
                     $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingData);
                 }
                 else {
                     echo "PUT";
                     $response = $this->request(self::$apiUrl['listing'], 'PUT',$code,$updateData);
-                }
+                }*/
                 $responseContent = $response->getContent();  
                 print_r($responseContent);
-                echo "\n\n";
+                echo "\n";
                 $responseArray = json_decode($responseContent, true); 
                 if ($response->getStatusCode() === 200) {
                     if (!empty($responseArray['completed'])) {
@@ -255,10 +256,10 @@ class WisersellCommand extends AbstractCommand
                     }
                 }
                 $listingData = [];
-                $count++;
+                /*$count++;
                 if ($count ==4) {
                     break;
-                }
+                }*/
             }
             break;
         }
