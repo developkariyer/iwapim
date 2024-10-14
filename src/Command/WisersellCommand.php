@@ -136,6 +136,7 @@ class WisersellCommand extends AbstractCommand
                $page = 0;
                do {
                    $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
+                   print_r($response->getContent());
                    $page++;
                    echo "Loaded ".($page*$pageSize)." listing from Wisersell\n";
                } while (count($response['rows']) == $pageSize);
