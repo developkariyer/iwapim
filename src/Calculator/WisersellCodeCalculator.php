@@ -46,7 +46,7 @@ class WisersellCodeCalculator implements CalculatorClassInterface
             $data = "{$storeId}_{$storeProductId}";
         }
         //$hash = hash('sha1', $data);
-        //return number_format($data);
+        //return number_format($hash);
         return $data;
     }
 
