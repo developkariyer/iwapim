@@ -119,8 +119,11 @@ class WisersellCommand extends AbstractCommand
     {
         foreach ($responseArray['rows'] as $row) {
             //$variantProduct = VariantProduct::findByField('wisersellVariantCode', $row['code']);
-            $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $row['storeproductid']);
-
+            //$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $row['storeproductid']);
+            $variantProducts = new \Pimcore\Model\DataObject\VariantProduct\Listing();
+            $variantProducts->setCondition("JSON_EXTRACT(apiResponseJson, '$.product_id') = ?", [$row['storeproductid']]);
+            $variantProducts->setLimit(1);
+            $variantProduct = $variantProducts->load();
             echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
