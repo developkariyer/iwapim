@@ -11,8 +11,8 @@ class WisersellCodeCalculator implements CalculatorClassInterface
     public function compute(Concrete $object, CalculatedValue $context): string
     {
         return match ($context->getFieldname()) {
-            //'calculatedWisersellCode ' => $this->calculateWisersellCode($object),
-            'calculatedWisersellCode' =>"WisersellCode",
+            'calculatedWisersellCode ' => $this->calculateWisersellCode($object),
+            //'calculatedWisersellCode' =>"WisersellCode",
             default => '',
         };
     }
