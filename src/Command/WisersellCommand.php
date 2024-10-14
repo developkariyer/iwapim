@@ -103,10 +103,10 @@ class WisersellCommand extends AbstractCommand
     protected function calculateWisersellCode()
     {
         $variantObject = new VariantProduct\Listing();
-        $limit = 50; 
+        $pageSize = 50;
         $offset = 0;
+        $variantObject->setLimit($pageSize);
         while (true) {
-            $variantObject->setLimit($limit);
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
             echo "Offset: " . $offset . "\n";
@@ -142,7 +142,7 @@ class WisersellCommand extends AbstractCommand
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
             }
-            $offset += $limit;
+            $offset += $pageSize;
         }
     }
 
