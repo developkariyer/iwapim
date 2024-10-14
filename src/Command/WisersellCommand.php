@@ -248,6 +248,8 @@ class WisersellCommand extends AbstractCommand
                 $responseArray = json_decode($responseContent, true); 
                 if ($response->getStatusCode() === 200) {
                     if (!empty($responseArray['completed'])) {
+                        echo "Code\n\n";
+                        echo $responseArray['completed'][0]['code'];
                         $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
                         $variantProduct->save();
                     }
