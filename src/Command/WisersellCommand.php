@@ -106,7 +106,9 @@ class WisersellCommand extends AbstractCommand
             $variantObject->setLimit($limit);
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
+            echo "Offset: " . $offset . "\n";
             foreach ($results as $object) {
+                echo "uniqueMarketplaceId: " . $product->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
                 $storeProductId = match ($marketplaceType) {
@@ -135,6 +137,7 @@ class WisersellCommand extends AbstractCommand
                 }
                 $hash = hash('sha1', $data);
                 $object->setCalculatedWisersellCode($hash);
+                $object->save();
             }
             $offset += $limit;
         }
