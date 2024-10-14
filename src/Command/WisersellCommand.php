@@ -59,6 +59,7 @@ class WisersellCommand extends AbstractCommand
             ->addOption('store', null, InputOption::VALUE_NONE, 'List all stores')
             ->addOption('relation', null, InputOption::VALUE_NONE, 'Sync relations')
             ->addOption('code', null, InputOption::VALUE_NONE, 'Sync code')
+            ->addOption('calculatecode', null, InputOption::VALUE_NONE, 'Calculate code')
             ;
     }
 
@@ -93,7 +94,9 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('code')) {
             $this->syncCode();
         }
-        $this->calculateWisersellCode();
+        if($input->getOption('calculatecode')) {
+            $this->calculateWisersellCode();
+        }
         return Command::SUCCESS;
     }
 
