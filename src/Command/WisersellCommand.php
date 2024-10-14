@@ -119,6 +119,7 @@ class WisersellCommand extends AbstractCommand
     {
         foreach ($responseArray['rows'] as $row) {
             //$variantProduct = VariantProduct::findByField('wisersellVariantCode', $row['code']);
+            echo $row['storeproductid'] .'\n';
             $variantProduct = VariantProduct::findByField('uniqueMarketplaceId', $row['storeproductid']);
 
             echo "\nProcessing {$row['code']}... \n";
