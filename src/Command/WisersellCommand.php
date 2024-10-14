@@ -116,8 +116,10 @@ class WisersellCommand extends AbstractCommand
 
     protected function syncCode()
     {
-        if(empty($this->storeList)) {
-            $this->syncStores();
+        $response = $this->request('store','GET','');   
+        foreach ($response->toArray() as $store) {
+            echo "Processing {$store['name']} {$store['id']}... ";
+            
         }
         
     }
