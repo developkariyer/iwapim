@@ -199,7 +199,7 @@ class WisersellCommand extends AbstractCommand
             }
         }
         if (!empty($wisersellListingsError)) {
-            file_put_contents($filePath, json_encode($wisersellListingsError, JSON_PRETTY_PRINT));
+            file_put_contents($filePath, json_encode($wisersellListingsError, JSON_PRETTY_PRINT), FILE_APPEND);
             echo "\nErrors appended to JSON file.\n";
         }
     }
