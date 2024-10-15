@@ -107,6 +107,7 @@ class WisersellCommand extends AbstractCommand
         $pageSize = 50;
         $offset = 0;
         $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(true);
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
