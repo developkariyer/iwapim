@@ -244,6 +244,7 @@ class WisersellCommand extends AbstractCommand
         $listingBucket = [];
         foreach ($this->storeList as $marketplace) {
             foreach ($marketplace->getVariantProductIds() as $id) {
+                echo "Processing {$id}... ";
                 $variantProduct = VariantProduct::getById($id);
                 if (isset($variantProduct) && $variantProduct->getWisersellVariantCode() !== null) {
                     continue;
@@ -314,7 +315,6 @@ class WisersellCommand extends AbstractCommand
             if (!empty($responseArray['completed'])) {
                 foreach ($responseArray['completed'] as $response) {
                     $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['code']);
-                    echo "Processing {$variantProduct->getUniqueMarketplaceId()}... ";
                     $variantProduct->setWisersellVariantCode($response['code']);
                     $variantProduct->save();
                 }
