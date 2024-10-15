@@ -314,9 +314,7 @@ class WisersellCommand extends AbstractCommand
             if (!empty($responseArray['completed'])) {
                 foreach ($responseArray['completed'] as $response) {
                     $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['code']);
-                    if ($variantProduct->getId()) {
-                        echo "Processing " . $variantProduct->getId() . "\n";
-                    }
+                    echo "Processing {$variantProduct->getUniqueMarketplaceId()}... ";
                     $variantProduct->setWisersellVariantCode($response['code']);
                     $variantProduct->save();
                 }
