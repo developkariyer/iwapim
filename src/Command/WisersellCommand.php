@@ -315,6 +315,10 @@ class WisersellCommand extends AbstractCommand
             if (!empty($responseArray['completed'])) {
                 foreach ($responseArray['completed'] as $response) {
                     $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['code']);
+                    if (!$variantProduct instanceof VariantProduct) {
+                        echo "Variant product not found for code: " . $response['code'];
+                        continue;
+                    }
                     $variantProduct->setWisersellVariantCode($response['code']);
                     $variantProduct->save();
                 }
