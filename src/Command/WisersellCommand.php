@@ -103,7 +103,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function test()
     {
-        $Object = VariantProduct::findOneByField('uniqueMarketplaceId','39564777652401');
+        $object = VariantProduct::findOneByField('uniqueMarketplaceId','39564777652401');
         $marketplaceObject = $object->getMarketplace();
         $marketplaceType = $marketplaceObject->getMarketplaceType();
         $storeId = $marketplaceObject->getWisersellStoreId();
