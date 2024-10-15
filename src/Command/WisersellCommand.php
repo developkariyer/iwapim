@@ -97,7 +97,6 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
-        $this->test();
         return Command::SUCCESS;
     }
 
