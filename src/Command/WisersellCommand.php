@@ -189,6 +189,7 @@ class WisersellCommand extends AbstractCommand
             echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
+                echo $variantProduct->getId();
                 $variantProduct->setWisersellVariantCode($row['code']);
                 $variantProduct->save();
                 echo "\nUpdated in PIM... \n";
