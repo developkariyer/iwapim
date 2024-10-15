@@ -128,6 +128,7 @@ class WisersellCommand extends AbstractCommand
         ];
         foreach ($codesToDelete as $code) {
             $response = $this->request(self::$apiUrl['listing'], 'DELETE', $code, []);
+            print_r($response->getContent());
             
         }
         return Command::SUCCESS;
