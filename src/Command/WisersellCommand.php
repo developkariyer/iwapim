@@ -330,10 +330,10 @@ class WisersellCommand extends AbstractCommand
         $responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
         if ($response->getStatusCode() === 200) {
-            foreach ($listingBucket as $listing) {
-                if (!empty($listing['completed'])) {
+            foreach ($responseArray as $response) {
+                if (!empty($response['completed'])) {
                     echo "Listing\n\n";
-                    print_r($listing);
+                    print_r($response);
                     echo "Listing\n\n";
 
 //                    $variantProduct = VariantProduct::getById($variantId);
