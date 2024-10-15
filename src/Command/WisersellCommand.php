@@ -101,48 +101,6 @@ class WisersellCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    protected function test()
-    {
-        $object = VariantProduct::findOneByField('uniqueMarketplaceId','8730113206', null,true);
-        if (!$object instanceof VariantProduct) {
-            echo "Variant Product Degil\n";
-        }
-        $marketplaceObject = $object->getMarketplace();
-        $marketplaceType = $marketplaceObject->getMarketplaceType();
-        $storeId = $marketplaceObject->getWisersellStoreId();
-        if (!$storeId) {
-            echo "Store ID nor found: ";
-        }
-        $storeProductId = match ($marketplaceType) {
-            'Etsy' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],
-            'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
-            'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
-            'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
-        };
-        if (!$storeProductId) {
-            echo "Store product id not found for variant product: " .$object->getId();
-           
-        }
-        $variantCode = match ($marketplaceType) {
-            'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
-            'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
-            'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
-        };
-        if (!$variantCode && $marketplaceType !== 'Amazon') {
-            echo "Variant code not found for variant product: " .$object->getId();
-        }
-        $data = "";
-        if($marketplaceType !== 'Amazon') {
-            $data = "{$storeId}_{$storeProductId}_{$variantCode}";
-        }
-        else {
-            $data = "{$storeId}_{$storeProductId}";
-        }
-        $hash = hash('sha1', $data);
-        $object->setCalculatedWisersellCode($hash);
-        $object->save();
-    }
-    
     protected function calculateWisersellCode()
     {
         $variantObject = new VariantListing();
