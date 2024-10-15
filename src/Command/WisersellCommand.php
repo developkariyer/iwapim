@@ -129,11 +129,7 @@ class WisersellCommand extends AbstractCommand
         ];
         foreach ($codesToDelete as $code) {
             $response = $this->request(self::$apiUrl['listing'], 'DELETE', $code, []);
-            if ($response->status == 'success') {
-                echo "Kod: $code başarıyla silindi.\n";
-            } else {
-                echo "Kod: $code silinemedi. Hata: " . $response->error . "\n";
-            }
+            
         }
         return Command::SUCCESS;
     }
