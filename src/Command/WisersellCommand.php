@@ -98,8 +98,6 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
-        $response  = $this->request('store','GET','');
-        print_r($response->getContent());
         return Command::SUCCESS;
     }
     
@@ -165,6 +163,7 @@ class WisersellCommand extends AbstractCommand
                 'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
                 'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
                 'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
+                'Shopify' => Marketplace::findByField('shopId', $store['shopId'] ),
                 default => null
             };
             if ($marketplace instanceof Marketplace) {
