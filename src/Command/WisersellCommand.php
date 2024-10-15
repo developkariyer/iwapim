@@ -295,7 +295,7 @@ class WisersellCommand extends AbstractCommand
                 echo json_encode($listingData);
                 echo "\n\n";
                 $listingBucket[] = $listingData;
-                if (count($listingBucket) <= 100) {
+                if (count($listingBucket) >= 100) {
                     $this->addListingBucketToWisersell($listingBucket,$id);
                     $listingBucket = [];
                 }
@@ -337,9 +337,7 @@ class WisersellCommand extends AbstractCommand
                    $variantProduct->save();
                 }
             }
-            
         }
-        
     }
 
     protected function syncCategories()
