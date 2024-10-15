@@ -304,6 +304,10 @@ class WisersellCommand extends AbstractCommand
                     break;
                 }
             }
+            if (count($listingBucket) > 0) {
+                $this->addListingBucketToWisersell($listingBucket, $id);
+                $listingBucket = []; 
+            }
             break;
         }
     }
@@ -311,8 +315,8 @@ class WisersellCommand extends AbstractCommand
     protected function addListingBucketToWisersell($listingBucket,$variantId)
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
-        print_r($response->getContent());
         $responseContent = $response->getContent();  
+        print_r($responseContent);
         $responseArray = json_decode($responseContent, true); 
         if ($response->getStatusCode() === 200) {
             foreach ($responseArray as $response) {
