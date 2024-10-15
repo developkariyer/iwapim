@@ -293,7 +293,7 @@ class WisersellCommand extends AbstractCommand
                         "variantStr" => (string)$variantCode
                 ];
                 $listingBucket[] = $listingData;
-                if (count($listingBucket) >= 100) {
+                if (count($listingBucket) <= 100) {
                     $this->addListingBucketToWisersell($listingBucket,$id);
                     $listingBucket = [];
                 }
