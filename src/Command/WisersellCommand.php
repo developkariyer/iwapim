@@ -316,12 +316,12 @@ class WisersellCommand extends AbstractCommand
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
         $responseContent = $response->getContent();  
-        print_r($responseContent);
         $responseArray = json_decode($responseContent, true); 
         if ($response->getStatusCode() === 200) {
             foreach ($responseArray as $response) {
                 if (!empty($response['completed'])) {
                    $variantProduct = VariantProduct::getById($variantId);
+                   print_r($response['completed'][0]['code']);
                    $variantProduct->setWisersellVariantCode($response['completed'][0]['code']);
                    $variantProduct->save();
                 }
