@@ -97,6 +97,8 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
+        
+        $response = $this->request(self::$apiUrl['listing'], 'DELETE','', []);
         return Command::SUCCESS;
     }
     
