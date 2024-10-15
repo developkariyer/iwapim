@@ -98,9 +98,11 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
+        $response  = $this->request('store','GET','');
+        print_r($response->getContent());
         return Command::SUCCESS;
     }
-
+    
     protected function calculateWisersellCode()
     {
         $variantObject = new VariantListing();
