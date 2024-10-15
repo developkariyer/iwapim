@@ -103,7 +103,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function test()
     {
-        $object = VariantProduct::findOneByField('uniqueMarketplaceId','8730113206');
+        $object = VariantProduct::findOneByField('uniqueMarketplaceId','8730113206', true);
         if (!$object instanceof VariantProduct) {
             echo "Variant Product Degil\n";
         }
