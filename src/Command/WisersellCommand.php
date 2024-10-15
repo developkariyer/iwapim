@@ -98,8 +98,10 @@ class WisersellCommand extends AbstractCommand
             $this->calculateWisersellCode();
         }
         /*$codesToDelete = [
+            '2d1d9a4b082002c7a3fce7f62147cc8f4e8a4d01',
             'be7170082b30bd3798ff1b90d88bd78349e012bd',
-            '2d1d9a4b082002c7a3fce7f62147cc8f4e8a4d01'
+            'b89906d6ab4a842b07335fa3c8dc1f2706f09e09',
+            '21830b84dcf5d77a115b4be4d05e281656c3ba63'
         ];
         foreach ($codesToDelete as $code) {
             $response = $this->request(self::$apiUrl['listing'], 'DELETE', "/{$code}", []);
@@ -304,7 +306,7 @@ class WisersellCommand extends AbstractCommand
                 ];
                 $listingBucket[] = $listingData;
                 if (count($listingBucket) <= 100) {
-                    $this->addListingBucketToWisersell($listingBucket,$id);
+                    $this->addListingBucketToWisersell($listingBucket);
                     $listingBucket = [];
                 }
                 $count++;
@@ -313,14 +315,14 @@ class WisersellCommand extends AbstractCommand
                 }
             }
             if (count($listingBucket) > 0) {
-                $this->addListingBucketToWisersell($listingBucket, $id);
+                $this->addListingBucketToWisersell($listingBucket);
                 $listingBucket = []; 
             }
             break;
         }
     }
 
-    protected function addListingBucketToWisersell($listingBucket,$variantId)
+    protected function addListingBucketToWisersell($listingBucket)
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
         $responseContent = $response->getContent();  
@@ -329,7 +331,7 @@ class WisersellCommand extends AbstractCommand
         if ($response->getStatusCode() === 200) {
             foreach ($responseArray as $response) {
                 if (!empty($response['completed'])) {
-                   $variantProduct = VariantProduct::getById($variantId);
+                   $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['completed'][0]['code']);
                    echo "Code\n\n";
                    print_r($response['completed'][0]['code']);
                    $variantProduct->setWisersellVariantCode($response['completed'][0]['code']);
