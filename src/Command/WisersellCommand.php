@@ -116,13 +116,7 @@ class WisersellCommand extends AbstractCommand
                 echo "uniqueMarketplaceId: " . $object->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
-                $storeId = match ($marketplaceType) {
-                    'Etsy' => $marketplaceObject->getShopId(),
-                    'Amazon' => $marketplaceObject->getMerchantId(),
-                    //'Shopify' => $marketplace->getShopifyStoreId(),  
-                    'Trendyol' => $marketplaceObject->getTrendyolSellerId(),
-                    default => null
-                };
+                $storeId = $marketplaceObject->getWisersellStoreId();
                 if ($storeId === null) {
                     continue; 
                 }
@@ -148,7 +142,6 @@ class WisersellCommand extends AbstractCommand
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
             }
-            
         }
     }
 
