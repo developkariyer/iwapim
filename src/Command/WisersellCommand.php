@@ -292,8 +292,6 @@ class WisersellCommand extends AbstractCommand
                         "variantCode" => (string)$variantCode,
                         "variantStr" => (string)$variantCode
                 ];
-                echo json_encode($listingData);
-                echo "\n\n";
                 $listingBucket[] = $listingData;
                 if (count($listingBucket) >= 100) {
                     $this->addListingBucketToWisersell($listingBucket,$id);
