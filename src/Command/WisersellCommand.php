@@ -99,7 +99,7 @@ class WisersellCommand extends AbstractCommand
             $this->calculateWisersellCode();
         }
         $response  = $this->request('store','GET','');
-        print_r($response->getContent());
+        file_put_contents('store.json', $response->getContent());
         return Command::SUCCESS;
     }
     
