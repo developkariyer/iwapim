@@ -181,24 +181,25 @@ class WisersellCommand extends AbstractCommand
 
     protected function searchAndUpdateVariantProducts($responseArray)
     {
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/wisersell_error_listings.json';
+        $wisersellListingsError = [];
         foreach ($responseArray['rows'] as $row) {
             $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $row['code']);
             echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
-                echo $variantProduct->getWisersellVariantCode()."\n";
+                $variantProduct->setWisersellVariantCode($row['code']);
+                $variantProduct->save();
+                echo "\nUpdated in PIM... \n";
             }
             else {
                 echo "\nNot found in PIM... \n";
+                $wisersellListingsError[] = $row;
             }
-
-            /*if ($variantProduct instanceof VariantProduct) {
-                if ($variantProduct->getWisersellVariantCode() != $row['code']) {
-                    echo "Updating PIM... \n";
-                    $variantProduct->setWisersellVariantCode($row['code']);
-                    $variantProduct->save();
-                }
-            }*/
+        }
+        if (!empty($wisersellListingsError)) {
+            file_put_contents($filePath, json_encode($wisersellListingsError, JSON_PRETTY_PRINT));
+            echo "\nErrors appended to JSON file.\n";
         }
     }
 
