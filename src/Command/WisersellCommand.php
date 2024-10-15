@@ -305,10 +305,10 @@ class WisersellCommand extends AbstractCommand
                         "variantStr" => (string)$variantCode
                 ];
                 $listingBucket[] = $listingData;
-                if (count($listingBucket) <= 100) {
+                /*if (count($listingBucket) >= 100) {
                     $this->addListingBucketToWisersell($listingBucket);
                     $listingBucket = [];
-                }
+                }*/
                 $count++;
                 if ($count ==4) {
                     break;
@@ -325,7 +325,8 @@ class WisersellCommand extends AbstractCommand
     protected function addListingBucketToWisersell($listingBucket)
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
-        print_r($response->getContent());
+        $responseArray = json_decode($responseContent, true); 
+        print_r($responseArray);
         /*$responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
         print_r($responseArray);
