@@ -252,7 +252,6 @@ class WisersellCommand extends AbstractCommand
         if(empty($this->storeList)) {
             $this->syncStores();
         }
-        $count = 0;
         $listingBucket = [];
         foreach ($this->storeList as $marketplace) {
             foreach ($marketplace->getVariantProductIds() as $id) {
@@ -305,13 +304,9 @@ class WisersellCommand extends AbstractCommand
                         "variantStr" => (string)$variantCode
                 ];
                 $listingBucket[] = $listingData;
-                /*if (count($listingBucket) >= 100) {
+                if (count($listingBucket) >= 100) {
                     $this->addListingBucketToWisersell($listingBucket);
                     $listingBucket = [];
-                }*/
-                $count++;
-                if ($count ==4) {
-                    break;
                 }
             }
             if (count($listingBucket) > 0) {
@@ -327,11 +322,11 @@ class WisersellCommand extends AbstractCommand
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
         $responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
-        print_r($responseArray);
         if ($response->getStatusCode() === 200) {
             if (!empty($responseArray['completed'])) {
                 foreach ($responseArray['completed'] as $response) {
                     $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['code']);
+                    echo "Processing ".$variantProduct->getId()."\n";
                     $variantProduct->setWisersellVariantCode($response['code']);
                     $variantProduct->save();
                 }
