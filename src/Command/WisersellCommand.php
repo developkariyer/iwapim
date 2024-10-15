@@ -126,11 +126,19 @@ class WisersellCommand extends AbstractCommand
                     'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
                     'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
                 };
+                if (!$storeProductId) {
+                    echo "Store product id not found for variant product: " .$object->getId();
+                    continue;
+                }
                 $variantCode = match ($marketplaceType) {
                     'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
                     'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
                     'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
                 };
+                if (!$variantCode && $marketplaceType !== 'Amazon') {
+                    echo "Variant code not found for variant product: " .$object->getId();
+                    continue;
+                }
                 $data = "";
                 if($marketplaceType !== 'Amazon') {
                     $data = "{$storeId}_{$storeProductId}_{$variantCode}";
