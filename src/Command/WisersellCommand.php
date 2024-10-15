@@ -98,10 +98,9 @@ class WisersellCommand extends AbstractCommand
             $this->calculateWisersellCode();
         }
         $codesToDelete = [
-            '21830b84dcf5d77a115b4be4d05e281656c3ba63',
             'b89906d6ab4a842b07335fa3c8dc1f2706f09e09',
-            '21830b84dcf5d77a115b4be4d05e281656c3ba63',
-            'd1f65acec7c1ad43b7a5679c7e08fa48b152167d'
+            'be7170082b30bd3798ff1b90d88bd78349e012bd',
+            '2d1d9a4b082002c7a3fce7f62147cc8f4e8a4d01'
         ];
         foreach ($codesToDelete as $code) {
             $response = $this->request(self::$apiUrl['listing'], 'DELETE', "/{$code}", []);
