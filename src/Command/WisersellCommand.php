@@ -227,7 +227,7 @@ class WisersellCommand extends AbstractCommand
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/wisersell_error_listings.json';
         $wisersellListingsError = [];
         foreach ($responseArray['rows'] as $row) {
-            $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $row['code']);
+            $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $row['code'],null,true);
             echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
