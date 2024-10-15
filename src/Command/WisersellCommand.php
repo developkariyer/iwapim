@@ -213,6 +213,7 @@ class WisersellCommand extends AbstractCommand
                 'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
                 'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
                 'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
+                'Shopify' => Marketplace::findByField('shopId', $store['shopId'] ),
                 default => null
             };
             if ($marketplace instanceof Marketplace) {
@@ -224,11 +225,8 @@ class WisersellCommand extends AbstractCommand
                         "page" => $page,
                         "pageSize" => $pageSize
                     ];
-                    echo json_encode($searchData);
-
                     $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
                     print_r($response->getContent()."\n");
-
                     $responseArray = $response->toArray();
                     foreach ($responseArray['rows'] as $row) {
                         $this->wisersellCodes[$row['code']] =  $row;
@@ -241,7 +239,6 @@ class WisersellCommand extends AbstractCommand
             }
         }
         print_r($this->wisersellCodes);
-        
     }
 
     protected function syncRelations()
@@ -273,7 +270,7 @@ class WisersellCommand extends AbstractCommand
                 $shopId = match ($marketplaceType) {
                     'Etsy' => $marketplace->getShopId(),
                     'Amazon' => $marketplace->getMerchantId(),
-                    //'Shopify' => $marketplace->getShopifyStoreId(),  
+                    'Shopify' => $marketplace->getShopId(),  
                     'Trendyol' => $marketplace->getTrendyolSellerId(),
                 };
                 if (!$shopId) {
