@@ -98,7 +98,6 @@ class WisersellCommand extends AbstractCommand
             $this->calculateWisersellCode();
         }
         $codesToDelete = [
-            'b89906d6ab4a842b07335fa3c8dc1f2706f09e09',
             '21830b84dcf5d77a115b4be4d05e281656c3ba63',
             'd1f65acec7c1ad43b7a5679c7e08fa48b152167d',
             '29e0737f7ef1c6645095163f0ca55dce289610ef',
