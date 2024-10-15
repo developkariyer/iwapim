@@ -332,13 +332,9 @@ class WisersellCommand extends AbstractCommand
         if ($response->getStatusCode() === 200) {
             foreach ($responseArray as $response) {
                 if (!empty($response['completed'])) {
-                    echo "Listing\n\n";
-                    print_r($response);
-                    echo "Listing\n\n";
-
-//                    $variantProduct = VariantProduct::getById($variantId);
-  //                  $variantProduct->setWisersellVariantCode($responseArray['completed'][0]['code']);
-    //                $variantProduct->save();
+                   $variantProduct = VariantProduct::getById($variantId);
+                   $variantProduct->setWisersellVariantCode($response['completed'][0]['code']);
+                   $variantProduct->save();
                 }
             }
             
