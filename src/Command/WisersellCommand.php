@@ -317,6 +317,7 @@ class WisersellCommand extends AbstractCommand
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
         $responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
+        print_r($responseArray);
         if ($response->getStatusCode() === 200) {
             foreach ($responseArray as $response) {
                 if (!empty($response['completed'])) {
