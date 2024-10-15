@@ -110,6 +110,9 @@ class WisersellCommand extends AbstractCommand
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
             echo "Offset: " . $offset . "\n";
             $offset += $pageSize;
             foreach ($results as $object) {
