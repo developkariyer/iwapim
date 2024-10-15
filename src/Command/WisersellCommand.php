@@ -302,7 +302,6 @@ class WisersellCommand extends AbstractCommand
                 $this->addListingBucketToWisersell($listingBucket);
                 $listingBucket = []; 
             }
-            break;
         }
     }
 
