@@ -315,7 +315,7 @@ class WisersellCommand extends AbstractCommand
                 }
                 $listingData = [];*/
                 $count++;
-                if ($count ==7) {
+                if ($count ==9) {
                     break;
                 }
             }
