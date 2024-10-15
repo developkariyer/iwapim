@@ -97,7 +97,7 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
-        $codesToDelete = [
+        /*$codesToDelete = [
             '2d1d9a4b082002c7a3fce7f62147cc8f4e8a4d01',
             'be7170082b30bd3798ff1b90d88bd78349e012bd',
             'b89906d6ab4a842b07335fa3c8dc1f2706f09e09',
@@ -106,7 +106,7 @@ class WisersellCommand extends AbstractCommand
         foreach ($codesToDelete as $code) {
             $response = $this->request(self::$apiUrl['listing'], 'DELETE', "/{$code}", []);
             print_r($response->getContent());
-        }
+        }*/
       
         return Command::SUCCESS;
     }
@@ -325,7 +325,8 @@ class WisersellCommand extends AbstractCommand
     protected function addListingBucketToWisersell($listingBucket)
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
-        $responseContent = $response->getContent();  
+        print_r($response->getContent());
+        /*$responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
         print_r($responseArray);
         if ($response->getStatusCode() === 200) {
@@ -338,7 +339,7 @@ class WisersellCommand extends AbstractCommand
                    $variantProduct->save();
                 }
             }
-        }
+        }*/
     }
 
     protected function syncCategories()
