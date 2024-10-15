@@ -325,23 +325,20 @@ class WisersellCommand extends AbstractCommand
     protected function addListingBucketToWisersell($listingBucket)
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
-        $responseContent = $response->getContent(); 
-        $responseArray = json_decode($responseContent, true); 
-        print_r($responseArray);
-        /*$responseContent = $response->getContent();  
+        $responseContent = $response->getContent();  
         $responseArray = json_decode($responseContent, true); 
         print_r($responseArray);
         if ($response->getStatusCode() === 200) {
-            foreach ($responseArray as $response) {
-                if (!empty($response['completed'])) {
-                   $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['completed'][0]['code']);
-                   echo "Code\n\n";
-                   print_r($response['completed'][0]['code']);
-                   $variantProduct->setWisersellVariantCode($response['completed'][0]['code']);
-                   $variantProduct->save();
+            if (!empty($responseArray['completed'])) {
+                foreach ($responseArray['completed'] as $response) {
+                    $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $response['code']);
+                    echo "Code\n\n";
+                    print_r($response['code']);
+                    $variantProduct->setWisersellVariantCode($response['code']);
+                    $variantProduct->save();
                 }
             }
-        }*/
+        }
     }
 
     protected function syncCategories()
