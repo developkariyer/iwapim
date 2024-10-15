@@ -47,7 +47,6 @@ class WisersellCommand extends AbstractCommand
     protected $categoryList = [];
     protected $wisersellToken = null;
     protected $storeList = [];
-    protected $wisersellCodes = [];
 
     protected function configure() 
     {
@@ -183,8 +182,7 @@ class WisersellCommand extends AbstractCommand
     protected function searchAndUpdateVariantProducts($responseArray)
     {
         foreach ($responseArray['rows'] as $row) {
-            $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $row['storeproductid']);
-            
+            $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $row['code']);
             echo "\nProcessing {$row['code']}... \n";
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
@@ -228,17 +226,12 @@ class WisersellCommand extends AbstractCommand
                     $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
                     print_r($response->getContent()."\n");
                     $responseArray = $response->toArray();
-                    foreach ($responseArray['rows'] as $row) {
-                        $this->wisersellCodes[$row['code']] =  $row;
-                    }
-                    //$this->searchAndUpdateVariantProducts($responseArray);
+                    $this->searchAndUpdateVariantProducts($responseArray);
                     $page++;
                     echo "Loaded ".($page*$pageSize)." listing from Wisersell\n";
                 } while (count($responseArray['rows']) == $pageSize);
-
             }
         }
-        print_r($this->wisersellCodes);
     }
 
     protected function syncRelations()
