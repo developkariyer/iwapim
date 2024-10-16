@@ -344,6 +344,7 @@ class WisersellCommand extends AbstractCommand
                     }
                     $variantProduct->setWisersellVariantCode($response['code']);
                     $variantProduct->save();
+                    echo "Variant product updated with code: " . $response['code'];
                 }
             }
         }
