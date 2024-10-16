@@ -191,10 +191,15 @@ class WisersellCommand extends AbstractCommand
             foreach ($marketplace->getVariantProductIds() as $id) {
                 echo "Processing {$id}... ";
                 $variantProduct = VariantProduct::getById($id);
-                if ($variantProduct->isPublished()) {
-                    echo "Published\n";
-                    continue;
+                if (!$variantProduct instanceof VariantProduct) {
+                    if ($variantProduct->isPublished()) {
+                        echo "Published\n";
+                    }
+                    else {
+                        echo "Not Published\n";
+                    }
                 }
+               
         
         
             }
