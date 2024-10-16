@@ -109,7 +109,7 @@ class WisersellCommand extends AbstractCommand
             echo "Product not found for variant product: \n";
         }
         else {
-            echo "\n". $product->getWisersellId() ."\n";
+            echo "\n". $mainProduct->getWisersellId() ."\n";
         }
 
     }
