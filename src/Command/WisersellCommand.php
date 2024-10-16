@@ -180,6 +180,28 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
+    protected function test()
+    {
+        if(empty($this->storeList)) {
+            $this->syncStores();
+        }
+        $listingBucket = [];
+        foreach ($this->storeList as $marketplace) {
+            foreach ($marketplace->getVariantProductIds() as $id) {
+                echo "Processing {$id}... ";
+                $variantProduct = VariantProduct::getById($id);
+                if ($variantProduct->isPublished()) {
+                    echo "Published\n";
+                    continue;
+                }
+        
+        
+            }
+        
+        
+        }
+    }
+
     protected function searchAndUpdateVariantProducts($responseArray)
     {
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/wisersell_error_listings.json';
