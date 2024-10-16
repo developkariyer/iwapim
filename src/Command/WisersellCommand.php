@@ -231,10 +231,8 @@ class WisersellCommand extends AbstractCommand
                     $variantProduct->save();
                     echo "\n Variant Product: {$variantProduct->getId()} Connected Main Product: {$product->getId()} \n";
                 }
-                else {
-                    $variantProduct->setWisersellVariantCode($row['code']);
-                    $variantProduct->save();
-                }
+                $variantProduct->setWisersellVariantCode($row['code']);
+                $variantProduct->save();
                 echo "\nUpdated in PIM... \n";
             }
             else {
