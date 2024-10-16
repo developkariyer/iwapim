@@ -82,21 +82,27 @@ class WisersellCommand extends AbstractCommand
         if ($input->getOption('category')) {
             $this->syncCategories();
         }
+
         if($input->getOption('product')) {
             $this->syncProducts($forceDownload);
         }
+
         if($input->getOption('store')) {
             $this->syncStores();
         }
+
         if($input->getOption('relation')) {
             $this->syncRelations();
         }
+
         if($input->getOption('code')) {
             $this->syncCode();
         }
+
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
+
         return Command::SUCCESS;
     }
 
@@ -214,7 +220,7 @@ class WisersellCommand extends AbstractCommand
 
     protected function syncCode()
     {
-        $response = $this->request('store','GET','');   
+        $response = $this->request(self::$apiUrl['store'],'GET','');   
         foreach ($response->toArray() as $store) {
             echo "Processing {$store['name']} {$store['id']}...  \n";
             $marketplace = match ($store['source']['name']) {
@@ -255,15 +261,24 @@ class WisersellCommand extends AbstractCommand
                 echo "Processing {$id}... ";
                 $variantProduct = VariantProduct::getById($id);
                 if (!$variantProduct instanceof VariantProduct || $variantProduct->getWisersellVariantCode() !== null ) {
+                    echo "Variant product unpublish or already has wisersell variant code: " .$id;
                     continue;
                 }
                 $marketplaceType = $marketplace->getMarketPlaceType();
+                if (!$marketplaceType) {
+                    echo "Marketplace type not found for variant product: " .$id;
+                    continue;
+                }
                 $mainProduct = $variantProduct->getMainProduct();
                 if (!$mainProduct) {
                     echo "Main product not found for variant product: " .$id;
                     continue;
                 }
                 $productId = $mainProduct[0]->getWisersellId();
+                if (!$productId) {
+                    echo "Product id(wisersellid) not found for variant product: " .$id;
+                    continue;
+                }
                 $storeProductId = match ($marketplaceType) {
                     'Etsy' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],
                     'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
@@ -602,7 +617,6 @@ class WisersellCommand extends AbstractCommand
 
     protected function fetchToken()
     {
-        //$url = "https://dev2.wisersell.com/restapi/token"; 
         $client = HttpClient::create();
         $response = $client->request('POST', static::$apiServer.'token', [
             'json' => [
