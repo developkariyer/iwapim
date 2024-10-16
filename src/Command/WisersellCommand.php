@@ -10,7 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Folder;
-//use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Marketplace\Listing;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
@@ -21,7 +20,6 @@ use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 use Exception;
 
-
 #[AsCommand(
     name: 'app:wisersell',
     description: 'connect wisersell api'
@@ -29,9 +27,7 @@ use Exception;
 
 class WisersellCommand extends AbstractCommand
 {
-    private $wisersellListings = [];
     protected $wisersellProducts = [];
-    private $iwapimListings = [];
     private static $apiServer = '';
     private static $email = '';
     private static $password = '';
