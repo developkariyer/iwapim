@@ -190,8 +190,23 @@ class WisersellCommand extends AbstractCommand
             if ($variantProduct instanceof VariantProduct) {
                 echo "\nFound in PIM... \n";
                 echo $variantProduct->getId();
-                $variantProduct->setWisersellVariantCode($row['code']);
-                $variantProduct->save();
+                $mainProduct = $variantProduct->getMainProduct();
+                if (!$mainProduct) {
+                    echo "Main product not found for variant product: \n";
+                    $product = Product::findByField('wisersellId', $row['product']['id']);
+                    if (!$product instanceof Product) {
+                        echo "Product not found for variant product: \n";
+                        $wisersellListingsError[] = $row;
+                        continue;
+                    }
+                    $variantProduct->setMainProduct($product);
+                    $variantProduct->save();
+                    echo "\n Variant Product: {$variantProduct->getId()} Connected Main Product: {$product->getId()} \n";
+                }
+                else {
+                    $variantProduct->setWisersellVariantCode($row['code']);
+                    $variantProduct->save();
+                }
                 echo "\nUpdated in PIM... \n";
             }
             else {
