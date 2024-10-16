@@ -97,7 +97,6 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
-        $this->test();
         return Command::SUCCESS;
     }
 
@@ -178,33 +177,6 @@ class WisersellCommand extends AbstractCommand
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
             }
-        }
-    }
-
-    protected function test()
-    {
-        if(empty($this->storeList)) {
-            $this->syncStores();
-        }
-        $listingBucket = [];
-        foreach ($this->storeList as $marketplace) {
-            foreach ($marketplace->getVariantProductIds() as $id) {
-                $variantProduct = VariantProduct::getById($id);
-                
-                if (!$variantProduct instanceof VariantProduct) {
-                    if ($variantProduct->isPublished()) {
-                        echo "Published\n";
-                    }
-                    else {
-                        echo "Not Published\n";
-                    }
-                }
-               
-        
-        
-            }
-        
-        
         }
     }
 
