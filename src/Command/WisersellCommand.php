@@ -105,13 +105,13 @@ class WisersellCommand extends AbstractCommand
     {
         $variantProduct = VariantProduct::getById(188000);
         echo $variantProduct->getId();
-        $mainProduct = $variantProduct->getMainProduct();
+        $mainProduct = Product::findByField('wisersellId', $row['product']['id']);
         if (!$mainProduct) {
             echo "Main product not found for variant product: " .$id;
         }
         else {
-            $variantProduct->setMainProduct($mainProduct[0]);
             echo "\n". $mainProduct[0]->getWisersellId() ."\n";
+            $variantProduct->setMainProduct($mainProduct);
         }
 
     }
