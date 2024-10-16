@@ -111,7 +111,7 @@ class WisersellCommand extends AbstractCommand
         }
         else {
             echo "\n". $mainProduct->getWisersellId() ."\n";
-            $variantProduct->setMainProducts([$mainProduct]);
+            $variantProduct->setMainProduct([$mainProduct]);
         }
 
     }
