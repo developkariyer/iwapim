@@ -9,8 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Folder;
-use App\Model\DataObject\Marketplace\Listing;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
 use Pimcore\Model\DataObject\Category;
@@ -132,7 +130,7 @@ class WisersellCommand extends AbstractCommand
         $pageSize = 50;
         $offset = 0;
         $variantObject->setLimit($pageSize);
-        $variantObject->setUnpublished(false);
+        $variantObject->setUnpublished(true);
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
@@ -144,37 +142,38 @@ class WisersellCommand extends AbstractCommand
             foreach ($results as $object) {
                 echo "uniqueMarketplaceId: " . $object->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
+                if (!$marketplaceObject instanceof Marketplace) {
+                    echo "Marketplace not found for variant product: " .$object->getId();
+                    continue;
+                }
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
                 $storeId = $marketplaceObject->getWisersellStoreId();
-                if ($storeId === null) {
+                if (empty($storeId) || empty($marketplaceType)) {
+                    echo "Store id or marketplace type not found for variant product: " .$object->getId();
                     continue; 
                 }
+                $apiResponseJson = json_decode($object->jsonRead('apiResponseJson'), true);
+                $parentResponseJson = json_decode($object->jsonRead('parentResponseJson'), true);
                 $storeProductId = match ($marketplaceType) {
-                    'Etsy' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],
-                    'Amazon' =>  json_decode($object->jsonRead('apiResponseJson'), true)["asin"],
-                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["product_id"],  
-                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["productCode"],
+                    'Etsy' => $apiResponseJson["product_id"] ?? '',
+                    'Amazon' => $apiResponseJson["asin"] ?? '',
+                    'Shopify' => $apiResponseJson["product_id"] ?? '',  
+                    'Trendyol' => $apiResponseJson["productCode"] ?? '',
                 };
-                if (!$storeProductId) {
+                if (empty($storeProductId)) {
                     echo "Store product id not found for variant product: " .$object->getId();
                     continue;
                 }
                 $variantCode = match ($marketplaceType) {
-                    'Etsy' => json_decode($object->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    'Shopify' => json_decode($object->jsonRead('apiResponseJson'), true)["id"],  
-                    'Trendyol' => json_decode($object->jsonRead('apiResponseJson'), true)["platformListingId"],
+                    'Etsy' => $parentResponseJson["listing_id"] ?? '',
+                    'Shopify' => $apiResponseJson["id"],  
+                    'Trendyol' => $apiResponseJson["platformListingId"],
                 };
-                if (!$variantCode && $marketplaceType !== 'Amazon') {
+                if (empty($variantCode) && $marketplaceType !== 'Amazon') {
                     echo "Variant code not found for variant product: " .$object->getId();
                     continue;
                 }
-                $data = "";
-                if($marketplaceType !== 'Amazon') {
-                    $data = "{$storeId}_{$storeProductId}_{$variantCode}";
-                }
-                else {
-                    $data = "{$storeId}_{$storeProductId}";
-                }
+                $data = ($marketplaceType === 'Amazon') ? "{$storeId}_{$storeProductId}" : "{$storeId}_{$storeProductId}_{$variantCode}";
                 $hash = hash('sha1', $data);
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
@@ -325,7 +324,7 @@ class WisersellCommand extends AbstractCommand
             }
             if (count($listingBucket) > 0) {
                 $this->addListingBucketToWisersell($listingBucket);
-                echo $countListingBucket."Listing bucket added to Wisersell \n";
+                echo count($listingBucket)." Listing bucket added to Wisersell \n";
                 $listingBucket = []; 
             }
         }
