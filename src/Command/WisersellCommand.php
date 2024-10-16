@@ -137,10 +137,9 @@ class WisersellCommand extends AbstractCommand
             if (empty($results)) {
                 break;
             }
-            echo "Offset: " . $offset . "\n";
+            echo "Offset $offset to ".($offset+$pageSize)."\n";
             $offset += $pageSize;
             foreach ($results as $object) {
-                echo "uniqueMarketplaceId: " . $object->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
                 if (!$marketplaceObject instanceof Marketplace) {
                     echo "Marketplace not found for variant product: " .$object->getId();
@@ -175,6 +174,7 @@ class WisersellCommand extends AbstractCommand
                 }
                 $data = ($marketplaceType === 'Amazon') ? "{$storeId}_{$storeProductId}" : "{$storeId}_{$storeProductId}_{$variantCode}";
                 $hash = hash('sha1', $data);
+                echo "Calculated Wisersell Code: {$hash} for {$object->getId()} using {$data}\n";
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
             }
