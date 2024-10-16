@@ -100,13 +100,37 @@ class WisersellCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    protected function syncStores()
+    {
+        $this->storeList = [];
+        $response = $this->request('store', 'GET', '');
+        foreach ($response->toArray() as $store) {
+            echo "Processing {$store['name']} {$store['id']}... ";
+            $marketplace = match ($store['source']['name']) {
+                'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
+                'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
+                'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
+                'Shopify' => Marketplace::findByField('shopId', $store['shopId'] ),
+                default => null
+            };
+            if ($marketplace instanceof Marketplace) {
+                $marketplace->setWisersellStoreId($store['id']);
+                $marketplace->save();
+                $this->storeList[] = $marketplace;
+                echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
+            } else {
+                echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
+            }
+        }
+    }
+
     protected function calculateWisersellCode()
     {
         $variantObject = new VariantListing();
         $pageSize = 50;
         $offset = 0;
         $variantObject->setLimit($pageSize);
-        $variantObject->setUnpublished(true);
+        $variantObject->setUnpublished(false);
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
@@ -152,30 +176,6 @@ class WisersellCommand extends AbstractCommand
                 $hash = hash('sha1', $data);
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
-            }
-        }
-    }
-
-    protected function syncStores()
-    {
-        $this->storeList = [];
-        $response = $this->request('store', 'GET', '');
-        foreach ($response->toArray() as $store) {
-            echo "Processing {$store['name']} {$store['id']}... ";
-            $marketplace = match ($store['source']['name']) {
-                'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
-                'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
-                'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
-                'Shopify' => Marketplace::findByField('shopId', $store['shopId'] ),
-                default => null
-            };
-            if ($marketplace instanceof Marketplace) {
-                $marketplace->setWisersellStoreId($store['id']);
-                $marketplace->save();
-                $this->storeList[] = $marketplace;
-                echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
-            } else {
-                echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
             }
         }
     }
@@ -247,7 +247,7 @@ class WisersellCommand extends AbstractCommand
             foreach ($marketplace->getVariantProductIds() as $id) {
                 echo "Processing {$id}... ";
                 $variantProduct = VariantProduct::getById($id);
-                if (isset($variantProduct) && $variantProduct->getWisersellVariantCode() !== null) {
+                if (!$variantProduct instanceof VariantProduct || $variantProduct->getWisersellVariantCode() !== null ) {
                     continue;
                 }
                 $marketplaceType = $marketplace->getMarketPlaceType();
