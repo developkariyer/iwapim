@@ -256,6 +256,7 @@ class WisersellCommand extends AbstractCommand
             $this->syncStores();
         }
         $listingBucket = [];
+        $count = 0;
         foreach ($this->storeList as $marketplace) {
             foreach ($marketplace->getVariantProductIds() as $id) {
                 echo "Processing {$id}... ";
@@ -317,13 +318,18 @@ class WisersellCommand extends AbstractCommand
                         "variantStr" => (string)$variantCode
                 ];
                 $listingBucket[] = $listingData;
-                if (count($listingBucket) >= 100) {
+                $countListingBucket = count($listingBucket);
+                if ($countListingBucket >= 100) {
                     $this->addListingBucketToWisersell($listingBucket);
+                    $count++;
+                    echo $countListingBucket."Listing bucket added to Wisersell \n";
+                    echo "Total Count: ".$count*$countListingBucket."\n";
                     $listingBucket = [];
                 }
             }
             if (count($listingBucket) > 0) {
                 $this->addListingBucketToWisersell($listingBucket);
+                echo $countListingBucket."Listing bucket added to Wisersell \n";
                 $listingBucket = []; 
             }
         }
