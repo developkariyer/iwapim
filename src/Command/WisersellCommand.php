@@ -104,6 +104,7 @@ class WisersellCommand extends AbstractCommand
     protected function test()
     {
         $variantProduct = VariantProduct::getById(188000);
+        echo $variantProduct->getId();
         $mainProduct = $variantProduct->getMainProduct();
         if (!$mainProduct instanceof Product) {
             echo "Product not found for variant product: \n";
