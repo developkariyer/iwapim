@@ -116,6 +116,9 @@ class WisersellCommand extends AbstractCommand
             echo "Offset: " . $offset . "\n";
             $offset += $pageSize;
             foreach ($results as $object) {
+                if ($object->getWisersellVariantCode() !== null) {
+                    continue;
+                }
                 echo "uniqueMarketplaceId: " . $object->getUniqueMarketplaceId() . "\n"; 
                 $marketplaceObject = $object->getMarketplace();
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
