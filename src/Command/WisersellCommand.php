@@ -97,24 +97,7 @@ class WisersellCommand extends AbstractCommand
         if($input->getOption('calculatecode')) {
             $this->calculateWisersellCode();
         }
-        $this->test();
         return Command::SUCCESS;
-    }
-
-    protected function test()
-    {
-        $variantProduct = VariantProduct::getById(188000);
-        echo $variantProduct->getId();
-        $mainProduct = Product::findByField('wisersellId', 5781);
-        if (!$mainProduct) {
-            echo "Main product not found for variant product: " .$id;
-        }
-        else {
-            echo "\n". $mainProduct->getWisersellId() ."\n";
-            $variantProduct->setMainProduct($mainProduct);
-            
-        }
-
     }
 
     protected function syncStores()
