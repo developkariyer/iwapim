@@ -142,13 +142,13 @@ class WisersellCommand extends AbstractCommand
             foreach ($results as $object) {
                 $marketplaceObject = $object->getMarketplace();
                 if (!$marketplaceObject instanceof Marketplace) {
-                    echo "Marketplace not found for variant product: " .$object->getId();
+                    echo "Marketplace not found for variant product: {$object->getId()}\n";
                     continue;
                 }
                 $marketplaceType = $marketplaceObject->getMarketplaceType();
                 $storeId = $marketplaceObject->getWisersellStoreId();
                 if (empty($storeId) || empty($marketplaceType)) {
-                    echo "Store id or marketplace type not found for variant product: " .$object->getId();
+                    echo "Store id or marketplace type not found for variant product: {$object->getId()}\n";
                     continue; 
                 }
                 $apiResponseJson = json_decode($object->jsonRead('apiResponseJson'), true);
@@ -160,7 +160,7 @@ class WisersellCommand extends AbstractCommand
                     'Trendyol' => $apiResponseJson["productCode"] ?? '',
                 };
                 if (empty($storeProductId)) {
-                    echo "Store product id not found for variant product: " .$object->getId();
+                    echo "Store product id not found for variant product: {$object->getId()}\n";
                     continue;
                 }
                 $variantCode = match ($marketplaceType) {
@@ -169,7 +169,7 @@ class WisersellCommand extends AbstractCommand
                     'Trendyol' => $apiResponseJson["platformListingId"],
                 };
                 if (empty($variantCode) && $marketplaceType !== 'Amazon') {
-                    echo "Variant code not found for variant product: " .$object->getId();
+                    echo "Variant code not found for variant product: {$object->getId()}\n";
                     continue;
                 }
                 $data = ($marketplaceType === 'Amazon') ? "{$storeId}_{$storeProductId}" : "{$storeId}_{$storeProductId}_{$variantCode}";
