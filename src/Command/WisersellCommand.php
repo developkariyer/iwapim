@@ -105,7 +105,7 @@ class WisersellCommand extends AbstractCommand
     {
         $variantProduct = VariantProduct::getById(188000);
         echo $variantProduct->getId();
-        $mainProduct = $variantProduct->getMainProduct();
+        $mainProducts = $variantProduct->getReverseAssignedRelatedObjects('mainProduct');
         if (!$mainProduct instanceof Product) {
             echo "Product not found for variant product: \n";
         }
