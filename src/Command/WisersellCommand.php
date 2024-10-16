@@ -174,9 +174,13 @@ class WisersellCommand extends AbstractCommand
                 }
                 $data = ($marketplaceType === 'Amazon') ? "{$storeId}_{$storeProductId}" : "{$storeId}_{$storeProductId}_{$variantCode}";
                 $hash = hash('sha1', $data);
-                echo "Calculated Wisersell Code: {$hash} for {$object->getId()} using {$data}\n";
+                if ($object->getCalculatedWisersellCode() === $hash) {
+                    echo "Calculated Wisersell Code already set for {$object->getId()}\n";
+                    continue;
+                }
                 $object->setCalculatedWisersellCode($hash);
                 $object->save();
+                echo "Saved calculated Wisersell Code: {$hash} for {$object->getId()} using {$data}\n";
             }
         }
     }
