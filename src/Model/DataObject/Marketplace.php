@@ -6,8 +6,22 @@ use App\MarketplaceConnector\AmazonConstants;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Marketplace\Listing;
 
+/**
+* Class Marketplace
+*
+* Represents a marketplace entity in the system, providing methods
+* to retrieve marketplace data and related operations.
+*
+* @package App\Model\DataObject
+*/
 class Marketplace extends Concrete
 {
+    /**
+    * Retrieves a list of marketplaces based on the specified type.
+    *
+    * @param string $type The type of marketplace to filter by (optional).
+    * @return array The list of marketplaces.
+    */
     public static function getMarketplaceList($type = '')
     {
         $list = new Listing();
@@ -18,6 +32,12 @@ class Marketplace extends Concrete
         return $marketplaces;
     }    
 
+    /**
+    * Retrieves a list of marketplaces and returns them as an associative array
+    * with marketplace keys, excluding Amazon marketplaces.
+    *
+    * @return array The associative array of marketplace keys.
+    */
     public static function getMarketplaceListAsArrayKeys()
     {
         $marketplaces = self::getMarketplaceList();
@@ -33,6 +53,13 @@ class Marketplace extends Concrete
         return $marketplacesArray;
     }
 
+    /**
+    * Finds a marketplace by a specified field and value.
+    *
+    * @param string $field The field to search by.
+    * @param mixed $value The value to search for.
+    * @return Concrete|null The found marketplace or null if not found.
+    */
     public static function findByField($field, $value)
     {
         $list = new Listing();
@@ -42,6 +69,11 @@ class Marketplace extends Concrete
         return $list->current();
     }
 
+    /**
+    * Retrieves variant product IDs related to the current marketplace.
+    *
+    * @return array An array of variant product IDs.
+    */
     public function getVariantProductIds()
     {
         $db = \Pimcore\Db::get();

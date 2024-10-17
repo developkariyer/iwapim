@@ -4,8 +4,22 @@ namespace App\Model\DataObject;
 
 use Pimcore\Model\DataObject\Concrete;
 
+/**
+* Class CostModel
+*
+* This class represents a model for calculating costs associated with a product. 
+* It handles the retrieval and computation of various cost factors related to the product.
+* 
+* @package App\Model\DataObject
+*/
 class CostModel extends Concrete
 {
+    /**
+    * Calculates the total cost of a product based on various cost nodes.
+    *
+    * @param Product $product The product for which the cost is calculated.
+    * @return string The total cost as a string formatted to two decimal places.
+    */
     public function getCost($product): string
     {
         $totalCost = '0.00';

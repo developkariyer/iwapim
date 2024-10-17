@@ -5,8 +5,22 @@ namespace App\Model\DataObject;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Currency\Listing;
 
+/**
+* Class Currency
+*
+* This class represents a currency model in the system. 
+* It provides methods for retrieving currency details and converting amounts between different currencies.
+* 
+* @package App\Model\DataObject
+*/
 class Currency extends Concrete
 {
+    /**
+    * Retrieves a currency object by its currency code.
+    *
+    * @param string $currencyCode The currency code to search for.
+    * @return Currency|null The currency object or null if not found.
+    */
     protected static function getCurrency($currencyCode)
     {
         switch ($currencyCode) {
@@ -38,7 +52,15 @@ class Currency extends Concrete
         $list->setLimit(1);
         return $list->current();
     }
-    
+
+    /**
+    * Converts an amount from one currency to another.
+    *
+    * @param string $fromCurrency The currency code to convert from.
+    * @param string $amount The amount to convert.
+    * @param string $toCurrency The currency code to convert to. Defaults to 'TL'.
+    * @return string The converted amount or "0.00" if conversion fails.
+    */
     public static function convertCurrency($fromCurrency, $amount, $toCurrency = 'TL')
     {
         if ($fromCurrency === $toCurrency) {
