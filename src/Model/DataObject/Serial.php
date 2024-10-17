@@ -10,9 +10,24 @@ use Pimcore\Model\Asset\Listing as AssetListing;
 use App\Utils\Utility;
 use App\Utils\PdfGenerator;
 
+/**
+ * Class Serial
+ *
+ * This class manages serial numbers for products,
+ * including generating unique serial numbers, checking 
+ * for existing labels, and creating labels if they do 
+ * not exist.
+ * 
+ * @package App\Model\DataObject
+ */
 class Serial extends Concrete
 {
 
+    /**
+    * Generates a unique serial number.
+    *
+    * @return int Unique serial number.
+    */
     public function generateUniqueSerialNumber()
     {
         do  {
@@ -21,6 +36,14 @@ class Serial extends Concrete
         return $candidateNumber;
     }
 
+    /**
+    * Finds a data object by field and value.
+    *
+    * @param string $field Field name.
+    * @param mixed $value Search value.
+    * 
+    * @return Concrete|null Found data object or null.
+    */
     public static function findByField($field, $value)
     {
         $list = new Listing();
@@ -30,6 +53,11 @@ class Serial extends Concrete
         return $list->current();
     }
 
+    /**
+    * Checks and generates a label for the serial number.
+    *
+    * @return void
+    */
     public function checkLabel()
     {
         if (!$this->isPublished()) {
@@ -52,6 +80,13 @@ class Serial extends Concrete
         }
     }
 
+    /**
+    * Checks if an asset exists by filename.
+    *
+    * @param string $filename The name of the asset file.
+    * 
+    * @return Asset The found asset 
+    */
     protected static function checkAsset($filename)
     {
         $list = new AssetListing();
