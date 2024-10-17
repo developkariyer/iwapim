@@ -8,6 +8,8 @@ use Pimcore\Model\DataObject\Product\Listing;
 use App\Utils\Utility;
 use Pimcore\Model\DataObject\Service;
 use Pimcore\Model\DataObject\Data\Video;
+use Pimcore\Model\DataObject\VariantProduct;
+
 
 class Product extends Concrete
 {
@@ -349,21 +351,22 @@ class Product extends Concrete
         $listingIds = array_map(function ($item) {
             return $item->getId();
         }, $listingItems);
-        if (is_array($variant)) {
-            foreach ($variant as $v) {
-                if (!in_array($v->getId(), $listingIds)) {
-                    $listingItems[] = $v;
-                }
+        $variantArray = (is_array($variant)) ? $variant : [$variant];
+        $dirty = false;
+        foreach ($variantArray as $variant) {
+            if (!$variant instanceof VariantProduct) {
+                continue;
             }
-            $this->setListingItems($listingItems);
-            return $this->save();
-        } else {
             if (!in_array($variant->getId(), $listingIds)) {
+                $dirty = true;
                 $listingItems[] = $variant;
-                $this->setListingItems($listingItems);
-                return $this->save();
             }
         }
+        if ($dirty) {
+            $this->setListingItems($listingItems);
+            return $this->save();
+        }
+        return true;
     }
 
     public function generateUniqueCode($numberDigits=5)
