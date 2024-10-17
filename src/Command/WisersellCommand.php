@@ -191,23 +191,38 @@ class WisersellCommand extends AbstractCommand
         $wisersellListingsError = [];
         foreach ($responseArray['rows'] as $row) {
             $variantProduct = VariantProduct::findOneByField('calculatedWisersellCode', $row['code'],null,true);
-            echo "\nProcessing {$row['code']}... \n";
+            echo "Wisersell code {$row['code']} ";
             if ($variantProduct instanceof VariantProduct) {
-                echo "\nFound in PIM... \n";
-                echo $variantProduct->getId();
+                echo "found in PIM as {$variantProduct->getId()} ";
                 $mainProduct = $variantProduct->getMainProduct();
-                if (!$mainProduct) {
-                    echo "Main product not found for variant product: \n";
-                    $variantProduct->setMainProduct($mainProduct);
-                    $variantProduct->save();
-                    echo "\n Variant Product: {$variantProduct->getId()} Connected Main Product: {$mainProduct->getId()} \n";
+                if ($mainProduct instanceof Product) {
+                    echo "already connected to Product {$mainProduct->getId()}\n";
+                } else {
+                    $wisersellProductId = $row["product"]["id"] ?? '';
+                    if (empty($wisersellProductId)) {
+                        echo "not connected to any Product\n";
+                        continue;
+                    }
+                    $mainProduct = Product::findByField('wisersellId', $wisersellProductId);
+                    if ($mainProduct instanceof Product) {
+                        $variantProduct->setMainProduct($mainProduct);
+                        $variantProduct->save();
+                        echo "connected to Product {$mainProduct->getId()}\n";
+                    } else {
+                        echo "connected to unknown Product in wisersell\n";
+                        $wisersellListingsError[] = $row;
+                    }
+                }
+                if ($variantProduct->getWisersellVariantCode() === $row['code']) {
+                    echo "already up-to-date in PIM\n";
+                    continue;
                 }
                 $variantProduct->setWisersellVariantCode($row['code']);
                 $variantProduct->save();
-                echo "\nUpdated in PIM... \n";
+                echo "updated in PIM... \n";
             }
             else {
-                echo "\nNot found in PIM... \n";
+                echo "Not found in PIM... \n";
                 $wisersellListingsError[] = $row;
             }
         }
