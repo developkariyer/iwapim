@@ -208,7 +208,7 @@ class WisersellCommand extends AbstractCommand
                         // will be added from mainProduct but be careful! Might loose all connections if not cateful!!!!
                         //$variantProduct->setMainProduct($mainProduct);
                         //$variantProduct->save();
-                        $mainProduct-addVariant($variantProduct);
+                        $mainProduct->addVariant($variantProduct);
                         echo "connected to Product {$mainProduct->getId()} ";
                     } else {
                         echo "connected to unknown Product in wisersell ";
