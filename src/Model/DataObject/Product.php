@@ -10,12 +10,29 @@ use Pimcore\Model\DataObject\Service;
 use Pimcore\Model\DataObject\Data\Video;
 use Pimcore\Model\DataObject\VariantProduct;
 
-
+/**
+ * Class Product
+ *
+ * This class serves as a data object for managing 
+ * product data and creating product variations in Pimcore.
+ * @package App\Model\DataObject
+ */
 class Product extends Concrete
 {
+    /**
+     * @var int $recursiveCounter
+     * Counter for recursive calls to prevent infinite loops
+     */
     private static $recursiveCounter = 0;
+     /**
+     * @var array $assetPaths
+     * Cached asset paths for the product
+     */
     protected $assetPaths = [];
-
+    /**
+     * @var array $level0NullFields
+     * Fields to nullify for level 0 products
+     */
     public static $level0NullFields = [
         'variationSize',
         'variationColor',
@@ -26,7 +43,10 @@ class Product extends Concrete
         'wisersellId',
         'wisersellJson',
     ];
-
+    /**
+     * @var array $level1NullFields
+     * Fields to nullify for level 1 products
+     */
     public static $level1NullFields = [
         'productIdentifier',
         'productCategory',
@@ -45,7 +65,10 @@ class Product extends Concrete
         'designFiles',
         'rawFiles',
     ];
-
+    /**
+     * @var array $nullables
+     * Fields that can be nullified
+     */
     protected static $nullables = [
         'productIdentifier',
         'name',
@@ -70,6 +93,11 @@ class Product extends Concrete
         'inContainerCount',
     ];
 
+    /**
+    * Nullifies nullable fields in the product, setting them to null if they are empty.
+    *
+    * @return void
+    */
     public function nullify()
     {
         foreach (self::$nullables as $field) {
@@ -79,11 +107,22 @@ class Product extends Concrete
         }    
     }
 
+    /**
+    * Returns the level of the product based on its parent status.
+    *
+    * @return int Returns 1 if the parent is an instance of Product, otherwise 0.
+    */
     public function level()
     {
         return ($this->getParent() instanceof Product) ? 1 : 0;
     }
 
+    /**
+    * Checks if the product code has the specified number of digits; generates a new code if not.
+    *
+    * @param int $numberDigits The required number of digits for the product code (default is 5).
+    * @return bool Returns false if the product code has the correct number of digits, otherwise returns true after generating a new code.
+    */
     public function checkProductCode($numberDigits = 5)
     {
         Product::setGetInheritedValues(false);
@@ -97,6 +136,12 @@ class Product extends Concrete
         return true;
     }
 
+    /**
+    * Checks and updates the Iwasku value based on the product identifier and conditions.
+    *
+    * @param bool $forced If true, forces the check regardless of the current conditions.
+    * @return bool Returns true if the Iwasku value was updated, otherwise returns false.
+    */
     public function checkIwasku($forced = false)
     {
         if ($forced || ($this->level() == 1 && $this->isPublished() && strlen($this->getIwasku() ?? '') != 12)) {
@@ -114,6 +159,11 @@ class Product extends Concrete
         return false;
     }
 
+    /**
+    * Constructs and sets the product key based on inherited fields; if empty, generates a temporary key.
+    *
+    * @return void
+    */
     public function checkKey()
     {
         $key = $this->getInheritedField("ProductIdentifier");
@@ -134,6 +184,11 @@ class Product extends Concrete
         }
     }
 
+    /**
+    * Validates and formats the product identifier by padding the numeric part with leading zeros.
+    *
+    * @return void
+    */
     public function checkProductIdentifier()
     {
         if (empty($this->getProductIdentifier())) {
@@ -146,6 +201,11 @@ class Product extends Concrete
         }
     }
 
+    /**
+    * Retrieves unique sizes and colors of the product variations.
+    *
+    * @return array An array containing two elements: an array of unique sizes and an array of unique colors.
+    */
     public function listVariations()
     {
         $sizes = [];
@@ -164,6 +224,13 @@ class Product extends Concrete
         return [$sizes, $colors];
     }
 
+    /**
+    * Updates the asset's filename and parent folder if necessary.
+    *
+    * @param mixed $asset The asset to be updated, which can be an instance of Video or other asset types.
+    * @param Folder $folder The target folder where the asset should be moved.
+    * @return void
+    */
     protected function updateAsset($asset, $folder)
     {
         if (!$asset) {
@@ -187,6 +254,12 @@ class Product extends Concrete
         $asset->save();
     }
 
+    /**
+    * Generates the asset path based on the product identifier and the main folder string.
+    *
+    * @param string $mainFolderString The main folder path as a string.
+    * @return string|null The generated asset path or null if the product identifier is invalid.
+    */
     protected function generateAssetPath($mainFolderString)
     {
         $productIdentifier = str_replace(' ', '', $this->getInheritedField("productIdentifier")); // e.g. AMS-123A
@@ -206,6 +279,12 @@ class Product extends Concrete
         );
     }
 
+    /**
+    * Retrieves a cached asset path or generates it if not already cached.
+    *
+    * @param string $path The path to check in the cache.
+    * @return string The generated asset path associated with the given path.
+    */
     protected function cachedAssetPath($path)
     {
         if (!isset($this->cachedAssetPaths[$path])) {
@@ -214,6 +293,15 @@ class Product extends Concrete
         return $this->cachedAssetPaths[$path];
     }
 
+    /**
+    * Checks and updates asset folders for the product based on its state and relationships.
+    *
+    * This method ensures that all assets are stored in the correct folders based on predefined 
+    * mappings. It handles fields, relations, and collections for assets and updates their 
+    * paths accordingly.
+    *
+    * @return void
+    */
     public function checkAssetFolders()
     {
         if (!$this->isPublished() || $this->level()>0) {
@@ -267,6 +355,16 @@ class Product extends Concrete
         }
     }
 
+    /**
+    * Checks and manages variations of the product based on size and color.
+    *
+    * This method evaluates the current product's variations (sizes and colors) and ensures
+    * that all combinations are represented as child products. If there are missing variations,
+    * it creates new child products for them. Additionally, it handles the deletion of child 
+    * products that no longer match the valid variations.
+    *
+    * @return void
+    */
     public function checkVariations()
     {
         if ($this->level() > 0) {
@@ -345,6 +443,14 @@ class Product extends Concrete
         $this->save();
     }
 
+    /**
+    * Adds a variant or variants to the product's listing items.
+    *
+    * Checks if the given variant(s) already exist. If not, adds them to the listing and saves the product.
+    *
+    * @param VariantProduct $variant A variant  to add.
+    * @return bool True if added successfully, false otherwise.
+    */
     public function addVariant($variant)
     {
         $listingItems = $this->getListingItems();
@@ -369,6 +475,15 @@ class Product extends Concrete
         return true;
     }
 
+    /**
+    * Generates a unique product code of a specified number of digits.
+    *
+    * Continuously generates candidate codes until a unique one is found that does not 
+    * already exist in the database.
+    *
+    * @param int $numberDigits The number of digits for the unique code. Default is 5.
+    * @return string The unique product code.
+    */
     public function generateUniqueCode($numberDigits=5)
     {
         while (true) {
@@ -379,6 +494,13 @@ class Product extends Concrete
         }
     }
 
+    /**
+    * Finds an object by a field and its value.
+    *
+    * @param string $field The field name.
+    * @param mixed $value The value to match.
+    * @return mixed The found object or null.
+    */
     public static function findByField($field, $value)
     {
         $list = new Listing();
@@ -388,12 +510,23 @@ class Product extends Concrete
         return $list->current();
     }
 
+    /**
+    * Finds a similar key and returns the associated product code.
+    *
+    * @return string|null The product code if found, null otherwise.
+    */
     public function findSimilarKey()
     {
         $current = $this->findByField('key', $this->key);
         return $current ? $current->getProductCode() : null;
     }
 
+    /**
+    * Generates a random custom string of specified length using alphanumeric characters.
+    *
+    * @param int $length The desired length of the generated string.
+    * @return string The generated random string.
+    */
     public static function generateCustomString($length = 5) {
         $characters = 'ABCDEFGHJKMNPQRSTVWXYZ1234567890';
         $charactersLength = strlen($characters);
@@ -406,6 +539,12 @@ class Product extends Concrete
         return $randomString;
     }
 
+    /**
+    * Retrieves the value of an inherited field from the current object.
+    *
+    * @param string $field The name of the field to retrieve.
+    * @return mixed The value of the inherited field.
+    */
     public function getInheritedField($field)
     {
         $object = $this;
@@ -416,6 +555,11 @@ class Product extends Concrete
         return $value;
     }
 
+    /**
+    * Determines the level of the product in the hierarchy.
+    *
+    * @return int The level of the product, where 0 is the top level.
+    */
     public function productLevel()
     {
         $level = 0;
@@ -427,6 +571,11 @@ class Product extends Concrete
         return $level;
     }
 
+    /**
+    * Calculates the area of the product based on its dimensions.
+    *
+    * @return float float The area in square meters. Returns 0 if dimensions are not set.
+    */
     public function getArea()
     {
         $dimension1 = $this->getProductDimension1();
@@ -437,6 +586,11 @@ class Product extends Concrete
         return 0;
     }
 
+    /**
+    * Calculates the area of the package based on its dimensions.
+    *
+    * @return float The package area in square meters. Returns 0 if dimensions are not set.
+    */
     public function getPackageArea()
     {
         $dimension1 = $this->getPackageDimension1();
@@ -447,6 +601,11 @@ class Product extends Concrete
         return 0;
     }
 
+    /**
+    * Generates a 4x6 iwasku sticker PDF and sets it to the current object.
+    *
+    * @return mixed The generated PDF asset or null if generation failed.
+    */
     public function checkSticker4x6iwasku()
     {
         $asset = PdfGenerator::generate4x6iwasku('', '',  $this, "{$this->getKey()}_4x6iwasku.pdf");
@@ -457,6 +616,11 @@ class Product extends Concrete
         return $asset;
     }
 
+    /**
+    * Generates a 4x6 EU sticker PDF and sets it to the current object.
+    *
+    * @return mixed The generated PDF asset or null if generation failed.
+    */
     public function checkSticker4x6eu()
     {
         $asset = PdfGenerator::generate4x6eu('', '',  $this, "{$this->getKey()}_4x6eu.pdf");
