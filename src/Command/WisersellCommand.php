@@ -205,9 +205,10 @@ class WisersellCommand extends AbstractCommand
                     }
                     $mainProduct = Product::findByField('wisersellId', $wisersellProductId);
                     if ($mainProduct instanceof Product) {
-                        $variantProduct->setMainProduct($mainProduct);
-                        $variantProduct->save();
-                        echo "connected to Product {$mainProduct->getId()}\n";
+                        // will be added from mainProduct but be careful! Might loose all connections if not cateful!!!!
+                        //$variantProduct->setMainProduct($mainProduct);
+                        //$variantProduct->save();
+                        echo "to be connected to Product {$mainProduct->getId()}\n";
                     } else {
                         echo "connected to unknown Product in wisersell\n";
                         $wisersellListingsError[] = $row;
