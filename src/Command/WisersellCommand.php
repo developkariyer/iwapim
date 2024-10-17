@@ -255,7 +255,7 @@ class WisersellCommand extends AbstractCommand
                         "pageSize" => $pageSize
                     ];
                     $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
-                    print_r($response->getContent()."\n");
+                    //print_r($response->getContent()."\n");
                     $responseArray = $response->toArray();
                     $this->searchAndUpdateVariantProducts($responseArray);
                     $page++;
