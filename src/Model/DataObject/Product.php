@@ -15,6 +15,7 @@ use Pimcore\Model\DataObject\VariantProduct;
  *
  * This class serves as a data object for managing 
  * product data and creating product variations in Pimcore.
+ * 
  * @package App\Model\DataObject
  */
 class Product extends Concrete
