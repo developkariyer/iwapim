@@ -476,7 +476,7 @@ class WisersellCommand extends AbstractCommand
 
     }
 
-    protected function loadWisersellProducts($forceDownload = false)
+    public function loadWisersellProducts($forceDownload = false)
     {
         $this->wisersellProducts = json_decode(Utility::getCustomCache('wisersell_products.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
         if (!(empty($this->wisersellProducts) || $forceDownload)) {
