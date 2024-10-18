@@ -37,6 +37,33 @@ class ErrorListingsCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    private function notConnectedListings()
+    {
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/notconnectedlistings.txt';
+        $variantObject = new VariantListing();
+        $pageSize = 50;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(true);
+        while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            echo "Offset $offset to ".($offset+$pageSize)."\n";
+            $offset += $pageSize;
+            foreach ($results as $object) {
+                $mainProduct = $object->getMainProduct();
+                if (!$mainProduct) {
+                    $message = "Processing {$object->getId()}\n";   
+                    echo $message;
+                    file_put_contents($filePath, $message, FILE_APPEND);
+                }
+            }
+        }
+    }
+
     private function multiConnectedListings()
     {
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/multiconnectedlistings.txt';
