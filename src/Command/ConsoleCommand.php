@@ -17,10 +17,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ConsoleCommand extends AbstractCommand
 {
-    protected function configure() 
-    {
-        $this->addOption('logging',null, InputOption::VALUE_NONE, 'Log everything to the log file');
-    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -56,9 +52,6 @@ class ConsoleCommand extends AbstractCommand
                 $context = get_defined_vars();
 
                 // Optionally log commands and results
-                if ($logging) {
-                    $this->logCommand($logFile, $command, $result ?? null);
-                }
 
             } catch (\Throwable $e) {
                 $io->error($e->getMessage());
