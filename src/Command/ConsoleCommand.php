@@ -36,19 +36,30 @@ class ConsoleCommand extends AbstractCommand
                 return 0;
             }
             try {
+                // Extract context to maintain variables across commands
                 extract($context);
-                if (preg_match('/^echo\s+/', $command)) {
+
+                // Check if the command starts with echo/print and handle it directly
+                if (preg_match('/^(echo|print)\s+/', $command)) {
                     eval($command . ';');
                 } else {
-                    // Wrap other commands in return to capture result
+                    // Evaluate the command and return the result
                     $result = eval('return ' . $command . ';');
 
-                    // Only output if result is non-null
+                    // Output non-null results
                     if ($result !== null) {
                         $io->writeln(var_export($result, true));
                     }
                 }
+
+                // Rebuild the context to include any new variables
                 $context = get_defined_vars();
+
+                // Optionally log commands and results
+                if ($logging) {
+                    $this->logCommand($logFile, $command, $result ?? null);
+                }
+
             } catch (\Throwable $e) {
                 $io->error($e->getMessage());
             }
