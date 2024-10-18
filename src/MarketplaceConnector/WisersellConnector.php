@@ -5,7 +5,8 @@ namespace App\MarketplaceConnector;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Pimcore\Model\DataObject\Category;
-use App\Utility\Utility;
+use App\Utils\Utility;
+use Exception;
 
 
 class WisersellConnector
