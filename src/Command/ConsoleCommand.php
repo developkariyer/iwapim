@@ -29,7 +29,7 @@ class ConsoleCommand extends AbstractCommand
         $context = [];
 
         while (true) {
-            $command = io->ask('');
+            $command = $io->ask('');
             if (trim($command) === 'exit') {
                 $io->success('Goodbye!');
                 return 0;
