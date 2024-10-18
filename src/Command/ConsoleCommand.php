@@ -28,7 +28,8 @@ class ConsoleCommand extends AbstractCommand
         $io->title('Pimcore Interactive Shell (REPL)');
 
         while (true) {
-            $command = $io->ask('>>> ');
+            fwrite(STDOUT, 'IWAPIM >>> ');
+            $command = trim(fgets(STDIN));
             if (trim($command) === 'exit') {
                 $io->success('Goodbye!');
                 return 0;
