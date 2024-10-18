@@ -53,7 +53,7 @@ class ErrorListingsCommand extends AbstractCommand
             echo "Offset $offset to ".($offset+$pageSize)."\n";
             $offset += $pageSize;
             foreach ($results as $object) {
-                $mainProduct = $variantProduct->getMainProduct();
+                $mainProduct = $variantObject->getMainProduct();
                 if (!$mainProduct) {
                     echo "Main product not found for variant product: " .$id;
                     continue;
