@@ -29,8 +29,7 @@ class ConsoleCommand extends AbstractCommand
         $context = [];
 
         while (true) {
-            fwrite(STDOUT, "\nIWAPIM >>> ");
-            $command = trim(fgets(STDIN));
+            $command = io->ask('');
             if (trim($command) === 'exit') {
                 $io->success('Goodbye!');
                 return 0;
