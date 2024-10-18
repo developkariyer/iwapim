@@ -55,7 +55,6 @@ class ErrorListingsCommand extends AbstractCommand
             foreach ($results as $object) {
                 $mainProduct = $object->getMainProduct();
                 if (!$mainProduct) {
-                    echo "Main product not found for variant product: " .$id;
                     continue;
                 }
                 $mainProductCount = count($mainProduct);
