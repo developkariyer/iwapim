@@ -28,7 +28,7 @@ class ConsoleCommand extends AbstractCommand
         $io->title('Pimcore Interactive Shell (REPL)');
 
         while (true) {
-            $command = $io->ask('php >');
+            $command = $io->ask();
             if (trim($command) === 'exit') {
                 $io->success('Goodbye!');
                 return 0;
