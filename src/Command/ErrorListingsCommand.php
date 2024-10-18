@@ -44,7 +44,7 @@ class ErrorListingsCommand extends AbstractCommand
         $pageSize = 50;
         $offset = 0;
         $variantObject->setLimit($pageSize);
-        $variantObject->setUnpublished(true);
+        $variantObject->setUnpublished(false);
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
