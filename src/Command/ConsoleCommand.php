@@ -19,10 +19,7 @@ class ConsoleCommand extends AbstractCommand
 {
     protected function configure() 
     {
-        $this
-            ->addOption('notconnected',null, InputOption::VALUE_NONE, '')
-            ->addOption('multiconnected',null, InputOption::VALUE_NONE, '')
-            ;
+        $this->addOption('logging',null, InputOption::VALUE_NONE, 'Log everything to the log file');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
