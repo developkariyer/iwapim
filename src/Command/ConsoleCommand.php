@@ -37,7 +37,17 @@ class ConsoleCommand extends AbstractCommand
             }
             try {
                 extract($context);
-                $result = eval($command . ';');
+                if (preg_match('/^echo\s+/', $command)) {
+                    eval($command . ';');
+                } else {
+                    // Wrap other commands in return to capture result
+                    $result = eval('return ' . $command . ';');
+
+                    // Only output if result is non-null
+                    if ($result !== null) {
+                        $io->writeln(var_export($result, true));
+                    }
+                }
                 $context = get_defined_vars();
                 if ($result !== null) {
                     $io->writeln(var_export($result, true));
