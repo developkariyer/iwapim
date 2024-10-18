@@ -26,6 +26,7 @@ class ConsoleCommand extends AbstractCommand
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Pimcore Interactive Shell (REPL)');
+        $context = [];
 
         while (true) {
             fwrite(STDOUT, "\nIWAPIM >>> ");
