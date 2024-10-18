@@ -20,15 +20,12 @@ use Exception;
 
 #[AsCommand(
     name: 'app:wisersell',
-    description: 'connect wisersell api'
+    description: 'Wisersell API connection and sync',
 )]
 
 class WisersellCommand extends AbstractCommand
 {
     protected $wisersellProducts = [];
-    private static $apiServer = '';
-    private static $email = '';
-    private static $password = '';
     private static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
@@ -45,15 +42,15 @@ class WisersellCommand extends AbstractCommand
     protected function configure() 
     {
         $this
-            ->addOption('dev',null, InputOption::VALUE_NONE, 'Development mode')
-            ->addOption('prod',null, InputOption::VALUE_NONE, 'Production mode')
-            ->addOption('category', null, InputOption::VALUE_NONE, 'Category add wisersell')
-            ->addOption('product', null, InputOption::VALUE_NONE, 'Product add wisersell')
-            ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell products')
+            ->addOption('dev',null, InputOption::VALUE_NONE, 'Use Wisersell DEV Server')
+            ->addOption('prod',null, InputOption::VALUE_NONE, 'Use Wisersell PROD Server')
+            ->addOption('download', null, InputOption::VALUE_NONE, 'Force download of wisersell data')
             ->addOption('store', null, InputOption::VALUE_NONE, 'List all stores')
-            ->addOption('relation', null, InputOption::VALUE_NONE, 'Sync relations')
-            ->addOption('code', null, InputOption::VALUE_NONE, 'Sync code')
-            ->addOption('calculatecode', null, InputOption::VALUE_NONE, 'Calculate code')
+            ->addOption('category', null, InputOption::VALUE_NONE, 'Sync categories')
+            ->addOption('product', null, InputOption::VALUE_NONE, 'Sync products')
+            ->addOption('relation', null, InputOption::VALUE_NONE, 'Push relations to wisersell')
+            ->addOption('code', null, InputOption::VALUE_NONE, 'Pull relation codes from wisersell')
+            ->addOption('calculatecode', null, InputOption::VALUE_NONE, 'Calculate wisersell relation codes in variantProduct')
             ;
     }
 
@@ -73,16 +70,16 @@ class WisersellCommand extends AbstractCommand
             static::$password = $_ENV['WISERSELL_PROD_PASSWORD'];
         }
 
+        if($input->getOption('store')) {
+            $this->syncStores();
+        }
+
         if ($input->getOption('category')) {
             $this->syncCategories();
         }
 
         if($input->getOption('product')) {
             $this->syncProducts($forceDownload);
-        }
-
-        if($input->getOption('store')) {
-            $this->syncStores();
         }
 
         if($input->getOption('relation')) {
@@ -120,6 +117,217 @@ class WisersellCommand extends AbstractCommand
                 echo "Store {$store['name']} ({$store['id']}) updated in PIM\n";
             } else {
                 echo "Store {$store['name']} ({$store['id']}) not found in PIM\n";
+            }
+        }
+    }
+
+    protected function syncCategories()
+    {
+        echo "Syncing Categories...\n";
+        $wisersellCategories = $this->getWisersellCategories();
+        $pimCategories = $this->getPimCategories();
+        foreach ($wisersellCategories as $wisersellCategory) {
+            echo "Processing {$wisersellCategory['name']}... ";
+            if (isset($pimCategories[$wisersellCategory['name']])) {
+                $pimCategory = $pimCategories[$wisersellCategory['name']];
+                if ($pimCategory->getWisersellCategoryId() != $wisersellCategory['id']) {
+                    $pimCategory->setWisersellCategoryId($wisersellCategory['id']);
+                    echo "Updated PIM... ";
+                    $pimCategory->save();
+                }
+                unset($pimCategories[$wisersellCategory['name']]);
+                echo "Done\n";
+                continue;
+            } 
+            echo "Adding to PIM... ";
+            $category = new Category();
+            $category->setKey($wisersellCategory['name']);
+            $category->setParent(Utility::checkSetPath('Kategoriler', Utility::checkSetPath('Ayarlar')));
+            $category->setCategory($wisersellCategory['name']);
+            $category->setWisersellCategoryId($wisersellCategory['id']);
+            $category->save();
+            echo "Done\n";
+        }
+        foreach ($pimCategories as $pimCategory) {
+            echo "Adding to {$pimCategory->getCategory()} to Wisersell... ";
+            $response = $this->addCategoryToWisersell($pimCategory->getCategory());
+            if (isset($response[0]['id'])) {
+                $pimCategory->setWisersellCategoryId($response[0]['id']);
+                $pimCategory->save();
+            } else {
+                echo "Failed to add category to Wisersell: " . json_encode($response) . "\n";
+            }
+            echo "Done\n";
+        }
+    }
+
+    protected function syncProducts($forceDownload = false)
+    {
+        $this->syncCategories();
+        $this->loadWisersellProducts($forceDownload);
+        echo "Syncing Products...\n";
+        $pageSize = 50;
+        $offset = 0;
+        $productBucket = [];
+        $subProductBucket = [];
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
+        $listingObject->setLimit($pageSize);
+        while (true) {
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                if ($product->level() != 1) {
+                    continue;
+                }
+                echo "Processing {$product->getIwasku()}... ";
+                if ($id = $this->searchIwaskuInWisersellProducts($product->getIwasku())) {
+                    echo "Found in Wisersell, comparing... ";
+                    $this->compareUpdateWisersellProduct($id, $product);
+                    unset($this->wisersellProducts[$id]);
+                    echo "Done\n";
+                    continue;
+                }
+                if (count($product->getBundleProducts())) {
+                    $subProductBucket[] = $product;
+                    echo "Added to subProductBucket\n";
+                } else {
+                    $productBucket[$product->getIwasku()] = $product;
+                    echo "Added to productBucket (".count($productBucket).")\n";
+                }
+                if (count($productBucket) >= 100) {
+                    $this->addProductBucketToWisersell($productBucket);
+                    $productBucket = [];
+                }
+            }
+            echo "\nProcessed {$offset}\n";
+        }
+        if (!empty($productBucket)) {
+            $this->addProductBucketToWisersell($productBucket);
+        }
+        if (!empty($this->wisersellProducts)) {
+            $this->addWisersellErrorProductsToPim();
+        }
+    }
+    
+    protected function syncRelations()
+    {
+        if(empty($this->storeList)) {
+            $this->syncStores();
+        }
+        $listingBucket = [];
+        $count = 0;
+        foreach ($this->storeList as $marketplace) {
+            foreach ($marketplace->getVariantProductIds() as $id) {
+                echo "Processing {$id}... ";
+                $variantProduct = VariantProduct::getById($id);
+                if (!$variantProduct instanceof VariantProduct || $variantProduct->getWisersellVariantCode() !== null ) {
+                    echo "Variant product unpublish or already has wisersell variant code: " .$id;
+                    continue;
+                }
+                $marketplaceType = $marketplace->getMarketPlaceType();
+                if (!$marketplaceType) {
+                    echo "Marketplace type not found for variant product: " .$id;
+                    continue;
+                }
+                $mainProduct = $variantProduct->getMainProduct();
+                if (!$mainProduct) {
+                    echo "Main product not found for variant product: " .$id;
+                    continue;
+                }
+                $productId = $mainProduct[0]->getWisersellId();
+                if (!$productId) {
+                    echo "Product id(wisersellid) not found for variant product: " .$id;
+                    continue;
+                }
+                $storeProductId = match ($marketplaceType) {
+                    'Etsy' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],
+                    'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
+                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],  
+                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"],
+                };
+                if (!$storeProductId) {
+                    echo "Store product id not found for variant product: " .$id;
+                    continue;
+                }
+                $shopId = match ($marketplaceType) {
+                    'Etsy' => $marketplace->getShopId(),
+                    'Amazon' => $marketplace->getMerchantId(),
+                    'Shopify' => $marketplace->getShopId(),  
+                    'Trendyol' => $marketplace->getTrendyolSellerId(),
+                };
+                if (!$shopId) {
+                    echo "Shop id not found for variant product: " .$id;
+                    continue;
+                }
+                $variantCode = match ($marketplaceType) {
+                    'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
+                    'Amazon' => null,
+                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
+                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
+                };
+                if (!$variantCode && $marketplaceType !== 'Amazon') {
+                    echo "Variant code not found for variant product: " .$id;
+                    continue;
+                }
+                $listingData = [
+                        "storeproductid" =>(string) $storeProductId,
+                        "productId" =>(int) $productId,
+                        "shopId" => $shopId,
+                        "variantCode" => (string)$variantCode,
+                        "variantStr" => (string)$variantCode
+                ];
+                $listingBucket[] = $listingData;
+                $countListingBucket = count($listingBucket);
+                if ($countListingBucket >= 100) {
+                    $this->addListingBucketToWisersell($listingBucket);
+                    $count++;
+                    echo $countListingBucket."Listing bucket added to Wisersell \n";
+                    echo "Total Count: ".$count*$countListingBucket."\n";
+                    $listingBucket = [];
+                }
+            }
+            if (count($listingBucket) > 0) {
+                $this->addListingBucketToWisersell($listingBucket);
+                echo count($listingBucket)." Listing bucket added to Wisersell \n";
+                $listingBucket = []; 
+            }
+        }
+    }
+    
+    protected function syncCode()
+    {
+        $response = $this->request(self::$apiUrl['store'],'GET','');   
+        foreach ($response->toArray() as $store) {
+            echo "Processing {$store['name']} {$store['id']}...  \n";
+            $marketplace = match ($store['source']['name']) {
+                'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
+                'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
+                'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
+                'Shopify' => Marketplace::findByField('shopId', $store['shopId'] ),
+                default => null
+            };
+            if ($marketplace instanceof Marketplace) {
+                $pageSize = 100;
+                $page = 0;
+                do {
+                    $searchData = [  
+                        "shopIds" => [$store['shopId']],
+                        "page" => $page,
+                        "pageSize" => $pageSize
+                    ];
+                    $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
+                    //print_r($response->getContent()."\n");
+                    $responseArray = $response->toArray();
+                    $this->searchAndUpdateVariantProducts($responseArray);
+                    $page++;
+                    echo "Loaded ".($page*$pageSize)." listing from Wisersell\n";
+                } while (count($responseArray['rows']) == $pageSize);
             }
         }
     }
@@ -234,123 +442,6 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
-    protected function syncCode()
-    {
-        $response = $this->request(self::$apiUrl['store'],'GET','');   
-        foreach ($response->toArray() as $store) {
-            echo "Processing {$store['name']} {$store['id']}...  \n";
-            $marketplace = match ($store['source']['name']) {
-                'Etsy' => Marketplace::findByField('shopId', $store['shopId'] ),
-                'Amazon' => Marketplace::findByField('merchantId', $store['shopId'] ),
-                'Trendyol' => Marketplace::findByField('trendyolSellerId', $store['shopId'] ),
-                'Shopify' => Marketplace::findByField('shopId', $store['shopId'] ),
-                default => null
-            };
-            if ($marketplace instanceof Marketplace) {
-                $pageSize = 100;
-                $page = 0;
-                do {
-                    $searchData = [  
-                        "shopIds" => [$store['shopId']],
-                        "page" => $page,
-                        "pageSize" => $pageSize
-                    ];
-                    $response = $this->request(self::$apiUrl['listingSearch'], 'POST','', $searchData);
-                    //print_r($response->getContent()."\n");
-                    $responseArray = $response->toArray();
-                    $this->searchAndUpdateVariantProducts($responseArray);
-                    $page++;
-                    echo "Loaded ".($page*$pageSize)." listing from Wisersell\n";
-                } while (count($responseArray['rows']) == $pageSize);
-            }
-        }
-    }
-
-    protected function syncRelations()
-    {
-        if(empty($this->storeList)) {
-            $this->syncStores();
-        }
-        $listingBucket = [];
-        $count = 0;
-        foreach ($this->storeList as $marketplace) {
-            foreach ($marketplace->getVariantProductIds() as $id) {
-                echo "Processing {$id}... ";
-                $variantProduct = VariantProduct::getById($id);
-                if (!$variantProduct instanceof VariantProduct || $variantProduct->getWisersellVariantCode() !== null ) {
-                    echo "Variant product unpublish or already has wisersell variant code: " .$id;
-                    continue;
-                }
-                $marketplaceType = $marketplace->getMarketPlaceType();
-                if (!$marketplaceType) {
-                    echo "Marketplace type not found for variant product: " .$id;
-                    continue;
-                }
-                $mainProduct = $variantProduct->getMainProduct();
-                if (!$mainProduct) {
-                    echo "Main product not found for variant product: " .$id;
-                    continue;
-                }
-                $productId = $mainProduct[0]->getWisersellId();
-                if (!$productId) {
-                    echo "Product id(wisersellid) not found for variant product: " .$id;
-                    continue;
-                }
-                $storeProductId = match ($marketplaceType) {
-                    'Etsy' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],
-                    'Amazon' =>  json_decode($variantProduct->jsonRead('apiResponseJson'), true)["asin"],
-                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["product_id"],  
-                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"],
-                };
-                if (!$storeProductId) {
-                    echo "Store product id not found for variant product: " .$id;
-                    continue;
-                }
-                $shopId = match ($marketplaceType) {
-                    'Etsy' => $marketplace->getShopId(),
-                    'Amazon' => $marketplace->getMerchantId(),
-                    'Shopify' => $marketplace->getShopId(),  
-                    'Trendyol' => $marketplace->getTrendyolSellerId(),
-                };
-                if (!$shopId) {
-                    echo "Shop id not found for variant product: " .$id;
-                    continue;
-                }
-                $variantCode = match ($marketplaceType) {
-                    'Etsy' => json_decode($variantProduct->jsonRead('parentResponseJson'), true) ["listing_id"],
-                    'Amazon' => null,
-                    'Shopify' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["id"],  
-                    'Trendyol' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)["platformListingId"],
-                };
-                if (!$variantCode && $marketplaceType !== 'Amazon') {
-                    echo "Variant code not found for variant product: " .$id;
-                    continue;
-                }
-                $listingData = [
-                        "storeproductid" =>(string) $storeProductId,
-                        "productId" =>(int) $productId,
-                        "shopId" => $shopId,
-                        "variantCode" => (string)$variantCode,
-                        "variantStr" => (string)$variantCode
-                ];
-                $listingBucket[] = $listingData;
-                $countListingBucket = count($listingBucket);
-                if ($countListingBucket >= 100) {
-                    $this->addListingBucketToWisersell($listingBucket);
-                    $count++;
-                    echo $countListingBucket."Listing bucket added to Wisersell \n";
-                    echo "Total Count: ".$count*$countListingBucket."\n";
-                    $listingBucket = [];
-                }
-            }
-            if (count($listingBucket) > 0) {
-                $this->addListingBucketToWisersell($listingBucket);
-                echo count($listingBucket)." Listing bucket added to Wisersell \n";
-                $listingBucket = []; 
-            }
-        }
-    }
-
     protected function addListingBucketToWisersell($listingBucket)
     {
         $response = $this->request(self::$apiUrl['listing'], 'POST','', $listingBucket);
@@ -372,44 +463,17 @@ class WisersellCommand extends AbstractCommand
         }
     }
 
-    protected function syncCategories()
+    protected function loadWisersellConnections($forceDownload = false)
     {
-        echo "Syncing Categories...\n";
-        $wisersellCategories = $this->getWisersellCategories();
-        $pimCategories = $this->getPimCategories();
-        foreach ($wisersellCategories as $wisersellCategory) {
-            echo "Processing {$wisersellCategory['name']}... ";
-            if (isset($pimCategories[$wisersellCategory['name']])) {
-                $pimCategory = $pimCategories[$wisersellCategory['name']];
-                if ($pimCategory->getWisersellCategoryId() != $wisersellCategory['id']) {
-                    $pimCategory->setWisersellCategoryId($wisersellCategory['id']);
-                    echo "Updated PIM... ";
-                    $pimCategory->save();
-                }
-                unset($pimCategories[$wisersellCategory['name']]);
-                echo "Done\n";
-                continue;
-            } 
-            echo "Adding to PIM... ";
-            $category = new Category();
-            $category->setKey($wisersellCategory['name']);
-            $category->setParent(Utility::checkSetPath('Kategoriler', Utility::checkSetPath('Ayarlar')));
-            $category->setCategory($wisersellCategory['name']);
-            $category->setWisersellCategoryId($wisersellCategory['id']);
-            $category->save();
-            echo "Done\n";
+        $this->wisersellConnections = json_decode(Utility::getCustomCache('wisersell_connections.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
+        if (!(empty($this->wisersellConnections) || $forceDownload)) {
+            echo "Loaded Wisersell Connections from cache\n";
+            return;
         }
-        foreach ($pimCategories as $pimCategory) {
-            echo "Adding to {$pimCategory->getCategory()} to Wisersell... ";
-            $response = $this->addCategoryToWisersell($pimCategory->getCategory());
-            if (isset($response[0]['id'])) {
-                $pimCategory->setWisersellCategoryId($response[0]['id']);
-                $pimCategory->save();
-            } else {
-                echo "Failed to add category to Wisersell: " . json_encode($response) . "\n";
-            }
-            echo "Done\n";
-        }
+        $wisersellConnections = [];
+        $pageSize = 100;
+        $page = 0;
+
     }
 
     protected function loadWisersellProducts($forceDownload = false)
@@ -423,11 +487,11 @@ class WisersellCommand extends AbstractCommand
         $pageSize = 100;
         $page = 0;
         do {
-            $response = $this->getWisersellProduct([
+            $response = $this->request(self::$apiUrl['productSearch'], 'POST', '', [
                 "page" => $page,
                 "pageSize" => $pageSize
-            ]);
-            $wisersellProducts = array_merge($wisersellProducts, $response['rows']);
+            ])->toArray();
+            $wisersellProducts = array_merge($wisersellProducts, $response['rows'] ?? []);
             $page++;
             echo "Loaded ".($page*$pageSize)." products from Wisersell\n";
         } while (count($response['rows']) == $pageSize);
@@ -500,60 +564,6 @@ class WisersellCommand extends AbstractCommand
         if ($updatePim) {
             echo "Updating PIM... ";
             $product->save();
-        }
-    }
-
-    protected function syncProducts($forceDownload = false)
-    {
-        $this->syncCategories();
-        $this->loadWisersellProducts($forceDownload);
-        echo "Syncing Products...\n";
-        $pageSize = 50;
-        $offset = 0;
-        $productBucket = [];
-        $subProductBucket = [];
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
-        $listingObject->setLimit($pageSize);
-        while (true) {
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
-            $offset += $pageSize;
-            foreach ($products as $product) {
-                if ($product->level() != 1) {
-                    continue;
-                }
-                echo "Processing {$product->getIwasku()}... ";
-                if ($id = $this->searchIwaskuInWisersellProducts($product->getIwasku())) {
-                    echo "Found in Wisersell, comparing... ";
-                    $this->compareUpdateWisersellProduct($id, $product);
-                    unset($this->wisersellProducts[$id]);
-                    echo "Done\n";
-                    continue;
-                }
-                if (count($product->getBundleProducts())) {
-                    $subProductBucket[] = $product;
-                    echo "Added to subProductBucket\n";
-                } else {
-                    $productBucket[$product->getIwasku()] = $product;
-                    echo "Added to productBucket (".count($productBucket).")\n";
-                }
-                if (count($productBucket) >= 100) {
-                    $this->addProductBucketToWisersell($productBucket);
-                    $productBucket = [];
-                }
-            }
-            echo "\nProcessed {$offset}\n";
-        }
-        if (!empty($productBucket)) {
-            $this->addProductBucketToWisersell($productBucket);
-        }
-        if (!empty($this->wisersellProducts)) {
-            $this->addWisersellErrorProductsToPim();
         }
     }
 
