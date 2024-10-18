@@ -35,7 +35,9 @@ class ConsoleCommand extends AbstractCommand
                 return 0;
             }
             try {
-                $result = eval("{$command};");
+                extract($context);
+                $result = eval($command . ';');
+                $context = get_defined_vars();
                 if ($result !== null) {
                     $io->writeln(var_export($result, true));
                 }
