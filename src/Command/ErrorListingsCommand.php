@@ -39,6 +39,7 @@ class ErrorListingsCommand extends AbstractCommand
 
     private function multiConnectedListings()
     {
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/multiconnectedlistings.txt';
         $variantObject = new VariantListing();
         $pageSize = 50;
         $offset = 0;
@@ -59,8 +60,9 @@ class ErrorListingsCommand extends AbstractCommand
                 }
                 $mainProductCount = count($mainProduct);
                 if ($mainProductCount > 1) {
-                    echo "Processing {$object->getId()}... ";
-                    echo "Main product count: {$mainProductCount}\n";   
+                    $message = "Processing {$object->getId()}... Main product count: {$mainProductCount}\n";   
+                    echo $message;
+                    file_put_contents($filePath, $message, FILE_APPEND);
                 }
             }
         }
