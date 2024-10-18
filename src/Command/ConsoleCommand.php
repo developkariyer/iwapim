@@ -33,29 +33,26 @@ class ConsoleCommand extends AbstractCommand
             }
             
             try {
-                // Extract existing variables from the context
-                extract($context);
-                
-                // Start output buffering to capture 'echo' or 'print' output
+                // Start capturing output
                 ob_start();
-                
+
                 // Evaluate the command
                 $result = eval($command . ';');
-                
-                // Capture anything that was printed (echo/print)
+
+                // Capture any printed output
                 $outputCaptured = ob_get_clean();
-                
-                // Print the captured output from echo/print commands
+
+                // Print captured output from echo/print commands
                 if (!empty($outputCaptured)) {
                     $io->writeln($outputCaptured);
                 }
-                
-                // Display the return value if it's not null
+
+                // If the command has a return value, display it
                 if ($result !== null) {
                     $io->writeln(var_export($result, true));
                 }
 
-                // Update the context with the new variables
+                // Update context with new variables
                 $context = get_defined_vars();
 
             } catch (\Throwable $e) {
