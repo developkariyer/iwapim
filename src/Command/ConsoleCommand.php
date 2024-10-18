@@ -35,7 +35,9 @@ class ConsoleCommand extends AbstractCommand
             }
             try {
                 $result = eval($command . ';');
-                $io->writeln(var_export($result, true));
+                if ($result !== null) {
+                    $io->writeln(var_export($result, true));
+                }
             } catch (\Throwable $e) {
                 $io->error($e->getMessage());
             }
