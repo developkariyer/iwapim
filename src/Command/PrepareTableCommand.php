@@ -66,7 +66,7 @@ class PrepareTableCommand extends AbstractCommand
                 $marketplaceType = $marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersFromShopifyOrderTable(),
+                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
                     
                 };
 
@@ -80,7 +80,7 @@ class PrepareTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersFromShopifyOrderTable()
+    protected static function transferOrdersFromShopifyOrderTable($marketPlaceId)
     {
         $shopifySql = "INSERT IGNORE INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
@@ -143,7 +143,8 @@ class PrepareTableCommand extends AbstractCommand
             JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
             AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
             AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
-            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0;
+            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
+            AND marketplace_id = $marketPlaceId;
         ";
         $db = \Pimcore\Db::get();
         $db->query($shopifySql);
