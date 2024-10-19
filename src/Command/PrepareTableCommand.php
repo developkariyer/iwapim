@@ -31,22 +31,30 @@ class PrepareTableCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // echo "Transferring orders from Shopify order table\n";
-        // $this->transferOrdersFromShopifyOrderTable();
+        //$this->transferOrdersFromShopifyOrderTable();
 
         // $values = $this->fetchValues();
         // $index = 0;
         // echo "\n";
         // foreach ($values as $row) {
         //     $index++;
-        //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "                            \r";
+        //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
         //     $this->prepareOrderTable($row['variant_id']);
         // }
-        
+        $sql = "
+        SELECT COUNT(DISTINCT variant_id) AS count
+        FROM iwa_marketplace_orders_line_items
+        WHERE product_code IS NULL OR product_code = ''
+    ";
+    
+        $db = \Pimcore\Db::get();
+        $count = $db->fetchOne($sql);
+        echo "Count: $count\n";
         // $values = $this->fetchValues();
         // $coins = $this->exchangeCoin();
 
         // $this->updateCurrentCoin($coins);
-        $this->transferOrders();
+        //$this->transferOrders();
         return Command::SUCCESS;
     }
 
@@ -74,10 +82,9 @@ class PrepareTableCommand extends AbstractCommand
 
 
 
-            } else {
-                echo "Marketplace ID: $id - Type: Not found\n"; 
             }
         }
+
     }
 
     protected static function transferOrdersFromShopifyOrderTable($marketPlaceId)
@@ -154,15 +161,89 @@ class PrepareTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         echo "Fetching variant IDs from Shopify line_items\n";
+        // $sql = "
+        // SELECT 
+        //     iwa_marketplace_orders_line_items.variant_id AS variant_id,
+        //     iwa_marketplace_orders_line_items.created_at AS created_at
+        // FROM 
+        //     iwa_marketplace_orders_line_items";
         $sql = "
-        SELECT 
-            iwa_marketplace_orders_line_items.variant_id AS variant_id,
-            iwa_marketplace_orders_line_items.created_at AS created_at
-        FROM 
-            iwa_marketplace_orders_line_items";
+            SELECT 
+                DISTINCT variant_id
+            FROM
+                iwa_marketplace_orders_line_items";
 
         $values = $db->fetchAllAssociative($sql); 
         return $values;
+    }
+
+   
+    protected static function prepareOrderTable($uniqueMarketplaceId)
+    {
+        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        if(!$variantObject) {
+            echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+            return;
+        }
+
+        $marketplace = $variantObject->getMarketplace();
+        if (!$marketplace instanceof Marketplace) {
+            echo "Marketplace not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            return;
+        }
+
+        $marketplaceKey = $marketplace->getKey(); // field 1
+        if (!$marketplaceKey) {
+            echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+        }
+
+        $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
+        if(!$mainProductObjectArray) {
+            echo "Main product not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            return;
+        }
+
+        $mainProductObject = reset($mainProductObjectArray);
+        if ($mainProductObject instanceof Product) {
+            $productCode = $mainProductObject->getProductCode(); //field 2
+            if (!$productCode) {
+                echo "Product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                return;
+            }
+            if ($mainProductObject->level() == 1) {
+                $parent = $mainProductObject->getParent();
+                if(!$parent) {
+                    echo "Parent is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                    return;
+                }
+                $parentProductCode = $parent->getProductCode(); // field 3
+                if (!$parentProductCode) {
+                    echo "Parent product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                    return;
+                }
+            } else {
+                echo "Main product is not a parent product for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                return;
+            }
+            $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
+            if (!$productIdentifier) {
+                echo "Product identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                return;
+            }
+            $productType = strtok($productIdentifier,'-'); // field 4
+            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType);
+        }
+    }
+
+    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType)
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "UPDATE iwa_marketplace_orders_line_items
+            SET marketplace_key = ?, product_code = ?, parent_product_code = ?, product_type =?
+            WHERE variant_id = $uniqueMarketplaceId;
+            ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType]);
     }
 
     protected static function exchangeCoin()
@@ -251,64 +332,5 @@ class PrepareTableCommand extends AbstractCommand
         ";
         $db->executeUpdate($total_price_TL);
         
-    }
-    protected static function prepareOrderTable($uniqueMarketplaceId)
-    {
-        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
-        if(!$variantObject) {
-            return Command::FAILURE;
-        }
-
-        $marketplace = $variantObject->getMarketplace();
-        if (!$marketplace instanceof Marketplace) {
-            throw new \Exception('Marketplace is required for adding/updating VariantProduct');
-        }
-
-        $marketplaceKey = $marketplace->getKey(); // field 1
-        if (!$marketplaceKey) {
-            throw new \Exception('Marketplace key is required for adding/updating VariantProduct');
-        }
-
-        $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
-        if(!$mainProductObjectArray) {
-            return Command::FAILURE;
-        }
-
-        $mainProductObject = reset($mainProductObjectArray);
-        if ($mainProductObject instanceof Product) {
-            $productCode = $mainProductObject->getProductCode(); //field 2
-            if (!$productCode) {
-                throw new \Exception('Product code is required for adding/updating VariantProduct');
-            }
-            if ($mainProductObject->level() == 1) {
-                $parent = $mainProductObject->getParent();
-                $parentProductCode = $parent->getProductCode(); // field 3
-                if(!$parent) {
-                    throw new \Exception('Parent is required for adding/updating VariantProduct');
-                }
-            } else {
-                throw new \Exception('VariantProduct is misconfigured. Please fix it');
-            }
-            $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
-            if (!$productIdentifier) {
-                throw new \Exception('Product identifier is required for adding/updating VariantProduct');
-            }
-            $productType = strtok($productIdentifier,'-'); // field 4
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType);
-        }
-    }
-
-    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType)
-    {
-
-        $db = \Pimcore\Db::get();
-        $tableName = "iwa_marketplace_orders_line_items";
-        $sql = "UPDATE $tableName
-            SET marketplace_key = ?, product_code = ?, parent_product_code = ?, product_type =?
-            WHERE variant_id = $uniqueMarketplaceId;
-            ";
-
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType]);
     }
 }
