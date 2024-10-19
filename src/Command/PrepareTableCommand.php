@@ -140,11 +140,7 @@ class PrepareTableCommand extends AbstractCommand
                 value JSON PATH '$'
             )) AS discount_application
         WHERE
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
-            AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
-            AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
-            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
-            AND marketplace_id = $marketPlaceId;
+            marketplace_id = $marketPlaceId;
         ";
         $db = \Pimcore\Db::get();
         $db->query($shopifySql);
