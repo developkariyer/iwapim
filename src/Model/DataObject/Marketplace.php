@@ -2,7 +2,7 @@
 
 namespace App\Model\DataObject;
 
-use App\MarketplaceConnector\AmazonConstants;
+use App\Connector\Marketplace\AmazonConstants;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Marketplace\Listing;
 

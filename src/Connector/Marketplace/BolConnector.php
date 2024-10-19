@@ -1,13 +1,13 @@
 <?php
 
-namespace App\MarketplaceConnector;
+namespace App\Connector\Marketplace;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
-use App\MarketplaceConnector\MarketplaceConnectorAbstract;
+use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 
 class BolConnector extends MarketplaceConnectorAbstract
 {

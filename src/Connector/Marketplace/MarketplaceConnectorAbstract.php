@@ -1,8 +1,8 @@
 <?php
 
-namespace App\MarketplaceConnector;
+namespace App\Connector\Marketplace;
 
-use App\MarketplaceConnector\MarketplaceConnectorInterface;
+use App\Connector\Marketplace\MarketplaceConnectorInterface;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Command\CacheImagesCommand;
 use Pimcore\Model\DataObject\Data\Link;

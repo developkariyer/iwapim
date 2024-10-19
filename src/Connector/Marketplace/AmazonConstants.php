@@ -1,6 +1,6 @@
 <?php
 
-namespace App\MarketplaceConnector;
+namespace App\Connector\Marketplace;
 
 class AmazonConstants
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\MarketplaceConnector;
+namespace App\Connector\Marketplace;
 
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;

@@ -1,10 +1,8 @@
 <?php
 
-namespace App\MarketplaceConnector;
+namespace App\Connector\Marketplace;
 
 use Pimcore\Model\DataObject\VariantProduct;
-use Symfony\Component\HttpClient\ScopingHttpClient;
-
 use App\Utils\Utility;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract

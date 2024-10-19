@@ -1,6 +1,6 @@
 <?php
 
-namespace App\MarketplaceConnector;
+namespace App\Connector\Marketplace;
 
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
@@ -12,7 +12,7 @@ use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
 use Pimcore\Model\DataObject\Folder;
 
-use App\MarketplaceConnector\AmazonConstants;
+use App\Connector\Marketplace\AmazonConstants;
 use App\Utils\Utility;
 
 class AmazonConnector extends MarketplaceConnectorAbstract
