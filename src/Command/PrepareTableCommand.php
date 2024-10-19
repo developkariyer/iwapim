@@ -42,9 +42,9 @@ class PrepareTableCommand extends AbstractCommand
         //     $this->prepareOrderTable($row['variant_id']);
         // }
         $sql = "
-       SELECT DISTINCT variant_id
-FROM iwa_marketplace_orders_line_items
-WHERE product_code IS NULL OR product_code = ''
+        SELECT COUNT(DISTINCT variant_id) AS count
+        FROM iwa_marketplace_orders_line_items
+        WHERE product_code IS NULL OR product_code = ''
     ";
     
         $db = \Pimcore\Db::get();
