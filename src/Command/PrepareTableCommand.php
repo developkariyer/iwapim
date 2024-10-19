@@ -31,17 +31,23 @@ class PrepareTableCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // echo "Transferring orders from Shopify order table\n";
-        // $this->transferOrdersFromShopifyOrderTable();
+        //$this->transferOrdersFromShopifyOrderTable();
 
-        $values = $this->fetchValues();
-        $index = 0;
-        echo "\n";
-        foreach ($values as $row) {
-            $index++;
-            if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-            $this->prepareOrderTable($row['variant_id']);
-        }
-        
+        // $values = $this->fetchValues();
+        // $index = 0;
+        // echo "\n";
+        // foreach ($values as $row) {
+        //     $index++;
+        //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+        //     $this->prepareOrderTable($row['variant_id']);
+        // }
+        $sql = "SELECT COUNT(*)
+                FROM iwa_marketplace_orders_line_items
+                WHERE product_code IS NULL OR product_code = ''";  
+
+        $db = \Pimcore\Db::get();
+        $count = $db->fetchOne($sql);
+        echo "Count: $count\n";
         // $values = $this->fetchValues();
         // $coins = $this->exchangeCoin();
 
