@@ -28,7 +28,6 @@ class PrepareTableCommand extends AbstractCommand
     //         ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
     //         ;
     // }
-    private $marketplace;
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // echo "Transferring orders from Shopify order table\n";
@@ -66,6 +65,15 @@ class PrepareTableCommand extends AbstractCommand
             if (isset($marketplaceListWithIds[$id])) {
                 $marketplaceType = $marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
+                $result = match ($marketplaceType) {
+                    'Shopify' => transferOrdersFromShopifyOrderTable(),
+                    
+                };
+
+
+
+
+
             } else {
                 echo "Marketplace ID: $id - Type: Not found\n"; 
             }
@@ -121,7 +129,7 @@ class PrepareTableCommand extends AbstractCommand
             NULL AS total_price_tl,
             NULL AS subtotal_price_tl
         FROM
-            iwa_shopify_orders
+            iwa_marketplace_orders
             CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS (
                 value JSON PATH '$'
             )) AS line_item
