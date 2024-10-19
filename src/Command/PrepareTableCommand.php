@@ -54,10 +54,14 @@ class PrepareTableCommand extends AbstractCommand
     protected function transferOrders()
     {
         $marketplaceList = Marketplace::getMarketplaceList();
+        $marketplaceListWithIds[] = [];
+        foreach ($marketplaceList as $marketplace) {
+            $marketplaceListWithIds[$marketplace['id']] = $marketplace['marketplaceType'];
+        }
         // $db = \Pimcore\Db::get();
         // $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         // $marketplaceIds = $db->fetchAllAssociative($sql);
-        print_r($marketplaceList);
+        print_r($marketplaceListWithIds);
     }
 
     protected static function transferOrdersFromShopifyOrderTable()
