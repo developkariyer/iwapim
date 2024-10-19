@@ -22,12 +22,12 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PrepareTableCommand extends AbstractCommand
 {
-    protected function configure() 
-    {
-        $this
-            ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
-            ;
-    }
+    // protected function configure() 
+    // {
+    //     $this
+    //         ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
+    //         ;
+    // }
     
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
