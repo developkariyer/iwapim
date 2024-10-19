@@ -149,11 +149,9 @@ class PrepareTableCommand extends AbstractCommand
         try {
             $db = \Pimcore\Db::get();
             $result = $db->query($shopifySql);
-            if ($result) {
-                echo 'Etkilenen satır sayısı: ' . $db->affected_rows;
-            } else {
-                echo 'Sorgu başarısız oldu: ' . $db->error;
-            }
+            if (!$result) {
+                echo 'Sorgu başarısız oldu: ' . $db->error;;
+            } 
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
