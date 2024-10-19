@@ -22,6 +22,44 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PrepareTableCommand extends AbstractCommand
 {
+    protected function configure() 
+    {
+        $this
+            ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
+            ;
+    }
+    
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        // echo "Transferring orders from Shopify order table\n";
+        // $this->transferOrdersFromShopifyOrderTable();
+
+        // $values = $this->fetchValues();
+        // $index = 0;
+        // echo "\n";
+        // foreach ($values as $row) {
+        //     $index++;
+        //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "                            \r";
+        //     $this->prepareOrderTable($row['variant_id']);
+        // }
+        
+        // $values = $this->fetchValues();
+        // $coins = $this->exchangeCoin();
+
+        // $this->updateCurrentCoin($coins);
+        $this->transferOrders();
+        return Command::SUCCESS;
+    }
+
+    protected function transferOrders()
+    {
+        $marketplaceList = Marketplace::getMarketplaceListAsArrayKeys();
+        // $db = \Pimcore\Db::get();
+        // $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
+        // $marketplaceIds = $db->fetchAllAssociative($sql);
+        echo $marketplaceList;
+    }
+
     protected static function transferOrdersFromShopifyOrderTable()
     {
         $shopifySql = "INSERT IGNORE INTO iwa_marketplace_orders_line_items (
@@ -104,27 +142,6 @@ class PrepareTableCommand extends AbstractCommand
 
         $values = $db->fetchAllAssociative($sql); 
         return $values;
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        echo "Transferring orders from Shopify order table\n";
-        $this->transferOrdersFromShopifyOrderTable();
-
-        $values = $this->fetchValues();
-        $index = 0;
-        echo "\n";
-        foreach ($values as $row) {
-            $index++;
-            if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "                            \r";
-            $this->prepareOrderTable($row['variant_id']);
-        }
-        
-        $values = $this->fetchValues();
-        $coins = $this->exchangeCoin();
-
-        $this->updateCurrentCoin($coins);
-        return Command::SUCCESS;
     }
 
     protected static function exchangeCoin()
