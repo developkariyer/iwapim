@@ -57,7 +57,7 @@ class PrepareTableCommand extends AbstractCommand
         // $db = \Pimcore\Db::get();
         // $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         // $marketplaceIds = $db->fetchAllAssociative($sql);
-        echo $marketplaceList;
+        print_r($marketplaceList);
     }
 
     protected static function transferOrdersFromShopifyOrderTable()
