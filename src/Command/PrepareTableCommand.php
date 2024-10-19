@@ -53,7 +53,7 @@ class PrepareTableCommand extends AbstractCommand
 
     protected function transferOrders()
     {
-        $marketplaceList = Marketplace::getMarketplaceListAsArrayKeys();
+        $marketplaceList = Marketplace::getMarketplaceList();
         // $db = \Pimcore\Db::get();
         // $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         // $marketplaceIds = $db->fetchAllAssociative($sql);
