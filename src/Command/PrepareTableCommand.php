@@ -146,15 +146,8 @@ class PrepareTableCommand extends AbstractCommand
             AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
             AND marketplace_id = $marketPlaceId;
         ";
-        try {
-            $db = \Pimcore\Db::get();
-            $result = $db->query($shopifySql);
-            if (!$result) {
-                echo 'Sorgu başarısız oldu: ' . $db->error;;
-            } 
-        } catch (\Exception $e) {
-            echo 'Hata: ' . $e->getMessage();
-        }
+        $db = \Pimcore\Db::get();
+        $db->query($shopifySql);
     }
 
     protected static function fetchValues()
