@@ -28,7 +28,7 @@ class PrepareTableCommand extends AbstractCommand
     //         ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
     //         ;
     // }
-    
+    private $marketplace;
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // echo "Transferring orders from Shopify order table\n";
@@ -58,10 +58,11 @@ class PrepareTableCommand extends AbstractCommand
         foreach ($marketplaceList as $marketplace) {
             $marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
         }
-        // $db = \Pimcore\Db::get();
-        // $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
-        // $marketplaceIds = $db->fetchAllAssociative($sql);
-        print_r($marketplaceListWithIds);
+        $db = \Pimcore\Db::get();
+        $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
+        $marketplaceIds = $db->fetchAllAssociative($sql);
+        print_r($marketplaceIds);
+        //print_r($marketplaceListWithIds);
     }
 
     protected static function transferOrdersFromShopifyOrderTable()
