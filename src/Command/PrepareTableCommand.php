@@ -56,7 +56,7 @@ class PrepareTableCommand extends AbstractCommand
         $marketplaceList = Marketplace::getMarketplaceList();
         $marketplaceListWithIds[] = [];
         foreach ($marketplaceList as $marketplace) {
-            $marketplaceListWithIds[$marketplace['id']] = $marketplace['marketplaceType'];
+            $marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
         }
         // $db = \Pimcore\Db::get();
         // $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
