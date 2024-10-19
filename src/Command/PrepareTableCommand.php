@@ -61,8 +61,15 @@ class PrepareTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
-        print_r($marketplaceIds);
-        //print_r($marketplaceListWithIds);
+        foreach ($marketplaceIds as $marketplaceId) {
+            $id = $marketplaceId['marketplace_id']; 
+            if (isset($marketplaceListWithIds[$id])) {
+                $marketplaceType = $marketplaceListWithIds[$id];
+                echo "Marketplace ID: $id - Type: $marketplaceType\n";
+            } else {
+                echo "Marketplace ID: $id - Type: Not found\n"; 
+            }
+        }
     }
 
     protected static function transferOrdersFromShopifyOrderTable()
