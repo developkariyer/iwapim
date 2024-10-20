@@ -57,7 +57,7 @@ class StoreSyncService
         }
         $this->wisersellStores = [];
         $response = $this->connector->request(Connector::$apiUrl['store'], 'GET');
-        if (empty($response['data'])) {
+        if (empty($response)) {
             return;
         }
         foreach ($response->toArray() as $store) {
