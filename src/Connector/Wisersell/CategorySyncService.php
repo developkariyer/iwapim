@@ -150,30 +150,39 @@ class CategorySyncService
     public function syncCategories()
     {
         $this->load();
-        echo "Loaded Pim (".count($this->pimCategories).") and Wisersell (".count($this->wisersellCategories).") categories.\n";
-        return;
+        echo "Categories loaded Pim(".count($this->pimCategories).") Wisersell(".count($this->wisersellCategories).") categories.\n";
         $wisersellCategories = $this->wisersellCategories;
         foreach ($this->pimCategories as $categoryName => $category) {
+            echo "  Syncing PIM category $categoryName";
             if (isset($this->wisersellCategories[$categoryName])) {
+                echo " Wisersell";
                 unset($wisersellCategories[$categoryName]);
                 if ($category->isPublished()) {
+                    echo " Published";
                     if ($category->getWisersellCategoryId() != $this->wisersellCategories[$categoryName]) {
+                        echo " ID_Updated";
                         $category->setWisersellCategoryId($this->wisersellCategories[$categoryName]);
                         $category->save();
                     }                        
                 } else {
+                    echo " Unpublished";
                     $this->deleteWisersellCategory($categoryName);
+                    echo " Deleted";
                 }
             } else {
                 if ($category->isPublished()) {
+                    echo " Published";
                     $this->addPimCategoryToWisersell($category);
+                    echo " Added";
                 }
             }
+            echo "\n";
         }
         foreach ($wisersellCategories as $categoryName => $categoryId) {
+            echo "  Syncing Wisersell category $categoryName to PIM\n";
             $this->addWisersellCategoryToPim($categoryName, $categoryId);
         }
-        $this->loadPimCategories();
+        $this->loadPimCategories(true);
     }
 
     public function getWisersellCategoryId($categoryName)
