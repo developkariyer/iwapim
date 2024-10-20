@@ -75,13 +75,11 @@ class StoreSyncService
     public function syncStores()
     {
         $this->load();
-        echo "PIM Stores loaded: ";
+        echo "Stores loaded: ";
         foreach ($this->pimStores as $key => $store) {
-            echo "$key (" . count($store) . ") ";
+            echo "$key(" . count($store) . ") ";
         }
-        echo PHP_EOL;        
-        echo "Wisersell Stores loaded: " .count($this->wisersellStores) .  PHP_EOL;
-        return;
+        echo "Wisersell(" .count($this->wisersellStores) . ")" .  PHP_EOL;
         foreach ($this->wisersellStores as $wisersellStore) {
             $storeType = $wisersellStore['source']['name'] ?? null;
             $storeId = $wisersellStore['shopId'] ?? null;
@@ -94,6 +92,7 @@ class StoreSyncService
             }
             $pimStore->setWisersellStoreId($wisersellStore['id']);
             $pimStore->save();
+            echo "  Matched Wisersell $storeType $storeId to {$pimStore->getId()}" . PHP_EOL;
         }
     }
 
