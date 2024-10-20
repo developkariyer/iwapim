@@ -242,6 +242,8 @@ class ProductSyncService
     public function syncProducts($forceUpdate = false)
     {
         $this->load();
+        echo "Loaded Products Pim(" . count($this->pimProducts) . ") Wisersell (" . count($this->wisersellProducts) . ")\n";
+        return;
         $wisersellProducts = $this->wisersellProducts;
         $productBasket = [];
         foreach ($this->pimProducts as $pimId) {
