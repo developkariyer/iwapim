@@ -126,7 +126,7 @@ class Connector
                 break;
             default:
                 echo "Failed to get response. HTTP Status Code: {$response->getStatusCode()}\n";
-                return null;
+                return '';
         }
         if ($response->getStatusCode() == 200) {
             return $response;

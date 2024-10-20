@@ -9,8 +9,8 @@ use App\Utils\Utility;
 class CategorySyncService
 {
     protected $connector;
-    protected $pimCategories;
-    protected $wisersellCategories;
+    protected $pimCategories = []; // [categoryName => Category] 
+    protected $wisersellCategories = []; // [categoryName => categoryId]
 
     public function __construct(Connector $connector)
     {   
@@ -36,6 +36,10 @@ class CategorySyncService
         if (!$force && !empty($this->wisersellCategories)) {
             return;
         }
+        $this->wisersellCategories = json_decode(Utility::getCustomCache('categories.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        if (!$force && !empty($this->wisersellCategories)) {
+            return;
+        }
         $response = $this->connector->request(Connector::$apiUrl['category'], 'GET');
         if (empty($response)) {
             return;
@@ -47,6 +51,7 @@ class CategorySyncService
                 $this->wisersellCategories[$wisersellCategory['name']] = $wisersellCategory['id'];
             }
         }
+        Utility::setCustomCache('categories.json', json_encode($this->wisersellCategories), PIMCORE_PROJECT_ROOT . '/tmp/wisersell');
     }
 
     public function load($force = false)
@@ -60,9 +65,7 @@ class CategorySyncService
         if (!($category instanceof Category)) {
             return;
         }
-        if (empty($this->wisersellCategories)) {
-            $this->loadWisersellCategories();
-        }
+        $this->load();
         if (isset($this->wisersellCategories[$category->getCategory()])) {
             $category->setWisersellCategoryId($this->wisersellCategories[$category->getCategory()]);
             $category->save();
@@ -84,30 +87,26 @@ class CategorySyncService
 
     public function updateWisersellCategory($categoryId, $categoryName)
     {
-        if (empty($this->wisersellCategories)) {
-            $this->loadWisersellCategories();
-        }
+        $this->load();
         if (isset($this->wisersellCategories[$categoryName]) && $this->wisersellCategories[$categoryName] == $categoryId) {
             return;
         }
         $response = $this->connector->request(Connector::$apiUrl['category'], 'PUT', "/{$categoryId}", ['name' => $categoryName]);
         if (empty($response)) {
-            return null;
+            return;
         }
         $wisersellCategory = $response->toArray();
-        if (isset($wisersellCategory['id']) && isset($wisersellCategory['name']) && $wisersellCategory['name'] === $categoryName) {
+        if (isset($wisersellCategory['id']) && isset($wisersellCategory['name'])) {
             $this->wisersellCategories[$wisersellCategory['name']] = $wisersellCategory['id'];
         }
     }
 
     public function deleteWisersellCategory($categoryName = null, $categoryId = null)
     {
-        if (is_null($categoryName) && is_null($categoryId)) {
+        if (is_null($categoryName) ^ is_null($categoryId)) { // XOR
             return;
         }
-        if (empty($this->wisersellCategories)) {
-            $this->loadWisersellCategories();
-        }
+        $this->load();
         if (!is_null($categoryName) && isset($this->wisersellCategories[$categoryName])) {
             $idToDelete = $this->wisersellCategories[$categoryName];
             $nameToDelete = $categoryName;
@@ -133,9 +132,7 @@ class CategorySyncService
 
     public function addWisersellCategoryToPim($categoryName, $categoryId)
     {
-        if (empty($this->pimCategories)) {
-            $this->loadPimCategories();
-        }
+        $this->load();
         if (isset($this->pimCategories[$categoryName])) {
             $this->pimCategories[$categoryName]->setWisersellCategoryId($categoryId);
             $this->pimCategories[$categoryName]->save();
@@ -152,12 +149,7 @@ class CategorySyncService
 
     public function syncCategories()
     {
-        if (empty($this->pimCategories)) {
-            $this->loadPimCategories();
-        }
-        if (empty($this->wisersellCategories)) {
-            $this->loadWisersellCategories();
-        }
+        $this->load();
         $wisersellCategories = $this->wisersellCategories;
         foreach ($this->pimCategories as $categoryName => $category) {
             if (isset($this->wisersellCategories[$categoryName])) {
@@ -184,9 +176,7 @@ class CategorySyncService
 
     public function getWisersellCategoryId($categoryName)
     {
-        if (empty($this->pimCategories)) {
-            $this->loadPimCategories();
-        }
+        $this->load();
         if (isset($this->pimCategories[$categoryName]) && $this->pimCategories[$categoryName] instanceof Category) {
             return $this->pimCategories[$categoryName]->getWisersellCategoryId();
         }

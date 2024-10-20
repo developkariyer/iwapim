@@ -9,8 +9,8 @@ use App\Utils\Utility;
 class ProductSyncService
 {
     protected $connector;
-    protected $wisersellProducts;
-    protected $pimProducts; // code => pim ID for product
+    protected $wisersellProducts = []; // id => wisersell product
+    protected $pimProducts = []; // iwasku => pim ID for product, (iwasku is code in wisersell)
 
     public function __construct(Connector $connector)
     {
@@ -22,7 +22,12 @@ class ProductSyncService
         if (!$force && !empty($this->wisersellProducts)) {
             return;
         }
+        $this->wisersellProducts = json_decode(Utility::getCustomCache('products.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        if (!$force && !empty($this->wisersellProducts)) {
+            return;
+        }
         $this->wisersellProducts = $this->searchWisersellProducts([]);
+        Utility::setCustomCache('products.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell', json_encode($this->wisersellProducts));
     }
 
     public function loadPimProducts($force = false) 
@@ -44,9 +49,19 @@ class ProductSyncService
         $this->loadPimProducts($force);
     }
 
+    public function findWisersellProductWithCode($code)
+    {
+        $this->load();
+        foreach ($this->wisersellProducts as $wisersellProduct) {
+            if (isset($wisersellProduct['code']) && $wisersellProduct['code'] === $code) {
+                return $wisersellProduct;
+            }
+        }
+        return null;
+    }
+
     public function addPimProductsToWisersell($products)
     {
-        $this->connector->categorySyncService->load();
         if (!is_array($products)) {
             $products = [$products];
         }
@@ -74,19 +89,62 @@ class ProductSyncService
     }
 
     public function addWisersellProductsToPim($wisersellProducts)
-    {   //TODO
+    {
+        $this->load();
         if (!is_array($wisersellProducts)) {
             $wisersellProducts = [$wisersellProducts];
         }
         foreach ($wisersellProducts as $wisersellProduct) {
-            if (!isset($wisersellProduct['code']) || !isset($this->pimProducts[$wisersellProduct['code']])) {
+            $pimProduct = null;
+            if (isset($wisersellProduct['code'])) {
+                if (isset($this->pimProducts[$wisersellProduct['code']])) {
+                    $pimProduct = Product::getById($this->pimProducts[$wisersellProduct['code']]);
+                }
+                if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
+                    $pimProduct = Product::getByIwasku($wisersellProduct['code']);
+                }
+            }
+            if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
+                $pimProduct = Product::getByWisersellId($wisersellProduct['id']);
+            }
+            if ($pimProduct instanceof Product) {                    
+                $this->updatePimProduct($wisersellProduct);
                 continue;
             }
-            $pimProduct = Product::getById($this->pimProducts[$wisersellProduct['code']]);
-            if (!($pimProduct instanceof Product)) {
-                continue;
+            $pimProduct = $this->addProductToPim($wisersellProduct);
+            if ($pimProduct instanceof Product) {
+                $this->updateWisersellProduct($pimProduct);
             }
-            $pimProduct->setWisersellId($wisersellProduct['id']);
+        }
+    }
+
+    public function addProductToPim($wisersellProduct)
+    {
+        if (!isset($wisersellProduct['id'])) {
+            return;
+        }
+        $pimProduct = Product::getByWisersellId($wisersellProduct['id']);
+        if (!$pimProduct instanceof Product) {
+            $pimProduct = new Product();
+        }
+        $pimProduct->setParent(Utility::checkSetPath("WISERSELL ERROR", Utility::checkSetPath('Ürünler')));
+        $pimProduct->setPublished(false);
+        $pimProduct->setKey($wisersellProduct['id']);
+        $pimProduct->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
+        $pimProduct->setWisersellJson(json_encode($wisersellProduct));
+        $pimProduct->setWisersellId($wisersellProduct['id']);
+        $pimProduct->save();
+        return $pimProduct;
+    }
+
+    public function updatePimProduct($wisersellProduct)
+    {
+        $this->load();
+        if (!isset($wisersellProduct['code']) || !isset($this->pimProducts[$wisersellProduct['code']])) {
+            return;
+        }
+        $pimProduct = Product::getById($this->pimProducts[$wisersellProduct['code']]);
+        if ($pimProduct instanceof Product) {
             $pimProduct->setWisersellJson(json_encode($wisersellProduct));
             $pimProduct->save();
         }
@@ -94,6 +152,7 @@ class ProductSyncService
 
     public function updateWisersellProduct($product)
     {
+        $this->load();
         if (!($product instanceof Product) || $product->level != 1) {
             return;
         }
@@ -121,6 +180,7 @@ class ProductSyncService
         if (empty($response)) {
             return null;
         }
+        $this->load();
         foreach ($response->toArray() as $wisersellResponse) {
             if (
                 isset($wisersellResponse['id']) && 
@@ -140,6 +200,7 @@ class ProductSyncService
 
     public function prepareProductData($product)
     {
+        $this->connector->categorySyncService->load();
         return [
             "name" => $product->getInheritedField('name'),
             "code" => $product->getIwasku(),
@@ -176,6 +237,49 @@ class ProductSyncService
             }
         }
         return $retval;
+    }
+
+    public function syncProducts($forceUpdate = false)
+    {
+        $this->load();
+        $wisersellProducts = $this->wisersellProducts;
+        $productBasket = [];
+        foreach ($this->pimProducts as $pimId) {
+            $wisersellProduct = null;
+            $updatePimProduct = false;
+            $pimProduct = Product::getById($pimId);
+            if (!($pimProduct instanceof Product) || $pimProduct->level != 1) {
+                continue;
+            }
+            $wisersellId = $pimProduct->getWisersellId();
+            $iwasku = $pimProduct->getIwasku();
+            if (strlen($iwasku) < 1) {
+                continue;
+            }
+            if (!empty($wisersellId) && isset($wisersellProducts[$wisersellId])) {
+                $wisersellProduct = $wisersellProducts[$wisersellId];
+            } else {
+                $wisersellProduct = $this->findWisersellProductWithCode($iwasku);
+                if (isset($wisersellProduct['id'])) {
+                    $updatePimProduct = true;
+                }
+            }
+            if (isset($wisersellProduct['id'])) {
+                unset($wisersellProducts[$wisersellProduct['id']]);
+                if ($forceUpdate) {
+                    $this->updateWisersellProduct($pimProduct);
+                }
+                if ($updatePimProduct) {
+                    $pimProduct->setWisersellId($wisersellProduct['id']);
+                    $pimProduct->setWisersellJson(json_encode($wisersellProduct));
+                    $pimProduct->save();
+                }
+                continue;
+            }
+            $productBasket[] = $pimProduct;
+        }
+        $this->addPimProductsToWisersell($productBasket);
+        $this->addWisersellProductsToPim($wisersellProducts);
     }
 
 }
