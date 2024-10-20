@@ -81,6 +81,7 @@ class StoreSyncService
         }
         echo PHP_EOL;        
         echo "Wisersell Stores loaded: " .count($this->wisersellStores) .  PHP_EOL;
+        return;
         foreach ($this->wisersellStores as $wisersellStore) {
             $storeType = $wisersellStore['source']['name'] ?? null;
             $storeId = $wisersellStore['shopId'] ?? null;
