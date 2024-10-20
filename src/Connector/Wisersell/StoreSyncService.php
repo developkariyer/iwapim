@@ -92,7 +92,7 @@ class StoreSyncService
             }
             $pimStore->setWisersellStoreId($wisersellStore['id']);
             $pimStore->save();
-            echo "  Matched Wisersell $storeType $storeId to {$pimStore->getId()}" . PHP_EOL;
+            echo "  Matched Wisersell $storeType $storeId to {$pimStore->getId()} {$pimStore->getKey()}" . PHP_EOL;
         }
     }
 
