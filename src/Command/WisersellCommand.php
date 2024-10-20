@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
+use App\Connector\Wisersell\Connector;
 use Exception;
 
 #[AsCommand(
@@ -56,6 +57,11 @@ class WisersellCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $t = new Connector();
+        $t->storeSyncService->load();
+
+        return Command::SUCCESS;
+
         $this->httpClient = HttpClient::create();
         $forceDownload = $input->getOption('download', false);
 
