@@ -63,7 +63,7 @@ class StoreSyncService
         foreach ($response->toArray() as $store) {
             $this->wisersellStores[$store['id']] = $store;
         }
-        Utility::setCustomCache('stores.json', json_encode($this->wisersellStores), PIMCORE_PROJECT_ROOT . '/tmp/wisersell');
+        Utility::setCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell', json_encode($this->wisersellStores));
     }
 
     public function load($force = false)
