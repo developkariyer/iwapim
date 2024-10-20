@@ -150,6 +150,8 @@ class CategorySyncService
     public function syncCategories()
     {
         $this->load();
+        echo "Loaded Pim (".count($this->pimCategories).") and Wisersell (".count($this->wisersellCategories).") categories.\n";
+        return;
         $wisersellCategories = $this->wisersellCategories;
         foreach ($this->pimCategories as $categoryName => $category) {
             if (isset($this->wisersellCategories[$categoryName])) {
