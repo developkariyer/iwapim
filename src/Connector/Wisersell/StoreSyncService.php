@@ -4,6 +4,8 @@ namespace App\Connector\Wisersell;
 
 use App\Connector\Wisersell\Connector;
 use Pimcore\Model\DataObject\Marketplace;
+use App\Utils\Utility;
+
 
 class StoreSyncService
 {
