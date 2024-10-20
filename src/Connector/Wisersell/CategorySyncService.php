@@ -127,6 +127,9 @@ class CategorySyncService
         if (empty($response)) {
             return;
         }
+        if ($response->getStatusCode() != 200) {
+            echo $response->getContent();
+        }
         unset($this->wisersellCategories[$nameToDelete]);
     }
 
