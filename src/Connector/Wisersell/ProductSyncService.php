@@ -307,6 +307,16 @@ class ProductSyncService
         }
         echo "\n";
         echo "Remaining PIM Products: " . count($pimProducts) . "\n";
+        foreach ($pimProducts as $iwasku => $pimId) {
+            $product = Product::getById($pimId);
+            if ($product instanceof Product) {
+                $product->setWisersellId(null);
+                $product->setWisersellJson(null);
+                $product->save();
+            } else {
+                echo "Product not found: $iwasku (".($pimId+0).")\n";
+            }
+        }
     }
 
     public function sync($forceUpdate = false)
