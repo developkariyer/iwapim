@@ -115,21 +115,23 @@ class Connector
 
     public function request($apiEndPoint, $type, $parameter = '', $json = [])
     {
-        echo "Requesting: {$apiEndPoint} {$type} {$parameter} in time ".time()."\n";
+        echo "Requesting: {$apiEndPoint} {$type} {$parameter} in time ".time();
         flush();
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
         sleep(2);
         switch ($response->getStatusCode()) {
             case 401:
+                echo " Token expired. Fetching new token...\n";
                 $this->wisersellToken = $this->fetchNewAccessToken();
                 $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
                 sleep(2);
                 break;
             case 200:
+                echo " Success (200)\n";
                 break;
             default:
-                echo "Failed to get response. HTTP Status Code: {$response->getStatusCode()}\n";
+                echo " Failed to get response. HTTP Status Code: {$response->getStatusCode()}\n";
                 return '';
         }
         if ($response->getStatusCode() == 200) {
