@@ -49,16 +49,16 @@ class StoreSyncService
     public function loadWisersellStores($force = false)
     {
         if (!$force && !empty($this->wisersellStores)) {
-            return;
+            return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
         }
         $this->wisersellStores = json_decode(Utility::getCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
         if (!$force && !empty($this->wisersellStores)) {
-            return;
+            return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
         }
         $this->wisersellStores = [];
         $response = $this->connector->request(Connector::$apiUrl['store'], 'GET');
         if (empty($response)) {
-            return;
+            return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
         }
         foreach ($response->toArray() as $store) {
             $this->wisersellStores[$store['id']] = $store;

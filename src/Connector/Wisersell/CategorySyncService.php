@@ -34,15 +34,15 @@ class CategorySyncService
     public function loadWisersellCategories($force = false)
     {
         if (!$force && !empty($this->wisersellCategories)) {
-            return;
+            return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
         }
         $this->wisersellCategories = json_decode(Utility::getCustomCache('categories.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
         if (!$force && !empty($this->wisersellCategories)) {
-            return;
+            return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
         }
         $response = $this->connector->request(Connector::$apiUrl['category'], 'GET');
         if (empty($response)) {
-            return;
+            return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
         }
         $result = $response->toArray();
         $this->wisersellCategories = [];
