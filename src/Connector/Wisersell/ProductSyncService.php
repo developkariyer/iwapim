@@ -275,10 +275,10 @@ class ProductSyncService
                 $wisersellProductWithCode[] = $wisersellProduct;
                 if (isset($this->pimProducts[$wisersellProduct['code']])) {
                     $product = Product::getById($this->pimProducts[$wisersellProduct['code']]);
-                    $pimProductMatchingCode[] = $product->getId();
+                    $pimProductMatchingCode[] = $wisersellProduct['code'];
                 } else {
                     $product = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
-                    $pimProductMatchingId[] = $product->getId();
+                    $pimProductMatchingId[] = $wisersellProduct['id'];
                 }
                 if ($product instanceof Product) {
                     if (isset($pimProducts[$product->getIwasku()])) {
