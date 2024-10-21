@@ -26,7 +26,7 @@ class ProductSyncService
         if (!$force && !empty($this->wisersellProducts)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
         }
-        $this->wisersellProducts = $this->searchWisersellProducts([]);
+        $this->wisersellProducts = $this->search([]);
         Utility::setCustomCache('products.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell', json_encode($this->wisersellProducts));
         return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
     }
@@ -138,6 +138,9 @@ class ProductSyncService
             return;
         }
         $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
+        if (!($pimProduct instanceof Product)) {
+            $pimProduct = Product::getByPath("/Ürünler/WISERSELL ERROR/".$wisersellProduct['id']);
+        }
         if (!$pimProduct instanceof Product) {
             $pimProduct = new Product();
         }
@@ -231,7 +234,7 @@ class ProductSyncService
         ];
     }
 
-    public function searchWisersellProducts($searchData)
+    public function search($searchData)
     {
         $searchData['page'] = 0;
         $searchData['pageSize'] = 100;
