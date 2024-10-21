@@ -52,7 +52,7 @@ class ErrorListingsCommand extends AbstractCommand
         $offset += $pageSize;
         foreach ($results as $object) {
             $parts = explode('/', $object->getFullPath());
-            $result = $parts[1] . '/' . $parts[2] . '/';
+            $result = $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
             echo $result."\n";
         }
         /*while (true) {
