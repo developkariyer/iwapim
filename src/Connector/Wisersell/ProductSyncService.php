@@ -37,8 +37,11 @@ class ProductSyncService
         }
         $db = \Pimcore\Db::get();
         $this->pimProducts = [];
-        $products = $db->fetchAll('SELECT oo_id, iwasku FROM object_product WHERE iwasku IS NOT NULL AND published = 1');
+        $products = $db->fetchAllAssociative('SELECT oo_id, iwasku FROM object_product WHERE iwasku IS NOT NULL AND published = 1');
         foreach ($products as $product) {
+            if (strlen($product['iwasku'])<1) {
+                continue;
+            }
             $this->pimProducts[$product['iwasku']] = $product['oo_id'];
         }
     }
