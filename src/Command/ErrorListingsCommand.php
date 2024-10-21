@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
 
 
@@ -34,8 +35,48 @@ class ErrorListingsCommand extends AbstractCommand
         if ($input->getOption('multiconnected')) {
             $this->multiConnectedListings();
         }
+        $this->unpublishListings();
         return Command::SUCCESS;
     }
+
+    private function unpublishListings()
+    {
+        $variantObject = new VariantListing();
+        $pageSize = 50;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(true);
+        $variantObject->setOffset($offset);
+        $results = $variantObject->load();
+        echo "Offset $offset to ".($offset+$pageSize)."\n";
+        $offset += $pageSize;
+        foreach ($results as $object) {
+            $parts = explode('/', $object->getFullPath());
+
+            $errorPath = '/' . $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
+            echo $object->getFullPath()."\n";
+            echo $errorPath."\n";
+        
+            /*
+            if (!$object->isPublished()) {
+                $object->setParent($errorPath);
+                $object->save();
+            }*/
+        }
+        /*while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            echo "Offset $offset to ".($offset+$pageSize)."\n";
+            $offset += $pageSize;
+            foreach ($results as $object) {
+                
+            }
+        }*/
+    }
+
 
     private function notConnectedListings()
     {
