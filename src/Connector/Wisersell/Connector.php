@@ -115,6 +115,7 @@ class Connector
 
     public function request($apiEndPoint, $type, $parameter = '', $json = [])
     {
+        echo "Requesting: {$apiEndPoint}{$parameter} in time ".time()."\n";
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
         usleep(2000000);
