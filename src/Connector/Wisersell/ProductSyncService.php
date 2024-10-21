@@ -115,11 +115,11 @@ class ProductSyncService
                     $pimProduct = Product::getById($this->pimProducts[$wisersellProduct['code']]);
                 }
                 if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
-                    $pimProduct = Product::getByIwasku($wisersellProduct['code']);
+                    $pimProduct = Product::getByIwasku($wisersellProduct['code'], ['limit' => 1]);
                 }
             }
             if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
-                $pimProduct = Product::getByWisersellId($wisersellProduct['id']);
+                $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
             }
             if ($pimProduct instanceof Product) {                    
                 $this->updatePimProduct($wisersellProduct);
@@ -137,7 +137,7 @@ class ProductSyncService
         if (!isset($wisersellProduct['id'])) {
             return;
         }
-        $pimProduct = Product::getByWisersellId($wisersellProduct['id']);
+        $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
         if (!$pimProduct instanceof Product) {
             $pimProduct = new Product();
         }
