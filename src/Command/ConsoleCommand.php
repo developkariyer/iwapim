@@ -59,6 +59,10 @@ class ConsoleCommand extends AbstractCommand
                 }
                 $context = get_defined_vars();
             } catch (\Throwable $e) {
+                $outputCaptured = ob_get_clean();
+                if (!empty($outputCaptured)) {
+                    $io->writeln($outputCaptured);
+                }
                 $io->error($e->getMessage());
             }
         }
