@@ -147,10 +147,10 @@ class ProductSyncService
         }
         if (!$pimProduct instanceof Product) {
             $pimProduct = new Product();
+            $pimProduct->setKey($wisersellProduct['id']);
         }
         $pimProduct->setParent(Utility::checkSetPath("WISERSELL ERROR", Utility::checkSetPath('Ürünler')));
         $pimProduct->setPublished(false);
-        $pimProduct->setKey($wisersellProduct['id']);
         $pimProduct->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
         $pimProduct->setWisersellJson(json_encode($wisersellProduct));
         $pimProduct->setWisersellId($wisersellProduct['id']);

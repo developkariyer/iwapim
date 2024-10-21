@@ -118,7 +118,7 @@ class DataObjectListener implements EventSubscriberInterface
     public function onPreUpdate(DataObjectEvent $event)
     {
         $object = $event->getObject();
-        if ($object instanceof Product) {
+        if ($object instanceof Product && $object->getParent()->getKey() !== 'WISERSELL ERROR') {
             Product::setGetInheritedValues(false);
             $object->checkIwasku();
             $object->checkProductCode();
@@ -136,7 +136,7 @@ class DataObjectListener implements EventSubscriberInterface
     public function onPostUpdate(DataObjectEvent $event)
     {
         $object = $event->getObject();
-        if ($object instanceof Product) {
+        if ($object instanceof Product && $object->getParent()->getKey() !== 'WISERSELL ERROR') {
             Product::setGetInheritedValues(false);
             if (!$object->getParent() instanceof Product) {
                 $object->checkVariations();
