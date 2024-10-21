@@ -53,7 +53,7 @@ class ProductSyncService
         return [
             'wisersell' => count($this->wisersellProducts),
             'pim' => count($this->pimProducts),
-            'expire' => $cacheExpire
+            'expire' => 86400-$cacheExpire
         ];
     }
 

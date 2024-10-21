@@ -67,7 +67,7 @@ class CategorySyncService
         return [
             'pim' => count($this->pimCategories),
             'wisersell' => count($this->wisersellCategories),
-            'expire' => $cacheExpire
+            'expire' => 86400-$cacheExpire
         ];
     }
 

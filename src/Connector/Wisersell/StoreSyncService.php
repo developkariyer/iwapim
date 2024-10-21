@@ -79,7 +79,7 @@ class StoreSyncService
         return [
             'pim' => array_sum(array_map('count', $this->pimStores)),
             'wisersell' => count($this->wisersellStores),
-            'expire' => $cacheExpire,
+            'expire' => 86400-$cacheExpire,
         ];
     }
 
