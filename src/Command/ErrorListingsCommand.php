@@ -43,10 +43,7 @@ class ErrorListingsCommand extends AbstractCommand
     {
         $marketPlaceFolder = Folder::getById(172891);
         foreach ($marketPlaceFolder->getChildren() as $marketPlace) {
-            if (!$marketPlace instanceof ObjectFolder) {
-                echo "Skipping non-folder object\n";
-                continue;
-            }
+           
             echo "Running in folder: " . $marketPlace->getFullPath() . "\n";
         }
     }
