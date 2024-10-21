@@ -253,6 +253,55 @@ class ProductSyncService
         return $retval;
     }
 
+    public function updatePimWisersellIds()
+    {
+        $this->load();
+        $totalWisersellProducts = count($this->wisersellProducts);
+        $totalPimProducts = count($this->pimProducts);
+        $wisersellProductCountWithCode = 0;
+        $pimProductCountMatchingCode = 0;
+        $pimProductCountMatchingId = 0;
+        $pimProductCountUpdated = 0;
+        $pimProductCountWithNoId = 0;
+        $pimProductCountWithWrongId = 0;
+        $index = 0;
+        foreach ($this->wisersellProducts as $wisersellProduct) {
+            $index++;
+            $pimNeedsUpdate = false;
+            if (isset($wisersellProduct['code'])) {
+                $wisersellProductCountWithCode++;
+                if (isset($this->pimProducts[$wisersellProduct['code']])) {
+                    $product = Product::getById($this->pimProducts[$wisersellProduct['code']]);
+                    $pimProductCountMatchingCode++;
+                } else {
+                    $product = Product::getByWisersellId($wisersellProduct['id']);
+                    $pimProductCountMatchingId++;
+                }
+                if ($product instanceof Product) {
+                    $wisersellId = $product->getWisersellId();
+                    if (empty($wisersellId)) {
+                        $pimNeedsUpdate = true;
+                        $pimProductCountWithNoId++;
+                    } else {
+                        if ($wisersellId != $wisersellProduct['id']) {
+                            $pimNeedsUpdate = true;
+                            $pimProductCountWithWrongId++;
+                        }
+                    }
+                    if ($pimNeedsUpdate) {
+                        $product->setWisersellId($wisersellProduct['id']);
+                        $product->setWisersellJson(json_encode($wisersellProduct));
+                        $product->save();
+                        $pimProductCountUpdated++;
+                    }
+                }
+            }
+            echo "\rProcessed: $index / $totalWisersellProducts ($totalPimProducts) | Code Matches: $pimProductCountMatchingCode | ID Matches: $pimProductCountMatchingId | Updated: $pimProductCountUpdated | No ID: $pimProductCountWithNoId | Wrong ID: $pimProductCountWithWrongId";
+            flush();
+        }
+        echo "\n";
+    }
+
     public function sync($forceUpdate = false)
     {
         $this->load();
