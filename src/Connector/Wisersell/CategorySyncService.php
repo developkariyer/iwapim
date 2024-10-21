@@ -60,6 +60,15 @@ class CategorySyncService
         $this->loadWisersellCategories($force);
     }
 
+    public function status()
+    {
+        $this->load();
+        return [
+            'pim' => count($this->pimCategories),
+            'wisersell' => count($this->wisersellCategories)
+        ];
+    }
+
     public function addPimCategoryToWisersell($category)
     {
         if (!($category instanceof Category)) {

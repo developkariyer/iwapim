@@ -46,6 +46,15 @@ class ProductSyncService
         }
     }
 
+    public function status()
+    {
+        $this->load();
+        return [
+            'wisersell' => count($this->wisersellProducts),
+            'pim' => count($this->pimProducts)
+        ];
+    }
+
     public function load($force = false)
     {
         $this->loadWisersellProducts($force);

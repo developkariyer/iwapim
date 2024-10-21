@@ -72,6 +72,15 @@ class StoreSyncService
         $this->loadWisersellStores($force);
     }
 
+    public function status()
+    {
+        $this->load();
+        return [
+            'pim' => array_sum(array_map('count', $this->pimStores)),
+            'wisersell' => count($this->wisersellStores),
+        ];
+    }
+
     public function syncStores()
     {
         $this->load();

@@ -27,10 +27,10 @@ class Connector
     private $wisersellCredentials = null;
     public $wisersellToken = null;
 
-    public $productSyncService = null;
-    public $categorySyncService = null;
-    public $listingSyncService = null;
     public $storeSyncService = null;
+    public $categorySyncService = null;
+    public $productSyncService = null;
+    public $listingSyncService = null;
 
     public function __construct($env = 'prod')
     {
@@ -49,10 +49,10 @@ class Connector
         };
         $this->env = $env;
         $this->prepareToken();
-        $this->productSyncService = new ProductSyncService($this);
-        $this->categorySyncService = new CategorySyncService($this);
-        $this->listingSyncService = new ListingSyncService($this);
         $this->storeSyncService = new StoreSyncService($this);
+        $this->categorySyncService = new CategorySyncService($this);
+        $this->productSyncService = new ProductSyncService($this);
+        $this->listingSyncService = new ListingSyncService($this);
     }
 
     protected function prepareToken()
