@@ -17,48 +17,41 @@ use App\Connector\Wisersell\Connector;
 class ConsoleCommand extends AbstractCommand
 {
 
+    protected static function getJwtRemainingTime($jwt): int
+    {
+        $jwt = explode('.', $jwt);
+        $jwt = json_decode(base64_decode($jwt[1]), true);
+        return $jwt['exp'] - time();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $t = new Connector();
+        $ws = new Connector();
         $io = new SymfonyStyle($input, $output);
         $io->title('IWAPIM Interactive Shell');
         $context = [];
 
         while (true) {
-            // Ask for user input in the REPL
+            if ($ws instanceof Connector) {
+                echo "Wisersell connected. Token expires in " . self::getJwtRemainingTime($ws->wisersellToken) . " seconds\n";
+            }
             $command = $io->ask('');
-            
-            // Exit the REPL loop
             if (trim($command) === 'exit') {
                 $io->success('Goodbye!');
                 return 0;
             }
-            
             try {
-                // Start capturing output
                 ob_start();
-
-                // Evaluate the command
                 $result = eval($command . ';');
-
-                // Capture any printed output
                 $outputCaptured = ob_get_clean();
-
-                // Print captured output from echo/print commands
                 if (!empty($outputCaptured)) {
                     $io->writeln($outputCaptured);
                 }
-
-                // If the command has a return value, display it
                 if ($result !== null) {
                     $io->writeln(var_export($result, true));
                 }
-
-                // Update context with new variables
                 $context = get_defined_vars();
-
             } catch (\Throwable $e) {
-                // Display errors
                 $io->error($e->getMessage());
             }
         }

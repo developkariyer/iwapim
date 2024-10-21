@@ -14,6 +14,7 @@ use Exception;
 
 class Connector
 {
+    public $env = '';
     public static $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
@@ -24,7 +25,7 @@ class Connector
     ];
     private $httpClient = null;
     private $wisersellCredentials = null;
-    private $wisersellToken = null;
+    public $wisersellToken = null;
 
     public $productSyncService = null;
     public $categorySyncService = null;
@@ -46,6 +47,7 @@ class Connector
                 'password' => $_ENV['WISERSELL_DEV_PASSWORD'],
             ],
         };
+        $this->env = $env;
         $this->prepareToken();
         $this->productSyncService = new ProductSyncService($this);
         $this->categorySyncService = new CategorySyncService($this);
