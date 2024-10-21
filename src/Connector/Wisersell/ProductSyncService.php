@@ -258,6 +258,7 @@ class ProductSyncService
     public function updatePimWisersellIds()
     {
         $this->load();
+        $pimProducts = $this->pimProducts;
         $totalWisersellProducts = count($this->wisersellProducts);
         $totalPimProducts = count($this->pimProducts);
         $wisersellProductCountWithCode = 0;
@@ -280,6 +281,9 @@ class ProductSyncService
                     $pimProductCountMatchingId++;
                 }
                 if ($product instanceof Product) {
+                    if (isset($pimProducts[$product->getIwasku()])) {
+                        unset($pimProducts[$product->getIwasku()]);
+                    }
                     $wisersellId = $product->getWisersellId();
                     if (empty($wisersellId)) {
                         $pimNeedsUpdate = true;
@@ -302,6 +306,7 @@ class ProductSyncService
             flush();
         }
         echo "\n";
+        echo "Remaining PIM Products: " . count($pimProducts) . "\n";
     }
 
     public function sync($forceUpdate = false)
