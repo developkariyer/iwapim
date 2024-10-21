@@ -137,6 +137,10 @@ class ProductSyncService
         if (!isset($wisersellProduct['id'])) {
             return;
         }
+        if (empty($wisersellProduct['id'])) {
+            echo "Empty Wisersell ID: ".json_encode($wisersellProduct)."\n";
+            return;
+        }
         $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
         if (!($pimProduct instanceof Product)) {
             $pimProduct = Product::getByPath("/Ürünler/WISERSELL ERROR/".$wisersellProduct['id']);
