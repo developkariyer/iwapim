@@ -51,16 +51,17 @@ class ErrorListingsCommand extends AbstractCommand
         echo "Offset $offset to ".($offset+$pageSize)."\n";
         $offset += $pageSize;
         foreach ($results as $object) {
-            /*$parts = explode('/', $object->getFullPath());
-            $result = $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
-            echo $result."\n";*/
-            if ($object->isPublished()) {
-                echo "Publish\n";
-            }
-            else {
-                echo "Unpublish\n";
-            }
-            echo $object->getParent()."\n";
+            $parts = explode('/', $object->getFullPath());
+
+            $errorPath = $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
+            echo $object->getFullPath()."\n";
+            echo $errorPath."\n";
+        
+            /*
+            if (!$object->isPublished()) {
+                $object->setParent($errorPath);
+                $object->save();
+            }*/
         }
         /*while (true) {
             $variantObject->setOffset($offset);
