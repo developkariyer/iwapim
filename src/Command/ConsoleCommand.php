@@ -55,6 +55,7 @@ class ConsoleCommand extends AbstractCommand
                 if ($result !== null) {
                     $io->writeln(var_export($result, true));
                 }
+                echo "\n";
                 $context = get_defined_vars();
             } catch (\Throwable $e) {
                 $outputCaptured = ob_get_clean();
