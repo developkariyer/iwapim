@@ -334,6 +334,7 @@ class ProductSyncService
         $index = $skippedPimProduct = $missingIwasku = $updatedPimProduct = 0;
         foreach ($this->pimProducts as $pimId) {
             $index++;
+            echo "\rProcessing $index / $totalCount";
             $wisersellProduct = null;
             $updatePimProduct = false;
             $pimProduct = Product::getById($pimId);
@@ -372,6 +373,7 @@ class ProductSyncService
             }
             $productBasket[] = $pimProduct;
         }
+        echo "\n";
         if (!empty($productBasket)) {
             $this->addPimProductsToWisersell($productBasket);
         }
