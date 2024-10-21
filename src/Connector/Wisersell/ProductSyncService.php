@@ -257,7 +257,6 @@ class ProductSyncService
     {
         $this->load();
         echo "Loaded Products Pim(" . count($this->pimProducts) . ") Wisersell (" . count($this->wisersellProducts) . ")\n";
-        return;
         $wisersellProducts = $this->wisersellProducts;
         $productBasket = [];
         foreach ($this->pimProducts as $pimId) {
@@ -284,17 +283,21 @@ class ProductSyncService
                 unset($wisersellProducts[$wisersellProduct['id']]);
                 if ($forceUpdate) {
                     $this->updateWisersellProduct($pimProduct);
+                    echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ")\n";
                 }
                 if ($updatePimProduct) {
                     $pimProduct->setWisersellId($wisersellProduct['id']);
                     $pimProduct->setWisersellJson(json_encode($wisersellProduct));
                     $pimProduct->save();
+                    echo "Updated PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ") to match Wisersell {$wisersellProduct['id']}\n";
                 }
                 continue;
             }
             $productBasket[] = $pimProduct;
         }
-        $this->addPimProductsToWisersell($productBasket);
+        if (!empty($productBasket)) {
+            $this->addPimProductsToWisersell($productBasket);
+        }
         $this->addWisersellProductsToPim($wisersellProducts);
     }
 
