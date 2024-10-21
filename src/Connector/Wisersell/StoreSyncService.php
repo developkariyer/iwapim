@@ -81,7 +81,7 @@ class StoreSyncService
         ];
     }
 
-    public function syncStores()
+    public function sync()
     {
         $this->load();
         echo "Stores loaded: ";

@@ -251,7 +251,7 @@ class ProductSyncService
         return $retval;
     }
 
-    public function syncProducts($forceUpdate = false)
+    public function sync($forceUpdate = false)
     {
         $this->load();
         echo "Loaded Products Pim(" . count($this->pimProducts) . ") Wisersell (" . count($this->wisersellProducts) . ")\n";
