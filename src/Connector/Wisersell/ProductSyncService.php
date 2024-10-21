@@ -302,7 +302,7 @@ class ProductSyncService
                     }
                 }
             }
-            echo "\rProcessed: $index / $totalWisersellProducts ($totalPimProducts) | Code Matches: ".
+            echo "\rProcessed: $index / ".count($wisersellProductWithCode)." / $totalWisersellProducts (PIM $totalPimProducts) | Code Matches: ".
             count($pimProductMatchingCode)." | ID Matches: ".
             count($pimProductMatchingId)." | Updated: ".
             $pimProductCountUpdated." | No ID: $pimProductCountWithNoId | Wrong ID: $pimProductCountWithWrongId";
