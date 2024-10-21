@@ -353,6 +353,7 @@ class ProductSyncService
             } else {
                 $wisersellProduct = $this->findWisersellProductWithCode($iwasku);
                 if (isset($wisersellProduct['id'])) {
+                    echo "Found Wisersell Product " . $wisersellProduct['id'] . " without id in PIM " . $iwasku . " (" . $pimProduct->getId() . ")\n";
                     $updatePimProduct = true;
                 }
             }
@@ -371,10 +372,12 @@ class ProductSyncService
                 $updatedPimProduct++;
                 continue;
             }
+            echo "Adding PIM Product " . $iwasku . " (" . $pimProduct->getId() . ") to basket\n";
             $productBasket[] = $pimProduct;
         }
         echo "\n";
         if (!empty($productBasket)) {
+            echo "Adding " . count($productBasket) . " PIM Products to Wisersell\n";
             $this->addPimProductsToWisersell($productBasket);
         }
         $this->addWisersellProductsToPim($wisersellProducts);
