@@ -64,20 +64,22 @@ class StoreSyncService
             $this->wisersellStores[$store['id']] = $store;
         }
         Utility::setCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell', json_encode($this->wisersellStores));
+        return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
     }
 
     public function load($force = false)
     {
         $this->loadPimStores($force);
-        $this->loadWisersellStores($force);
+        return $this->loadWisersellStores($force);
     }
 
     public function status()
     {
-        $this->load();
+        $cacheExpire = $this->load();
         return [
             'pim' => array_sum(array_map('count', $this->pimStores)),
             'wisersell' => count($this->wisersellStores),
+            'expire' => $cacheExpire,
         ];
     }
 

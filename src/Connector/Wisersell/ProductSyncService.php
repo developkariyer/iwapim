@@ -28,6 +28,7 @@ class ProductSyncService
         }
         $this->wisersellProducts = $this->searchWisersellProducts([]);
         Utility::setCustomCache('products.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell', json_encode($this->wisersellProducts));
+        return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
     }
 
     public function loadPimProducts($force = false) 
@@ -48,17 +49,18 @@ class ProductSyncService
 
     public function status()
     {
-        $this->load();
+        $cacheExpire = $this->load();
         return [
             'wisersell' => count($this->wisersellProducts),
-            'pim' => count($this->pimProducts)
+            'pim' => count($this->pimProducts),
+            'expire' => $cacheExpire
         ];
     }
 
     public function load($force = false)
     {
-        $this->loadWisersellProducts($force);
         $this->loadPimProducts($force);
+        return $this->loadWisersellProducts($force);
     }
 
     public function findWisersellProductWithCode($code)

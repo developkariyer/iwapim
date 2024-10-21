@@ -52,20 +52,22 @@ class CategorySyncService
             }
         }
         Utility::setCustomCache('categories.json', json_encode($this->wisersellCategories), PIMCORE_PROJECT_ROOT . '/tmp/wisersell');
+        return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
     }
 
     public function load($force = false)
     {
         $this->loadPimCategories($force);
-        $this->loadWisersellCategories($force);
+        return $this->loadWisersellCategories($force);
     }
 
     public function status()
     {
-        $this->load();
+        $cacheExpire = $this->load();
         return [
             'pim' => count($this->pimCategories),
-            'wisersell' => count($this->wisersellCategories)
+            'wisersell' => count($this->wisersellCategories),
+            'expire' => $cacheExpire
         ];
     }
 

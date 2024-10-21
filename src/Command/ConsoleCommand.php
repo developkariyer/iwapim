@@ -37,10 +37,13 @@ class ConsoleCommand extends AbstractCommand
 
         while (true) {
             if ($ws instanceof Connector) {
+                $storeStatus = $stores->status();
+                $categoryStatus = $categories->status();
+                $productStatus = $products->status();
                 echo "Wisersell connected. Token expires in " . self::getJwtRemainingTime($ws->wisersellToken) . " seconds\n";
-                echo "  Stores    :\tWisersell({$stores->status()['wisersell']})    \tPim({$stores->status()['pim']})\n";
-                echo "  Categories:\tWisersell({$categories->status()['wisersell']})    \tPim({$categories->status()['pim']})\n";
-                echo "  Products  :\tWisersell({$products->status()['wisersell']})\tPim({$products->status()['pim']})\n";
+                echo "  Stores    :\tWisersell({$storeStatus['wisersell']})    \tPim({$storeStatus['pim']}) ({$storeStatus['expire']})\n";
+                echo "  Categories:\tWisersell({$categoryStatus['wisersell']})    \tPim({$categoryStatus['pim']}) ({$categoryStatus['expire']})\n";
+                echo "  Products  :\tWisersell({$productStatus['wisersell']})\tPim({$productStatus['pim']}) ({$productStatus['expire']})\n";
             }
             $command = $io->ask('');
             if (trim($command) === 'exit') {
