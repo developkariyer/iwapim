@@ -115,16 +115,16 @@ class Connector
 
     public function request($apiEndPoint, $type, $parameter = '', $json = [])
     {
-        echo "Requesting: {$apiEndPoint}{$parameter} in time ".time()."\n";
+        echo "Requesting: {$apiEndPoint} {$type} {$parameter} in time ".time()."\n";
         flush();
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
-        usleep(2000000);
+        sleep(2);
         switch ($response->getStatusCode()) {
             case 401:
                 $this->wisersellToken = $this->fetchNewAccessToken();
                 $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
-                usleep(2000000);
+                sleep(2);
                 break;
             case 200:
                 break;
