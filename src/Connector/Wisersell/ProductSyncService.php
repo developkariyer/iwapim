@@ -81,7 +81,7 @@ class ProductSyncService
         }
         $productData = [];
         foreach ($products as $product) {
-            if (!($product instanceof Product) || $product->level != 1) {
+            if (!($product instanceof Product) || $product->level() != 1) {
                 continue;
             }
             if (empty($product->getIwasku())) {
@@ -167,7 +167,7 @@ class ProductSyncService
     public function updateWisersellProduct($product)
     {
         $this->load();
-        if (!($product instanceof Product) || $product->level != 1) {
+        if (!($product instanceof Product) || $product->level() != 1) {
             return;
         }
         if (empty($product->getWisersellId())) {
@@ -330,16 +330,21 @@ class ProductSyncService
         echo "Loaded Products Pim(" . count($this->pimProducts) . ") Wisersell (" . count($this->wisersellProducts) . ")\n";
         $wisersellProducts = $this->wisersellProducts;
         $productBasket = [];
+        $totalCount = count($this->pimProducts);
+        $index = $skippedPimProduct = $missingIwasku = $updatedPimProduct = 0;
         foreach ($this->pimProducts as $pimId) {
+            $index++;
             $wisersellProduct = null;
             $updatePimProduct = false;
             $pimProduct = Product::getById($pimId);
-            if (!($pimProduct instanceof Product) || $pimProduct->level != 1) {
+            if (!($pimProduct instanceof Product) || $pimProduct->level() != 1) {
+                $skippedPimProduct++;
                 continue;
             }
             $wisersellId = $pimProduct->getWisersellId();
             $iwasku = $pimProduct->getIwasku();
             if (strlen($iwasku) < 1) {
+                $missingIwasku++;
                 continue;
             }
             if (!empty($wisersellId) && isset($wisersellProducts[$wisersellId])) {
@@ -362,6 +367,7 @@ class ProductSyncService
                     $pimProduct->save();
                     echo "Updated PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ") to match Wisersell {$wisersellProduct['id']}\n";
                 }
+                $updatedPimProduct++;
                 continue;
             }
             $productBasket[] = $pimProduct;
