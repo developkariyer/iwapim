@@ -277,7 +277,7 @@ class ProductSyncService
                     $product = Product::getById($this->pimProducts[$wisersellProduct['code']]);
                     $pimProductCountMatchingCode++;
                 } else {
-                    $product = Product::getByWisersellId($wisersellProduct['id']);
+                    $product = Product::getByWisersellId($wisersellProduct['id'])->first();
                     $pimProductCountMatchingId++;
                 }
                 if ($product instanceof Product) {
