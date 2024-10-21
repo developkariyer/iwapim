@@ -244,7 +244,9 @@ class ProductSyncService
             $response = $result->toArray();
             $products = array_merge($products, $response['rows'] ?? []);
             $searchData['page']++;
+            echo "\rLoaded " . count($products) . " Wisersell Products   ";
         } while (count($response['rows']) > 0);
+        echo "\n";
         foreach ($products as $product) {
             if (!empty($product['id'])) {
                 $retval[$product['id']] = $product;
