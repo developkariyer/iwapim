@@ -47,18 +47,8 @@ class ErrorListingsCommand extends AbstractCommand
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(true);      
 
-
-        $variantObject->setOffset($offset);
-        $results = $variantObject->load();
-        foreach ($results as $object) {
-            $marketplace =  $object->getMarketPlace();
-            $marketplaceKey = $marketplace->getKey();
-            echo $marketplaceKey . "\n";
-          
-        }
-
-
-        /*while (true) {
+        
+        while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
             if (empty($results)) {
@@ -67,14 +57,14 @@ class ErrorListingsCommand extends AbstractCommand
             echo "Offset $offset to ".($offset+$pageSize)."\n";
             $offset += $pageSize;
             foreach ($results as $object) {
-                $parts = explode('/', $object->getFullPath());
-                $errorPath = '/' . $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
+                $marketplace = $object->getMarketplace();
+                $marketplaceKey = $marketplace->getKey();
                 if (!$object->isPublished()) {
-                    $object->setParent($errorPath);
+                    $object->setParent(Utility::checkSetPath("_Pasif",Utility::checkSetPath($marketplaceKey)));
                     $object->save();
                 }
             }
-        }*/
+        }
     }
 
 
