@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
 
 
@@ -34,8 +35,21 @@ class ErrorListingsCommand extends AbstractCommand
         if ($input->getOption('multiconnected')) {
             $this->multiConnectedListings();
         }
+        $this->unpublishListings();
         return Command::SUCCESS;
     }
+
+    private function unpublishListings()
+    {
+        $marketPlaceFolder = Folder::getById(172891);
+        foreach ($marketPlaceFolder->getChildren() as $marketPlace) {
+            if (!$marketPlace instanceof ObjectFolder) {
+                continue;
+            }
+            echo "Running in folder: " . $marketPlace->getFullPath() . "\n";
+        }
+    }
+
 
     private function notConnectedListings()
     {
