@@ -345,7 +345,7 @@ class ProductSyncService
             $wisersellId = $pimProduct->getWisersellId();
             $iwasku = $pimProduct->getIwasku();
             if (strlen($iwasku) < 1) {
-                $missingIwasku++;
+                echo "Missing iwasku for PIM Product " . $pimProduct->getId() . "\n";
                 continue;
             }
             if (!empty($wisersellId) && isset($wisersellProducts[$wisersellId])) {
