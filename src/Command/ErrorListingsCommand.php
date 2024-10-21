@@ -54,6 +54,12 @@ class ErrorListingsCommand extends AbstractCommand
             /*$parts = explode('/', $object->getFullPath());
             $result = $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
             echo $result."\n";*/
+            if ($object->isPublished()) {
+                echo "Publish\n";
+            }
+            else {
+                echo "Unpublish\n";
+            }
             echo $object->getParent()."\n";
         }
         /*while (true) {
