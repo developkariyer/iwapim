@@ -51,7 +51,7 @@ class CategorySyncService
                 $this->wisersellCategories[$wisersellCategory['name']] = $wisersellCategory['id'];
             }
         }
-        Utility::setCustomCache('categories.json', json_encode($this->wisersellCategories), PIMCORE_PROJECT_ROOT . '/tmp/wisersell');
+        Utility::setCustomCache('categories.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell', json_encode($this->wisersellCategories));
         return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
     }
 
