@@ -51,12 +51,7 @@ class ConsoleCommand extends AbstractCommand
                 return 0;
             }
             try {
-                ob_start();
                 $result = eval($command . ';');
-                $outputCaptured = ob_get_clean();
-                if (!empty($outputCaptured)) {
-                    $io->writeln($outputCaptured);
-                }
                 if ($result !== null) {
                     $io->writeln(var_export($result, true));
                 }
