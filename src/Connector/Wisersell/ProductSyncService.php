@@ -261,9 +261,9 @@ class ProductSyncService
         $pimProducts = $this->pimProducts;
         $totalWisersellProducts = count($this->wisersellProducts);
         $totalPimProducts = count($this->pimProducts);
-        $wisersellProductCountWithCode = 0;
-        $pimProductCountMatchingCode = 0;
-        $pimProductCountMatchingId = 0;
+        $wisersellProductWithCode = [];
+        $pimProductMatchingCode = [];
+        $pimProductMatchingId = [];
         $pimProductCountUpdated = 0;
         $pimProductCountWithNoId = 0;
         $pimProductCountWithWrongId = 0;
@@ -272,13 +272,13 @@ class ProductSyncService
             $index++;
             $pimNeedsUpdate = false;
             if (isset($wisersellProduct['code'])) {
-                $wisersellProductCountWithCode++;
+                $wisersellProductWithCode[] = $wisersellProduct;
                 if (isset($this->pimProducts[$wisersellProduct['code']])) {
                     $product = Product::getById($this->pimProducts[$wisersellProduct['code']]);
-                    $pimProductCountMatchingCode++;
+                    $pimProductMatchingCode[] = $product->getId();
                 } else {
                     $product = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
-                    $pimProductCountMatchingId++;
+                    $pimProductMatchingId[] = $product->getId();
                 }
                 if ($product instanceof Product) {
                     if (isset($pimProducts[$product->getIwasku()])) {
@@ -302,7 +302,10 @@ class ProductSyncService
                     }
                 }
             }
-            echo "\rProcessed: $index / $totalWisersellProducts ($totalPimProducts) | Code Matches: $pimProductCountMatchingCode | ID Matches: $pimProductCountMatchingId | Updated: $pimProductCountUpdated | No ID: $pimProductCountWithNoId | Wrong ID: $pimProductCountWithWrongId";
+            echo "\rProcessed: $index / $totalWisersellProducts ($totalPimProducts) | Code Matches: ".
+            count($pimProductMatchingCode)." | ID Matches: ".
+            count($pimProductMatchingId)." | Updated: ".
+            $pimProductCountUpdated." | No ID: $pimProductCountWithNoId | Wrong ID: $pimProductCountWithWrongId";
             flush();
         }
         echo "\n";
@@ -310,6 +313,7 @@ class ProductSyncService
         foreach ($pimProducts as $iwasku => $pimId) {
             $product = Product::getById($pimId);
             if ($product instanceof Product) {
+                echo "Removing Wisersell ID from PIM Product: $iwasku (".($pimId+0).")\n";
                 $product->setWisersellId(null);
                 $product->setWisersellJson(null);
                 $product->save();
@@ -317,6 +321,7 @@ class ProductSyncService
                 echo "Product not found: $iwasku (".($pimId+0).")\n";
             }
         }
+        print_r($pimProductMatchingId);
     }
 
     public function sync($forceUpdate = false)
