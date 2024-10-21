@@ -41,11 +41,31 @@ class ErrorListingsCommand extends AbstractCommand
 
     private function unpublishListings()
     {
-        $marketPlaceFolder = Folder::getById(172891);
-        foreach ($marketPlaceFolder->getChildren() as $marketPlace) {
-           
-            echo "Running in folder: " . $marketPlace->getFullPath() . "\n";
+        $variantObject = new VariantListing();
+        $pageSize = 50;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(true);
+        $variantObject->setOffset($offset);
+        $results = $variantObject->load();
+        echo "Offset $offset to ".($offset+$pageSize)."\n";
+        $offset += $pageSize;
+        foreach ($results as $object) {
+            echo $object->getFullPath();
+            
         }
+        /*while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            echo "Offset $offset to ".($offset+$pageSize)."\n";
+            $offset += $pageSize;
+            foreach ($results as $object) {
+                
+            }
+        }*/
     }
 
 
