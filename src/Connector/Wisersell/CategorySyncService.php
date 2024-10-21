@@ -9,8 +9,8 @@ use App\Utils\Utility;
 class CategorySyncService
 {
     protected $connector;
-    protected $pimCategories = []; // [categoryName => Category] 
-    protected $wisersellCategories = []; // [categoryName => categoryId]
+    public $pimCategories = []; // [categoryName => Category] 
+    public $wisersellCategories = []; // [categoryName => categoryId]
 
     public function __construct(Connector $connector)
     {   

@@ -9,8 +9,8 @@ use App\Utils\Utility;
 class ProductSyncService
 {
     protected $connector;
-    protected $wisersellProducts = []; // id => wisersell product
-    protected $pimProducts = []; // iwasku => pim ID for product, (iwasku is code in wisersell)
+    public $wisersellProducts = []; // id => wisersell product
+    public $pimProducts = []; // iwasku => pim ID for product, (iwasku is code in wisersell)
 
     public function __construct(Connector $connector)
     {

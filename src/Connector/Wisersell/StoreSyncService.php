@@ -10,8 +10,8 @@ use App\Utils\Utility;
 class StoreSyncService
 {
     protected $connector;
-    protected $wisersellStores = []; // [id => store]
-    protected $pimStores = []; // [storeType => [storeId => store]]
+    public $wisersellStores = []; // [id => store]
+    public $pimStores = []; // [storeType => [storeId => store]]
 
     public function __construct(Connector $connector)
     {
