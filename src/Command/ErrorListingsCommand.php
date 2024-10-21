@@ -53,7 +53,7 @@ class ErrorListingsCommand extends AbstractCommand
         foreach ($results as $object) {
             $parts = explode('/', $object->getFullPath());
 
-            $errorPath = $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
+            $errorPath = '/' . $parts[1] . '/' . $parts[2] . '/' . '_Pasif/';
             echo $object->getFullPath()."\n";
             echo $errorPath."\n";
         
