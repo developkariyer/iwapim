@@ -19,13 +19,14 @@ class ConsoleCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $t = new Connector();
         $io = new SymfonyStyle($input, $output);
-        $io->title('Pimcore Interactive Shell (REPL)');
+        $io->title('IWAPIM Interactive Shell');
         $context = [];
 
         while (true) {
             // Ask for user input in the REPL
-            $command = $io->ask('IWAPIM >>>');
+            $command = $io->ask('');
             
             // Exit the REPL loop
             if (trim($command) === 'exit') {
