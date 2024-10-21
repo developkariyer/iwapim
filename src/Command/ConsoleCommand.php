@@ -27,6 +27,10 @@ class ConsoleCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $ws = new Connector();
+        $stores = $ws->storeSyncService;
+        $categories = $ws->categorySyncService;
+        $products = $ws->productSyncService;
+        $listings = $ws->listingSyncService;
         $io = new SymfonyStyle($input, $output);
         $io->title('IWAPIM Interactive Shell');
         $context = [];
@@ -34,9 +38,9 @@ class ConsoleCommand extends AbstractCommand
         while (true) {
             if ($ws instanceof Connector) {
                 echo "Wisersell connected. Token expires in " . self::getJwtRemainingTime($ws->wisersellToken) . " seconds\n";
-                echo "  Stores    :\tWisersell({$ws->storeSyncService->status()['wisersell']})\tPim({$ws->storeSyncService->status()['pim']})\n";
-                echo "  Categories:\tWisersell({$ws->categorySyncService->status()['wisersell']})\tPim({$ws->categorySyncService->status()['pim']})\n";
-                echo "  Products  :\tWisersell({$ws->productSyncService->status()['wisersell']})\tPim({$ws->productSyncService->status()['pim']})\n";
+                echo "  Stores    :\tWisersell({$stores->status()['wisersell']})    \tPim({$stores->status()['pim']})\n";
+                echo "  Categories:\tWisersell({$categories->status()['wisersell']})    \tPim({$categories->status()['pim']})\n";
+                echo "  Products  :\tWisersell({$products->status()['wisersell']})\tPim({$products->status()['pim']})\n";
             }
             $command = $io->ask('');
             if (trim($command) === 'exit') {
