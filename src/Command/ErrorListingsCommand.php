@@ -35,7 +35,7 @@ class ErrorListingsCommand extends AbstractCommand
         if ($input->getOption('multiconnected')) {
             $this->multiConnectedListings();
         }
-        $this->unpublishListings();
+        //$this->unpublishListings();
         return Command::SUCCESS;
     }
 
