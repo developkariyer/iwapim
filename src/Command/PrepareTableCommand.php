@@ -85,14 +85,13 @@ class PrepareTableCommand extends AbstractCommand
     {
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_id, marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
             created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
             discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
             SELECT
-                $marketPlaceId,
                 '$marketplaceType',
                 NULL AS marketplace_key,
                 NULL AS product_code,
@@ -140,7 +139,6 @@ class PrepareTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
-                marketplace_id = VALUES(marketplace_id),
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
                 product_code = VALUES(product_code),
@@ -184,7 +182,7 @@ class PrepareTableCommand extends AbstractCommand
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_id, marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+                marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
                 created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -193,7 +191,6 @@ class PrepareTableCommand extends AbstractCommand
                 current_EUR
             )
             SELECT
-                $marketPlaceId,
                 '$marketplaceType',
                 NULL AS marketplace_key,
                 NULL AS product_code,
@@ -241,7 +238,6 @@ class PrepareTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
-                marketplace_id = VALUES(marketplace_id),
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
                 product_code = VALUES(product_code),
