@@ -72,8 +72,8 @@ class CatalogController extends FrontendController
                 'id' => $row->getId(),
                 'productIdentifier' => $row->getProductIdentifier(),
                 'name' => $row->getName(),
-                'variationSizeList' => $row->getVariationSizeList(),
-                'variationColorList' => $row->getVariationColorList(),
+                'variationSizeList' => str_replace("\n", " | ", $row->getVariationSizeList()),
+                'variationColorList' => str_replace("\n", " | ", $row->getVariationColorList()),
                 'image' => $image,
                 'album' => $album,
             ];
