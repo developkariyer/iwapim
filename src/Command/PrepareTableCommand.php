@@ -304,11 +304,13 @@ class PrepareTableCommand extends AbstractCommand
             SELECT object_id
             FROM iwa_json_store
             WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = $uniqueMarketplaceId
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = :uniqueMarketplaceId
             LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql);
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['uniqueMarketplaceId' => $uniqueMarketplaceId]);
+        $result = $stmt->fetchAssociative();
         $objectId = $result ? $result['object_id'] : null;
         if ($objectId) {
             return VariantProduct::getById($objectId);
