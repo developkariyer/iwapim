@@ -59,6 +59,21 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $page = 0;
         $size = 200;
         $now = strtotime('now');
+
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT MAX(created_at)
+            FROM iwa_marketplace_orders 
+            WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+
+        if ($lastUpdatedAt) {
+            $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
+            $threeMonthsAgo = strtotime('-3 months', $now);
+            $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
+        } else {
+            $startDate = strtotime('-3 months');
+        }
         $startDate = strtotime('-3 months');
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
 
