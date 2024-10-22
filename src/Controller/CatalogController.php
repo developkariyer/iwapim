@@ -26,6 +26,9 @@ class CatalogController extends FrontendController
         foreach ($product->getChildren() as $variant) {
             foreach ($variant->getListingItems() as $listing) {
                 $listings[] = $listing->getUrlLink();
+                if (count($album) >= 30) {
+                    continue;
+                }
                 foreach ($listing->getImageGallery() as $image) {
                     if (is_null($mainImage)) {
                         $mainImage = $image->getImage()->getThumbnail('katalog');
@@ -37,7 +40,7 @@ class CatalogController extends FrontendController
                 }
             }
         }
-        return [$mainImage, $album];
+        return [$mainImage, $album, $listings];
     }
 
     /**
