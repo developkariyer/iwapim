@@ -67,8 +67,8 @@ class PrepareTableCommand extends AbstractCommand
                 $marketplaceType = $marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    //'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
-                    'Trendyol' => $this->transferOrdersTrendyol($id),
+                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
+                    //'Trendyol' => $this->transferOrdersTrendyol($id),
 
                     
                 };
