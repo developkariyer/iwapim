@@ -59,10 +59,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $page = 0;
         $size = 200;
         $now = strtotime('now');
-
         $lastUpdatedAt = $db->fetchOne(
             "SELECT MAX(created_at)
-            FROM iwa_trendyol_orders 
+            FROM iwa_marketplace_orders 
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
@@ -75,7 +74,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-
         do {
             $page = 0;
             do {
@@ -103,7 +101,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     $db->beginTransaction();
                     foreach ($orders as $order) {
                         $db->executeStatement(
-                            "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
                                 $this->marketplace->getId(),
                                 $order['orderNumber'],
@@ -116,7 +114,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     $db->rollBack();
                     echo "Error: " . $e->getMessage() . "\n";
                 }
-
                 $page++;
                 $total = $data['totalElements'];
                 echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
@@ -126,7 +123,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
-
             if ($startDate >= $now) {
                 break;
             }
