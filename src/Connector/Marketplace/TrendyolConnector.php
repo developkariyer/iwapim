@@ -54,56 +54,80 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        $db = \Pimcore\Db::get();
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $page = 0;
-        $db = \Pimcore\Db::get();
+        $size = 200;
+        $now = strtotime('now');
         $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(
-                UNIX_TIMESTAMP(CONVERT_TZ(MAX(json_extract(json, '$.orderDate')), '+00:00', '+03:00')), 
-                UNIX_TIMESTAMP('2000-01-01 00:00:00')
-            ) 
+            "SELECT MAX(created_at)
             FROM iwa_marketplace_orders 
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
+
+        if ($lastUpdatedAt) {
+            $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
+            $threeMonthsAgo = strtotime('-3 months', $now);
+            $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
+        } else {
+            $startDate = strtotime('-3 months');
+        }
+        $endDate = min(strtotime('+2 weeks', $startDate), $now);
         do {
-            $response = $this->httpClient->request('GET', $apiUrl, [
-                'headers' => [
-                    'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-                ],
-                'query' => [
-                    'page' => $page,
-                    'endDate' => $lastUpdatedAt*1000
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
+            $page = 0;
+            do {
+                $response = $this->httpClient->request('GET', $apiUrl, [
+                    'headers' => [
+                        'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+                    ],
+                    'query' => [
+                        'page' => $page,
+                        'size' => $size,
+                        'startDate' => $startDate * 1000, 
+                        'endDate' => $endDate * 1000
+                    ]
+                ]);
+
+                $statusCode = $response->getStatusCode();
+                if ($statusCode !== 200) {
+                    echo "Error: $statusCode\n";
+                    break;
+                }
+
+                try {
+                    $data = $response->toArray();
+                    $orders = $data['content'];
+                    $db->beginTransaction();
+                    foreach ($orders as $order) {
+                        $db->executeStatement(
+                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            [
+                                $this->marketplace->getId(),
+                                $order['orderNumber'],
+                                json_encode($order)
+                            ]
+                        );
+                    }
+                    $db->commit();
+                } catch (\Exception $e) {
+                    $db->rollBack();
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
+                $page++;
+                $total = $data['totalElements'];
+                echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+                sleep(1);
+
+            } while ($page <= $data['totalPages']);
+
+            $startDate = $endDate;
+            $endDate = min(strtotime('+2 weeks', $startDate), $now);
+            if ($startDate >= $now) {
                 break;
             }
-            try {
-                $data = $response->toArray();  
-                $orders = $data['content'];
-                $db->beginTransaction();
-                foreach ($orders as $order) {
-                    $db->executeStatement(
-                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                        [
-                            $this->marketplace->getId(),
-                            $order['orderNumber'],
-                            json_encode($order)
-                        ]
-                    );
-                }
-                $db->commit();
-            } catch (\Exception $e) {
-                $db->rollBack();
-                echo "Error: " . $e->getMessage() . "\n";
-            }
-            $page++;
-            echo ".";
-            sleep(1);  
-        } while ($page <= $data['totalPages']);
+
+        } while ($startDate < strtotime('now'));
     }
 
     private function getAttributes($listing) {

@@ -33,27 +33,21 @@ class PrepareTableCommand extends AbstractCommand
         // echo "Transferring orders from Shopify order table\n";
         //$this->transferOrdersFromShopifyOrderTable();
 
-        // $values = $this->fetchValues();
-        // $index = 0;
-        // echo "\n";
-        // foreach ($values as $row) {
-        //     $index++;
-        //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-        //     $this->prepareOrderTable($row['variant_id']);
-        // }
-        $sql = "
-        SELECT COUNT(DISTINCT variant_id) AS count
-        FROM iwa_marketplace_orders_line_items
-        WHERE product_code IS NULL OR product_code = ''
-    ";
-    
-        $db = \Pimcore\Db::get();
-        $count = $db->fetchOne($sql);
-        echo "Count: $count\n";
+        $values = $this->fetchValues();
+        $index = 0;
+        echo "\n";
+        foreach ($values as $row) {
+            $index++;
+            if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+            $this->prepareOrderTable($row['variant_id'],'Trendyol');
+        }
+      
+        
         // $values = $this->fetchValues();
         // $coins = $this->exchangeCoin();
 
         // $this->updateCurrentCoin($coins);
+        
         //$this->transferOrders();
         return Command::SUCCESS;
     }
@@ -70,12 +64,13 @@ class PrepareTableCommand extends AbstractCommand
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
+
             if (isset($marketplaceListWithIds[$id])) {
                 $marketplaceType = $marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
-                    
+                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
+                    'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                 };
 
 
@@ -87,72 +82,198 @@ class PrepareTableCommand extends AbstractCommand
 
     }
 
-    protected static function transferOrdersFromShopifyOrderTable($marketPlaceId)
+    protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
-        $shopifySql = "INSERT IGNORE INTO iwa_marketplace_orders_line_items (
+        $trendyolSql = "
+            INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
             created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR,created_date,total_price_tl,subtotal_price_tl)
-        SELECT
-            'Shopify' AS marketplace_type,
-            NULL AS marketplace_key,
-            NULL AS product_code,
-            NULL AS parent_product_code,
-            NULL AS product_type,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.closed_at')) AS closed_at,               
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS product_id,
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,        
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.vendor')) AS vendor,
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_title')) AS variant_title,
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.total_discount')) AS total_discount,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.referring_site')) AS referring_site,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.landing_site')) AS landing_site,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,  
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country')) AS shipping_country,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.province')) AS shipping_province,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.city')) AS shipping_city,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.company')) AS shipping_company,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country_code')) AS shipping_country_code,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.source_name')) AS source_name,
-            JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.id')) AS fulfillments_id,
-            JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')) AS fulfillments_status,
-            JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')) AS tracking_company,
-            JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.code')) AS discount_code,
-            JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.type')) AS discount_code_type,
-            JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')) AS discount_value,
-            JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')) AS discount_value_type,
-            NULL AS current_USD,
-            NULL AS current_EUR,
-            NULL AS created_date,
-            NULL AS total_price_tl,
-            NULL AS subtotal_price_tl
-        FROM
-            iwa_marketplace_orders
-            CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS (
-                value JSON PATH '$'
-            )) AS line_item
-            CROSS JOIN JSON_TABLE(json, '$.fulfillments[*]' COLUMNS (
-                value JSON PATH '$'
-            )) AS fulfillments
-            CROSS JOIN JSON_TABLE(json, '$.discount_applications[*]' COLUMNS (
-                value JSON PATH '$'
-            )) AS discount_application
-        WHERE
-            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
-            AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
-            AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
-            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
-            AND marketplace_id = $marketPlaceId;
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
+            SELECT
+                '$marketplaceType',
+                NULL AS marketplace_key,
+                NULL AS product_code,
+                NULL AS parent_product_code,
+                NULL AS product_type,
+                FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
+                FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.currencyCode')) AS currency,        
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.merchantId')) AS vendor,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productName')) AS variant_title,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS total_discount,
+                NULL AS referring_site,
+                NULL AS landing_site,
+                NULL AS subtotal_price,  
+                NULL AS shipping_country,
+                NULL AS shipping_province,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.city')) AS shipping_city,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.commercial')) AS shipping_company,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.countryCode')) AS shipping_country_code,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
+                NULL AS source_name,
+                NULL AS fulfillments_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company,
+                NULL AS discount_code,
+                NULL AS discount_code_type,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
+                NULL AS discount_value_type,
+                NULL AS current_USD,
+                NULL AS current_EUR
+            FROM
+                iwa_marketplace_orders
+                CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
+                    value JSON PATH '$'
+                )) AS line_item
+            WHERE
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) IS NOT NULL
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
+                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
+                AND marketplace_id = $marketPlaceId
+			ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_key = VALUES(marketplace_key),
+                product_code = VALUES(product_code),
+                parent_product_code = VALUES(parent_product_code),
+                product_type = VALUES(product_type),
+                created_at = VALUES(created_at),
+                closed_at = VALUES(closed_at),
+                product_id = VALUES(product_id),
+                variant_id = VALUES(variant_id),
+                price = VALUES(price),
+                currency = VALUES(currency),
+                quantity = VALUES(quantity),
+                vendor = VALUES(vendor),
+                variant_title = VALUES(variant_title),
+                total_discount = VALUES(total_discount),
+                referring_site = VALUES(referring_site),
+                landing_site = VALUES(landing_site),
+                subtotal_price = VALUES(subtotal_price),
+                shipping_country = VALUES(shipping_country),
+                shipping_province = VALUES(shipping_province),
+                shipping_city = VALUES(shipping_city),
+                shipping_company = VALUES(shipping_company),
+                shipping_country_code = VALUES(shipping_country_code),
+                total_price = VALUES(total_price),
+                source_name = VALUES(source_name),
+                fulfillments_id = VALUES(fulfillments_id),
+                fulfillments_status = VALUES(fulfillments_status),
+                tracking_company = VALUES(tracking_company),
+                discount_code = VALUES(discount_code),
+                discount_code_type = VALUES(discount_code_type),
+                discount_value = VALUES(discount_value),
+                discount_value_type = VALUES(discount_value_type),
+                current_USD = VALUES(current_USD),
+                current_EUR = VALUES(current_EUR);
         ";
+        $db = \Pimcore\Db::get();
+        $db->query($trendyolSql);
+    }
+
+    protected static function transferOrdersFromShopifyOrderTable($marketPlaceId,$marketplaceType)
+    {
+        $shopifySql = "
+            INSERT INTO iwa_marketplace_orders_line_items (
+                marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+                created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
+                vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
+                shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
+                total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
+                discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
+                current_EUR
+            )
+            SELECT
+                '$marketplaceType',
+                NULL AS marketplace_key,
+                NULL AS product_code,
+                NULL AS parent_product_code,
+                NULL AS product_type,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.closed_at')) AS closed_at,               
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS product_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,        
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.vendor')) AS vendor,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_title')) AS variant_title,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.total_discount')) AS total_discount,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.referring_site')) AS referring_site,
+                COALESCE(LEFT(JSON_UNQUOTE(JSON_EXTRACT(json, '$.landing_site')), 255), NULL) AS landing_site,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,  
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country')) AS shipping_country,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.province')) AS shipping_province,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.city')) AS shipping_city,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.company')) AS shipping_company,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country_code')) AS shipping_country_code,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.source_name')) AS source_name,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.id')), NULL) AS fulfillments_id,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')), NULL) AS fulfillments_status,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.code')), NULL) AS discount_code,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.type')), NULL) AS discount_code_type,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')), NULL) AS discount_value,
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type,
+                NULL AS current_USD,
+                NULL AS current_EUR
+            FROM
+                iwa_marketplace_orders
+                CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
+                LEFT JOIN JSON_TABLE(json, '$.fulfillments[*]' COLUMNS ( value JSON PATH '$' )) AS fulfillments ON TRUE
+                LEFT JOIN JSON_TABLE(json, '$.discount_applications[*]' COLUMNS ( value JSON PATH '$' )) AS discount_application ON TRUE
+            WHERE
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
+                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
+                AND marketplace_id = $marketPlaceId
+            ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_key = VALUES(marketplace_key),
+                product_code = VALUES(product_code),
+                parent_product_code = VALUES(parent_product_code),
+                product_type = VALUES(product_type),
+                created_at = VALUES(created_at),
+                closed_at = VALUES(closed_at),
+                product_id = VALUES(product_id),
+                variant_id = VALUES(variant_id),
+                price = VALUES(price),
+                currency = VALUES(currency),
+                quantity = VALUES(quantity),
+                vendor = VALUES(vendor),
+                variant_title = VALUES(variant_title),
+                total_discount = VALUES(total_discount),
+                referring_site = VALUES(referring_site),
+                landing_site = VALUES(landing_site),
+                subtotal_price = VALUES(subtotal_price),
+                shipping_country = VALUES(shipping_country),
+                shipping_province = VALUES(shipping_province),
+                shipping_city = VALUES(shipping_city),
+                shipping_company = VALUES(shipping_company),
+                shipping_country_code = VALUES(shipping_country_code),
+                total_price = VALUES(total_price),
+                source_name = VALUES(source_name),
+                fulfillments_id = VALUES(fulfillments_id),
+                fulfillments_status = VALUES(fulfillments_status),
+                tracking_company = VALUES(tracking_company),
+                discount_code = VALUES(discount_code),
+                discount_code_type = VALUES(discount_code_type),
+                discount_value = VALUES(discount_value),
+                discount_value_type = VALUES(discount_value_type),
+                current_USD = VALUES(current_USD),
+                current_EUR = VALUES(current_EUR);
+                ";
         $db = \Pimcore\Db::get();
         $db->query($shopifySql);
     }
@@ -177,10 +298,31 @@ class PrepareTableCommand extends AbstractCommand
         return $values;
     }
 
-   
-    protected static function prepareOrderTable($uniqueMarketplaceId)
+    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
     {
-        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
+   
+    protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
+    {
+        $variantObject = match ($marketplaceType) {
+            //'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+        };
+        
         if(!$variantObject) {
             echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
             return;

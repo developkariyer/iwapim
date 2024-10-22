@@ -250,7 +250,6 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
-        $db = \Pimcore\Db::get();
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m-%d')) FROM iwa_marketplace_orders WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
