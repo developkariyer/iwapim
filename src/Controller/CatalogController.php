@@ -25,7 +25,7 @@ class CatalogController extends FrontendController
         $listings = [];
         foreach ($product->getChildren() as $variant) {
             foreach ($variant->getListingItems() as $listing) {
-                $listings[] = $listing->getUrlLink();
+                $listings[] = $listing->getUrlLink()->getPath();
                 if (count($album) >= 30) {
                     continue;
                 }
