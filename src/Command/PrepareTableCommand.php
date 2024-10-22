@@ -47,7 +47,7 @@ class PrepareTableCommand extends AbstractCommand
         // $coins = $this->exchangeCoin();
 
         // $this->updateCurrentCoin($coins);
-        //$this->transferOrders();
+        $this->transferOrders();
         return Command::SUCCESS;
     }
 
@@ -68,7 +68,7 @@ class PrepareTableCommand extends AbstractCommand
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
                     'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
-                    
+
                     
                 };
 
@@ -80,7 +80,65 @@ class PrepareTableCommand extends AbstractCommand
         }
 
     }
-
+ /*
+ INSERT IGNORE INTO iwa_trendyol_orders_line_items (
+            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
+            vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
+            shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
+            total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR,created_date,total_price_tl,subtotal_price_tl)
+        SELECT
+            'Trendyol' AS marketplace_type,
+            NULL AS marketplace_key,
+            NULL AS product_code,
+            NULL AS parent_product_code,
+            NULL AS product_type,
+            FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
+            FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.currencyCode')) AS currency,        
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.merchantId')) AS vendor,
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productName')) AS variant_title,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS total_discount,
+            NULL AS referring_site,
+            NULL AS landing_site,
+            NULL AS subtotal_price,  
+            NULL AS shipping_country,
+            NULL AS shipping_province,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.city')) AS shipping_city,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.commercial')) AS shipping_company,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.countryCode')) AS shipping_country_code,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
+            NULL AS source_name,
+            NULL AS fulfillments_id,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company,
+            NULL AS discount_code,
+            NULL AS discount_code_type,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
+            NULL AS discount_value_type,
+            NULL AS current_USD,
+            NULL AS current_EUR,
+            NULL AS created_date,
+            NULL AS total_price_tl,
+            NULL AS subtotal_price_tl
+        FROM
+            iwa_trendyol_orders
+            CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
+                value JSON PATH '$'
+            )) AS line_item
+        WHERE
+            JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) IS NOT NULL
+            AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
+            AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
+            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
+    
+ */
     protected static function transferOrdersFromShopifyOrderTable($marketPlaceId)
     {
         $shopifySql = "INSERT IGNORE INTO iwa_marketplace_orders_line_items (
