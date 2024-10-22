@@ -69,6 +69,7 @@ class PrepareTableCommand extends AbstractCommand
                 $result = match ($marketplaceType) {
                     'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
                     
+                    
                 };
 
 
