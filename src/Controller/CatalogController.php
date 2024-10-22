@@ -24,7 +24,7 @@ class CatalogController extends FrontendController
     public function catalogAction(): Response
     {
         $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT SUBSTRING_INDEX(productCode, '-', 1) AS productType FROM object_product ORDER BY productType";
+        $sql = "SELECT DISTINCT SUBSTRING_INDEX(productIdentifier, '-', 1) AS productType FROM object_product ORDER BY productType";
         $result = $db->fetchAllAssociative($sql);
         $productTypes = array_column($result, 'productType');
 
