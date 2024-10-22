@@ -57,6 +57,9 @@ class CatalogController extends FrontendController
 
         $products = [];
         foreach ($result as $row) {
+            if ($row->level() > 0) {
+                continue;
+            }
             [$image, $album] = $this->getImageAndAlbum($row);
             if (is_null($image)) {
                 if ($row->getImage()) {
