@@ -90,7 +90,7 @@ class PrepareTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR,created_date,total_price_tl,subtotal_price_tl)
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
             SELECT
                 $marketPlaceId AS marketplace_id,
                 $marketplaceType AS marketplace_type,
@@ -190,7 +190,7 @@ class PrepareTableCommand extends AbstractCommand
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
                 total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
                 discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-                current_EUR, created_date, total_price_tl, subtotal_price_tl
+                current_EUR
             )
             SELECT
                 $marketPlaceId AS marketplace_id,
