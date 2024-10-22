@@ -62,7 +62,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
         $lastUpdatedAt = $db->fetchOne(
             "SELECT MAX(created_at)
-            FROM iwa_marketplace_orders 
+            FROM iwa_trendyol_orders 
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
