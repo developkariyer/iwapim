@@ -33,21 +33,22 @@ class PrepareTableCommand extends AbstractCommand
         // echo "Transferring orders from Shopify order table\n";
         //$this->transferOrdersFromShopifyOrderTable();
 
-        // $values = $this->fetchValues();
-        // $index = 0;
-        // echo "\n";
-        // foreach ($values as $row) {
-        //     $index++;
-        //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-        //     $this->prepareOrderTable($row['variant_id']);
-        // }
+        $values = $this->fetchValues();
+        $index = 0;
+        echo "\n";
+        foreach ($values as $row) {
+            $index++;
+            if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+            $this->prepareOrderTable($row['variant_id']);
+        }
       
         
         // $values = $this->fetchValues();
         // $coins = $this->exchangeCoin();
 
         // $this->updateCurrentCoin($coins);
-        $this->transferOrders();
+        
+        //$this->transferOrders();
         return Command::SUCCESS;
     }
 
