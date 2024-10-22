@@ -47,7 +47,7 @@ class CatalogController extends FrontendController
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT SUBSTRING_INDEX(productIdentifier, '-', 1) AS productType FROM object_product ORDER BY productType";
         $result = $db->fetchAllAssociative($sql);
-        $productTypes = array_column($result, 'productType');
+        $productTypes = array_filter(array_column($result, 'productType'));
 
         $listing = new Product\Listing();
         $listing->setCondition('iwasku IS NULL');
