@@ -128,57 +128,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             }
 
         } while ($startDate < strtotime('now'));
-
-
-        /*$page = 0;
-        $db = \Pimcore\Db::get();
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(
-                UNIX_TIMESTAMP(CONVERT_TZ(MAX(json_extract(json, '$.orderDate')), '+00:00', '+03:00')), 
-                UNIX_TIMESTAMP('2000-01-01 00:00:00')
-            ) 
-            FROM iwa_marketplace_orders 
-            WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
-        do {
-            $response = $this->httpClient->request('GET', $apiUrl, [
-                'headers' => [
-                    'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-                ],
-                'query' => [
-                    'page' => $page,
-                    'endDate' => $lastUpdatedAt*1000
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            try {
-                $data = $response->toArray();  
-                $orders = $data['content'];
-                $db->beginTransaction();
-                foreach ($orders as $order) {
-                    $db->executeStatement(
-                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                        [
-                            $this->marketplace->getId(),
-                            $order['orderNumber'],
-                            json_encode($order)
-                        ]
-                    );
-                }
-                $db->commit();
-            } catch (\Exception $e) {
-                $db->rollBack();
-                echo "Error: " . $e->getMessage() . "\n";
-            }
-            $page++;
-            echo ".";
-            sleep(1);  
-        } while ($page <= $data['totalPages']);*/
     }
 
     private function getAttributes($listing) {
