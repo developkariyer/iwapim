@@ -255,7 +255,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             [$this->marketplace->getId()]
         );
         $page = 1;
-       o {
+        do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
             $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
             $orders = $data['orders'];
