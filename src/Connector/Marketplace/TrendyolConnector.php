@@ -54,6 +54,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        $db = \Pimcore\Db::get();
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $page = 0;
         $size = 200;
