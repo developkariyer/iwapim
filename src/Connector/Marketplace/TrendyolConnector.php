@@ -66,7 +66,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 'query' => [
                     'page' => $page,
                     'size' => $size,
-                    'startDate' => strtotime('-3 month')*1000
+                    'startDate' => strtotime('-10 month')*1000
                 ]
             ]);
             $statusCode = $response->getStatusCode();
