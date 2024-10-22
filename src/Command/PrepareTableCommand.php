@@ -275,7 +275,7 @@ class PrepareTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR),;
+                current_EUR = VALUES(current_EUR);
                 ";
         $db = \Pimcore\Db::get();
         $db->query($shopifySql);
