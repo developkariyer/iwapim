@@ -18,20 +18,21 @@ use Pimcore\Model\Asset;
 class CatalogController extends FrontendController
 {
     
-    protected function getImageAndAlbum($product)
+    protected function getImageAndAlbumAndListings($product)
     {
         $mainImage = null;
         $album = [];
+        $listings = [];
         foreach ($product->getChildren() as $variant) {
             foreach ($variant->getListingItems() as $listing) {
+                $listings[] = $listing->getUrlLink();
                 foreach ($listing->getImageGallery() as $image) {
                     if (is_null($mainImage)) {
                         $mainImage = $image->getImage()->getThumbnail('katalog');
                     } else {
-                        $album[] = $image->getImage()->getThumbnail('album');
-                    }
-                    if (count($album) >= 30) {
-                        return [$mainImage, $album];
+                        if (count($album) < 30) {
+                            $album[] = $image->getImage()->getThumbnail('album');
+                        }
                     }
                 }
             }
@@ -60,7 +61,7 @@ class CatalogController extends FrontendController
             if ($row->level() > 0) {
                 continue;
             }
-            [$image, $album] = $this->getImageAndAlbum($row);
+            [$image, $album, $listings] = $this->getImageAndAlbumAndListings($row);
             if (is_null($image)) {
                 if ($row->getImage()) {
                     $image = $row->getImage()->getThumbnail('katalog');
@@ -74,6 +75,7 @@ class CatalogController extends FrontendController
                 'name' => $row->getName(),
                 'variationSizeList' => str_replace("\n", " | ", $row->getVariationSizeList()),
                 'variationColorList' => str_replace("\n", " | ", $row->getVariationColorList()),
+                'listings' => $listings,
                 'image' => $image,
                 'album' => $album,
             ];

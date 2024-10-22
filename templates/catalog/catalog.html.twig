@@ -96,11 +96,16 @@
                                             <u>Renkler:</u> {{ product.variationColorList }}
                                         </div>
                                         <div class="col-6" style="font-size: smaller;">
+                                            <ul>
+                                                {{ for listing in product.listings }}
+                                                    <li>{{ listing }}</li>
+                                                {{ endfor }}
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
                             </td>
-                            <td style="width: 300px; vertical-align: middle; border: none; padding: 0;">
+                            <td style="width: 300px; vertical-align: top; border: none; padding: 0;">
                                 <div class="product-gallery">
                                     {% for image in product.album %}
                                         <img src="{{ image }}" alt="thumb1">
