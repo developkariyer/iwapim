@@ -13,7 +13,7 @@ use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Currency;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
-use Pimcore\Asset;
+use Pimcore\Model\Asset;
 
 class CatalogController extends FrontendController
 {
