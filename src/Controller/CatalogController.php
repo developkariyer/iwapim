@@ -18,6 +18,24 @@ use Pimcore\Asset;
 class CatalogController extends FrontendController
 {
     
+    protected function getAlbum($product)
+    {
+        $album = [];
+        foreach ($product->getChildren() as $variant) {
+            foreach ($variant->getListingItems() as $listing) {
+                foreach ($listing->getImageGallery() as $imageGallery) {
+                    foreach ($imageGallery as $image) {
+                        $album[] = $image->getImage()->getThumbnail('album');
+                        if (count($album) >= 30) {
+                            return $album;
+                        }
+                    }
+                }
+            }
+        }
+        return $album;
+    }
+
     /**
      * @Route("/catalog", name="catalog")
      */
@@ -36,23 +54,6 @@ class CatalogController extends FrontendController
 
         $products = [];
         foreach ($result as $row) {
-            $album = [];
-            foreach ($row->getChildren() as $variant) {
-                error_log("Variant: ".$variant->getId());
-                foreach ($variant->getListingItems() as $listing) {
-                    error_log(get_class($listing));
-                    foreach ($listing->getImageGallery() as $imageGallery) {
-                        error_log(get_class($imageGallery));
-                        foreach ($imageGallery as $image) {
-                            error_log(get_class($image));
-                            $album[] = $image->getImage()->getThumbnail('album');
-                            if (count($album) >= 30) {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
             $image = $row->getImage() ? $row->getImage()->getThumbnail('katalog') : null;
             $products[] = [
                 'id' => $row->getId(),
@@ -61,7 +62,7 @@ class CatalogController extends FrontendController
                 'variationSizeList' => $row->getVariationSizeList(),
                 'variationColorList' => $row->getVariationColorList(),
                 'image' => $image,
-                'album' => $album
+                'album' => $this->getAlbum($row)
             ];
         }
 
