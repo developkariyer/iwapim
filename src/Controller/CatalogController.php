@@ -62,7 +62,7 @@ class CatalogController extends FrontendController
                 if ($row->getImage()) {
                     $image = $row->getImage()->getThumbnail('katalog');
                 } else {
-                    $image = Asset\Image::getById(76678)->getThumbnail('katalog');
+                    $image = Asset::getById(76678)->getThumbnail('katalog');
                 }
             }
             $products[] = [
