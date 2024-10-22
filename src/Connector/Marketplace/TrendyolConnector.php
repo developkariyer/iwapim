@@ -70,7 +70,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     ],
                     'query' => [
                         'page' => $page,
-                        'size' => $pageSize,
+                        'size' => $size,
                         'startDate' => $startDate * 1000, 
                         'endDate' => $endDate * 1000
                     ]
