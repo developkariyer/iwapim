@@ -58,7 +58,7 @@ class CatalogController extends FrontendController
         $products = [];
         foreach ($result as $row) {
             [$image, $album] = $this->getImageAndAlbum($row);
-            if (is_null($image)) {
+            if (is_null($image) && $row->getImage()) {
                 $image = $row->getImage()->getThumbnail('katalog');
             }
             $products[] = [
