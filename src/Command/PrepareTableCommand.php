@@ -39,7 +39,7 @@ class PrepareTableCommand extends AbstractCommand
         foreach ($values as $row) {
             $index++;
             if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-            $this->prepareOrderTable($row['variant_id']);
+            $this->prepareOrderTable($row['variant_id'],'Trendyol');
         }
       
         
