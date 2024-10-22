@@ -109,10 +109,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             } while ($page <= $data['totalPages']);
 
             $startDate = $endDate;
-            $endDate = strtotime('+2 weeks', $startDate);
+            $endDate = min(strtotime('+2 weeks', $startDate), $now);
 
-            if ($endDate > strtotime('now')) {
-                $endDate = strtotime('now');
+            if ($startDate >= $now) {
+                break;
             }
 
         } while ($startDate < strtotime('now'));
