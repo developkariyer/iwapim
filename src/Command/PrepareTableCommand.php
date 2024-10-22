@@ -41,15 +41,8 @@ class PrepareTableCommand extends AbstractCommand
         //     if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
         //     $this->prepareOrderTable($row['variant_id']);
         // }
-        $sql = "
-        SELECT COUNT(DISTINCT variant_id) AS count
-        FROM iwa_marketplace_orders_line_items
-        WHERE product_code IS NULL OR product_code = ''
-    ";
-    
-        $db = \Pimcore\Db::get();
-        $count = $db->fetchOne($sql);
-        echo "Count: $count\n";
+      
+        
         // $values = $this->fetchValues();
         // $coins = $this->exchangeCoin();
 

@@ -56,6 +56,50 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $page = 0;
+        $size = 200;
+        do {
+            $response = $this->httpClient->request('GET', $apiUrl, [
+                'headers' => [
+                    'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+                ],
+                'query' => [
+                    'page' => $page,
+                    'size' => $size,
+                    'startDate' => strtotime('-3 month')*1000
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            try {
+                $data = $response->toArray();  
+                $orders = $data['content'];
+                $db->beginTransaction();
+                foreach ($orders as $order) {
+                    $db->executeStatement(
+                        "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        [
+                            $this->marketplace->getId(),
+                            $order['orderNumber'],
+                            json_encode($order)
+                        ]
+                    );
+                }
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            $page++;
+            echo "Page $page\n";
+            sleep(1);  
+
+        } while($page <= $data['totalPages']);
+
+
+        /*$page = 0;
         $db = \Pimcore\Db::get();
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(
@@ -103,7 +147,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $page++;
             echo ".";
             sleep(1);  
-        } while ($page <= $data['totalPages']);
+        } while ($page <= $data['totalPages']);*/
     }
 
     private function getAttributes($listing) {
