@@ -308,8 +308,7 @@ class PrepareTableCommand extends AbstractCommand
             LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result ? $result['object_id'] : null;
+        $objectId = $db->fetchColumn($sql);
         if ($objectId) {
             return VariantProduct::getById($objectId);
         }
