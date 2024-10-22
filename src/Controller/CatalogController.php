@@ -57,7 +57,7 @@ class CatalogController extends FrontendController
 
         $products = [];
         foreach ($result as $row) {
-            [$image, $album] = $this->getAlbum($row);
+            [$image, $album] = $this->getImageAndAlbum($row);
             $products[] = [
                 'id' => $row->getId(),
                 'productIdentifier' => $row->getProductIdentifier(),
