@@ -40,6 +40,7 @@ class CatalogController extends FrontendController
                 }
             }
         }
+        error_log(print_r($listings, true));
         return [$mainImage, $album, $listings];
     }
 
