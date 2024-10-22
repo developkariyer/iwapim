@@ -63,14 +63,13 @@ class PrepareTableCommand extends AbstractCommand
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
+
             if (isset($marketplaceListWithIds[$id])) {
                 $marketplaceType = $marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
-                    //'Trendyol' => $this->transferOrdersTrendyol($id),
-
-                    
+                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
+                    'Trendyol' => $this->transferOrdersTrendyol($id),
                 };
 
 
@@ -82,18 +81,19 @@ class PrepareTableCommand extends AbstractCommand
 
     }
 
-    protected static function transferOrdersTrendyol($marketPlaceId)
+    protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_id, marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
             created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
             discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR,created_date,total_price_tl,subtotal_price_tl)
             SELECT
-                'Trendyol' AS marketplace_type,
+                $marketPlaceId AS marketplace_id,
+                $marketplaceType AS marketplace_type,
                 NULL AS marketplace_key,
                 NULL AS product_code,
                 NULL AS parent_product_code,
@@ -127,10 +127,7 @@ class PrepareTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
                 NULL AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR,
-                NULL AS created_date,
-                NULL AS total_price_tl,
-                NULL AS subtotal_price_tl
+                NULL AS current_EUR
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -143,6 +140,7 @@ class PrepareTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
+                marketplace_id = VALUES(marketplace_id),
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
                 product_code = VALUES(product_code),
@@ -176,20 +174,17 @@ class PrepareTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR),
-                created_date = VALUES(created_date),
-                total_price_tl = VALUES(total_price_tl),
-                subtotal_price_tl = VALUES(subtotal_price_tl);
+                current_EUR = VALUES(current_EUR);
         ";
         $db = \Pimcore\Db::get();
         $db->query($trendyolSql);
     }
 
-    protected static function transferOrdersFromShopifyOrderTable($marketPlaceId)
+    protected static function transferOrdersFromShopifyOrderTable($marketPlaceId,$marketplaceType)
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+                marketplace_id, marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
                 created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -198,7 +193,8 @@ class PrepareTableCommand extends AbstractCommand
                 current_EUR, created_date, total_price_tl, subtotal_price_tl
             )
             SELECT
-                'Shopify' AS marketplace_type,
+                $marketPlaceId AS marketplace_id,
+                $marketplaceType AS marketplace_type,
                 NULL AS marketplace_key,
                 NULL AS product_code,
                 NULL AS parent_product_code,
@@ -233,9 +229,6 @@ class PrepareTableCommand extends AbstractCommand
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type,
                 NULL AS current_USD,
                 NULL AS current_EUR,
-                NULL AS created_date,
-                NULL AS total_price_tl,
-                NULL AS subtotal_price_tl
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -248,6 +241,7 @@ class PrepareTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
+                marketplace_id = VALUES(marketplace_id),
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
                 product_code = VALUES(product_code),
@@ -281,10 +275,8 @@ class PrepareTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR),
-                created_date = VALUES(created_date),
-                total_price_tl = VALUES(total_price_tl),
-                subtotal_price_tl = VALUES(subtotal_price_tl);";
+                current_EUR = VALUES(current_EUR),;
+                ";
         $db = \Pimcore\Db::get();
         $db->query($shopifySql);
     }
