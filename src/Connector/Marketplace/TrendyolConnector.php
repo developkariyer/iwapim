@@ -74,7 +74,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         } else {
             $startDate = strtotime('-3 months');
         }
-        $startDate = strtotime('-3 months');
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
 
         do {
