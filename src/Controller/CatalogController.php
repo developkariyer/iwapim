@@ -23,15 +23,10 @@ class CatalogController extends FrontendController
         $album = [];
         foreach ($product->getChildren() as $variant) {
             foreach ($variant->getListingItems() as $listing) {
-                foreach ($listing->getImageGallery() as $imageGallery) {
-                    error_log("imageGallery: ".get_class($imageGallery));
-                    foreach ($imageGallery as $image) {
-                        error_log("image: ".get_class($image));
-                        error_log($image->getId());
-                        $album[] = $image->getImage()->getThumbnail('album');
-                        if (count($album) >= 30) {
-                            return $album;
-                        }
+                foreach ($listing->getImageGallery() as $image) {
+                    $album[] = $image->getImage()->getThumbnail('album');
+                    if (count($album) >= 30) {
+                        return $album;
                     }
                 }
             }
