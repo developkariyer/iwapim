@@ -45,13 +45,14 @@ class CatalogController extends FrontendController
                     }
                 }
             }
+            $image = $row->getImage() ? $row->getImage()->getThumbnail('katalog') : null;
             $products[] = [
                 'id' => $row->getId(),
                 'productIdentifier' => $row->getProductIdentifier(),
                 'name' => $row->getName(),
                 'variationSizeList' => $row->getVariationSizeList(),
                 'variationColorList' => $row->getVariationColorList(),
-                'image' => $row->getImage()->getThumbnail('katalog'),
+                'image' => $image,
                 'album' => $album
             ];
         }
