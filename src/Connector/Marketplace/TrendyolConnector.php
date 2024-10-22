@@ -104,7 +104,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 }
 
                 $page++;
-                echo "Page $page for date range " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+                $total = $data['totalElements'];
+                echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
                 sleep(1);
 
             } while ($page <= $data['totalPages']);
