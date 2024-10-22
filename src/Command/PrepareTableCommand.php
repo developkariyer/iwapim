@@ -228,7 +228,7 @@ class PrepareTableCommand extends AbstractCommand
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')), NULL) AS discount_value,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR,
+                NULL AS current_EUR
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
