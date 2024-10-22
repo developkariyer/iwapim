@@ -68,7 +68,8 @@ class CatalogController extends FrontendController
 
         return $this->render('catalog/catalog.html.twig', [
             'productTypes' => $productTypes,
-            'products' => $products
+            'products' => $products,
+            'debug' => json_encode($products)
         ]);
 
     }
