@@ -58,8 +58,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $page = 0;
         $size = 200;
+        $now = strtotime('now');
         $startDate = strtotime('-3 months');
-        $endDate = strtotime('-3 months +2 weeks');
+        $endDate = min(strtotime('+2 weeks', $startDate), $now);
 
         do {
             $page = 0;
