@@ -58,46 +58,64 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $page = 0;
         $size = 200;
-        do {
-            $response = $this->httpClient->request('GET', $apiUrl, [
-                'headers' => [
-                    'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-                ],
-                'query' => [
-                    'page' => $page,
-                    'size' => $size,
-                    'startDate' => strtotime('-10 month')*1000
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            try {
-                $data = $response->toArray();  
-                $orders = $data['content'];
-                $db->beginTransaction();
-                foreach ($orders as $order) {
-                    $db->executeStatement(
-                        "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                        [
-                            $this->marketplace->getId(),
-                            $order['orderNumber'],
-                            json_encode($order)
-                        ]
-                    );
-                }
-                $db->commit();
-            } catch (\Exception $e) {
-                $db->rollBack();
-                echo "Error: " . $e->getMessage() . "\n";
-            }
-            $page++;
-            echo "Page $page\n";
-            sleep(1);  
+        $startDate = strtotime('-3 months');
+        $endDate = strtotime('-3 months +2 weeks');
 
-        } while($page <= $data['totalPages']);
+        do {
+            $page = 0;
+            do {
+                $response = $this->httpClient->request('GET', $apiUrl, [
+                    'headers' => [
+                        'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+                    ],
+                    'query' => [
+                        'page' => $page,
+                        'size' => $pageSize,
+                        'startDate' => $startDate * 1000, 
+                        'endDate' => $endDate * 1000
+                    ]
+                ]);
+
+                $statusCode = $response->getStatusCode();
+                if ($statusCode !== 200) {
+                    echo "Error: $statusCode\n";
+                    break;
+                }
+
+                try {
+                    $data = $response->toArray();
+                    $orders = $data['content'];
+                    $db->beginTransaction();
+                    foreach ($orders as $order) {
+                        $db->executeStatement(
+                            "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            [
+                                $this->marketplace->getId(),
+                                $order['orderNumber'],
+                                json_encode($order)
+                            ]
+                        );
+                    }
+                    $db->commit();
+                } catch (\Exception $e) {
+                    $db->rollBack();
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
+
+                $page++;
+                echo "Page $page for date range " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+                sleep(1);
+
+            } while ($page <= $data['totalPages']);
+
+            $startDate = $endDate;
+            $endDate = strtotime('+2 weeks', $startDate);
+
+            if ($endDate > strtotime('now')) {
+                $endDate = strtotime('now');
+            }
+
+        } while ($startDate < strtotime('now'));
 
 
         /*$page = 0;
