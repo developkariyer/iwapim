@@ -28,6 +28,34 @@ class CatalogController extends FrontendController
         $result = $db->fetchAllAssociative($sql);
         $productTypes = array_column($result, 'productType');
 
+        $listing = new Product\Listing();
+        $listing->setCondition('iwasku IS NULL');
+        $listing->setOrderKey('productIdentifier');
+        $listing->setLimit(50);
+        $result = $listing->load();
+
+        $products = [];
+        foreach ($result as $row) {
+            $album = [];
+            foreach ($row->getListingItems() as $listing) {
+                foreach ($listing->getImageGallery() as $image) {
+                    $album[] = $image->getImage()->getThumbnail('album');
+                    if (count($album) >= 30) {
+                        break;
+                    }
+                }
+            }
+            $products[] = [
+                'id' => $row->getId(),
+                'productIdentifier' => $row->getProductIdentifier(),
+                'name' => $row->getName(),
+                'variationSizeList' => $row->getVariationSizeList(),
+                'variationColorList' => $row->getVariationColorList(),
+                'image' => $row->getImage()->getThumbnail('katalog'),
+                'album' => $album
+            ];
+        }
+
         return $this->render('catalog/catalog.html.twig', [
             'productTypes' => $productTypes
         ]);
