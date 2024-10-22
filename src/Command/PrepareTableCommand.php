@@ -297,13 +297,32 @@ class PrepareTableCommand extends AbstractCommand
         return $values;
     }
 
+    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
+    {
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = :uniqueMarketplaceId
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['uniqueMarketplaceId' => $uniqueMarketplaceId]);
+        $objectId = $stmt->fetchColumn();
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
    
     protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
-            'Trendyol' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId)
+            //'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
         };
+        
         if(!$variantObject) {
             echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
             return;
