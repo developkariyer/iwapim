@@ -141,7 +141,7 @@ class PrepareTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
-                AND iwa_marketplace_orders.marketplace_id = $marketPlaceId
+                AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
@@ -246,7 +246,7 @@ class PrepareTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
-                marketplace_id = $marketPlaceId
+                AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
