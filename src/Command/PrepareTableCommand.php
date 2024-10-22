@@ -308,8 +308,7 @@ class PrepareTableCommand extends AbstractCommand
             LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
-        $stmt = $db->prepare($sql);
-        $result = $db->fetchAllAssociative();
+        $result = $db->fetchAllAssociative($sql);
         $objectId = $result ? $result['object_id'] : null;
         if ($objectId) {
             return VariantProduct::getById($objectId);
