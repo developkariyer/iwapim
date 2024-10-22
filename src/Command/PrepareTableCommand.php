@@ -67,7 +67,7 @@ class PrepareTableCommand extends AbstractCommand
                 $marketplaceType = $marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
+                    //'Shopify' => $this->transferOrdersFromShopifyOrderTable($id),
                     'Trendyol' => $this->transferOrdersTrendyol($id),
 
                     
@@ -100,7 +100,7 @@ class PrepareTableCommand extends AbstractCommand
                 NULL AS product_type,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
@@ -132,7 +132,7 @@ class PrepareTableCommand extends AbstractCommand
                 NULL AS total_price_tl,
                 NULL AS subtotal_price_tl
             FROM
-                iwa_trendyol_orders
+                iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
                     value JSON PATH '$'
                 )) AS line_item
@@ -141,6 +141,7 @@ class PrepareTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
+                marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
@@ -245,6 +246,7 @@ class PrepareTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
+                marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_key = VALUES(marketplace_key),
@@ -308,9 +310,12 @@ class PrepareTableCommand extends AbstractCommand
     }
 
    
-    protected static function prepareOrderTable($uniqueMarketplaceId)
+    protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
     {
-        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantObject = match ($marketplaceType) {
+            'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Trendyol' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId)
+        };
         if(!$variantObject) {
             echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
             return;
