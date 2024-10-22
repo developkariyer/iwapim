@@ -93,7 +93,7 @@ class PrepareTableCommand extends AbstractCommand
             discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
             SELECT
                 $marketPlaceId,
-                $marketplaceType,
+                '$marketplaceType',
                 NULL AS marketplace_key,
                 NULL AS product_code,
                 NULL AS parent_product_code,
@@ -194,7 +194,7 @@ class PrepareTableCommand extends AbstractCommand
             )
             SELECT
                 $marketPlaceId,
-                $marketplaceType,
+                '$marketplaceType',
                 NULL AS marketplace_key,
                 NULL AS product_code,
                 NULL AS parent_product_code,
