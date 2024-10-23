@@ -8,12 +8,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <style>
-        @media only screen and (max-width: 768px) {
-            .product-gallery {
-                display: none;
-            }
-        }
-        
         body {
             background-color: #070e53;
         }
@@ -112,7 +106,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td style="width: 320px; vertical-align: top; border: none; padding: 0;">
+                            <td class="d-none d-md-table-cell" style="width: 320px; vertical-align: top; border: none; padding: 0;">
                                 <div class="product-gallery">
                                     {% for image in product.album %}
                                         <img src="{{ image }}" alt="thumb1">
