@@ -97,9 +97,9 @@
                                         </div>
                                         <div class="col-6" style="font-size: smaller;">
                                             <ul>
-                                                {{ for listing in product.listings }}
+                                                {% for listing in product.listings %}
                                                     <li>{{ listing }}</li>
-                                                {{ endfor }}
+                                                {% endfor %}
                                             </ul>
                                         </div>
                                     </div>
