@@ -56,7 +56,7 @@ class CatalogController extends FrontendController
         $listing = new Product\Listing();
         $listing->setCondition('iwasku IS NULL');
         $listing->setOrderKey('productIdentifier');
-        $listing->setLimit(50);
+        $listing->setLimit(100);
         $result = $listing->load();
 
         $products = [];
