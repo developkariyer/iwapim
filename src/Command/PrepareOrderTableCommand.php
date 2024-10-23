@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
     description: 'Imports products from Shopify sites!'
 )]
 
-class PrepareTableCommand extends AbstractCommand
+class PrepareOrderTableCommand extends AbstractCommand
 {
     private $marketplaceListWithIds = [];
 
