@@ -214,15 +214,16 @@ class ListingSyncService
             if ($listing['store']['source']['name'] === 'Amazon') {
                 continue;
             }
-            if (isset($pimListings[$listing['code']])) {
-                $variantProduct = VariantProduct::getById($pimListings[$listing['code']]['oo_id']);
-                unset($pimListings[$listing['code']]);
+            $code = trim($listing['code']);
+            if (isset($pimListings[$code])) {
+                $variantProduct = VariantProduct::getById($pimListings[$code]['oo_id']);
+                unset($pimListings[$code]);
             } else {
-                $variantProduct = VariantProduct::getByWisersellVariantCode($listing['code'], ['limit' => 1]);
+                $variantProduct = VariantProduct::getByWisersellVariantCode($code, ['limit' => 1]);
             }
             if (!$variantProduct instanceof VariantProduct) {
-                echo "Variant product not found for {$listing['code']}, deleting from WS: ".json_encode($listing)."\n";
-                $this->deleteFromWisersell($listing['code']);
+                echo "Variant product not found for {$code}, deleting from WS: ".json_encode($listing)."\n";
+                $this->deleteFromWisersell($code);
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
