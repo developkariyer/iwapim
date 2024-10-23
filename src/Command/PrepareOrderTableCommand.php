@@ -474,19 +474,18 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $coins = self::exchangeCoin();
         $db = \Pimcore\Db::get();
-        $sql = "
+        /*$sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
         WHERE DATE(created_at) = ?
         ";
-        $stmt = $db->prepare($sql);
+        $stmt = $db->prepare($sql);*/
         foreach ($coins as $date => $coin) {
             echo "Excel'den gelen tarih: " . $date . "<br>";
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $stmtCheck = $db->prepare("SELECT DATE(created_at) AS db_date FROM iwa_marketplace_orders_line_items WHERE DATE(created_at) = ?");
-                $stmtCheck->execute([$date]);
-                $result = $stmtCheck->fetchAllAssociative();
+                $sql = "SELECT DATE(created_at) AS db_date FROM iwa_marketplace_orders_line_items WHERE DATE(created_at) = ?";
+                $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
                 if (!empty($result)) {
                     foreach ($result as $row) {
                         echo "Veritabanından dönen tarih: " . $row['db_date'] . "<br>";
