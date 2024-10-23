@@ -71,14 +71,14 @@
         <div class="row my-4">
             <div class="col-md-3">
                 <select class="form-select" id="category-select">
-                    <option selected>Kategori Seçin</option>
+                    <option value="all" selected>Tüm Ürün Tipleri</option>
                     {% for type in productTypes %}
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
-                </select>        
+                </select>
             </div>
             <div class="col-md-9">
-            <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek ara...">
+            <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek arayın...">
             </div>
         </div>
 

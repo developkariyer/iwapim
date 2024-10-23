@@ -43,41 +43,86 @@ class CatalogController extends FrontendController
         return [$mainImage, $album, $listings];
     }
 
-    /**
-     * @Route("/catalog", name="catalog")
-     */
-    public function catalogAction(): Response
+    protected function getProductTypeOptions()
     {
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT SUBSTRING_INDEX(productIdentifier, '-', 1) AS productType FROM object_product ORDER BY productType";
         $result = $db->fetchAllAssociative($sql);
-        $productTypes = array_filter(array_column($result, 'productType'));
+        return array_filter(array_column($result, 'productType'));
+    }
 
-        $listing = new Product\Listing();
-        $listing->setCondition('iwasku IS NULL');
-        $listing->setOrderKey('productIdentifier');
-        $listing->setLimit(100);
-        $result = $listing->load();
+    protected function getProductQuery($query, $category, &$params = [])
+    {
+        $sql = "FROM object_store_product osp
+                INNER JOIN objects o ON osp.oo_id = o.id
+                WHERE o.published = 1
+                AND o.className = 'Product'
+                AND o.type = 'object'
+                AND (SELECT parent.type FROM objects parent WHERE parent.id = o.parentId) = 'folder'";
+        if ($category !== 'all') {
+            $sql .= " AND osp.productIdentifier LIKE :category";
+            $params['category'] = "$category-%";
+        }
+        if ($query !== 'all') {
+            $sql .= " AND (osp.productIdentifier LIKE :query OR osp.name LIKE :name)";
+            $params['query'] = "%$query%";
+            $params['name'] = "%$query%";
+        }
+        $sql .= " ORDER BY osp.productIdentifier";
+        return $sql;
+    }
+    
+    protected function getProductCount($query, $category)
+    {
+        $db = \Pimcore\Db::get();
+        $params = [];
+        $sql = "SELECT COUNT(*) AS count " . $this->getProductQuery($query, $category, $params);
+        return $db->fetchOne($sql, $params);
+    }
+    
+    protected function getProducts($query, $category, $page, $pageSize = 100)
+    {
+        $db = \Pimcore\Db::get();
+        $params = [];
+        $sql = "SELECT osp.oo_id " . $this->getProductQuery($query, $category, $params) . " LIMIT :limit OFFSET :offset";
+        $params['limit'] = $pageSize;
+        $params['offset'] = $page * $pageSize;
+        return $db->fetchFirstColumn($sql, $params);
+    }
 
+    /**
+     * @Route("/catalog/{query?all}/{category?all}/{page?0}", name="catalog")
+     */
+    public function catalogAction(Request $request): Response
+    {
+        $query = $request->get('query');
+        $page = $request->get('page');
+        $category = $request->get('category');
+
+        $productTypes = $this->getProductTypeOptions();
+
+        $pimProductCount = $this->getProductCount($query, $category);
+        $pimProductIds = $this->getProducts($query, $category, $page);
         $products = [];
-        foreach ($result as $row) {
-            if ($row->level() > 0) {
+        foreach ($pimProductIds as $pimProductId) {
+            $pimProduct = Product::getById($pimProductId);
+            if ($pimProduct->level() > 0) {
                 continue;
             }
-            [$image, $album, $listings] = $this->getImageAndAlbumAndListings($row);
+            [$image, $album, $listings] = $this->getImageAndAlbumAndListings($pimProduct);
             if (is_null($image)) {
-                if ($row->getImage()) {
-                    $image = $row->getImage()->getThumbnail('katalog');
+                if ($pimProduct->getImage()) {
+                    $image = $pimProduct->getImage()->getThumbnail('katalog');
                 } else {
                     $image = Asset::getById(76678)->getThumbnail('katalog');
                 }
             }
             $products[] = [
-                'id' => $row->getId(),
-                'productIdentifier' => $row->getProductIdentifier(),
-                'name' => $row->getName(),
-                'variationSizeList' => str_replace("\n", " | ", $row->getVariationSizeList()),
-                'variationColorList' => str_replace("\n", " | ", $row->getVariationColorList()),
+                'id' => $pimProduct->getId(),
+                'productIdentifier' => $pimProduct->getProductIdentifier(),
+                'name' => $pimProduct->getName(),
+                'variationSizeList' => str_replace("\n", " | ", $pimProduct->getVariationSizeList()),
+                'variationColorList' => str_replace("\n", " | ", $pimProduct->getVariationColorList()),
                 'listings' => $listings,
                 'image' => $image,
                 'album' => $album,
@@ -85,6 +130,8 @@ class CatalogController extends FrontendController
         }
 
         return $this->render('catalog/catalog.html.twig', [
+            'totalProductCount' => $pimProductCount,
+            'currentPage' => $page,
             'productTypes' => $productTypes,
             'products' => $products,
         ]);
