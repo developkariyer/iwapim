@@ -231,16 +231,18 @@ class ListingSyncService
         }
     }
 
-    public function calculateWisersellCode($listingData)
+    public function calculateWisersellCode($variantProduct)
     {
+        $listingData = $this->prepareListingData($variantProduct);
+        $storeId = $variantProduct->getWisersellStoreId();
         $data = empty($listingData['variantCode']) ? 
-            "{$listingData['shopId']}_{$listingData['storeproductid']}" : 
-            "{$listingData['shopId']}_{$listingData['storeproductid']}_{$listingData['variantCode']}";
+            "{$storeId}_{$listingData['storeproductid']}" : 
+            "{$storeId}_{$listingData['storeproductid']}_{$listingData['variantCode']}";
         return hash('sha1', $data);
     }
 
     public function updatePimCalculatedWisersellCodes()
-    {
+    {   // $listings->updatePimCalculatedWisersellCodes()
         $vpl = new VariantProduct\Listing();
         $vpl->setUnpublished(true);
         $pageSize = 50;
@@ -261,7 +263,7 @@ class ListingSyncService
                     continue;
                 }
                 $fullData++;
-                $calculatedWisersellCode = $this->calculateWisersellCode($listingData);
+                $calculatedWisersellCode = $this->calculateWisersellCode($variantProduct);
                 if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode()) {
                     echo "{$variantProduct->getId()} : {$listingData['variantStr']}\n";
                 } else {
