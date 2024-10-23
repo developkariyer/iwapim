@@ -149,10 +149,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
-                marketplace_key = VALUES(marketplace_key),
-                product_code = VALUES(product_code),
-                parent_product_code = VALUES(parent_product_code),
-                product_type = VALUES(product_type),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -250,10 +246,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
-                marketplace_key = VALUES(marketplace_key),
-                product_code = VALUES(product_code),
-                parent_product_code = VALUES(parent_product_code),
-                product_type = VALUES(product_type),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
