@@ -421,7 +421,8 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function exchangeCoin()
     {
-        $filePath = '/var/www/iwapim/tmp/EVDS.xlsx';
+        
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
@@ -474,6 +475,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function updateCurrentCoin()
     {
         $coins = self::exchangeCoin();
+        $db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
