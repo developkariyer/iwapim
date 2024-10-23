@@ -246,7 +246,7 @@ class ListingSyncService
         $vpl->setUnpublished(true);
         $pageSize = 50;
         $offset = 0;
-        $emptyData = $fullData = 0;
+        $emptyData = $fullData = $emptyCode = 0;
         $vpl->setLimit($pageSize);
         while (true) {
             echo "Processing $pageSize from $offset, until now $emptyData/$fullData\n";
@@ -263,7 +263,10 @@ class ListingSyncService
                 }
                 $fullData++;
                 $calculatedWisersellCode = $this->calculateWisersellCode($listingData);
-                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}     ".($calculatedWisersellCode === $variantProduct->getCalculatedWisersellCode())."\n";
+                if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode() || empty($calculatedWisersellCode)) {
+                    echo "{$variantProduct->getId()} : ".json_encode($listingData)."\n";
+                }
+//                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}     ".($calculatedWisersellCode === $variantProduct->getCalculatedWisersellCode())."\n";
 //                $variantProduct->setCalculatedWisersellCode($calculatedWisersellCode);
 //                $variantProduct->save();
             }
