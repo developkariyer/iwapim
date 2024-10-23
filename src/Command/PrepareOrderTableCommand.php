@@ -54,7 +54,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, ['', 5542189990050]);
+        $result = $db->fetchAllAssociative($sql, ['', '5542189990050']);
         $objectId = $result[0]['object_id'] ?? null;
         echo "Object ID: $objectId\n";
         return Command::SUCCESS;
