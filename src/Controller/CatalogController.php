@@ -97,8 +97,8 @@ class CatalogController extends FrontendController
     public function catalogAction(Request $request): Response
     {
         $query = $request->get('query');
-        $page = $request->get('page');
         $category = $request->get('category');
+        $page = $request->get('page');
 
         $productTypes = $this->getProductTypeOptions();
 
@@ -132,7 +132,9 @@ class CatalogController extends FrontendController
 
         return $this->render('catalog/catalog.html.twig', [
             'totalProductCount' => $pimProductCount,
-            'currentPage' => $page,
+            'query' => $query,
+            'category' => $category,
+            'page' => $page,
             'productTypes' => $productTypes,
             'products' => $products,
         ]);

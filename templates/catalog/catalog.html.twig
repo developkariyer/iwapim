@@ -136,6 +136,10 @@
 
     <script>
         $(document).ready(function() {
+            let currentQuery = '{{ query|e('js') }}'; 
+            let currentCategory = '{{ category|e('js') }}';
+            let currentPage = {{ page|default(0) }}; 
+
             $('#search-box').on('input', function() {
                 let searchQuery = $(this).val();
                 // Make AJAX request to fetch product data based on search query
@@ -144,8 +148,7 @@
 
             $('#category-select').on('change', function() {
                 let selectedCategory = $(this).val();
-                // Make AJAX request to fetch product data based on selected category
-                // Example: $.ajax({ ... });
+                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/${currentPage}`;
             });
         });
 
