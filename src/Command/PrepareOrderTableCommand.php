@@ -472,7 +472,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function updateCurrentCoin()
     {
-        $coins = self::exchangeCoin();
+        /*$coins = self::exchangeCoin();
         $db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
@@ -484,6 +484,18 @@ class PrepareOrderTableCommand extends AbstractCommand
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
                 $stmt->execute([$coin['usd'], $coin['euro'], $date]);
+            }
+        }*/
+        $coins = self::exchangeCoin();
+        $db = \Pimcore\Db::get();
+        $sql = "
+        INSERT INTO iwa_history (date, usd, eur)
+        VALUES (?, ?, ?)
+        ";
+        foreach ($coins as $date => $coin) {
+            $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
+            if ($dateTime && $dateTime->format('Y-m-d') === $date) {
+                $stmt->execute([$date, $coin['usd'], $coin['euro']]);
             }
         }
     }
