@@ -180,6 +180,7 @@ class ListingSyncService
         if (empty($listingData)) {
             return;
         }
+        echo "Adding {$listingData['variantStr']}\n";
         $this->bucket[] = $listingData;
         if (count($this->bucket) >= 100) {
             $this->flushListingBucketToWisersell();
@@ -248,6 +249,14 @@ class ListingSyncService
             }
         }
         echo "\n";
+        foreach ($pimListings as $pimListing) {
+            $variantProduct = VariantProduct::getById($pimListing['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $this->updateWisersellListing($variantProduct);
+        }
+        $this->flushListingBucketToWisersell();
     }
 
     public function calculateWisersellCode($variantProduct)
