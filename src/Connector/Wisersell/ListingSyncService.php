@@ -133,7 +133,7 @@ class ListingSyncService
         }
         return [
             'storeproductid' => $storeProductId,
-            'productid' => $productId,
+            'productId' => $productId,
             'shopId' => $shopId,
             'variantCode' => $variantCode,
             'variantStr' => "{$marketplaceType} SId: {$shopId} PId:{$storeProductId} VId:{$variantCode} PimId:{$productId}"
@@ -153,7 +153,7 @@ class ListingSyncService
             return;
         }
         $response = $this->connector->request(Connector::$apiUrl['listing'], 'PUT', $code, [
-            'productId' => $listingData['productid'],
+            'productId' => $listingData['productId'],
             'shopId' => $listingData['shopId'],
         ]);
         if (empty($response) || $response->getStatusCode() !== 200) {
