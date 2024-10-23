@@ -41,7 +41,10 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->processVariantOrderData();
         }
 
+        // $coins = $this->exchangeCoin();
 
+        // $this->updateCurrentCoin($coins);
+        
         return Command::SUCCESS;
     }
     
@@ -402,9 +405,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
-
         $result = [];
-
         $previousUsd = null;
         $previousEuro = null;
 
@@ -452,35 +453,17 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function updateCurrentCoin($coins)
     {
-        $db = \Pimcore\Db::get();
-        $updateCreatedDateSql = "
-            UPDATE iwa_marketplace_orders_line_items
-            SET created_date = DATE(created_at);
-        ";
-        $db->executeUpdate($updateCreatedDateSql);
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
-        WHERE created_date = ?
+        WHERE DATE(created_date) = ?
         ";
         $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $stmt->bindValue(1, $coin['usd']);
-                $stmt->bindValue(2, $coin['euro']);
-                $stmt->bindValue(3, $date);
-
-                $stmt->execute();
+                $stmt->execute([$coin['usd'], $coin['euro'], $date]);
             }
         }
-        $total_price_TL = "
-        UPDATE `iwa_marketplace_orders_line_items` 
-        SET 
-            total_price_tl = ROUND(total_price * current_USD * 100) / 100,
-            subtotal_price_tl = ROUND(subtotal_price * current_USD * 100) / 100
-        ";
-        $db->executeUpdate($total_price_TL);
-        
     }
 }
