@@ -481,22 +481,22 @@ class PrepareOrderTableCommand extends AbstractCommand
         ";
         $stmt = $db->prepare($sql);*/
         foreach ($coins as $date => $coin) {
-            echo "Excel'den gelen tarih: " . $date . "<br>";
+            echo "Excel'den gelen tarih: " . $date . "\n";
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
                 $sql = "SELECT DATE(created_at) AS db_date FROM iwa_marketplace_orders_line_items WHERE DATE(created_at) = ?";
                 $result = $db->fetchAllAssociative($sql, [$date]);
                 if (!empty($result)) {
                     foreach ($result as $row) {
-                        echo "Veritabanından dönen tarih: " . $row['db_date'] . "<br>";
+                        echo "Veritabanından dönen tarih: " . $row['db_date'] . "\n";
                     }
-                    echo "Eşleşen tarih: " . $date . "<br>";
+                    echo "Eşleşen tarih: " . $date . "\n";
                     $stmt->execute([$coin['usd'], $coin['euro'], $date]);
                 } else {
-                    echo "Veritabanında eşleşen tarih bulunamadı: " . $date . "<br>";
+                    echo "Veritabanında eşleşen tarih bulunamadı: " . $date . "\n";
                 }
             } else {
-                echo "Tarih formatı hatalı: " . $date . "<br>";
+                echo "Tarih formatı hatalı: " . $date . "\n";
             }
         }
         /*foreach ($coins as $date => $coin) {
