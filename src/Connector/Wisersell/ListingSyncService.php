@@ -92,7 +92,7 @@ class ListingSyncService
             echo "Not a variant product\n";
             return null;
         }
-        $mainProduct = $variantProduct->getMainProduct();
+        $mainProduct = $variantProduct->getMainProduct()[0] ?? null;
         if (!$mainProduct instanceof Product) {
             echo "{$variantProduct->getId()} do not have a main product\n";
             return null;
@@ -207,7 +207,7 @@ class ListingSyncService
                 // delete listing from wisersell
                 continue;
             }
-            $mainProduct = $variantProduct->getMainProduct();
+            $mainProduct = $variantProduct->getMainProduct()[0] ?? null;
             if (!$mainProduct instanceof Product) {
                 // not connected or multiple connected in pim
                 continue;
