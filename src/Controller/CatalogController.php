@@ -85,8 +85,8 @@ class CatalogController extends FrontendController
         $db = \Pimcore\Db::get();
         $params = [];
         $sql = "SELECT osp.oo_id " . $this->getProductQuery($query, $category, $params) . " LIMIT :limit OFFSET :offset";
-        $params['limit'] = $pageSize;
-        $params['offset'] = $page * $pageSize;
+        $params['limit'] = (int) $pageSize;
+        $params['offset'] = (int) $page * $pageSize;
         return $db->fetchFirstColumn($sql, $params);
     }
 
