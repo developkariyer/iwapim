@@ -149,14 +149,17 @@
             }
 
             $('#search-box').on('input', function() {
-                let searchQuery = $(this).val();
-                // Make AJAX request to fetch product data based on search query
-                // Example: $.ajax({ ... });
+                let searchQuery = $(this).val().trim();
+
+                // Reload the page only if the search query has changed
+                if (searchQuery !== currentQuery) {
+                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0`;
+                }            
             });
 
             $('#category-select').on('change', function() {
                 let selectedCategory = $(this).val();
-                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/${currentPage}`;
+                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0`;
             });
         });
 
