@@ -247,22 +247,19 @@ class ListingSyncService
         $vpl->setUnpublished(true);
         $pageSize = 50;
         $offset = 0;
-        $emptyData = $fullData = $emptyCode = 0;
         $vpl->setLimit($pageSize);
         while (true) {
-            echo "Processing $pageSize from $offset, until now $emptyData/$fullData\n";
+            echo "Processing $pageSize from $offset\n";
             $vpl->setOffset($offset);
             $variantProducts = $vpl->load();
             if (empty($variantProducts)) {
                 break;
             }
             foreach ($variantProducts as $variantProduct) {
-                $listingData = $this->prepareListingData($variantProduct);
-                if (empty($listingData)) {
-                    $emptyData++;
+                if ($variantProduct->getMarketplace()->getMarketplaceType() === 'Amazon') {
                     continue;
                 }
-                $fullData++;
+                $listingData = $this->prepareListingData($variantProduct);
                 $calculatedWisersellCode = $this->calculateWisersellCode($variantProduct);
                 if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode()) {
                     echo "Calculated code changed for {$variantProduct->getId()}: {$listingData['variantStr']}\n";
