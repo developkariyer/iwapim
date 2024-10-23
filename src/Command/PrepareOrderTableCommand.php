@@ -7,11 +7,10 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
-
 use App\Model\DataObject\VariantProduct;
-
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
@@ -20,63 +19,71 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
     description: 'Imports products from Shopify sites!'
 )]
 
-class PrepareTableCommand extends AbstractCommand
+class PrepareOrderTableCommand extends AbstractCommand
 {
-    // protected function configure() 
-    // {
-    //     $this
-    //         ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
-    //         ;
-    // }
+    private $marketplaceListWithIds = [];
+
+    protected function configure() 
+    {
+        $this
+            ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_orders to iwa_marketplace_orders_line_items')
+            ->addOption('processVariantOrderData',null, InputOption::VALUE_NONE, 'Process variant order data find main product')
+            ->addOption('updateCoin',null, InputOption::VALUE_NONE, 'Update current coin')
+            ;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // echo "Transferring orders from Shopify order table\n";
-        //$this->transferOrdersFromShopifyOrderTable();
-
-        $values = $this->fetchValues();
-        $index = 0;
-        echo "\n";
-        foreach ($values as $row) {
-            $index++;
-            if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-            $this->prepareOrderTable($row['variant_id'],'Trendyol');
+        if($input->getOption('transfer')) {
+            $this->transferOrders();
         }
-      
-        
-        // $values = $this->fetchValues();
-        // $coins = $this->exchangeCoin();
 
-        // $this->updateCurrentCoin($coins);
+        if($input->getOption('processVariantOrderData')) {
+            $this->processVariantOrderData();
+        }
+
+        if($input->getOption('updateCoin')) {
+            $this->updateCurrentCoin();
+        }
         
-        //$this->transferOrders();
         return Command::SUCCESS;
+    }
+    
+    protected function processVariantOrderData()
+    {
+        if (empty($this->marketplaceListWithIds)) {
+            $this->marketplaceList();
+        }
+        $marketplaceTypes = array_values($this->marketplaceListWithIds);
+        foreach ($marketplaceTypes as $marketplaceType) {
+            $values = $this->fetchVariantIds($marketplaceType);
+            $index = 0;
+            foreach ($values as $row) {
+                $index++;
+                if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+                $this->prepareOrderTable($row['variant_id'],$marketplaceType);
+            }
+    
+        }
     }
 
     protected function transferOrders()
     {
-        $marketplaceList = Marketplace::getMarketplaceList();
-        $marketplaceListWithIds[] = [];
-        foreach ($marketplaceList as $marketplace) {
-            $marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        if (empty($this->marketplaceListWithIds)) {
+            $this->marketplaceList();
         }
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
-
-            if (isset($marketplaceListWithIds[$id])) {
-                $marketplaceType = $marketplaceListWithIds[$id];
+            if (isset($this->marketplaceListWithIds[$id])) {
+                $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
                     'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                 };
-
-
-
-
-
             }
         }
 
@@ -278,49 +285,27 @@ class PrepareTableCommand extends AbstractCommand
         $db->query($shopifySql);
     }
 
-    protected static function fetchValues()
+    protected static function fetchVariantIds($marketplaceType)
     {
         $db = \Pimcore\Db::get();
-        echo "Fetching variant IDs from Shopify line_items\n";
-        // $sql = "
-        // SELECT 
-        //     iwa_marketplace_orders_line_items.variant_id AS variant_id,
-        //     iwa_marketplace_orders_line_items.created_at AS created_at
-        // FROM 
-        //     iwa_marketplace_orders_line_items";
         $sql = "
             SELECT 
                 DISTINCT variant_id
             FROM
-                iwa_marketplace_orders_line_items";
-
+                iwa_marketplace_orders_line_items
+            WHERE 
+                marketplace_type = '$marketplaceType'
+            ";
         $values = $db->fetchAllAssociative($sql); 
         return $values;
     }
 
-    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
-    {
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
-            LIMIT 1;
-        ";
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        return null;
-    }
-   
     protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            default => null,
         };
         
         if(!$variantObject) {
@@ -388,15 +373,40 @@ class PrepareTableCommand extends AbstractCommand
         $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType]);
     }
 
+    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
+    {
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
+   
+    protected function marketplaceList()
+    {
+        $marketplaceList = Marketplace::getMarketplaceList();
+        foreach ($marketplaceList as $marketplace) {
+            $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        }
+
+    }
+
     protected static function exchangeCoin()
     {
         $filePath = '/var/www/iwapim/tmp/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
-
         $result = [];
-
         $previousUsd = null;
         $previousEuro = null;
 
@@ -442,37 +452,20 @@ class PrepareTableCommand extends AbstractCommand
         return $result;
     }
 
-    protected static function updateCurrentCoin($coins)
+    protected static function updateCurrentCoin()
     {
-        $db = \Pimcore\Db::get();
-        $updateCreatedDateSql = "
-            UPDATE iwa_marketplace_orders_line_items
-            SET created_date = DATE(created_at);
-        ";
-        $db->executeUpdate($updateCreatedDateSql);
+        $coins = self::exchangeCoin();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
-        WHERE created_date = ?
+        WHERE DATE(created_date) = ?
         ";
         $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $stmt->bindValue(1, $coin['usd']);
-                $stmt->bindValue(2, $coin['euro']);
-                $stmt->bindValue(3, $date);
-
-                $stmt->execute();
+                $stmt->execute([$coin['usd'], $coin['euro'], $date]);
             }
         }
-        $total_price_TL = "
-        UPDATE `iwa_marketplace_orders_line_items` 
-        SET 
-            total_price_tl = ROUND(total_price * current_USD * 100) / 100,
-            subtotal_price_tl = ROUND(subtotal_price * current_USD * 100) / 100
-        ";
-        $db->executeUpdate($total_price_TL);
-        
     }
 }
