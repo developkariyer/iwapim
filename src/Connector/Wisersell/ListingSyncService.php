@@ -234,7 +234,7 @@ class ListingSyncService
     public function calculateWisersellCode($variantProduct)
     {
         $listingData = $this->prepareListingData($variantProduct);
-        $storeId = $variantProduct->getWisersellStoreId();
+        $storeId = $variantProduct->getMarketplace()->getWisersellStoreId();
         $data = empty($listingData['variantCode']) ? 
             "{$storeId}_{$listingData['storeproductid']}" : 
             "{$storeId}_{$listingData['storeproductid']}_{$listingData['variantCode']}";
