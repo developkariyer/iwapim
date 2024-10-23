@@ -286,7 +286,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                variant_id,
+                DISTINCT variant_id,
                 product_id,
                 sku
             FROM
@@ -307,12 +307,11 @@ class PrepareOrderTableCommand extends AbstractCommand
         $sql = "
             SELECT object_id
             FROM iwa_json_store
-            WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?)
-            OR (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
+            WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
             LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$sku, $productId]);
+        $result = $db->fetchAllAssociative($sql, [$productId]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
             return VariantProduct::getById($objectId);
@@ -422,7 +421,8 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function exchangeCoin()
     {
-        $filePath = '/var/www/iwapim/tmp/EVDS.xlsx';
+        
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
@@ -475,10 +475,11 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function updateCurrentCoin()
     {
         $coins = self::exchangeCoin();
+        $db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
-        WHERE DATE(created_date) = ?
+        WHERE DATE(created_at) = ?
         ";
         $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
