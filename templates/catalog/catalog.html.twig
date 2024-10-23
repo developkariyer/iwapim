@@ -123,23 +123,37 @@
         <div class="page-container">
             <nav>
                 <ul class="pagination">
-                    {# Previous Button - disable if on the first page #}
+                    <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0">First</a>
+                    </li>
+        
                     <li class="page-item {% if page == 0 %}disabled{% endif %}">
                         <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}{% else %}#{% endif %}">Previous</a>
                     </li>
         
-                    {# Page Number Buttons - show 5 pages around the current one #}
-                    {% for i in 0..pageCount-1 %}
-                        {% if i >= page - 2 and i <= page + 2 %}
-                            <li class="page-item {% if i == page %}active{% endif %}">
-                                <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}">{{ i + 1 }}</a>
-                            </li>
+                    {% set start = max(page - 9, 0) %}
+                    {% set end = min(page + 9, pageCount - 1) %}
+                    
+                    {% if end - start < 18 %}
+                        {% if start == 0 %}
+                            {% set end = min(18, pageCount - 1) %}
+                        {% else %}
+                            {% set start = max(pageCount - 19, 0) %}
                         {% endif %}
+                    {% endif %}
+                    
+                    {% for i in start..end %}
+                        <li class="page-item {% if i == page %}active{% endif %}">
+                            <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}">{{ i + 1 }}</a>
+                        </li>
                     {% endfor %}
         
-                    {# Next Button - disable if on the last page #}
                     <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
                         <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}{% else %}#{% endif %}">Next</a>
+                    </li>
+        
+                    <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}">Last</a>
                     </li>
                 </ul>
             </nav>
