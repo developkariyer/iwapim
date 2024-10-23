@@ -124,11 +124,11 @@
             <nav>
                 <ul class="pagination">
                     <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0">İlk</a>
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0">&lt;&lt;</a>
                     </li>
         
                     <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}{% else %}#{% endif %}">Önceki</a>
+                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}{% else %}#{% endif %}">&lt;</a>
                     </li>
         
                     {% set start = max(page - 2, 0) %}
@@ -149,11 +149,11 @@
                     {% endfor %}
         
                     <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}{% else %}#{% endif %}">Sonraki</a>
+                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}{% else %}#{% endif %}">&gt;</a>
                     </li>
         
                     <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}">Son</a>
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}">&gt;&gt;</a>
                     </li>
                 </ul>
             </nav>
