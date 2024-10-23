@@ -108,7 +108,7 @@ class ListingSyncService
         $productId = $mainProduct->getWisersellId();
         $storeProductId = match ($marketplaceType) {
             'Etsy' => $apiResponse['product_id'] ?? null,
-            'Amazon' => $apiResponse['asin'] ?? null,
+            'Amazon' => $variantProduct->getUniqueMarketplaceId(),
             'Shopify' => $apiResponse['product_id'] ?? null,
             'Trendyol' => $apiResponse['productCode'] ?? null,
             default => null,
