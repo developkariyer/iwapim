@@ -45,6 +45,17 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('updateCoin')) {
             $this->updateCurrentCoin();
         }
+
+        $sql = "
+        SELECT object_id
+        FROM iwa_json_store
+        WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?)
+        OR (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
+        LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, ['', 5542189990050]);
+        $objectId = $result[0]['object_id'] ?? null;
         
         return Command::SUCCESS;
     }
