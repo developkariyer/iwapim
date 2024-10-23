@@ -90,18 +90,14 @@
                             <td style="vertical-align: top; border: none; padding: 3px; overflow: hidden;">
                                 <div class="card-body product-info" style="padding: 0;">
                                     <h5 class="card-title">{{ product.productIdentifier }} {{ product.name }}</h5>
-                                    <div class="row">
-                                        <div class="col-6" style="font-size: smaller;">
-                                            <u>Ebatlar:</u> {{ product.variationSizeList }}<br>
-                                            <u>Renkler:</u> {{ product.variationColorList }}
-                                        </div>
-                                        <div class="col-6" style="font-size: smaller;">
-                                            <ul>
-                                                {% for listing in product.listings %}
-                                                    <li>{{ listing|raw }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
+                                    <div class="col-6" style="font-size: smaller;">
+                                        <u>Ebatlar:</u> {{ product.variationSizeList }}<br>
+                                        <u>Renkler:</u> {{ product.variationColorList }}<br>
+                                        <u>Pazaryerleri:</u>
+                                            {% for listing in product.listings %}
+                                                {{ listing|raw }} |
+                                            {% endfor %}
+                                    </div>
                                     </div>
                                 </div>
                             </td>
