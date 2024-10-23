@@ -298,7 +298,6 @@ class PrepareTableCommand extends AbstractCommand
             WHERE 
                 marketplace_type = '$marketplaceType'
             ";
-
         $values = $db->fetchAllAssociative($sql); 
         return $values;
     }
@@ -386,10 +385,13 @@ class PrepareTableCommand extends AbstractCommand
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType)
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_orders_line_items
-            SET marketplace_key = ?, product_code = ?, parent_product_code = ?, product_type =?
-            WHERE variant_id = $uniqueMarketplaceId;
-            ";
+        $sql = "INSERT INTO iwa_marketplace_orders_line_items (variant_id, marketplace_key, product_code, parent_product_code, product_type)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    marketplace_key = VALUES(marketplace_key),
+                    product_code = VALUES(product_code),
+                    parent_product_code = VALUES(parent_product_code),
+                    product_type = VALUES(product_type);";
         $stmt = $db->prepare($sql);
         $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType]);
     }
