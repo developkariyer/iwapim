@@ -265,7 +265,7 @@ class ListingSyncService
                 if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode()) {
                     echo "{$variantProduct->getId()} : {$listingData['variantStr']}\n";
                 } else {
-                    echo "                                                 OLEYYYYYYYYY {$variantProduct->getId()}\n";
+                    echo "                                                 OLEYYYYYYYYY {$variantProduct->getId()} : {$listingData['variantStr']}\n";
                 }
 //                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}     ".($calculatedWisersellCode === $variantProduct->getCalculatedWisersellCode())."\n";
 //                $variantProduct->setCalculatedWisersellCode($calculatedWisersellCode);
