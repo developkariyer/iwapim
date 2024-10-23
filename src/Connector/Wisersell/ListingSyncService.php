@@ -296,7 +296,7 @@ class ListingSyncService
     {
         $response = $this->connector->request(Connector::$apiUrl['listing'], 'DELETE', $code);
         if (empty($response) || $response->getStatusCode() !== 200) {
-            echo "Error deleting {$code}: {$response->getContent()}\n";
+            echo "Error deleting {$code}\n";
             return;
         }
         echo "Deleted {$code}\n";
