@@ -165,6 +165,7 @@ class ListingSyncService
 
     public function updatePimVariantProduct($listing)
     {
+        print_r($listing); return;
         $variantProduct = VariantProduct::getByCalculatedWisersellCode($listing['code'], ['limit' => 1]);
         if (!$variantProduct instanceof VariantProduct) {
             return;
@@ -239,6 +240,7 @@ class ListingSyncService
             $wisersellProductId = $listing['product']['id'] ?? null;
             if (!is_null($wisersellProductId) && (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
+                $this->deleteFromWisersell($code);
                 $this->updateWisersellListing($variantProduct);
                 continue;
             }
