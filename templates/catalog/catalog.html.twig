@@ -123,10 +123,24 @@
         <div class="page-container">
             <nav>
                 <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    {# Previous Button - disable if on the first page #}
+                    <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}{% else %}#{% endif %}">Previous</a>
+                    </li>
+        
+                    {# Page Number Buttons - show 5 pages around the current one #}
+                    {% for i in 0..pageCount-1 %}
+                        {% if i >= page - 2 and i <= page + 2 %}
+                            <li class="page-item {% if i == page %}active{% endif %}">
+                                <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}">{{ i + 1 }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+        
+                    {# Next Button - disable if on the last page #}
+                    <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}{% else %}#{% endif %}">Next</a>
+                    </li>
                 </ul>
             </nav>
         </div>

@@ -103,7 +103,7 @@ class CatalogController extends FrontendController
         $productTypes = $this->getProductTypeOptions();
 
         $pimProductCount = $this->getProductCount($query, $category);
-        $pimProductIds = $this->getProducts($query, $category, $page);
+        $pimProductIds = $this->getProducts($query, $category, $page, 20);
         $products = [];
         foreach ($pimProductIds as $pimProductId) {
             $pimProduct = Product::getById($pimProductId);
@@ -131,7 +131,7 @@ class CatalogController extends FrontendController
         }
 
         return $this->render('catalog/catalog.html.twig', [
-            'totalProductCount' => $pimProductCount,
+            'pageCount' => ceiling($pimProductCount/20),
             'query' => $query,
             'category' => $category,
             'page' => $page,
