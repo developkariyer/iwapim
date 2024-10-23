@@ -486,7 +486,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
                 $stmtCheck = $db->prepare("SELECT DATE(created_at) AS db_date FROM iwa_marketplace_orders_line_items WHERE DATE(created_at) = ?");
                 $stmtCheck->execute([$date]);
-                $result = $stmtCheck->fetchAll();
+                $result = $stmtCheck->fetchAllAssociative();
                 if (!empty($result)) {
                     foreach ($result as $row) {
                         echo "Veritabanından dönen tarih: " . $row['db_date'] . "<br>";
