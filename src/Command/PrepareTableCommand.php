@@ -23,17 +23,32 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class PrepareTableCommand extends AbstractCommand
 {
     private $marketplaceListWithIds = [];
-    // protected function configure() 
-    // {
-    //     $this
-    //         ->addOption('prepare',null, InputOption::VALUE_NONE, 'Prepare table')
-    //         ;
-    // }
+
+    protected function configure() 
+    {
+        $this
+            ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_orders to iwa_marketplace_orders_line_items')
+            ->addOption('processVariantOrderData',null, InputOption::VALUE_NONE, 'Process variant order data find main product')
+            ;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // echo "Transferring orders from Shopify order table\n";
-        //$this->transferOrdersFromShopifyOrderTable();
-        if (empty($marketplaceListWithIds)) {
+        if($input->getOption('transfer')) {
+            $this->transferOrders();
+        }
+
+        if($input->getOption('processVariantOrderData')) {
+            $this->processVariantOrderData();
+        }
+
+
+        return Command::SUCCESS;
+    }
+    
+    protected function processVariantOrderData()
+    {
+        if (empty($this->marketplaceListWithIds)) {
             $this->marketplaceList();
         }
         $marketplaceTypes = array_values($this->marketplaceListWithIds);
@@ -47,33 +62,13 @@ class PrepareTableCommand extends AbstractCommand
             }
     
         }
-      
-        
-        // $values = $this->fetchValues();
-        // $coins = $this->exchangeCoin();
-
-        // $this->updateCurrentCoin($coins);
-        
-        //$this->transferOrders();
-        return Command::SUCCESS;
     }
 
-    protected function marketplaceList()
-    {
-        $marketplaceList = Marketplace::getMarketplaceList();
-        foreach ($marketplaceList as $marketplace) {
-            $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
-        }
-
-    }
     protected function transferOrders()
     {
-        /*$marketplaceList = Marketplace::getMarketplaceList();
-        $marketplaceListWithIds[] = [];
-        foreach ($marketplaceList as $marketplace) {
-            $marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
-        }*/
-        $this->marketplaceList();
+        if (empty($this->marketplaceListWithIds)) {
+            $this->marketplaceList();
+        }
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
@@ -302,28 +297,10 @@ class PrepareTableCommand extends AbstractCommand
         return $values;
     }
 
-    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
-    {
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
-            LIMIT 1;
-        ";
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        return null;
-    }
-   
     protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             default => null,
         };
@@ -391,6 +368,33 @@ class PrepareTableCommand extends AbstractCommand
             ";
         $stmt = $db->prepare($sql);
         $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType]);
+    }
+
+    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
+    {
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
+   
+    protected function marketplaceList()
+    {
+        $marketplaceList = Marketplace::getMarketplaceList();
+        foreach ($marketplaceList as $marketplace) {
+            $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        }
+
     }
 
     protected static function exchangeCoin()
