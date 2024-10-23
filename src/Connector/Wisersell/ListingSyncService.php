@@ -136,7 +136,7 @@ class ListingSyncService
             'productid' => $productId,
             'shopId' => $shopId,
             'variantCode' => $variantCode,
-            'variantStr' => "{$marketplaceType} PId:{$storeProductId} VId:{$variantCode} PimId:{$productId}"
+            'variantStr' => "{$marketplaceType} SId: {$shopId} PId:{$storeProductId} VId:{$variantCode} PimId:{$productId}"
         ];
     }
 
@@ -264,7 +264,7 @@ class ListingSyncService
                 $fullData++;
                 $calculatedWisersellCode = $this->calculateWisersellCode($listingData);
                 if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode() || empty($calculatedWisersellCode)) {
-                    echo "{$variantProduct->getId()} : ".json_encode($listingData)."\n";
+                    echo "{$variantProduct->getId()} : {$listingData['variantStr']}\n";
                 }
 //                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}     ".($calculatedWisersellCode === $variantProduct->getCalculatedWisersellCode())."\n";
 //                $variantProduct->setCalculatedWisersellCode($calculatedWisersellCode);
