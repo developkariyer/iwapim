@@ -311,7 +311,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$sku, $productId]);
+        $result = $db->fetchAllAssociative($sql, [$productId]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
             return VariantProduct::getById($objectId);
