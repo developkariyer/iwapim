@@ -205,10 +205,24 @@ class ListingSyncService
     public function sync()
     {
         $this->load();
+        $pimListings = $this->pimListings;
+        $index = 0;
+        $totalCount = count($this->wisersellListings);
         foreach ($this->wisersellListings as $listing) {
-            $variantProduct = VariantProduct::getByCalculatedWisersellCode($listing['code'], ['limit' => 1]);
+            $index++;
+            echo "\rSyncing $index of $totalCount  ";
+            if ($listing['store']['category']['name'] === 'Amazon') {
+                continue;
+            }
+            if (isset($pimListings[$listing['code']])) {
+                $variantProduct = VariantProduct::getById($pimListings[$listing['code']]['oo_id']);
+                unset($pimListings[$listing['code']]);
+            } else {
+                $variantProduct = VariantProduct::getByWisersellVariantCode($listing['code'], ['limit' => 1]);
+            }
             if (!$variantProduct instanceof VariantProduct) {
-                // delete listing from wisersell
+                echo "Variant product not found for {$listing['code']}, deleting from WS\n";
+                $this->deleteFromWisersell($listing['code']);
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
@@ -216,20 +230,23 @@ class ListingSyncService
                 $mainProduct = reset($mainProduct);
             }
             if (!$mainProduct instanceof Product) {
-                // not connected or multiple connected in pim
+                echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
                 continue;
             }
             $wisersellProductId = $listing['product']['id'] ?? null;
             $pimProductId = $variantProduct->getMainProduct()->getWisersellId();
             if (!is_null($wisersellProductId) && $wisersellProductId !== $pimProductId) {
+                echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
                 $this->updateWisersellListing($variantProduct);
                 continue;
             }
             if (empty($variantProduct->getWisersellVariantCode())) {
+                echo "Variant code missing for {$listing['code']} in {$variantProduct->getId()}, updating\n";
                 $this->updatePimVariantProduct($listing);
                 continue;
             }
         }
+        echo "\n";
     }
 
     public function calculateWisersellCode($variantProduct)
@@ -275,19 +292,26 @@ class ListingSyncService
         }
     }
 
-    public function deleteFromWisersell()
+    public function deleteFromWisersell($code)
     {
-        $this->load();
-        $index = 0;
-        $totalCount = count($this->wisersellListings);
-        foreach ($this->wisersellListings as $listing) {
-            $index++;
-            $response = $this->connector->request(Connector::$apiUrl['listing'], 'DELETE', $listing['code']);
-            if (empty($response) || $response->getStatusCode() !== 200) {
-                echo "Error deleting {$listing['code']}: {$response->getContent()}\n";
-            }
-            echo "\rDeleted $index of $totalCount listings";
+        $response = $this->connector->request(Connector::$apiUrl['listing'], 'DELETE', $code);
+        if (empty($response) || $response->getStatusCode() !== 200) {
+            echo "Error deleting {$code}: {$response->getContent()}\n";
+            return;
         }
-        echo "\n";
+        echo "Deleted {$code}\n";
+        if (isset($this->wisersellListings[$code])) {
+            unset($this->wisersellListings[$code]);
+        }
+        if (isset($this->pimListings[$code])) {
+            $variantProduct = VariantProduct::getById($this->pimListings[$code]['oo_id']);
+            if ($variantProduct instanceof VariantProduct) {
+                $variantProduct->setWisersellVariantCode(null);
+                $variantProduct->setWisersellVariantJson(null);
+                $variantProduct->save();
+            }
+            unset($this->pimListings[$code]);
+        }
     }
+
 }
