@@ -263,7 +263,7 @@ class ListingSyncService
                 }
                 $fullData++;
                 $calculatedWisersellCode = $this->calculateWisersellCode($listingData);
-                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}\n";
+                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}     ".($calculatedWisersellCode === $variantProduct->getCalculatedWisersellCode())."\n";
 //                $variantProduct->setCalculatedWisersellCode($calculatedWisersellCode);
 //                $variantProduct->save();
             }
