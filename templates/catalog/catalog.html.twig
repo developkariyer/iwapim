@@ -140,6 +140,14 @@
             let currentCategory = '{{ category|e('js') }}';
             let currentPage = {{ page|default(0) }}; 
 
+            if (currentQuery !== 'all') {
+                $('#search-box').val(currentQuery);
+            }
+            
+            if (currentCategory !== 'all') {
+                $('#category-select').val(currentCategory);
+            }
+
             $('#search-box').on('input', function() {
                 let searchQuery = $(this).val();
                 // Make AJAX request to fetch product data based on search query
