@@ -33,7 +33,7 @@ class PrepareTableCommand extends AbstractCommand
     {
         // echo "Transferring orders from Shopify order table\n";
         //$this->transferOrdersFromShopifyOrderTable();
-        if (empty($marketplaceListWithIds)) {
+        /*if (empty($marketplaceListWithIds)) {
             $this->marketplaceList();
         }
         $marketplaceTypes = array_values($this->marketplaceListWithIds);
@@ -46,7 +46,7 @@ class PrepareTableCommand extends AbstractCommand
                 $this->prepareOrderTable($row['variant_id'],$marketplaceType);
             }
     
-        }
+        }*/
       
         
         // $values = $this->fetchValues();
@@ -54,7 +54,7 @@ class PrepareTableCommand extends AbstractCommand
 
         // $this->updateCurrentCoin($coins);
         
-        //$this->transferOrders();
+        $this->transferOrders();
         return Command::SUCCESS;
     }
 
