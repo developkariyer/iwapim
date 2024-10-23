@@ -94,6 +94,9 @@ class ListingSyncService
             return null;
         }
         $mainProduct = $variantProduct->getMainProduct();
+        if (is_array($mainProduct)) {
+            $mainProduct = reset($mainProduct);
+        }
         if (!$mainProduct instanceof Product) {
             echo "{$variantProduct->getId()} do not have a main product\n";
             return null;
@@ -209,6 +212,9 @@ class ListingSyncService
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
+            if (is_array($mainProduct)) {
+                $mainProduct = reset($mainProduct);
+            }
             if (!$mainProduct instanceof Product) {
                 // not connected or multiple connected in pim
                 continue;
