@@ -416,12 +416,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($marketplaceList as $marketplace) {
             $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
         }
-
     }
 
     protected static function exchangeCoin()
     {
-        
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
@@ -483,10 +481,32 @@ class PrepareOrderTableCommand extends AbstractCommand
         ";
         $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
+            echo "Excel'den gelen tarih: " . $date . "<br>";
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $stmt->execute([$coin['usd'], $coin['euro'], $date]);
+                $stmtCheck = $db->prepare("SELECT DATE(created_at) AS db_date FROM iwa_marketplace_orders_line_items WHERE DATE(created_at) = ?");
+                $stmtCheck->execute([$date]);
+                $result = $stmtCheck->fetchAll();
+                if (!empty($result)) {
+                    foreach ($result as $row) {
+                        echo "Veritabanından dönen tarih: " . $row['db_date'] . "<br>";
+                    }
+                    echo "Eşleşen tarih: " . $date . "<br>";
+                    $stmt->execute([$coin['usd'], $coin['euro'], $date]);
+                } else {
+                    echo "Veritabanında eşleşen tarih bulunamadı: " . $date . "<br>";
+                }
+            } else {
+                echo "Tarih formatı hatalı: " . $date . "<br>";
             }
         }
+        /*foreach ($coins as $date => $coin) {
+            echo "Excel'den gelen tarih: " . $date . "<br>";
+            $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
+            if ($dateTime && $dateTime->format('Y-m-d') === $date) {
+
+                $stmt->execute([$coin['usd'], $coin['euro'], $date]);
+            }
+        }*/
     }
 }
