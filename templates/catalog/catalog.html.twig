@@ -13,7 +13,7 @@
                 display: none;
             }
         }
-
+        
         body {
             background-color: #070e53;
         }
@@ -109,11 +109,11 @@
                                                 {{ listing|raw }} |
                                             {% endfor %}
                                     </div>
+                                    </div>
                                 </div>
                             </td>
-                            <!-- Third column (product-gallery) hidden in mobile view -->
-                            <td class="product-gallery" style="width: 320px; vertical-align: top; border: none; padding: 0;">
-                                <div>
+                            <td style="width: 320px; vertical-align: top; border: none; padding: 0;">
+                                <div class="product-gallery">
                                     {% for image in product.album %}
                                         <img src="{{ image }}" alt="thumb1">
                                     {% endfor %}
