@@ -25,7 +25,7 @@ class CatalogController extends FrontendController
         $listings = [];
         foreach ($product->getChildren() as $variant) {
             foreach ($variant->getListingItems() as $listing) {
-                $listings[] = "<a href='{$listing->getUrlLink()->getPath()}' target='_blank'>{$listing->getMarketplace()->getKey()}</a>";
+                $listings[] = "<a href='{$listing->getUrlLink()->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$variant->getIwasku()} {$variant->getVariationColor()}'>{$listing->getMarketplace()->getKey()}</a>";
                 if (count($album) >= 30) {
                     continue;
                 }
