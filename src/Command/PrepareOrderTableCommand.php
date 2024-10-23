@@ -94,7 +94,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
-            created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
+            created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
@@ -110,6 +110,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.currencyCode')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
@@ -156,6 +157,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
+                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
@@ -191,7 +193,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
                 marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
-                created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
+                created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
                 total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
@@ -209,6 +211,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
@@ -255,6 +258,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
+                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
