@@ -22,6 +22,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PrepareTableCommand extends AbstractCommand
 {
+    private $marketplaceListWithIds = [];
     // protected function configure() 
     // {
     //     $this
@@ -32,14 +33,19 @@ class PrepareTableCommand extends AbstractCommand
     {
         // echo "Transferring orders from Shopify order table\n";
         //$this->transferOrdersFromShopifyOrderTable();
-
-        $values = $this->fetchValues();
-        $index = 0;
-        echo "\n";
-        foreach ($values as $row) {
-            $index++;
-            if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-            $this->prepareOrderTable($row['variant_id'],'Trendyol');
+        if (empty($marketplaceListWithIds)) {
+            $this->marketplaceList();
+        }
+        $marketplaceTypes = array_values($this->marketplaceListWithIds);
+        foreach ($marketplaceTypes as $marketplaceType) {
+            $values = $this->fetchVariantIds($marketplaceType);
+            $index = 0;
+            foreach ($values as $row) {
+                $index++;
+                if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+                $this->prepareOrderTable($row['variant_id'],$marketplaceType);
+            }
+    
         }
       
         
@@ -52,31 +58,34 @@ class PrepareTableCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    protected function transferOrders()
+    protected function marketplaceList()
     {
         $marketplaceList = Marketplace::getMarketplaceList();
+        foreach ($marketplaceList as $marketplace) {
+            $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        }
+
+    }
+    protected function transferOrders()
+    {
+        /*$marketplaceList = Marketplace::getMarketplaceList();
         $marketplaceListWithIds[] = [];
         foreach ($marketplaceList as $marketplace) {
             $marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
-        }
+        }*/
+        $this->marketplaceList();
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
-
-            if (isset($marketplaceListWithIds[$id])) {
-                $marketplaceType = $marketplaceListWithIds[$id];
+            if (isset($this->marketplaceListWithIds[$id])) {
+                $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
                     'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                 };
-
-
-
-
-
             }
         }
 
@@ -278,21 +287,17 @@ class PrepareTableCommand extends AbstractCommand
         $db->query($shopifySql);
     }
 
-    protected static function fetchValues()
+    protected static function fetchVariantIds($marketplaceType)
     {
         $db = \Pimcore\Db::get();
-        echo "Fetching variant IDs from Shopify line_items\n";
-        // $sql = "
-        // SELECT 
-        //     iwa_marketplace_orders_line_items.variant_id AS variant_id,
-        //     iwa_marketplace_orders_line_items.created_at AS created_at
-        // FROM 
-        //     iwa_marketplace_orders_line_items";
         $sql = "
             SELECT 
                 DISTINCT variant_id
             FROM
-                iwa_marketplace_orders_line_items";
+                iwa_marketplace_orders_line_items
+            WHERE 
+                marketplace_type = '$marketplaceType'
+            ";
 
         $values = $db->fetchAllAssociative($sql); 
         return $values;
