@@ -93,9 +93,8 @@
                                 <div class="card-body product-info" style="padding: 0;">
                                     <h5 class="card-title">{{ product.productIdentifier }} {{ product.name }}</h5>
                                     <div class="col-12" style="font-size: smaller;">
-                                        <u>Ebatlar:</u> {{ product.variationSizeList }}<br>
-                                        <u>Renkler:</u> {{ product.variationColorList }}<br>
-                                        <u>Pazaryerleri:</u>
+                                        <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
+                                        <b>Pazaryerleri:</b>
                                             {% for listing in product.listings %}
                                                 {{ listing|raw }} |
                                             {% endfor %}
