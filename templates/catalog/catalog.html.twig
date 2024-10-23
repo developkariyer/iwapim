@@ -136,7 +136,7 @@
                     
                     {% if end - start < 8 %}
                         {% if start == 0 %}
-                            {% set end = min(18, pageCount - 1) %}
+                            {% set end = min(8, pageCount - 1) %}
                         {% else %}
                             {% set start = max(pageCount - 9, 0) %}
                         {% endif %}
