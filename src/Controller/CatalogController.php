@@ -81,7 +81,7 @@ class CatalogController extends FrontendController
         return $db->fetchOne($sql, $params);
     }
     
-    protected function getProducts($query, $category, $page, $pageSize = 100)
+    protected function getProducts($query, $category, $page, $pageSize = 20)
     {
         $db = \Pimcore\Db::get();
         $limit = (int) $pageSize;
