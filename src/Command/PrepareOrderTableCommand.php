@@ -46,6 +46,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->updateCurrentCoin();
         }
 
+        $this->insertClosedAtDiff();
+
         return Command::SUCCESS;
     }
     
