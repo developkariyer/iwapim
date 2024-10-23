@@ -83,10 +83,10 @@ class CatalogController extends FrontendController
     protected function getProducts($query, $category, $page, $pageSize = 100)
     {
         $db = \Pimcore\Db::get();
+        $limit = (int) $pageSize;
+        $offset = (int) $page * $pageSize;
         $params = [];
-        $sql = "SELECT osp.oo_id " . $this->getProductQuery($query, $category, $params) . " LIMIT :limit OFFSET :offset";
-        $params['limit'] = (int) $pageSize;
-        $params['offset'] = (int) $page * $pageSize;
+        $sql = "SELECT osp.oo_id " . $this->getProductQuery($query, $category, $params) . " LIMIT $limit OFFSET $offset";
         return $db->fetchFirstColumn($sql, $params);
     }
 
