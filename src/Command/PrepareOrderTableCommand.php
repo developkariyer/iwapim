@@ -454,7 +454,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function updateCurrentCoin()
     {
-        $coins = $this->exchangeCoin();
+        $coins = self::exchangeCoin();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
