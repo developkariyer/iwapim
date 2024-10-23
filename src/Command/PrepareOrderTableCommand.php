@@ -492,6 +492,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         INSERT INTO iwa_history (date, usd, eur)
         VALUES (?, ?, ?)
         ";
+        $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
