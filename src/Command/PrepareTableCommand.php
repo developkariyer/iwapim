@@ -326,6 +326,7 @@ class PrepareTableCommand extends AbstractCommand
         $variantObject = match ($marketplaceType) {
             //'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            default => null,
         };
         
         if(!$variantObject) {
