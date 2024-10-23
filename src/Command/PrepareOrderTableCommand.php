@@ -495,13 +495,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
 
         $sql = "
-        INSERT INTO iwa_marketplace_orders_line_items (completion_day)
-        SELECT 
-            DATEDIFF(DATE(closed_at), DATE(created_at)) AS completion_day
-        FROM 
-            iwa_marketplace_orders_line_items
-        WHERE 
-            DATE(closed_at) IS NOT NULL
+        UPDATE iwa_marketplace_orders_line_items
+        SET completion_day = DATEDIFF(DATE(closed_at), DATE(created_at))
+        WHERE DATE(closed_at) IS NOT NULL;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
