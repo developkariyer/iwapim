@@ -56,12 +56,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceTypes = array_values($this->marketplaceListWithIds);
         foreach ($marketplaceTypes as $marketplaceType) {
-            $values = $this->fetchVariantIds($marketplaceType);
+            $values = $this->fetchVariantInfo($marketplaceType);
             $index = 0;
             foreach ($values as $row) {
                 $index++;
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-                $this->prepareOrderTable($row['variant_id'],$marketplaceType);
+                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
     
         }
@@ -94,7 +94,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
-            created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
+            created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
@@ -110,6 +110,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.currencyCode')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
@@ -148,14 +149,11 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
-                marketplace_key = VALUES(marketplace_key),
-                product_code = VALUES(product_code),
-                parent_product_code = VALUES(parent_product_code),
-                product_type = VALUES(product_type),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
+                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
@@ -191,7 +189,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
                 marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
-                created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
+                created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
                 total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
@@ -209,6 +207,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
@@ -247,14 +246,11 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
-                marketplace_key = VALUES(marketplace_key),
-                product_code = VALUES(product_code),
-                parent_product_code = VALUES(parent_product_code),
-                product_type = VALUES(product_type),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
+                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
@@ -285,12 +281,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db->query($shopifySql);
     }
 
-    protected static function fetchVariantIds($marketplaceType)
+    protected static function fetchVariantInfo($marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                DISTINCT variant_id
+                DISTINCT variant_id,
+                product_id,
+                sku
             FROM
                 iwa_marketplace_orders_line_items
             WHERE 
@@ -300,10 +298,32 @@ class PrepareOrderTableCommand extends AbstractCommand
         return $values;
     }
 
-    protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
+    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?)
+            OR (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$sku, $productId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
+
+    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku ,$marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             default => null,
         };
