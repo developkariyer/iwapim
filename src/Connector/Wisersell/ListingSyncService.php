@@ -265,13 +265,10 @@ class ListingSyncService
                 $fullData++;
                 $calculatedWisersellCode = $this->calculateWisersellCode($variantProduct);
                 if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode()) {
-                    echo "{$variantProduct->getId()} : {$listingData['variantStr']}\n";
-                } else {
-                    echo "                                                 OLEYYYYYYYYY {$variantProduct->getId()} : {$listingData['variantStr']}\n";
+                    echo "Calculated code changed for {$variantProduct->getId()}: {$listingData['variantStr']}\n";
+                    $variantProduct->setCalculatedWisersellCode($calculatedWisersellCode);
+                    $variantProduct->save();
                 }
-//                echo "{$variantProduct->getId()}: {$calculatedWisersellCode} === {$variantProduct->getCalculatedWisersellCode()}     ".($calculatedWisersellCode === $variantProduct->getCalculatedWisersellCode())."\n";
-//                $variantProduct->setCalculatedWisersellCode($calculatedWisersellCode);
-//                $variantProduct->save();
             }
             $offset += $pageSize;
         }
