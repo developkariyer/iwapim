@@ -28,6 +28,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this
             ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_orders to iwa_marketplace_orders_line_items')
             ->addOption('processVariantOrderData',null, InputOption::VALUE_NONE, 'Process variant order data find main product')
+            ->addOption('updateCoin',null, InputOption::VALUE_NONE, 'Update current coin')
             ;
     }
 
@@ -41,9 +42,9 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->processVariantOrderData();
         }
 
-        // $coins = $this->exchangeCoin();
-
-        // $this->updateCurrentCoin($coins);
+        if($input->getOption('updateCoin')) {
+            $this->updateCurrentCoin();
+        }
         
         return Command::SUCCESS;
     }
@@ -451,8 +452,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         return $result;
     }
 
-    protected static function updateCurrentCoin($coins)
+    protected static function updateCurrentCoin()
     {
+        $coins = $this->exchangeCoin();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
