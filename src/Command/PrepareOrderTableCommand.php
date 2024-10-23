@@ -416,12 +416,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($marketplaceList as $marketplace) {
             $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
         }
-
     }
 
     protected static function exchangeCoin()
     {
-        
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
