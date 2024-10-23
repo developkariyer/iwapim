@@ -131,14 +131,14 @@
                         <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}{% else %}#{% endif %}">Önceki</a>
                     </li>
         
-                    {% set start = max(page - 4, 0) %}
-                    {% set end = min(page + 4, pageCount - 1) %}
+                    {% set start = max(page - 2, 0) %}
+                    {% set end = min(page + 2, pageCount - 1) %}
                     
-                    {% if end - start < 8 %}
+                    {% if end - start < 4 %}
                         {% if start == 0 %}
-                            {% set end = min(8, pageCount - 1) %}
+                            {% set end = min(4, pageCount - 1) %}
                         {% else %}
-                            {% set start = max(pageCount - 9, 0) %}
+                            {% set start = max(pageCount - 5, 0) %}
                         {% endif %}
                     {% endif %}
                     
