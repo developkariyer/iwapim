@@ -5,6 +5,7 @@ namespace App\Connector\Wisersell;
 use App\Connector\Wisersell\Connector;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Product;
+use App\Utils\Utility;
 
 class ListingSyncService
 {
