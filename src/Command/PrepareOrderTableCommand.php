@@ -56,12 +56,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceTypes = array_values($this->marketplaceListWithIds);
         foreach ($marketplaceTypes as $marketplaceType) {
-            $values = $this->fetchVariantIds($marketplaceType);
+            $values = $this->fetchVariantInfo($marketplaceType);
             $index = 0;
             foreach ($values as $row) {
                 $index++;
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-                $this->prepareOrderTable($row['variant_id'],$marketplaceType);
+                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
     
         }
@@ -281,12 +281,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db->query($shopifySql);
     }
 
-    protected static function fetchVariantIds($marketplaceType)
+    protected static function fetchVariantInfo($marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                DISTINCT variant_id
+                DISTINCT variant_id,
+                product_id,
+                sku
             FROM
                 iwa_marketplace_orders_line_items
             WHERE 
@@ -296,10 +298,32 @@ class PrepareOrderTableCommand extends AbstractCommand
         return $values;
     }
 
-    protected static function prepareOrderTable($uniqueMarketplaceId,$marketplaceType)
+    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?)
+            OR (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$sku, $productId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
+
+    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku ,$marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' =>  VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             default => null,
         };
