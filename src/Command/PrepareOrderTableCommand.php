@@ -308,7 +308,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT object_id
             FROM iwa_json_store
             WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?)
-            OR (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
+            OR (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, $.product_id)) = ?)
             LIMIT 1;
         ";
         $db = \Pimcore\Db::get();
