@@ -479,7 +479,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
-        WHERE DATE(created_date) = ?
+        WHERE DATE(created_at) = ?
         ";
         $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
