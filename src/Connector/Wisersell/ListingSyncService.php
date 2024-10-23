@@ -260,6 +260,9 @@ class ListingSyncService
                     continue;
                 }
                 $listingData = $this->prepareListingData($variantProduct);
+                if (empty($listingData)) {
+                    continue;
+                }
                 $calculatedWisersellCode = $this->calculateWisersellCode($variantProduct);
                 if ($calculatedWisersellCode !== $variantProduct->getCalculatedWisersellCode()) {
                     echo "Calculated code changed for {$variantProduct->getId()}: {$listingData['variantStr']}\n";
