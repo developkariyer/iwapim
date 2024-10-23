@@ -89,10 +89,12 @@ class ListingSyncService
     public function prepareListingData($variantProduct)
     {
         if (!$variantProduct instanceof VariantProduct) {
+            echo "Not a variant product\n";
             return null;
         }
         $mainProduct = $variantProduct->getMainProduct();
         if (!$mainProduct instanceof Product) {
+            echo "{$variantProduct->getId()} do not have a main product\n";
             return null;
         }
         $marketplace = $variantProduct->getMarketplace();
@@ -122,6 +124,7 @@ class ListingSyncService
             default => null,
         };
         if (empty($storeProductId) || empty($shopId) || (empty($variantCode) && $marketplaceType !== 'Amazon') || empty($productId)) {
+            echo "Empty data for {$variantProduct->getId()}: {$marketplaceType}, {$shopId}, {$storeProductId}, {$variantCode}, {$productId}\n";
             return null;
         }
         return [
