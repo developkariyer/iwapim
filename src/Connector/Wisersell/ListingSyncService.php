@@ -238,6 +238,7 @@ class ListingSyncService
         $offset = 0;
         $vpl->setLimit($pageSize);
         while (true) {
+            echo "Processing $pageSize from $offset\n";
             $vpl->setOffset($offset);
             $variantProducts = $vpl->load();
             if (empty($variantProducts)) {
@@ -246,6 +247,7 @@ class ListingSyncService
             foreach ($variantProducts as $variantProduct) {
                 $listingData = $this->prepareListingData($variantProduct);
                 if (empty($listingData)) {
+                    echo "Empty listing data for {$variantProduct->getId()}\n";
                     continue;
                 }
                 $calculatedWisersellCode = $this->calculateWisersellCode($listingData);
