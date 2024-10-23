@@ -272,6 +272,21 @@ class ListingSyncService
             }
             $offset += $pageSize;
         }
+    }
 
+    public function deleteFromWisersell()
+    {
+        $this->load();
+        $index = 0;
+        $totalCount = count($this->wisersellListings);
+        foreach ($this->wisersellListings as $listing) {
+            $index++;
+            $response = $this->connector->request(Connector::$apiUrl['listing'], 'DELETE', $listing['code']);
+            if (empty($response) || $response->getStatusCode() !== 200) {
+                echo "Error deleting {$listing['code']}: {$response->getContent()}\n";
+            }
+            echo "\rDeleted $index of $totalCount listings";
+        }
+        echo "\n";
     }
 }
