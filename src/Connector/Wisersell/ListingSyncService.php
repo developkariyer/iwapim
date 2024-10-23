@@ -211,7 +211,7 @@ class ListingSyncService
         foreach ($this->wisersellListings as $listing) {
             $index++;
             echo "\rSyncing $index of $totalCount  ";
-            print_r($listing);exit;
+            print_r($listing);return;
             if ($listing['store']['category']['name'] === 'Amazon') {
                 continue;
             }
