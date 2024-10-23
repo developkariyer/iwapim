@@ -211,8 +211,7 @@ class ListingSyncService
         foreach ($this->wisersellListings as $listing) {
             $index++;
             echo "\rSyncing $index of $totalCount  ";
-            print_r($listing);return;
-            if ($listing['store']['category']['name'] === 'Amazon') {
+            if ($listing['store']['source']['name'] === 'Amazon') {
                 continue;
             }
             if (isset($pimListings[$listing['code']])) {
@@ -234,8 +233,8 @@ class ListingSyncService
                 echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
                 continue;
             }
+            $pimProductId = $mainProduct->getWisersellId();
             $wisersellProductId = $listing['product']['id'] ?? null;
-            $pimProductId = $variantProduct->getMainProduct()->getWisersellId();
             if (!is_null($wisersellProductId) && $wisersellProductId !== $pimProductId) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
                 $this->updateWisersellListing($variantProduct);
