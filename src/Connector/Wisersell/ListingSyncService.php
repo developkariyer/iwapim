@@ -98,7 +98,6 @@ class ListingSyncService
             $mainProduct = reset($mainProduct);
         }
         if (!$mainProduct instanceof Product) {
-            echo "{$variantProduct->getId()} do not have a main product\n";
             return null;
         }
         $marketplace = $variantProduct->getMarketplace();
