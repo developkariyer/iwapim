@@ -286,7 +286,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                variant_id,
+                DISTINCT variant_id,
                 product_id,
                 sku
             FROM
