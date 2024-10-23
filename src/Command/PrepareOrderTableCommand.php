@@ -474,38 +474,17 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $coins = self::exchangeCoin();
         $db = \Pimcore\Db::get();
-        /*$sql = "
+        $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET current_USD = ?, current_EUR = ?
         WHERE DATE(created_at) = ?
         ";
-        $stmt = $db->prepare($sql);*/
+        $stmt = $db->prepare($sql);
         foreach ($coins as $date => $coin) {
-            echo "Excel'den gelen tarih: " . $date . "\n";
             $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $sql = "SELECT DATE(created_at) AS db_date FROM iwa_marketplace_orders_line_items WHERE DATE(created_at) = ?";
-                $result = $db->fetchAllAssociative($sql, [$date]);
-                if (!empty($result)) {
-                    foreach ($result as $row) {
-                        echo "Veritabanından dönen tarih: " . $row['db_date'] . "\n";
-                    }
-                    echo "Eşleşen tarih: " . $date . "\n";
-                    //$stmt->execute([$coin['usd'], $coin['euro'], $date]);
-                } else {
-                    echo "Veritabanında eşleşen tarih bulunamadı: " . $date . "\n";
-                }
-            } else {
-                echo "Tarih formatı hatalı: " . $date . "\n";
-            }
-        }
-        /*foreach ($coins as $date => $coin) {
-            echo "Excel'den gelen tarih: " . $date . "<br>";
-            $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
-            if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-
                 $stmt->execute([$coin['usd'], $coin['euro'], $date]);
             }
-        }*/
+        }
     }
 }
