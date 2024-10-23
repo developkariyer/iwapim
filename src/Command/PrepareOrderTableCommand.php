@@ -491,7 +491,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                         echo "Veritabanından dönen tarih: " . $row['db_date'] . "\n";
                     }
                     echo "Eşleşen tarih: " . $date . "\n";
-                    $stmt->execute([$coin['usd'], $coin['euro'], $date]);
+                    //$stmt->execute([$coin['usd'], $coin['euro'], $date]);
                 } else {
                     echo "Veritabanında eşleşen tarih bulunamadı: " . $date . "\n";
                 }
