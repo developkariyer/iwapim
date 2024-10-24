@@ -609,5 +609,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $url = "https://0ed862d6853b0bc21c46f82374f231a6.safeframe.googlesyndication.com/";
         $parsedUrl = parse_url($url);
         $host = $parsedUrl['host'];
+        echo $host;
     }
 }
