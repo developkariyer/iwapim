@@ -617,11 +617,11 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql); 
         foreach ($results as $row) {
             $referringSite = $row['referring_site'];
-            $parsedUrl = parse_url($referringSite);
+            $cleanHost = preg_replace('/[^a-zA-Z0-9.-]/', '', $referringSite);
+            $parsedUrl = parse_url($cleanHost);
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
-                $cleanHost = preg_replace('/[^a-zA-Z0-9.-]/', '', $host);
-                $domain = preg_replace('/^www\./', '', $cleanHost);
+                $domain = preg_replace('/^www\./', '', $host);
                 $updateQuery = "
                     UPDATE iwa_marketplace_orders_line_items 
                     SET referring_site_domain = $domain
