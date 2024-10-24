@@ -206,6 +206,7 @@ class ListingSyncService
         $response = $response->toArray();
         print_r($response);
         foreach (($response['completed'] ?? []) as $listing) {
+            echo "Updating {$listing['code']}\n";
             $this->updatePimVariantProduct($listing);
         }
         $this->bucket = [];
@@ -231,8 +232,8 @@ class ListingSyncService
                 $variantProduct = VariantProduct::getByWisersellVariantCode($code, ['limit' => 1]);
             }
             if (!$variantProduct instanceof VariantProduct) {
-                echo "Variant product not found for {$code}, deleting from WS: ".json_encode($listing)."\n";
-                $this->deleteFromWisersell($code);
+                echo "Variant product not found in PIM for {$code}: ".json_encode($listing)."\n";
+                //$this->deleteFromWisersell($code);
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
@@ -257,6 +258,7 @@ class ListingSyncService
             }
         }
         echo "\n";
+        echo "**** Adding missing codes from PIM to WS\n";
         foreach ($pimListings as $pimListing) {
             $variantProduct = VariantProduct::getById($pimListing['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
