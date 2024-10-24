@@ -64,6 +64,13 @@ class ListingSyncService
         return $this->loadWisersell($force);
     }
 
+    public function dump()
+    {
+        $this->load();
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.wisersell.txt', print_r($this->wisersellListings, true));
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.pim.txt', print_r($this->pimListings, true));        
+    }
+
     public function search($params)
     {
         $params['page'] = 0;
