@@ -161,7 +161,7 @@ class ListingSyncService
             return;
         }
         $response = $response->toArray();
-        print_r($response);
+        print_r($response); exit;
         $this->updatePimVariantProduct($response);
     }
 
