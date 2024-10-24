@@ -120,7 +120,7 @@ class Connector
         $this->prepareToken();
         $response = $this->httpClient->request($type, "{$apiEndPoint}/{$parameter}", ['json' => $json]);
         if (strpos($apiEndPoint, 'listing') !== false) {
-            usleep(600000);
+            usleep(500000);
         } else {
             usleep(2000000);
         }
