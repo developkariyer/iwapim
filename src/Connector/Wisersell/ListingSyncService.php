@@ -95,6 +95,7 @@ class ListingSyncService
                 }
             }
         }
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.amazon.txt', print_r($this->amazonListings, true));
     }
 
     public function status()
