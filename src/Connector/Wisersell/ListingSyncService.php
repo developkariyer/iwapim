@@ -149,7 +149,7 @@ class ListingSyncService
             return;
         }
         $listingData = $this->prepareListingData($variantProduct);
-        if (empty($listingData)) {
+        if (empty($listingData) || empty($listingData['productId']) || empty($listingData['shopId'])) {
             return;
         }
         //print_r(['code' => $code, 'productId' => $listingData['productId'], 'shopId' => $listingData['shopId']]);
@@ -179,7 +179,7 @@ class ListingSyncService
     public function addVariantProductToWisersell($variantProduct)
     {
         $listingData = $this->prepareListingData($variantProduct);
-        if (empty($listingData)) {
+        if (empty($listingData) || empty($listingData['productId']) || empty($listingData['shopId'])) {
             return;
         }
         echo "Adding {$listingData['variantStr']}\n";
@@ -242,8 +242,6 @@ class ListingSyncService
             $wisersellProductId = $listing['product']['id'] ?? null;
             if (!is_null($wisersellProductId) && (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
-//                $this->deleteFromWisersell($code);
-//                $this->updateWisersellListing($variantProduct);
                 $this->updateWisersellListing($variantProduct);
                 continue;
             }
@@ -259,9 +257,12 @@ class ListingSyncService
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
-            //$this->updateWisersellListing($variantProduct);
+            if (empty($variantProduct->getMarketplace()->getWisersellStoreId())) {
+                continue;
+            }
+            $this->updateWisersellListing($variantProduct);
         }
-        //$this->flushListingBucketToWisersell();
+        $this->flushListingBucketToWisersell();
     }
 
     public function calculateWisersellCode($variantProduct)
