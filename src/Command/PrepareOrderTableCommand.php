@@ -567,4 +567,25 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt = $db->prepare($sql);
         $stmt->execute();
     }
+
+    protected function calculatePrice()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET 
+            product_price_usd = CASE 
+                        WHEN currency = 'USD' THEN price
+                        WHEN currency = 'TRY' THEN ROUND((price * 100 / current_USD), 2) / 100
+                        ELSE price
+                    END,
+            total_price_usd = CASE 
+                            WHEN currency = 'USD' THEN total_price
+                            WHEN currency = 'TRY' THEN ROUND((total_price * 100 / current_USD), 2) / 100
+                            ELSE total_price
+                        END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
 }
