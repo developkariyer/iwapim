@@ -225,7 +225,7 @@ class ListingSyncService
             }
             if (!$variantProduct instanceof VariantProduct) {
                 echo "Variant product not found for {$code}, deleting from WS: ".json_encode($listing)."\n";
-                //$this->deleteFromWisersell($code);
+                $this->deleteFromWisersell($code);
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
