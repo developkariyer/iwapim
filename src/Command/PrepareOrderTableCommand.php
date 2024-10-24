@@ -617,7 +617,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql); 
         foreach ($results as $row) {
             $referringSite = $row['referring_site'];
-            echo "Referring Site: $referringSite\n";
             $parsedUrl = parse_url($referringSite);
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
