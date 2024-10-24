@@ -612,8 +612,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk',
             'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi',
             'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz',
-            'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay',
-            'm.', 'l.', 'lm.', 'com.'
+            'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'
         ];
         $db = \Pimcore\Db::get();
         $sql = "
@@ -630,12 +629,18 @@ class PrepareOrderTableCommand extends AbstractCommand
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
                 $domainParts = explode('.', $host);
-                while (!empty($domainParts) && in_array(end($domainParts), $tldList)) {
-                    array_pop($domainParts); 
+                while (count($domainParts) > 1 && in_array(end($domainParts), $tldList)) {
+                    array_pop($domainParts);
                 }
-                $domain = implode('.', $domainParts);
+                if (count($domainParts) > 1) {
+                    $domain = implode('.', array_slice($domainParts, -2)); 
+                } elseif (count($domainParts) === 1) {
+                    $domain = $domainParts[0]; 
+                } else {
+                    $domain = ''; 
+                }
                 $domain = preg_replace('/^www\./', '', $domain);
-                $domain = strtolower($domain);
+                $domain = strtolower($domain); 
                 $updateQuery = "
                     UPDATE iwa_marketplace_orders_line_items 
                     SET referring_site_domain = ?
