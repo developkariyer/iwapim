@@ -517,4 +517,21 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt = $db->prepare($sql);
         $stmt->execute();
     }
+
+    protected function isfullfilled()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET is_fulfilled = 
+        CASE 
+            WHEN fulfillments_status = 'success' 
+            OR fulfillments_status = 'Delivered'
+            OR fulfillments_status IS NULL THEN TRUE
+            ELSE FALSE
+        END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
 }
