@@ -606,6 +606,14 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function parseUrl()
     {
+        $tldList = [
+            'com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk',
+            'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg',
+            'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk',
+            'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi',
+            'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz',
+            'ua', 'www'
+        ];
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT DISTINCT referring_site 
@@ -620,7 +628,12 @@ class PrepareOrderTableCommand extends AbstractCommand
             $parsedUrl = parse_url($referringSite);
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
-                $domain = preg_replace('/^www\./', '', $host);
+                $domainParts = explode('.', $host);
+                while (end($domainParts) && in_array(end($domainParts), $tldList)) {
+                    array_pop($domainParts);
+                }
+                $domain = implode('.', $domainParts);
+                $domain = strtolower($domain);
                 $updateQuery = "
                     UPDATE iwa_marketplace_orders_line_items 
                     SET referring_site_domain = ?
