@@ -152,7 +152,7 @@ class ListingSyncService
         if (empty($listingData)) {
             return;
         }
-        print_r(['code' => $code, 'productId' => $listingData['productId'], 'shopId' => $listingData['shopId']]);
+        //print_r(['code' => $code, 'productId' => $listingData['productId'], 'shopId' => $listingData['shopId']]);
         $response = $this->connector->request(Connector::$apiUrl['listing'], 'PUT', $code, [
             'productId' => $listingData['productId'],
             'shopId' => $listingData['shopId'],
@@ -161,7 +161,7 @@ class ListingSyncService
             return;
         }
         $response = $response->toArray();
-        print_r($response); exit;
+        //print_r($response); exit;
         $this->updatePimVariantProduct($response);
     }
 
@@ -259,9 +259,9 @@ class ListingSyncService
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
-            $this->updateWisersellListing($variantProduct);
+            //$this->updateWisersellListing($variantProduct);
         }
-        $this->flushListingBucketToWisersell();
+        //$this->flushListingBucketToWisersell();
     }
 
     public function calculateWisersellCode($variantProduct)
