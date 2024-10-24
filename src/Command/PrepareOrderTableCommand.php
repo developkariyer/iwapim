@@ -606,7 +606,6 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function parseUrl()
     {
-
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT DISTINCT referring_site 
