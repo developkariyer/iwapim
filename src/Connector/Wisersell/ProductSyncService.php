@@ -109,7 +109,7 @@ class ProductSyncService
             $wisersellProducts = [$wisersellProducts];
         }
         foreach ($wisersellProducts as $wisersellProduct) {
-            echo "Adding Wisersell Product: ".json_encode($wisersellProduct)."\n";
+            echo "Adding Wisersell Product to PIM Error: ".json_encode($wisersellProduct)."\n";
             $pimProduct = null;
             if (isset($wisersellProduct['code'])) {
                 if (isset($this->pimProducts[$wisersellProduct['code']])) {
