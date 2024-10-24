@@ -204,8 +204,8 @@ class ListingSyncService
             return;
         }
         $response = $response->toArray();
-        print_r($response);return;
-        foreach ($response as $listing) {
+        print_r($response);
+        foreach (($response['completed'] ?? []) as $listing) {
             $this->updatePimVariantProduct($listing);
         }
         $this->bucket = [];
