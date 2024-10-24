@@ -628,7 +628,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     WHERE referring_site = ?
                 ";
                 $stmt = $db->prepare($updateQuery);
-                $stmt->execute($domain,$row['referring_site']);
+                $stmt->execute([$domain,$row['referring_site']]);
                
             }
 
