@@ -47,7 +47,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
 
         //$this->insertClosedAtDiff();
-        $this->discountValue();
+        //$this->discountValue();
+        $this->isfullfilled();
         return Command::SUCCESS;
     }
     
