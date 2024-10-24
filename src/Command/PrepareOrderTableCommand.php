@@ -50,7 +50,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->discountValue();
         //$this->isfullfilled();
         //$this->productCount();
-        $this->calculatePrice();
+        //$this->calculatePrice();
         return Command::SUCCESS;
     }
     
