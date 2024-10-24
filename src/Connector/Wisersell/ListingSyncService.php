@@ -239,7 +239,8 @@ class ListingSyncService
             $wisersellProductId = $listing['product']['id'] ?? null;
             if (!is_null($wisersellProductId) && (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
-                $this->deleteFromWisersell($code);
+//                $this->deleteFromWisersell($code);
+//                $this->updateWisersellListing($variantProduct);
                 $this->updateWisersellListing($variantProduct);
                 continue;
             }
@@ -325,9 +326,61 @@ class ListingSyncService
         }
     }
 
-    public function addAmazonVariantsToWisersell()
+    public function syncAmazon()
     {
-        
+        $this->load();
+        $pimListings = $this->pimListings;
+        $index = 0;
+        $totalCount = count($this->wisersellListings);
+        foreach ($this->wisersellListings as $listing) {
+            $index++;
+            echo "\rSyncing $index of $totalCount  ";
+            if ($listing['store']['source']['name'] === 'Amazon') {
+                continue;
+            }
+            $code = trim($listing['code']);
+            if (isset($pimListings[$code])) {
+                $variantProduct = VariantProduct::getById($pimListings[$code]['oo_id']);
+                unset($pimListings[$code]);
+            } else {
+                $variantProduct = VariantProduct::getByWisersellVariantCode($code, ['limit' => 1]);
+            }
+            if (!$variantProduct instanceof VariantProduct) {
+                echo "Variant product not found for {$code}, deleting from WS: ".json_encode($listing)."\n";
+                $this->deleteFromWisersell($code);
+                continue;
+            }
+            $mainProduct = $variantProduct->getMainProduct();
+            if (is_array($mainProduct)) {
+                $mainProduct = reset($mainProduct);
+            }
+            if (!$mainProduct instanceof Product) {
+                echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
+                continue;
+            }
+            $pimProductId = $mainProduct->getWisersellId();
+            $wisersellProductId = $listing['product']['id'] ?? null;
+            if (!is_null($wisersellProductId) && (($wisersellProductId+0) != ($pimProductId+0))) {
+                echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
+                $this->deleteFromWisersell($code);
+                $this->updateWisersellListing($variantProduct);
+                continue;
+            }
+            if (empty($variantProduct->getWisersellVariantCode())) {
+                echo "Variant code missing for {$listing['code']} in {$variantProduct->getId()}, updating\n";
+                $this->updatePimVariantProduct($listing);
+                continue;
+            }
+        }
+        echo "\n";
+        foreach ($pimListings as $pimListing) {
+            $variantProduct = VariantProduct::getById($pimListing['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $this->updateWisersellListing($variantProduct);
+        }
+        $this->flushListingBucketToWisersell();
     }
 
 }

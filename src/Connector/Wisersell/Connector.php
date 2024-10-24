@@ -126,6 +126,7 @@ class Connector
         }
         switch ($response->getStatusCode()) {
             case 401:
+            case 502:
                 echo " Token expired. Fetching new token...\n";
                 $this->wisersellToken = $this->fetchNewAccessToken();
                 $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
