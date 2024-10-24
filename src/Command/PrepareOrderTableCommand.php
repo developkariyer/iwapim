@@ -49,6 +49,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->insertClosedAtDiff();
         //$this->discountValue();
         //$this->isfullfilled();
+        $this->productCount();
         return Command::SUCCESS;
     }
     
@@ -545,6 +546,23 @@ class PrepareOrderTableCommand extends AbstractCommand
             OR fulfillments_status IS NULL THEN TRUE
             ELSE FALSE
         END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function productCount()
+    {
+        $db = \Pimcre\Db::get();
+        $sql = "
+            UPDATE iwa_marketplace_orders_line_items AS orders
+            JOIN (
+                SELECT order_id, COUNT(*) AS product_count
+                FROM iwa_marketplace_orders_line_items
+                GROUP BY order_id
+            ) AS order_counts
+            ON orders.order_id = order_counts.order_id
+            SET orders.product_count = order_counts.product_count;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
