@@ -507,12 +507,12 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "
-        SELECT *, 
+        UPDATE iwa_marketplace_orders_line_items
+        SET has_discount = 
         CASE 
             WHEN discount_value IS NOT NULL AND discount_value <> 0.00 THEN TRUE
-            ELSE FALSE 
-        END AS has_discount
-        FROM iwa_marketplace_orders_line_items;
+            ELSE FALSE
+        END;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
