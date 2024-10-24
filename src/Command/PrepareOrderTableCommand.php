@@ -606,7 +606,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function parseUrl()
     {
-        $url = "https://0ed862d6853b0bc21c46f82374f231a6.safeframe.googlesyndication.com/";
+        $url = "https://colorfullworlds-com.cdn.ampproject.org/v/s/colorfullworlds.com/a/s/products/3d-wooden-multilayered-ukraine-map?amp_gsa=1&amp_js_v=a9&usqp=mq331AQIUAKwASCAAgM=";
         $parsedUrl = parse_url($url);
         $host = $parsedUrl['host'];
         echo $host;
