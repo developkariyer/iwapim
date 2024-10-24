@@ -54,7 +54,7 @@ class ListingSyncService
     {
         $this->load();
         if ($force || empty($this->amazonListings)) {
-            $this->amazonListings = [];
+/*            $this->amazonListings = [];
             $listObj = new VariantProduct\Listing();
             $listObj->setUnpublished(false);
             $pageSize = 100;
@@ -82,7 +82,7 @@ class ListingSyncService
                 $offset += $pageSize;
             }
             echo "\n";
-
+*/
             foreach ($this->wisersellListings as $listing) {
                 if ($listing['store']['source']['name'] === 'Amazon') {
                     $asin = $listing['storeproductid'] ?? null;
