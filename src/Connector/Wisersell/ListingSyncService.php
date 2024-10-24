@@ -330,12 +330,13 @@ class ListingSyncService
     {
         $this->load();
         $pimListings = $this->pimListings;
+        $amazonShopIds = $this->connector->storeSyncService->getAmazonShopIds();
         $index = 0;
         $totalCount = count($this->wisersellListings);
         foreach ($this->wisersellListings as $listing) {
             $index++;
             echo "\rSyncing $index of $totalCount  ";
-            if ($listing['store']['source']['name'] === 'Amazon') {
+            if ($listing['store']['source']['name'] !== 'Amazon') {
                 continue;
             }
             $code = trim($listing['code']);
