@@ -61,6 +61,7 @@ class ListingSyncService
             $listObj->setLimit($pageSize);
             $offset = 0;
             while (true) {
+                echo "\rLooking for Amazon listings in PIM from $offset to ".($offset+$pageSize);
                 $listObj->setOffset($offset);
                 $variantProducts = $listObj->load();
                 if (empty($variantProducts)) {
@@ -80,6 +81,7 @@ class ListingSyncService
                 }
                 $offset += $pageSize;
             }
+            echo "\n";
 
             foreach ($this->wisersellListings as $listing) {
                 if ($listing['store']['source']['name'] === 'Amazon') {
