@@ -47,7 +47,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
 
         //$this->insertClosedAtDiff();
-
+        $this->discountValue();
         return Command::SUCCESS;
     }
     
@@ -498,6 +498,21 @@ class PrepareOrderTableCommand extends AbstractCommand
         UPDATE iwa_marketplace_orders_line_items
         SET completion_day = DATEDIFF(DATE(closed_at), DATE(created_at))
         WHERE DATE(closed_at) IS NOT NULL;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function discountValue()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        SELECT *, 
+        CASE 
+            WHEN discount_value IS NOT NULL AND discount_value <> 0.00 THEN TRUE
+            ELSE FALSE 
+        END AS has_discount
+        FROM iwa_marketplace_orders_line_items;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
