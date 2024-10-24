@@ -49,7 +49,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->insertClosedAtDiff();
         //$this->discountValue();
         //$this->isfullfilled();
-        $this->productCount();
+        //$this->productCount();
+        //$this->calculatePrice();
+        //$this->countryCode();
+        $this->parseUrl();  
         return Command::SUCCESS;
     }
     
@@ -566,5 +569,85 @@ class PrepareOrderTableCommand extends AbstractCommand
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
+    }
+
+    protected function calculatePrice()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET 
+            product_price_usd = CASE 
+                        WHEN currency = 'USD' THEN price
+                        WHEN currency = 'TRY' THEN ROUND((price * 100 / current_USD), 2) / 100
+                        ELSE price
+                    END,
+            total_price_usd = CASE 
+                            WHEN currency = 'USD' THEN total_price
+                            WHEN currency = 'TRY' THEN ROUND((total_price * 100 / current_USD), 2) / 100
+                            ELSE total_price
+                        END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function countryCode()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET shipping_country = 'Turkey'
+        WHERE shipping_country_code = 'TR';
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function parseUrl()
+    {
+        $tldList = [
+            'com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk',
+            'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg',
+            'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk',
+            'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi',
+            'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz', 'gm',
+            'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'
+        ];
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT DISTINCT referring_site 
+            FROM iwa_marketplace_orders_line_items 
+            WHERE referring_site IS NOT NULL 
+            AND referring_site != '' 
+            AND referring_site != 'null'
+            ";
+        $results = $db->fetchAllAssociative($sql); 
+        foreach ($results as $row) {
+            $referringSite = $row['referring_site'];
+            $parsedUrl = parse_url($referringSite);
+            if (isset($parsedUrl['host'])) {
+                $host = $parsedUrl['host'];
+                $domainParts = explode('.', $host);
+                while (!empty($domainParts) && in_array(end($domainParts), $tldList)) {
+                    array_pop($domainParts); 
+                }
+                while (!empty($domainParts) && in_array(reset($domainParts), $tldList)) {
+                    array_shift($domainParts); 
+                }
+                $domain = implode('.', $domainParts);
+                $domain = preg_replace('/^www\./', '', $domain);
+                $domain = strtolower($domain);
+                $updateQuery = "
+                    UPDATE iwa_marketplace_orders_line_items 
+                    SET referring_site_domain = ?
+                    WHERE referring_site = ?
+                ";
+                $stmt = $db->prepare($updateQuery);
+                $stmt->execute([$domain,$row['referring_site']]);
+               
+            }
+
+        }
     }
 }
