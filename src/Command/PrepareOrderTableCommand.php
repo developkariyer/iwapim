@@ -48,7 +48,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
         //$this->insertClosedAtDiff();
         //$this->discountValue();
-        $this->isfullfilled();
+        //$this->isfullfilled();
         return Command::SUCCESS;
     }
     
@@ -475,6 +475,20 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function updateCurrentCoin()
     {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items AS orders
+        JOIN iwa_history AS history
+        ON DATE(orders.created_at) = history.date
+        SET orders.current_USD = history.usd, 
+            orders.current_EUR = history.eur
+        WHERE DATE(orders.created_at) = history.date;
+        ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        /*
         $coins = self::exchangeCoin();
         $db = \Pimcore\Db::get();
         $sql = "
@@ -488,7 +502,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             if ($dateTime && $dateTime->format('Y-m-d') === $date) {
                 $stmt->execute([$coin['usd'], $coin['euro'], $date]);
             }
-        }
+        }*/
     }
 
     protected function insertClosedAtDiff()
