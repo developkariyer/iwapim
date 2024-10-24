@@ -611,7 +611,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg',
             'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk',
             'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi',
-            'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz',
+            'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz', 'gm', 'andorid',
             'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'
         ];
         $db = \Pimcore\Db::get();
