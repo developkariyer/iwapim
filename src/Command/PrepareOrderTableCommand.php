@@ -618,19 +618,19 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($results as $row) {
             $referringSite = $row['referring_site'];
             echo "Referring Site: $referringSite\n";
-            /*$parsedUrl = parse_url($referringSite);
+            $parsedUrl = parse_url($referringSite);
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
                 $domain = preg_replace('/^www\./', '', $host);
                 $updateQuery = "
                     UPDATE iwa_marketplace_orders_line_items 
-                    SET referring_site_domain = $domain
-                    WHERE referring_site = $referringSite
+                    SET referring_site_domain = ?
+                    WHERE referring_site = ?
                 ";
                 $stmt = $db->prepare($updateQuery);
-                $stmt->execute();
+                $stmt->execute($domain,$row['referring_site']);
                
-            }*/
+            }
 
         }
     }
