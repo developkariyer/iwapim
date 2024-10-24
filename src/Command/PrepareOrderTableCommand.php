@@ -606,9 +606,17 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function parseUrl()
     {
-        $url = "colorfullworlds-com.cdn.ampproject.org";
-        $parsedUrl = parse_url($url);
-        $host = $parsedUrl['host'];
-        echo $host;
+
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT DISTINCT referring_site 
+            FROM iwa_marketplace_orders_line_items 
+            WHERE referring_site IS NOT NULL 
+            AND referring_site != '' 
+            AND referring_site != 'null'
+            ";
+        $values = $db->fetchAllAssociative($sql); 
+        print_r($values);
+
     }
 }
