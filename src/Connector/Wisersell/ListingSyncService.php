@@ -165,7 +165,6 @@ class ListingSyncService
 
     public function updatePimVariantProduct($listing)
     {
-        print_r($listing); return;
         $variantProduct = VariantProduct::getByCalculatedWisersellCode($listing['code'], ['limit' => 1]);
         if (!$variantProduct instanceof VariantProduct) {
             return;
@@ -324,6 +323,11 @@ class ListingSyncService
             }
             unset($this->pimListings[$code]);
         }
+    }
+
+    public function addAmazonVariantsToWisersell()
+    {
+        
     }
 
 }
