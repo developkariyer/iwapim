@@ -4,6 +4,7 @@ namespace App\Connector\Wisersell;
 
 use App\Connector\Wisersell\Connector;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
 use App\Utils\Utility;
 
@@ -240,7 +241,14 @@ class ListingSyncService
             }
             if (!$variantProduct instanceof VariantProduct) {
                 echo "Variant product not found in PIM for {$code}: ".json_encode($listing)."\n";
-                //$this->deleteFromWisersell($code);
+                $shopId = $listing['store']['id'] ?? null;
+                if ($shopId) {
+                    $marketplace = Marketplace::getByWisersellStoreId($shopId, ['limit' => 1]);
+                    if ($marketplace instanceof Marketplace) {
+                        echo "Deleting {$code} for {$marketplace->getKey()} from WS\n";
+                        $this->deleteFromWisersell($code);
+                    }
+                }
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
