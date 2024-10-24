@@ -553,7 +553,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function productCount()
     {
-        $db = \Pimcre\Db::get();
+        $db = \Pimcore\Db::get();
         $sql = "
             UPDATE iwa_marketplace_orders_line_items AS orders
             JOIN (
