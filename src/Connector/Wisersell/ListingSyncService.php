@@ -14,6 +14,7 @@ class ListingSyncService
     public $wisersellListings = [];   // code => wisersell listing array (check swagger)
     public $pimListings = [];   // calculatedWisersellCode => [oo_id, wisersellVariantCode, calculatedWisersellCode]
     public $bucket = [];
+    public $amazonListings = [];
     public function __construct(Connector $connector)
     {
         $this->connector = $connector;
@@ -46,6 +47,53 @@ class ListingSyncService
                 continue;
             }
             $this->pimListings[$listing['calculatedWisersellCode']] = $listing;
+        }
+    }
+
+    public function loadAmazon($force = false)
+    {
+        $this->load();
+        if ($force || empty($this->amazonListings)) {
+            $this->amazonListings = [];
+            $listObj = new VariantProduct\Listing();
+            $listObj->setUnpublished(false);
+            $pageSize = 100;
+            $listObj->setLimit($pageSize);
+            $offset = 0;
+            while (true) {
+                $listObj->setOffset($offset);
+                $variantProducts = $listObj->load();
+                if (empty($variantProducts)) {
+                    break;
+                }
+                foreach ($variantProducts as $variantProduct) {
+                    if ($variantProduct->getMarketplace()->getMarketplaceType() === 'Amazon') {
+                        $asin = $variantProduct->getUniqueMarketplaceId();
+                        if (strlen($asin)<1) {
+                            continue;
+                        }
+                        if (!isset($this->amazonListings[$asin])) {
+                            $this->amazonListings[$asin] = [];
+                        }
+                        $this->amazonListings[$asin]['pim'] = $variantProduct;
+                    }
+                }
+                $offset += $pageSize;
+            }
+
+            foreach ($this->wisersellListings as $listing) {
+                if ($listing['store']['source']['name'] === 'Amazon') {
+                    $asin = $listing['storeproductid'] ?? null;
+                    $shopId = $listing['store']['shopId'] ?? null;
+                    if (strlen($asin)<1 || strlen($shopId)<1) {
+                        continue;
+                    }
+                    if (!isset($this->amazonListings[$asin])) {
+                        $this->amazonListings[$asin] = [];
+                    }
+                    $this->amazonListings[$asin][$shopId] = $listing;
+                }
+            }
         }
     }
 
