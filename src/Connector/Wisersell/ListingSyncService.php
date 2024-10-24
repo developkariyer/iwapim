@@ -167,6 +167,11 @@ class ListingSyncService
 
     public function updatePimVariantProduct($listing)
     {
+        if (empty($listing['code'])) {
+            print_r($listing);
+            sleep(1);
+            return;
+        }
         $variantProduct = VariantProduct::getByCalculatedWisersellCode($listing['code'], ['limit' => 1]);
         if (!$variantProduct instanceof VariantProduct) {
             return;
