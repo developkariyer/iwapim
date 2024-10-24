@@ -152,6 +152,7 @@ class ListingSyncService
         if (empty($listingData)) {
             return;
         }
+        print_r(['code' => $code, 'productId' => $listingData['productId'], 'shopId' => $listingData['shopId']]);
         $response = $this->connector->request(Connector::$apiUrl['listing'], 'PUT', $code, [
             'productId' => $listingData['productId'],
             'shopId' => $listingData['shopId'],
