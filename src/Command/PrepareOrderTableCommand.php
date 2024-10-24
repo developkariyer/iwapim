@@ -379,7 +379,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 return;
             }
             $productType = strtok($productIdentifier,'-'); // field 4
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType);
+            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType);
         }
     }
 
@@ -388,10 +388,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
             SET marketplace_key = ?, product_code = ?, parent_product_code = ?, product_type =?
-            WHERE variant_id = $uniqueMarketplaceId;
+            WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
             ";
         $stmt = $db->prepare($sql);
-        $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType]);
+        $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType]);
     }
 
     protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
