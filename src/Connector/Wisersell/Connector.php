@@ -21,7 +21,7 @@ class Connector
         'product'=> 'product',
         'store' => 'store',
         'listingSearch' => 'listing/search',
-        'listing' => 'listing/'
+        'listing' => 'listing'
     ];
     private $httpClient = null;
     private $wisersellCredentials = null;
@@ -119,7 +119,11 @@ class Connector
         flush();
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
-        sleep(2);
+        if (strpos($apiEndPoint, 'listing') !== false) {
+            usleep(500000);
+        } else {
+            usleep(200000);
+        }
         switch ($response->getStatusCode()) {
             case 401:
                 echo " Token expired. Fetching new token...\n";
