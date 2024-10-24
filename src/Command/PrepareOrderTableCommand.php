@@ -620,7 +620,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             $parsedUrl = parse_url($referringSite);
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
-                $domain = preg_replace('/^www\./', '', $host);
+                $cleanHost = preg_replace('/[^a-zA-Z0-9.-]/', '', $host);
+                $domain = preg_replace('/^www\./', '', $cleanHost);
                 $updateQuery = "
                     UPDATE iwa_marketplace_orders_line_items 
                     SET referring_site_domain = $domain
