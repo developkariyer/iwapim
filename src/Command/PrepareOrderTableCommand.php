@@ -56,7 +56,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (empty($this->marketplaceListWithIds)) {
             $this->marketplaceList();
         }
-        $marketplaceTypes = array_values($this->marketplaceListWithIds);
+        $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
             echo $marketplaceType . "\n";
         }
