@@ -629,18 +629,15 @@ class PrepareOrderTableCommand extends AbstractCommand
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
                 $domainParts = explode('.', $host);
-                while (count($domainParts) > 1 && in_array(end($domainParts), $tldList)) {
-                    array_pop($domainParts);
+                while (!empty($domainParts) && in_array(end($domainParts), $tldList)) {
+                    array_pop($domainParts); 
                 }
-                if (count($domainParts) > 1) {
-                    $domain = implode('.', array_slice($domainParts, -2)); 
-                } elseif (count($domainParts) === 1) {
-                    $domain = $domainParts[0]; 
-                } else {
-                    $domain = ''; 
+                while (!empty($domainParts) && in_array(reset($domainParts), $tldList)) {
+                    array_shift($domainParts); 
                 }
+                $domain = implode('.', $domainParts);
                 $domain = preg_replace('/^www\./', '', $domain);
-                $domain = strtolower($domain); 
+                $domain = strtolower($domain);
                 $updateQuery = "
                     UPDATE iwa_marketplace_orders_line_items 
                     SET referring_site_domain = ?
