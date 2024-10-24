@@ -118,7 +118,7 @@ class Connector
         echo "Requesting: {$apiEndPoint} {$type} {$parameter} in time ".time();
         flush();
         $this->prepareToken();
-        $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['json' => $json]);
+        $response = $this->httpClient->request($type, "{$apiEndPoint}/{$parameter}", ['json' => $json]);
         if (strpos($apiEndPoint, 'listing') !== false) {
             usleep(600000);
         } else {
