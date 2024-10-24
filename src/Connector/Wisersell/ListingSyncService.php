@@ -54,7 +54,7 @@ class ListingSyncService
     {
         $this->load();
         if ($force || empty($this->amazonListings)) {
-/*            $this->amazonListings = [];
+            $this->amazonListings = [];
             $listObj = new VariantProduct\Listing();
             $listObj->setUnpublished(false);
             $pageSize = 100;
@@ -82,7 +82,7 @@ class ListingSyncService
                 $offset += $pageSize;
             }
             echo "\n";
-*/
+
             foreach ($this->wisersellListings as $listing) {
                 if ($listing['store']['source']['name'] === 'Amazon') {
                     $asin = $listing['storeproductid'] ?? null;
@@ -97,7 +97,57 @@ class ListingSyncService
                 }
             }
         }
-        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.amazon.txt', print_r($this->amazonListings, true));
+
+        $amazonShopIds = $this->connector->storeSyncService->getAmazonShopIds();
+        foreach ($this->amazonListings as $asin => $listings) {
+            if (!isset($listings['pim'])) {
+                echo "Amazon listing not found in PIM for $asin\n";
+                continue;
+            }
+            $mainProduct = $listings['pim']->getMainProduct();
+            if (is_array($mainProduct)) {
+                $mainProduct = reset($mainProduct);
+            }
+            if (!$mainProduct instanceof Product) {
+                echo "Variant {$listings['pim']->getId()} not connected in PIM for $asin\n";
+                continue;
+            }
+            $productId = $mainProduct->getWisersellId();
+            if (empty($productId)) {
+                echo "Main product {$mainProduct->getId()} in PIM not synced with WS for $asin\n";
+                continue;
+            }
+            foreach ($amazonShopIds as $shopId) {
+                if (!isset($listings[$shopId])) {
+                    echo "Amazon listing not found in WS shop $shopId for $asin\n";
+                    $this->bucket[] = [
+                        'storeproductid' => $asin,
+                        'productId' => $productId,
+                        'shopId' => $shopId,
+                        'variantCode' => null,
+                        'variantStr' => "Amazon SId: {$shopId} PId:{$asin} VId:- PimId:{$productId}"
+                    ];
+                    if (count($this->bucket) >= 100) {
+                        $this->flushListingBucketToWisersell();
+                    }
+                    continue;
+                }
+                $wsProductId = $listings[$shopId]['product']['id'] ?? null;
+                if ($productId !== $wsProductId && strlen($listings[$shopId]['code'] ?? '')>0) {
+                    echo "Product ID mismatch for $asin: WS:{$wsProductId} PIM:{$productId}\n";
+                    $this->connector->request(
+                        Connector::$apiUrl['listing'], 
+                        'PUT', 
+                        $listings[$shopId]['code'], 
+                        [
+                            'productId' => $productId,
+                            'shopId' => $shopId,
+                        ]
+                    );
+                    continue;
+                }
+            }
+        }
     }
 
     public function status()
@@ -253,7 +303,7 @@ class ListingSyncService
         }
     }
 
-    public function flushListingBucketToWisersell()
+    public function flushListingBucketToWisersell($updatePim = true)
     {
         if (empty($this->bucket)) {
             return;
@@ -264,11 +314,14 @@ class ListingSyncService
         }
         $response = $response->toArray();
         print_r($response);
+        $this->bucket = [];
+        if (!$updatePim) {
+            return;
+        }
         foreach (($response['completed'] ?? []) as $listing) {
             echo "Updating {$listing['code']}\n";
             $this->updatePimVariantProduct($listing);
         }
-        $this->bucket = [];
     }
 
     public function sync()
