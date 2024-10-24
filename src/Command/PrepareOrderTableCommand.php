@@ -51,6 +51,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->isfullfilled();
         //$this->productCount();
         //$this->calculatePrice();
+        $this->countryCode();
         return Command::SUCCESS;
     }
     
@@ -585,6 +586,18 @@ class PrepareOrderTableCommand extends AbstractCommand
                             WHEN currency = 'TRY' THEN ROUND((total_price * 100 / current_USD), 2) / 100
                             ELSE total_price
                         END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function countryCode()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET shipping_country = 'Turkey'
+        WHERE shipping_country_code = 'TR';
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
