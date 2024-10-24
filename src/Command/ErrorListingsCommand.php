@@ -24,6 +24,7 @@ class ErrorListingsCommand extends AbstractCommand
         $this
             ->addOption('notconnected',null, InputOption::VALUE_NONE, '')
             ->addOption('multiconnected',null, InputOption::VALUE_NONE, '')
+            ->addOption('unpublish',null, InputOption::VALUE_NONE, '')
             ;
     }
 
@@ -35,7 +36,9 @@ class ErrorListingsCommand extends AbstractCommand
         if ($input->getOption('multiconnected')) {
             $this->multiConnectedListings();
         }
-        $this->unpublishListings();
+        if ($input->getOption('unpublish')) {
+            $this->unpublishListings();
+        }
         return Command::SUCCESS;
     }
 
@@ -46,8 +49,6 @@ class ErrorListingsCommand extends AbstractCommand
         $offset = 0;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(true);      
-
-        
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
@@ -66,7 +67,6 @@ class ErrorListingsCommand extends AbstractCommand
             }
         }
     }
-
 
     private function notConnectedListings()
     {
