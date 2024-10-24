@@ -160,6 +160,7 @@ class ListingSyncService
             return;
         }
         $response = $response->toArray();
+        print_r($response);
         $this->updatePimVariantProduct($response);
     }
 
@@ -197,6 +198,7 @@ class ListingSyncService
             return;
         }
         $response = $response->toArray();
+        print_r($response);return;
         foreach ($response as $listing) {
             $this->updatePimVariantProduct($listing);
         }
