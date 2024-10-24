@@ -52,7 +52,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->productCount();
         //$this->calculatePrice();
         //$this->countryCode();
-        $this->parseUrl();  
+        //$this->parseUrl();  
         return Command::SUCCESS;
     }
     
@@ -645,9 +645,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 ";
                 $stmt = $db->prepare($updateQuery);
                 $stmt->execute([$domain,$row['referring_site']]);
-               
             }
-
         }
     }
 }
