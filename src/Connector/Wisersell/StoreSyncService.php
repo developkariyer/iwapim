@@ -101,8 +101,8 @@ class StoreSyncService
             if (!$pimStore instanceof Marketplace) {
                 continue;
             }
-            $pimStore->setWisersellStoreId($wisersellStore['id']);
-            $pimStore->save();
+            //$pimStore->setWisersellStoreId($wisersellStore['id']);
+            //$pimStore->save();
             echo "  Matched Wisersell $storeType $storeId to {$pimStore->getId()} {$pimStore->getKey()}" . PHP_EOL;
         }
     }
