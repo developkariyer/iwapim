@@ -226,8 +226,8 @@ class ListingSyncService
                 $variantProduct = VariantProduct::getByWisersellVariantCode($code, ['limit' => 1]);
             }
             if (!$variantProduct instanceof VariantProduct) {
-                //echo "Variant product not found for {$code}, deleting from WS: ".json_encode($listing)."\n";
-                //$this->deleteFromWisersell($code);
+                echo "Variant product not found for {$code}, deleting from WS: ".json_encode($listing)."\n";
+                $this->deleteFromWisersell($code);
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
