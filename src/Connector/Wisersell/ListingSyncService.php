@@ -265,6 +265,9 @@ class ListingSyncService
             if (empty($variantProduct->getMarketplace()->getWisersellStoreId())) {
                 continue;
             }
+            if ($variantProduct->getMarketplace()->getMarketplaceType() === 'Amazon') {
+                continue;
+            }
             $this->updateWisersellListing($variantProduct);
         }
         $this->flushListingBucketToWisersell();

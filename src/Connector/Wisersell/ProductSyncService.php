@@ -171,7 +171,7 @@ class ProductSyncService
         }
     }
 
-    public function updateWisersellProduct($product)
+    public function updateWisersellProduct($product, $error = false)
     {
         $this->load();
         if (!($product instanceof Product) || $product->level() != 1) {
@@ -182,6 +182,9 @@ class ProductSyncService
             return;
         }
         $productData = $this->prepareProductData($product);
+        if ($error) {
+            $productData['name'] = "ERROR: ".$productData['name'];
+        }
         $response = $this->connector->request(Connector::$apiUrl['product'] . '/' . $product->getWisersellId(), 'PUT', '', $productData);
         if (empty($response)) {
             return;
