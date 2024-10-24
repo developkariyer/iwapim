@@ -615,8 +615,23 @@ class PrepareOrderTableCommand extends AbstractCommand
             AND referring_site != '' 
             AND referring_site != 'null'
             ";
-        $values = $db->fetchAllAssociative($sql); 
-        print_r($values);
+        $results = $db->fetchAllAssociative($sql); 
+        foreach ($results as $row) {
+            $referringSite = $row['referring_site'];
+            $parsedUrl = parse_url($referringSite);
+            if (isset($parsedUrl['host'])) {
+                $host = $parsedUrl['host'];
+                $domain = preg_replace('/^www\./', '', $host);
+                $updateQuery = "
+                    UPDATE iwa_marketplace_orders_line_items 
+                    SET referring_site_domain = $domain
+                    WHERE referring_site = $referringSite
+                ";
+                $stmt = $db->prepare($updateQuery);
+                $stmt->execute();
+               
+            }
 
+        }
     }
 }
