@@ -58,9 +58,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
-            echo $marketplaceType . "\n";
-        }
-        /*foreach ($marketplaceTypes as $marketplaceType) {
             $values = $this->fetchVariantInfo($marketplaceType);
             $index = 0;
             foreach ($values as $row) {
@@ -69,7 +66,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
     
-        }*/
+        }
     }
 
     protected function transferOrders()
