@@ -617,8 +617,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql); 
         foreach ($results as $row) {
             $referringSite = $row['referring_site'];
-            $cleanHost = preg_replace('/[^a-zA-Z0-9.-]/', '', $referringSite);
-            $parsedUrl = parse_url($cleanHost);
+            $parsedUrl = parse_url($referringSite);
             if (isset($parsedUrl['host'])) {
                 $host = $parsedUrl['host'];
                 $domain = preg_replace('/^www\./', '', $host);
