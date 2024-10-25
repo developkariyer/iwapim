@@ -255,6 +255,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             [$this->marketplace->getId()]
         );
         $page = 1;
+
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
             $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
@@ -263,7 +264,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $db->beginTransaction();
                 foreach ($orders as $order) {
                     $db->executeStatement(
-                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                         [
                             $this->marketplace->getId(),
                             $order['orderId'],

@@ -53,6 +53,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->calculatePrice();
         //$this->countryCode();
         //$this->parseUrl();  
+        $this->productQuantity();
         return Command::SUCCESS;
     }
     
@@ -566,6 +567,26 @@ class PrepareOrderTableCommand extends AbstractCommand
             ) AS order_counts
             ON orders.order_id = order_counts.order_id
             SET orders.product_count = order_counts.product_count;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function productQuantity()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            UPDATE iwa_marketplace_orders_line_items AS orders
+            JOIN (
+                SELECT 
+                    order_id, 
+                    SUM(quantity) AS total_quantity
+                FROM 
+                    iwa_marketplace_orders_line_items
+                GROUP BY 
+                    order_id
+            ) AS order_totals ON orders.order_id = order_totals.order_id
+            SET orders.total_quantity = order_totals.total_quantity;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
