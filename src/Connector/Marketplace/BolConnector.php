@@ -250,17 +250,13 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
-        /*$lastUpdatedAt = $db->fetchOne(
+        $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m-%d')) FROM iwa_marketplace_orders WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-        $page = 1;*/
+        $page = 1;
 
-        $params = ['status' => 'ALL', 'fulfilment-method' => 'ALL'];
-        $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
-        $orders = $data['orders'];
-        print_r($orders);
-        /*do {
+        do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
             $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
             $orders = $data['orders'];
@@ -283,7 +279,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             }
             $page++;
             sleep(2);
-        } while(count($orders) == 50);*/
+        } while(count($orders) == 50);
     }
 
     public function downloadInventory()
