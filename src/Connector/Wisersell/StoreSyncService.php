@@ -118,7 +118,7 @@ class StoreSyncService
                 }
             }
         }
-        return $shopIds;
+        return array_unique($shopIds);
     }
 
 }
