@@ -129,7 +129,7 @@ class ListingSyncService
                         'variantStr' => "Amazon SId: {$shopId} PId:{$asin} VId:- PimId:{$productId}"
                     ];
                     if (count($this->bucket) >= 100) {
-                        $this->flushListingBucketToWisersell();
+                        $this->flushListingBucketToWisersell(false);
                     }
                     continue;
                 }
@@ -149,7 +149,7 @@ class ListingSyncService
                 }
             }
         }
-        $this->flushListingBucketToWisersell();
+        $this->flushListingBucketToWisersell(false);
     }
 
     public function status()
