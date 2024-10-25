@@ -284,6 +284,11 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 marketplace: $this->marketplace,
                 parent: $this->getFolder($asin),
             );
+            $mainProduct = $variantProduct->getMainProduct();
+            if (empty($mainProduct)) {
+                echo "Main product not found\n";
+                continue;
+            }
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;

@@ -128,7 +128,11 @@ class ProductSyncService
             }
             $pimProduct = $this->addProductToPim($wisersellProduct);
             if ($pimProduct instanceof Product) {
-                $this->updateWisersellProduct($pimProduct);
+                $wisersellProduct['name'] = substr("OLMAYAN URUN! ".$wisersellProduct['name'], 0, 255);
+                $response = $this->connector->request(Connector::$apiUrl['product'] . '/' . $wisersellProduct['id'], 'PUT', '', $wisersellProduct);
+                if (!empty($response)) {
+                    echo "Updated Wisersell Product: ".$wisersellProduct['id']." with status ". $response->getStatusCode()."\n";
+                }
             }
         }
     }
