@@ -102,6 +102,10 @@ class ListingSyncService
         $amazonShopIds = $this->connector->storeSyncService->getAmazonShopIds();
         foreach ($this->amazonListings as $asin => $listings) {
             echo "\rChecking Amazon listing $asin  ";
+            if ($asin === 'B099QVFJL7') {
+                print_r($listings);
+                sleep(10);
+            }
             if (!isset($listings['pim'])) {
                 echo "Amazon listing not found in PIM for $asin\n";
                 continue;
