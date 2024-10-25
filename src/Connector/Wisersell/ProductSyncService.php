@@ -63,6 +63,13 @@ class ProductSyncService
         return $this->loadWisersellProducts($force);
     }
 
+    public function dump()
+    {
+        $this->load();
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.wisersell.txt', print_r($this->wisersellProducts, true));
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.pim.txt', print_r($this->pimProducts, true));        
+    }
+
     public function findWisersellProductWithCode($code)
     {
         $this->load();
