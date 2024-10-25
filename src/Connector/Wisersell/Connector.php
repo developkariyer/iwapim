@@ -118,7 +118,7 @@ class Connector
         echo "Requesting: {$apiEndPoint} {$type} {$parameter} in time ".time();
         flush();
         $this->prepareToken();
-        file_put_contents(PIMCORE_PROJECT_ROOT . '/var/logs/wisersell.log', date('Y-m-d H:i:s').", {$type}, {$apiEndPoint}/{$parameter}, ".json_encode($json)."\n", FILE_APPEND);
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/wisersell.log', date('Y-m-d H:i:s').", {$type}, {$apiEndPoint}/{$parameter}, ".json_encode($json)."\n", FILE_APPEND);
         $response = $this->httpClient->request($type, "{$apiEndPoint}/{$parameter}", ['json' => $json]);
         if (strpos($apiEndPoint, 'listing') !== false) {
             usleep(500000);
