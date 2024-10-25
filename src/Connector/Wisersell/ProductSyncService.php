@@ -136,7 +136,7 @@ class ProductSyncService
             }
             $pimProduct = $this->addProductToPim($wisersellProduct);
             if ($pimProduct instanceof Product) {
-                $wisersellProduct['name'] = substr("OLMAYAN URUN! ".$wisersellProduct['name'], 0, 255);
+                $wisersellProduct['name'] = "OLMAYAN URUN!";
                 $bucket[] = $wisersellProduct;
                 if (count($bucket) >= 100) {
                     $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
