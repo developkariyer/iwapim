@@ -125,6 +125,7 @@ class ListingSyncService
                         'storeproductid' => $asin,
                         'productId' => $productId,
                         'shopId' => $shopId,
+                        'variantCode' => (string) null,
                         'variantStr' => "Amazon SId: {$shopId} PId:{$asin} VId:- PimId:{$productId}"
                     ];
                     if (count($this->bucket) >= 100) {
