@@ -113,6 +113,7 @@ class StoreSyncService
         $shopIds = [];
         foreach ($this->wisersellStores as $wisersellStore) {
             if ($wisersellStore['source']['name'] === 'Amazon') {
+                print_r($wisersellStore);
                 if (strlen($wisersellStore['shopId']) > 5) {
                     $shopIds[] = $wisersellStore['shopId'];
                 }
