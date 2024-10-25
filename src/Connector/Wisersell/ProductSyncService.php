@@ -108,6 +108,7 @@ class ProductSyncService
         if (!is_array($wisersellProducts)) {
             $wisersellProducts = [$wisersellProducts];
         }
+        $bucket = [];
         foreach ($wisersellProducts as $wisersellProduct) {
             echo "Adding Wisersell Product to PIM Error: ".json_encode($wisersellProduct)."\n";
             $pimProduct = null;
@@ -129,10 +130,20 @@ class ProductSyncService
             $pimProduct = $this->addProductToPim($wisersellProduct);
             if ($pimProduct instanceof Product) {
                 $wisersellProduct['name'] = substr("OLMAYAN URUN! ".$wisersellProduct['name'], 0, 255);
-                $response = $this->connector->request(Connector::$apiUrl['product'] . '/' . $wisersellProduct['id'], 'PUT', '', $wisersellProduct);
-                if (!empty($response)) {
-                    echo "Updated Wisersell Product: ".$wisersellProduct['id']." with status ". $response->getStatusCode()."\n";
+                $bucket[] = $wisersellProduct;
+                if (count($bucket) >= 100) {
+                    $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
+                    if (!empty($response)) {
+                        echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
+                    }
+                    $bucket = [];
                 }
+            }
+        }
+        if (!empty($bucket)) {
+            $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
+            if (!empty($response)) {
+                echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
             }
         }
     }
