@@ -107,7 +107,7 @@ class VariantProduct extends Concrete
         $key_base.= Utility::sanitizeVariable($variant['attributes'] ?? '');
         $key_base = Utility::sanitizeVariable($key_base,250);
         $key = '';
-        while (self::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
+        while (VariantProduct::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
             $key = $key ? $key+1 : 1;
         }
         $this->setKey(trim("$key_base$key"));

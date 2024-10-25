@@ -416,4 +416,56 @@ class ProductSyncService
         $this->addWisersellProductsToPim($wisersellProducts);
     }
 
+    public function fixWisersellNames()
+    {
+        $this->load();
+        $bucket = [];
+        $pimProducts = [];
+        $index = 0;
+        $totalCount = count($this->wisersellProducts);
+        foreach ($this->wisersellProducts as $wisersellProduct) {
+            $index++;
+            echo "\rProcessing $index / $totalCount";
+            $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
+            if (!$pimProduct instanceof Product) {
+                continue;
+            }
+            $pimKey = $pimProduct->getKey();
+            if ($pimKey === $wisersellProduct['name']) {
+                continue;
+            }
+            $wisersellProduct['name'] = $pimKey;
+            $bucket[] = $wisersellProduct;
+            $pimProducts[$wisersellProduct['id']] = $pimProduct;
+            if (count($bucket) >= 100) {
+                $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
+                if (!empty($response)) {
+                    echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
+                    $completed = $response->toArray()['completed'] ?? [];
+                    foreach ($completed as $wsProduct) {
+                        if (isset($pimProducts[$wsProduct['id'] ?? 0])) {
+                            $pimProducts[$wsProduct['id']]->setWisersellJson(json_encode($wsProduct));
+                            $pimProducts[$wsProduct['id']]->save();
+                        }
+                    }
+                }
+                $bucket = [];
+            }
+        }
+        echo "\n";
+        if (!empty($bucket)) {
+            $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
+            if (!empty($response)) {
+                echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
+                $completed = $response->toArray();
+                foreach ($completed as $wsProduct) {
+                    if (isset($pimProducts[$wsProduct['id'] ?? 0])) {
+                        $pimProducts[$wsProduct['id']]->setWisersellJson(json_encode($wsProduct));
+                        $pimProducts[$wsProduct['id']]->save();
+                    }
+                }
+            }
+        }
+    }
+
 }
