@@ -7,6 +7,7 @@ use SellingPartnerApi\Enums\Endpoint;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 
 use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
