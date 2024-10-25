@@ -96,6 +96,7 @@ class ListingSyncService
                     $this->amazonListings[$asin][$shopId] = $listing;
                 }
             }
+            file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.amazon.txt', print_r($this->amazonListings, true));
         }
 
         $amazonShopIds = $this->connector->storeSyncService->getAmazonShopIds();
