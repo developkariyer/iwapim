@@ -134,7 +134,7 @@ class ListingSyncService
                     continue;
                 }
                 $wsProductId = $listings[$shopId]['product']['id'] ?? null;
-                if ($productId !== $wsProductId && strlen($listings[$shopId]['code'] ?? '')>0) {
+                if ($productId != $wsProductId && strlen($listings[$shopId]['code'] ?? '')>0) {
                     echo "Product ID mismatch for $asin: WS:{$wsProductId} PIM:{$productId}\n";
                     $this->connector->request(
                         Connector::$apiUrl['listing'], 
