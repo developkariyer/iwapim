@@ -36,6 +36,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     private $countryCodes = [];
     private $mainCountry = null;
     private $asinBucket = [];
+    private $iwaskuList = [];
 
     public function __construct(Marketplace $marketplace) 
     {
@@ -248,6 +249,16 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         );
     }
 
+    protected function checkIwasku($iwasku)
+    {
+        if (empty($this->iwaskuList)) {
+            $db = \Pimcore\Db::get();
+            $this->iwaskuList = $db->fetchFirstColumn("SELECT DISTINCT iwasku FROM object_store_product WHERE iwasku IS NOT NULL ORDER BY iwasku");
+            $this->iwaskuList = array_filter( $this->iwaskuList);
+        }
+        return in_array($iwasku, $this->iwaskuList);
+    }
+
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -285,10 +296,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 parent: $this->getFolder($asin),
             );
             $mainProduct = $variantProduct->getMainProduct();
-            if (empty($mainProduct)) {
-                echo "Main product not found\n";
-                continue;
-            }
+            $skuRequired = empty($mainProduct) ? true : false;
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;
@@ -296,6 +304,18 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 foreach ($countryListings as $countryListing) {
                     echo "$country ";
                     $this->processFieldCollection($variantProduct, $countryListing, $country);
+                    if ($skuRequired) {
+                        $sku = explode('_', $countryListing['seller-sku'] ?? '')[0] ?? '';
+                        if ($this->checkIwasku($sku)) {
+                            $mainProduct = Product::getByIwasku($sku, ['limit' => 1]);
+                            if ($mainProduct instanceof Product) {
+                                echo "Adding variant {$variantProduct->getId()} to {$mainProduct->getId()} ";
+                                if ($mainProduct->addVariant($variantProduct)) {
+                                    $skuRequired = false;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             echo "{$variantProduct->getId()} ";
