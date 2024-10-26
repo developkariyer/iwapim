@@ -63,6 +63,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         $variantProducts = $this->marketplace->getVariantProducts();
         foreach ($variantProducts as $variantProduct) {
             $variantProduct->setPublished(false);
+            $variantProduct->save();
         }
         echo "Done.\n";
         $total = count($this->listings);
