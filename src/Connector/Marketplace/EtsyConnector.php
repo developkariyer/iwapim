@@ -59,6 +59,10 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
+        $variantProducts = $this->marketplace->getVariantProducts();
+        foreach ($variantProducts as $variantProduct) {
+            $variantProduct->setPublished(false);
+        }
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $mainListing) {
