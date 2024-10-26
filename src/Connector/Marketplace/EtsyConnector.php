@@ -62,8 +62,10 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         echo "Unpublishing current listings...";
         $variantProducts = $this->marketplace->getVariantProducts();
         foreach ($variantProducts as $variantProduct) {
-            $variantProduct->setPublished(false);
-            $variantProduct->save();
+            if ($variantProduct->isPublished()) {
+                $variantProduct->setPublished(false);
+                $variantProduct->save();
+            }
         }
         echo "Done.\n";
         $total = count($this->listings);
