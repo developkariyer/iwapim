@@ -107,7 +107,7 @@ class VariantProduct extends Concrete
         $key_base.= Utility::sanitizeVariable($variant['attributes'] ?? '');
         $key_base = Utility::sanitizeVariable($key_base,250);
         $key = '';
-        while (VariantProduct::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
+        while (\Pimcore\Object\Model\DataObject\VariantProduct::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
             $key = $key ? $key+1 : 1;
         }
         $this->setKey(trim("$key_base$key"));
@@ -126,6 +126,10 @@ class VariantProduct extends Concrete
         $this->setPublished($variant['published'] ?? false);
         $this->setLastUpdate(Carbon::now());
         try {
+            $tmpVP = \Pimcore\Object\Model\DataObject\VariantProduct::getByPath($this->getFullPath());
+            if ($tmpVP && $tmpVP->getId() !== $this->getId()) {
+                $this->setKey(substr($this->getKey(), 0, 240).'-'.uniqid());
+            }
             $result = $this->save();
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
