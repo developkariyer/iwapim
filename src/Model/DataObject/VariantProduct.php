@@ -125,11 +125,11 @@ class VariantProduct extends Concrete
         $this->setParent($parent);
         $this->setPublished($variant['published'] ?? false);
         $this->setLastUpdate(Carbon::now());
-        try {
+        try {/*
             $tmpVP = \Pimcore\Object\Model\DataObject\VariantProduct::getByPath($this->getFullPath());
             if ($tmpVP && $tmpVP->getId() !== $this->getId()) {
                 $this->setKey(substr($this->getKey(), 0, 240).'-'.uniqid());
-            }
+            }*/
             $result = $this->save();
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";

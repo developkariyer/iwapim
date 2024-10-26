@@ -372,7 +372,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $variantProduct->setPublished(true);
         } else {
             $variantProduct->setPublished(false);
-            $variantProduct->setKey(Utility::sanitizeVariable('(Parent or Inactive) '.$variantProduct->getKey(), 250));
+            $variantProduct->setKey(Utility::sanitizeVariable('(Parent or Inactive) '.$variantProduct->getKey().uniqid(), 250));
         }
         $variantProduct->save();
     }
