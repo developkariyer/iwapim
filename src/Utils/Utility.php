@@ -166,6 +166,12 @@ class Utility
         if ($result) {
             return json_decode($result['json_data'], true);
         }
+        $folders = ['AmazonUS', 'AmazonUK', 'AmazonCA'];
+        foreach ($folders as $folder) {
+            if (file_exists(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$folder}/ASIN_{$fieldName}.json")) {
+                return json_decode(file_get_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$folder}/ASIN_{$fieldName}.json"), true);
+            }
+        }
         return null;
     }
 
