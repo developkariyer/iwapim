@@ -110,7 +110,11 @@ class CacheImagesCommand extends AbstractCommand
 
     protected static function processAmazon($variant)
     {
-        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $json = Utility::retrieveJsonData($variant->getUniqueMarketplaceId());
+        if (empty($json)) {
+            echo "NULL for {$variant->getId()}.\n";
+            return;
+        }
         $listingImageList = [];
         foreach ($json['images'][0]['images'] ?? [] as $image) {
             if ($image['height'] < 1000) {
