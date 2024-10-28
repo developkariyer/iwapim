@@ -19,6 +19,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
     description: 'Imports products from Shopify sites!'
 )]
 
+// TODO : 1. current coin function error
+// 2. current coin automatic update
+
 class PrepareOrderTableCommand extends AbstractCommand
 {
     private $marketplaceListWithIds = [];
@@ -29,6 +32,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_orders to iwa_marketplace_orders_line_items')
             ->addOption('processVariantOrderData',null, InputOption::VALUE_NONE, 'Process variant order data find main product')
             ->addOption('updateCoin',null, InputOption::VALUE_NONE, 'Update current coin')
+            ->addOption('extraColumns',null, InputOption::VALUE_NONE, 'Insert extra columns')
             ;
     }
 
@@ -42,21 +46,31 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->processVariantOrderData();
         }
 
+        // ERRORR!!!!!!!
         if($input->getOption('updateCoin')) {
             $this->updateCurrentCoin();
         }
 
-        //$this->insertClosedAtDiff();
-        //$this->discountValue();
-        //$this->isfullfilled();
-        //$this->productCount();
-        //$this->calculatePrice();
-        //$this->countryCode();
-        //$this->parseUrl();  
-        $this->productQuantity();
+        if($input->getOption('extraColumns')) {
+            $this->extraColumns();
+        }
+
         return Command::SUCCESS;
     }
     
+    protected function extraColumns()
+    {
+        $this->insertClosedAtDiff();
+        $this->discountValue();
+        $this->isfullfilled();
+        $this->productCount();
+        $this->calculatePrice();
+        $this->countryCode();
+        $this->parseUrl();  
+        $this->productQuantity();
+    }
+        
+
     protected function processVariantOrderData()
     {
         if (empty($this->marketplaceListWithIds)) {
