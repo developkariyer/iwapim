@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Connector\Wisersell\Connector;
+use Symfony\Component\Console\Command\Command;
 
 #[AsCommand(
     name: 'app:wisersell',
