@@ -40,7 +40,7 @@ class WisersellCommand extends AbstractCommand
         $processListings = $input->getOption('listings') | $processAll;
         $processProducts = $input->getOption('products') | $processAll;
         $processStores = $input->getOption('stores') | $processListings;
-        $processCategories = $input->getOption('cagetories') | $processProducts;
+        $processCategories = $input->getOption('categories') | $processProducts;
         //actions
         $download = $input->getOption('download');
         $dump = $input->getOption('dump');
