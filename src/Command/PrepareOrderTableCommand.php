@@ -42,6 +42,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->processVariantOrderData();
         }
 
+        // ERRORR!!!!!!!
         if($input->getOption('updateCoin')) {
             $this->updateCurrentCoin();
         }
