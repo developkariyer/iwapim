@@ -42,66 +42,90 @@ class WisersellCommand extends AbstractCommand
         $processStores = $input->getOption('stores') | $processListings;
         $processCategories = $input->getOption('categories') | $processProducts;
         //actions
-        $download = $input->getOption('download');
-        $dump = $input->getOption('dump');
-        $print = $input->getOption('print');
         $sync = $input->getOption('sync');
+        $print = $input->getOption('print');
+        $dump = $input->getOption('dump');
+        $download = $input->getOption('download');
 
         $connector = new Connector();
         // download
-        if ($processStores) {
-            $connector->storeSyncService->load(true);
-        }
-        if ($processCategories) {
-            $connector->categorySyncService->load(true);
-        }
-        if ($processProducts) {
-            $connector->productSyncService->load(true);
-        }
-        if ($processListings) {
-            $connector->listingSyncService->load(true);
+        if ($download) {
+            if (!$processStores && !$processCategories && !$processProducts && !$processListings) {
+                $output->writeln('Download requires stores, categories, products, listings or all.');
+                return Command::FAILURE;
+            }
+            if ($processStores) {
+                $connector->storeSyncService->download();
+            }
+            if ($processCategories) {
+                $connector->categorySyncService->download();
+            }
+            if ($processProducts) {
+                $connector->productSyncService->download();
+            }
+            if ($processListings) {
+                $connector->listingSyncService->download();
+            }
         }
 
         // dump
-        if ($processStores) {
-            $connector->storeSyncService->dump();
-        }
-        if ($processCategories) {
-            $connector->categorySyncService->dump();
-        }
-        if ($processProducts) {
-            $connector->productSyncService->dump();
-        }
-        if ($processListings) {
-            $connector->listingSyncService->dump();
+        if ($dump) {
+            if (!$processStores && !$processCategories && !$processProducts && !$processListings) {
+                $output->writeln('Dump requires stores, categories, products, listings or all.');
+                return Command::FAILURE;
+            }
+            if ($processStores) {
+                $connector->storeSyncService->dump();
+            }
+            if ($processCategories) {
+                $connector->categorySyncService->dump();
+            }
+            if ($processProducts) {
+                $connector->productSyncService->dump();
+            }
+            if ($processListings) {
+                $connector->listingSyncService->dump();
+            }
         }
 
         // print
-        if ($processStores) {
-            print_r($connector->storeSyncService->wisersellStores);
-        }
-        if ($processCategories) {
-            print_r($connector->categorySyncService->wisersellCategories);
-        }
-        if ($processProducts) {
-            print_r($connector->productSyncService->wisersellProducts);
-        }
-        if ($processListings) {
-            print_r($connector->listingSyncService->wisersellListings);
+        if ($print) {
+            if (!$processStores && !$processCategories && !$processProducts && !$processListings) {
+                $output->writeln('Print requires stores, categories, products, listings or all.');
+                return Command::FAILURE;
+            }
+            if ($processStores) {
+                print_r($connector->storeSyncService->wisersellStores);
+            }
+            if ($processCategories) {
+                print_r($connector->categorySyncService->wisersellCategories);
+            }
+            if ($processProducts) {
+                print_r($connector->productSyncService->wisersellProducts);
+            }
+            if ($processListings) {
+                print_r($connector->listingSyncService->wisersellListings);
+            }
         }
 
         // sync
-        if ($processStores) {
-            $connector->storeSyncService->sync();
-        }
-        if ($processCategories) {
-            $connector->categorySyncService->sync();
-        }
-        if ($processProducts) {
-            $connector->productSyncService->sync();
-        }
-        if ($processListings) {
-            $connector->listingSyncService->sync();
+        if ($sync) {
+            if (!$processStores && !$processCategories && !$processProducts && !$processListings) {
+                $output->writeln('Sync requires stores, categories, products, listings or all.');
+                return Command::FAILURE;
+            }
+            if ($processStores) {
+                $connector->storeSyncService->sync();
+            }
+            if ($processCategories) {
+                $connector->categorySyncService->sync();
+            }
+            if ($processProducts) {
+                $connector->productSyncService->sync();
+            }
+            if ($processListings) {
+                $connector->listingSyncService->sync();
+            }
         }
 
         return Command::SUCCESS;
