@@ -53,7 +53,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->calculatePrice();
         //$this->countryCode();
         //$this->parseUrl();  
-        $this->productQuantity();
+        //$this->productQuantity();
         return Command::SUCCESS;
     }
     
