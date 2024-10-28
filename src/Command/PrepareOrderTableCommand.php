@@ -19,6 +19,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
     description: 'Imports products from Shopify sites!'
 )]
 
+// TODO : 1. current coin function error
+// 2. current coin automatic update
+
 class PrepareOrderTableCommand extends AbstractCommand
 {
     private $marketplaceListWithIds = [];
