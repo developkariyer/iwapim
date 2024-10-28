@@ -46,17 +46,26 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->updateCurrentCoin();
         }
 
-        //$this->insertClosedAtDiff();
-        //$this->discountValue();
-        //$this->isfullfilled();
-        //$this->productCount();
-        //$this->calculatePrice();
-        //$this->countryCode();
-        //$this->parseUrl();  
-        //$this->productQuantity();
+        if($input->getOption('extraColumns')) {
+            $this->extraColumns();
+        }
+
         return Command::SUCCESS;
     }
     
+    protected function extraColumns()
+    {
+        $this->insertClosedAtDiff();
+        $this->discountValue();
+        $this->isfullfilled();
+        $this->productCount();
+        $this->calculatePrice();
+        $this->countryCode();
+        $this->parseUrl();  
+        $this->productQuantity();
+    }
+        
+
     protected function processVariantOrderData()
     {
         if (empty($this->marketplaceListWithIds)) {
