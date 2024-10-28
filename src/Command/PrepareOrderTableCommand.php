@@ -46,14 +46,14 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->updateCurrentCoin();
         }
 
-        //$this->insertClosedAtDiff();
+        $this->insertClosedAtDiff();
         //$this->discountValue();
         //$this->isfullfilled();
         //$this->productCount();
         //$this->calculatePrice();
         //$this->countryCode();
         //$this->parseUrl();  
-        $this->productQuantity();
+        //$this->productQuantity();
         return Command::SUCCESS;
     }
     
