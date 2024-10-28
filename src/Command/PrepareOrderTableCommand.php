@@ -51,8 +51,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         //$this->isfullfilled();
         //$this->productCount();
         //$this->calculatePrice();
-        $this->countryCode();
-        //$this->parseUrl();  
+        //$this->countryCode();
+        $this->parseUrl();  
         //$this->productQuantity();
         return Command::SUCCESS;
     }
