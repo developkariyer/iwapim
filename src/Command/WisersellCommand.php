@@ -47,6 +47,18 @@ class WisersellCommand extends AbstractCommand
         $dump = $input->getOption('dump');
         $download = $input->getOption('download');
 
+        $output->writeln('Wisersell API connection and sync');
+        $output->writeln('----------------------------------');
+        $output->writeln('Stores: ' . ($processStores ? 'Yes' : 'No'));
+        $output->writeln('Categories: ' . ($processCategories ? 'Yes' : 'No'));
+        $output->writeln('Products: ' . ($processProducts ? 'Yes' : 'No'));
+        $output->writeln('Listings: ' . ($processListings ? 'Yes' : 'No'));
+        $output->writeln('Sync: ' . ($sync ? 'Yes' : 'No'));
+        $output->writeln('Print: ' . ($print ? 'Yes' : 'No'));
+        $output->writeln('Dump: ' . ($dump ? 'Yes' : 'No'));
+        $output->writeln('Download: ' . ($download ? 'Yes' : 'No'));
+        $output->writeln('----------------------------------');
+        
         $connector = new Connector();
         // download
         if ($download) {
