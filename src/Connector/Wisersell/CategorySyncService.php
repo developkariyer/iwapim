@@ -71,6 +71,13 @@ class CategorySyncService
         ];
     }
 
+    public function dump()
+    {
+        $this->load();
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.wisersell.txt', print_r($this->wisersellCategories, true));
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.pim.txt', print_r($this->pimCategories, true));
+    }
+
     public function addPimCategoryToWisersell($category)
     {
         if (!($category instanceof Category)) {

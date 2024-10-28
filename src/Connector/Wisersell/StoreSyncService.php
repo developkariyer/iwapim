@@ -83,6 +83,13 @@ class StoreSyncService
         ];
     }
 
+    public function dump()
+    {
+        $this->load();
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.wisersell.txt', print_r($this->wisersellStores, true));
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.pim.txt', print_r($this->pimStores, true));
+    }
+    
     public function sync()
     {
         $this->load();
