@@ -101,6 +101,9 @@ class StoreSyncService
             if (!$pimStore instanceof Marketplace) {
                 continue;
             }
+            if ($pimStore->getMarketplaceType() === 'Amazon') {
+                continue;
+            }
             //$pimStore->setWisersellStoreId($wisersellStore['id']);
             //$pimStore->save();
             echo "  Matched Wisersell $storeType $storeId to {$pimStore->getId()} {$pimStore->getKey()}" . PHP_EOL;
@@ -113,7 +116,6 @@ class StoreSyncService
         $shopIds = [];
         foreach ($this->wisersellStores as $wisersellStore) {
             if ($wisersellStore['source']['name'] === 'Amazon') {
-                print_r($wisersellStore);
                 if (strlen($wisersellStore['shopId']) > 5) {
                     $shopIds[] = $wisersellStore['shopId'];
                 }

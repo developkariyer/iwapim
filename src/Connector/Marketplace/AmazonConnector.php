@@ -159,6 +159,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             }        
         } else {
             $this->listings[$asin]['catalog'] = $item;
+            Utility::storeJsonData(0, $asin, $item);
         }
     }
 

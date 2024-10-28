@@ -359,6 +359,8 @@ class ProductSyncService
 
     public function sync($forceUpdate = false)
     {
+        $this->updatePimWisersellIds();
+        $this->loadPimProducts(true);
         $this->load();
         echo "Loaded Products Pim(" . count($this->pimProducts) . ") Wisersell (" . count($this->wisersellProducts) . ")\n";
         $wisersellProducts = $this->wisersellProducts;

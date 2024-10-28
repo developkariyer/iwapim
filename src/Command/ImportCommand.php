@@ -67,7 +67,6 @@ class ImportCommand extends AbstractCommand
             ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
             ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
             ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
-            ->addOption('asins', null, InputOption::VALUE_NONE, 'Downloads ASINs from Amazon.')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Test command.')
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
@@ -188,11 +187,6 @@ class ImportCommand extends AbstractCommand
 
             if ($input->getOption('memory-table')) {
                 return self::prepareShopifyLineItems();
-            }
-
-            if ($input->getOption('asins')) {
-                AmazonConnector::downloadAsins();
-                return Command::SUCCESS;
             }
 
             $marketplaces = self::getMarketplaceObjects();
