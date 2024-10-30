@@ -68,16 +68,16 @@ class WisersellCommand extends AbstractCommand
                 return Command::FAILURE;
             }
             if ($processStores) {
-                $connector->storeSyncService->download();
+                $connector->storeSyncService->load(true);
             }
             if ($processCategories) {
-                $connector->categorySyncService->download();
+                $connector->categorySyncService->load(true);
             }
             if ($processProducts) {
-                $connector->productSyncService->download();
+                $connector->productSyncService->load(true);
             }
             if ($processListings) {
-                $connector->listingSyncService->download();
+                $connector->listingSyncService->load(true);
             }
         }
 
