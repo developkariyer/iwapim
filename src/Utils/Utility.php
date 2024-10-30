@@ -173,11 +173,12 @@ class Utility
     {
         $db = \Pimcore\Db::get();
         try {
-            $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) 
-                ON DUPLICATE KEY UPDATE json_data=?";
+            $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json_data=?";
             $db->query($sql, [$objectId, $fieldName, json_encode($data), json_encode($data)]);
         } catch (\Exception $e) {
             echo $e->getMessage();
+            echo $objectId, '-', $fieldName, '-', json_encode($data);
+            exit;
         }
     }
 
