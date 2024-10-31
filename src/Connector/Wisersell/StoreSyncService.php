@@ -117,18 +117,18 @@ class StoreSyncService
         }
     }
 
-    public function getAmazonShopIds()
+    public function getAmazonStoreIds()
     {
         $this->load();
-        $shopIds = [];
+        $storeIds = [];
         foreach ($this->wisersellStores as $wisersellStore) {
             if ($wisersellStore['source']['name'] === 'Amazon') {
-                if (strlen($wisersellStore['shopId']) > 5) {
-                    $shopIds[] = $wisersellStore['shopId'];
+                if (strlen($wisersellStore['storeId']) > 5) {
+                    $storeIds[] = $wisersellStore['storeId'];
                 }
             }
         }
-        return array_unique($shopIds);
+        return array_unique($storeIds);
     }
 
 }
