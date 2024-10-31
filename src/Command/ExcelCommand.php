@@ -72,8 +72,8 @@ class ExcelCommand extends AbstractCommand
             ];
         }
         echo "\n";
-        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/tmp/products.csv', $data);
-        echo "Products dumped to tmp/products.csv\n";
+        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products.csv', $data);
+        echo "Products dumped to public/products.csv\n";
     }
 
     private function writeCsv($filename, $data)
