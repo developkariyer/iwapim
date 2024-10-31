@@ -8,15 +8,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\VariantProduct;
-
+use App\Connector\Wisersell\Connector;
 
 #[AsCommand(
-    name: 'app:console',
+    name: 'app:wiserconsole',
     description: 'Interactive Wisersell Connection Console',
 )]
-class ConsoleCommand extends AbstractCommand
+class WiserConsoleCommand extends AbstractCommand
 {
 
     protected static function getJwtRemainingTime($jwt): int
@@ -28,11 +26,27 @@ class ConsoleCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $ws = new Connector();
+        $stores = $ws->storeSyncService;
+        $categories = $ws->categorySyncService;
+        $products = $ws->productSyncService;
+        $listings = $ws->listingSyncService;
         $io = new SymfonyStyle($input, $output);
         $io->title('IWAPIM Interactive Shell');
         $context = [];
 
         while (true) {
+            if ($ws instanceof Connector) {
+                $storeStatus = $stores->status();
+                $categoryStatus = $categories->status();
+                $productStatus = $products->status();
+                $listingStatus = $listings->status();
+                echo "Wisersell connected. Token expires in " . self::getJwtRemainingTime($ws->wisersellToken) . " seconds\n";
+                echo "  Stores    :\tWisersell({$storeStatus['wisersell']})    \tPim({$storeStatus['pim']}) ({$storeStatus['expire']}sn)\n";
+                echo "  Categories:\tWisersell({$categoryStatus['wisersell']})    \tPim({$categoryStatus['pim']}) ({$categoryStatus['expire']}sn)\n";
+                echo "  Products  :\tWisersell({$productStatus['wisersell']})\tPim({$productStatus['pim']}) ({$productStatus['expire']}sn)\n";
+                echo "  Listings  :\tWisersell({$listingStatus['wisersell']})\tPim({$listingStatus['pim']}) ({$listingStatus['expire']}sn)\n";
+            }
             $command = $io->ask('');
             if (trim($command) === 'exit') {
                 $io->success('Goodbye!');

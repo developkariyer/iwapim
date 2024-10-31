@@ -87,7 +87,7 @@ class ListingSyncService
                 if ($listing['store']['source']['name'] === 'Amazon') {
                     $asin = $listing['storeproductid'] ?? null;
                     $storeId = $listing['store']['id'] ?? null;
-                    if (strlen($asin)<1 || strlen($storeId)<1) {
+                    if (is_null($asin) || is_null($storeId)) {
                         continue;
                     }
                     if (!isset($this->amazonListings[$asin])) {
