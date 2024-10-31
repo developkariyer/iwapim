@@ -45,9 +45,14 @@ class ExcelCommand extends AbstractCommand
         $products = new Product\Listing();
         $products->setUnpublished(false);
         $products->setCondition('requiresIwasku = true');
+        echo "Loading products...";
         $products = $products->load();
         $data = [];
+        echo "\n";
+        $index = 0;
         foreach ($products as $product) {
+            $index++;
+            echo "\rProcessing product $index";
             $data[] = [
                 'id' => $product->getId(),
                 'key' => $product->getKey(),
@@ -65,7 +70,9 @@ class ExcelCommand extends AbstractCommand
                 'category' => $product->getInheritedField('productCategory'),
             ];
         }
+        echo "\n";
         $this->writeCsv(PIMCORE_PROJECT_ROOT . '/tmp/products.csv', $data);
+        echo "Products dumped to tmp/products.csv\n";
     }
 
     private function writeCsv($filename, $data)
