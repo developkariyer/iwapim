@@ -86,26 +86,22 @@ class ListingSyncService
             foreach ($this->wisersellListings as $listing) {
                 if ($listing['store']['source']['name'] === 'Amazon') {
                     $asin = $listing['storeproductid'] ?? null;
-                    $shopId = $listing['store']['shopId'] ?? null;
-                    if (strlen($asin)<1 || strlen($shopId)<1) {
+                    $storeId = $listing['store']['id'] ?? null;
+                    if (strlen($asin)<1 || strlen($storeId)<1) {
                         continue;
                     }
                     if (!isset($this->amazonListings[$asin])) {
                         $this->amazonListings[$asin] = [];
                     }
-                    $this->amazonListings[$asin][$shopId] = $listing;
+                    $this->amazonListings[$asin][$storeId] = $listing;
                 }
             }
             file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.amazon.txt', print_r($this->amazonListings, true));
         }
 
-        $amazonShopIds = $this->connector->storeSyncService->getAmazonShopIds();
+        $amazonStoreIds = $this->connector->storeSyncService->getAmazonStoreIds();
         foreach ($this->amazonListings as $asin => $listings) {
             echo "\rChecking Amazon listing $asin  ";
-            if ($asin === 'B099QVFJL7') {
-                print_r($listings);
-                sleep(10);
-            }
             if (!isset($listings['pim'])) {
                 echo "Amazon listing not found in PIM for $asin\n";
                 continue;
@@ -123,31 +119,31 @@ class ListingSyncService
                 echo "Main product {$mainProduct->getId()} in PIM not synced with WS for $asin\n";
                 continue;
             }
-            foreach ($amazonShopIds as $shopId) {
-                if (!isset($listings[$shopId])) {
-                    echo "Amazon listing not found in WS shop $shopId for $asin\n";
+            foreach ($amazonStoreIds as $storeId) {
+                if (!isset($listings[$storeId])) {
+                    echo "Amazon listing not found in WS shop $storeId for $asin\n";
                     $this->bucket[] = [
                         'storeproductid' => $asin,
                         'productId' => $productId,
-                        'shopId' => $shopId,
+                        'storeId' => $storeId,
                         'variantCode' => (string) null,
-                        'variantStr' => "Amazon SId: {$shopId} PId:{$asin} VId:- PimId:{$productId}"
+                        'variantStr' => "Amazon SId: {$storeId} PId:{$asin} VId:- PimId:{$productId}"
                     ];
                     if (count($this->bucket) >= 100) {
                         $this->flushListingBucketToWisersell(false);
                     }
                     continue;
                 }
-                $wsProductId = $listings[$shopId]['product']['id'] ?? null;
-                if ((empty($wsProductId) || (int)$productId != (int)$wsProductId) && strlen($listings[$shopId]['code'] ?? '')>0) {
+                $wsProductId = $listings[$storeId]['product']['id'] ?? null;
+                if ((empty($wsProductId) || (int)$productId != (int)$wsProductId) && strlen($listings[$storeId]['code'] ?? '')>0) {
                     echo "Product ID mismatch for $asin: WS:{$wsProductId} PIM:{$productId}\n";
                     $this->connector->request(
                         Connector::$apiUrl['listing'], 
                         'PUT', 
-                        $listings[$shopId]['code'], 
+                        $listings[$storeId]['code'], 
                         [
                             'productId' => $productId,
-                            'shopId' => $shopId,
+                            'storeId' => $storeId,
                         ]
                     );
                     continue;
@@ -229,13 +225,7 @@ class ListingSyncService
             'Trendyol' => $apiResponse['productCode'] ?? null,
             default => null,
         };
-        $shopId = match ($marketplaceType) {
-            'Etsy' => $marketplace->getShopId(),
-            'Amazon' => $marketplace->getMerchantId(),
-            'Shopify' => $marketplace->getShopId(),
-            'Trendyol' => $marketplace->getTrendyolSellerId(),
-            default => null,
-        };
+        $storeId = $marketplace->getWisersellStoreId();
         $variantCode = match ($marketplaceType) {
             'Etsy' => $parentResponse['listing_id'] ?? null,
             'Amazon' => null,
@@ -243,16 +233,16 @@ class ListingSyncService
             'Trendyol' => $apiResponse['platformListingId'] ?? null,
             default => null,
         };
-        if (empty($storeProductId) || empty($shopId) || (empty($variantCode) && $marketplaceType !== 'Amazon') || empty($productId)) {
-            echo "Empty data for {$variantProduct->getId()}: {$marketplaceType}, {$shopId}, {$storeProductId}, {$variantCode}, {$productId}\n";
+        if (empty($storeProductId) || empty($storeId) || (empty($variantCode) && $marketplaceType !== 'Amazon') || empty($productId)) {
+            echo "Empty data for {$variantProduct->getId()}: {$marketplaceType}, {$storeId}, {$storeProductId}, {$variantCode}, {$productId}\n";
             return null;
         }
         return [
             'storeproductid' => $storeProductId,
             'productId' => $productId,
-            'shopId' => $shopId,
+            'storeId' => $storeId,
             'variantCode' => $variantCode,
-            'variantStr' => "{$marketplaceType} SId: {$shopId} PId:{$storeProductId} VId:{$variantCode} PimId:{$productId}"
+            'variantStr' => "{$marketplaceType} SId: {$storeId} PId:{$storeProductId} VId:{$variantCode} PimId:{$productId}"
         ];
     }
 
@@ -265,19 +255,17 @@ class ListingSyncService
             return;
         }
         $listingData = $this->prepareListingData($variantProduct);
-        if (empty($listingData) || empty($listingData['productId']) || empty($listingData['shopId'])) {
+        if (empty($listingData) || empty($listingData['productId']) || empty($listingData['storeId'])) {
             return;
         }
-        //print_r(['code' => $code, 'productId' => $listingData['productId'], 'shopId' => $listingData['shopId']]);
         $response = $this->connector->request(Connector::$apiUrl['listing'], 'PUT', $code, [
             'productId' => $listingData['productId'],
-            'shopId' => $listingData['shopId'],
+            'storeId' => $listingData['storeId'],
         ]);
         if (empty($response) || $response->getStatusCode() !== 200) {
             return;
         }
         $response = $response->toArray();
-        //print_r($response); exit;
         $this->updatePimVariantProduct($response);
     }
 
@@ -300,7 +288,7 @@ class ListingSyncService
     public function addVariantProductToWisersell($variantProduct)
     {
         $listingData = $this->prepareListingData($variantProduct);
-        if (empty($listingData) || empty($listingData['productId']) || empty($listingData['shopId'])) {
+        if (empty($listingData) || empty($listingData['productId']) || empty($listingData['storeId'])) {
             return;
         }
         echo "Adding {$listingData['variantStr']}\n";
@@ -354,9 +342,9 @@ class ListingSyncService
             }
             if (!$variantProduct instanceof VariantProduct) {
                 echo "Variant product not found in PIM for {$code}: ".json_encode($listing)."\n";
-                $shopId = $listing['store']['id'] ?? null;
-                if ($shopId) {
-                    $marketplace = Marketplace::getByWisersellStoreId($shopId, ['limit' => 1]);
+                $storeId = $listing['store']['id'] ?? null;
+                if ($storeId) {
+                    $marketplace = Marketplace::getByWisersellStoreId($storeId, ['limit' => 1]);
                     if ($marketplace instanceof Marketplace) {
                         echo "Deleting {$code} for {$marketplace->getKey()} from WS\n";
                         $this->deleteFromWisersell($code);
