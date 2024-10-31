@@ -15,7 +15,7 @@ use Pimcore\Model\DataObject\Product;
     description: 'Dump excel table'
 )]
 
-class ErrorListingsCommand extends AbstractCommand
+class ExcelCommand extends AbstractCommand
 {
     protected function configure() 
     {
