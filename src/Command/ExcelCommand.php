@@ -44,7 +44,7 @@ class ExcelCommand extends AbstractCommand
     {
         $products = new Product\Listing();
         $products->setUnpublished(false);
-        $products->setCondition('requiredIwasku = true');
+        $products->setCondition('requiresIwasku = true');
         $products = $products->load();
         $data = [];
         foreach ($products as $product) {
