@@ -53,7 +53,11 @@ class ExcelCommand extends AbstractCommand
         foreach ($products as $product) {
             $index++;
             echo "\rProcessing product $index";
-            $data[] = [
+            $category = $product->getInheritedField('productCategory');
+            if (!isset($data[$category])) {
+                $data[$category] = [];
+            }
+            $data[$category][] = [
                 'id' => $product->getId(),
                 'key' => $product->getKey(),
                 'iwasku' => $product->getIwasku(),
@@ -67,12 +71,14 @@ class ExcelCommand extends AbstractCommand
                 'packageDimension2' => $product->getInheritedField('packageDimension2'),
                 'packageDimension3' => $product->getInheritedField('packageDimension3'),
                 'packageWeight' => $product->getInheritedField('packageWeight'),
-                'category' => $product->getInheritedField('productCategory'),
                 'image' => $product->getImageUrl() ? $product->getImageUrl()->getUrl() : '',
             ];
         }
         echo "\n";
-        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products.csv', $data);
+        foreach ($data as $category=>$products) {
+            $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products_' . $category . '.csv', $products);
+            echo "Products dumped to public/products_$category.csv\n";
+        }
         echo "Products dumped to public/products.csv\n";
     }
 
