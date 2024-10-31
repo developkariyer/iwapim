@@ -68,6 +68,7 @@ class ExcelCommand extends AbstractCommand
                 'packageDimension3' => $product->getInheritedField('packageDimension3'),
                 'packageWeight' => $product->getInheritedField('packageWeight'),
                 'category' => $product->getInheritedField('productCategory'),
+                'image' => $product->getImageUrl() ? $product->getImageUrl()->getUrl() : '',
             ];
         }
         echo "\n";
