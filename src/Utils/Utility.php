@@ -178,6 +178,10 @@ class Utility
         } catch (\Exception $e) {
             echo $e->getMessage();
             echo $objectId, '-', $fieldName, '-', json_encode($data);
+            if ($e instanceof \PDOException) {
+                echo "SQLSTATE code: " . $e->errorInfo[0] . "\n";
+                echo "SQL error: " . $e->errorInfo[2] . "\n"; 
+            }
             exit;
         }
     }
