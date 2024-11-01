@@ -59,7 +59,7 @@ class ExcelCommand extends AbstractCommand
             }
             $data[$category][] = [
                 'id' => $product->getId(),
-                'key' => $product->getKey(),
+                'name' => $product->getInheritedField('name'),
                 'iwasku' => $product->getIwasku(),
                 'variationSize' => $product->getVariationSize(),
                 'variationColor' => $product->getVariationColor(),
