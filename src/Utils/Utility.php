@@ -178,6 +178,7 @@ class Utility
         } catch (\Exception $e) {
             echo $e->getMessage();
             echo $objectId, '-', $fieldName, '-', json_encode($data);
+            echo "Bindings: " . json_encode([$objectId, $fieldName, json_encode($data), json_encode($data)]) . "\n";
             exit;
         }
     }
