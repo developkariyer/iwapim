@@ -59,7 +59,7 @@ class ExcelCommand extends AbstractCommand
             }
             $data[$category][] = [
                 'id' => $product->getId(),
-                'name' => $product->getInheritedField('name'),
+                'name' => $product->getProductIdentifier().' '.$product->getInheritedField('name'),
                 'iwasku' => $product->getIwasku(),
                 'variationSize' => $product->getVariationSize(),
                 'variationColor' => $product->getVariationColor(),
@@ -72,6 +72,7 @@ class ExcelCommand extends AbstractCommand
                 'packageDimension3' => $product->getInheritedField('packageDimension3'),
                 'packageWeight' => $product->getInheritedField('packageWeight'),
                 'image' => $product->getImageUrl() ? $product->getImageUrl()->getUrl() : '',
+                'category' => $category,
             ];
         }
         echo "\n";
