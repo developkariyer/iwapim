@@ -420,7 +420,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     {
         $db = \Pimcore\Db::get();
         $lastUpdateAt = $this->getLatestOrderUpdate();
-        $ordersApi = $this->amazonSellerConnector->ordersV0();
+        echo "Last Update: $lastUpdateAt\n";
+        /*$ordersApi = $this->amazonSellerConnector->ordersV0();
         $marketplaceIds = array_map(function($country) {
             return AmazonConstants::amazonMerchant[$country]['id'];
         }, $this->countryCodes);
@@ -466,7 +467,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             $db->rollBack();
             echo $e->getMessage();
-        }
+        }*/
     }
 
     public function downloadInventory(): void
