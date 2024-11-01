@@ -420,7 +420,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     {
         $db = \Pimcore\Db::get();
         $lastUpdateAt = $this->getLatestOrderUpdate();
-        //echo "Last Update: $lastUpdateAt\n";
+        echo "Last Update: $lastUpdateAt\n";
         /*$ordersApi = $this->amazonSellerConnector->ordersV0();
         $marketplaceIds = array_map(function($country) {
             return AmazonConstants::amazonMerchant[$country]['id'];
