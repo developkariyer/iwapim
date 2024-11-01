@@ -75,10 +75,13 @@ class ExcelCommand extends AbstractCommand
             ];
         }
         echo "\n";
+        $flatfile = [];
         foreach ($data as $category=>$products) {
             $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products_' . $category . '.csv', $products);
             echo "Products dumped to public/products_$category.csv\n";
+            $flatfile = array_merge($flatfile, $products);
         }
+        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products.csv', $flatfile);
         echo "Products dumped to public/products.csv\n";
     }
 
