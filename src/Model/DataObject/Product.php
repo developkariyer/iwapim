@@ -414,12 +414,8 @@ class Product extends Concrete
         foreach ($this->getChildren() as $child) {
             if (!$child instanceof Product) {continue;}
             if (!in_array($child->getVariationSize(), $sizes) || !in_array($child->getVariationColor(), $colors)) {
-                if (!$child->getListingItems()) {
-                    $child->delete();
-                } else {
-                    $child->setPublished(false);
-                    $child->save();
-                }
+                $child->setPublished(false);
+                $child->save();
                 continue;
             }
             $matrix[$child->getVariationSize()][$child->getVariationColor()] = true;
