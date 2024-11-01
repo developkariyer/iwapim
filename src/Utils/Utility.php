@@ -174,6 +174,23 @@ class Utility
         $db = \Pimcore\Db::get();
         try {
             $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json_data=?";
+            echo "Debug Query Parameters:\n";
+            echo "Object ID: " . $objectId . "\n";
+            echo "Field Name: " . $fieldName . "\n";
+            echo "JSON Data: " . json_encode($data, JSON_PRETTY_PRINT) . "\n";
+
+            // SQL sorgusu ve parametreleri
+            $params = [
+                'objectId' => $objectId,
+                'fieldName' => $fieldName,
+                'jsonData' => json_encode($data),
+                'jsonDataUpdate' => json_encode($data)
+            ];
+
+            echo "\nSQL Query:\n" . $sql . "\n";
+            echo "\nParameters:\n";
+            print_r($params);
+
             $db->query($sql, [$objectId, $fieldName, json_encode($data), json_encode($data)]);
         } catch (\Exception $e) {
             echo $e->getMessage();
