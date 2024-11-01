@@ -51,33 +51,45 @@ class CatalogController extends FrontendController
         $result = $db->fetchAllAssociative($sql);
         return array_filter(array_column($result, 'productType'));
     }
-
-    protected function getProductQuery($query, $category, &$params = [])
+    
+    protected function getProductQuery($query, $category, &$params = [], $countOnly = false)
     {
-        $sql = "FROM object_store_product osp
+        $sql = "SELECT osp.oo_id, o.id, o.published, o.className, o.type,
+                        (SELECT GROUP_CONCAT(child_osp.iwasku SEPARATOR ',')
+                        FROM object_store_product child_osp
+                        INNER JOIN objects child ON child_osp.oo_id = child.id
+                        WHERE child.parentId = o.id) AS children_iwaskus
+                FROM object_store_product osp
                 INNER JOIN objects o ON osp.oo_id = o.id
                 WHERE o.published = 1
-                AND o.className = 'Product'
-                AND o.type = 'object'
-                AND (SELECT parent.type FROM objects parent WHERE parent.id = o.parentId) = 'folder'";
+                    AND o.className = 'Product'
+                    AND o.type = 'object'
+                    AND (SELECT parent.type FROM objects parent WHERE parent.id = o.parentId) = 'folder'";
+    
         if ($category !== 'all') {
             $sql .= " AND osp.productIdentifier LIKE :category";
             $params['category'] = "$category-%";
         }
+    
         if ($query !== 'all') {
-            $sql .= " AND (osp.productIdentifier LIKE :query OR osp.name LIKE :name)";
+            $sql .= " HAVING (children_iwaskus LIKE :query OR osp.productIdentifier LIKE :query OR osp.name LIKE :query)";
             $params['query'] = "%$query%";
-            $params['name'] = "%$query%";
         }
-        $sql .= " ORDER BY osp.productIdentifier";
+    
+        if ($countOnly) {
+            $sql = "SELECT COUNT(*) AS total_count FROM ($sql) AS result";
+        } else {
+            $sql .= " ORDER BY osp.productIdentifier";
+        }
+    
         return $sql;
     }
-    
+
     protected function getProductCount($query, $category)
     {
         $db = \Pimcore\Db::get();
         $params = [];
-        $sql = "SELECT COUNT(*) AS count " . $this->getProductQuery($query, $category, $params);
+        $sql = $this->getProductQuery(query: $query, category: $category, params: $params, countOnly: true);
         return $db->fetchOne($sql, $params);
     }
     
@@ -87,7 +99,7 @@ class CatalogController extends FrontendController
         $limit = (int) $pageSize;
         $offset = (int) $page * $pageSize;
         $params = [];
-        $sql = "SELECT osp.oo_id " . $this->getProductQuery($query, $category, $params) . " LIMIT $limit OFFSET $offset";
+        $sql = $this->getProductQuery($query, $category, $params) . " LIMIT $limit OFFSET $offset";
         return $db->fetchFirstColumn($sql, $params);
     }
 
