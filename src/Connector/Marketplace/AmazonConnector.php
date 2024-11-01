@@ -143,7 +143,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $asin = $item['asin'] ?? '';
             $this->listings[$asin]['catalog'] = $item;
             Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($item));
-            Utility::storeJsonData(0, $asin, $item);
+            Utility::storeJsonData($this->marketplace->getId(), $asin, $item);
         }
         sleep(1);
     }
@@ -159,7 +159,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             }        
         } else {
             $this->listings[$asin]['catalog'] = $item;
-            Utility::storeJsonData(0, $asin, $item);
+            Utility::storeJsonData($this->marketplace->getId(), $asin, $item);
         }
     }
 
