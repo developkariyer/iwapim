@@ -95,7 +95,7 @@ class CatalogController extends FrontendController
                     }
                     $url = unserialize($listing['urlLink'] ?? '');
                     if ($url instanceof Link && count($album)<24 && strlen($listing['imageUrl'])>0) {
-                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listings['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
+                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
                     }
                 }
             }
