@@ -58,7 +58,7 @@ class CatalogController extends FrontendController
     }
 
     /**
-     * @Route("/catalog/{query?all}/{category?all}/{page?0}", name="catalog")
+     * @Route("/catalog/{query?all}/{category?all}/{page?0}/{pagesize?20}", name="catalog")
      */
     public function catalogAction(Request $request): Response
     {
@@ -71,11 +71,12 @@ class CatalogController extends FrontendController
         $query = $request->get('query');
         $category = $request->get('category');
         $page = $request->get('page');
+        $pageSize = $request->get('pagesize');
 
         $productTypes = $this->getProductTypeOptions();
 
         $catalogCount = $this->getProducts(query: $query, category: $category, countOnly: true);
-        $catalog = $this->getProducts(query: $query, category: $category, page: $page, pageSize: 20);
+        $catalog = $this->getProducts(query: $query, category: $category, page: $page, pageSize: $pageSize);
         $products = [];
         foreach ($catalog as $product) {
             $imageUrl = $this->getThumbnail($product['imageUrl'] ?? '', 'katalog');
@@ -132,6 +133,7 @@ class CatalogController extends FrontendController
             'query' => $query,
             'category' => $category,
             'page' => $page,
+            'pageSize' => $pageSize,
             'productTypes' => $productTypes,
             'products' => $products,
         ]);
