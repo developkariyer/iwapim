@@ -17,7 +17,7 @@ use Pimcore\Model\Asset;
 
 class CatalogController extends FrontendController
 {
-    
+
     protected function getImageAndAlbumAndListings($product)
     {
         $mainImage = null;
@@ -47,60 +47,30 @@ class CatalogController extends FrontendController
     protected function getProductTypeOptions()
     {
         $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT SUBSTRING_INDEX(productIdentifier, '-', 1) AS productType FROM object_product ORDER BY productType";
-        $result = $db->fetchAllAssociative($sql);
-        return array_filter(array_column($result, 'productType'));
+        $sql = "SELECT DISTINCT segment FROM iwa_catalog WHERE segment IS NOT NULL ORDER BY segment";
+        return $db->fetchFirstColumn($sql);
     }
     
-    protected function getProductQuery($query, $category, &$params = [], $countOnly = false)
-    {
-        $sql = "SELECT osp.oo_id, o.id, o.published, o.className, o.type,
-                        (SELECT GROUP_CONCAT(child_osp.iwasku SEPARATOR ',')
-                        FROM object_store_product child_osp
-                        INNER JOIN objects child ON child_osp.oo_id = child.id
-                        WHERE child.parentId = o.id) AS children_iwaskus
-                FROM object_store_product osp
-                INNER JOIN objects o ON osp.oo_id = o.id
-                WHERE o.published = 1
-                    AND o.className = 'Product'
-                    AND o.type = 'object'
-                    AND (SELECT parent.type FROM objects parent WHERE parent.id = o.parentId) = 'folder'";
-    
-        if ($category !== 'all') {
-            $sql .= " AND osp.productIdentifier LIKE :category";
-            $params['category'] = "$category-%";
-        }
-    
-        if ($query !== 'all') {
-            $sql .= " HAVING (children_iwaskus LIKE :query OR osp.productIdentifier LIKE :query OR osp.name LIKE :query)";
-            $params['query'] = "%$query%";
-        }
-    
-        if ($countOnly) {
-            $sql = "SELECT COUNT(*) AS total_count FROM ($sql) AS result";
-        } else {
-            $sql .= " ORDER BY osp.productIdentifier";
-        }
-    
-        return $sql;
-    }
-
-    protected function getProductCount($query, $category)
+    protected function getProducts($query, $category, $page = 0, $pageSize = 20, $countOnly = false)
     {
         $db = \Pimcore\Db::get();
         $params = [];
-        $sql = $this->getProductQuery(query: $query, category: $category, params: $params, countOnly: true);
-        return $db->fetchOne($sql, $params);
-    }
-    
-    protected function getProducts($query, $category, $page, $pageSize = 20)
-    {
-        $db = \Pimcore\Db::get();
         $limit = (int) $pageSize;
         $offset = (int) $page * $pageSize;
-        $params = [];
-        $sql = $this->getProductQuery($query, $category, $params) . " LIMIT $limit OFFSET $offset";
-        return $db->fetchFirstColumn($sql, $params);
+        $sql = "SELECT `id`, `productIdentifier`, `name`, `category`, `segment`, `children` FROM iwa_catalog WHERE 1=1";
+        if ($category !== 'all') {
+            $sql .= " AND (`category` = :category OR `segment` = :category)";	
+            $params['category'] = $category;
+        }
+        if ($query !== 'all') {
+            $sql .= " AND `children` LIKE :query";
+            $params['query'] = "%$query%";
+        }
+        if ($countOnly) {
+            return $db->fetchOne("SELECT COUNT(*) AS total_count FROM ($sql) AS result", $params);
+        } else {
+            return $db->fetchAllAssociative("$sql ORDER BY `key` LIMIT $limit OFFSET $offset", $params);
+        }
     }
 
     /**
@@ -114,43 +84,55 @@ class CatalogController extends FrontendController
 
         $productTypes = $this->getProductTypeOptions();
 
-        $pimProductCount = $this->getProductCount($query, $category);
-        $pimProductIds = $this->getProducts($query, $category, $page, 20);
+        $catalogCount = $this->getProducts(query: $query, category: $category, countOnly: true);
+        $catalog = $this->getProducts(query: $query, category: $category, page: $page, pageSize: 20);
         $products = [];
-        foreach ($pimProductIds as $pimProductId) {
-            $pimProduct = Product::getById($pimProductId);
-            if ($pimProduct->level() > 0) {
-                continue;
-            }
-            [$image, $album, $listings] = $this->getImageAndAlbumAndListings($pimProduct);
-            if (is_null($image)) {
-                if ($pimProduct->getImage()) {
-                    $image = $pimProduct->getImage()->getThumbnail('katalog');
-                } else {
-                    $image = Asset::getById(76678)->getThumbnail('katalog');
+        foreach ($catalog as $product) {
+            $imageUrl = $product['imageUrl'] ?? '';
+            $variationSizeList = $variationColorList = $iwaskuList = $listings = $album = [];
+            $children = json_decode($product['children'], true);
+            foreach ($children as $child) {
+                $variationSizeList[] = $child['variationSize'];
+                $variationColorList[] = $child['variationColor'];
+                $iwaskuList[] = $child['iwasku'];
+                $album[] = $child['imageUrl'] ?? '';
+                foreach ($child['listings'] as $listing) {
+                    $album[] = $listing['imageUrl'] ?? '';
+                    $url = unserialize($listing['urlLink'] ?? '');
+                    if ($url instanceof Link) {
+                        $listings[$listing['marketplaceType'] ?? ''] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$child['iwasku']} | {$child['variationSize']} | {$child['variationColor']}'>{$listing['marketplace']}</a>";
+                    }
                 }
             }
+            $variationSizeList = array_unique($variationSizeList);
+            $variationColorList = array_unique($variationColorList);
+            asort($variationSizeList);
+            asort($variationColorList);
+            if (strlen($imageUrl) == 0) {
+                $imageUrl = $album[0] ?? '';
+            }
+
             $products[] = [
-                'id' => $pimProduct->getId(),
-                'productIdentifier' => $pimProduct->getProductIdentifier(),
-                'name' => $pimProduct->getName(),
-                'variationSizeList' => str_replace("\n", " | ", $pimProduct->getVariationSizeList()),
-                'variationColorList' => str_replace("\n", " | ", $pimProduct->getVariationColorList()),
-                'listings' => $listings,
-                'image' => $image,
-                'album' => $album,
+                'id' => $product['id'],
+                'productIdentifier' => $product['productIdentifier'] ?? '',
+                'name' => $product['name'] ?? '',
+                'variationSizeList' => $variationSizeList,
+                'variationColorList' => $variationColorList,
+                'iwaskus' => $iwaskuList,
+                'listings' => array_unique($listings),
+                'image' => $imageUrl,
+                'album' => array_unique($album),
             ];
         }
 
         return $this->render('catalog/catalog.html.twig', [
-            'pageCount' => ceil($pimProductCount/20),
+            'pageCount' => ceil($catalogCount/20),
             'query' => $query,
             'category' => $category,
             'page' => $page,
             'productTypes' => $productTypes,
             'products' => $products,
         ]);
-
     }
 
 }
