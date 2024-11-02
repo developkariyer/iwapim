@@ -95,7 +95,7 @@ class CatalogController extends FrontendController
                         $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
                     }
                     $url = unserialize($listing['urlLink'] ?? '');
-                    if ($url instanceof Link && count($album)<24 && strlen($listing['imageUrl'])>0) {
+                    if ($url instanceof Link && strlen($listing['imageUrl'])>0) {
                         $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
                     }
                 }
