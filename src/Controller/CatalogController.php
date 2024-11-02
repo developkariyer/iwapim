@@ -71,15 +71,12 @@ class CatalogController extends FrontendController
                 $tooltip = "Size: {$child['variationSize']} | Color: {$child['variationColor']}";
                 $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
                 if (count($album)<24) {
-                    $album[] = $child['imageUrl'] ?? '';
+                    //$album[] = $child['imageUrl'] ?? '';
                 }
                 foreach ($child['listings'] as $listing) {
-                    if (count($album)<24) {
-                        $album[] = $listing['imageUrl'] ?? '';
-                    }
                     $url = unserialize($listing['urlLink'] ?? '');
-                    if ($url instanceof Link) {
-                        $listings[$listing['marketplaceType'] ?? ''] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$child['iwasku']} | {$child['variationSize']} | {$child['variationColor']}'>{$listing['marketplace']}</a>";
+                    if ($url instanceof Link && count($album)<24 && strlen($listing['imageUrl'])>0) {
+                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$child['iwasku']} | {$child['variationSize']} | {$child['variationColor']}'>{$listing['imageUrl']}</a>";
                     }
                 }
             }
@@ -98,7 +95,6 @@ class CatalogController extends FrontendController
                 'variationSizeList' => implode(' | ', $variationSizeList),
                 'variationColorList' => implode(' | ', $variationColorList),
                 'iwaskuList' => implode(' | ', $iwaskuList),
-                'listings' => array_unique($listings),
                 'image' => $imageUrl,
                 'album' => array_unique($album),
             ];

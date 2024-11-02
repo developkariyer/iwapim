@@ -111,7 +111,7 @@
                             <td class="d-none d-md-table-cell" style="width: 320px; vertical-align: top; border: none; padding: 0;">
                                 <div class="product-gallery">
                                     {% for image in product.album %}
-                                        <img src="{{ image }}" alt="thumb1">
+                                        {{ image|raw }}
                                     {% endfor %}
                                 </div>
                             </td>
