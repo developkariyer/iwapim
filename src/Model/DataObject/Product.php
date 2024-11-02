@@ -40,7 +40,6 @@ class Product extends Concrete
         'iwasku',
         'listingItems',
         'brandItems',
-        'bundleItems',
         'wisersellId',
         'wisersellJson',
     ];
