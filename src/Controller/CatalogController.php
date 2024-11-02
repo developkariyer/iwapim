@@ -52,9 +52,11 @@ class CatalogController extends FrontendController
      */
     public function catalogAction(Request $request): Response
     {
-        $placeholderImage = Asset::getByPath('iwapim.png');
+        $placeholderImage = Asset::getByPath('/iwapim.png');
+        error_log(get_class($placeholderImage));
         if ($placeholderImage instanceof Asset) {
             $placeholder = $placeholderImage->getThumbnail('katalog')->getFullPath();
+            error_log($placeholder);
         }
         $query = $request->get('query');
         $category = $request->get('category');
