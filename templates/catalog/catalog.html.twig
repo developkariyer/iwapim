@@ -136,11 +136,11 @@
             <nav>
                 <ul class="pagination">
                     <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pagesize }}">&lt;&lt;</a>
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}">&lt;&lt;</a>
                     </li>
         
                     <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pagesize }}{% else %}#{% endif %}">&lt;</a>
+                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}">&lt;</a>
                     </li>
         
                     {% set start = max(page - 2, 0) %}
@@ -156,16 +156,16 @@
                     
                     {% for i in start..end %}
                         <li class="page-item {% if i == page %}active{% endif %}">
-                            <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pagesize }}">{{ i + 1 }}</a>
+                            <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
                         </li>
                     {% endfor %}
         
                     <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pagesize }}{% else %}#{% endif %}">&gt;</a>
+                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}">&gt;</a>
                     </li>
         
                     <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pagesize }}">&gt;&gt;</a>
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}">&gt;&gt;</a>
                     </li>
                 </ul>
             </nav>
@@ -185,7 +185,7 @@
             if (currentCategory !== 'all') {
                 $('#category-select').val(currentCategory);
             }
-            $('#page-size-select').val('{{ pagesize }}');
+            $('#page-size-select').val('{{ pageSize }}');
             $('#page-size-select').on('change', function() {
                 let selectedPageSize = $(this).val();
                 window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
@@ -193,12 +193,12 @@
             $('#search-box').on('input', function() {
                 let searchQuery = $(this).val().trim();
                 if (searchQuery !== currentQuery) {
-                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pagesize }}`;
+                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
                 }            
             });
             $('#category-select').on('change', function() {
                 let selectedCategory = $(this).val();
-                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pagesize }}`;
+                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
             });
         });
 
