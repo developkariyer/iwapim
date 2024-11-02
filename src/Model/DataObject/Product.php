@@ -105,7 +105,10 @@ class Product extends Concrete
             if (empty($this->$field) && !is_null($this->$field)) {
                 $this->$field = null;
             }
-        }    
+        }
+        foreach (($this->level() ? self::$level1NullFields : self::$level0NullFields) as $field) {
+            $this->$field = null;
+        }
     }
 
     /**
