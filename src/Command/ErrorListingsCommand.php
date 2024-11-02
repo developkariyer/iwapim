@@ -22,9 +22,9 @@ class ErrorListingsCommand extends AbstractCommand
     protected function configure() 
     {
         $this
-            ->addOption('notconnected',null, InputOption::VALUE_NONE, '')
-            ->addOption('multiconnected',null, InputOption::VALUE_NONE, '')
-            ->addOption('unpublish',null, InputOption::VALUE_NONE, '')
+            ->addOption('notconnected',null, InputOption::VALUE_NONE, 'List listings without main product')
+            ->addOption('multiconnected',null, InputOption::VALUE_NONE, 'List listings with multiple main products')
+            ->addOption('unpublish',null, InputOption::VALUE_NONE, 'Move unpublished listings to _Pasif folders');
             ;
     }
 
@@ -45,17 +45,19 @@ class ErrorListingsCommand extends AbstractCommand
     private function unpublishListings()
     {
         $variantObject = new VariantListing();
-        $pageSize = 50;
+        $pageSize = 5;
         $offset = 0;
         $variantObject->setLimit($pageSize);
-        $variantObject->setUnpublished(true);      
+        $variantObject->setUnpublished(true);
+        $index = 0;      
         while (true) {
+            $index++;
+            echo "\rProcessing $index ";
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
             if (empty($results)) {
                 break;
             }
-            echo "Offset $offset to ".($offset+$pageSize)."\n";
             $offset += $pageSize;
             foreach ($results as $object) {
                 $marketplace = $object->getMarketplace();
@@ -66,6 +68,7 @@ class ErrorListingsCommand extends AbstractCommand
                 }
             }
         }
+        echo "\nFinished\n";
     }
 
     private function notConnectedListings()
