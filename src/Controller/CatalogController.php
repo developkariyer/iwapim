@@ -119,7 +119,7 @@ class CatalogController extends FrontendController
                 'name' => $product['name'] ?? '',
                 'variationSizeList' => implode(' | ', $variationSizeList),
                 'variationColorList' => implode(' | ', $variationColorList),
-                'iwaskus' => $iwaskuList,
+                'iwaskuList' => implode(' | ', $iwaskuList),
                 'listings' => array_unique($listings),
                 'image' => $imageUrl,
                 'album' => array_unique($album),
