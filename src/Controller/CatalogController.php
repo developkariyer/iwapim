@@ -55,7 +55,7 @@ class CatalogController extends FrontendController
         $placeholderImage = Asset::getByPath('/iwapim.png');
         error_log(get_class($placeholderImage));
         if ($placeholderImage instanceof Asset) {
-            $placeholder = $placeholderImage->getThumbnail('katalog')->getFullPath();
+            $placeholder = $placeholderImage->getThumbnail('katalog')->getUri();
             error_log($placeholder);
         }
         $query = $request->get('query');
@@ -98,7 +98,7 @@ class CatalogController extends FrontendController
                 if ($productObj instanceof Product) {
                     $image = $productObj->getImage();
                     if ($image instanceof Asset) {
-                        $imageUrl = $image->getThumbnail()->getFullPath();
+                        $imageUrl = $image->getThumbnail()->getUri();
                     }
                 }
             }
