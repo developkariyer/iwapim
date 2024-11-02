@@ -190,6 +190,7 @@ class CleanCommand extends AbstractCommand
         $listingObject->setUnpublished(false);
         $pageSize = 50;
         $offset = 0;
+        $index = 0;
 
         Product::setGetInheritedValues(false);
         DataObject::setGetInheritedValues(false);
@@ -201,6 +202,8 @@ class CleanCommand extends AbstractCommand
                 break;
             }
             foreach ($products as $product) {
+                $index++;
+                echo "\rProcessing: {$index} {$product->getId()}   ";
                 $dirty = false;
                 if ($product->checkProductCode()) {
                     $dirty = true;
@@ -239,9 +242,8 @@ class CleanCommand extends AbstractCommand
                 }
             }
             $offset += $pageSize;
-            echo "\rProcessed {$offset}       ";
         }
-        echo "Processed {$offset} items   \n";
+        echo "Processed {$offset} items                              \n";
     }
 
     private static function linkCheck()
