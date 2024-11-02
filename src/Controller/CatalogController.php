@@ -47,6 +47,16 @@ class CatalogController extends FrontendController
         }
     }
 
+    public function getThumbnail($imageUrl, $size = 'album')
+    {
+        $imagePath = str_replace('https://mesa.iwa.web.tr/var/assets', '', $imageUrl);
+        $image = Asset::getByPath($imagePath);
+        if ($image instanceof Asset) {
+            return $image->getThumbnail($size)->getPath();
+        }
+        return $imageUrl;
+    }
+
     /**
      * @Route("/catalog/{query?all}/{category?all}/{page?0}", name="catalog")
      */
@@ -68,7 +78,7 @@ class CatalogController extends FrontendController
         $catalog = $this->getProducts(query: $query, category: $category, page: $page, pageSize: 20);
         $products = [];
         foreach ($catalog as $product) {
-            $imageUrl = $product['imageUrl'] ?? '';
+            $imageUrl = $this->getThumbnail($product['imageUrl'] ?? '', 'katalog');
             $variationSizeList = $variationColorList = $iwaskuList = $listings = $album = [];
             $children = json_decode($product['children'], true);
             foreach ($children as $child) {
@@ -77,15 +87,15 @@ class CatalogController extends FrontendController
                 $tooltip = "Size: {$child['variationSize']} | Color: {$child['variationColor']}";
                 $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
                 if (strlen($imageUrl) == 0) {
-                    $imageUrl = $child['imageUrl'];
+                    $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
                 }
                 foreach ($child['listings'] as $listing) {
                     if (strlen($imageUrl) == 0) {
-                        $imageUrl = $listing['imageUrl'];
+                        $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
                     }
                     $url = unserialize($listing['urlLink'] ?? '');
                     if ($url instanceof Link && count($album)<24 && strlen($listing['imageUrl'])>0) {
-                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listings['marketplaceType']} | {$tooltip}'><img src='{$listing['imageUrl']}'></a>";
+                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listings['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
                     }
                 }
             }
@@ -98,7 +108,7 @@ class CatalogController extends FrontendController
                 if ($productObj instanceof Product) {
                     $image = $productObj->getImage();
                     if ($image instanceof Asset) {
-                        $imageUrl = $image->getThumbnail()->getPath();
+                        $imageUrl = $image->getThumbnail('katalog')->getPath();
                     }
                 }
             }
