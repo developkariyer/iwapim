@@ -73,11 +73,11 @@
 <body>
 
     <div class="container-fluid">
-        <div class="row my-4">
-            <div class="col-md-6">
+        <div class="row my-4 my-md-4">
+            <div class="col-md-6 mb-3 mb-md-0">
                 <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek arayın...">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 mb-3 mb-md-0">
                 <select class="form-select" id="category-select">
                     <option value="all" selected>Tüm Ürün Tipleri</option>
                     {% for type in productTypes %}
@@ -96,6 +96,7 @@
                 </div>
             </div>
         </div>
+    
 
         <!-- Product catalog container -->
         <div id="catalog-container">
