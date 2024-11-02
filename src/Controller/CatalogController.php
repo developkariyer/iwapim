@@ -69,7 +69,7 @@ class CatalogController extends FrontendController
         if ($countOnly) {
             return $db->fetchOne("SELECT COUNT(*) AS total_count FROM ($sql) AS result", $params);
         } else {
-            return $db->fetchAllAssociative("$sql ORDER BY `key` LIMIT $limit OFFSET $offset", $params);
+            return $db->fetchAllAssociative("$sql ORDER BY `productIdentifier`, `name` LIMIT $limit OFFSET $offset", $params);
         }
     }
 
