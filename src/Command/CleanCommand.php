@@ -224,6 +224,10 @@ class CleanCommand extends AbstractCommand
                                 $product->set($field, null);
                             }
                         }
+                        if (!$product->getRequiresIwasku()) {
+                            $dirty = true;
+                            $product->setRequiresIwasku(true);
+                        }
                         break;
                     default:
                         echo "?{$product->getId()}\n";
