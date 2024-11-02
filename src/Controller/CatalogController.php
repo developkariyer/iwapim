@@ -18,32 +18,6 @@ use Pimcore\Model\Asset;
 class CatalogController extends FrontendController
 {
 
-    protected function getImageAndAlbumAndListings($product)
-    {
-        $mainImage = null;
-        $album = [];
-        $listings = [];
-        foreach ($product->getChildren() as $variant) {
-            foreach ($variant->getListingItems() as $listing) {
-                $url = ($listing && $listing->getUrlLink()) ? $listing->getUrlLink()->getPath() : '';
-                $listings[] = "<a href='{$url}' target='_blank' data-bs-toggle='tooltip' title='{$variant->getIwasku()} | {$variant->getVariationSize()} | {$variant->getVariationColor()}'>{$listing->getMarketplace()->getKey()}</a>";
-                if (count($album) >= 30) {
-                    continue;
-                }
-                foreach ($listing->getImageGallery() as $image) {
-                    if (is_null($mainImage)) {
-                        $mainImage = $image->getImage()->getThumbnail('katalog');
-                    } else {
-                        if (count($album) < 30) {
-                            $album[] = $image->getImage()->getThumbnail('album');
-                        }
-                    }
-                }
-            }
-        }
-        return [$mainImage, $album, $listings];
-    }
-
     protected function getProductTypeOptions()
     {
         $db = \Pimcore\Db::get();
@@ -96,9 +70,13 @@ class CatalogController extends FrontendController
                 $variationColorList[] = $child['variationColor'];
                 $tooltip = "Size: {$child['variationSize']} | Color: {$child['variationColor']}";
                 $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
-                $album[] = $child['imageUrl'] ?? '';
+                if (count($album)<24) {
+                    $album[] = $child['imageUrl'] ?? '';
+                }
                 foreach ($child['listings'] as $listing) {
-                    $album[] = $listing['imageUrl'] ?? '';
+                    if (count($album)<24) {
+                        $album[] = $listing['imageUrl'] ?? '';
+                    }
                     $url = unserialize($listing['urlLink'] ?? '');
                     if ($url instanceof Link) {
                         $listings[$listing['marketplaceType'] ?? ''] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$child['iwasku']} | {$child['variationSize']} | {$child['variationColor']}'>{$listing['marketplace']}</a>";
