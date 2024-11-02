@@ -96,6 +96,9 @@ class CatalogController extends FrontendController
                     }
                 }
             }
+            if (strlen($imageUrl) == 0) {
+                $imageUrl = 'https://mesa.iwa.web.tr/admin/asset/download-image-thumbnail?id=76678&thumbnail=album';
+            }
             $products[] = [
                 'id' => $product['id'],
                 'productIdentifier' => $product['productIdentifier'] ?? '',
