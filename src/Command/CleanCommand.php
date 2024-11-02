@@ -128,7 +128,7 @@ class CleanCommand extends AbstractCommand
         foreach ($listingObject as $variant) {
             $index++;
             if ($variant->getMarketplace()->getMarketplaceType()==="Etsy") {
-           echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
+            echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
             $variant->setPublished(false);
             $variant->save();
 } else echo $index;

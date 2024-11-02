@@ -63,6 +63,9 @@ class ErrorListingsCommand extends AbstractCommand
                 $marketplace = $object->getMarketplace();
                 $marketplaceKey = $marketplace->getKey();
                 if (!$object->isPublished()) {
+                    if ($object->getParent()->getKey() === "_Pasif") {
+                        continue;
+                    }
                     $object->setParent(Utility::checkSetPath("_Pasif",Utility::checkSetPath($marketplaceKey,Utility::checkSetPath("Pazaryerleri"))));
                     $object->save();
                 }
