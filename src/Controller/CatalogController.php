@@ -129,7 +129,7 @@ class CatalogController extends FrontendController
         }
 
         return $this->render('catalog/catalog.html.twig', [
-            'pageCount' => ceil($catalogCount/20),
+            'pageCount' => ceil($catalogCount/$pageSize),
             'query' => $query,
             'category' => $category,
             'page' => $page,
