@@ -120,13 +120,13 @@ class DataObjectListener implements EventSubscriberInterface
         $object = $event->getObject();
         if ($object instanceof Product && $object->getParent()->getKey() !== 'WISERSELL ERROR') {
             Product::setGetInheritedValues(false);
+            if ($object->getParent() instanceof Product) {
+                $object->nullify();
+            }
             $object->checkIwasku();
             $object->checkProductCode();
             $object->checkProductIdentifier();
             $object->checkKey();
-            if ($object->getParent() instanceof Product) {
-                $object->nullify();
-            }
         }
         if ($object instanceof Serial) {
             $object->checkLabel();
