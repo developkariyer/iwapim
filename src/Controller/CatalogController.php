@@ -70,10 +70,13 @@ class CatalogController extends FrontendController
                 $variationColorList[] = $child['variationColor'];
                 $tooltip = "Size: {$child['variationSize']} | Color: {$child['variationColor']}";
                 $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
-                if (count($album)<24) {
-                    //$album[] = $child['imageUrl'] ?? '';
+                if (strlen($imageUrl) == 0) {
+                    $imageUrl = $child['imageUrl'];
                 }
                 foreach ($child['listings'] as $listing) {
+                    if (strlen($imageUrl) == 0) {
+                        $imageUrl = $listing['imageUrl'];
+                    }
                     $url = unserialize($listing['urlLink'] ?? '');
                     if ($url instanceof Link && count($album)<24 && strlen($listing['imageUrl'])>0) {
                         $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$tooltip}'><img src='{$listing['imageUrl']}'></a>";
