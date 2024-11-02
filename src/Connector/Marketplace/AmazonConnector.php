@@ -193,10 +193,10 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $totalCount = count($this->listings);
         $index = 0;
         foreach ($this->listings as $asin=>$listing) {
-            $index++;
+            $index++; /*
             if (empty($listing[$this->mainCountry])) {
                 continue;
-            }
+            }*/
             echo "($index/$totalCount) Downloading $asin ...\n";
             $this->addToAsinBucket($asin, $forceDownload);
         }
