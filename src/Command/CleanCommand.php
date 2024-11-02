@@ -187,7 +187,7 @@ class CleanCommand extends AbstractCommand
     private static function fixProducts()
     {
         $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(true);
+        $listingObject->setUnpublished(false);
         $pageSize = 50;
         $offset = 0;
 
@@ -202,41 +202,26 @@ class CleanCommand extends AbstractCommand
             }
             foreach ($products as $product) {
                 $dirty = false;
+                if ($product->checkProductCode()) {
+                    $dirty = true;
+                }
                 switch ($product->level()) {
                     case 0:
-                        if ($product->checkProductCode()) {
-                            $dirty = true;
-                        }
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
-//                                echo "\nLevel 0 product: {$product->getId()} {$field} is not null\n";
                                 $dirty = true;
                                 $product->set($field, null);
                             }
                         }
                         break;
                     case 1:
-                        if ($product->checkProductCode()) {
-                            $dirty = true;
-                        }
                         if ($product->checkIwasku()) {
                             $dirty = true;
                         }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
-//                                echo "\nLevel 1 product: {$product->getId()} {$field} is not empty\n";
                                 $dirty = true;
                                 $product->set($field, null);
-                            }
-                        }
-                        $size = $product->getVariationSize();
-                        if (preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)cm$/', $size, $matches)) {
-                            $width = $matches[1];
-                            $height = $matches[3];
-                            if (empty($product->getProductDimension1()) || empty($product->getProductDimension2())) {
-                                $product->setProductDimension1($width);
-                                $product->setProductDimension2($height);
-                                $dirty = true;
                             }
                         }
                         break;
