@@ -76,7 +76,7 @@ class CatalogController extends FrontendController
                 foreach ($child['listings'] as $listing) {
                     $url = unserialize($listing['urlLink'] ?? '');
                     if ($url instanceof Link && count($album)<24 && strlen($listing['imageUrl'])>0) {
-                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$child['iwasku']} | {$child['variationSize']} | {$child['variationColor']}'>{$listing['imageUrl']}</a>";
+                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$tooltip}'><img src='{$listing['imageUrl']}'></a>";
                     }
                 }
             }
