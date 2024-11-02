@@ -87,6 +87,15 @@ class CatalogController extends FrontendController
             $variationColorList = array_unique($variationColorList);
             asort($variationSizeList);
             asort($variationColorList);
+            if (strlen($imageUrl) == 0) {
+                $productObj = Product::getById($product['id']);
+                if ($productObj instanceof Product) {
+                    $image = $productObj->getImage();
+                    if ($image instanceof Asset) {
+                        $imageUrl = $image->getThumbnail()->getUri();
+                    }
+                }
+            }
             $products[] = [
                 'id' => $product['id'],
                 'productIdentifier' => $product['productIdentifier'] ?? '',
