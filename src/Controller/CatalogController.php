@@ -87,10 +87,6 @@ class CatalogController extends FrontendController
             $variationColorList = array_unique($variationColorList);
             asort($variationSizeList);
             asort($variationColorList);
-            if (strlen($imageUrl) == 0) {
-                $imageUrl = $album[0] ?? '';
-            }
-
             $products[] = [
                 'id' => $product['id'],
                 'productIdentifier' => $product['productIdentifier'] ?? '',
