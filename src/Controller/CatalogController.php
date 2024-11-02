@@ -84,7 +84,7 @@ class CatalogController extends FrontendController
             foreach ($children as $child) {
                 $variationSizeList[] = $child['variationSize'];
                 $variationColorList[] = $child['variationColor'];
-                $tooltip = urlencode("Size: {$child['variationSize']} | Color: {$child['variationColor']}");
+                $tooltip = htmlspecialchars("Size: {$child['variationSize']} | Color: {$child['variationColor']}");
                 $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
                 if (strlen($imageUrl) == 0) {
                     $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
