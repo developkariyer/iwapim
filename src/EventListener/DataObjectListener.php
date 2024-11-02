@@ -186,25 +186,25 @@ class DataObjectListener implements EventSubscriberInterface
         $image_url = '';
         if ($object instanceof Product) {
             Product::setGetInheritedValues(false);
-            $image_url = self::traverseProducts($object);
-            if (!empty($image_url)) {
-                $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
-            } else {
-                $object->setImageUrl(null);
+            if (empty($object->getImageUrl())) {
+                $image_url = self::traverseProducts($object);
+                if (!empty($image_url)) {
+                    $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
+                } else {
+                    $object->setImageUrl(null);
+                }
             }
             if ($object->level()>0) {
                 $object->setTechnicals(null);
                 $object->setVariationSizeList(null);
                 $object->setVariationColorList(null);
-            }
-            if ($object->level()==0) {
+            } else {
                 [$sizes, $colors] = $object->listVariations();
                 $object->setVariationSizeList(implode("\n", $sizes));
                 $object->setVariationColorList(implode("\n", $colors));
-
-                $l = new Link();
-                $l->setPath('https://iwa.web.tr/report/product/' . $object->getId());
-                $object->setReportLink($l);
+                if (empty($object->getReportLink())) {
+                    $object->setReportLink(static::generateLink('https://iwa.web.tr/report/product/' . $object->getId()));
+                }
             }
         }
         if ($object instanceof GroupProduct) {
