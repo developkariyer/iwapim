@@ -94,7 +94,8 @@ class CatalogController extends FrontendController
             foreach ($children as $child) {
                 $variationSizeList[] = $child['variationSize'];
                 $variationColorList[] = $child['variationColor'];
-                $iwaskuList[] = $child['iwasku'];
+                $tooltip = "Size: {$child['variationSize']} | Color: {$child['variationColor']}";
+                $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
                 $album[] = $child['imageUrl'] ?? '';
                 foreach ($child['listings'] as $listing) {
                     $album[] = $listing['imageUrl'] ?? '';
