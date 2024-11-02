@@ -52,6 +52,10 @@ class CatalogController extends FrontendController
      */
     public function catalogAction(Request $request): Response
     {
+        $placeholderImage = Asset::getByPath('iwapim.png');
+        if ($placeholderImage instanceof Asset) {
+            $placeholder = $placeholderImage->getThumbnail('katalog')->getFullPath();
+        }
         $query = $request->get('query');
         $category = $request->get('category');
         $page = $request->get('page');
@@ -92,12 +96,12 @@ class CatalogController extends FrontendController
                 if ($productObj instanceof Product) {
                     $image = $productObj->getImage();
                     if ($image instanceof Asset) {
-                        $imageUrl = $image->getThumbnail()->getUri();
+                        $imageUrl = $image->getThumbnail()->getFullPath();
                     }
                 }
             }
             if (strlen($imageUrl) == 0) {
-                $imageUrl = 'https://mesa.iwa.web.tr/admin/asset/download-image-thumbnail?id=76678&thumbnail=album';
+                $imageUrl = $placeholder;
             }
             $products[] = [
                 'id' => $product['id'],
