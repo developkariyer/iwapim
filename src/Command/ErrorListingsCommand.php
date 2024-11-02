@@ -51,8 +51,6 @@ class ErrorListingsCommand extends AbstractCommand
         $variantObject->setUnpublished(true);
         $index = 0;      
         while (true) {
-            $index++;
-            echo "\rProcessing $index ";
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
             if (empty($results)) {
@@ -60,12 +58,15 @@ class ErrorListingsCommand extends AbstractCommand
             }
             $offset += $pageSize;
             foreach ($results as $object) {
+                $index++;
+                echo "\rProcessing $index {$object->getId()}";
                 $marketplace = $object->getMarketplace();
                 $marketplaceKey = $marketplace->getKey();
                 if (!$object->isPublished()) {
                     if ($object->getParent()->getKey() === "_Pasif") {
                         continue;
                     }
+                    echo " moving to _Pasif\n";
                     $object->setParent(Utility::checkSetPath("_Pasif",Utility::checkSetPath($marketplaceKey,Utility::checkSetPath("Pazaryerleri"))));
                     $object->save();
                 }
