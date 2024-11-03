@@ -99,6 +99,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
                         'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                         'parentResponseJson' => json_encode($parentResponseJson, JSON_PRETTY_PRINT),
                         'published' => !((bool) $listing['is_deleted'] ?? false),
+                        'sku' => $listing['sku'] ?? '',
                     ],
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,

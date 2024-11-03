@@ -179,6 +179,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'uniqueMarketplaceId' => $listing['id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $this->getPublished($listing),
+                    'sku' => $listing['barcode'] ?? '',
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
