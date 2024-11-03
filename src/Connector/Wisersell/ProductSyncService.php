@@ -126,9 +126,6 @@ class ProductSyncService
                 if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
                     $pimProduct = Product::getByIwasku($wisersellProduct['code'], ['limit' => 1]);
                 }
-                if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
-                    $pimProduct = Product::getByPath("/Ürünler/WISERSELL ERROR/".$wisersellProduct['id']);
-                }
             }
             if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
                 $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
@@ -138,16 +135,15 @@ class ProductSyncService
                 continue;
             }
             $pimProduct = $this->addProductToPim($wisersellProduct);
-            if ($pimProduct instanceof Product) {
-                $wisersellProduct['name'] = "OLMAYAN URUN!";
-                $bucket[] = $wisersellProduct;
-                if (count($bucket) >= 100) {
-                    $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
-                    if (!empty($response)) {
-                        echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
-                    }
-                    $bucket = [];
+            file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt', json_encode($wisersellProduct)."\n", FILE_APPEND);
+            $wisersellProduct['name'] = "OLMAYAN URUN!";
+            $bucket[] = $wisersellProduct;
+            if (count($bucket) >= 100) {
+                $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
+                if (!empty($response)) {
+                    echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
                 }
+                $bucket = [];
             }
         }
         if (!empty($bucket)) {
