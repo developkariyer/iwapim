@@ -42,6 +42,36 @@ class ErrorListingsCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    private function updateMainProductCounts()
+    {
+        $variantObject = new VariantListing();
+        $pageSize = 5;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(true);
+        $index = 0;      
+        while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($results as $object) {
+                $index++;
+                echo "\rProcessing $index {$object->getId()}";
+                $mainProduct = $object->getMainProduct();
+                $mainProductCount = $object->getCountMainProduct();
+                if (count($mainProduct) != $mainProductCount) {
+                    $object->setCountMainProduct(count($mainProduct));
+                    $object->save();
+                    echo " updated\n";
+                }
+            }
+        }
+        echo "\nFinished\n";
+    }
+
     private function unpublishListings()
     {
         $variantObject = new VariantListing();
