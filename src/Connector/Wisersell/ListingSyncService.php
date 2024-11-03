@@ -334,6 +334,10 @@ class ListingSyncService
                 continue;
             }
             $code = trim($listing['code']);
+            if ($code === '16c9d03b8bc83d3ac114a8ccb58bfdf43a666292') {
+                print_r($listing);
+                sleep(10);
+            }
             if (isset($pimListings[$code])) {
                 $variantProduct = VariantProduct::getById($pimListings[$code]['oo_id']);
                 unset($pimListings[$code]);
@@ -403,20 +407,22 @@ class ListingSyncService
     }
 
     public function updatePimCalculatedWisersellCodes()
-    {   // $listings->updatePimCalculatedWisersellCodes()
+    {
         $vpl = new VariantProduct\Listing();
         $vpl->setUnpublished(true);
-        $pageSize = 50;
+        $pageSize = 9;
         $offset = 0;
         $vpl->setLimit($pageSize);
+        $index = 0;
         while (true) {
-            echo "Processing $pageSize from $offset\n";
             $vpl->setOffset($offset);
             $variantProducts = $vpl->load();
             if (empty($variantProducts)) {
                 break;
             }
             foreach ($variantProducts as $variantProduct) {
+                $index++;
+                echo "\rProcessing $index";
                 if ($variantProduct->getMarketplace()->getMarketplaceType() === 'Amazon') {
                     continue;
                 }
@@ -433,6 +439,7 @@ class ListingSyncService
             }
             $offset += $pageSize;
         }
+        echo "\n";
     }
 
     public function deleteFromWisersell($code)
