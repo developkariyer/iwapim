@@ -126,6 +126,9 @@ class ProductSyncService
                 if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
                     $pimProduct = Product::getByIwasku($wisersellProduct['code'], ['limit' => 1]);
                 }
+                if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
+                    $pimProduct = Product::getByPath("/Ürünler/WISERSELL ERROR/".$wisersellProduct['id']);
+                }
             }
             if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
                 $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
