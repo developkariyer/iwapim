@@ -377,7 +377,7 @@ class ListingSyncService
                 echo "pimProductId: $pimProductId\nwisersellProductId: $wisersellProductId\n";
                 sleep(10);
             }
-            if (!is_null($wisersellProductId) && (($wisersellProductId+0) != ($pimProductId+0))) {
+            if (empty($wisersellProductId) || (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
                 $this->updateWisersellListing($variantProduct);
                 continue;
