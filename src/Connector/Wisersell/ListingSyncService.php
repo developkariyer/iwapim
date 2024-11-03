@@ -329,22 +329,12 @@ class ListingSyncService
         $totalCount = count($this->wisersellListings);
         $allStop = false;
         foreach ($this->wisersellListings as $listing) {
-            if ($allStop) {
-                exit;
-            }
             $index++;
             echo "\rSyncing $index of $totalCount  ";
             if ($listing['store']['source']['name'] === 'Amazon') {
                 continue;
             }
             $code = trim($listing['code']);
-            if ($code === '16c9d03b8bc83d3ac114a8ccb58bfdf43a666292') {
-                $allStop = true;
-                echo "\n********************************\n";
-                print_r($listing);
-                echo "\n********************************\n";
-                echo "Isset pimListings[$code]: ".isset($pimListings[$code])."\n";
-            }
             if (isset($pimListings[$code])) {
                 $variantProduct = VariantProduct::getById($pimListings[$code]['oo_id']);
                 unset($pimListings[$code]);
@@ -373,10 +363,6 @@ class ListingSyncService
             }
             $pimProductId = $mainProduct->getWisersellId();
             $wisersellProductId = $listing['product']['id'] ?? null;
-            if ($code === '16c9d03b8bc83d3ac114a8ccb58bfdf43a666292') {
-                echo "pimProductId: $pimProductId\nwisersellProductId: $wisersellProductId\n";
-                sleep(10);
-            }
             if (empty($wisersellProductId) || (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
                 $this->updateWisersellListing($variantProduct);
