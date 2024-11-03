@@ -335,8 +335,10 @@ class ListingSyncService
             }
             $code = trim($listing['code']);
             if ($code === '16c9d03b8bc83d3ac114a8ccb58bfdf43a666292') {
+                echo "\n********************************\n";
                 print_r($listing);
-                sleep(10);
+                echo "\n********************************\n";
+                echo "Isset pimListings[$code]: ".isset($pimListings[$code])."\n";
             }
             if (isset($pimListings[$code])) {
                 $variantProduct = VariantProduct::getById($pimListings[$code]['oo_id']);
@@ -350,8 +352,8 @@ class ListingSyncService
                 if ($storeId) {
                     $marketplace = Marketplace::getByWisersellStoreId($storeId, ['limit' => 1]);
                     if ($marketplace instanceof Marketplace) {
-                        echo "Deleting {$code} for {$marketplace->getKey()} from WS\n";
-                        $this->deleteFromWisersell($code);
+                        echo "(SIMULATE) Deleting {$code} for {$marketplace->getKey()} from WS\n";
+                        //$this->deleteFromWisersell($code);
                     }
                 }
                 continue;
@@ -366,6 +368,10 @@ class ListingSyncService
             }
             $pimProductId = $mainProduct->getWisersellId();
             $wisersellProductId = $listing['product']['id'] ?? null;
+            if ($code === '16c9d03b8bc83d3ac114a8ccb58bfdf43a666292') {
+                echo "pimProductId: $pimProductId\nwisersellProductId: $wisersellProductId\n";
+                sleep(10);
+            }
             if (!is_null($wisersellProductId) && (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
                 $this->updateWisersellListing($variantProduct);
