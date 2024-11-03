@@ -75,7 +75,14 @@ class VariantProduct extends Concrete
             }
             $object = new \Pimcore\Model\DataObject\VariantProduct();
         }
-        $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+        $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+        if ($result && !empty($variant['sku'])) {
+            $product = Product::findOneByField('iwasku', $variant['sku'], unpublished: false);
+            if ($product instanceof Product) {
+                $product->addVariant($object);
+                $product->save();
+            }
+        }
         return $object;
     }
 
@@ -125,11 +132,7 @@ class VariantProduct extends Concrete
         $this->setParent($parent);
         $this->setPublished($variant['published'] ?? false);
         $this->setLastUpdate(Carbon::now());
-        try {/*
-            $tmpVP = \Pimcore\Object\Model\DataObject\VariantProduct::getByPath($this->getFullPath());
-            if ($tmpVP && $tmpVP->getId() !== $this->getId()) {
-                $this->setKey(substr($this->getKey(), 0, 240).'-'.uniqid());
-            }*/
+        try {
             $result = $this->save();
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
