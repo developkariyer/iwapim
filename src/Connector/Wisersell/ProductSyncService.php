@@ -116,6 +116,9 @@ class ProductSyncService
             $wisersellProducts = [$wisersellProducts];
         }
         $bucket = [];
+        if (file_exists(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt')) {
+            unlink(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt');
+        }
         foreach ($wisersellProducts as $wisersellProduct) {
             echo "Adding Wisersell Product to PIM Error: ".json_encode($wisersellProduct)."\n";
             $pimProduct = null;
