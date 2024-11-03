@@ -116,9 +116,7 @@ class ProductSyncService
             $wisersellProducts = [$wisersellProducts];
         }
         $bucket = [];
-        if (file_exists(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt')) {
-            unlink(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt');
-        }
+        $errorProducts = [];
         foreach ($wisersellProducts as $wisersellProduct) {
             echo "Adding Wisersell Product to PIM Error: ".json_encode($wisersellProduct)."\n";
             $pimProduct = null;
@@ -137,8 +135,7 @@ class ProductSyncService
                 $this->updatePimProduct($wisersellProduct);
                 continue;
             }
-            $pimProduct = $this->addProductToPim($wisersellProduct);
-            file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt', json_encode($wisersellProduct)."\n", FILE_APPEND);
+            $errorProducts[] = $wisersellProduct;
             $wisersellProduct['name'] = "OLMAYAN URUN!";
             $bucket[] = $wisersellProduct;
             if (count($bucket) >= 100) {
@@ -155,6 +152,7 @@ class ProductSyncService
                 echo "Updated Wisersell Product bucket with status ". $response->getStatusCode()."\n";
             }
         }
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt', json_encode($errorProducts));
     }
 
     public function addProductToPim($wisersellProduct)
