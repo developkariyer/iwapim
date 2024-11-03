@@ -24,7 +24,8 @@ class ErrorListingsCommand extends AbstractCommand
         $this
             ->addOption('notconnected',null, InputOption::VALUE_NONE, 'List listings without main product')
             ->addOption('multiconnected',null, InputOption::VALUE_NONE, 'List listings with multiple main products')
-            ->addOption('unpublish',null, InputOption::VALUE_NONE, 'Move unpublished listings to _Pasif folders');
+            ->addOption('unpublish',null, InputOption::VALUE_NONE, 'Move unpublished listings to _Pasif folders')
+            ->addOption('updatecount',null, InputOption::VALUE_NONE, 'Update main product count')
             ;
     }
 
@@ -38,6 +39,9 @@ class ErrorListingsCommand extends AbstractCommand
         }
         if ($input->getOption('unpublish')) {
             $this->unpublishListings();
+        }
+        if ($input->getOption('updatecount')) {
+            $this->updateMainProductCounts();
         }
         return Command::SUCCESS;
     }
