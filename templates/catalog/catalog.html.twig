@@ -76,6 +76,7 @@
         <div class="row my-4 my-md-4">
             <div class="col-md-3 mb-3 mb-md-0">
                 <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek arayın...">
+                <button type="button" id="search-button" class="btn btn-primary">Ara</button>
             </div>
             <div class="col-md-3 mb-3 mb-md-0">
                 <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Tüm arama ve filtre bilgilerini sıfırla" onclick="window.location.href='/catalog'">Hepsini Göster</button>
@@ -190,16 +191,17 @@
                 $('#category-select').val(currentCategory);
             }
             $('#page-size-select').val('{{ pageSize }}');
+
             $('#page-size-select').on('change', function() {
                 let selectedPageSize = $(this).val();
                 window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
             });
-            $('#search-box').on('input', function() {
-                let searchQuery = $(this).val().trim();
-                if (searchQuery !== currentQuery) {
-                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
-                }            
+
+            $('#search-button').on('click', function() {
+                let searchQuery = $('#search-box').val().trim();
+                window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
             });
+
             $('#category-select').on('change', function() {
                 let selectedCategory = $(this).val();
                 window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
