@@ -422,7 +422,7 @@ class ListingSyncService
             }
             foreach ($variantProducts as $variantProduct) {
                 $index++;
-                echo "\rProcessing $index";
+                echo "\rProcessing $index {$variantProduct->getId()}  ";
                 if ($variantProduct->getMarketplace()->getMarketplaceType() === 'Amazon') {
                     continue;
                 }
