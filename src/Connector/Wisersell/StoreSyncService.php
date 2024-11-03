@@ -123,8 +123,8 @@ class StoreSyncService
         $storeIds = [];
         foreach ($this->wisersellStores as $wisersellStore) {
             if ($wisersellStore['source']['name'] === 'Amazon') {
-                if (strlen($wisersellStore['storeId']) > 0) {
-                    $storeIds[] = $wisersellStore['storeId'];
+                if (strlen($wisersellStore['id']) > 0) {
+                    $storeIds[] = $wisersellStore['id'];
                 }
             }
         }
