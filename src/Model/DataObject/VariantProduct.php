@@ -77,7 +77,7 @@ class VariantProduct extends Concrete
         }
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
         if ($result && !empty($variant['sku'])) {
-            $product = Product::findOneByField('iwasku', $variant['sku'], unpublished: false);
+            $product = Product::getByIwasku($variant['sku'], ['limit' => 1]);
             if ($product instanceof Product) {
                 $product->addVariant($object);
                 $product->save();
