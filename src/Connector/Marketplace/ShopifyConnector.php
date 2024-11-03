@@ -152,6 +152,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $parent
                 );    
             }
+            if (($mainListing['status'] ?? 'active') !== 'active') {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable('_Pasif'),
+                    $marketplaceFolder
+                );
+            }
             $parentResponseJson = $mainListing;
             if (isset($parentResponseJson['variants'])) {
                 unset($parentResponseJson['variants']);
