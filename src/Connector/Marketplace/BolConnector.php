@@ -265,7 +265,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             
             try {
                 $data = $response->toArray();
-                $orders = $data['orders'];
+                $orders = $data['orders'] ?? [];
                 $db->beginTransaction();
                 foreach ($orders as $order) {
                     $db->executeStatement(
