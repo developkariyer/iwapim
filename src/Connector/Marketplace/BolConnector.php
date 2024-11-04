@@ -253,7 +253,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
-        $threeMonthsAgoTimestamp = strtotime('-90 days');
+        $threeMonthsAgoTimestamp = strtotime('-3 months');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         $now = strtotime('now');
         $now = date('Y-m-d', $now);
