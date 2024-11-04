@@ -409,7 +409,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
                 $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
-    
         }
     }
 
@@ -445,6 +444,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($objectId) {
             return VariantProduct::getById($objectId);
         }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
         return null;
     }
 
@@ -489,6 +489,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             return VariantProduct::getById($objectId);
         }
         echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
     }
 
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku ,$marketplaceType)
@@ -496,6 +497,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $variantObject = match ($marketplaceType) {
             'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
@@ -563,8 +565,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt = $db->prepare($sql);
         $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType]);
     }
-
-   
    
     protected function marketplaceList()
     {
