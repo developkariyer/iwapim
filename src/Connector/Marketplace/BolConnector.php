@@ -278,7 +278,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 try {
                     $data = $response->toArray();
-
                     $orders = $data['orders'] ?? [];
                     foreach ($orders as  &$order) {
                         foreach ($order['orderItems'] as  &$orderItem) {
@@ -292,7 +291,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                             echo "Bol Product ID: $bolProductId\n";
                             $orderItem['bolProductId'] = $bolProductId;
                             usleep(1500000);
-                            break;
                         }
 
                         $orderId = $order['orderId'];
@@ -312,15 +310,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                                 }
                             }
                         }
-
-
-
-
-
                         $order['orderDetail'] = $orderDetail; 
-                        print_r($order);
-
-                        /*$db->beginTransaction();
+                        $db->beginTransaction();
                         $db->executeStatement(
                             "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
@@ -330,27 +321,9 @@ class BolConnector extends MarketplaceConnectorAbstract
                             ]
                         );
                         echo "Inserting order: " . $order['orderId'] . "\n";
-                        
-                        $db->commit();*/
-                        break;
+                        $db->commit();
                         usleep(50000);
                     }
-
-
-
-                    /*$db->beginTransaction();
-                    foreach ($orders as $order) {
-                        $db->executeStatement(
-                            "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                            [
-                                $this->marketplace->getId(),
-                                $order['orderId'],
-                                json_encode($order)
-                            ]
-                        );
-                        echo "Inserting order: " . $order['orderId'] . "\n";
-                    }
-                    $db->commit();*/
                 } catch (\Exception $e) {
                     $db->rollBack();
                     echo "Error: " . $e->getMessage() . "\n";
@@ -358,16 +331,12 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $page++;
                 usleep(3000000);
                 echo "Page $page for date  " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
-                ///*****////////
-                break;
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
             if ($startDate >= $now) {
                 break;
             }
-            ////****////
-            break;
         } while ($startDate < strtotime('now'));
         unset($order); 
 
