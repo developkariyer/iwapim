@@ -303,6 +303,103 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db->query($shopifySql);
     }
 
+    protected static function transferOrdersFromBolcomOrderTable($marketPlaceId,$marketplaceType)
+    {
+        $bolcomSql = "
+        INSERT INTO iwa_bolcom_orders_line_items (
+            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
+            vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
+            shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
+            total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
+            discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
+            current_EUR
+        )
+        SELECT
+            '$marketplaceType',
+            NULL AS marketplace_key,
+            NULL AS product_code,
+            NULL AS parent_product_code,
+            NULL AS product_type,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS created_at,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS closed_at,               
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderId')) AS order_id,
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.ean')) AS product_id,
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS variant_id,
+            NULL AS sku,
+            (
+                CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.unitPrice')) AS DECIMAL(10,2)) +
+                CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.commission')) AS DECIMAL(10,2))
+            ) AS price,
+            'EUR' AS currency,        
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.quantity')) AS quantity,
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.offer.offerId')) AS vendor,
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.title')) AS variant_title,
+            NULL AS total_discount,
+            NULL AS referring_site,
+            NULL AS landing_site,
+            NULL AS subtotal_price,  
+            NULL AS shipping_country,
+            NULL AS shipping_province,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.city')) AS shipping_city,
+            NULL AS shipping_company,
+            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.countryCode')) AS shipping_country_code,
+            NULL AS total_price,
+            NULL AS source_name,
+            NULL AS fulfillments_id,
+            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
+            NULL AS tracking_company,
+            NULL AS discount_code,
+            NULL AS discount_code_type,
+            NULL AS discount_value,
+            NULL AS discount_value_type,
+            NULL AS current_USD,
+            NULL AS current_EUR
+        FROM
+            iwa_marketplace_orders
+            CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
+            CROSS JOIN JSON_TABLE(json, '$.orderDetail.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item_detail
+        WHERE
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) IS NOT NULL
+            AND JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) != 'null'
+            AND JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) != ''
+            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS UNSIGNED) > 0
+            AND marketplace_id = $marketPlaceId
+        ON DUPLICATE KEY UPDATE
+            marketplace_type = VALUES(marketplace_type),
+            created_at = VALUES(created_at),
+            closed_at = VALUES(closed_at),
+            product_id = VALUES(product_id),
+            variant_id = VALUES(variant_id),
+            sku = VALUES(sku),
+            price = VALUES(price),
+            currency = VALUES(currency),
+            quantity = VALUES(quantity),
+            vendor = VALUES(vendor),
+            variant_title = VALUES(variant_title),
+            total_discount = VALUES(total_discount),
+            referring_site = VALUES(referring_site),
+            landing_site = VALUES(landing_site),
+            subtotal_price = VALUES(subtotal_price),
+            shipping_country = VALUES(shipping_country),
+            shipping_province = VALUES(shipping_province),
+            shipping_city = VALUES(shipping_city),
+            shipping_company = VALUES(shipping_company),
+            shipping_country_code = VALUES(shipping_country_code),
+            total_price = VALUES(total_price),
+            source_name = VALUES(source_name),
+            fulfillments_id = VALUES(fulfillments_id),
+            fulfillments_status = VALUES(fulfillments_status),
+            tracking_company = VALUES(tracking_company),
+            discount_code = VALUES(discount_code),
+            discount_code_type = VALUES(discount_code_type),
+            discount_value = VALUES(discount_value),
+            discount_value_type = VALUES(discount_value_type),
+            current_USD = VALUES(current_USD),
+            current_EUR = VALUES(current_EUR);
+            ";
+    }
+
     protected static function fetchVariantInfo($marketplaceType)
     {
         $db = \Pimcore\Db::get();
