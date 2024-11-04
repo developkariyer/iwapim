@@ -399,6 +399,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             current_USD = VALUES(current_USD),
             current_EUR = VALUES(current_EUR);
             ";
+        $db = \Pimcore\Db::get();
+        $db->query($bolcomSql);
     }
 
     protected static function fetchVariantInfo($marketplaceType)
