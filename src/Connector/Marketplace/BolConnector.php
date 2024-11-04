@@ -295,16 +295,30 @@ class BolConnector extends MarketplaceConnectorAbstract
                             break;
                         }
 
-                        echo                             $bolProductId;
                         $orderId = $order['orderId'];
                         $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
                         if ($orderDetailResponse->getStatusCode() !== 200) {
                             echo "Failed to download order detail: " . $orderDetail->getContent() . "\n";
                             continue;
                         }
-                        $orderDetail = $orderDetailResponse->toArray();                        
+
+                        $orderDetail = $orderDetailResponse->toArray();          
+                        foreach ($orderDetail['orderItems'] as &$orderItem) {
+                            $ean = $orderItem['product']['ean'];
+                            foreach ($order['orderItems'] as $item) {
+                                if ($item['ean'] === $ean) {
+                                    $orderItem['bolProductId'] = $item['bolProductId']; 
+                                    break; 
+                                }
+                            }
+                        }
+
+
+
+
+
                         $order['orderDetail'] = $orderDetail; 
-                        //print_r($order);
+                        print_r($order);
 
                         /*$db->beginTransaction();
                         $db->executeStatement(
