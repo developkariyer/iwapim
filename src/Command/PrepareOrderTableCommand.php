@@ -95,7 +95,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->marketplaceList();
         }
         $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
+        $sql = "SELECT DISTINCT marketplace_id FROM iwa_bolcom_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
@@ -103,8 +103,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    //'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
-                    //'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
+                    'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
+                    'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                     'Bolcom' => $this->transferOrdersFromBolcomOrderTable($id,$marketplaceType),
                 };
             }
