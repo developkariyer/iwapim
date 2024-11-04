@@ -70,9 +70,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->productQuantity();
     }
         
-
-   
-
     protected function transferOrders()
     {
         if (empty($this->marketplaceListWithIds)) {
