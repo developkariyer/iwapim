@@ -293,10 +293,9 @@ class BolConnector extends MarketplaceConnectorAbstract
                             $orderItem['bolProductId'] = $bolProductId;
                             usleep(1500000);
                             break;
-
                         }
 
-
+                        echo                             $bolProductId;
                         $orderId = $order['orderId'];
                         $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
                         if ($orderDetailResponse->getStatusCode() !== 200) {
@@ -305,7 +304,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         }
                         $orderDetail = $orderDetailResponse->toArray();                        
                         $order['orderDetail'] = $orderDetail; 
-                        print_r($order);
+                        //print_r($order);
 
                         /*$db->beginTransaction();
                         $db->executeStatement(
