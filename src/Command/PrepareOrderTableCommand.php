@@ -306,6 +306,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function transferOrdersFromBolcomOrderTable($marketPlaceId,$marketplaceType)
     {
+        echo "Bol.com\n";
         $bolcomSql = "
         INSERT INTO iwa_bolcom_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
