@@ -289,6 +289,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                             }
                             $productDetail = $productDetailResponse->toArray();
                             $bolProductId = $productDetail['bolProductId'] ?? '';
+                            echo "Bol Product ID: $bolProductId\n";
                             $orderItem['bolProductId'] = $bolProductId;
                             usleep(1500000);
                             break;
