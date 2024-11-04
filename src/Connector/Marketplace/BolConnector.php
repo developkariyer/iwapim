@@ -253,16 +253,15 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
-        $threeMonthsAgoTimestamp = strtotime('-3 months');
+        $threeMonthsAgoTimestamp = strtotime('-2 months');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         do {
-            $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
+            $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$threeMonthsAgo];
             $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to download orders: " . $response->getContent() . "\n";
                 return;
             }
-            print_r($response->getContent());
             try {
                 $data = $response->toArray();
                 $orders = $data['orders'] ?? [];
