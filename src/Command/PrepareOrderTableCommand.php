@@ -105,7 +105,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $result = match ($marketplaceType) {
                     'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
-                    'Bolcom' => $this->transferOrdersFromBolcomOrderTable($id,$marketplaceType),
+                    'Bol.com' => $this->transferOrdersFromBolcomOrderTable($id,$marketplaceType),
                 };
             }
         }
