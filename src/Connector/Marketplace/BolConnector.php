@@ -278,7 +278,25 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 try {
                     $data = $response->toArray();
+                    // EAN
+
                     $orders = $data['orders'] ?? [];
+                    foreach ($orders as $order) {
+                        $orderId = $order['orderId'];
+                        $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
+                        if ($orderDetailResponse->getStatusCode() !== 200) {
+                            echo "Failed to download order detail: " . $orderDetail->getContent() . "\n";
+                            continue;
+                        }
+                        $orderDetail = $orderDetailResponse->toArray();                        
+                        $order['orderDetail'] = $orderDetail; 
+                        print_r($order);
+
+                       usleep(50000);
+                    }
+
+
+
                     $db->beginTransaction();
                     foreach ($orders as $order) {
                         $db->executeStatement(
@@ -299,12 +317,16 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $page++;
                 usleep(3000000);
                 echo "Page $page for date  " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+                ///*****////////
+                break;
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
             if ($startDate >= $now) {
                 break;
             }
+            ////****////
+            break;
         } while ($startDate < strtotime('now'));
 
 
