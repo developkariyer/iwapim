@@ -253,7 +253,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
-        $threeMonthsAgoTimestamp = strtotime('-1 months -15 days');
+        $threeMonthsAgoTimestamp = strtotime('-2 months -15 days');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         echo "Downloading orders from $threeMonthsAgo\n";
         do {
