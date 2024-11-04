@@ -250,6 +250,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
         do {
