@@ -253,12 +253,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
-        $threeMonthsAgoTimestamp = strtotime('-2 months -15 days');
+        $threeMonthsAgoTimestamp = strtotime('-90 days');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         $now = strtotime('now');
         $now = date('Y-m-d', $now);
-        echo "Downloading orders from $now\n";
-        do {
+        echo "Downloading orders from $threeMonthsAgo\n";
+
+        /*do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
             $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
             if ($response->getStatusCode() !== 200) {
@@ -287,7 +288,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             }
             $page++;
             usleep(200000);
-        } while(count($orders) == 50);
+        } while(count($orders) == 50);*/
 
 
 
