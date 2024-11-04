@@ -251,16 +251,61 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadOrders()
     {
         $this->prepareToken();
-        $page = 1;
         $db = \Pimcore\Db::get();
         $now = strtotime('now');
         $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.latestChangedDateTime'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
+            "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
              FROM iwa_bolcom_orders 
              WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-
+        if ($lastUpdatedAt) {
+            $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
+            $threeMonthsAgo = strtotime('-3 months', $now);
+            $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
+        } else {
+            $startDate = strtotime('-3 months');
+        }
+        $endDate = min(strtotime('+1 day', $startDate), $now);
+        do {
+            $page = 1;
+            do {
+                $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
+                $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
+                if ($response->getStatusCode() !== 200) {
+                    echo "Failed to download orders: " . $response->getContent() . "\n";
+                    return;
+                }
+                try {
+                    $data = $response->toArray();
+                    $orders = $data['orders'] ?? [];
+                    $db->beginTransaction();
+                    foreach ($orders as $order) {
+                        $db->executeStatement(
+                            "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            [
+                                $this->marketplace->getId(),
+                                $order['orderId'],
+                                json_encode($order)
+                            ]
+                        );
+                        echo "Inserting order: " . $order['orderId'] . "\n";
+                    }
+                    $db->commit();
+                } catch (\Exception $e) {
+                    $db->rollBack();
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
+                $page++;
+                usleep(200000);
+                echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+            } while(count($orders) == 50);
+            $startDate = $endDate;
+            $endDate = min(strtotime('+1 day', $startDate), $now);
+            if ($startDate >= $now) {
+                break;
+            }
+        } while ($startDate < strtotime('now'));
 
 
 
