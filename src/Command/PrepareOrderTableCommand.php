@@ -95,7 +95,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->marketplaceList();
         }
         $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT marketplace_id FROM iwa_bolcom_orders";
+        $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
@@ -307,7 +307,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersFromBolcomOrderTable($marketPlaceId,$marketplaceType)
     {
         $bolcomSql = "
-        INSERT INTO iwa_bolcom_orders_line_items (
+        INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
@@ -357,7 +357,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS current_USD,
             NULL AS current_EUR
         FROM
-            iwa_bolcom_orders
+            iwa_marketplace_orders
             CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
             CROSS JOIN JSON_TABLE(json, '$.orderDetail.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item_detail
         WHERE
