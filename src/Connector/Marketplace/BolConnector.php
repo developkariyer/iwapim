@@ -16,9 +16,9 @@ class BolConnector extends MarketplaceConnectorAbstract
         'offerExportUrl' => "/retailer/offers/export/",
         'processStatusUrl' => "/shared/process-status/",
         'productsUrl' => "/retailer/products/",
-        'catalogProductsUrl' => "https://api.bol.com/retailer/content/catalog-products/",
+        'catalogProductsUrl' => "/retailer/content/catalog-products/",
         'commissionUrl' => "/retailer/commission/",
-        'orders' => 'https://api.bol.com/retailer/orders/'
+        'orders' => '/retailer/orders/'
     ];
     public static $marketplaceType = 'Bol.com';
 
