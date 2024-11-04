@@ -280,8 +280,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                     $data = $response->toArray();
 
                     $orders = $data['orders'] ?? [];
-                    foreach ($orders as $order) {
-                        foreach ($order['orderItems'] as $orderItem) {
+                    foreach ($orders as  &$order) {
+                        foreach ($order['orderItems'] as  &$orderItem) {
                             $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$orderItem['ean'].'/product-ids');
                             if ($productDetailResponse->getStatusCode() !== 200) {
                                 echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
@@ -356,7 +356,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             ////****////
             break;
         } while ($startDate < strtotime('now'));
-
+        unset($order); 
 
 
 
