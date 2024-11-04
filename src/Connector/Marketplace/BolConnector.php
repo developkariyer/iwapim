@@ -256,7 +256,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $threeMonthsAgoTimestamp = strtotime('-3 months');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         do {
-            $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$threeMonthsAgo];
+            $params = [ 'page' => $page,'latest-change-date'=>$threeMonthsAgo];
             $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to download orders: " . $response->getContent() . "\n";
