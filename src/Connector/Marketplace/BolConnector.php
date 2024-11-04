@@ -296,7 +296,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $orderId = $order['orderId'];
                         $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
                         if ($orderDetailResponse->getStatusCode() !== 200) {
-                            echo "Failed to download order detail: " . $orderDetail->getContent() . "\n";
+                            echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
                             continue;
                         }
 
