@@ -253,9 +253,8 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
-        $currentDate = new DateTime();
-        $currentDate->modify('-3 months');
-        $threeMonthsAgo = $currentDate->format('Y-m-d');
+        $threeMonthsAgoTimestamp = strtotime('-3 months');
+        $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$threeMonthsAgo];
             $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
