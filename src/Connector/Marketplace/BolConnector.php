@@ -255,12 +255,12 @@ class BolConnector extends MarketplaceConnectorAbstract
         $db = \Pimcore\Db::get();
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
-            $data = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
-            if ($data->getStatusCode() !== 200) {
+            $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
+            if ($response->getStatusCode() !== 200) {
                 echo "Failed to download orders: " . $data->getContent() . "\n";
                 return;
             }
-            $data = json_decode($data->getContent(), true);
+            $data = json_decode($response->getContent(), true);
             print_r($data);
 
             /*$orders = $data['orders'];
