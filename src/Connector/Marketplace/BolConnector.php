@@ -287,11 +287,13 @@ class BolConnector extends MarketplaceConnectorAbstract
                                 echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
                                 continue;
                             }
-                            print_r($productDetailResponse->getContent());
+                            $productDetail = $productDetailResponse->toArray();
+                            $bolProductId = $productDetail['bolProductId'] ?? '';
+                            $orderItem['bolProductId'] = $bolProductId;
+                            usleep(1500000);
                             break;
 
                         }
-
 
 
                         $orderId = $order['orderId'];
@@ -302,7 +304,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         }
                         $orderDetail = $orderDetailResponse->toArray();                        
                         $order['orderDetail'] = $orderDetail; 
-                        //print_r($order);
+                        print_r($order);
 
                         /*$db->beginTransaction();
                         $db->executeStatement(
