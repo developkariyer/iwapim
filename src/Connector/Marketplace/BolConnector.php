@@ -113,9 +113,6 @@ class BolConnector extends MarketplaceConnectorAbstract
     protected function downloadExtra($apiEndPoint, $type, $parameter, $query = [])
     {
         $this->prepareToken();
-        $fullUrl = $apiEndPoint;
-        echo "Requesting URL: " . $fullUrl . "\n";
-        echo "With params: " . json_encode($params) . "\n";
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
         if ($response->getStatusCode() !== 200) {
             echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
@@ -253,11 +250,12 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
-            $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
+            $data = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
             $orders = $data['orders'];
             try {
                 $db->beginTransaction();
@@ -277,6 +275,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 echo "Error: " . $e->getMessage() . "\n";
             }
             $page++;
+            usleep(200000);
         } while(count($orders) == 50);
 
 
