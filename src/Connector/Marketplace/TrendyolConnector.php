@@ -125,7 +125,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
-
         } while ($startDate < strtotime('now'));
     }
 
