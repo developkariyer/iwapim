@@ -59,14 +59,20 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $page = 0;
         $size = 200;
         $now = strtotime('now');
-        $lastUpdatedAt = $db->fetchOne(
+        /*$lastUpdatedAt = $db->fetchOne(
             "SELECT MAX(created_at)
             FROM iwa_marketplace_orders 
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
+        );*/
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
+             FROM iwa_marketplace_orders 
+             WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
         );
 
-        if ($lastUpdatedAt) {
+        /*if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
             $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
@@ -127,7 +133,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 break;
             }
 
-        } while ($startDate < strtotime('now'));
+        } while ($startDate < strtotime('now'));*/
     }
 
     private function getAttributes($listing) {
