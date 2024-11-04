@@ -278,7 +278,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                     // Debug için
                     echo "Inserting order: " . $order['orderId'] . "\n";
                     
-                    $db->executeStatement($sql, $params);
+                    $result = $db->executeStatement($sql, $params);
+                    echo "Affected rows: " . $result . "\n";
                 }
                 $db->commit();
             } catch (\Exception $e) {
