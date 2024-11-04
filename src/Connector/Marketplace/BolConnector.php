@@ -37,14 +37,14 @@ class BolConnector extends MarketplaceConnectorAbstract
             $decodedResponse = json_decode($response->getContent(), true);
             $this->marketplace->setBolJwtToken($decodedResponse['access_token']);
             $this->marketplace->save();
-            $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://api.bol.com/', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->marketplace->getBolJwtToken(),
-                    'Accept' => 'application/vnd.retailer.v10+json',
-                    'Content-Type' => 'application/vnd.retailer.v10+json'
-                ],
-            ]);         
         } 
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://api.bol.com/', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getBolJwtToken(),
+                'Accept' => 'application/vnd.retailer.v10+json',
+                'Content-Type' => 'application/vnd.retailer.v10+json'
+            ],
+        ]);
     }
 
     protected function requestOfferReport()
