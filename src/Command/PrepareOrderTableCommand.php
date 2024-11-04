@@ -306,7 +306,6 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function transferOrdersFromBolcomOrderTable($marketPlaceId,$marketplaceType)
     {
-        echo "Bol.com\n";
         $bolcomSql = "
         INSERT INTO iwa_bolcom_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
@@ -400,8 +399,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             current_USD = VALUES(current_USD),
             current_EUR = VALUES(current_EUR);
             ";
-        $db = \Pimcore\Db::get();
-        $db->query($bolcomSql);
+        try {
+            $db = \Pimcore\Db::get();
+            $result = $db->query($bolcomSql);
+            
+            if ($result) {
+                // Sonuçları işle
+            } else {
+                // Hata varsa, detayları yazdır
+                echo "Sorgu başarısız oldu: " . $db->errorInfo();
+            }
+        } catch (\Exception $e) {
+            echo "Hata: " . $e->getMessage();
+        }
     }
 
     protected static function fetchVariantInfo($marketplaceType)
