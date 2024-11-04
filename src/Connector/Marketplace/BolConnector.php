@@ -305,7 +305,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                             $ean = $orderItem['product']['ean'];
                             foreach ($order['orderItems'] as $item) {
                                 if ($item['ean'] === $ean) {
-                                    $orderItem['bolProductId'] = $item['bolProductId']; 
+                                    $orderItem['product']['bolProductId'] = $item['bolProductId']; 
                                     break; 
                                 }
                             }
