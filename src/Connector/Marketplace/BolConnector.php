@@ -260,9 +260,10 @@ class BolConnector extends MarketplaceConnectorAbstract
                 echo "Failed to download orders: " . $data->getContent() . "\n";
                 return;
             }
-            $data = $response->toArray();
-            $orders = $response;
+            
             try {
+                $data = $response->toArray();
+                $orders = $data['orders'];
                 $db->beginTransaction();
                 foreach ($orders as $order) {
                     $result = $db->executeStatement(
