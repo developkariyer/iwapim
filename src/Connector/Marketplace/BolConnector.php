@@ -322,12 +322,12 @@ class BolConnector extends MarketplaceConnectorAbstract
                         );
                         echo "Inserting order: " . $order['orderId'] . "\n";
                         $db->commit();
-                        usleep(50000);
                     }
                     catch (\Exception $e) {
                         $db->rollBack();
                         echo "Error: " . $e->getMessage() . "\n";
                     }
+                    usleep(50000);
                 } 
                 $page++;
                 usleep(3000000);
@@ -337,6 +337,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
+            this->prepareToken();
         } while ($startDate < strtotime('now'));
         unset($order); 
     }
