@@ -206,14 +206,15 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        print_r($this->listings);
+        /*if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
         }
         $this->getListings(
             $this->downloadOfferReport($forceDownload)
         );
-        Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
+        Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));*/
     }
 
     public function import($updateFlag, $importFlag)
@@ -250,6 +251,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        $page = 1;
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
             $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
