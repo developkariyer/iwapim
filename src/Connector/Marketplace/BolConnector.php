@@ -278,10 +278,22 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 try {
                     $data = $response->toArray();
-                    // EAN
 
                     $orders = $data['orders'] ?? [];
                     foreach ($orders as $order) {
+                        foreach ($orders['orderItems'] as $orderItem) {
+                            $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$orderItem['ean'].'/product-ids');
+                            if ($productDetailResponse->getStatusCode() !== 200) {
+                                echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
+                                continue;
+                            }
+                            print_r($productDetailResponse->getContent());
+                            break;
+
+                        }
+
+
+
                         $orderId = $order['orderId'];
                         $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
                         if ($orderDetailResponse->getStatusCode() !== 200) {
@@ -291,8 +303,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $orderDetail = $orderDetailResponse->toArray();                        
                         $order['orderDetail'] = $orderDetail; 
                         //print_r($order);
-                        $db->beginTransaction();
-                        
+
+                        /*$db->beginTransaction();
                         $db->executeStatement(
                             "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
@@ -303,9 +315,9 @@ class BolConnector extends MarketplaceConnectorAbstract
                         );
                         echo "Inserting order: " . $order['orderId'] . "\n";
                         
-                        $db->commit();
+                        $db->commit();*/
 
-                       usleep(50000);
+                        usleep(50000);
                     }
 
 
