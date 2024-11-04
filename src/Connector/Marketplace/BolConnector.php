@@ -259,6 +259,9 @@ class BolConnector extends MarketplaceConnectorAbstract
         $now = date('Y-m-d', $now);
         echo "Downloading orders from $threeMonthsAgo\n";
 
+        $response = $this->httpClient->request("GET", static::$apiUrl['orders'],'4170089653', ['query' => $params]);
+        print_r($response->getContent());
+
         /*do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
             $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
