@@ -428,6 +428,24 @@ class PrepareOrderTableCommand extends AbstractCommand
         return $values;
     }
 
+    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
+    {
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
+            LIMIT 1;
+        ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        return null;
+    }
+    
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
@@ -522,23 +540,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType]);
     }
 
-    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
-    {
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
-            LIMIT 1;
-        ";
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        return null;
-    }
+   
    
     protected function marketplaceList()
     {
