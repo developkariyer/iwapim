@@ -357,7 +357,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS current_USD,
             NULL AS current_EUR
         FROM
-            iwa_marketplace_orders
+            iwa_bolcom_orders
             CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
             CROSS JOIN JSON_TABLE(json, '$.orderDetail.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item_detail
         WHERE
