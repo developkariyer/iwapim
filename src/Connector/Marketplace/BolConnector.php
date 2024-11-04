@@ -207,7 +207,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         echo "Listings: ";
-        print_r($this->listings);
+        print_r(empty($this->listings));
         /*if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
