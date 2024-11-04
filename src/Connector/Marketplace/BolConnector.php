@@ -261,6 +261,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 return;
             }
             $data = json_decode($data->getContent(), true);
+            print_r($data);
 
             /*$orders = $data['orders'];
             try {
