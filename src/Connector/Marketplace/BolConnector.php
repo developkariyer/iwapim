@@ -256,7 +256,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
             $data = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
-            $orders = $data['orders'];
+            if ($data->getStatusCode() !== 200) {
+                echo "Failed to download orders: " . $data->getContent() . "\n";
+                return;
+            }
+            $data = json_decode($data->getContent(), true);
+
+            /*$orders = $data['orders'];
             try {
                 $db->beginTransaction();
                 foreach ($orders as $order) {
@@ -274,7 +280,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
             }
-            $page++;
+            $page++;*/
             usleep(200000);
         } while(count($orders) == 50);
 
