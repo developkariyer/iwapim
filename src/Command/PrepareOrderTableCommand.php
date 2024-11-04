@@ -71,23 +71,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     }
         
 
-    protected function processVariantOrderData()
-    {
-        if (empty($this->marketplaceListWithIds)) {
-            $this->marketplaceList();
-        }
-        $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
-        foreach ($marketplaceTypes as $marketplaceType) {
-            $values = $this->fetchVariantInfo($marketplaceType);
-            $index = 0;
-            foreach ($values as $row) {
-                $index++;
-                if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
-            }
-    
-        }
-    }
+   
 
     protected function transferOrders()
     {
@@ -411,6 +395,24 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    protected function processVariantOrderData()
+    {
+        if (empty($this->marketplaceListWithIds)) {
+            $this->marketplaceList();
+        }
+        $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
+        foreach ($marketplaceTypes as $marketplaceType) {
+            $values = $this->fetchVariantInfo($marketplaceType);
+            $index = 0;
+            foreach ($values as $row) {
+                $index++;
+                if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
+            }
+    
+        }
+    }
+
     protected static function fetchVariantInfo($marketplaceType)
     {
         $db = \Pimcore\Db::get();
@@ -445,7 +447,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         return null;
     }
-    
+
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
@@ -465,6 +467,28 @@ class PrepareOrderTableCommand extends AbstractCommand
             return VariantProduct::getById($objectId);
         }
         return null;
+    }
+
+    protected static function getBolcomVariantProduct($uniqueMarketplaceId)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product-ids.bolProductId')) = ?
+            LIMIT 1;";
+        
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
     }
 
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku ,$marketplaceType)
