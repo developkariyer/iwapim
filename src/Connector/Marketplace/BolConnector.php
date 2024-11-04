@@ -318,7 +318,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         echo "Inserting order: " . $order['orderId'] . "\n";
                         
                         $db->commit();*/
-
+                        break;
                         usleep(50000);
                     }
 
