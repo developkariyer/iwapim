@@ -261,9 +261,10 @@ class BolConnector extends MarketplaceConnectorAbstract
                 return;
             }
             $data = json_decode($response->getContent(), true);
+            $orders = $data['orders'];
             print_r($data);
 
-            /*$orders = $data['orders'];
+            
             try {
                 $db->beginTransaction();
                 foreach ($orders as $order) {
@@ -281,7 +282,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
             }
-            $page++;*/
+            $page++;
             usleep(200000);
         } while(count($orders) == 50);
 
