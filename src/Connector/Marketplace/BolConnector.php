@@ -260,7 +260,11 @@ class BolConnector extends MarketplaceConnectorAbstract
         echo "Downloading orders from $threeMonthsAgo\n";
 
         $response = $this->httpClient->request("GET", static::$apiUrl['orders'].'/4170089653', ['query' => $params]);
-        print_r($response->getContent());
+        usleep(200000);
+        $data = $response->toArray();
+        echo $data['orderItems'][0]['product']['ean'];
+        //$response2 = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/{$response}'.'/product-ids', ['query' => $params]);
+        //print_r($response->getContent());
 
         /*do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
