@@ -251,6 +251,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadOrders()
     {
         $page = 1;
+        $db = \Pimcore\Db::get();
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL'];
             $data = $this->downloadExtra(static::$apiUrl['orders'], 'GET', '',$params);
