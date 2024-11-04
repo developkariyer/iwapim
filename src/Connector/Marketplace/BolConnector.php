@@ -277,41 +277,41 @@ class BolConnector extends MarketplaceConnectorAbstract
                     echo "Failed to download orders: " . $response->getContent() . "\n";
                     return;
                 }
-                try {
-                    $data = $response->toArray();
-                    $orders = $data['orders'] ?? [];
-                    foreach ($orders as  &$order) {
-                        foreach ($order['orderItems'] as  &$orderItem) {
-                            $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$orderItem['ean'].'/product-ids');
-                            if ($productDetailResponse->getStatusCode() !== 200) {
-                                echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
-                                continue;
-                            }
-                            $productDetail = $productDetailResponse->toArray();
-                            $bolProductId = $productDetail['bolProductId'] ?? '';
-                            $orderItem['bolProductId'] = $bolProductId;
-                            usleep(1500000);
-                        }
-
-                        $orderId = $order['orderId'];
-                        $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
-                        if ($orderDetailResponse->getStatusCode() !== 200) {
-                            echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
+                $data = $response->toArray();
+                $orders = $data['orders'] ?? [];
+                foreach ($orders as  &$order) {
+                    foreach ($order['orderItems'] as  &$orderItem) {
+                        $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$orderItem['ean'].'/product-ids');
+                        if ($productDetailResponse->getStatusCode() !== 200) {
+                            echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
                             continue;
                         }
+                        $productDetail = $productDetailResponse->toArray();
+                        $bolProductId = $productDetail['bolProductId'] ?? '';
+                        $orderItem['bolProductId'] = $bolProductId;
+                        usleep(1500000);
+                    }
 
-                        $orderDetail = $orderDetailResponse->toArray();          
-                        foreach ($orderDetail['orderItems'] as &$orderItem) {
-                            $ean = $orderItem['product']['ean'];
-                            foreach ($order['orderItems'] as $item) {
-                                if ($item['ean'] === $ean) {
-                                    $orderItem['product']['bolProductId'] = $item['bolProductId']; 
-                                    break; 
-                                }
+                    $orderId = $order['orderId'];
+                    $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
+                    if ($orderDetailResponse->getStatusCode() !== 200) {
+                        echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
+                        continue;
+                    }
+
+                    $orderDetail = $orderDetailResponse->toArray();          
+                    foreach ($orderDetail['orderItems'] as &$orderItem) {
+                        $ean = $orderItem['product']['ean'];
+                        foreach ($order['orderItems'] as $item) {
+                            if ($item['ean'] === $ean) {
+                                $orderItem['product']['bolProductId'] = $item['bolProductId']; 
+                                break; 
                             }
                         }
-                        $order['orderDetail'] = $orderDetail; 
-                        $db->beginTransaction();
+                    }
+                    $order['orderDetail'] = $orderDetail; 
+                    $db->beginTransaction();
+                    try {
                         $db->executeStatement(
                             "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
@@ -324,10 +324,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $db->commit();
                         usleep(50000);
                     }
-                } catch (\Exception $e) {
-                    $db->rollBack();
-                    echo "Error: " . $e->getMessage() . "\n";
-                }
+                    catch (\Exception $e) {
+                        $db->rollBack();
+                        echo "Error: " . $e->getMessage() . "\n";
+                    }
+                } 
                 $page++;
                 usleep(3000000);
             } while(count($orders) == 50);
