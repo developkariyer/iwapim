@@ -273,6 +273,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                             json_encode($order)
                         ]
                     );
+                    echo "Inserting order: " . $order['orderId'] . "\n";
                 }
                 $db->commit();
             } catch (\Exception $e) {
