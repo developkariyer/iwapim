@@ -256,6 +256,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $threeMonthsAgoTimestamp = strtotime('-1 months');
         $threeMonthsAgoTimestamp = strtotime('+2 weeks');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
+        echo "Downloading orders from $threeMonthsAgo\n";
         do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$threeMonthsAgo];
             $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
