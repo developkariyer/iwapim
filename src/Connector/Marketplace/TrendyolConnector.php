@@ -66,7 +66,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             [$this->marketplace->getId()]
         );
         if ($lastUpdatedAt) {
-            echo "I am here";
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
             $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
