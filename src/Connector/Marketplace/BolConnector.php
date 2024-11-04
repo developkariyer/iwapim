@@ -269,6 +269,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $endDate = min(strtotime('+1 day', $startDate), $now);
         do {
             $page = 1;
+            echo "Page $page for date  " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
             do {
                 $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>date('Y-m-d', $startDate)];
                 $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
@@ -288,7 +289,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                             }
                             $productDetail = $productDetailResponse->toArray();
                             $bolProductId = $productDetail['bolProductId'] ?? '';
-                            echo "Bol Product ID: $bolProductId\n";
                             $orderItem['bolProductId'] = $bolProductId;
                             usleep(1500000);
                         }
@@ -330,7 +330,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 $page++;
                 usleep(3000000);
-                echo "Page $page for date  " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
