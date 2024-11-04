@@ -253,6 +253,21 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $page = 1;
         $db = \Pimcore\Db::get();
+        $now = strtotime('now');
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.latestChangedDateTime'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
+             FROM iwa_bolcom_orders 
+             WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+
+
+
+
+
+
+
+
         $threeMonthsAgoTimestamp = strtotime('-3 months');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         $now = strtotime('now');
