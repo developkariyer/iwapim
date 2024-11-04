@@ -328,10 +328,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.ean')) AS product_id,
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS variant_id,
             NULL AS sku,
-            (
-                CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.unitPrice')) AS DECIMAL(10,2)) +
-                CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.commission')) AS DECIMAL(10,2))
-            ) AS price,
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.unitPrice')) AS price,
             'EUR' AS currency,        
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.quantity')) AS quantity,
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.offer.offerId')) AS vendor,
