@@ -270,7 +270,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         do {
             $page = 1;
             do {
-                $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
+                $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>date('Y-m-d', $startDate)];
                 $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
                 if ($response->getStatusCode() !== 200) {
                     echo "Failed to download orders: " . $response->getContent() . "\n";
@@ -327,7 +327,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
 
 
-        
+
 
         /*do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
