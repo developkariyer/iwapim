@@ -262,9 +262,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             }
             $data = json_decode($response->getContent(), true);
             $orders = $data['orders'];
-            print_r($data);
-
-            
             try {
                 $db->beginTransaction();
                 foreach ($orders as $order) {
