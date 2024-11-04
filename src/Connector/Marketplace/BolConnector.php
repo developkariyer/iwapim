@@ -313,7 +313,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
 
 
-        $threeMonthsAgoTimestamp = strtotime('-3 months');
+        /*$threeMonthsAgoTimestamp = strtotime('-3 months');
         $threeMonthsAgo = date('Y-m-d', $threeMonthsAgoTimestamp);
         $now = strtotime('now');
         $now = date('Y-m-d', $now);
@@ -323,7 +323,11 @@ class BolConnector extends MarketplaceConnectorAbstract
         usleep(200000);
         $data = $response->toArray();
         $response2 = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$data['orderItems'][0]['product']['ean'].'/product-ids', ['query' => $params]);
-        print_r($response2->getContent());
+        print_r($response2->getContent());*/
+
+
+
+        
 
         /*do {
             $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>$now];
