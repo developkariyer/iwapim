@@ -265,14 +265,20 @@ class BolConnector extends MarketplaceConnectorAbstract
             try {
                 $db->beginTransaction();
                 foreach ($orders as $order) {
-                    $db->executeStatement(
-                        "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                        [
-                            $this->marketplace->getId(),
-                            $order['orderId'],
-                            json_encode($order)
-                        ]
-                    );
+                    $sql = "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) 
+                        VALUES (:marketplace_id, :order_id, :json_data) 
+                        ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                
+                    $params = [
+                        'marketplace_id' => $this->marketplace->getId(),
+                        'order_id' => $order['orderId'],
+                        'json_data' => json_encode($order)
+                    ];
+                    
+                    // Debug için
+                    echo "Inserting order: " . $order['orderId'] . "\n";
+                    
+                    $db->executeStatement($sql, $params);
                 }
                 $db->commit();
             } catch (\Exception $e) {
