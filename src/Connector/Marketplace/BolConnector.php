@@ -337,7 +337,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
-            this->prepareToken();
+            $this->prepareToken();
         } while ($startDate < strtotime('now'));
         unset($order); 
     }
