@@ -57,7 +57,7 @@ class ExcelCommand extends AbstractCommand
         foreach ($products as $product) {
             $index++;
             echo "\rProcessing product $index {$product->getId()} ";
-            if ($products->level() != 1) {
+            if ($product->level() != 1) {
                 continue;
             }
             $data[] = [
