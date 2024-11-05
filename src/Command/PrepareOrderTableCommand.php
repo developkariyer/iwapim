@@ -487,18 +487,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             return null;
         }
 
-        $newVariantProduct = new VariantProduct();
-        //$newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
-        $newVariantProduct->setMainProduct($mainProduct);
-        $newVariantProduct->setTitle("Diger");
-        $newVariantProduct->setPublished(false);
-    
         try {
+            $newVariantProduct = clone $randomMainProduct;
+            $newVariantProduct->setKey($randomMainProduct->getKey() . '-' . uniqid()); 
+            $newVariantProduct->setParent($randomMainProduct->getParent()); 
+            $newVariantProduct->setTitle("Diger");
+            $newVariantProduct->setPublished(true);
+            $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
+    
             $newVariantProduct->save();
             echo "New variant created.\n";
             return $newVariantProduct;
         } catch (\Exception $e) {
-            echo "New variant create error: " . $e->getMessage() . "\n";
+            echo "New variant created error: " . $e->getMessage() . "\n";
             return null;
         }
     }
