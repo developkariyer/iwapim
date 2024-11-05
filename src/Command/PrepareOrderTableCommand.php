@@ -494,7 +494,33 @@ class PrepareOrderTableCommand extends AbstractCommand
         $path = Utility::sanitizeVariable('Diger');
         $parent = Utility::checkSetPath($path, $marketplaceFolder);
         $parent = Utility::checkSetPath(Utility::sanitizeVariable($productId), $parent);
-        $newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
+
+
+
+        $newVariantProduct  = VariantProduct::addUpdateVariant(
+            variant: [
+                'imageUrl' =>  '',
+                'urlLink' =>  '',
+                'salePrice' => 0,
+                'saleCurrency' => '',
+                'title' => 'Diger',
+                'attributes' => '',
+                'uniqueMarketplaceId' => $uniqueMarketplaceId,
+                'apiResponseJson' => '',
+                'published' => false,
+                'sku' => '',
+            ],
+            importFlag: true,
+            updateFlag: true,
+            marketplace: $randomObject->getMarketplace(),
+            parent: $parent
+        );
+        $randomMainProduct->addVariant($newVariantProduct);
+        $randomMainProduct->save();
+        return $newVariantProduct;
+
+
+        /*$newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         $newVariantProduct->setTitle('Diger');
         $newVariantProduct->setPublished(false);
@@ -510,7 +536,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return false;
-        }
+        }*/
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
