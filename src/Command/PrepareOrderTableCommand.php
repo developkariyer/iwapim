@@ -516,34 +516,11 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$newVariantProduct) {
             return null;
         }
-        try {
-            echo "Saving variant:\n";
-            $randomMainProduct[0]->addVariant($newVariantProduct);
-            $randomMainProduct[0]->save();
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
         
+        $randomMainProduct[0]->addVariant($newVariantProduct);
+        $randomMainProduct[0]->save();
         return $newVariantProduct;
 
-
-        /*$newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
-        $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
-        $newVariantProduct->setTitle('Diger');
-        $newVariantProduct->setPublished(false);
-        $newVariantProduct->setMarketplace($randomObject->getMarketplace());
-        $newVariantProduct->setParent($parent);
-        try {
-            $newVariantProduct->save();
-            echo "New variant created";
-            $randomMainProduct->addVariant($newVariantProduct);
-            $randomMainProduct->save();
-            echo "Added variant";
-            return $newVariantProduct;
-        } catch (\Throwable $e) {
-            echo "Error: {$e->getMessage()}\n";
-            return false;
-        }*/
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
