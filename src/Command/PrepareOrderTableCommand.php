@@ -500,7 +500,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $newVariantProduct  = VariantProduct::addUpdateVariant(
             variant: [
                 'imageUrl' =>  '',
-                'urlLink' =>  '',
+                'urlLink' =>  null,
                 'salePrice' => 0,
                 'saleCurrency' => '',
                 'title' => 'Diger',
