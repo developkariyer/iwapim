@@ -467,7 +467,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         return null;*/
 
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
             return $variantProduct;
         }
