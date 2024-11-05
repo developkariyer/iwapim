@@ -488,7 +488,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
 
         $newVariantProduct = new VariantProduct();
-        $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
+        //$newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         $newVariantProduct->setMainProduct($mainProduct);
         $newVariantProduct->setTitle("Diger");
         $newVariantProduct->setPublished(false);
