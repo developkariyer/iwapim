@@ -393,8 +393,8 @@ class ProductSyncService
                 }
             }
             if (isset($wisersellProduct['id'])) {
-                if ($wisersellProduct['name'] === "OLMAYAN URUN!") {
-                    $this->updateWisersellProduct($pimProduct, true);
+                if ($wisersellProduct['name'] !== $pimProduct->getKey()) {
+                    $this->updateWisersellProduct($pimProduct, false);
                     echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ") (name)\n";
                 }
                 unset($wisersellProducts[$wisersellProduct['id']]);
