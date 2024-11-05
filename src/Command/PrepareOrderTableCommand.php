@@ -520,14 +520,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$newVariantProduct) {
             return null;
         }
-        $newVariantProduct->setMainProduct([$mainProductObject]);
-        $newVariantProduct->save();
-       /* try {
+        try {
             $mainProductObject->addVariant($newVariantProduct);
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return null;
-        }*/
+        }
         return $newVariantProduct;
     }
 
