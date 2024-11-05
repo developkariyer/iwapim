@@ -48,7 +48,6 @@ class ExcelCommand extends AbstractCommand
     {
         $products = new Product\Listing();
         $products->setUnpublished(false);
-        $products->setCondition('requiresIwasku = true');
         echo "Loading categories and products...";
         $products = $products->load();
         $data = [];
