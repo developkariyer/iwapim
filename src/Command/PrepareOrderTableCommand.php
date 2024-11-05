@@ -518,9 +518,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$newVariantProduct) {
             return null;
         }
+        echo size($randomMainProduct)."\n";
         if ($newVariantProduct instanceof VariantProduct) {
             $randomMainProduct[0]->addVariant($newVariantProduct);
-            $randomMainProduct->save();
+            $randomMainProduct[0]->save();
         }
        
         return $newVariantProduct;
