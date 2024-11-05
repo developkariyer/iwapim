@@ -46,7 +46,29 @@ class ExcelCommand extends AbstractCommand
 
     private function dumpCategories()
     {
-        
+        $products = new Product\Listing();
+        $products->setUnpublished(false);
+        $products->setCondition('requiresIwasku = true');
+        echo "Loading categories and products...";
+        $products = $products->load();
+        $data = [];
+        echo "\n";
+        $index = 0;
+        foreach ($products as $product) {
+            $index++;
+            echo "\rProcessing product $index {$product->getId()} ";
+            if ($products->level() != 1) {
+                continue;
+            }
+            $data[] = [
+                'id' => $product->getId(),
+                'name' => $product->getInheritedField('productIdentifier').' '.$product->getInheritedField('name'),
+                'category' => $product->getInheritedField('productCategory'),
+            ];
+        }
+        echo "\n";
+        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/categories.csv', $data);
+        echo "Categories dumped to public/categories.csv\n";
     }
 
     private function dumpProducts()
