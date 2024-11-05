@@ -23,6 +23,7 @@ class ExcelCommand extends AbstractCommand
             ->addOption('products',null, InputOption::VALUE_NONE, 'Dump products to tmp/products.csv')
             ->addOption('listings',null, InputOption::VALUE_NONE, 'Dump listings to tmp/listings.csv')
             ->addOption('costs',null, InputOption::VALUE_NONE, 'Dump costs to tmp/costs.csv')
+            ->addOption('categories', null, InputOption::VALUE_NONE, 'Dump categories to tmp/categories.csv')
             ;
     }
 
@@ -37,7 +38,15 @@ class ExcelCommand extends AbstractCommand
         if ($input->getOption('costs')) {
             $this->dumpCosts();
         }
+        if ($input->getOption('categories')) {
+            $this->dumpCategories();
+        }    
         return Command::SUCCESS;
+    }
+
+    private function dumpCategories()
+    {
+        
     }
 
     private function dumpProducts()
