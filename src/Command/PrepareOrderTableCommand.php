@@ -520,11 +520,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         var_dump($randomMainProduct);
         if ($newVariantProduct instanceof VariantProduct) {
-            echo $newVariantProduct;
-            foreach ($newVariantProduct as $variant) {
-                $randomMainProduct->addVariant($newVariantProduct);
-                $randomMainProduct->save();
-            }
+            $randomMainProduct[0]->addVariant($newVariantProduct);
+            $randomMainProduct->save();
         }
        
         return $newVariantProduct;
