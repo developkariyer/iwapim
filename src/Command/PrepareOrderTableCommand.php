@@ -487,21 +487,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             return null;
         }
 
+        $newVariantProduct = new Product();
+        $newVariantProduct->setPublished(false);
+        $newVariantProduct->setParent($randomMainProduct);
+        $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         try {
-            $newVariantProduct = clone $randomMainProduct;
-            $newVariantProduct->setKey($randomMainProduct->getKey() . '-' . uniqid()); 
-            $newVariantProduct->setParent($randomMainProduct->getParent()); 
-            $newVariantProduct->setTitle("Diger");
-            $newVariantProduct->setPublished(true);
-            $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
-    
+            echo "Saving variant\n";
             $newVariantProduct->save();
-            echo "New variant created.\n";
-            return $newVariantProduct;
         } catch (\Exception $e) {
-            echo "New variant created error: " . $e->getMessage() . "\n";
-            return null;
+            echo $e->getMessage();
         }
+
+
+
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
