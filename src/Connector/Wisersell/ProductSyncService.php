@@ -249,7 +249,7 @@ class ProductSyncService
     {
         $this->connector->categorySyncService->load();
         return [
-            "name" => $product->getInheritedField('name'),
+            "name" => $product->getKey(),
             "code" => $product->getIwasku(),
             "categoryId" => $this->connector->categorySyncService->getWisersellCategoryId($product->getInheritedField('productCategory')),
             "weight" => $product->getInheritedField("packageWeight"),
