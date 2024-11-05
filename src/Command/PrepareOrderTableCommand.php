@@ -516,8 +516,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$newVariantProduct) {
             return null;
         }
-        $randomMainProduct[0]->addVariant($newVariantProduct);
-        $randomMainProduct[0]->save();
+        try {
+            echo "Saving variant:\n";
+            $randomMainProduct[0]->addVariant($newVariantProduct);
+            $randomMainProduct[0]->save();
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+        
         return $newVariantProduct;
 
 
