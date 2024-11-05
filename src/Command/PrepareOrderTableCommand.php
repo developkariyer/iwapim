@@ -493,9 +493,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         );
         $path = Utility::sanitizeVariable('Diger');
         $parent = Utility::checkSetPath($path, $marketplaceFolder);
-        if ($listing['productMainId']) {
-            $parent = Utility::checkSetPath(Utility::sanitizeVariable($productId), $parent);
-        }
+        $parent = Utility::checkSetPath(Utility::sanitizeVariable($productId), $parent);
         $newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         $newVariantProduct->setTitle('Diger');
