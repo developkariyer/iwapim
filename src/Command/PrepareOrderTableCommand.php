@@ -488,12 +488,15 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
-        $newVariantProduct->setMainProduct($randomMainProduct);
+        //$newVariantProduct->setMainProduct($randomMainProduct);
         $newVariantProduct->setTitle('Diger');
         $newVariantProduct->setPublished(false);
         try {
             $newVariantProduct->save();
             echo "New variant created";
+            $randomMainProduct->addVariant($newVariantProduct);
+            $randomMainProduct->save();
+            echo "Added variant"
             return $newVariantProduct;
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
