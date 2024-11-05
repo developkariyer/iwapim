@@ -515,7 +515,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             marketplace: $randomObject->getMarketplace(),
             parent: $parent
         );
-        $randomMainProduct->addVariant([$newVariantProduct]);
+        $randomMainProduct->addVariant($newVariantProduct);
         $randomMainProduct->save();
         return $newVariantProduct;
 
