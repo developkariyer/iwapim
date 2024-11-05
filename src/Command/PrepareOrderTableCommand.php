@@ -405,7 +405,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             foreach ($values as $row) {
                 $index++;
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
+                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$row['variant_title'],$marketplaceType);
             }
         }
     }
@@ -417,7 +417,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT 
                 DISTINCT variant_id,
                 product_id,
-                sku
+                sku,
+                variant_title
             FROM
                 iwa_marketplace_orders_line_items
             WHERE 
@@ -446,7 +447,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
+    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku, $variantTitle)
     {
         /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
@@ -494,16 +495,13 @@ class PrepareOrderTableCommand extends AbstractCommand
         $path = Utility::sanitizeVariable('Diger');
         $parent = Utility::checkSetPath($path, $marketplaceFolder);
         $parent = Utility::checkSetPath(Utility::sanitizeVariable($productId), $parent);
-
-
-
         $newVariantProduct  = VariantProduct::addUpdateVariant(
             variant: [
                 'imageUrl' =>  '',
                 'urlLink' =>  null,
                 'salePrice' => 0,
                 'saleCurrency' => '',
-                'title' => 'Diger',
+                'title' => $variantTitle,
                 'attributes' => '',
                 'uniqueMarketplaceId' => $uniqueMarketplaceId,
                 'apiResponseJson' => '',
@@ -568,10 +566,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku ,$marketplaceType)
+    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $variantTitle, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku,$variantTitle),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
             default => null,
