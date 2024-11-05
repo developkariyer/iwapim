@@ -491,7 +491,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             Utility::sanitizeVariable($randomObject->getMarketplace()->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
-        $category = $randomMainProduct->getCategory();
+        $category = $randomMainProduct->getProductCategory();
         $path = Utility::sanitizeVariable($category ?? 'Tasnif-Edilmemiş');
         $parent = Utility::checkSetPath($path, $marketplaceFolder);
         if ($listing['productMainId']) {
