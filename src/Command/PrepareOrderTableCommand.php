@@ -449,6 +449,10 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku, $variantTitle)
     {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
         /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
