@@ -484,8 +484,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$randomObject) {
             return null;
         }
-        $randomMainProduct = $randomObject->getMainProduct();
-        if (!$randomMainProduct) {
+        $mainProductObjectArray = $randomObject->getMainProduct();
+        if (!$mainProductObjectArray) {
+            return null;
+        }
+        $mainProductObject = reset($mainProductObjectArray);
+        if (!$mainProductObject instanceof Product) {
             return null;
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -517,8 +521,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             return null;
         }
         try {
-            $randomMainProduct[0]->addVariant($newVariantProduct);
-            $randomMainProduct[0]->save();
+            $mainProductObject->addVariant($newVariantProduct);
+            $mainProductObject->save();
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return null;
