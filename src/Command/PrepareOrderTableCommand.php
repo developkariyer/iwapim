@@ -447,7 +447,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -463,7 +463,44 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($objectId) {
             return VariantProduct::getById($objectId);
         }
-        return null;
+        return null;*/
+
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?
+            LIMIT 1; ";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$productId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        $randomObject = VariantProduct::getById($objectId);
+        if (!$randomObject) {
+            return null;
+        }
+        $randomMainProduct = $randomObject->getMainProduct();
+        if (!$randomMainProduct) {
+            return null;
+        }
+
+        $newVariantProduct = new VariantProduct();
+        $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
+        $newVariantProduct->setMainProduct($mainProduct);
+        $newVariantProduct->setTitle("Diger");
+        $newVariantProduct->setPublished(false);
+    
+        try {
+            $newVariantProduct->save();
+            echo "New variant created.\n";
+            return $newVariantProduct;
+        } catch (\Exception $e) {
+            echo "New variant create error: " . $e->getMessage() . "\n";
+            return null;
+        }
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
