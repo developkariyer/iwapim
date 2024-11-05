@@ -57,13 +57,13 @@ class ExcelCommand extends AbstractCommand
         foreach ($products as $product) {
             $index++;
             echo "\rProcessing product $index {$product->getId()} ";
-            if ($product->level()) {
+            if ($product->level()>0) {
                 continue;
             }
             $data[] = [
                 'id' => $product->getId(),
-                'name' => $product->getInheritedField('productIdentifier').' '.$product->getInheritedField('name'),
-                'category' => $product->getInheritedField('productCategory'),
+                'name' => $product->getProductIdentifier().' '.$product->getName(),
+                'category' => $product->getProductCategory(),
             ];
         }
         echo "\n";
