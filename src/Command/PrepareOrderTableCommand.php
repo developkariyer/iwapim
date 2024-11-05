@@ -500,6 +500,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         $newVariantProduct->setTitle('Diger');
         $newVariantProduct->setPublished(false);
+        $newVariantProduct->setMarketplace($randomObject->getMarketplace());
         $newVariantProduct->setParent($parent);
         try {
             $newVariantProduct->save();
