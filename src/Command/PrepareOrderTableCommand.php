@@ -488,7 +488,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
-        //$newVariantProduct->setMainProduct($randomMainProduct);
         $newVariantProduct->setTitle('Diger');
         $newVariantProduct->setPublished(false);
         try {
