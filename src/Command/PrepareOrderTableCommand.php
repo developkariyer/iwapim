@@ -467,7 +467,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         return null;*/
 
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -527,7 +527,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "Error: {$e->getMessage()}\n";
             return null;
         }
-        return $newVariantProduct;
+        return $newVariantProduct;*/
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
