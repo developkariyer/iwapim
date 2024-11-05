@@ -489,7 +489,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
         $newVariantProduct = new Product();
         $newVariantProduct->setPublished(false);
-        $newVariantProduct->setParent($randomMainProduct);
+        $newVariantProduct->setMainProduct($randomMainProduct);
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         try {
             echo "Saving variant\n";
