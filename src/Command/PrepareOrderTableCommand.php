@@ -447,7 +447,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -463,9 +463,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($objectId) {
             return VariantProduct::getById($objectId);
         }
-        return null;
+        return null;*/
 
-        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -486,10 +486,21 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$randomMainProduct) {
             return null;
         }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($randomObject->getMarketplace()->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $category = $randomMainProduct->getCategory();
+        $path = Utility::sanitizeVariable($category ?? 'Tasnif-Edilmemiş');
+        $parent = Utility::checkSetPath($path, $marketplaceFolder);
+        if ($listing['productMainId']) {
+            $parent = Utility::checkSetPath(Utility::sanitizeVariable($productId), $parent);
+        }
         $newVariantProduct = new \Pimcore\Model\DataObject\VariantProduct();
         $newVariantProduct->setUniqueMarketplaceId($uniqueMarketplaceId);
         $newVariantProduct->setTitle('Diger');
         $newVariantProduct->setPublished(false);
+        $newVariantProduct->setParent($parent);
         try {
             $newVariantProduct->save();
             echo "New variant created";
@@ -500,7 +511,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return false;
-        }*/
+        }
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
