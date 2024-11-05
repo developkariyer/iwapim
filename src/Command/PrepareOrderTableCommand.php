@@ -447,7 +447,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
-        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -463,9 +463,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($objectId) {
             return VariantProduct::getById($objectId);
         }
-        return null;*/
+        return null;
 
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -500,7 +500,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return false;
-        }
+        }*/
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
