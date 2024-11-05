@@ -496,7 +496,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "New variant created";
             $randomMainProduct->addVariant($newVariantProduct);
             $randomMainProduct->save();
-            echo "Added variant"
+            echo "Added variant";
             return $newVariantProduct;
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
