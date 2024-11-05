@@ -255,7 +255,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $now = strtotime('now');
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
-             FROM iwa_bolcom_orders 
+             FROM iwa_marketplace_orders 
              WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
@@ -313,7 +313,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                     $db->beginTransaction();
                     try {
                         $db->executeStatement(
-                            "INSERT INTO iwa_bolcom_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
                                 $this->marketplace->getId(),
                                 $order['orderId'],
