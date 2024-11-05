@@ -522,7 +522,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         try {
             $mainProductObject->addVariant($newVariantProduct);
-            $mainProductObject->save();
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return null;
