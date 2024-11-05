@@ -485,7 +485,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             return null;
         }
         $randomMainProduct = $randomObject->getMainProduct();
-        if (!$randomMainProduct instanceof Product) {
+        if (!$randomMainProduct) {
             return null;
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -516,11 +516,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$newVariantProduct) {
             return null;
         }
-        
-        $randomMainProduct[0]->addVariant($newVariantProduct);
-        $randomMainProduct[0]->save();
+        try {
+            $randomMainProduct[0]->addVariant($newVariantProduct);
+            $randomMainProduct[0]->save();
+        } catch (\Throwable $e) {
+            echo "Error: {$e->getMessage()}\n";
+            return null;
+        }
         return $newVariantProduct;
-
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
