@@ -394,8 +394,8 @@ class ProductSyncService
             }
             if (isset($wisersellProduct['id'])) {
                 if ($wisersellProduct['name'] !== $pimProduct->getKey()) {
+                    echo "{$wisersellProduct['name']} !== {$pimProduct->getKey()}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $this->updateWisersellProduct($pimProduct, false);
-                    echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ") (name)\n";
                 }
                 unset($wisersellProducts[$wisersellProduct['id']]);
                 if ($forceUpdate) {
