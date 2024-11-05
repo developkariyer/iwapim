@@ -517,13 +517,12 @@ class PrepareOrderTableCommand extends AbstractCommand
             marketplace: $randomObject->getMarketplace(),
             parent: $parent
         );
-        echo $newVariantProduct->getId() . "\n";
-        echo $mainProductObject->getId() . "\n";
         if (!$newVariantProduct) {
             return null;
         }
         try {
-            $mainProductObject->addVariant($newVariantProduct);
+            $result = $mainProductObject->addVariant($newVariantProduct);
+            echo "Result: $result\n";
         } catch (\Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return null;
