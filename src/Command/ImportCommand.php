@@ -215,7 +215,7 @@ class ImportCommand extends AbstractCommand
                         if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
                             continue;
                         }
-                        if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Ebay') {
+                        if (!self::$ebayFlag && $marketplace->getMarketplaceType() === 'Ebay') {
                             continue;
                         }
                     }
