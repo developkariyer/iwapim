@@ -536,7 +536,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
     {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
             return $variantProduct;
         }
