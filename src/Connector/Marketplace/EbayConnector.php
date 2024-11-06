@@ -20,7 +20,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"),
-                    'Accept' => 'application/json'
+                    'Content-Type' => 'application/x-www-form-urlencoded'
                 ]
             ]);
             print_r($response->getContent());
