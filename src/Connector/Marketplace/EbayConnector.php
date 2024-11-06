@@ -47,7 +47,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"),
                     'Content-Type' => 'application/x-www-form-urlencoded'
                 ],
-                'form_params' => [
+                'data' => [
                     'grant_type' => 'client_credentials',
                     'scope' => $scopeString
                 ]
