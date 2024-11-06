@@ -19,11 +19,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
         if (!Utility::checkJwtTokenValidity($this->marketplace->getEbayAccessToken())) {
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
-                    'Authorization' => 'Basic ' . "{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}",
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"),
                     'Accept' => 'application/json'
                 ]
             ]);
-            print_r($response);
+            print_r($response->getContent());
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed Ebay login');
             }
