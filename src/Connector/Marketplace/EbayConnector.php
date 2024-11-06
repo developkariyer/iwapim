@@ -23,8 +23,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Accept' => 'application/json'
                 ]
             ]);
+            print_r($response);
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to get JWT token from Bol.com');
+                throw new \Exception('Failed Ebay login');
             }
             $decodedResponse = json_decode($response->getContent(), true);
             $this->marketplace->setEbayAccessToken($decodedResponse['access_token']);
