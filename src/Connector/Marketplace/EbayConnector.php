@@ -52,7 +52,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'scope' => $scopeString
                 ])
             ]);
-            print_r($response);
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed Ebay login');
             }
