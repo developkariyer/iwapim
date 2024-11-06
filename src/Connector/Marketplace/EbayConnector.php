@@ -49,7 +49,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'form_params' => [
                     'grant_type' => 'client_credentials',
-                    'scope' => scopeString
+                    'scope' => $scopeString
                 ]
             ]);
             print_r($response->getContent());
