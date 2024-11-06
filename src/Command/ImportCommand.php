@@ -17,6 +17,7 @@ use App\Connector\Marketplace\ShopifyConnector;
 use App\Connector\Marketplace\EtsyConnector;
 use App\Connector\Marketplace\TrendyolConnector;
 use App\Connector\Marketplace\BolConnector;
+use App\Connector\Marketplace\EbayConnector;
 
 
 #[AsCommand(
