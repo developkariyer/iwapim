@@ -19,7 +19,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         if (!Utility::checkJwtTokenValidity($this->marketplace->getEbayAccessToken())) {
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
-                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"),
+                    'Authorization' => 'Basic ' . "{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}",
                     'Accept' => 'application/json'
                 ]
             ]);
