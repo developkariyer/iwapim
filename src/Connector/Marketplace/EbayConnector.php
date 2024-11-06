@@ -10,7 +10,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 class EbayConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth2/token"
+        'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth/token"
     ];
     private static $scopeList = [
         'https://api.ebay.com/oauth/api_scope',
