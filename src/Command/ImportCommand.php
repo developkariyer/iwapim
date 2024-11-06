@@ -62,6 +62,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, processes Shopify objects.')
             ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, processes Trendyol objects.')
             ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, processes Bol.com objects.')
+            ->addOption('ebay', null, InputOption::VALUE_NONE, 'If set, processes Ebay objects.')
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
