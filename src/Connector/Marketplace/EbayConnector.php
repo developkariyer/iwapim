@@ -48,7 +48,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/x-www-form-urlencoded'
                 ],
                 'body' => http_build_query([
-                    'grant_type' => 'client_credentials',
+                    'grant_type' => 'authorization_code',
                     'scope' => $scopeString
                 ])
             ]);
