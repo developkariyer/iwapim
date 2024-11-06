@@ -38,6 +38,7 @@ class ImportCommand extends AbstractCommand
     private static $trendyolFlag = false;
     private static $allFlag = false;
     private static $bolcomFlag = false;
+    private static $ebayFlag = false;
 
     private static $itemCodes = [];
 
@@ -170,6 +171,7 @@ class ImportCommand extends AbstractCommand
         self::$shopifyFlag = $input->getOption('shopify');
         self::$trendyolFlag = $input->getOption('trendyol');
         self::$bolcomFlag = $input->getOption('bolcom');
+        self::$ebayFlag = $input->getOption('ebay');
         self::$allFlag = $input->getOption('all');
 
         $this->removeListeners();
@@ -212,6 +214,9 @@ class ImportCommand extends AbstractCommand
                         if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
                             continue;
                         }
+                        if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Ebay') {
+                            continue;
+                        }
                     }
                 }
                 
@@ -222,6 +227,7 @@ class ImportCommand extends AbstractCommand
                     'Shopify' => new ShopifyConnector($marketplace),
                     'Trendyol' => new TrendyolConnector($marketplace),
                     'Bol.com' => new BolConnector($marketplace),
+                    'Ebay' => new EbayConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {
