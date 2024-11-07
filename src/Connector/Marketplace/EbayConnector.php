@@ -40,17 +40,17 @@ class EbayConnector extends MarketplaceConnectorAbstract
     protected function prepareToken()
     {
         if (!Utility::checkJwtTokenValidity($this->marketplace->getEbayAccessToken())) {
-            $scopeString = implode(' ', self::$scopeList);
+            $scopeString = urlencode(implode(' ', self::$scopeList));
 
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
                 ],
-                'body' => http_build_query([
+                'body' => [
                     'grant_type' => 'client_credentials',
                     'scope' => $scopeString
-                ])
+                ]
             ]);
             print_r($response->getContent());
             if ($response->getStatusCode() !== 200) {
