@@ -42,21 +42,17 @@ class EbayConnector extends MarketplaceConnectorAbstract
         if (!Utility::checkJwtTokenValidity($this->marketplace->getEbayAccessToken())) {
             $scopeString = urlencode(implode(' ', self::$scopeList));
 
-            try {
-                $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
-                    'headers' => [
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                        'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
-                    ],
-                    'body' => http_build_query([
-                        'grant_type' => 'client_credentials',
-                        'scope' => $scopeString
-                    ])
-                ]);
-            } catch (\Exception $e) {
-                echo 'Request failed: ' . $e->getMessage();
-            }
-            print_r($response->getContent());
+            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
+                ],
+                'body' => http_build_query([
+                    'grant_type' => 'client_credentials',
+                    'scope' => $scopeString
+                ])
+            ]);
+            print_r($response);
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed Ebay login');
             }
@@ -73,7 +69,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ],
         ]);*/
     }
-
+    
+    
     public function download($forceDownload = false)
     {
         $this->prepareToken();
