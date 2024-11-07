@@ -55,7 +55,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
     public function createUrlLink()
     {
         foreach ($this->listings as $listing) {
-            $url = $listing['url'];
+            $url = $listing['offer_url'];
             echo $url."\n";
         }
 
