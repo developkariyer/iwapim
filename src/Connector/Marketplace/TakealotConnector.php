@@ -56,8 +56,30 @@ class TakealotConnector extends MarketplaceConnectorAbstract
     {
         foreach ($this->listings as $listing) {
             $url = $listing['offer_url'];
+            $title = $listing['title'];
+            $titleParts = explode('-', $title);
+            if (isset($titleParts[1])) {
+                $colour_variant = $titleParts[1];
+            }
+            if (isset($titleParts[2])) {
+                $size = $titleParts[2];
+            }
+
+            echo $colour_variant."\n";
+            echo $size."\n";
+
+
+
+
+            /*$colour_variant="";
+            $size  ="";
+
+            $newUrl = $url . "?colour_variant=".$colour_variant."&size=".$size;
             echo $url."\n";
+            echo $newUrl."\n";*/
+        
         }
+
 
     }
 
