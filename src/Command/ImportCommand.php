@@ -17,6 +17,9 @@ use App\Connector\Marketplace\ShopifyConnector;
 use App\Connector\Marketplace\EtsyConnector;
 use App\Connector\Marketplace\TrendyolConnector;
 use App\Connector\Marketplace\BolConnector;
+use App\Connector\Marketplace\EbayConnector;
+use App\Connector\Marketplace\TakealotConnector;
+
 
 
 #[AsCommand(
@@ -38,7 +41,8 @@ class ImportCommand extends AbstractCommand
     private static $trendyolFlag = false;
     private static $allFlag = false;
     private static $bolcomFlag = false;
-
+    private static $ebayFlag = false;
+    private static $takealotFlag = false;
     private static $itemCodes = [];
 
     private EventDispatcherInterface $eventDispatcher;
@@ -61,6 +65,8 @@ class ImportCommand extends AbstractCommand
             ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, processes Shopify objects.')
             ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, processes Trendyol objects.')
             ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, processes Bol.com objects.')
+            ->addOption('ebay', null, InputOption::VALUE_NONE, 'If set, processes Ebay objects.')
+            ->addOption('takealot', null, InputOption::VALUE_NONE, 'If set, processes Takealot objects.')
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
@@ -170,6 +176,8 @@ class ImportCommand extends AbstractCommand
         self::$shopifyFlag = $input->getOption('shopify');
         self::$trendyolFlag = $input->getOption('trendyol');
         self::$bolcomFlag = $input->getOption('bolcom');
+        self::$ebayFlag = $input->getOption('ebay');
+        self::$takealotFlag = $input->getOption('takealot');
         self::$allFlag = $input->getOption('all');
 
         $this->removeListeners();
@@ -212,6 +220,12 @@ class ImportCommand extends AbstractCommand
                         if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
                             continue;
                         }
+                        if (!self::$ebayFlag && $marketplace->getMarketplaceType() === 'Ebay') {
+                            continue;
+                        }
+                        if (!self::$takealotFlag && $marketplace->getMarketplaceType() === 'Takealot') {
+                            continue;
+                        }
                     }
                 }
                 
@@ -222,6 +236,8 @@ class ImportCommand extends AbstractCommand
                     'Shopify' => new ShopifyConnector($marketplace),
                     'Trendyol' => new TrendyolConnector($marketplace),
                     'Bol.com' => new BolConnector($marketplace),
+                    'Ebay' => new EbayConnector($marketplace),
+                    'Takealot' => new TakealotConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {

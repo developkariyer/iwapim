@@ -89,6 +89,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                     'Bol.com' => $this->transferOrdersFromBolcomOrderTable($id,$marketplaceType),
                 };
+                echo "Complated: $markerplaceType\n";
             }
         }
 
@@ -185,8 +186,12 @@ class PrepareOrderTableCommand extends AbstractCommand
                 current_USD = VALUES(current_USD),
                 current_EUR = VALUES(current_EUR);
         ";
-        $db = \Pimcore\Db::get();
-        $db->query($trendyolSql);
+        try {
+            $db = \Pimcore\Db::get();
+            $db->query($trendyolSql);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
     protected static function transferOrdersFromShopifyOrderTable($marketPlaceId,$marketplaceType)
@@ -282,8 +287,12 @@ class PrepareOrderTableCommand extends AbstractCommand
                 current_USD = VALUES(current_USD),
                 current_EUR = VALUES(current_EUR);
                 ";
-        $db = \Pimcore\Db::get();
-        $db->query($shopifySql);
+        try {
+            $db = \Pimcore\Db::get();
+            $db->query($shopifySql);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
     protected static function transferOrdersFromBolcomOrderTable($marketPlaceId,$marketplaceType)
@@ -380,16 +389,9 @@ class PrepareOrderTableCommand extends AbstractCommand
             ";
         try {
             $db = \Pimcore\Db::get();
-            $result = $db->query($bolcomSql);
-            
-            if ($result) {
-                // Sonuçları işle
-            } else {
-                // Hata varsa, detayları yazdır
-                echo "Sorgu başarısız oldu: " . $db->errorInfo();
-            }
+            $db->query($bolcomSql);
         } catch (\Exception $e) {
-            echo "Hata: " . $e->getMessage();
+            echo "Error: " . $e->getMessage();
         }
     }
 
@@ -536,7 +538,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
     {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
             return $variantProduct;
         }
@@ -696,13 +698,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items AS orders
-        JOIN iwa_history AS history
+        JOIN currency_history AS history
         ON DATE(orders.created_at) = history.date
         SET orders.current_USD = history.usd, 
             orders.current_EUR = history.eur
         WHERE DATE(orders.created_at) = history.date;
         ";
-
         $stmt = $db->prepare($sql);
         $stmt->execute();
 
