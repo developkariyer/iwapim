@@ -98,23 +98,16 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         return $newUrl;
     }
 
-    public function getParentId ()
-    {
-        foreach ($this->listings as $listing) {
-            $url = $listing['offer_url'];
-            $urlParts = explode('/', $url);
-            $lastPart = $urlParts[count($urlParts) - 1];
-            echo $lastPart;
-        }
-        
-        //return $lastPart;
-
+    public function getParentId ($url)
+    {   
+        $urlParts = explode('/', $url);
+        $lastPart = $urlParts[count($urlParts) - 1];
+        return $lastPart;
     }
 
     public function import($updateFlag, $importFlag)
     {
-        $this->getParentId();
-        /*
+        
         if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
@@ -129,8 +122,30 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             $path = Utility::sanitizeVariable($listing['categoryName'] ?? 'Tasnif-Edilmemiş');
             $parent = Utility::checkSetPath($path, $marketplaceFolder);
             if ($listing['offer_url']) {
-                $parent = Utility::checkSetPath(Utility::sanitizeVariable($listing['productMainId']), $parent);
-            }*/
+                $parent = Utility::checkSetPath(Utility::sanitizeVariable($this->getParentId($listing['offer_url'])), $parent);
+            }
+            $imageUrl = Utility::getCachedImage($listing['image_url']);
+            $urlLink = $this->createUrlLink($listing['offer_url'], $listing['title']);
+            $salePrice = $listing['selling_price'] ?? 0;
+            $saleCurrency = 'ZAR';
+            $title = $listing['title'] ?? '';
+            $attributes = $listing['title'] ?? '';
+            $uniqueMarketplaceId = $listing['tsin_id'] ?? '';
+            $apiResponseJson = json_encode($listing, JSON_PRETTY_PRINT);
+            $published =  $listing['status'] === 'Buyable' ? true : false;
+            $sku = $listing['sku'] ?? '';
+            echo "<pre>";
+            echo "Image URL: $imageUrl\n";
+            echo "Product URL: $urlLink\n";
+            echo "Sale Price: $salePrice\n";
+            echo "Sale Currency: $saleCurrency\n";
+            echo "Title: $title\n";
+            echo "Attributes: $attributes\n";
+            echo "Unique Marketplace ID: $uniqueMarketplaceId\n";
+            echo "API Response JSON: $apiResponseJson\n";
+            echo "Published: $published\n";
+            echo "SKU: $sku\n";
+            echo "</pre>";
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]['url'] ?? ''),
@@ -150,8 +165,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;
-        }    */
+            $index++;*/
+        }    
     }
 
     public function downloadInventory()
