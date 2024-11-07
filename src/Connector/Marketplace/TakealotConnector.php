@@ -148,10 +148,10 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );*/
+            );
             echo "OK\n";
             $index++;
-        }    
+        }    */
     }
 
     public function downloadInventory()
