@@ -126,7 +126,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            
+            print_r($parent);
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
