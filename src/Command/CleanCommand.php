@@ -121,17 +121,15 @@ class CleanCommand extends AbstractCommand
     {
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 1 DAY");
+        $listingObject->setCondition("lastUpdate < NOW() - INTERVAL 3 DAY");
         $listingObject->load();
         $totalCount = $listingObject->getTotalCount();
         $index = 0;
         foreach ($listingObject as $variant) {
             $index++;
-            if ($variant->getMarketplace()->getMarketplaceType()==="Etsy") {
             echo "Unpublishing: ($index/$totalCount) {$variant->getId()} {$variant->getKey()}\n";
             $variant->setPublished(false);
             $variant->save();
-} else echo $index;
         }
     }
 
