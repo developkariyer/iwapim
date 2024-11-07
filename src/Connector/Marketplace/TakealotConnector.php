@@ -31,8 +31,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     ],
                     'query' => [
                         'page_number' => $page,
-                        'page_size' => $size,
-                        'api-key' => $this->marketplace->getTakealotKey()
+                        'page_size' => $size
                     ]
                 ]);
                 print_r($response->getContent());
