@@ -44,9 +44,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
-                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"),
                     'Content-Type' => 'application/x-www-form-urlencoded',
-                    'Accept' => 'application/json'
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
                 ],
                 'body' => http_build_query([
                     'grant_type' => 'client_credentials',
@@ -57,10 +56,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed Ebay login');
             }
-            $decodedResponse = json_decode($response->getContent(), true);
-            $this->marketplace->setEbayAccessToken($decodedResponse['access_token']);
-            $this->marketplace->save();
-            echo $decodedResponse;
+            //$decodedResponse = json_decode($response->getContent(), true);
+            //$this->marketplace->setEbayAccessToken($decodedResponse['access_token']);
+            //$this->marketplace->save();
+            //echo $decodedResponse;
         } 
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://api.ebay.com/', [
             'headers' => [
