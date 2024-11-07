@@ -134,6 +134,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             $apiResponseJson = json_encode($listing, JSON_PRETTY_PRINT);
             $published =  $listing['status'] === 'Buyable' ? true : false;
             $sku = $listing['sku'] ?? '';
+            echo "\n";
             echo "<pre>";
             echo "Image URL: $imageUrl\n";
             echo "Product URL: $urlLink\n";
@@ -145,6 +146,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             echo "Published: $published\n";
             echo "SKU: $sku\n";
             echo "</pre>";
+            echo "\n";
+
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]['url'] ?? ''),
