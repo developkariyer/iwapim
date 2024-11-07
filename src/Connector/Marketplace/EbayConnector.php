@@ -13,7 +13,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
         'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth2/token"
     ];
     private static $scopeList = [
-        'https://api.ebay.com/oauth/api_scope',
         'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
         'https://api.ebay.com/oauth/api_scope/sell.marketing',
         'https://api.ebay.com/oauth/api_scope/sell.inventory.readonly',
@@ -31,8 +30,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         'https://api.ebay.com/oauth/api_scope/commerce.notification.subscription',
         'https://api.ebay.com/oauth/api_scope/commerce.notification.subscription.readonly',
         'https://api.ebay.com/oauth/api_scope/sell.stores',
-        'https://api.ebay.com/oauth/api_scope/sell.stores.readonly',
-        'https://api.ebay.com/oauth/api_scope'
+        'https://api.ebay.com/oauth/api_scope/sell.stores.readonly'
     ];
     
     public static $marketplaceType = 'Ebay';
@@ -56,6 +54,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed Ebay login');
             }
+
+ 
             //$decodedResponse = json_decode($response->getContent(), true);
             //$this->marketplace->setEbayAccessToken($decodedResponse['access_token']);
             //$this->marketplace->save();
