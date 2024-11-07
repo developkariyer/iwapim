@@ -26,6 +26,9 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             $this->listings = [];
             do {
                 $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                    'headers' => [
+                        'Authorization' =>'Key ' . $this->marketplace->getTakealotKey()
+                    ],
                     'query' => [
                         'page_number' => $page,
                         'page_size' => $size,
