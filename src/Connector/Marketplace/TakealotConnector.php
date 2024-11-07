@@ -47,7 +47,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 echo ".";
                 sleep(1);  
             } while ($data['total_results'] === $size);
-            //file_put_contents($filename, json_encode($this->listings));
+            file_put_contents($filename, json_encode($this->listings));
         }
         return count($this->listings);
     }
