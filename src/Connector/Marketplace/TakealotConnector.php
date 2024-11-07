@@ -126,7 +126,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            /*VariantProduct::addUpdateVariant(
+            VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
                     'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
@@ -143,7 +143,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );*/
+            );
             echo "OK\n";
             $index++;
         }    
