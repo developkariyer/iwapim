@@ -98,8 +98,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             if ($size !== "" and $colour_variant === "") {
                 $newUrl .= "size=".$size;
             }
-            echo $title."\n";
-            echo $url."\n";
             echo $newUrl."\n";
         
             /*$colour_variant="";
