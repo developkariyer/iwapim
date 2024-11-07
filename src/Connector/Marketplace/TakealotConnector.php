@@ -67,9 +67,12 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     $size = trim($size);
                     $size = str_replace(' ', '+', $size);
                     $colour_variant = trim($titleParts[count($titleParts) - 2]);
+                    $colour_variant = trim($colour_variant);
+                    $colour_variant = str_replace(' ', '+', $colour_variant);
                 } else {
                     $colour_variant = $lastPart;
                     $colour_variant = trim($colour_variant);
+                    $colour_variant = str_replace(' ', '+', $colour_variant);
                 }
             }
             else {
@@ -81,6 +84,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 } else {
                     $colour_variant = $lastPart;
                     $colour_variant = trim($colour_variant);
+                    $colour_variant = str_replace(' ', '+', $colour_variant);
                 }
             }
 
