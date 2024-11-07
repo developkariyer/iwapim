@@ -9,7 +9,7 @@ use Symfony\Component\HttpClient\HttpClient;
 class TakealotConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "https://sellers.takealot.com/api/v2/offers",
+        'offers' => "https://seller-api.takealot.com/api/v2/offers",
     ];
     
     public static $marketplaceType = 'Takealot';
