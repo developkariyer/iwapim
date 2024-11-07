@@ -238,6 +238,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                     'uniqueMarketplaceId' => $listing['product-ids']['bolProductId'] ?? '',
                     'apiResponseJson' => json_encode($listing),
                     'published' => $listing['catalog']['published'] ?? false,
+                    'ean' => $listing['ean'],
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
