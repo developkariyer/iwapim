@@ -370,7 +370,7 @@ class CleanCommand extends AbstractCommand
         if ($objectFolder instanceof ObjectFolder) {
             echo "\rRunning in folder: " . $objectFolder->getFullPath() . " ";
             $childCount = 0;
-            foreach ($objectFolder->getChildren() as $child) {
+            foreach ($objectFolder->getChildren(['unpublished' => true]) as $child) {
                 $childCount++;
                 if ($child instanceof ObjectFolder) {
                     self::traverseObjectFolders($child);
@@ -388,6 +388,7 @@ class CleanCommand extends AbstractCommand
             }
         }
     }
+
     private static function traverseAssetFolder($assetFolder)
     {
         if ($assetFolder->getFullPath() === "/Image Cache") {
