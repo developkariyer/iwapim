@@ -34,12 +34,12 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                         'page_size' => $size
                     ]
                 ]);
+                print_r($response->getContent());
                 $statusCode = $response->getStatusCode();
                 if ($statusCode !== 200) {
                     echo "Error: $statusCode\n";
                     break;
                 }
-                print_r($response);
                 $data = $response->toArray();
                 break; 
                 $products = $data['content'];
