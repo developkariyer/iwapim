@@ -39,8 +39,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }
-                print_r($response->getContent());
-                $data = $response->toArray();
+                $data = $response->getContent()->toArray();
                 $products = $data['offers'];
                 $this->listings = array_merge($this->listings, $products);
                 echo "Page: " . $page . " ";
