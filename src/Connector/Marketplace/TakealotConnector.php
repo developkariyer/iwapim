@@ -41,15 +41,12 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 }
                 $data = $response->toArray();
                 $products = $data['offers'];
-                echo $data['total_results'] . " ";
-                break;
-                $products = $data['offers'];
                 $this->listings = array_merge($this->listings, $products);
                 echo "Page: " . $page . " ";
                 $page++;
                 echo ".";
                 sleep(1);  
-            } while ($data['total_results'] <= $size);
+            } while ($data['total_results'] === $size);
             //file_put_contents($filename, json_encode($this->listings));
         }
         return count($this->listings);
