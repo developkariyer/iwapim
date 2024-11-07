@@ -142,7 +142,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             echo "Title: $title\n";
             echo "Attributes: $attributes\n";
             echo "Unique Marketplace ID: $uniqueMarketplaceId\n";
-            echo "API Response JSON: $apiResponseJson\n";
             echo "Published: $published\n";
             echo "SKU: $sku\n";
             echo "</pre>";
