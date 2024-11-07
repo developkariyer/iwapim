@@ -119,12 +119,10 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['title']} ...";
-            $parent = Utility::checkSetPath($marketplaceFolder);
-            if (!empty($listing['offer_url'])) {
-                $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($this->getParentId($listing['offer_url'])),
-                    $parent
-                );
+            $path = Utility::sanitizeVariable($listing['categoryName'] ?? 'Tasnif-Edilmemiş');
+            $parent = Utility::checkSetPath($path, $marketplaceFolder);
+            if ($listing['offer_url']) {
+                $parent = Utility::checkSetPath(Utility::sanitizeVariable($this->getParentId($listing['offer_url'])), $parent);
             }
             
             print_r($parent);
