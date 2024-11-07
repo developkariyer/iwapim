@@ -65,12 +65,22 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 $size = $titleParts[2];
             }
 
-            echo $colour_variant."\n";
-            echo $size."\n";
+            $newUrl = $url . "?";
+            if ($colour_variant !== "") {
+                $newUrl .= "colour_variant=".$colour_variant;
+            }
+            if ($size !== "" and $colour_variant !== "") {
+                $size = str_replace(' ', '+', $size);
+                $newUrl .= "&size=".$size;
+            }
+            if ($size !== "" and $colour_variant === "") {
+                $size = str_replace(' ', '+', $size);
+                $newUrl .= "size=".$size;
+            }
 
-
-
-
+            echo $url."\n";
+            echo $newUrl."\n";
+        
             /*$colour_variant="";
             $size  ="";
 
