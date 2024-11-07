@@ -124,50 +124,28 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             if ($listing['offer_url']) {
                 $parent = Utility::checkSetPath(Utility::sanitizeVariable($this->getParentId($listing['offer_url'])), $parent);
             }
-            $imageUrl = Utility::getCachedImage($listing['image_url']);
-            $urlLink = $this->createUrlLink($listing['offer_url'], $listing['title']);
-            $salePrice = $listing['selling_price'] ?? 0;
-            $saleCurrency = 'ZAR';
-            $title = $listing['title'] ?? '';
-            $attributes = $listing['title'] ?? '';
-            $uniqueMarketplaceId = $listing['tsin_id'] ?? '';
-            $apiResponseJson = json_encode($listing, JSON_PRETTY_PRINT);
-            $published =  $listing['status'] === 'Buyable' ? true : false;
-            $sku = $listing['sku'] ?? '';
-            echo "\n";
-            echo "<pre>";
-            echo "Image URL: $imageUrl\n";
-            echo "Product URL: $urlLink\n";
-            echo "Sale Price: $salePrice\n";
-            echo "Sale Currency: $saleCurrency\n";
-            echo "Title: $title\n";
-            echo "Attributes: $attributes\n";
-            echo "Unique Marketplace ID: $uniqueMarketplaceId\n";
-            echo "Published: $published\n";
-            echo "SKU: $sku\n";
-            echo "</pre>";
-            echo "\n";
-
+            
+            print_r($parent);
             /*VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['images'][0]['url'] ?? ''),
-                    'urlLink' => $this->getUrlLink($listing['productUrl'] ?? ''),
-                    'salePrice' => $listing['salePrice'] ?? 0,
-                    'saleCurrency' => 'TL',
+                    'imageUrl' => Utility::getCachedImage($listing['image_url']),
+                    'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
+                    'salePrice' => $listing['selling_price'] ?? 0,
+                    'saleCurrency' => 'ZAR',
                     'title' => $listing['title'] ?? '',
-                    'attributes' => $this->getAttributes($listing),
-                    'uniqueMarketplaceId' => $listing['id'] ?? '',
+                    'attributes' => $listing['title'] ?? '',
+                    'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $this->getPublished($listing),
-                    'sku' => $listing['barcode'] ?? '',
+                    'published' => $listing['status'] === 'Buyable' ? true : false,
+                    'sku' => $listing['sku'] ?? '',
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );
+            );*/
             echo "OK\n";
-            $index++;*/
+            $index++;
         }    
     }
 
