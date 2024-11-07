@@ -58,29 +58,40 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             $url = $listing['offer_url'];
             $title = $listing['title'];
             $titleParts = explode('-', $title);
-            foreach ($titleParts as $key => $part) {
-                echo $key . " " . $part . "\n";
+            $size = "";
+            $colour_variant = "";
+            if (count($titleParts) >= 3) {
+                $lastPart = trim($titleParts[count($titleParts) - 1]);
+                if (strpos($lastPart, 'cm') !== false) {
+                    $size = $lastPart;
+                    $size = trim($size);
+                    $size = str_replace(' ', '+', $size);
+                    $colour_variant = trim($titleParts[count($titleParts) - 2]);
+                } else {
+                    $colour_variant = $lastPart;
+                    $colour_variant = trim($colour_variant);
+                }
             }
-            if (isset($titleParts[1])) {
-                $colour_variant = $titleParts[1];
-            }
-            if (isset($titleParts[2])) {
-                $size = $titleParts[2];
+            else {
+                $lastPart = trim($titleParts[count($titleParts) - 1]);
+                if (strpos($lastPart, 'cm') !== false) {
+                    $size = $lastPart;
+                    $size = trim($size);
+                    $size = str_replace(' ', '+', $size);
+                } else {
+                    $colour_variant = $lastPart;
+                    $colour_variant = trim($colour_variant);
+                }
             }
 
             $newUrl = $url . "?";
             if ($colour_variant !== "") {
-                $colour_variant = trim($colour_variant);
                 $newUrl .= "colour_variant=".$colour_variant;
             }
             if ($size !== "" and $colour_variant !== "") {
-                $size = trim($size);
-                $size = str_replace(' ', '+', $size);
                 $newUrl .= "&size=".$size;
             }
             if ($size !== "" and $colour_variant === "") {
-                $size = trim($size);
-                $size = str_replace(' ', '+', $size);
                 $newUrl .= "size=".$size;
             }
             echo $title."\n";
