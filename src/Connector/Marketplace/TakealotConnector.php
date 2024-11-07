@@ -59,7 +59,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             $title = $listing['title'];
             $titleParts = explode('-', $title);
             foreach ($titleParts as $key => $part) {
-                $titleParts[$key] = trim($part);
+                echo $key . " " . $part . "\n";
             }
             if (isset($titleParts[1])) {
                 $colour_variant = $titleParts[1];
