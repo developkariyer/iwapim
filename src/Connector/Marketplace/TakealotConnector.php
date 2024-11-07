@@ -5,7 +5,6 @@ namespace App\Connector\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\ScopingHttpClient;
 
 class TakealotConnector extends MarketplaceConnectorAbstract
 {
@@ -28,7 +27,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             do {
                 $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
                     'headers' => [
-                        'Authorization' => this->marketplace->getTakealotKey()
+                        'Authorization' => $this->marketplace->getTakealotKey()
                     ],
                     'query' => [
                         'page_number' => $page,
