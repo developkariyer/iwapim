@@ -384,7 +384,7 @@ class CleanCommand extends AbstractCommand
             }
             if ($childCount === 0) {
                 $objectFolder->delete();
-                echo "Deleted folder: " . $objectFolder->getFullPath() . "\n";
+                echo "\nDeleted folder: " . $objectFolder->getFullPath() . "\n";
             }
         }
     }
