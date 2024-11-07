@@ -52,6 +52,15 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         return count($this->listings);
     }
 
+    public function createUrlLink()
+    {
+        foreach ($this->listings as $listing) {
+            $url = $listing['url'];
+            echo $url."\n";
+        }
+
+    }
+
     public function downloadInventory()
     {
 
