@@ -40,6 +40,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     break;
                 }
                 $data = $response->toArray();
+                print_r($data);
+                break;
                 $products = $data['offers'];
                 $this->listings = array_merge($this->listings, $products);
                 echo "Page: " . $page . " ";
