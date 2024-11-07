@@ -238,7 +238,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $folderTree = [];
             $parent = $json['classifications'][0]['classifications'][0];
             while (!empty($parent['displayName'])) {
-                if ($parent['displayName'] !== 'Categories') {
+                if (!in_array($parent['displayName'], ['Categories', 'Subjects', 'Departments'])) {
                     $folderTree[] = $parent['displayName'];
                 }
                 $parent = $parent['parent'] ?? [];
