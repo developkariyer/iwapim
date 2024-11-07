@@ -77,7 +77,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        
+        $this->createUrlLink();        
     }
 
 
