@@ -9,7 +9,7 @@ use Symfony\Component\HttpClient\HttpClient;
 class TakealotConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "http://seller-api.takealot.com/api/v2/offers",
+        'offers' => "https://seller-api.takealot.com/api/v2/offers",
     ];
     
     public static $marketplaceType = 'Takealot';
@@ -39,8 +39,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }
+                print_r($response);
                 $data = $response->toArray();
-                print_r($data);
                 break; 
                 $products = $data['content'];
                 $this->listings = array_merge($this->listings, $products);
