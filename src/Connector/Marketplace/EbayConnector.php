@@ -73,7 +73,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $this->prepareToken();
+     //   $this->prepareToken();
     }
 
     public function downloadInventory()
