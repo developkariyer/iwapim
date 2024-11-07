@@ -38,7 +38,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     protected function prepareToken()
     {
         if (!Utility::checkJwtTokenValidity($this->marketplace->getEbayAccessToken())) {
-            $scopeString = urlencode(implode(' ', self::$scopeList));
+            $scopeString = implode(' ', self::$scopeList);
 
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
