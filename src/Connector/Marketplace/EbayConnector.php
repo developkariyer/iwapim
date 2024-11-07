@@ -61,13 +61,13 @@ class EbayConnector extends MarketplaceConnectorAbstract
             //$this->marketplace->save();
             //echo $decodedResponse;
         } 
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://api.ebay.com/', [
+        /*$this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://api.ebay.com/', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ],
-        ]);
+        ]);*/
     }
 
     public function download($forceDownload = false)
