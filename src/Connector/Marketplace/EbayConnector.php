@@ -40,7 +40,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     protected function prepareToken()
     {
         if (!Utility::checkJwtTokenValidity($this->marketplace->getEbayAccessToken())) {
-            $scopeString = urlencode(implode(' ', self::$scopeList));
+            $scopeString = implode(' ', self::$scopeList);
 
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
@@ -52,7 +52,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'scope' => $scopeString
                 ])
             ]);
-            print_r($response);
+            print_r($response->getContent());
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed Ebay login');
             }
