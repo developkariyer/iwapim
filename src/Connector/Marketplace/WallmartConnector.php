@@ -13,7 +13,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     ];
     public static $marketplaceType = 'Wallmart';
 
-    function generateCorrelationId () 
+    function generateCorrelationId() 
     {
         $randomHex = bin2hex(random_bytes(4));
         return substr($randomHex, 0, 4) . '-' . substr($randomHex, 4, 4);
@@ -25,7 +25,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         echo "Generated Correlation ID: " . $correlationId . "\n";
         $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
-                'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
                 'WM_QOS.CORRELATION_ID' => $this->generateCorrelationId(),
                 'Accept' => 'application/json'
