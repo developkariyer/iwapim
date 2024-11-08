@@ -61,7 +61,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $this->listings = json_decode(file_get_contents($filename), true);
             echo "Using cached data ";
         } else {
-            $offset = 0;
+            $offset = 1;
             $limit = 20;
             $this->listings = [];
             do {
