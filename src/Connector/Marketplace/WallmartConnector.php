@@ -25,14 +25,14 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Accept' => 'application/json',
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
                     'WM_QOS.CORRELATION_ID' => $correlationId,
-                    'Accept' => 'application/json'
+                    'Content-Type' => 'application/x-www-form-urlencoded',
                 ],
-                'body' => http_build_query([
+                'body' => [
                     'grant_type' => 'client_credentials'
-                ])
+                ]
             ]);
             print_r($response->getContent());
         } catch (\Exception $e) {
