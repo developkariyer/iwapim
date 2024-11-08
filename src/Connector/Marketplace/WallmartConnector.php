@@ -85,7 +85,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $data = $response->toArray();
                 $products = $data['ItemResponse'];
                 $this->listings = array_merge($this->listings, $products);
-                echo "Page: " . $offset . " ";
+                echo "Page: " . $offset . " " . count($products) . " ";
                 $offset++;
                 echo ".";
                 sleep(1);  
