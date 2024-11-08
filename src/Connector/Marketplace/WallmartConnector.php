@@ -91,7 +91,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 sleep(1);  
                 echo "Total Items: " . $data['totalItems'] . "\n";
                 echo "Count: " . count($this->listings) . "\n";
-            } while ($data['totalItems'] !== count($this->listings));
+            } while ($data['totalItems'] === count($this->listings));
             print_r($this->listings);
             //file_put_contents($filename, json_encode($this->listings));
         }
