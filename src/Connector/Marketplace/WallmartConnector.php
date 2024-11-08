@@ -15,7 +15,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     function generateCorrelationId () 
     {
-        return randomBytes(16).toString('hex');
+        return bin2hex(random_bytes(16));
     }
 
     public function prepareToken()
