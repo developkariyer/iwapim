@@ -403,13 +403,13 @@ class PrepareOrderTableCommand extends AbstractCommand
         $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
             $values = $this->fetchVariantInfo($marketplaceType);
-            echo "Burda\n";
             $index = 0;
             foreach ($values as $row) {
                 $index++;
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
                 $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
+
         }
     }
 
@@ -451,7 +451,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
         if ($variantProduct) {
             return $variantProduct;
         }
