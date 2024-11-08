@@ -22,18 +22,22 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function prepareToken()
     {
         $correlationId = $this->generateCorrelationId();
-        echo "Generated Correlation ID: " . $correlationId . "\n";
-        $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
-            'headers' => [
-                'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
-                'WM_QOS.CORRELATION_ID' => $this->generateCorrelationId(),
-                'Accept' => 'application/json'
-            ],
-            'body' => http_build_query([
-                'grant_type' => 'client_credentials'
-            ])
-        ]);
-        print_r($response->getContent());
+        try {
+            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
+                    'WM_QOS.CORRELATION_ID' => $correlationId,
+                    'Accept' => 'application/json'
+                ],
+                'body' => http_build_query([
+                    'grant_type' => 'client_credentials'
+                ])
+            ]);
+            print_r($response->getContent());
+        } catch (\Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+        }
     }
 
     public function download($forceDownload = false)
