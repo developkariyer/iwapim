@@ -30,11 +30,13 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'WM_QOS.CORRELATION_ID' => $correlationId,
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ],
-                'body' => [
+                'body' => http_build_query([
                     'grant_type' => 'client_credentials'
-                ]
+                ])
             ]);
-            print_r($response->getContent());
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get token: ' . $response->getContent(false));
+            }
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
