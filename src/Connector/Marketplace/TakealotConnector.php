@@ -126,10 +126,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            if ($listing['status'] === 'Buyable')
-                echo "published";
-            
-            
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
