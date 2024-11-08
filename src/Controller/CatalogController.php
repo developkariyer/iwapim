@@ -90,13 +90,15 @@ class CatalogController extends FrontendController
                 if (strlen($imageUrl) == 0) {
                     $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
                 }
-                foreach ($child['listings'] as $listing) {
-                    if (strlen($imageUrl) == 0) {
-                        $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
-                    }
-                    $url = unserialize($listing['urlLink'] ?? '');
-                    if ($url instanceof Link && strlen($listing['imageUrl'])>0) {
-                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
+                if (isset($child['listings']) && is_array($child['listings'])) {
+                    foreach ($child['listings'] as $listing) {
+                        if (strlen($imageUrl) == 0) {
+                            $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
+                        }
+                        $url = unserialize($listing['urlLink'] ?? '');
+                        if ($url instanceof Link && strlen($listing['imageUrl'])>0) {
+                            $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
+                        }
                     }
                 }
             }
