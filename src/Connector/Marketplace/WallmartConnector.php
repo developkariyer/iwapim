@@ -44,5 +44,15 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
 
     }
+
+    public function downloadOrders()
+    {
+        
+    }
+    
+    public function downloadInventory()
+    {
+
+    }
    
 }
