@@ -89,7 +89,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                     'Bol.com' => $this->transferOrdersFromBolcomOrderTable($id,$marketplaceType),
                 };
-                echo "Complated: $markerplaceType\n";
+                echo "Complated: $marketplaceType\n";
             }
         }
 
