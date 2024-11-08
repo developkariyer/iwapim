@@ -10,6 +10,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
         'offers' => "https://seller-api.takealot.com/v2/offers/",
+        'orders' => "https://seller-api.takealot.com/v2/sales/summary",
     ];
     
     public static $marketplaceType = 'Takealot';
@@ -149,14 +150,20 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         }    
     }
 
+    public function downloadOrders()
+    {
+        $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+            ]
+        ]);
+        print_r($response->toArray());
+        
+    }
+    
     public function downloadInventory()
     {
 
     }
-
-    public function downloadOrders()
-    {
-    }
-    
 
 }
