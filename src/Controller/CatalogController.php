@@ -90,9 +90,6 @@ class CatalogController extends FrontendController
                 if (strlen($imageUrl) == 0) {
                     $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
                 }
-                if (empty($child['listings'])) {
-                    error_log('No listings found for '.$child['iwasku'].' '.$child['variationSize'].' '.$child['variationColor'].' at Product '.$product['productIdentifier']);
-                }
                 foreach (($child['listings'] ?? []) as $listing) {
                     if (strlen($imageUrl) == 0) {
                         $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
