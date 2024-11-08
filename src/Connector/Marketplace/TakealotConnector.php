@@ -126,6 +126,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
+            if ($listing['status'] === 'Buyable')
+                echo "published";
             $data = [
                 'imageUrl' => Utility::getCachedImage($listing['image_url']),
                 'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
