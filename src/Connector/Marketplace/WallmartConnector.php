@@ -34,9 +34,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'grant_type' => 'client_credentials'
             ])
         ]);
-        print_r($response);
-        
-
+        print_r($response->getContent());
     }
 
     public function download($forceDownload = false)
