@@ -83,7 +83,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     break;
                 }
                 $data = $response->toArray();
-                $products = $data['offers'];
+                $products = $data['ItemResponse'];
                 $this->listings = array_merge($this->listings, $products);
                 echo "Page: " . $offset . " ";
                 $offset++;
