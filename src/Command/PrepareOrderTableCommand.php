@@ -407,7 +407,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             foreach ($values as $row) {
                 $index++;
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$row['variant_title'],$marketplaceType);
+                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
         }
     }
@@ -419,8 +419,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT 
                 DISTINCT variant_id,
                 product_id,
-                sku,
-                variant_title
+                sku
             FROM
                 iwa_marketplace_orders_line_items
             WHERE 
@@ -449,7 +448,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku, $variantTitle)
+    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
@@ -559,10 +558,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $variantTitle, $marketplaceType)
+    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku,$variantTitle),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
             default => null,
