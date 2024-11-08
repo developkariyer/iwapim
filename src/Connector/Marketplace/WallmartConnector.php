@@ -61,8 +61,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $this->listings = json_decode(file_get_contents($filename), true);
             echo "Using cached data ";
         } else {
-            $offset = 1;
-            $limit = 20;
+            $offset = 0;
             $this->listings = [];
             do {
                 $response = $this->httpClient->request('GET',  static::$apiUrl['offers'], [
@@ -73,7 +72,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                         'Accept' => 'application/json'
                     ],
                     'query' => [
-                        'limit' => $limit,
                         'offset' => $offset
                     ]
                 ]);
@@ -91,7 +89,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 sleep(1);  
                 echo "Total Items: " . $data['totalItems'] . "\n";
                 echo "Count: " . count($this->listings) . "\n";
-            } while ($data['totalItems'] === count($this->listings));
+            } while ($data['totalItems'] !== count($this->listings));
             print_r($this->listings);
             //file_put_contents($filename, json_encode($this->listings));
         }
