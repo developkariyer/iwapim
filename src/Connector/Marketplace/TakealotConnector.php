@@ -126,6 +126,19 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
+            $data = [
+                'imageUrl' => Utility::getCachedImage($listing['image_url']),
+                'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
+                'salePrice' => $listing['selling_price'] ?? 0,
+                'saleCurrency' => 'ZAR',
+                'title' => $listing['title'] ?? '',
+                'attributes' => $listing['title'] ?? '',
+                'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
+                'published' => $listing['status'] === 'Buyable',
+                'sku' => $listing['sku'] ?? ''
+            ];
+            print_r($data);
+            
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
