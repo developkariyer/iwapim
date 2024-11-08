@@ -89,6 +89,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $offset++;
                 echo ".";
                 sleep(1);  
+                print_r($this->listings);
+
             } while ($limit === count($products));
             print_r($this->listings);
             //file_put_contents($filename, json_encode($this->listings));
