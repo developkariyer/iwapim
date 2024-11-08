@@ -91,7 +91,7 @@ class CatalogController extends FrontendController
                     $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
                 }
 //                if (isset($child['listings']) && is_array($child['listings'])) {
-                    foreach ($child['listings'] as $listing) {
+                    foreach (($child['listings'] ?? []) as $listing) {
                         if (strlen($imageUrl) == 0) {
                             $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
                         }
