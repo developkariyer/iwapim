@@ -29,7 +29,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
                     'WM_QOS.CORRELATION_ID' => $correlationId,
                     'Content-Type' => 'application/x-www-form-urlencoded',
-                    'WM_SVC.NAME' => ''
+                    'WM_SVC.NAME' => null
                 ],
                 'body' => http_build_query([
                     'grant_type' => 'client_credentials'
