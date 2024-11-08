@@ -403,6 +403,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
             $values = $this->fetchVariantInfo($marketplaceType);
+            echo "Burda\n";
             $index = 0;
             foreach ($values as $row) {
                 $index++;
