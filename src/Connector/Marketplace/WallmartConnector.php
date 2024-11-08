@@ -9,7 +9,8 @@ use Symfony\Component\HttpClient\HttpClient;
 class WallmartConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token"
+        'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token",
+        'offers' => 'https://marketplace.walmartapis.com/v3/items'
     ];
     public static $marketplaceType = 'Wallmart';
     public static $expires_in;
@@ -55,14 +56,47 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
-        $response = $this->httpClient->request('GET', 'https://marketplace.walmartapis.com/v3/items', [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ]
-        ]);
+        $filename = 'tmp/' . urlencode($this->marketplace->getKey()) . '.json';
+        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
+            $this->listings = json_decode(file_get_contents($filename), true);
+            echo "Using cached data ";
+        } else {
+            $offset = 0;
+            $limit = 20;
+            $this->listings = [];
+            do {
+                $response = $this->httpClient->request('GET',  static::$apiUrl['offers'], [
+                    'headers' => [
+                        'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                        'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                        'WM_SVC.NAME' => 'Walmart Marketplace',
+                        'Accept' => 'application/json'
+                    ],
+                    'query' => [
+                        'limit' => $limit,
+                        'offset' => $offset
+                    ]
+                ]);
+                $statusCode = $response->getStatusCode();
+                if ($statusCode !== 200) {
+                    echo "Error: $statusCode\n";
+                    break;
+                }
+                $data = $response->toArray();
+                $products = $data['offers'];
+                $this->listings = array_merge($this->listings, $products);
+                echo "Page: " . $offset . " ";
+                $offset++;
+                echo ".";
+                sleep(1);  
+            } while ($data['totalItems'] === $limit);
+            print_r($this->listings);
+            //file_put_contents($filename, json_encode($this->listings));
+        }
+        return count($this->listings);
+
+        
+        
         print_r($response->getContent());
     }
 
