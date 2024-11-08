@@ -57,7 +57,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         $response = $this->httpClient->request('GET', 'https://marketplace.walmartapis.com/v3/items', [
             'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => 'Bearer ' . $this->marketplace->getWallmartAccessToken(),
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
                 'WM_QOS.CORRELATION_ID' => static::$correlationId,
                 'WM_SVC.NAME' => 'Walmart Marketplace'
             ]
