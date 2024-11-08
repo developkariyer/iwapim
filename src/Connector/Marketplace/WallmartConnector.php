@@ -20,6 +20,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function prepareToken()
     {
+        $correlationId = $this->generateCorrelationId();
+        echo "Generated Correlation ID: " . $correlationId . "\n";
         $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
