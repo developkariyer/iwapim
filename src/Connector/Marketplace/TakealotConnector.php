@@ -158,13 +158,5 @@ class TakealotConnector extends MarketplaceConnectorAbstract
     {
     }
     
-    protected function getImage($listing, $mainListing) 
-    {
-        
-    }
-
-    
-
-
 
 }
