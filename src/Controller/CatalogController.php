@@ -90,17 +90,15 @@ class CatalogController extends FrontendController
                 if (strlen($imageUrl) == 0) {
                     $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
                 }
-//                if (isset($child['listings']) && is_array($child['listings'])) {
-                    foreach (($child['listings'] ?? []) as $listing) {
-                        if (strlen($imageUrl) == 0) {
-                            $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
-                        }
-                        $url = unserialize($listing['urlLink'] ?? '');
-                        if ($url instanceof Link && strlen($listing['imageUrl'])>0) {
-                            $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
-                        }
+                foreach (($child['listings'] ?? []) as $listing) {
+                    if (strlen($imageUrl) == 0) {
+                        $imageUrl = $this->getThumbnail($listing['imageUrl'] ?? '', 'katalog');
                     }
-  //              }
+                    $url = unserialize($listing['urlLink'] ?? '');
+                    if ($url instanceof Link && strlen($listing['imageUrl'])>0) {
+                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
+                    }
+                }
             }
             $variationSizeList = array_unique($variationSizeList);
             $variationColorList = array_unique($variationColorList);
