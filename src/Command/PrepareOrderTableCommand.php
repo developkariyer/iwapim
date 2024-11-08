@@ -542,11 +542,11 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($variantProduct) {
             return $variantProduct;
         }
-        /*$sql = "
+        $sql = "
             SELECT object_id
             FROM iwa_json_store
             WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product-ids.bolProductId')) = ?
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"product-ids\".bolProductId')) = ?
             LIMIT 1;";
         
         $db = \Pimcore\Db::get();
@@ -556,7 +556,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             return VariantProduct::getById($objectId);
         }
         echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;*/
+        return null;
     }
 
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
