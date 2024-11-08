@@ -38,6 +38,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed to get token: ' . $response->getContent(false));
             }
+            $data = $response->toArray();
+            print_r($data);
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
