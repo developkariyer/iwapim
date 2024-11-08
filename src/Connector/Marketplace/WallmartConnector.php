@@ -12,6 +12,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token"
     ];
     public static $marketplaceType = 'Wallmart';
+    public static $expires_in;
 
     function generateCorrelationId() 
     {
@@ -39,7 +40,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
-            print_r($data);
+            static::$expires_in = $data['expires_in'];
+            $this->marketplace->setWallmartAccessToken($data['access_token']);
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
