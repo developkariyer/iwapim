@@ -59,7 +59,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
                 'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace'
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
             ]
         ]);
         print_r($response->getContent());
