@@ -19,7 +19,7 @@ use App\Connector\Marketplace\TrendyolConnector;
 use App\Connector\Marketplace\BolConnector;
 use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\TakealotConnector;
-
+use App\Connector\Marketplace\WallmartConnector;
 
 
 #[AsCommand(
@@ -43,6 +43,7 @@ class ImportCommand extends AbstractCommand
     private static $bolcomFlag = false;
     private static $ebayFlag = false;
     private static $takealotFlag = false;
+    private static $wallmartFlag = false;
     private static $itemCodes = [];
 
     private EventDispatcherInterface $eventDispatcher;
@@ -67,6 +68,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, processes Bol.com objects.')
             ->addOption('ebay', null, InputOption::VALUE_NONE, 'If set, processes Ebay objects.')
             ->addOption('takealot', null, InputOption::VALUE_NONE, 'If set, processes Takealot objects.')
+            ->addOption('wallmart', null, InputOption::VALUE_NONE, 'If set, processes Wallmart objects.')
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
@@ -178,6 +180,7 @@ class ImportCommand extends AbstractCommand
         self::$bolcomFlag = $input->getOption('bolcom');
         self::$ebayFlag = $input->getOption('ebay');
         self::$takealotFlag = $input->getOption('takealot');
+        self::$wallmartFlag = $input->getOption('wallmart');
         self::$allFlag = $input->getOption('all');
 
         $this->removeListeners();
@@ -226,6 +229,9 @@ class ImportCommand extends AbstractCommand
                         if (!self::$takealotFlag && $marketplace->getMarketplaceType() === 'Takealot') {
                             continue;
                         }
+                        if (!self::$wallmartFlag && $marketplace->getMarketplaceType() === 'Wallmart') {
+                            continue;
+                        }
                     }
                 }
                 
@@ -238,6 +244,7 @@ class ImportCommand extends AbstractCommand
                     'Bol.com' => new BolConnector($marketplace),
                     'Ebay' => new EbayConnector($marketplace),
                     'Takealot' => new TakealotConnector($marketplace),
+                    'Wallmart' => new WallmartConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {
