@@ -15,7 +15,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     function generateCorrelationId () 
     {
-        return bin2hex(random_bytes(16));
+        $randomHex = bin2hex(random_bytes(4));
+        return substr($randomHex, 0, 4) . '-' . substr($randomHex, 4, 4);
     }
 
     public function prepareToken()
