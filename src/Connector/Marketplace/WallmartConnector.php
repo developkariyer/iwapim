@@ -13,6 +13,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     ];
     public static $marketplaceType = 'Wallmart';
     public static $expires_in;
+    public static $correlationId;
 
     function generateCorrelationId() 
     {
@@ -22,7 +23,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function prepareToken()
     {
-        $correlationId = $this->generateCorrelationId();
+        static::$correlationId = $this->generateCorrelationId();
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
@@ -40,7 +41,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
-            static::$expires_in = $data['expires_in'];
+            static::$expires_in = time() + $data['expires_in'];
             $this->marketplace->setWallmartAccessToken($data['access_token']);
             $this->marketplace->save();
         } catch (\Exception $e) {
@@ -50,7 +51,18 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $this->prepareToken();
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareToken();
+        }
+        echo "Token is valid. Proceeding with download...\n";
+        $response = $this->httpClient->request('GET', 'https://marketplace.walmartapis.com/v3/items', [
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => 'Bearer ' . $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace'
+            ]
+        ]);
+        print_r($response->getContent());
     }
 
     public function import($updateFlag, $importFlag)
