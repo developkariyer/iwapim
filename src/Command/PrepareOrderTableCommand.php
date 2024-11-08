@@ -542,7 +542,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($variantProduct) {
             return $variantProduct;
         }
-        $sql = "
+        /*$sql = "
             SELECT object_id
             FROM iwa_json_store
             WHERE field_name = 'apiResponseJson'
@@ -556,13 +556,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             return VariantProduct::getById($objectId);
         }
         echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
+        return null;*/
     }
 
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
             default => null,
