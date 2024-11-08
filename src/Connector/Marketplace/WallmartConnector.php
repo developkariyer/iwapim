@@ -52,7 +52,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+       /* if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
@@ -100,7 +100,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
         
         
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
 
     public function import($updateFlag, $importFlag)
