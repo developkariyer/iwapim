@@ -74,36 +74,46 @@ class ExcelCommand extends AbstractCommand
     {
         $products = new Product\Listing();
         $products->setUnpublished(false);
-        $products->setCondition('requiresIwasku = true');
         echo "Loading products...";
         $products = $products->load();
         $data = [];
+        $parentProduct = [];
         echo "\n";
         $index = 0;
         foreach ($products as $product) {
             $index++;
             echo "\rProcessing product $index";
             $category = $product->getInheritedField('productCategory');
-            if (!isset($data[$category])) {
-                $data[$category] = [];
+            if ($product->getRequiresIwasku()) {
+                if (!isset($data[$category])) {
+                    $data[$category] = [];
+                }
+                $data[$category][] = [
+                    'id' => $product->getId(),
+                    'identifier' => $product->getInheritedField('productIdentifier'),
+                    'name' => $product->getInheritedField('productIdentifier').' '.$product->getInheritedField('name'),
+                    'iwasku' => $product->getIwasku(),
+                    'variationSize' => $product->getVariationSize(),
+                    'variationColor' => $product->getVariationColor(),
+                    'productDimension1' => $product->getInheritedField('productDimension1'),
+                    'productDimension2' => $product->getInheritedField('productDimension2'),
+                    'productDimension3' => $product->getInheritedField('productDimension3'),
+                    'productWeight' => $product->getInheritedField('productWeight'),
+                    'packageDimension1' => $product->getInheritedField('packageDimension1'),
+                    'packageDimension2' => $product->getInheritedField('packageDimension2'),
+                    'packageDimension3' => $product->getInheritedField('packageDimension3'),
+                    'packageWeight' => $product->getInheritedField('packageWeight'),
+                    'image' => $product->getImageUrl() ? $product->getImageUrl()->getUrl() : '',
+                    'category' => $category,
+                ];
+            } else {
+                $parentProduct[] = [
+                    'id' => $product->getId(),
+                    'identifier' => $product->getInheritedField('productIdentifier'),
+                    'name' => $product->getInheritedField('productIdentifier').' '.$product->getInheritedField('name'),
+                    'category' => $category,
+                ];
             }
-            $data[$category][] = [
-                'id' => $product->getId(),
-                'name' => $product->getInheritedField('productIdentifier').' '.$product->getInheritedField('name'),
-                'iwasku' => $product->getIwasku(),
-                'variationSize' => $product->getVariationSize(),
-                'variationColor' => $product->getVariationColor(),
-                'productDimension1' => $product->getInheritedField('productDimension1'),
-                'productDimension2' => $product->getInheritedField('productDimension2'),
-                'productDimension3' => $product->getInheritedField('productDimension3'),
-                'productWeight' => $product->getInheritedField('productWeight'),
-                'packageDimension1' => $product->getInheritedField('packageDimension1'),
-                'packageDimension2' => $product->getInheritedField('packageDimension2'),
-                'packageDimension3' => $product->getInheritedField('packageDimension3'),
-                'packageWeight' => $product->getInheritedField('packageWeight'),
-                'image' => $product->getImageUrl() ? $product->getImageUrl()->getUrl() : '',
-                'category' => $category,
-            ];
         }
         echo "\n";
         $flatfile = [];
@@ -113,6 +123,7 @@ class ExcelCommand extends AbstractCommand
             $flatfile = array_merge($flatfile, $products);
         }
         $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products.csv', $flatfile);
+        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/parent_products.csv', $parentProduct);
         echo "Products dumped to public/products.csv\n";
     }
 
