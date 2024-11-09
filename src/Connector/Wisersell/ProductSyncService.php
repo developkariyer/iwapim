@@ -393,15 +393,20 @@ class ProductSyncService
                 }
             }
             if (isset($wisersellProduct['id'])) {
+                $updateWisersellProduct = false;
                 if ($wisersellProduct['name'] !== $pimProduct->getKey()) {
                     echo "{$wisersellProduct['name']} !== {$pimProduct->getKey()}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
-                    $this->updateWisersellProduct($pimProduct, false);
+                    $updateWisersellProduct = true;
                 }
-                unset($wisersellProducts[$wisersellProduct['id']]);
-                if ($forceUpdate) {
+                if ($wisersellProduct['categoryId'] != $this->connector->categorySyncService->getWisersellCategoryId($pimProduct->getInheritedField('productCategory'))) {
+                    echo "Category Mismatch: {$wisersellProduct['categoryId']} != {$pimProduct->getInheritedField('productCategory')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
+                if ($forceUpdate || $updateWisersellProduct) {
                     $this->updateWisersellProduct($pimProduct);
                     echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ")\n";
                 }
+                unset($wisersellProducts[$wisersellProduct['id']]);
                 if ($updatePimProduct) {
                     $pimProduct->setWisersellId($wisersellProduct['id']);
                     $pimProduct->setWisersellJson(json_encode($wisersellProduct));
