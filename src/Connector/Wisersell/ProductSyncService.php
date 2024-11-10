@@ -248,13 +248,23 @@ class ProductSyncService
     public function prepareProductData($product)
     {
         $this->connector->categorySyncService->load();
-        /*$subProducts = $product->getBundleProducts();
+        $subProducts = $product->getBundleProducts();
+        $subProductData = [];
         if (!empty($subProducts) && is_array($subProducts)) {
-            $subProductData = [];
             foreach ($subProducts as $subProduct) {
-                $subProductData[] = $this->prepareProductData($subProduct);
+                $obj = $subProduct->getObject();
+                if (!($obj instanceof Product)) {
+                    continue;
+                }
+                if (empty($obj->getWisersellId()) || empty($subProduct->getAmount())) {
+                    continue;
+                }
+                $subProductData[] = [
+                    "subprodId" => $subProduct->getWisersellId(),
+                    "qty" => $subProduct->getAmount(),
+                ];
             }
-        }*/
+        }
         return [
             "name" => $product->getKey(),
             "code" => $product->getIwasku(),
@@ -267,7 +277,7 @@ class ProductSyncService
                 "Size" => $product->getVariationSize(),
                 "Color" => $product->getVariationColor()
             ],
-            "subproducts" => []
+            "subproducts" => $subProductData
         ];
     }
 
