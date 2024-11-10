@@ -410,6 +410,7 @@ class ProductSyncService
                 }
             }
             if (isset($wisersellProduct['id'])) {
+                /* Check if WS requires an update comparing downloaded WS data and PIM */
                 $updateWisersellProduct = false;
                 if ($wisersellProduct['name'] !== $pimProduct->getKey()) {
                     echo "{$wisersellProduct['name']} !== {$pimProduct->getKey()}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
@@ -423,6 +424,23 @@ class ProductSyncService
                     echo "Subproduct Mismatch: ".count($wisersellProduct['subproducts'])." != ".count($pimProduct->getBundleProducts()).", {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
+                if ($wisersellProduct['weight'] != $pimProduct->getInheritedField('packageWeight')) {
+                    echo "Weight Mismatch: {$wisersellProduct['weight']} != {$pimProduct->getInheritedField('packageWeight')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
+                if ($wisersellProduct['width'] != $pimProduct->getInheritedField('packageDimension1')) {
+                    echo "Width Mismatch: {$wisersellProduct['width']} != {$pimProduct->getInheritedField('packageDimension1')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
+                if ($wisersellProduct['length'] != $pimProduct->getInheritedField('packageDimension2')) {
+                    echo "Length Mismatch: {$wisersellProduct['length']} != {$pimProduct->getInheritedField('packageDimension2')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
+                if ($wisersellProduct['height'] != $pimProduct->getInheritedField('packageDimension3')) {
+                    echo "Height Mismatch: {$wisersellProduct['height']} != {$pimProduct->getInheritedField('packageDimension3')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
+                /* End check */
                 if ($forceUpdate || $updateWisersellProduct) {
                     $this->updateWisersellProduct($pimProduct);
                     echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ")\n";
