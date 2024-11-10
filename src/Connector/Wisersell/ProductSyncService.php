@@ -419,6 +419,10 @@ class ProductSyncService
                     echo "Category Mismatch: {$wisersellProduct['categoryId']} != {$pimProduct->getInheritedField('productCategory')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
+                if (count($wisersellProduct['subproducts']) != count($pimProduct->getBundleProducts())) {
+                    echo "Subproduct Mismatch: ".count($wisersellProduct['subproducts'])." != ".count($pimProduct->getBundleProducts()).", {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
                 if ($forceUpdate || $updateWisersellProduct) {
                     $this->updateWisersellProduct($pimProduct);
                     echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ")\n";
