@@ -40,7 +40,6 @@ class CostCalculator implements CalculatorClassInterface
             $costModelCost = $costModel->getCost($object) ?? '0.00';
             $totalCost = bcadd($totalCost, $costModelCost, 4);
         }
-    
         return number_format($totalCost, 4, '.', '');
     }    
 
