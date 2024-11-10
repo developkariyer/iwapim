@@ -260,7 +260,7 @@ class ProductSyncService
                     continue;
                 }
                 $subProductData[] = [
-                    "subprodId" => $subProduct->getWisersellId(),
+                    "subprodId" => $obj->getWisersellId(),
                     "qty" => $subProduct->getAmount(),
                 ];
             }
