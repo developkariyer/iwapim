@@ -248,6 +248,13 @@ class ProductSyncService
     public function prepareProductData($product)
     {
         $this->connector->categorySyncService->load();
+        /*$subProducts = $product->getBundleProducts();
+        if (!empty($subProducts) && is_array($subProducts)) {
+            $subProductData = [];
+            foreach ($subProducts as $subProduct) {
+                $subProductData[] = $this->prepareProductData($subProduct);
+            }
+        }*/
         return [
             "name" => $product->getKey(),
             "code" => $product->getIwasku(),

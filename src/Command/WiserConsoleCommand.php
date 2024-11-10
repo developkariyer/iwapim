@@ -9,6 +9,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Connector\Wisersell\Connector;
+use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\Category;
+use Pimcore\Model\DataObject\Currency;
+use Pimcore\Model\DataObject\CostModel;
+use Pimcore\Model\DataObject\Serial;
 
 #[AsCommand(
     name: 'app:wiserconsole',
