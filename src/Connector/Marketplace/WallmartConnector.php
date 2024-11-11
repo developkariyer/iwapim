@@ -114,7 +114,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($this->getParentId($listing['variantGroupId'])),
+                    Utility::sanitizeVariable(listing['variantGroupId']),
                     $parent
                 );
             }
@@ -127,6 +127,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
             echo "sku: " . $listing['sku'] . "\n";
+            
 
             /*VariantProduct::addUpdateVariant(
                 variant: [
