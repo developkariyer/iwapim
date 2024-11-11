@@ -202,6 +202,13 @@
                 window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
             });
 
+            $('#search-box').on('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    let searchQuery = $(this).val().trim();
+                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
+                }
+            });
+
             $('#category-select').on('change', function() {
                 let selectedCategory = $(this).val();
                 window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
