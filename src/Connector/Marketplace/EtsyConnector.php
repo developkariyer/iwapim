@@ -50,6 +50,20 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         return '';
     }
 
+    protected function getEtsyUrlLink($mainListing, $listing) 
+    {
+        $url = $mainListing['url'] ?? '';
+        if (strlen($url)<1) {
+            return null;
+        }
+        $first = true;
+        foreach (($listing['property_values'] ?? []) as $property) {
+            $url .= ($first) ? '?' : '&';
+            $url .= $property['property_id'].'='.$property['values'][0];
+        }
+        return this->getUrlLink($url);
+    }
+
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
