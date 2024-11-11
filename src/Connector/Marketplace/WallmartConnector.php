@@ -93,14 +93,14 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 echo "Total Items: " . $data['totalItems'] . "\n";
                 echo "Count: " . count($this->listings) . "\n";
             } while (count($this->listings) < $totalItems);
-            print_r($this->listings);
+            print_r(json_encode($this->listings));
+
             //file_put_contents($filename, json_encode($this->listings));
         }
         //return count($this->listings);
 
         
         
-        print_r($response->getContent());
     }
 
     public function import($updateFlag, $importFlag)
