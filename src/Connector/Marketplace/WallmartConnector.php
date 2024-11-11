@@ -121,7 +121,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             }
             //echo Utility::getCachedImage($listing['image_url']);
             echo "\n\n";
-            echo 'urlLink: ' . "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['sku'] . "\n";
+            echo 'urlLink: ' . "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid'] . "\n";
             echo "salePrice: " . $listing['price']['amount'] . "\n";
             echo "title: " . $listing['productName'] . "\n";
             echo "attributes: " . $listing['productName'] . "\n";
