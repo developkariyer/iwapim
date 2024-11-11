@@ -52,7 +52,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-       /* if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+       if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
@@ -86,7 +86,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $products = $data['ItemResponse'];
                 $totalItems = $data['totalItems'];
                 $this->listings = array_merge($this->listings, $products);
-                echo "Page: " . $offset . " " . count($products) . " ";
+                echo "Page: " . $offset . " " . count($this->listings) . " ";
                 $offset++;
                 echo ".";
                 sleep(1);  
@@ -96,11 +96,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             print_r($this->listings);
             //file_put_contents($filename, json_encode($this->listings));
         }
-        return count($this->listings);
+        //return count($this->listings);
 
         
         
-        print_r($response->getContent());*/
+        print_r($response->getContent());
     }
 
     public function import($updateFlag, $importFlag)
