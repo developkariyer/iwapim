@@ -50,21 +50,6 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         return '';
     }
 
-    protected function getEtsyUrlLink($mainListing, $listing) 
-    {
-        $url = $mainListing['url'] ?? '';
-        if (strlen($url)<1) {
-            return null;
-        }
-        $index = 0;
-        foreach (($listing['property_values'] ?? []) as $property) {
-            $url .= ($index) ? '&' : '?';
-            $valueIds = $property['value_ids'] ?? [''];
-            $url .= "variation{$index}=".reset($valueIds);
-        }
-        return $this->getUrlLink($url);
-    }
-
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -108,7 +93,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => null,
-                        'urlLink' => $this->getEtsyUrlLink($mainListing, $listing),
+                        'urlLink' => $this->getUrlLink($mainListing['url'] ?? ''),
                         'salePrice' => $this->getSalePrice($listing, 'price'),
                         'saleCurrency' => $this->getSalePrice($listing, 'currency'),
                         'attributes' => $this->getAttributes($listing),
