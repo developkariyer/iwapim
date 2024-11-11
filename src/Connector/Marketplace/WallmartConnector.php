@@ -114,7 +114,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable(listing['variantGroupId']),
+                    Utility::sanitizeVariable($listing['variantGroupId']),
                     $parent
                 );
             }
