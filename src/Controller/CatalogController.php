@@ -31,13 +31,16 @@ class CatalogController extends FrontendController
         $params = [];
         $limit = (int) $pageSize;
         $offset = (int) $page * $pageSize;
-        $sql = "SELECT `id`, `productIdentifier`, `name`, `category`, `segment`, `children` FROM iwa_catalog WHERE 1=1";
+        $sql = "SELECT `id`, `productIdentifier`, `name`, `category`, `segment`, `children` FROM iwa_catalog WHERE 1=1";        
         if ($category !== 'all') {
-            $sql .= " AND (LOWER(`category`) = LOWER(:category) OR LOWER(`segment`) = LOWER(:category))";
+            $sql .= " AND (";
+            $sql .= "LOWER(`category`) = LOWER(:category COLLATE utf8mb4_unicode_ci)";
+            $sql .= " OR LOWER(`segment`) = LOWER(:category COLLATE utf8mb4_unicode_ci)";
+            $sql .= ")";
             $params['category'] = $category;
         }
         if ($query !== 'all') {
-            $sql .= " AND LOWER(`children`) LIKE LOWER(:query)";
+            $sql .= " AND LOWER(`children`) LIKE LOWER(:query COLLATE utf8mb4_unicode_ci)";
             $params['query'] = "%$query%";
         }
         if ($countOnly) {
@@ -46,7 +49,7 @@ class CatalogController extends FrontendController
             return $db->fetchAllAssociative("$sql ORDER BY `productIdentifier`, `name` LIMIT $limit OFFSET $offset", $params);
         }
     }
-    
+        
     public function getThumbnail($imageUrl, $size = 'album')
     {
         $imagePath = str_replace('https://mesa.iwa.web.tr/var/assets', '', $imageUrl);
