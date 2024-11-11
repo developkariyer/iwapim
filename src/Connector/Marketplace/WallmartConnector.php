@@ -109,7 +109,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'WM_SVC.NAME' => 'Walmart Marketplace',
                 'Accept' => 'application/json'
             ],
-            'query' => [
+            'json' => [
                 'items' => [
                     ['sku' => $sku]
                 ]
