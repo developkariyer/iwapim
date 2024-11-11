@@ -61,7 +61,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             $url .= ($first) ? '?' : '&';
             $url .= $property['property_id'].'='.$property['values'][0];
         }
-        return this->getUrlLink($url);
+        return $this->getUrlLink($url);
     }
 
     public function import($updateFlag, $importFlag)
