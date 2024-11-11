@@ -33,11 +33,11 @@ class CatalogController extends FrontendController
         $offset = (int) $page * $pageSize;
         $sql = "SELECT `id`, `productIdentifier`, `name`, `category`, `segment`, `children` FROM iwa_catalog WHERE 1=1";
         if ($category !== 'all') {
-            $sql .= " AND (`category` = :category OR `segment` = :category)";	
+            $sql .= " AND (LOWER(`category`) = LOWER(:category) OR LOWER(`segment`) = LOWER(:category))";
             $params['category'] = $category;
         }
         if ($query !== 'all') {
-            $sql .= " AND `children` LIKE :query";
+            $sql .= " AND LOWER(`children`) LIKE LOWER(:query)";
             $params['query'] = "%$query%";
         }
         if ($countOnly) {
@@ -46,7 +46,7 @@ class CatalogController extends FrontendController
             return $db->fetchAllAssociative("$sql ORDER BY `productIdentifier`, `name` LIMIT $limit OFFSET $offset", $params);
         }
     }
-
+    
     public function getThumbnail($imageUrl, $size = 'album')
     {
         $imagePath = str_replace('https://mesa.iwa.web.tr/var/assets', '', $imageUrl);
