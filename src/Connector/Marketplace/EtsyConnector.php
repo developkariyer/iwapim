@@ -80,9 +80,9 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             if ($variantProduct->isPublished()) {
                 $variantProduct->setPublished(false);
                 $variantProduct->save();
-                echo "\r+";
+                echo "+";
             } else {
-                echo "\r.";
+                echo ".";
             }
         }
         echo "Done.\n";
