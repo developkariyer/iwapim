@@ -93,19 +93,62 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 echo "Total Items: " . $data['totalItems'] . "\n";
                 echo "Count: " . count($this->listings) . "\n";
             } while (count($this->listings) < $totalItems);
-            print_r(json_encode($this->listings));
-
-            //file_put_contents($filename, json_encode($this->listings));
+            file_put_contents($filename, json_encode($this->listings));
         }
-        //return count($this->listings);
-
-        
-        
+        return count($this->listings);
     }
 
     public function import($updateFlag, $importFlag)
     {
+        if (empty($this->listings)) {
+            echo "Nothing to import\n";
+        }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $listing) {
+            echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
+            $parent = Utility::checkSetPath($marketplaceFolder);
+            if (!empty($listing['variantGroupId'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($this->getParentId($listing['variantGroupId'])),
+                    $parent
+                );
+            }
+            //echo Utility::getCachedImage($listing['image_url']);
+            //echo 'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
+            echo "salePrice: " . $listing['price']['amount'] . "\n";
+            echo "title: " . $listing['productName'] . "\n";
+            echo "attributes: " . $listing['productName'] . "\n";
+            echo "uniqueMarketplaceId: " . $listing['wpid'] . "\n";
+            echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
+            echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
+            echo "sku: " . $listing['sku'] . "\n";
 
+            /*VariantProduct::addUpdateVariant(
+                variant: [
+                    'imageUrl' => Utility::getCachedImage($listing['image_url']),
+                    'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
+                    'salePrice' => $listing['selling_price'] ?? 0,
+                    'saleCurrency' => 'ZAR',
+                    'title' => $listing['title'] ?? '',
+                    'attributes' => $listing['title'] ?? '',
+                    'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
+                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
+                    'published' => $listing['status'] === 'Buyable' ? true : false,
+                    'sku' => $listing['sku'] ?? '',
+                ],
+                importFlag: $importFlag,
+                updateFlag: $updateFlag,
+                marketplace: $this->marketplace,
+                parent: $parent
+            );*/
+            echo "OK\n";
+            $index++;
+        }    
     }
 
     public function downloadOrders()
