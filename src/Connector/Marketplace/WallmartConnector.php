@@ -100,30 +100,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return count($this->listings);
     }
 
-    public function getItemAssociations($sku)
-    {
-        $response = $this->httpClient->request('POST',  static::$apiUrl['associations'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
-            'json' => [
-                'items' => [
-                    ['sku' => $sku]
-                ]
-            ]
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return [];
-        }
-        $data = $response->toArray();
-        return $data;
-    }
-
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -155,7 +131,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             //echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
             echo "sku: " . $listing['sku'] . "\n";
-            print_r($this->getItemAssociations($listing['sku']));
             
 
             /*VariantProduct::addUpdateVariant(
