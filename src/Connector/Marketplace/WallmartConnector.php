@@ -110,7 +110,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'Accept' => 'application/json'
             ],
             'query' => [
-                'sku' => [$sku]
+                'sku' => $sku
             ]
         ]);
         $statusCode = $response->getStatusCode();
