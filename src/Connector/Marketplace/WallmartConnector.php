@@ -143,7 +143,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "title: " . $listing['productName'] . "\n";
             echo "attributes: " . $listing['productName'] . "\n";
             echo "uniqueMarketplaceId: " . $listing['wpid'] . "\n";
-            echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
+            //echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
             echo "sku: " . $listing['sku'] . "\n";
             echo "item detail: " . json_encode($this->getItem($listing['wpid']), JSON_PRETTY_PRINT) . "\n";
