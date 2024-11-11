@@ -79,6 +79,9 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             if ($variantProduct->isPublished()) {
                 $variantProduct->setPublished(false);
                 $variantProduct->save();
+                echo "\r+";
+            } else {
+                echo "\r.";
             }
         }
         echo "Done.\n";
@@ -104,7 +107,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => null,
-                        'urlLink' => null,
+                        'urlLink' => $this->getEtsyUrlLink($mainListing, $listing),
                         'salePrice' => $this->getSalePrice($listing, 'price'),
                         'saleCurrency' => $this->getSalePrice($listing, 'currency'),
                         'attributes' => $this->getAttributes($listing),
