@@ -130,7 +130,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
-                    'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
+                    'urlLink' => $this->urlLink($this->createUrlLink($listing['offer_url'], $listing['title'])),
                     'salePrice' => $listing['selling_price'] ?? 0,
                     'saleCurrency' => 'ZAR',
                     'title' => $listing['title'] ?? '',
