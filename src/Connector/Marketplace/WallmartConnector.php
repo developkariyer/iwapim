@@ -146,7 +146,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             //echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
             echo "sku: " . $listing['sku'] . "\n";
-            print_r(json_encode($this->getItem($listing['sku']), JSON_PRETTY_PRINT) . "\n");
+            print_r(json_encode($this->getItem($listing['id']), JSON_PRETTY_PRINT) . "\n");
             
 
             /*VariantProduct::addUpdateVariant(
