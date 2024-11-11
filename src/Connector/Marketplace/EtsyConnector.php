@@ -56,10 +56,11 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         if (strlen($url)<1) {
             return null;
         }
-        $first = true;
+        $index = 0;
         foreach (($listing['property_values'] ?? []) as $property) {
-            $url .= ($first) ? '?' : '&';
-            $url .= $property['property_id'].'='.$property['values'][0];
+            $url .= ($index) ? '&' : '?';
+            $valueIds = $property['value_ids'] ?? [''];
+            $url .= "variation{$index}=".reset($valueIds);
         }
         return $this->getUrlLink($url);
     }
