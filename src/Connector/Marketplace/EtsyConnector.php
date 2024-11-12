@@ -32,11 +32,12 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         try {
             foreach ($orders as $order) {
                 $db->executeStatement(
-                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = ?",
                     [
                         $this->marketplace->getId(),
                         $order['receipt_id'],
-                        json_encode($order)
+                        json_encode($order),
+                        json_encode($order),
                     ]
                 );
             }
@@ -45,7 +46,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             $db->rollBack();
             echo "Error: " . $e->getMessage() . "\n";
         }
-        print_r(reset($orders));
+        //print_r(reset($orders));
         echo "Finished.\n";
     }
 
