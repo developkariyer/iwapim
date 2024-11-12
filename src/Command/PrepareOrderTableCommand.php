@@ -55,7 +55,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-
         return Command::SUCCESS;
     }
     
@@ -69,6 +68,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->countryCode();
         $this->parseUrl();  
         $this->productQuantity();
+        $this->usaCode();
     }
         
     protected function transferOrders()
@@ -336,7 +336,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS total_price,
             NULL AS source_name,
             NULL AS fulfillments_id,
-            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
+            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
             NULL AS tracking_company,
             NULL AS discount_code,
             NULL AS discount_code_type,
@@ -761,7 +761,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         CASE 
             WHEN fulfillments_status = 'success' 
             OR fulfillments_status = 'Delivered'
-            OR fulfillments_status IS NULL THEN TRUE
+            OR fullfillments_status = 'HANDLED'
+            THEN TRUE
             ELSE FALSE
         END;
         ";
@@ -880,6 +881,94 @@ class PrepareOrderTableCommand extends AbstractCommand
                 ";
                 $stmt = $db->prepare($updateQuery);
                 $stmt->execute([$domain,$row['referring_site']]);
+            }
+        }
+    }
+
+    protected function usaCode()
+    {
+        $isoCodes = [
+            'Alabama' => 'US-AL',
+            'Alaska' =>'US-AK',
+            'Arizona' =>'US-AZ',
+            'Arkansas' =>'US-AR',
+            'California' =>'US-CA',
+            'Colorado' =>'US-CO',
+            'Connecticut' =>'US-CT',
+            'Delaware' =>'US-DE',
+            'Florida' =>'US-FL',
+            'Georgia' =>'US-GA',
+            'Hawaii' =>'US-HI',
+            'Idaho' =>'US-ID',
+            'Illinois' =>'US-IL',
+            'Indiana' =>'US-IN',
+            'Iowa' =>'US-IA',
+            'Kansas' =>'US-KS',
+            'Kentucky' =>'US-KY',
+            'Louisiana' =>'US-LA',
+            'Maine' =>'US-ME',
+            'Maryland' =>'US-MD',
+            'Massachusetts' =>'US-MA',
+            'Michigan' =>'US-MI',
+            'Minnesota' =>'US-MN',
+            'Mississippi' =>'US-MS',
+            'Missouri' =>'US-MO',
+            'Montana' =>'US-MT',
+            'Nebraska' =>'US-NE',
+            'Nevada' =>'US-NV',
+            'New Hampshire' =>'US-NH',
+            'New Jersey' =>'US-NJ',
+            'New Mexico' =>'US-NM',
+            'New York' =>'US-NY',
+            'North Carolina' =>'US-NC',
+            'North Dakota' =>'US-ND',
+            'Ohio' =>'US-OH',
+            'Oklahoma' =>'US-OK',
+            'Oregon' =>'US-OR',
+            'Pennsylvania' =>'US-PA',
+            'Rhode Island' =>'US-RI',
+            'South Carolina' =>'US-SC',
+            'South Dakota' =>'US-SD',
+            'Tennessee' =>'US-TN',
+            'Texas' =>'US-TX',
+            'Utah' =>'US-UT',
+            'Vermont' =>'US-VT',
+            'Virginia' =>'US-VA',
+            'Washington' =>'US-WA',
+            'West Virginia' =>'US-WV',
+            'Wisconsin' =>'US-WI',
+            'Wyoming' =>'US-WY',
+            'American Samoa' =>'US-AS',
+            'Guam' =>'US-GU',
+            'Northern Mariana Islands' =>'US-MP',
+            'Puerto Rico' =>'US-PR',
+            'United States Minor Outlying Islands' =>'US-UM',
+            'Virgin Islands, U.S.' =>'US-VI',
+            'District of Columbia' =>'US-DC',
+        ];
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT DISTINCT shipping_province 
+            FROM iwa_marketplace_orders_line_items 
+            WHERE shipping_province IS NOT NULL 
+            AND shipping_province != '' 
+            AND shipping_province != 'null'
+            ";
+        $results = $db->fetchAllAssociative($sql);
+
+        foreach ($results as $result) {
+            $shippingProvince = $result['shipping_province'];
+            if (isset($isoCodes[$shippingProvince])) {
+                $provinceCode = $isoCodes[$shippingProvince];
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items 
+                    SET province_code = :province_code 
+                    WHERE shipping_province = :shipping_province
+                ";
+                $db->executeStatement($updateSql, [
+                    'province_code' => $provinceCode,
+                    'shipping_province' => $shippingProvince
+                ]);
             }
         }
     }

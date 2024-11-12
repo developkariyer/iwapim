@@ -100,6 +100,26 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return count($this->listings);
     }
 
+    public function getAnItem($sku)
+    {
+        $response = $this->httpClient->request('GET', static::$apiUrl['item'] . $sku, [
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        print_r($data);
+
+    }
+
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -121,8 +141,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 );
             }
             //echo Utility::getCachedImage($listing['image_url']);
-
-            echo "\n\n";
+            $this->getAnItem($listing['sku']);
+            break;
+            //print_r($listing);
+           /* echo "\n\n";
             echo 'urlLink: ' . "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid'] . "\n";
             echo "salePrice: " . $listing['price']['amount'] . "\n";
             echo "title: " . $listing['productName'] . "\n";
@@ -130,7 +152,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "uniqueMarketplaceId: " . $listing['wpid'] . "\n";
             //echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
-            echo "sku: " . $listing['sku'] . "\n";
+            echo "sku: " . $listing['sku'] . "\n";*/
             
 
             /*VariantProduct::addUpdateVariant(
