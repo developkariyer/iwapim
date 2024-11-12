@@ -24,8 +24,10 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         $jsonData = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
         $orders = $jsonData['orders'] ?? [];
         if (empty($orders)) {
+            echo "Orders empty.\n";
             return;
         }
+        echo "Found ".count($orders)." orders. Importing them...\n";
         $db->beginTransaction();
         try {
             foreach ($orders as $order) {
@@ -43,6 +45,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             $db->rollBack();
             echo "Error: " . $e->getMessage() . "\n";
         }
+        echo "Finished.\n";
     }
 
     public function downloadInventory()
