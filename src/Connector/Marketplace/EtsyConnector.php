@@ -45,6 +45,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             $db->rollBack();
             echo "Error: " . $e->getMessage() . "\n";
         }
+        print_r(reset($orders));
         echo "Finished.\n";
     }
 
