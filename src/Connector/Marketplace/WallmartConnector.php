@@ -121,8 +121,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 );
             }
             //echo Utility::getCachedImage($listing['image_url']);
-
-            echo "\n\n";
+            print_r($listing);
+           /* echo "\n\n";
             echo 'urlLink: ' . "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid'] . "\n";
             echo "salePrice: " . $listing['price']['amount'] . "\n";
             echo "title: " . $listing['productName'] . "\n";
@@ -130,7 +130,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "uniqueMarketplaceId: " . $listing['wpid'] . "\n";
             //echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
-            echo "sku: " . $listing['sku'] . "\n";
+            echo "sku: " . $listing['sku'] . "\n";*/
             
 
             /*VariantProduct::addUpdateVariant(
