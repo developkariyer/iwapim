@@ -55,7 +55,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->usaCode();
         return Command::SUCCESS;
     }
     
@@ -69,6 +68,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->countryCode();
         $this->parseUrl();  
         $this->productQuantity();
+        $this->usaCode();
     }
         
     protected function transferOrders()
