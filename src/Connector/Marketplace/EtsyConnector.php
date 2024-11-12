@@ -12,12 +12,37 @@ class EtsyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $filename = 'tmp/'.urlencode($this->marketplace->getShopId()).'.json';
-        $this->listings = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
+        $jsonData = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
+        $this->listings = $jsonData['listings'] ?? [];
         return count($this->listings);
     }
 
     public function downloadOrders()
     {
+        $db = \Pimcore\Db::get();
+        $filename = 'tmp/'.urlencode($this->marketplace->getShopId()).'.json';
+        $jsonData = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
+        $orders = $jsonData['orders'] ?? [];
+        if (empty($orders)) {
+            return;
+        }
+        $db->beginTransaction();
+        try {
+            foreach ($orders as $order) {
+                $db->executeStatement(
+                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                    [
+                        $this->marketplace->getId(),
+                        $order['receipt_id'],
+                        json_encode($order)
+                    ]
+                );
+            }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            echo "Error: " . $e->getMessage() . "\n";
+        }
     }
 
     public function downloadInventory()
