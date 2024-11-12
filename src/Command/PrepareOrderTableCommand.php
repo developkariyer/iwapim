@@ -336,7 +336,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS total_price,
             NULL AS source_name,
             NULL AS fulfillments_id,
-            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
+            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
             NULL AS tracking_company,
             NULL AS discount_code,
             NULL AS discount_code_type,
