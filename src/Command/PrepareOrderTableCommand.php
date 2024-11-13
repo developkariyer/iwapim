@@ -93,11 +93,114 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Shopify' => $this->transferOrdersFromShopifyOrderTable($id,$marketplaceType),
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                     'Bol.com' => $this->transferOrdersFromBolcomOrderTable($id,$marketplaceType),
+                    'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType)
                 };
                 echo "Complated: $marketplaceType\n";
             }
         }
 
+    }
+
+    protected static function transferOrdersEtsy($marketPlaceId,$marketplaceType)
+    {
+        $etsySql = "
+            INSERT INTO iwa_marketplace_orders_line_items (
+            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
+            vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
+            shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
+            total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
+            SELECT
+                '$marketplaceType',
+                NULL AS marketplace_key,
+                NULL AS product_code,
+                NULL AS parent_product_code,
+                NULL AS product_type,
+                FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.create_timestamp')) / 1000) AS created_at,
+                FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.update_timestamp')) / 1000) AS closed_at,         
+                order_id AS order_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.listing_id')) AS product_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.amount')) / JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.divisor')) AS price,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.currency_code')) AS currency,        
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.seller_email')) AS vendor,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.title')) AS variant_title,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.discount_amt.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.discount_amt.divisor'))  AS total_discount,
+                NULL AS referring_site,
+                NULL AS landing_site,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.divisor'))  AS subtotal_price,  
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.country_iso'))  AS shipping_country,
+                NULL AS shipping_province,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.city')) AS shipping_city,
+                NULL AS shipping_company,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.country_iso')) AS shipping_country_code,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price.divisor'))  AS total_price,  
+                NULL AS source_name,
+                NULL AS fulfillments_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
+                JSON_UNQUOTE(JSON_EXTRACT(shipments.value, '$.carrier_name')) AS tracking_company,
+                NULL AS discount_code,
+                NULL AS discount_code_type,
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.shop_coupon')) AS discount_value,
+                NULL AS discount_value_type,
+                NULL AS current_USD,
+                NULL AS current_EUR
+            FROM
+                iwa_marketplace_orders
+                CROSS JOIN JSON_TABLE(json, '$.transactions[*]' COLUMNS (
+                    value JSON PATH '$'
+                )) AS line_item
+                CROSS JOIN JSON_TABLE(json, '$.shipments[*]' COLUMNS (
+                    value JSON PATH '$'
+                )) AS shipments
+            WHERE
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) IS NOT NULL
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
+                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
+                AND marketplace_id = $marketPlaceId
+			ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                created_at = VALUES(created_at),
+                closed_at = VALUES(closed_at),
+                product_id = VALUES(product_id),
+                variant_id = VALUES(variant_id),
+                sku = VALUES(sku),
+                price = VALUES(price),
+                currency = VALUES(currency),
+                quantity = VALUES(quantity),
+                vendor = VALUES(vendor),
+                variant_title = VALUES(variant_title),
+                total_discount = VALUES(total_discount),
+                referring_site = VALUES(referring_site),
+                landing_site = VALUES(landing_site),
+                subtotal_price = VALUES(subtotal_price),
+                shipping_country = VALUES(shipping_country),
+                shipping_province = VALUES(shipping_province),
+                shipping_city = VALUES(shipping_city),
+                shipping_company = VALUES(shipping_company),
+                shipping_country_code = VALUES(shipping_country_code),
+                total_price = VALUES(total_price),
+                source_name = VALUES(source_name),
+                fulfillments_id = VALUES(fulfillments_id),
+                fulfillments_status = VALUES(fulfillments_status),
+                tracking_company = VALUES(tracking_company),
+                discount_code = VALUES(discount_code),
+                discount_code_type = VALUES(discount_code_type),
+                discount_value = VALUES(discount_value),
+                discount_value_type = VALUES(discount_value_type),
+                current_USD = VALUES(current_USD),
+                current_EUR = VALUES(current_EUR);
+        ";
+        try {
+            $db = \Pimcore\Db::get();
+            $db->query($trendyolSql);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
     protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
