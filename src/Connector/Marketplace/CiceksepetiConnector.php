@@ -62,6 +62,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
+        echo $this->marketplace->getKey() . "\n";
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
@@ -73,7 +74,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            VariantProduct::addUpdateVariant(
+            echo $listing['mainProductCode'] .  "\n";
+            /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
                     'urlLink' =>  $this->getUrlLink($listing['link']) ?? '',
@@ -90,7 +92,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );
+            );*/
             echo "OK\n";
             $index++;
         }    
