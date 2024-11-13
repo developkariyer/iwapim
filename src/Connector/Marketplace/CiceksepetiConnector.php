@@ -80,7 +80,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'salePrice' => $listing['listPrice'] ?? 0,
                     'saleCurrency' => 'TL',
                     'title' => $listing['productName'] ?? '',
-                    'attributes' => substr(json_encode($listing['attributes']) ?? '', 0, 300)  ?? '',
+                    'attributes' => $listing['productName'] ?? '',
                     'uniqueMarketplaceId' =>  $listing['barcode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['isActive'] ?? false,
