@@ -92,7 +92,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $offset += $limit;
                 echo ".";
                 sleep(1);  
-                echo "Total Items: " . $data['totalItems'] . "\n";
+                echo "Total Items: " . $totalItems . "\n";
                 echo "Count: " . count($this->listings) . "\n";
             } while (count($this->listings) < $totalItems);
             file_put_contents($filename, json_encode($this->listings));
