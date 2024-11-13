@@ -68,9 +68,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
-            if (!empty($listing['productCode'])) {
+            if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($listing['productCode']),
+                    Utility::sanitizeVariable($listing['mainProductCode']),
                     $parent
                 );
             }
