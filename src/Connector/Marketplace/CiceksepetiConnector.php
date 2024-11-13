@@ -70,7 +70,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($this->getParentId($listing['mainProductCode'])),
+                    Utility::sanitizeVariable($listing['mainProductCode']),
                     $parent
                 );
             }
@@ -84,7 +84,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             //echo "apiResponseJson: ". json_encode($listing, JSON_PRETTY_PRINT);
             echo "published: ". $listing['isActive'];
             echo "sku: ". $listing['barcode'];
-            
+
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
