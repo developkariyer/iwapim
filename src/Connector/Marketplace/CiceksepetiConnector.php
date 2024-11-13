@@ -73,11 +73,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-
-            /*VariantProduct::addUpdateVariant(
+            VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]),
-                    'urlLink' =>  $this->getUrlLink($listing['link']),
+                    'urlLink' =>  $this->getUrlLink($listing['link'] ?? ''),
                     'salePrice' => $listing['listPrice'] ?? 0,
                     'saleCurrency' => 'TL',
                     'title' => $listing['productName'] ?? '',
@@ -91,7 +90,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );*/
+            );
             echo "OK\n";
             $index++;
         }    
