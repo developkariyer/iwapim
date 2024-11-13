@@ -30,8 +30,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                         'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
                     ],
                     'query' => [
-                        'page_number' => $page,
-                        'page_size' => $size
+                        'Page' => $page,
+                        'PageSize' => $size
                     ]
                 ]);
                 $statusCode = $response->getStatusCode();
