@@ -73,7 +73,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            echo is_string($this->marketplace->getKey()) ? 'true' : 'false';
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
