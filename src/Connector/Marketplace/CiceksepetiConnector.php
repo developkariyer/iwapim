@@ -83,7 +83,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'attributes' => $listing['attributes'] ?? '',
                     'uniqueMarketplaceId' =>  $listing['barcode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['isActive'],
+                    'published' => $listing['isActive'] ?? false,
                     'sku' => $listing['stockCode'] ?? '',
                 ],
                 importFlag: $importFlag,
