@@ -137,7 +137,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     'attributes' => $listing['title'] ?? '',
                     'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' =>  $listing['isActive'] === 'True' ? true : false,
+                    'published' => $listing['status'] === 'Buyable' ? true : false,
                     'sku' => $listing['sku'] ?? '',
                 ],
                 importFlag: $importFlag,
