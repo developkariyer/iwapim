@@ -75,8 +75,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             }
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['images'][0]),
-                    'urlLink' =>  $this->getUrlLink($listing['link'] ?? ''),
+                    'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
+                    'urlLink' =>  $this->getUrlLink($listing['link']) ?? '',
                     'salePrice' => $listing['listPrice'] ?? 0,
                     'saleCurrency' => 'TL',
                     'title' => $listing['productName'] ?? '',
