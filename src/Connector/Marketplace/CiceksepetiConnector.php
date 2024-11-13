@@ -55,7 +55,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        
         if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
