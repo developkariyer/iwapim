@@ -67,36 +67,26 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
-            /*$parent = Utility::checkSetPath($marketplaceFolder);
+            $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
                     Utility::sanitizeVariable($listing['mainProductCode']),
                     $parent
                 );
-            }*/
-            echo "imageUrl: ". Utility::getCachedImage($listing['images'][0]);
-            echo "urlLink: ". $this->getUrlLink($listing['link']);
-            echo "salePrice: ". $listing['listPrice'];
-            echo "saleCurrency: ". 'TL';
-            echo "title: ". $listing['productName'];
-            echo "attributes: ". $listing['attributes'];
-            echo "uniqueMarketplaceId: ". $listing['barcode'];
-            //echo "apiResponseJson: ". json_encode($listing, JSON_PRETTY_PRINT);
-            echo "published: ". $listing['isActive'];
-            echo "sku: ". $listing['barcode'];
+            }
 
             /*VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['image_url']),
-                    'urlLink' => $this->getUrlLink($this->createUrlLink($listing['offer_url'], $listing['title'])),
-                    'salePrice' => $listing['selling_price'] ?? 0,
-                    'saleCurrency' => 'ZAR',
-                    'title' => $listing['title'] ?? '',
-                    'attributes' => $listing['title'] ?? '',
-                    'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
+                    'imageUrl' => Utility::getCachedImage($listing['images'][0]),
+                    'urlLink' =>  $this->getUrlLink($listing['link']),
+                    'salePrice' => $listing['listPrice'] ?? 0,
+                    'saleCurrency' => 'TL',
+                    'title' => $listing['productName'] ?? '',
+                    'attributes' => $listing['attributes'] ?? '',
+                    'uniqueMarketplaceId' =>  $listing['barcode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['status'] === 'Buyable' ? true : false,
-                    'sku' => $listing['sku'] ?? '',
+                    'published' => $listing['isActive'],
+                    'sku' => $listing['stockCode'] ?? '',
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
