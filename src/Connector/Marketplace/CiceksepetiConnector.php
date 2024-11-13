@@ -67,13 +67,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
-            $parent = Utility::checkSetPath($marketplaceFolder);
+            /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
                     Utility::sanitizeVariable($listing['mainProductCode']),
                     $parent
                 );
-            }
+            }*/
             echo "imageUrl: ". Utility::getCachedImage($listing['images'][0]);
             echo "urlLink: ". $this->getUrlLink($listing['link']);
             echo "salePrice: ". $listing['listPrice'];
