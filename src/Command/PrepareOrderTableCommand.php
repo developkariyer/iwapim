@@ -197,7 +197,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         ";
         try {
             $db = \Pimcore\Db::get();
-            $db->query($trendyolSql);
+            $db->query($etsySql);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
