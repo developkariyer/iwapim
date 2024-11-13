@@ -20,6 +20,8 @@ use App\Connector\Marketplace\BolConnector;
 use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\TakealotConnector;
 use App\Connector\Marketplace\WallmartConnector;
+use App\Connector\Marketplace\CiceksepetiConnector;
+
 
 
 #[AsCommand(
@@ -44,6 +46,7 @@ class ImportCommand extends AbstractCommand
     private static $ebayFlag = false;
     private static $takealotFlag = false;
     private static $wallmartFlag = false;
+    private static $ciceksepetiFlag = false;
     private static $itemCodes = [];
 
     private EventDispatcherInterface $eventDispatcher;
@@ -69,6 +72,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('ebay', null, InputOption::VALUE_NONE, 'If set, processes Ebay objects.')
             ->addOption('takealot', null, InputOption::VALUE_NONE, 'If set, processes Takealot objects.')
             ->addOption('wallmart', null, InputOption::VALUE_NONE, 'If set, processes Wallmart objects.')
+            ->addOption('ciceksepeti', null, InputOption::VALUE_NONE, 'If set, processes ciceksepeti objects.')
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
@@ -181,6 +185,7 @@ class ImportCommand extends AbstractCommand
         self::$ebayFlag = $input->getOption('ebay');
         self::$takealotFlag = $input->getOption('takealot');
         self::$wallmartFlag = $input->getOption('wallmart');
+        self::$ciceksepetiFlag = $input->getOption('ciceksepeti');
         self::$allFlag = $input->getOption('all');
 
         $this->removeListeners();
@@ -232,6 +237,9 @@ class ImportCommand extends AbstractCommand
                         if (!self::$wallmartFlag && $marketplace->getMarketplaceType() === 'Wallmart') {
                             continue;
                         }
+                        if (!self::$ciceksepetiFlag && $marketplace->getMarketplaceType() === 'Ciceksepeti') {
+                            continue;
+                        }
                     }
                 }
                 
@@ -245,6 +253,7 @@ class ImportCommand extends AbstractCommand
                     'Ebay' => new EbayConnector($marketplace),
                     'Takealot' => new TakealotConnector($marketplace),
                     'Wallmart' => new WallmartConnector($marketplace),
+                    'Ciceksepeti' => new CiceksepetiConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {
