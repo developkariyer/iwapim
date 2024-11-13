@@ -44,9 +44,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 $this->listings = array_merge($this->listings, $products);
                 $totalItems = $data['totalCount'];
                 echo "Page: " . $page . " ";
+                echo "Count: " . count($this->listings) . " / Total Count: " . $totalItems . "\n";
                 $page++;
-                echo ".";
-                echo "Count: " . $totalItems . "\n";
                 sleep(5);
             } while (count($this->listings) < $totalItems);
             file_put_contents($filename, json_encode($this->listings));
