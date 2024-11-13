@@ -81,9 +81,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "title: ". $listing['productName'];
             echo "attributes: ". $listing['attributes'];
             echo "uniqueMarketplaceId: ". $listing['barcode'];
-            echo "apiResponseJson: ". json_encode($listing, JSON_PRETTY_PRINT);
+            //echo "apiResponseJson: ". json_encode($listing, JSON_PRETTY_PRINT);
             echo "published: ". $listing['isActive'];
             echo "sku: ". $listing['barcode'];
+            
             /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
