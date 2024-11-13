@@ -666,12 +666,21 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
+    protected static function getEtsyVariantProduct($uniqueMarketplaceId)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+    }
+
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
             'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
