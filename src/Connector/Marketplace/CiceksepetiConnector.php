@@ -42,7 +42,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 $data = $response->toArray();
                 $products = $data['products'];
                 $this->listings = array_merge($this->listings, $products);
-                $totalItems = $data['totalItems'];
+                $totalItems = $data['totalCount'];
                 echo "Page: " . $page . " ";
                 $page++;
                 echo ".";
