@@ -103,6 +103,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function transferOrdersEtsy($marketPlaceId,$marketplaceType)
     {
+        echo "Etsy SQL\n";
         $etsySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
