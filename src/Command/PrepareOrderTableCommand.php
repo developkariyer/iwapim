@@ -160,7 +160,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) IS NOT NULL
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
