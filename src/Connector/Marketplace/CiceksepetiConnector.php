@@ -45,7 +45,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 echo "Page: " . $page . " ";
                 $page++;
                 echo ".";
-                sleep(1);  
+                sleep(5);
             } while ($data['totalCount'] === $size);
             file_put_contents($filename, json_encode($this->listings));
         }
