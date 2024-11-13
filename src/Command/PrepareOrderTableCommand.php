@@ -157,10 +157,10 @@ class PrepareOrderTableCommand extends AbstractCommand
                     value JSON PATH '$'
                 )) AS shipments
             WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) IS NOT NULL
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != 'null'
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != ''
+                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
