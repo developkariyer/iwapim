@@ -140,39 +140,24 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            //echo Utility::getCachedImage($listing['image_url']);
-            $this->getAnItem($listing['sku']);
-            break;
-            //print_r($listing);
-           /* echo "\n\n";
-            echo 'urlLink: ' . "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid'] . "\n";
-            echo "salePrice: " . $listing['price']['amount'] . "\n";
-            echo "title: " . $listing['productName'] . "\n";
-            echo "attributes: " . $listing['productName'] . "\n";
-            echo "uniqueMarketplaceId: " . $listing['wpid'] . "\n";
-            //echo 'apiResponseJson' .json_encode($listing, JSON_PRETTY_PRINT) . "\n";
-            echo "published: " . ($listing['publishedStatus'] === 'PUBLISHED' ? true : false) . "\n";
-            echo "sku: " . $listing['sku'] . "\n";*/
-            
-
-            /*VariantProduct::addUpdateVariant(
+            VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['image_url']),
-                    'urlLink' => $this->createUrlLink($listing['offer_url'], $listing['title']),
-                    'salePrice' => $listing['selling_price'] ?? 0,
-                    'saleCurrency' => 'ZAR',
-                    'title' => $listing['title'] ?? '',
-                    'attributes' => $listing['title'] ?? '',
-                    'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
+                    'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
+                    'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
+                    'salePrice' => $listing['price']['amount'] ?? 0,
+                    'saleCurrency' => 'USD',
+                    'title' => $listing['productName'] ?? '',
+                    'attributes' =>$listing['productName'] ?? '',
+                    'uniqueMarketplaceId' => $listing['wpid'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['status'] === 'Buyable' ? true : false,
+                    'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
                     'sku' => $listing['sku'] ?? '',
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );*/
+            );
             echo "OK\n";
             $index++;
         }    
