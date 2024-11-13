@@ -31,7 +31,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $this
             ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_orders to iwa_marketplace_orders_line_items')
-            ->addOption('processVariantOrderData',null, InputOption::VALUE_NONE, 'Process variant order data find main product')
+            ->addOption('variant',null, InputOption::VALUE_NONE, 'Process variant order data find main product')
             ->addOption('updateCoin',null, InputOption::VALUE_NONE, 'Update current coin')
             ->addOption('extraColumns',null, InputOption::VALUE_NONE, 'Insert extra columns')
             ;
@@ -43,7 +43,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->transferOrders();
         }
 
-        if($input->getOption('processVariantOrderData')) {
+        if($input->getOption('variant')) {
             $this->processVariantOrderData();
         }
 
