@@ -57,7 +57,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function import($updateFlag, $importFlag)
     {
         
-        /*if (empty($this->listings)) {
+        if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -67,15 +67,25 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['title']} ...";
+            echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
-            if (!empty($listing['offer_url'])) {
+            if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($this->getParentId($listing['offer_url'])),
+                    Utility::sanitizeVariable($this->getParentId($listing['mainProductCode'])),
                     $parent
                 );
             }
-            VariantProduct::addUpdateVariant(
+            echo "imageUrl: ". Utility::getCachedImage($listing['images'][0]);
+            echo "urlLink: ". $this->getUrlLink($listing['link']);
+            echo "salePrice: ". $listing['listPrice'];
+            echo "saleCurrency: ". 'TL';
+            echo "title: ". $listing['productName'];
+            echo "attributes: ". $listing['attributes'];
+            echo "uniqueMarketplaceId: ". $listing['barcode'];
+            echo "apiResponseJson: ". json_encode($listing, JSON_PRETTY_PRINT);
+            echo "published: ". $listing['isActive'];
+            echo "sku: ". $listing['barcode'];
+            /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
                     'urlLink' => $this->getUrlLink($this->createUrlLink($listing['offer_url'], $listing['title'])),
@@ -92,10 +102,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );
+            );*/
             echo "OK\n";
             $index++;
-        }    */
+        }    
     }
 
     public function downloadOrders()
