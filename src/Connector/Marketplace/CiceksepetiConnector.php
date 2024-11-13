@@ -65,8 +65,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            echo gettype($listing['mainProductCode']) . "\n";
-            /*echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
+            echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
@@ -74,6 +73,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
+            print_r($parent);
+            /*
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
@@ -91,9 +92,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );
+            );*/
             echo "OK\n";
-            $index++;*/
+            $index++;
         }    
     }
 
