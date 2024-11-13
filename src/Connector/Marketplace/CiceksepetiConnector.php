@@ -69,7 +69,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['mainProductCode'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable(strval($listing['mainProductCode'])),
+                    Utility::sanitizeVariable($listing['mainProductCode']),
                     $parent
                 );
             }
