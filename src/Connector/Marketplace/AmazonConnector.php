@@ -549,7 +549,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $listing = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
-            marketplaceIds: $this->getAllMarketplaceIds(asArray:true),
+            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
             sku: rawurlencode($sku),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
