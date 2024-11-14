@@ -24,6 +24,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         }
         $page = 1;
         $size = 100;
+        $this->listings = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
                 'headers' => [
