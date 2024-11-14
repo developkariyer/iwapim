@@ -545,15 +545,18 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
         return $asArray ? $ids : implode(',', $ids);
     }
-    
-    public function patchListing($sku)
-    {   
+
+    public function patchListing($sku, $country = null)
+    {
+        if (empty($country)) {
+            $country = $this->mainCountry;
+        }
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         /*
         echo "Getting details for SKU $sku\n";
         $listing = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
-            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
+            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             sku: rawurlencode($sku),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
@@ -566,7 +569,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         echo "Getting definitions for product type $productType\n";
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
         $definitions = $productTypeDefinitionsApi->getDefinitionsProductType(
-            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
+            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             sellerId: $this->marketplace->getMerchantId(),
             productType: $productType
         );
@@ -581,12 +584,34 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
                     [
-                        "marketplace_id" => AmazonConstants::amazonMerchant[$this->mainCountry]['id'],
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
                         "value" => true,
-
                     ]
                 ]
-            ),/*
+            ),
+            new PatchOperation(
+                op: "replace",
+                path: "/attributes/dsa_responsible_party_address",
+                value: [
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                        "value" => "responsible@iwaconcept.com",
+                    ]
+                ]
+            ),
+            new PatchOperation(
+                op: "replace",
+                path: "/attributes/gpsr_manufacturer_email_address",
+                value: [
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                        "value" => "responsible@iwaconcept.com",
+                    ]
+                ]
+            )
+        ];
+
+            /*
             new PatchOperation(
                 op: "replace",
                 path: "/attributes/gpsr_safety_attestation",
@@ -602,7 +627,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 path: "/attributes/gpsr_manufacturer_reference",
                 value: ["responsible@iwaconcept.com"]
             )*/
-        ];
 
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
             productType: $productType,
@@ -613,7 +637,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $patch = $listingsApi->patchListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             sku: rawurlencode($sku),
-            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
+            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             listingsItemPatchRequest: $listingsItemPatchRequest
         );
 
