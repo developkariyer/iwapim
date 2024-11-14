@@ -580,6 +580,10 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 "value" => "responsible@iwaconcept.com",
             ],
         ];
+        $patchBody = [
+            'productType' => $productType,
+            'patches' => $patches,
+        ];
 
         echo "Patching SKU $sku\n";
         $patch = $listingsApi->patchListingsItem(
