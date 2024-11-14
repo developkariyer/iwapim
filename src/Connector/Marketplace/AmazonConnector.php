@@ -580,7 +580,11 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 op: "replace",
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
-                    true,
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$this->mainCountry]['id'],
+                        "value" => true,
+
+                    ]
                 ]
             ),/*
             new PatchOperation(
