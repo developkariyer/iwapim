@@ -601,7 +601,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             ),
             new PatchOperation(
                 op: "replace",
-                path: "/attributes/gpsr_manufacturer_email_address",
+                path: "/attributes/gpsr_manufacturer_reference",
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
