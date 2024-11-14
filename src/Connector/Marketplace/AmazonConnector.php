@@ -596,10 +596,10 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         ];
 
         // Pass the array directly without converting it to an object
-        $listingsItemPatchRequest = new ListingsItemPatchRequest([
+        $listingsItemPatchRequest = new ListingsItemPatchRequest(
             'productType' => $productType,
             'patches' => $patches, // Ensure this is a native PHP array
-        ]);
+        );
 
         echo "Patching SKU $sku\n";
         $patch = $listingsApi->patchListingsItem(
