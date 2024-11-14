@@ -573,12 +573,12 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $patches = [
             new PatchOperation(
                 op: "replace",
-                path: "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
+                path: "/attributes/gpsr_safety_attestation",
                 value: [true]
             ),
             new PatchOperation(
                 op: "replace",
-                path: "/propertyGroups/safety_and_compliance/dsa_responsible_party_address",
+                path: "/attributes/dsa_responsible_party_address",
                 value: ["responsible@iwaconcept.com"]
             ),
         ];
