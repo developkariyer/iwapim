@@ -17,40 +17,41 @@ class TakealotConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $filename = 'tmp/' . urlencode($this->marketplace->getKey()) . '.json';
-        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
-            $this->listings = json_decode(file_get_contents($filename), true);
-            echo "Using cached data ";
-        } else {
-            $page = 1;
-            $size = 100;
-            $this->listings = [];
-            do {
-                $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                    'headers' => [
-                        'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-                    ],
-                    'query' => [
-                        'page_number' => $page,
-                        'page_size' => $size
-                    ]
-                ]);
-                $statusCode = $response->getStatusCode();
-                if ($statusCode !== 200) {
-                    echo "Error: $statusCode\n";
-                    break;
-                }
-                $data = $response->toArray();
-                $products = $data['offers'];
-                $this->listings = array_merge($this->listings, $products);
-                echo "Page: " . $page . " ";
-                $page++;
-                echo ".";
-                sleep(1);  
-            } while ($data['total_results'] === $size);
-            file_put_contents($filename, json_encode($this->listings));
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!(empty($this->listings) || $forceDownload)) {
+            echo "Using cached listings\n";
+            return;
         }
-        return count($this->listings);
+        $page = 1;
+        $size = 100;
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                'headers' => [
+                    'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+                ],
+                'query' => [
+                    'page_number' => $page,
+                    'page_size' => $size
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $products = $data['offers'];
+            $this->listings = array_merge($this->listings, $products);
+            echo "Page: " . $page . " ";
+            $page++;
+            echo ".";
+            sleep(1);  
+        } while ($data['total_results'] === $size);
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+        }
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     public function createUrlLink($url,$title)
