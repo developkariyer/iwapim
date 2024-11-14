@@ -53,6 +53,21 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         return count($this->listings);
     }
 
+    private function getAttributes($listing)
+    {
+        $color = '';
+        $size = '';
+        if (!empty($listing['attributes'])) {
+            if ($attribute['parentName'] === 'Renk' && $attribute['type'] === 'Variant Özelliği') {
+                $color = $attribute['name'];
+            }
+            if ($attribute['parentName'] === 'Ebat' || $attribute['parentName'] === 'Uzunluk' ) {
+                $size = $attribute['name'];
+            }
+        }
+        return trim($color . '-' . $size, '-');
+    }
+
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -65,7 +80,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
+            echo $this->getAttributes($listing);
+
+            /*echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if ($listing['mainProductCode']) {
                 $parent = Utility::checkSetPath(
@@ -73,6 +90,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
+
+
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
@@ -92,7 +111,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;
+            $index++;*/
         }    
     }
 
