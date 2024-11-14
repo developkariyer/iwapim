@@ -574,14 +574,15 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 "op" => "replace",
                 "path" => "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
                 "value" => true,
-            ],
+            ]
+        ];/*,
             [
                 "op" => "replace",
                 "path" => "/propertyGroups/safety_and_compliance/dsa_responsible_party_address",
                 "value" => "responsible@iwaconcept.com",
             ],
         ];
-
+*/
         echo "Patching SKU $sku\n";
         $patch = $listingsApi->patchListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
@@ -589,6 +590,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
             listingsItemPatchRequest: new ListingsItemPatchRequest($productType, json_decode(json_encode($patches)))
         );
+        echo "Patched SKU $sku\n";
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTpatchListingsItem_SKU.json", json_encode($patch->json()));
         print_r($patch->json());
     }
