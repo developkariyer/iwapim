@@ -586,19 +586,19 @@ class AmazonConnector extends MarketplaceConnectorAbstract
 
 
 
-        $patches = [
+        $patches = 
             [
                 "op" => "replace",
                 "path" => "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
                 "value" => true,
             ]
             // Add other patches if needed
-        ];
+        ;
 
         // Pass the array directly without converting it to an object
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
             productType: $productType,
-            patches: [$patches], // Ensure this is a native PHP array
+            patches: $patches, // Ensure this is a native PHP array
         );
 
         echo "Patching SKU $sku\n";
