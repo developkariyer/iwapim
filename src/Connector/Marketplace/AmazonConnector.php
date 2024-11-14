@@ -553,8 +553,11 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             sku: rawurlencode($sku),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
-        $result = $listing->json();
-        $productType = $result['summaries'][0]['productType'];
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTlistingsItems_SKU.json", json_encode($listing->json()));
+
+        $productType = $listing->json()['summaries'][0]['productType'] ?? '';
+
+        if (empty($productType)) { return; }
 
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
         $definitions = $productTypeDefinitionsApi->getDefinitions(
@@ -562,7 +565,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             sellerId: $this->marketplace->getMerchantId(),
             productType: $productType
         );
-        print_r($definitions->json());
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
 
 
