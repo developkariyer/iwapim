@@ -575,7 +575,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 op: "replace",
                 path: "/attributes/gpsr_safety_attestation",
                 value: ["true"]
-            ),
+            ),/*
             new PatchOperation(
                 op: "replace",
                 path: "/attributes/dsa_responsible_party_address",
@@ -585,7 +585,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 op: "replace",
                 path: "/attributes/gpsr_manufacturer_reference",
                 value: ["responsible@iwaconcept.com"]
-            )
+            )*/
         ];
 
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
