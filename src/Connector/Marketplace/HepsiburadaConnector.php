@@ -23,7 +23,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Using cached data ";
         } else {
             $offset = 0;
-            $limit = 20;
+            $limit = 10;
             $this->listings = [];
             //do {
                 $response = $this->httpClient->request('GET', "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getHepsiburadaMerchantId()}", [
