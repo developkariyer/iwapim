@@ -553,8 +553,26 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             sku: rawurlencode($sku),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
-        print_r($listing->json());
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTlistingsItems_SKU.json", json_encode($listing->json()));
+        $result = $listing->json();
+        $productType = $result['summaries'][0]['productType'];
+
+        $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
+        $definitions = $productTypeDefinitionsApi->getDefinitions(
+            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
+            sellerId: $this->marketplace->getMerchantId(),
+            productType: $productType
+        );
+        print_r($definitions->json());
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
+
+
+        $patches = [
+            [
+                'op' => 'replace',
+                'path' => 'gpsr_safety_attestation',
+
+            ]
+        ];
     }
 
 }
