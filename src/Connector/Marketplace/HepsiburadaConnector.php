@@ -40,6 +40,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }*/
+                print_r($response);
                 $data = $response->toArray();
                 $products = $data['listings'];
                 $this->listings = array_merge($this->listings, $products);
