@@ -16,41 +16,44 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $filename = 'tmp/' . urlencode($this->marketplace->getKey()) . '.json';
-        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
-            $this->listings = json_decode(file_get_contents($filename), true);
-            echo "Using cached data ";
-        } else {
-            $page = 1;
-            $size = 60;
-            $this->listings = [];
-            do {
-                $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                    'headers' => [
-                        'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
-                    ],
-                    'query' => [
-                        'Page' => $page,
-                        'PageSize' => $size
-                    ]
-                ]);
-                $statusCode = $response->getStatusCode();
-                if ($statusCode !== 200) {
-                    echo "Error: $statusCode\n";
-                    break;
-                }
-                $data = $response->toArray();
-                $products = $data['products'];
-                $this->listings = array_merge($this->listings, $products);
-                $totalItems = $data['totalCount'];
-                echo "Page: " . $page . " ";
-                echo "Count: " . count($this->listings) . " / Total Count: " . $totalItems . "\n";
-                $page++;
-                sleep(5);
-            } while (count($this->listings) < $totalItems);
-            file_put_contents($filename, json_encode($this->listings));
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!(empty($this->listings) || $forceDownload)) {
+            echo "Using cached listings\n";
+            return;
         }
-        return count($this->listings);
+        
+        $page = 1;
+        $size = 60;
+        $this->listings = [];
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                'headers' => [
+                    'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+                ],
+                'query' => [
+                    'Page' => $page,
+                    'PageSize' => $size
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $products = $data['products'];
+            $this->listings = array_merge($this->listings, $products);
+            $totalItems = $data['totalCount'];
+            echo "Page: " . $page . " ";
+            echo "Count: " . count($this->listings) . " / Total Count: " . $totalItems . "\n";
+            $page++;
+            sleep(5);
+        } while (count($this->listings) < $totalItems);
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+        }
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     private function getAttributes($listing)
