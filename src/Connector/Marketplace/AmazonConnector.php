@@ -581,6 +581,11 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 path: "/attributes/dsa_responsible_party_address",
                 value: ["responsible@iwaconcept.com"]
             ),
+            new PatchOperation(
+                op: "replace",
+                path: "/attributes/gpsr_manufacturer_email_address",
+                value: ["responsible@iwaconcept.com"]
+            )
         ];
 
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
