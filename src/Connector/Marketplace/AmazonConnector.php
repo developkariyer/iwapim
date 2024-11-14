@@ -581,7 +581,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
                     true,
-                    "gpsr_safety_attestation" => true
                 ]
             ),/*
             new PatchOperation(
