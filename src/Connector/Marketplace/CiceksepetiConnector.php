@@ -21,10 +21,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        
         $page = 1;
         $size = 60;
-        $this->listings = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
                 'headers' => [
