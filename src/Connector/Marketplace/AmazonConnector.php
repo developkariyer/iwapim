@@ -6,6 +6,7 @@ use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest;
+use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\PatchOperation;
 
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
@@ -568,37 +569,23 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             productType: $productType
         );
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
-/*
+
         $patches = [
-            [
-                "op" => "replace",
-                "path" => "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
-                "value" => true,
-            ]
-        ];/*,
-            [
-                "op" => "replace",
-                "path" => "/propertyGroups/safety_and_compliance/dsa_responsible_party_address",
-                "value" => "responsible@iwaconcept.com",
-            ],
+            new PatchOperation(
+                op: "replace",
+                path: "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
+                value: true
+            ),
+            new PatchOperation(
+                op: "replace",
+                path: "/propertyGroups/safety_and_compliance/dsa_responsible_party_address",
+                value: "responsible@iwaconcept.com"
+            ),
         ];
-*/
 
-
-
-        $patches = 
-            [
-                "op" => "replace",
-                "path" => "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
-                "value" => true,
-            ]
-            // Add other patches if needed
-        ;
-
-        // Pass the array directly without converting it to an object
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
             productType: $productType,
-            patches: [$patches], // Ensure this is a native PHP array
+            patches: $patches,
         );
 
         echo "Patching SKU $sku\n";
