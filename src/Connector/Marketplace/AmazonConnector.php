@@ -568,7 +568,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             productType: $productType
         );
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
-
+/*
         $patches = [
             [
                 "op" => "replace",
@@ -583,13 +583,33 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             ],
         ];
 */
+
+
+
+        $patches = [
+            [
+                "op" => "replace",
+                "path" => "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
+                "value" => true,
+            ]
+            // Add other patches if needed
+        ];
+
+        // Pass the array directly without converting it to an object
+        $listingsItemPatchRequest = new ListingsItemPatchRequest([
+            'productType' => $productType,
+            'patches' => $patches, // Ensure this is a native PHP array
+        ]);
+
         echo "Patching SKU $sku\n";
         $patch = $listingsApi->patchListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             sku: rawurlencode($sku),
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
-            listingsItemPatchRequest: new ListingsItemPatchRequest($productType, json_decode(json_encode($patches)))
+            listingsItemPatchRequest: $listingsItemPatchRequest
         );
+
+
         echo "Patched SKU $sku\n";
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTpatchListingsItem_SKU.json", json_encode($patch->json()));
         print_r($patch->json());
