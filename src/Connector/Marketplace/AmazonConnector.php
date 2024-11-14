@@ -546,6 +546,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     
     public function patchListing($sku)
     {
+        echo "Getting details for SKU $sku\n";
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $listing = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
@@ -558,7 +559,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $productType = $listing->json()['summaries'][0]['productType'] ?? '';
 
         if (empty($productType)) { return; }
-
+        echo "Getting definitions for product type $productType\n";
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
         $definitions = $productTypeDefinitionsApi->getDefinitionsProductType(
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
@@ -567,14 +568,28 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         );
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
 
-
         $patches = [
             [
-                'op' => 'replace',
-                'path' => 'gpsr_safety_attestation',
-
-            ]
+                "op" => "replace",
+                "path" => "/propertyGroups/safety_and_compliance/gpsr_safety_attestation",
+                "value" => true,
+            ],
+            [
+                "op" => "replace",
+                "path" => "/propertyGroups/safety_and_compliance/dsa_responsible_party_address",
+                "value" => "responsible@iwaconcept.com",
+            ],
         ];
+
+        echo "Patching SKU $sku\n";
+        $patch = $listingsApi->patchListingsItem(
+            sellerId: $this->marketplace->getMerchantId(),
+            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
+            sku: rawurlencode($sku),
+            body: $patches
+        );
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTpatchListingsItem_SKU.json", json_encode($patch->json()));
+        print_r($patch->json());
     }
 
 }
