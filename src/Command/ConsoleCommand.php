@@ -9,7 +9,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
+use App\Connector\Marketplace\AmazonConnector;
+use App\Connector\Marketplace\AmazonConstants;
 
 
 #[AsCommand(
@@ -28,6 +31,8 @@ class ConsoleCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $amazon = new AmazonConnector(Marketplace::getById(200568));
+
         $io = new SymfonyStyle($input, $output);
         $io->title('IWAPIM Interactive Shell');
         $context = [];

@@ -535,4 +535,26 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    private function getAllMarketplaceIds($asArray = false)
+    {
+        $ids = array_map(function($country) {
+            return AmazonConstants::amazonMerchant[$country]['id'];
+        }, $this->countryCodes);
+
+        return $asArray ? $ids : implode(',', $ids);
+    }
+    
+    public function patchListing($sku)
+    {
+        $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
+        $listing = $listingsApi->getListingsItem(
+            sellerId: $this->marketplace->getMerchantId(),
+            marketplaceIds: $this->getAllMarketplaceIds(),
+            sku: rawurlencode($sku),
+            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
+        );
+        print_r($listing->json());
+
+    }
+
 }
