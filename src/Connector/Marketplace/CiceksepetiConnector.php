@@ -82,7 +82,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            echo $this->getAttributes($listing);
+            echo $this->getAttributes($listing) . "\n";
 
             /*echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
