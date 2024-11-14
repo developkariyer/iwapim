@@ -547,7 +547,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     }
     
     public function patchListing($sku)
-    {
+    {   /*
         echo "Getting details for SKU $sku\n";
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
         $listing = $listingsApi->getListingsItem(
@@ -561,6 +561,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $productType = $listing->json()['summaries'][0]['productType'] ?? '';
 
         if (empty($productType)) { return; }
+        */
+        $productType = "WALL_ART";
+
         echo "Getting definitions for product type $productType\n";
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
         $definitions = $productTypeDefinitionsApi->getDefinitionsProductType(
