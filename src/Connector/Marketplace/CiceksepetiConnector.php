@@ -90,8 +90,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-
-
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
@@ -102,7 +100,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'attributes' => $this->getAttributes($listing)  ?? '',
                     'uniqueMarketplaceId' =>  $listing['barcode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['isActive'],
+                    'published' => $listing['productStatusType'] === 'YAYINDA' ? 1 : 0,
                     'sku' => $listing['stockCode'] ?? '',
                 ],
                 importFlag: $importFlag,
