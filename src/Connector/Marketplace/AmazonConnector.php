@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace;
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
+use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest;
 
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
@@ -590,7 +591,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $this->marketplace->getMerchantId(),
             rawurlencode($sku),
             [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
-            new SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest($patchBody)
+            new ListingsItemPatchRequest($patchBody)
         );
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTpatchListingsItem_SKU.json", json_encode($patch->json()));
         print_r($patch->json());
