@@ -560,7 +560,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         if (empty($productType)) { return; }
 
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
-        $definitions = $productTypeDefinitionsApi->getDefinitions(
+        $definitions = $productTypeDefinitionsApi->getDefinitionsProductType(
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
             sellerId: $this->marketplace->getMerchantId(),
             productType: $productType
