@@ -580,6 +580,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 op: "replace",
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
+                    true,
                     "gpsr_safety_attestation" => true
                 ]
             ),/*
