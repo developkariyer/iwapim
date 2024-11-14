@@ -82,9 +82,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            echo $this->getAttributes($listing) . "\n";
-
-            /*echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
+            echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if ($listing['mainProductCode']) {
                 $parent = Utility::checkSetPath(
@@ -101,7 +99,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'salePrice' => $listing['listPrice'] ?? 0,
                     'saleCurrency' => 'TL',
                     'title' => $listing['productName'] ?? '',
-                    'attributes' => $listing['productName'] ?? '',
+                    'attributes' => $this->getAttributes($listing)  ?? '',
                     'uniqueMarketplaceId' =>  $listing['barcode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['isActive'],
@@ -113,7 +111,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;*/
+            $index++;
         }    
     }
 
