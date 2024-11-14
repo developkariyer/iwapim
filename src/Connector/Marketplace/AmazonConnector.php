@@ -550,7 +550,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $listing = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             marketplaceIds: $this->getAllMarketplaceIds(),
-            sku: rawurlencode($sku),
+            sku: [rawurlencode($sku)],
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
         print_r($listing->json());
