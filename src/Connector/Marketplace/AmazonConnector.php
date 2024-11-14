@@ -554,7 +554,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
         print_r($listing->json());
-
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTlistingsItems_SKU.json", json_encode($listing->json()));
     }
 
 }
