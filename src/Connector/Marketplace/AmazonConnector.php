@@ -562,8 +562,6 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $productType = $listing->json()['summaries'][0]['productType'] ?? '';
 
         if (empty($productType)) { return; }
-        */
-        $productType = "WALL_ART";
 
         echo "Getting definitions for product type $productType\n";
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
@@ -573,6 +571,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             productType: $productType
         );
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
+
+        */
+        $productType = "WALL_ART";
 
         $patches = [
             new PatchOperation(
