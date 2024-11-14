@@ -547,9 +547,10 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     }
     
     public function patchListing($sku)
-    {   /*
-        echo "Getting details for SKU $sku\n";
+    {   
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
+        /*
+        echo "Getting details for SKU $sku\n";
         $listing = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
