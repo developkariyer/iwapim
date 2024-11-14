@@ -58,11 +58,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $color = '';
         $size = '';
         if (!empty($listing['attributes'])) {
-            if ($attribute['parentName'] === 'Renk' && $attribute['type'] === 'Variant Özelliği') {
-                $color = $attribute['name'];
-            }
-            if ($attribute['parentName'] === 'Ebat' || $attribute['parentName'] === 'Uzunluk' ) {
-                $size = $attribute['name'];
+            foreach ($listing['attributes'] as $attribute) {
+                if ($attribute['parentName'] === 'Renk' && $attribute['type'] === 'Variant Özelliği') {
+                    $color = $attribute['name'];
+                }
+                if ($attribute['parentName'] === 'Ebat' || $attribute['parentName'] === 'Uzunluk' ) {
+                    $size = $attribute['name'];
+                }
             }
         }
         return trim($color . '-' . $size, '-');
