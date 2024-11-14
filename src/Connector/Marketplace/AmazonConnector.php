@@ -573,9 +573,16 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $patches = [
             new PatchOperation(
                 op: "replace",
+                path: "/attributes/safety_and_compliance",
+                value: [
+                    "gpsr_safety_attestation" => true
+                ]
+            ),/*
+            new PatchOperation(
+                op: "replace",
                 path: "/attributes/gpsr_safety_attestation",
                 value: ["true"]
-            ),/*
+            ),
             new PatchOperation(
                 op: "replace",
                 path: "/attributes/dsa_responsible_party_address",
