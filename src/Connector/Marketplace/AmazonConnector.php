@@ -613,7 +613,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             patches: $patches,
         );
 
-        echo " patching";
+        echo " patching ";
         $patch = $listingsApi->patchListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             sku: rawurlencode($sku),
