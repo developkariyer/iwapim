@@ -620,6 +620,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             listingsItemPatchRequest: $listingsItemPatchRequest
         );
+        echo $patch->json()['status'] ?? " ??";
         echo " OK\n";
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$sku.json", json_encode($patch->json()));
     }
