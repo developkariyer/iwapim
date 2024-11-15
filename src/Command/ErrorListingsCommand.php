@@ -77,7 +77,7 @@ class ErrorListingsCommand extends AbstractCommand
                 $index++;
                 echo "\rProcessing $index {$listing->getId()}";
                 $marketplace = $listing->getMarketplace();
-                if ($marketplace->getMarketplaceType !== 'Amazon') {
+                if ($marketplace->getMarketplaceType() !== 'Amazon') {
                     continue;
                 }
                 $amazonMarketplaces = $listing->getAmazonMarketplace();
