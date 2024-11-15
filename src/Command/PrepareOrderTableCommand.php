@@ -788,7 +788,15 @@ class PrepareOrderTableCommand extends AbstractCommand
             // Sorguyu çalıştırın
             $stmt->execute();
         }*/
-      
+        $url = "https://www.tcmb.gov.tr/kurlar/today.xml";
+        $xml = simplexml_load_file($url);
+        $json = json_encode($xml);
+        $array = json_decode($json, TRUE);
+	    echo "Current Date: ".date('m/d/Y')."\n";
+        echo "TCMP Date: ".$array['@attributes']['Date']."\n";
+        foreach ($array['Currency'] as $currency) {
+            print_r($currency);                
+        }
     }
 
     protected static function updateCurrentCoin()
