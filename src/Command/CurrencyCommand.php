@@ -41,7 +41,7 @@ class CurrencyCommand extends AbstractCommand
         $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
         foreach ($array['Currency'] as $currency) {
             echo trim($currency['CurrencyName']) . " - " . $currency['ForexBuying']/$currency['Unit'];
-            /*$currencyObject = Currency::getByCurrencyCode(trim($currency['CurrencyName']), ['limit' => 1,'unpublished' => true]);
+            $currencyObject = Currency::getByCurrencyCode(trim($currency['CurrencyName']), ['limit' => 1,'unpublished' => true]);
             if (!$currencyObject) {
                 echo " - Yeni";
                 $currencyObject = new Currency();
@@ -51,7 +51,7 @@ class CurrencyCommand extends AbstractCommand
             }
             $currencyObject->setDate(Carbon::createFromFormat('m/d/Y', $array['@attributes']['Date']));
             $currencyObject->setRate($currency['ForexBuying']/$currency['Unit']);
-            $currencyObject->save();*/
+            $currencyObject->save();
             $this->updateCurrencyHistoryTable($currency,$date);
             echo "\n";
         }
