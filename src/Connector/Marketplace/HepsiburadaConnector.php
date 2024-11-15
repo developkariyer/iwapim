@@ -26,7 +26,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             $limit = 10;
             $this->listings = [];
             //do {
-                $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}", [
+                $response = $this->httpClient->request('GET', "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}", [
                     'headers' => [
                         'accept' => 'application/json',
                         'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
