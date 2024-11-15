@@ -800,7 +800,18 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo $currency['@attributes']['CurrencyCode']."\n";
             echo 'value: ' .  number_format($currency['ForexBuying']/$currency['Unit'],2)."\n";
             echo 'date: ' . $date."\n";
+            $currencyCode = $currency['@attributes']['CurrencyCode'];
+            $value = number_format($currency['ForexBuying']/$currency['Unit'],2);
+            $db = \Pimcore\Db::get();
+            $sql = "
+                INSERT INTO currency_historyy (currency_code, value, date) 
+                VALUES ('$currencyCode', $value, '$date')
+                ON DUPLICATE KEY UPDATE value = $value, date = '$date'
+            ";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
         }
+
     }
 
     protected static function updateCurrentCoin()
