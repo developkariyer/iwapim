@@ -798,7 +798,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
         foreach ($array['Currency'] as $currency) {
             echo $currency['@attributes']['CurrencyCode']."\n";
-            echo 'value: ' . $currency['ForexBuying']/$currency['Unit']."\n";
+            echo 'value: ' .  number_format($currency['ForexBuying']/$currency['Unit'],2)."\n";
             echo 'date: ' . $date."\n";
         }
     }
