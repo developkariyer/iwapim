@@ -794,9 +794,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         $array = json_decode($json, TRUE);
 	    echo "Current Date: ".date('m/d/Y')."\n";
         echo "TCMP Date: ".$array['@attributes']['Date']."\n";
+        list($month, $day, $year) = explode('/', $array['@attributes']['Date']);
+        $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
         foreach ($array['Currency'] as $currency) {
             echo $currency['@attributes']['CurrencyCode']."\n";
             echo 'value: ' . $currency['ForexBuying']/$currency['Unit']."\n";
+            echo 'date: ' . $date."\n";
         }
     }
 
