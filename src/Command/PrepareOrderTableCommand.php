@@ -788,19 +788,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             // Sorguyu çalıştırın
             $stmt->execute();
         }*/
-        $currentDate = "11/13/2024";
-        $tcmpDate = "11/12/2024";
-
-        // Tarihleri string ile parçalayıp yıl-ay-gün formatına dönüştürme
-        list($month, $day, $year) = explode('/', $currentDate);
-        $formattedCurrentDate = sprintf('%4d-%02d-%02d', $year, $month, $day);
-
-        list($month, $day, $year) = explode('/', $tcmpDate);
-        $formattedTcmpDate = sprintf('%4d-%02d-%02d', $year, $month, $day);
-
-        // Çıktıyı yazdır
-        echo "Current Date: " . $formattedCurrentDate . "\n";
-        echo "TCMP Date: " . $formattedTcmpDate . "\n";
+      
     }
 
     protected static function updateCurrentCoin()
