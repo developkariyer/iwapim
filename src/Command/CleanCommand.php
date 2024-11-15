@@ -231,8 +231,9 @@ class CleanCommand extends AbstractCommand
                         }
                         $listingUniqueIds = "";
                         foreach ($product->getListingItems() as $listingItem) {
-                            $listingUniqueIds .= "{$listingItem->getUniqueMarketplaceId()}\n";
+                            $listingUniqueIds .= "{$listingItem->getUniqueMarketplaceId()} ";
                         }
+                        $listingUniqueIds = trim($listingUniqueIds);
                         if ($listingUniqueIds !== $product->getListingUniqueIds()) {
                             $dirty = true;
                             $product->setListingUniqueIds($listingUniqueIds);
