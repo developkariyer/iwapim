@@ -792,7 +792,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function updateCurrentCoin()
     {
-        $db = \Pimcore\Db::get();
+        /*$db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items AS orders
         JOIN iwa_currency_historyy AS history
@@ -802,7 +802,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         WHERE DATE(orders.created_at) = history.date;
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute();*/
 
         /*
         $coins = self::exchangeCoin();
@@ -911,7 +911,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         UPDATE iwa_marketplace_orders_line_items AS items
         JOIN iwa_currency_historyy AS currency_history
             ON items.currency = currency_history.currency
-            AND items.created_at = currency_history.date 
+            AND DATE(items.created_at) = currency_history.date 
         JOIN iwa_currency_historyy AS usd_history
             ON usd_history.currency = 'USD'
             AND usd_history.date = currency_history.date
