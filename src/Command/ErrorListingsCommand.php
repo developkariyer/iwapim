@@ -66,8 +66,12 @@ class ErrorListingsCommand extends AbstractCommand
                 echo "\rProcessing $index {$object->getId()}";
                 $mainProduct = $object->getMainProduct();
                 $mainProductCount = $object->getCountMainProduct();
+                $objectDirty = false;
                 if (is_null($mainProductCount) || count($mainProduct) != $mainProductCount) {
                     $object->setCountMainProduct(count($mainProduct));
+                    $objectDirty = true;
+                }
+                if ($objectDirty) {
                     $object->save();
                     echo " updated\n";
                 }

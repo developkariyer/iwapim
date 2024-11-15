@@ -229,6 +229,14 @@ class CleanCommand extends AbstractCommand
                             $dirty = true;
                             $product->setRequiresIwasku(true);
                         }
+                        $listingUniqueIds = "";
+                        foreach ($product->getListingObjects() as $listingObject) {
+                            $listingUniqueIds .= "{$listingObject->getUniqueMarketplaceId()}\n";
+                        }
+                        if ($listingUniqueIds !== $product->getListingUniqueIds()) {
+                            $dirty = true;
+                            $product->setListingUniqueIds($listingUniqueIds);
+                        }
                         break;
                     default:
                         echo "?{$product->getId()}\n";
