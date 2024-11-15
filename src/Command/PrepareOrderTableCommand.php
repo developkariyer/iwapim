@@ -795,7 +795,8 @@ class PrepareOrderTableCommand extends AbstractCommand
 	    echo "Current Date: ".date('m/d/Y')."\n";
         echo "TCMP Date: ".$array['@attributes']['Date']."\n";
         foreach ($array['Currency'] as $currency) {
-            print_r($currency);                
+            echo $currency['@attributes']['CurrencyCode']."\n";
+            echo 'value: ' . $currency['ForexBuying']/$currency['Unit']."\n";
         }
     }
 
