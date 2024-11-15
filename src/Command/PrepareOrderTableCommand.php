@@ -773,7 +773,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         
             // SQL sorgusunu hazırlayın (veritabanına eklemek için)
             $sql = "
-            INSERT INTO iwa_currency_historyy (date, currency, value)
+            INSERT INTO iwa_currency_history (date, currency, value)
             VALUES (:date, :currency, :value)
             ";
         
