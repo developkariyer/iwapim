@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Folder;
+use Pimcore\Model\DataObject\Marketplace;
+use App\Connector\Marketplace\AmazonConnector;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
 use App\Utils\Utility;
 
@@ -26,6 +28,7 @@ class ErrorListingsCommand extends AbstractCommand
             ->addOption('multiconnected',null, InputOption::VALUE_NONE, 'List listings with multiple main products')
             ->addOption('unpublish',null, InputOption::VALUE_NONE, 'Move unpublished listings to _Pasif folders')
             ->addOption('updatecount',null, InputOption::VALUE_NONE, 'Update main product count')
+            ->addOption('amazon-safety', null, InputOption::VALUE_NONE, 'Set gpsr_safety_attestation to TRUE and set dsa_responsible_person_email to responsible@iwaconcept.com')
             ;
     }
 
@@ -43,7 +46,57 @@ class ErrorListingsCommand extends AbstractCommand
         if ($input->getOption('updatecount')) {
             $this->updateMainProductCounts();
         }
+        if ($input->getOption('amazon-safety')) {
+            $this->amazonSafetyFix();
+        }
         return Command::SUCCESS;
+    }
+
+    private function amazonSafetyFix()
+    {
+        $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
+        if (!$amazonConnector) {
+            echo "Amazon connector not connected!\n";
+            return;
+        }
+        $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
+        $variantObject = new VariantListing();
+        $pageSize = 5;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(false);
+        $index = 0;
+        while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($results as $listing) {
+                $index++;
+                echo "\rProcessing $index {$listing->getId()}";
+                $marketplace = $listing->getMarketplace();
+                if ($marketplace->getMarketplaceType !== 'Amazon') {
+                    continue;
+                }
+                $amazonMarketplaces = $listing->getAmazonMarketplace();
+                foreach ($amazonMarketplaces as $amazonMarketplace) {
+                    if (!in_array($amazonMarketplace->getMarketplaceId(), $amazonEuMarkets) || $amazonMarketplace->getStatus() !== 'Active') {
+                        continue;
+                    }
+                    $sku = $amazonMarketplace->getSku();
+                    if (empty($sku)) {
+                        continue;
+                    }
+                    foreach ($amazonEuMarkets as $country) {
+                        echo " $country $sku ";
+                        $amazonConnector->patchListing($sku, $country);
+                    }
+                }
+            }
+        }
+        echo "\nFinished\n";
     }
 
     private function updateMainProductCounts()

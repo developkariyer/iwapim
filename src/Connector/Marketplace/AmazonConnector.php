@@ -552,32 +552,29 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $country = $this->mainCountry;
         }
         $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
-        /*
-        echo "Getting details for SKU $sku\n";
+        
+        echo "Processing $sku details";
         $listing = $listingsApi->getListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             sku: rawurlencode($sku),
             includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
         );
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTlistingsItems_SKU.json", json_encode($listing->json()));
 
         $productType = $listing->json()['summaries'][0]['productType'] ?? '';
 
         if (empty($productType)) { return; }
+        echo " $productType";
 
-        echo "Getting definitions for product type $productType\n";
+        /*
+        echo " $productType definitions";
         $productTypeDefinitionsApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
         $definitions = $productTypeDefinitionsApi->getDefinitionsProductType(
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             sellerId: $this->marketplace->getMerchantId(),
             productType: $productType
         );
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTproductTypeDefinitions.json", json_encode($definitions->json()));
-
         */
-        $productType = "WALL_ART";
-
         $patches = [
             new PatchOperation(
                 op: "replace",
@@ -611,40 +608,20 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             )
         ];
 
-            /*
-            new PatchOperation(
-                op: "replace",
-                path: "/attributes/gpsr_safety_attestation",
-                value: ["true"]
-            ),
-            new PatchOperation(
-                op: "replace",
-                path: "/attributes/dsa_responsible_party_address",
-                value: ["responsible@iwaconcept.com"]
-            ),
-            new PatchOperation(
-                op: "replace",
-                path: "/attributes/gpsr_manufacturer_reference",
-                value: ["responsible@iwaconcept.com"]
-            )*/
-
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
             productType: $productType,
             patches: $patches,
         );
 
-        echo "Patching SKU $sku\n";
+        echo " patching";
         $patch = $listingsApi->patchListingsItem(
             sellerId: $this->marketplace->getMerchantId(),
             sku: rawurlencode($sku),
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             listingsItemPatchRequest: $listingsItemPatchRequest
         );
-
-
-        echo "Patched SKU $sku\n";
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTpatchListingsItem_SKU.json", json_encode($patch->json()));
-        print_r($patch->json());
+        echo " OK\n";
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$sku.json", json_encode($patch->json()));
     }
 
 }
