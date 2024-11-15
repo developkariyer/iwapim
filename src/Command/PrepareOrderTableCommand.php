@@ -804,7 +804,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $value = number_format($currency['ForexBuying']/$currency['Unit'],2);
             $db = \Pimcore\Db::get();
             $sql = "
-                INSERT INTO currency_historyy (currency_code, value, date) 
+                INSERT INTO iwa_currency_historyy (currency_code, value, date) 
                 VALUES ('$currencyCode', $value, '$date')
                 ON DUPLICATE KEY UPDATE value = $value, date = '$date'
             ";
