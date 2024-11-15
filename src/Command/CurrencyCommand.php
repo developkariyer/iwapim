@@ -64,7 +64,7 @@ class CurrencyCommand extends AbstractCommand
         $value = number_format($currency['ForexBuying'] / $currency['Unit'],2);
         $db = \Pimcore\Db::get();
         $sql = "
-            INSERT INTO iwa_currency_historyy (date, currency, value) 
+            INSERT INTO iwa_currency_history (date, currency, value) 
             VALUES ('$date' , '$currencyCode', $value)
             ON DUPLICATE KEY UPDATE value = $value, date = '$date'
         ";
