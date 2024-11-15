@@ -66,6 +66,7 @@ class ErrorListingsCommand extends AbstractCommand
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
         $index = $offset;
+        $patched = [];
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
@@ -94,7 +95,12 @@ class ErrorListingsCommand extends AbstractCommand
                     }
                     echo " $country $sku ";
                     //$amazonConnector[$marketplace->getId()]->patchListing($sku, $country);
+                    if (isset($patched["$country-$sku"])) {
+                        echo " Already patched\n";
+                        continue;
+                    }
                     $amazonConnector[200568]->patchListing($sku, $country);
+                    $patched["$country-$sku"] = true;
                 }
             }
         }
