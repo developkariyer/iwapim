@@ -230,8 +230,8 @@ class CleanCommand extends AbstractCommand
                             $product->setRequiresIwasku(true);
                         }
                         $listingUniqueIds = "";
-                        foreach ($product->getListingObjects() as $listingObject) {
-                            $listingUniqueIds .= "{$listingObject->getUniqueMarketplaceId()}\n";
+                        foreach ($product->getListingItems() as $listingItem) {
+                            $listingUniqueIds .= "{$listingItem->getUniqueMarketplaceId()}\n";
                         }
                         if ($listingUniqueIds !== $product->getListingUniqueIds()) {
                             $dirty = true;
