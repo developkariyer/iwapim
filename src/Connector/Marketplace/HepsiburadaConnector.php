@@ -26,9 +26,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             $limit = 10;
             $this->listings = [];
             //do {
-                $response = $this->httpClient->request('GET', "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getHepsiburadaMerchantId()}", [
+                $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}", [
                     'headers' => [
-                        'accept' => 'application/json'
+                        'accept' => 'application/json',
+                        'authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                     ],
                     'query' => [
                         'offset' => $offset,
@@ -40,7 +41,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }*/
-                print_r($response);
+                print_r($response->getContent());
                 $data = $response->toArray();
                 $products = $data['listings'];
                 $this->listings = array_merge($this->listings, $products);

@@ -55,6 +55,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->calculatePrice();
         return Command::SUCCESS;
     }
     
@@ -759,69 +760,49 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function exchangeCoin()
     {
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/EVDS.xlsx';
+        /*$filePath = PIMCORE_PROJECT_ROOT. '/src/Command/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
-        $result = [];
-        $previousUsd = null;
-        $previousEuro = null;
-
+        $db = \Pimcore\Db::get();
         foreach ($data as $row) {
-            $tarih = $row[0] ?? null; 
-            $usd = $row[1] ?? null; 
-            $euro = $row[2] ?? null;   
+            // Excel'deki her satırdaki verilere karşılık gelen sütunları alalım
+            $date = $row[0];  // Tarih
+            $currency = $row[1];  // Döviz türü (USD, EUR, vb.)
+            $value = $row[2];  // Döviz değeri
         
-            if ($tarih !== null) {
-                $dateParts = explode('-', $tarih);
-                if (count($dateParts) === 3) {
-                    [$gun, $ay, $yil] = $dateParts;
-                    $tarih = "$yil-$ay-$gun";
-                } 
-            }
+            // SQL sorgusunu hazırlayın (veritabanına eklemek için)
+            $sql = "
+            INSERT INTO iwa_currency_history (date, currency, value)
+            VALUES (:date, :currency, :value)
+            ";
         
-            if ($usd !== null) {
-                $previousUsd = $usd;
-            } else {
-                $usd = $previousUsd;
-            }
+            // Sorguyu hazırlayın
+            $stmt = $db->prepare($sql);
         
-            if ($euro !== null) {
-                $previousEuro = $euro;
-            } else {
-                $euro = $previousEuro;
-            }
+            // Parametreleri bind edin
+            $stmt->bindParam(':date', $date);
+            $stmt->bindParam(':currency', $currency);
+            $stmt->bindParam(':value', $value);
         
-            $result[$tarih] = [
-                'usd' => $usd,
-                'euro' => $euro
-            ];
-        }
-        foreach ($result as &$item) {
-            if (isset($item['tarih'])) {
-                $dateParts = explode('-', $item['tarih']);                
-                if (count($dateParts) === 3) {
-                    list($gun, $ay, $yil) = $dateParts;        
-                    $item['tarih'] = "$yil-$ay-$gun";
-                } 
-            }
-        }
-        return $result;
+            // Sorguyu çalıştırın
+            $stmt->execute();
+        }*/
     }
 
     protected static function updateCurrentCoin()
     {
-        $db = \Pimcore\Db::get();
+        /*$db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items AS orders
-        JOIN currency_history AS history
+        JOIN iwa_currency_historyy AS history
         ON DATE(orders.created_at) = history.date
         SET orders.current_USD = history.usd, 
             orders.current_EUR = history.eur
         WHERE DATE(orders.created_at) = history.date;
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute();*/
 
         /*
         $coins = self::exchangeCoin();
@@ -877,7 +858,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         CASE 
             WHEN fulfillments_status = 'success' 
             OR fulfillments_status = 'Delivered'
-            OR fullfillments_status = 'HANDLED'
+            OR fulfillments_status = 'HANDLED'
             THEN TRUE
             ELSE FALSE
         END;
@@ -927,21 +908,33 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "
-        UPDATE iwa_marketplace_orders_line_items
+        UPDATE iwa_marketplace_orders_line_items AS items
+        JOIN iwa_currency_historyy AS currency_history
+            ON items.currency = currency_history.currency
+            AND DATE(items.created_at) = DATE(currency_history.date) 
+        JOIN iwa_currency_historyy AS usd_history
+            ON usd_history.currency = 'USD'
+            AND DATE(usd_history.date) = DATE(currency_history.date)
         SET 
-            product_price_usd = CASE 
-                        WHEN currency = 'USD' THEN price
-                        WHEN currency = 'TRY' THEN ROUND((price * 100 / current_USD), 2) / 100
-                        ELSE price
-                    END,
-            total_price_usd = CASE 
-                            WHEN currency = 'USD' THEN total_price
-                            WHEN currency = 'TRY' THEN ROUND((total_price * 100 / current_USD), 2) / 100
-                            ELSE total_price
-                        END;
+            items.product_price_usd = CASE 
+                WHEN items.currency = 'USD' THEN items.price
+                ELSE ROUND((items.price / usd_history.value), 2)
+            END,
+                items.total_price_usd = CASE 
+                    WHEN items.currency = 'USD' THEN items.total_price
+                    ELSE ROUND((items.total_price / usd_history.value), 2)
+            END;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $affectedRows = $stmt->rowCount();
+            echo "SQL Query executed successfully. Affected rows: " . $affectedRows;
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
     protected function countryCode()

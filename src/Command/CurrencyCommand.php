@@ -35,8 +35,10 @@ class CurrencyCommand extends AbstractCommand
         $xml = simplexml_load_file($url);
         $json = json_encode($xml);
         $array = json_decode($json, TRUE);
-	echo "Current Date: ".date('m/d/Y')."\n";
+	    echo "Current Date: ".date('m/d/Y')."\n";
         echo "TCMP Date: ".$array['@attributes']['Date']."\n";
+        list($month, $day, $year) = explode('/', $array['@attributes']['Date']);
+        $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
         foreach ($array['Currency'] as $currency) {
             echo trim($currency['CurrencyName']) . " - " . $currency['ForexBuying']/$currency['Unit'];
             $currencyObject = Currency::getByCurrencyCode(trim($currency['CurrencyName']), ['limit' => 1,'unpublished' => true]);
@@ -50,8 +52,23 @@ class CurrencyCommand extends AbstractCommand
             $currencyObject->setDate(Carbon::createFromFormat('m/d/Y', $array['@attributes']['Date']));
             $currencyObject->setRate($currency['ForexBuying']/$currency['Unit']);
             $currencyObject->save();
+            $this->updateCurrencyHistoryTable($currency,$date);
             echo "\n";
         }
         return Command::SUCCESS;
+    }
+
+    protected function updateCurrencyHistoryTable($currency,$date)
+    {
+        $currencyCode = $currency['@attributes']['CurrencyCode'];
+        $value = number_format($currency['ForexBuying'] / $currency['Unit'],2);
+        $db = \Pimcore\Db::get();
+        $sql = "
+            INSERT INTO iwa_currency_history (date, currency, value) 
+            VALUES ('$date' , '$currencyCode', $value)
+            ON DUPLICATE KEY UPDATE value = $value, date = '$date'
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
     }
 }
