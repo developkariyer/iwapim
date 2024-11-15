@@ -927,6 +927,15 @@ class PrepareOrderTableCommand extends AbstractCommand
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            // Log Success
+            \Pimcore\Log\Simple::log("SQL Query executed successfully.");
+        } catch (\Exception $e) {
+            // Log Error
+            \Pimcore\Log\Simple::log("Error executing SQL: " . $e->getMessage());
+        }
     }
 
     protected function countryCode()
