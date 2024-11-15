@@ -55,7 +55,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->exchangeCoin();
+        $this->calculatePrice();
         return Command::SUCCESS;
     }
     
@@ -795,7 +795,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items AS orders
-        JOIN currency_history AS history
+        JOIN iwa_currency_history AS history
         ON DATE(orders.created_at) = history.date
         SET orders.current_USD = history.usd, 
             orders.current_EUR = history.eur
@@ -820,8 +820,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         }*/
     }
-
-    
 
     protected function insertClosedAtDiff()
     {
@@ -910,18 +908,22 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "
-        UPDATE iwa_marketplace_orders_line_items
+        UPDATE iwa_marketplace_orders_line_items AS items
+        JOIN iwa_currency_history AS currency_history
+            ON items.currency = currency_history.currency
+            AND items.created_at = currency_history.date 
+        JOIN iwa_currency_history AS usd_history
+            ON usd_history.currency = 'USD'
+            AND usd_history.date = currency_history.date
         SET 
-            product_price_usd = CASE 
-                        WHEN currency = 'USD' THEN price
-                        WHEN currency = 'TRY' THEN ROUND((price * 100 / current_USD), 2) / 100
-                        ELSE price
-                    END,
-            total_price_usd = CASE 
-                            WHEN currency = 'USD' THEN total_price
-                            WHEN currency = 'TRY' THEN ROUND((total_price * 100 / current_USD), 2) / 100
-                            ELSE total_price
-                        END;
+            items.product_price_usd = CASE 
+                WHEN items.currency = 'USD' THEN items.price
+                ELSE ROUND((items.price / usd_history.value), 2)
+            END,
+                items.total_price_usd = CASE 
+                    WHEN items.currency = 'USD' THEN items.total_price
+                    ELSE ROUND((items.total_price / usd_history.value), 2)
+            END;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
