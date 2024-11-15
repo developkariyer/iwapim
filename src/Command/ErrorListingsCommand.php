@@ -54,11 +54,11 @@ class ErrorListingsCommand extends AbstractCommand
 
     private function amazonSafetyFix()
     {
-        $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
-        if (!$amazonConnector) {
-            echo "Amazon connector not connected!\n";
-            return;
-        }
+        $amazonConnector = [
+            200568 => new AmazonConnector(Marketplace::getById(200568)), // UK Amazon
+            149795 => new AmazonConnector(Marketplace::getById(149795)), // US Amazon
+            234692 => new AmazonConnector(Marketplace::getById(234692)), // CA Amazon
+        ];
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
         $variantObject = new VariantListing();
         $pageSize = 5;
@@ -78,23 +78,22 @@ class ErrorListingsCommand extends AbstractCommand
                 echo "\rProcessing $index {$listing->getId()}";
                 $marketplace = $listing->getMarketplace();
                 echo " {$marketplace->getMarketplaceType()}                ";
-                if ($marketplace->getMarketplaceType() !== 'Amazon' || $marketplace->getId() !== 200568) {
+                if ($marketplace->getMarketplaceType() !== 'Amazon') {
                     continue;
                 }
                 echo "\n";
                 $amazonMarketplaces = $listing->getAmazonMarketplace();
                 foreach ($amazonMarketplaces as $amazonMarketplace) {
-                    if (!in_array($amazonMarketplace->getMarketplaceId(), $amazonEuMarkets) || $amazonMarketplace->getStatus() !== 'Active') {
+                    $country = $amazonMarketplace->getMarketplaceId();
+                    if (!in_array($country, $amazonEuMarkets) || $amazonMarketplace->getStatus() !== 'Active') {
                         continue;
                     }
                     $sku = $amazonMarketplace->getSku();
                     if (empty($sku)) {
                         continue;
                     }
-                    foreach ($amazonEuMarkets as $country) {
-                        echo " $country $sku ";
-                        $amazonConnector->patchListing($sku, $country);
-                    }
+                    echo " $country $sku ";
+                    $amazonConnector[$marketplace->getId()]->patchListing($sku, $country);
                 }
             }
         }

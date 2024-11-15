@@ -16,6 +16,8 @@ use Pimcore\Model\DataObject\Marketplace\Listing;
 */
 class Marketplace extends Concrete
 {
+    private $connector;
+    
     /**
     * Retrieves a list of marketplaces based on the specified type.
     *
