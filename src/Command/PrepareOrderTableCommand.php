@@ -930,11 +930,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         try {
             $stmt = $db->prepare($sql);
             $stmt->execute();
-            // Log Success
-            \Pimcore\Log\Simple::log("SQL Query executed successfully.");
+            $affectedRows = $stmt->rowCount();
+            echo "SQL Query executed successfully. Affected rows: " . $affectedRows;
         } catch (\Exception $e) {
-            // Log Error
-            \Pimcore\Log\Simple::log("Error executing SQL: " . $e->getMessage());
+            echo "Error: " . $e->getMessage();
         }
     }
 
