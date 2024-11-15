@@ -93,12 +93,10 @@ class ErrorListingsCommand extends AbstractCommand
                     if (empty($sku)) {
                         continue;
                     }
-                    echo " $country $sku ";
-                    //$amazonConnector[$marketplace->getId()]->patchListing($sku, $country);
                     if (isset($patched["$country-$sku"])) {
-                        echo " Already patched\n";
                         continue;
                     }
+                    echo " $country $sku ";
                     $amazonConnector[200568]->patchListing($sku, $country);
                     $patched["$country-$sku"] = true;
                 }
