@@ -877,7 +877,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         CASE 
             WHEN fulfillments_status = 'success' 
             OR fulfillments_status = 'Delivered'
-            OR fullfillments_status = 'HANDLED'
+            OR fulfillments_status = 'HANDLED'
             THEN TRUE
             ELSE FALSE
         END;
