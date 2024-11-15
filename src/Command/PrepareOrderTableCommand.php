@@ -909,10 +909,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items AS items
-        JOIN iwa_currency_history AS currency_history
+        JOIN iwa_currency_historyy AS currency_history
             ON items.currency = currency_history.currency
             AND items.created_at = currency_history.date 
-        JOIN iwa_currency_history AS usd_history
+        JOIN iwa_currency_historyy AS usd_history
             ON usd_history.currency = 'USD'
             AND usd_history.date = currency_history.date
         SET 
