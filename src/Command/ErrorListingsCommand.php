@@ -65,7 +65,7 @@ class ErrorListingsCommand extends AbstractCommand
         $offset = 14730;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
-        $index = 0;
+        $index = $offset;
         while (true) {
             $variantObject->setOffset($offset);
             $results = $variantObject->load();
