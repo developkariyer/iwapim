@@ -760,7 +760,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function exchangeCoin()
     {
-        $filePath = 'EVDS.xlsx';
+        $filePath = PIMCORE_PROJECT_ROOT. '/src/Command/EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
