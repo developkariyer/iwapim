@@ -788,30 +788,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             // Sorguyu çalıştırın
             $stmt->execute();
         }*/
-        $url = "https://www.tcmb.gov.tr/kurlar/today.xml";
-        $xml = simplexml_load_file($url);
-        $json = json_encode($xml);
-        $array = json_decode($json, TRUE);
-	    echo "Current Date: ".date('m/d/Y')."\n";
-        echo "TCMP Date: ".$array['@attributes']['Date']."\n";
-        list($month, $day, $year) = explode('/', $array['@attributes']['Date']);
-        $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
-        foreach ($array['Currency'] as $currency) {
-            echo $currency['@attributes']['CurrencyCode']."\n";
-            echo 'value: ' .  number_format($currency['ForexBuying']/$currency['Unit'],2)."\n";
-            echo 'date: ' . $date."\n";
-            $currencyCode = $currency['@attributes']['CurrencyCode'];
-            $value = number_format($currency['ForexBuying']/$currency['Unit'],2);
-            $db = \Pimcore\Db::get();
-            $sql = "
-                INSERT INTO iwa_currency_historyy (date,currency, value) 
-                VALUES ('$date' , '$currencyCode', $value)
-                ON DUPLICATE KEY UPDATE value = $value, date = '$date'
-            ";
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-        }
-
     }
 
     protected static function updateCurrentCoin()
