@@ -62,7 +62,7 @@ class ErrorListingsCommand extends AbstractCommand
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
         $variantObject = new VariantListing();
         $pageSize = 5;
-        $offset = 0;
+        $offset = 14730;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
         $index = 0;
@@ -78,7 +78,7 @@ class ErrorListingsCommand extends AbstractCommand
                 echo "\rProcessing $index {$listing->getId()}";
                 $marketplace = $listing->getMarketplace();
                 echo " {$marketplace->getMarketplaceType()}                ";
-                if ($marketplace->getMarketplaceType() !== 'Amazon') {
+                if ($marketplace->getMarketplaceType() !== 'Amazon' || $marketplace->getId() !== 200568) {
                     continue;
                 }
                 echo "\n";
