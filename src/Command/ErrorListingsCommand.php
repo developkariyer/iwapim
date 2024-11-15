@@ -93,7 +93,8 @@ class ErrorListingsCommand extends AbstractCommand
                         continue;
                     }
                     echo " $country $sku ";
-                    $amazonConnector[$marketplace->getId()]->patchListing($sku, $country);
+                    //$amazonConnector[$marketplace->getId()]->patchListing($sku, $country);
+                    $amazonConnector[200568]->patchListing($sku, $country);
                 }
             }
         }
