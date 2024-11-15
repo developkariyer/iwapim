@@ -55,6 +55,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->exchangeCoin();
         return Command::SUCCESS;
     }
     
@@ -759,54 +760,34 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function exchangeCoin()
     {
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/EVDS.xlsx';
+        $filePath = 'EVDS.xlsx';
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = $worksheet->toArray();
-        $result = [];
-        $previousUsd = null;
-        $previousEuro = null;
-
+        $db = \Pimcore\Db::get();
         foreach ($data as $row) {
-            $tarih = $row[0] ?? null; 
-            $usd = $row[1] ?? null; 
-            $euro = $row[2] ?? null;   
+            // Excel'deki her satırdaki verilere karşılık gelen sütunları alalım
+            $date = $row[0];  // Tarih
+            $currency = $row[1];  // Döviz türü (USD, EUR, vb.)
+            $value = $row[2];  // Döviz değeri
         
-            if ($tarih !== null) {
-                $dateParts = explode('-', $tarih);
-                if (count($dateParts) === 3) {
-                    [$gun, $ay, $yil] = $dateParts;
-                    $tarih = "$yil-$ay-$gun";
-                } 
-            }
+            // SQL sorgusunu hazırlayın (veritabanına eklemek için)
+            $sql = "
+            INSERT INTO iwa_currency_historyy (date, currency, value)
+            VALUES (:date, :currency, :value)
+            ";
         
-            if ($usd !== null) {
-                $previousUsd = $usd;
-            } else {
-                $usd = $previousUsd;
-            }
+            // Sorguyu hazırlayın
+            $stmt = $db->prepare($sql);
         
-            if ($euro !== null) {
-                $previousEuro = $euro;
-            } else {
-                $euro = $previousEuro;
-            }
+            // Parametreleri bind edin
+            $stmt->bindParam(':date', $date);
+            $stmt->bindParam(':currency', $currency);
+            $stmt->bindParam(':value', $value);
         
-            $result[$tarih] = [
-                'usd' => $usd,
-                'euro' => $euro
-            ];
+            // Sorguyu çalıştırın
+            $stmt->execute();
         }
-        foreach ($result as &$item) {
-            if (isset($item['tarih'])) {
-                $dateParts = explode('-', $item['tarih']);                
-                if (count($dateParts) === 3) {
-                    list($gun, $ay, $yil) = $dateParts;        
-                    $item['tarih'] = "$yil-$ay-$gun";
-                } 
-            }
-        }
-        return $result;
     }
 
     protected static function updateCurrentCoin()
@@ -839,6 +820,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         }*/
     }
+
+    
 
     protected function insertClosedAtDiff()
     {
