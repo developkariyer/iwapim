@@ -37,6 +37,7 @@ class SlackAiController
         $threadTs = $content['thread_ts'] ?? null;
 
         $this->messageBus->dispatch(new SlackMessage($incomingText, $responseUrl, $threadTs));
+        error_log('Message received and queued for processing');
 
         return new Response('Message received and queued for processing', Response::HTTP_OK);
     }
