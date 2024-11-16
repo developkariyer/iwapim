@@ -33,19 +33,17 @@ class SlackMessageHandler implements MessageHandlerInterface
                 $payload['thread_ts'] = $message->getThreadTs();
             }
 
-            // Send the response back to Slack
-            $this->sendResponseToSlack($message->getResponseUrl(), $payload);
+            // Send the response back to Slack using the Webhook URL
+            $this->sendResponseToSlack($payload);
 
             $this->logger->info('SlackMessage processed successfully', [
                 'text' => $message->getText(),
-                'response_url' => $message->getResponseUrl(),
                 'thread_ts' => $message->getThreadTs(),
             ]);
         } catch (\Exception $e) {
             $this->logger->error('Failed to process SlackMessage', [
                 'message' => $e->getMessage(),
                 'text' => $message->getText(),
-                'response_url' => $message->getResponseUrl(),
             ]);
         }
     }
@@ -61,12 +59,19 @@ class SlackMessageHandler implements MessageHandlerInterface
         return "I received your message: $text";
     }
 
-    private function sendResponseToSlack(string $responseUrl, array $payload): void
+    private function sendResponseToSlack(array $payload): void
     {
         $httpClient = HttpClient::create();
 
-        // Send POST request to Slack's response_url
-        $response = $httpClient->request('POST', $responseUrl, [
+        // Use predefined Webhook URL from environment variable
+        $webhookUrl = $_ENV['SLACK_AI_WEBHOOK_URL'] ?? null;
+
+        if (!$webhookUrl) {
+            throw new \RuntimeException('SLACK_AI_WEBHOOK_URL is not defined in environment variables.');
+        }
+
+        // Send POST request to Slack Webhook URL
+        $response = $httpClient->request('POST', $webhookUrl, [
             'json' => $payload,
         ]);
 
