@@ -9,17 +9,27 @@ use Psr\Log\LoggerInterface;
 class SlackMessageHandler implements MessageHandlerInterface
 {
     private LoggerInterface $logger;
+    private string $botUserId;
 
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
+        $this->botUserId = 'U080PEA1HAR'; 
     }
 
     public function __invoke(SlackMessage $message): void
     {
         try {
             // Process the message content
-            $responseText = $this->processMessage($message->getText());
+            $responseText = $this->processMessage(
+                trim(
+                    preg_replace(
+                        '/<@' . preg_quote($this->botUserId, '/') . '>/', 
+                        '', 
+                        $message->getText()
+                    )
+                )
+            );
 
             // Prepare payload for Slack response
             $payload = [
