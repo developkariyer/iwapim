@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\SlackAi\SlackMessage;
 
-class SlackAi
+class SlackAiController
 {
     private MessageBusInterface $messageBus;
 
