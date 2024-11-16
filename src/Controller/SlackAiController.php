@@ -24,22 +24,35 @@ class SlackAiController
     {
         $content = json_decode($request->getContent(), true);
 
+        // Log the payload for debugging
+        error_log('Payload received: ' . print_r($content, true));
+
+        // Handle Slack URL Verification Challenge
         if (isset($content['type']) && $content['type'] === 'url_verification') {
             return new Response($content['challenge'], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
         }
-        error_log('Payload received: ' . print_r($content, true));
 
-        if (!isset($content['text']) || !isset($content['response_url'])) {
+        // Validate payload structure
+        if (!isset($content['event']['text']) || !isset($content['event']['channel'])) {
+            error_log('Invalid payload structure: ' . json_encode($content));
             return new Response('Invalid Slack payload', Response::HTTP_BAD_REQUEST);
         }
 
-        $incomingText = $content['text'];
-        $responseUrl = $content['response_url'];
-        $threadTs = $content['thread_ts'] ?? null;
+        // Extract necessary data
+        $incomingText = $content['event']['text'];
+        $channel = $content['event']['channel'];
+        $responseUrl = $content['response_url'] ?? null; // Note: response_url might not always be present in this payload
+        $threadTs = $content['event']['thread_ts'] ?? $content['event']['ts'] ?? null;
 
-        $this->messageBus->dispatch(new SlackMessage($incomingText, $responseUrl, $threadTs));
-        error_log('Message received and queued for processing');
+        // Dispatch the message to the queue
+        $this->messageBus->dispatch(new SlackMessage($incomingText, $channel, $threadTs));
+        error_log('Message dispatched to queue: ' . json_encode([
+            'text' => $incomingText,
+            'channel' => $channel,
+            'thread_ts' => $threadTs,
+        ]));
 
+        // Return an immediate response
         return new Response('Message received and queued for processing', Response::HTTP_OK);
     }
 }
