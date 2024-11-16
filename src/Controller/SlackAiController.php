@@ -27,6 +27,7 @@ class SlackAiController
         if (isset($content['type']) && $content['type'] === 'url_verification') {
             return new Response($content['challenge'], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
         }
+        error_log('Payload received: ' . print_r($content, true));
 
         if (!isset($content['text']) || !isset($content['response_url'])) {
             return new Response('Invalid Slack payload', Response::HTTP_BAD_REQUEST);
