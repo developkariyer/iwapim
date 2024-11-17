@@ -82,7 +82,7 @@ class SlackMessageHandler implements MessageHandlerInterface
         error_log("Assistant run created successfully: {$runResponse->id}");
 
         $responseContent = "";
-        do {
+        while (true) {
             $running = false;
             while (!in_array($runResponse->status, ['requires_action', 'completed', 'failed', 'cancelled', 'expired'])) {
                 error_log("Assistant run status: {$runResponse->status}");
@@ -93,7 +93,6 @@ class SlackMessageHandler implements MessageHandlerInterface
             $tool_outputs = [];
             $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
             error_log("Assistant run steps fetched successfully.");
-            $responseContent = null;
             foreach ($runStepList->data as $step) {
                 if ($step->stepDetails->type === 'message_creation') {
                     error_log("Assistant response step found: {$step->stepDetails->messageCreation->messageId}");
@@ -130,7 +129,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                 error_log("Assistant run completed successfully.");
                 break;
             }
-        } while (!$running);
+        } 
         $client->threads()->delete($threadId);
         return $responseContent ?? "Hüstın bir sorun var...";
     }
