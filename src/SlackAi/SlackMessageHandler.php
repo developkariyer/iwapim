@@ -82,6 +82,7 @@ class SlackMessageHandler implements MessageHandlerInterface
         error_log("Assistant run created successfully: {$runResponse->id}");
 
         $responseContent = "";
+        $loopCounter = 0;
         while (true) {
             $running = false;
             while (!in_array($runResponse->status, ['requires_action', 'completed', 'failed', 'cancelled', 'expired'])) {
@@ -142,8 +143,11 @@ class SlackMessageHandler implements MessageHandlerInterface
                 error_log("Tool outputs submitted successfully.");
             } else {
                 error_log("Assistant run completed successfully.");
-                if (!empty($responseContent)) {
+                if (!empty($responseContent) || $loopCounter > 10) {
                     break;
+                } else {
+                    sleep(1);
+                    $loopCounter++;
                 }
             }
         } 
