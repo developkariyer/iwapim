@@ -124,6 +124,12 @@ class SlackMessageHandler implements MessageHandlerInterface
                 }
             }
             if ($running) {
+                $runResponse = $client->threads()->runs()->retrieve($threadId, $runResponse->id);
+                while (!in_array($runResponse->status, ['requires_action', 'completed', 'failed', 'cancelled', 'expired'])) {
+                    error_log("Assistant run status: {$runResponse->status}");
+                    sleep(1);
+                    $runResponse = $client->threads()->runs()->retrieve($threadId, $runResponse->id);
+                }    
                 $client->threads()->runs()->submitToolOutputs($threadId, $runResponse->id, ['tool_outputs' => $tool_outputs]);
                 error_log("Tool outputs submitted successfully.");
             } else {
