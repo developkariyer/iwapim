@@ -103,7 +103,7 @@ class SlackMessageHandler implements MessageHandlerInterface
         $responseContent = "";
         do {
             $running = false;
-            $client->threads()->runs()->stop($threadId, $runResponse->id);
+            $client->threads()->runs()->cancel($threadId, $runResponse->id);
             error_log("Assistant run stopped successfully.");
             $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
             error_log("Assistant run steps fetched successfully.");
