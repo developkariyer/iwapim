@@ -105,18 +105,22 @@ class SlackMessageHandler implements MessageHandlerInterface
                     error_log("Function call detected.");
                     $logarray = $step->stepDetails->toArray();
                     error_log(json_encode($logarray));
-                    $functionCallDetails = $step->stepDetails->toolCalls->functionCall;
-                    $callId = $functionCallDetails->id;
-                    $functionName = $functionCallDetails->function->name;
-                    $arguments = $functionCallDetails->function->arguments;
-                    error_log("Function Name: {$functionName}");
-                    error_log("Function Arguments: " . json_encode($arguments));
-                    $functionResult = $this->executeFunction($functionName, $arguments);
-                    $tool_outputs[] = [
-                        'tool_call_id' => $callId,
-                        'output' => $functionResult,
-                    ];
-                    $running = true;
+                    $toolCalls = $step->stepDetails->toolCalls ?? [];
+                    foreach ($toolCalls as $toolCall) {
+                        $callId = $toolCall->id;
+                        if ($toolCall->type === 'function') {
+                            $functionName = $toolCall->function->name;
+                            $arguments = $toolCall->function->arguments;
+                            error_log("Function Name: {$functionName}");
+                            error_log("Function Arguments: " . json_encode($arguments));
+                            $functionResult = $this->executeFunction($functionName, $arguments);
+                            $tool_outputs[] = [
+                                'tool_call_id' => $callId,
+                                'output' => $functionResult,
+                            ];
+                            $running = true;
+                        }
+                    }
                 }
             }
             if ($running) {
