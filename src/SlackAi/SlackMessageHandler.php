@@ -135,10 +135,10 @@ class SlackMessageHandler implements MessageHandlerInterface
         return $responseContent ?? "Hüstın bir sorun var...";
     }
 
-    private function executeFunction(string $functionName, array $arguments): string
+    private function executeFunction(string $functionName, string $arguments): string
     {
         return match($functionName) {
-            'run_mysql_query' => $this->runMysqlQuery($arguments),
+            'run_mysql_query' => $this->runMysqlQuery(json_decode($arguments, true)),
             default => "Function not found: {$functionName}",
         };
     }
