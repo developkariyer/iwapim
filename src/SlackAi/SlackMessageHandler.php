@@ -5,7 +5,7 @@ namespace App\SlackAi;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
-use OpenAI\Client;
+use OpenAI;
 
 class SlackMessageHandler implements MessageHandlerInterface
 {
@@ -64,7 +64,7 @@ class SlackMessageHandler implements MessageHandlerInterface
     {
         $db = \Pimcore\Db::get();
 
-        $client = new Client($_ENV['OPENAI_API_KEY'] ?? null);
+        $client = OpenAI::Client($_ENV['OPENAI_API_KEY'] ?? null);
         if (!$client) {
             throw new \RuntimeException('OPENAI_API_KEY is not defined in environment variables or Client init failed.');
         }
