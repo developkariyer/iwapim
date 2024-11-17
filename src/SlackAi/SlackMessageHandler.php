@@ -99,8 +99,12 @@ class SlackMessageHandler implements MessageHandlerInterface
                     error_log("Assistant response step found: {$step->stepDetails->messageCreation->messageId}");
                     $messageId = $step->stepDetails->messageCreation->messageId;
                     $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
-                    $responseContent .= "\n".$assistantMessage->content[0]->text->value;
-                    error_log("Assistant response message: {$assistantMessage->content[0]->text->value}");
+                    foreach ($assistantMessage->content ?? [] as $content) {
+                        if ($content->type === 'text') {
+                            $responseContent .= "\n".$content->text->value;
+                            error_log("Assistant response message: {$content->text->value}");
+                        }
+                    }
                 } elseif ($step->type === 'tool_calls') {
                     error_log("Function call detected.");
                     $logarray = $step->stepDetails->toArray();
