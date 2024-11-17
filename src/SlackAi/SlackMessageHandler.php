@@ -100,6 +100,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                     $messageId = $step->stepDetails->messageCreation->messageId;
                     $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
                     $responseContent .= "\n".$assistantMessage->content[0]->text->value;
+                    error_log("Assistant response message: {$assistantMessage->content[0]->text->value}");
                 } elseif ($step->stepDetails->type === 'tool_calls') {
                     error_log("Function call detected.");
                     $functionCallDetails = $step->stepDetails->tool_calls->functionCall;
@@ -119,6 +120,9 @@ class SlackMessageHandler implements MessageHandlerInterface
             if ($running) {
                 $client->threads()->runs()->submitToolOutputs($threadId, $runResponse->id, ['tool_outputs' => $tool_outputs]);
                 error_log("Tool outputs submitted successfully.");
+            } else {
+                error_log("Assistant run completed successfully.");
+                break;
             }
         } while (!$running);
         $client->threads()->delete($threadId);
