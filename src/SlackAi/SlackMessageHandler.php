@@ -62,49 +62,33 @@ class SlackMessageHandler implements MessageHandlerInterface
 
     private function processMessage(string $text, string $user): string
     {
-        $db = \Pimcore\Db::get();
         $client = OpenAI::Client($_ENV['OPENAI_SECRET'] ?? null);
         if (!$client) {
             throw new \RuntimeException('OPENAI_API_KEY is not defined in environment variables or Client init failed.');
         }
         error_log("OpenAI client initialized successfully.");
-        $threadId = $db->fetchOne("SELECT thread_id FROM iwa_assistant_thread WHERE user_id = ?", [$user]);
-        if ($threadId) {
-            error_log("Thread ID found in database: $threadId");
-            $messageResponse = $client->threads()->messages()->create($threadId, [
-                'role' => 'user',
-                'content' => $text,
-            ]);
-            error_log("User message created successfully: {$messageResponse->id}");
-            $runResponse = $client->threads()->runs()->create($threadId, [
-                'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
-            ]);
-        } else {
-            error_log("Thread ID not found in database. Creating new thread.");
-            $runResponse = $client->threads()->createAndRun([
-                'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
-                'thread' => [
-                    'messages' => [
-                        [
-                            'role' => 'user',
-                            'content' => $text,
-                        ],
+        $runResponse = $client->threads()->createAndRun([
+            'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
+            'thread' => [
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $text,
                     ],
                 ],
-            ]);
-            $threadId = $runResponse->threadId;
-            $db->executeQuery(
-                "INSERT INTO iwa_assistant_thread (thread_id, user_id) VALUES (?, ?)",
-                [$runResponse->threadId, $user]
-            );
-        }
+            ],
+        ]);
+        $threadId = $runResponse->threadId;
         error_log("Assistant run created successfully: {$runResponse->id}");
 
         $responseContent = "";
         do {
             $running = false;
-            $client->threads()->runs()->cancel($threadId, $runResponse->id);
-            error_log("Assistant run stopped successfully.");
+            while (!in_array($runResponse->status, ['requires_action', 'completed', 'failed', 'cancelled', 'expired'])) {
+                sleep(1);
+                $runResponse = $client->threads()->runs()->retrieve($threadId, $runResponse->id);
+            }
+            $tool_outputs = [];
             $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
             error_log("Assistant run steps fetched successfully.");
             $responseContent = null;
@@ -114,25 +98,28 @@ class SlackMessageHandler implements MessageHandlerInterface
                     $messageId = $step->stepDetails->messageCreation->messageId;
                     $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
                     $responseContent .= "\n".$assistantMessage->content[0]->text->value;
-                } elseif ($step->stepDetails->type === 'function_call') {
+                } elseif ($step->stepDetails->type === 'tool_calls') {
                     error_log("Function call detected.");
-                    $functionCallDetails = $step->stepDetails->functionCall;
-                    $functionName = $functionCallDetails->name;
-                    $arguments = $functionCallDetails->arguments;
+                    $functionCallDetails = $step->stepDetails->tool_calls->functionCall;
+                    $callId = $functionCallDetails->id;
+                    $functionName = $functionCallDetails->function->name;
+                    $arguments = $functionCallDetails->function->arguments;
                     error_log("Function Name: {$functionName}");
                     error_log("Function Arguments: " . json_encode($arguments));
                     $functionResult = $this->executeFunction($functionName, $arguments);
-                    $client->threads()->messages()->create($threadId, [
-                        'role' => 'assistant',
-                        'content' => json_encode([
-                            'function_name' => $functionName,
-                            'result' => $functionResult,
-                        ]),
-                    ]);
+                    $tool_outputs[] = [
+                        'tool_call_id' => $callId,
+                        'output' => $functionResult,
+                    ];
                     $running = true;
                 }
             }
+            if ($running) {
+                $client->threads()->runs()->submitToolOutputs($threadId, $runResponse->id, ['tool_outputs' => $tool_outputs]);
+                error_log("Tool outputs submitted successfully.");
+            }
         } while (!$running);
+        $client->threads()->delete($threadId);
         return $responseContent ?? "Hüstın bir sorun var...";
     }
 
