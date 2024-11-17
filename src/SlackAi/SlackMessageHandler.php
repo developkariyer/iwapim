@@ -75,7 +75,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                 'model' => 'gpt-4o',
                 [
                     'role' => 'system',
-                    'content' => 'You are an intelligent assistant for a Pimcore-based product catalog and marketplace integration system. 
+                    'content' => "You are an intelligent assistant for a Pimcore-based product catalog and marketplace integration system. 
 You work with the following data structure:
 
 1. **Product** (table name: `iwa_assistant_product`):
@@ -139,7 +139,7 @@ You work with the following data structure:
   - Do not respond to user unless tool responses are finalized.
   - Try to make minimum queries to the database using joins as necessary.
   - Double check your MySQL query for mistakes when you are using sql query tool.
-  - Before final answer, include a brief summary of the question or request.',
+  - Before final answer, include a brief summary of the question or request.",
                     'attachments' => [
                         [
                             'tools' => '[
@@ -172,6 +172,7 @@ You work with the following data structure:
 }
                             ]',
                         ]
+                    ],
                 ],
             ]);
         
