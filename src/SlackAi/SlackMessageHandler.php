@@ -147,7 +147,7 @@ class SlackMessageHandler implements MessageHandlerInterface
     {
         $db = \Pimcore\Db::get();
         $query = trim($arguments['query']);
-        $params = $arguments['params'];
+        $params = $arguments['parameters'] ?? [];
     
         // Ensure the query starts with SELECT
         if (!preg_match('/^SELECT\s/i', $query)) {
