@@ -161,7 +161,7 @@ class SlackMessageHandler implements MessageHandlerInterface
         }
     
         // Execute the query
-        $result = $db->fetchAll($query, $params);
+        $result = $db->executeQuery($query, $params)->fetchAllAssociative();
     
         return json_encode($result);
     }
