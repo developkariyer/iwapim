@@ -103,7 +103,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                     error_log("Assistant response message: {$assistantMessage->content[0]->text->value}");
                 } elseif ($step->stepDetails->type === 'tool_calls') {
                     error_log("Function call detected.");
-                    $functionCallDetails = $step->stepDetails->tool_calls->functionCall;
+                    $functionCallDetails = $step->stepDetails->toolCalls->functionCall;
                     $callId = $functionCallDetails->id;
                     $functionName = $functionCallDetails->function->name;
                     $arguments = $functionCallDetails->function->arguments;
