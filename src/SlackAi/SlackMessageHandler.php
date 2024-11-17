@@ -113,6 +113,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                             error_log("Function Name: {$functionName}");
                             error_log("Function Arguments: " . json_encode($arguments));
                             $functionResult = $this->executeFunction($functionName, $arguments);
+                            error_log("Function Result: {$functionResult}");
                             $tool_outputs[] = [
                                 'tool_call_id' => $callId,
                                 'output' => $functionResult,
