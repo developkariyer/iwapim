@@ -145,6 +145,7 @@ class SlackMessageHandler implements MessageHandlerInterface
             }
         } 
         $client->threads()->delete($threadId);
+        error_log("Final Response content: {$responseContent}");
         return $responseContent ?? "Hüstın bir sorun var...";
     }
 
