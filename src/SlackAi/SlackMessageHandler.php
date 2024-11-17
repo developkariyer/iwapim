@@ -69,11 +69,38 @@ class SlackMessageHandler implements MessageHandlerInterface
             throw new \RuntimeException('OPENAI_API_KEY is not defined in environment variables or Client init failed.');
         }
 
+        $tools = [
+            [
+                "name" => "run_mysql_query",
+                "description" => "Run MySQL query provided by assistant and return its result. Only supports SELECT queries and first 10 results are returned.",
+                "strict" => true,
+                "parameters" => [
+                    "type" => "object",
+                    "required" => ["query", "parameters"],
+                    "properties" => [
+                        "query" => [
+                            "type" => "string",
+                            "description" => "The SQL query to be executed",
+                        ],
+                        "parameters" => [
+                            "type" => "array",
+                            "description" => "Parameters to bind to the query if it uses placeholders",
+                            "items" => [
+                                "type" => "string",
+                                "description" => "Value for each placeholder in the query",
+                            ],
+                        ],
+                    ],
+                    "additionalProperties" => false,
+                ],
+            ],
+        ];
+
         $threadId = $db->fetchOne("SELECT thread_id FROM iwa_assistant_thread WHERE user_id = ?", [$user]);
         $thread = $threadId ? $client->threads()->retrieve($threadId) : 
-            $client->threads()->create([
-                'model' => 'gpt-4o',
-                [
+            $client->threads()->create(
+                model: 'gpt-4o',
+                messages: [
                     'role' => 'system',
                     'content' => "You are an intelligent assistant for a Pimcore-based product catalog and marketplace integration system. 
 You work with the following data structure:
@@ -142,39 +169,11 @@ You work with the following data structure:
   - Before final answer, include a brief summary of the question or request.",
                     'attachments' => [
                         [
-                            'tools' => '[
-{
-  "name": "run_mysql_query",
-  "description": "Run MySQL query provided by assistant and return its result. Only supports SELECT queries and first 10 results are returned.",
-  "strict": true,
-  "parameters": {
-    "type": "object",
-    "required": [
-      "query",
-      "parameters"
-    ],
-    "properties": {
-      "query": {
-        "type": "string",
-        "description": "The SQL query to be executed"
-      },
-      "parameters": {
-        "type": "array",
-        "description": "Parameters to bind to the query if it uses placeholders",
-        "items": {
-          "type": "string",
-          "description": "Value for each placeholder in the query"
-        }
-      }
-    },
-    "additionalProperties": false
-  }
-}
-                            ]',
+                            'tools' => $tools,
                         ]
                     ],
                 ],
-            ]);
+            );
         
         $db->executeQuery(
             "INSERT INTO iwa_assistant_thread (thread_id, user_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE thread_id = ?", 
