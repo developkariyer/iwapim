@@ -142,7 +142,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                 error_log("Tool outputs submitted successfully.");
             } else {
                 error_log("Assistant run completed successfully.");
-                if ($runResponse->status === 'completed') {
+                if (!empty($responseContent)) {
                     break;
                 }
             }
