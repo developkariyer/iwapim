@@ -136,6 +136,37 @@ class SlackMessageHandler implements MessageHandlerInterface
         return $responseContent ?? "Hüstın bir sorun var...";
     }
 
+    private function executeFunction(string $functionName, array $arguments): string
+    {
+        return match($functionName) {
+            'run_mysql_query' => $this->runMysqlQuery($arguments),
+            default => "Function not found: {$functionName}",
+        };
+    }
+
+    private function runMysqlQuery($arguments)
+    {
+        $db = \Pimcore\Db::get();
+        $query = trim($arguments['query']);
+        $params = $arguments['params'];
+    
+        // Ensure the query starts with SELECT
+        if (!preg_match('/^SELECT\s/i', $query)) {
+            throw new \InvalidArgumentException('Only SELECT queries are allowed.');
+        }
+    
+        // Check if the query has a LIMIT clause
+        if (!preg_match('/\bLIMIT\b/i', $query)) {
+            // Append LIMIT 10 if not present
+            $query = rtrim($query, ';') . ' LIMIT 10';
+        }
+    
+        // Execute the query
+        $result = $db->fetchAll($query, $params);
+    
+        return json_encode($result);
+    }
+    
     private function sendResponseToSlack(array $payload): void
     {
         $httpClient = HttpClient::create();
