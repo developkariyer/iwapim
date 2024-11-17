@@ -63,22 +63,24 @@ class SlackMessageHandler implements MessageHandlerInterface
     private function processMessage(string $text, string $user): string
     {
         $db = \Pimcore\Db::get();
-
         $client = OpenAI::Client($_ENV['OPENAI_SECRET'] ?? null);
         if (!$client) {
             throw new \RuntimeException('OPENAI_API_KEY is not defined in environment variables or Client init failed.');
         }
-
+        error_log("OpenAI client initialized successfully.");
         $threadId = $db->fetchOne("SELECT thread_id FROM iwa_assistant_thread WHERE user_id = ?", [$user]);
         if ($threadId) {
+            error_log("Thread ID found in database: $threadId");
             $messageResponse = $client->threads()->messages()->create($threadId, [
                 'role' => 'user',
                 'content' => $text,
             ]);
+            error_log("User message created successfully: {$messageResponse->id}");
             $runResponse = $client->threads()->runs()->create($threadId, [
                 'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
             ]);
         } else {
+            error_log("Thread ID not found in database. Creating new thread.");
             $runResponse = $client->threads()->createAndRun([
                 'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
                 'thread' => [
@@ -94,8 +96,10 @@ class SlackMessageHandler implements MessageHandlerInterface
                 "INSERT INTO iwa_assistant_thread (thread_id, user_id) VALUES (?, ?)",
                 [$runResponse->threadId, $user]
             );
-        }        
+        }
+        error_log("Assistant run created successfully: {$runResponse->id}");
         $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
+        error_log("Assistant run steps fetched successfully.");
         $responseStep = null;
         foreach ($runStepList->data as $step) {
             if ($step->stepDetails->type === 'message_creation') {
@@ -104,11 +108,12 @@ class SlackMessageHandler implements MessageHandlerInterface
             }
         }
         if ($responseStep) {
+            error_log("Assistant response found: {$responseStep->stepDetails->messageCreation->messageId}");
             $messageId = $responseStep->stepDetails->messageCreation->messageId;
             $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
             return $assistantMessage->content[0]->text->value;
         }
-        return null;
+        return "Sorry, I couldn't understand that.";
     }
 
     private function sendResponseToSlack(array $payload): void
