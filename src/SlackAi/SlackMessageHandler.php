@@ -110,6 +110,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                         if ($toolCall->type === 'function') {
                             $functionName = $toolCall->function->name;
                             $arguments = $toolCall->function->arguments;
+                            error_log("Function Call ID: {$callId}");
                             error_log("Function Name: {$functionName}");
                             error_log("Function Arguments: " . json_encode($arguments));
                             $functionResult = $this->executeFunction($functionName, $arguments);
@@ -129,8 +130,11 @@ class SlackMessageHandler implements MessageHandlerInterface
                     error_log("Assistant run status: {$runResponse->status}");
                     sleep(1);
                     $runResponse = $client->threads()->runs()->retrieve($threadId, $runResponse->id);
-                }    
-                $client->threads()->runs()->submitToolOutputs($threadId, $runResponse->id, ['tool_outputs' => $tool_outputs]);
+                }
+                error_log("Assistant run status: {$runResponse->status}");
+                error_log(json_encode($tool_outputs));
+                $submitResponse = $client->threads()->runs()->submitToolOutputs($threadId, $runResponse->id, ['tool_outputs' => $tool_outputs]);
+                error_log("Submit Response Status: {$submitResponse->status}");
                 error_log("Tool outputs submitted successfully.");
             } else {
                 error_log("Assistant run completed successfully.");
