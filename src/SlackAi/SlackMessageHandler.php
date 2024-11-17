@@ -92,28 +92,48 @@ class SlackMessageHandler implements MessageHandlerInterface
                     ],
                 ],
             ]);
+            $threadId = $runResponse->threadId;
             $db->executeQuery(
                 "INSERT INTO iwa_assistant_thread (thread_id, user_id) VALUES (?, ?)",
                 [$runResponse->threadId, $user]
             );
         }
         error_log("Assistant run created successfully: {$runResponse->id}");
-        $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
-        error_log("Assistant run steps fetched successfully.");
-        $responseStep = null;
-        foreach ($runStepList->data as $step) {
-            if ($step->stepDetails->type === 'message_creation') {
-                $responseStep = $step;
-                break;
+
+        $responseContent = "";
+        do {
+            $running = false;
+            $client->threads()->runs()->stop($threadId, $runResponse->id);
+            error_log("Assistant run stopped successfully.");
+            $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
+            error_log("Assistant run steps fetched successfully.");
+            $responseContent = null;
+            foreach ($runStepList->data as $step) {
+                if ($step->stepDetails->type === 'message_creation') {
+                    error_log("Assistant response step found: {$step->stepDetails->messageCreation->messageId}");
+                    $messageId = $step->stepDetails->messageCreation->messageId;
+                    $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
+                    $responseContent .= "\n".$assistantMessage->content[0]->text->value;
+                } elseif ($step->stepDetails->type === 'function_call') {
+                    error_log("Function call detected.");
+                    $functionCallDetails = $step->stepDetails->functionCall;
+                    $functionName = $functionCallDetails->name;
+                    $arguments = $functionCallDetails->arguments;
+                    error_log("Function Name: {$functionName}");
+                    error_log("Function Arguments: " . json_encode($arguments));
+                    $functionResult = $this->executeFunction($functionName, $arguments);
+                    $client->threads()->messages()->create($threadId, [
+                        'role' => 'assistant',
+                        'content' => json_encode([
+                            'function_name' => $functionName,
+                            'result' => $functionResult,
+                        ]),
+                    ]);
+                    $running = true;
+                }
             }
-        }
-        if ($responseStep) {
-            error_log("Assistant response found: {$responseStep->stepDetails->messageCreation->messageId}");
-            $messageId = $responseStep->stepDetails->messageCreation->messageId;
-            $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
-            return $assistantMessage->content[0]->text->value;
-        }
-        return "Sorry, I couldn't understand that.";
+        } while (!$running);
+        return $responseContent ?? "Hüstın bir sorun var...";
     }
 
     private function sendResponseToSlack(array $payload): void
