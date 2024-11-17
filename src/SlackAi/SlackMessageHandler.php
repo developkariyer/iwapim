@@ -64,7 +64,7 @@ class SlackMessageHandler implements MessageHandlerInterface
     {
         $db = \Pimcore\Db::get();
 
-        $client = OpenAI::Client($_ENV['OPENAI_API_KEY'] ?? null);
+        $client = OpenAI::Client($_ENV['OPENAI_SECRET'] ?? null);
         if (!$client) {
             throw new \RuntimeException('OPENAI_API_KEY is not defined in environment variables or Client init failed.');
         }
