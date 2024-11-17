@@ -92,15 +92,15 @@ class SlackMessageHandler implements MessageHandlerInterface
             error_log("Assistant run status: {$runResponse->status}");
             $tool_outputs = [];
             $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
-            error_log("Assistant run steps fetched successfully.");
+            error_log("Assistant run steps fetched successfully. ".count($runStepList->data)." steps found.");
             foreach ($runStepList->data as $step) {
-                if ($step->stepDetails->type === 'message_creation') {
+                if ($step->type === 'message_creation') {
                     error_log("Assistant response step found: {$step->stepDetails->messageCreation->messageId}");
                     $messageId = $step->stepDetails->messageCreation->messageId;
                     $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
                     $responseContent .= "\n".$assistantMessage->content[0]->text->value;
                     error_log("Assistant response message: {$assistantMessage->content[0]->text->value}");
-                } elseif ($step->stepDetails->type === 'tool_calls') {
+                } elseif ($step->type === 'tool_calls') {
                     error_log("Function call detected.");
                     $logarray = $step->stepDetails->toArray();
                     error_log(json_encode($logarray));
