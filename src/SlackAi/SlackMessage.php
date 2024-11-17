@@ -6,12 +6,14 @@ class SlackMessage
 {
     private string $text;
     private string $responseUrl;
+    private string $user;
     private ?string $threadTs;
 
-    public function __construct(string $text, string $responseUrl, ?string $threadTs = null)
+    public function __construct(string $text, string $responseUrl, string $user, ?string $threadTs = null)
     {
         $this->text = $text;
         $this->responseUrl = $responseUrl;
+        $this->user = $user;
         $this->threadTs = $threadTs;
     }
 
@@ -28,5 +30,10 @@ class SlackMessage
     public function getThreadTs(): ?string
     {
         return $this->threadTs;
+    }
+
+    public function getUser(): string
+    {
+        return $this->user;
     }
 }

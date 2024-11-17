@@ -41,14 +41,16 @@ class SlackAiController
         // Extract necessary data
         $incomingText = $content['event']['text'];
         $channel = $content['event']['channel'];
-        $responseUrl = $content['response_url'] ?? null; // Note: response_url might not always be present in this payload
+        $user = $content['event']['user'];
+        //$responseUrl = $content['response_url'] ?? null; // Note: response_url might not always be present in this payload
         $threadTs = $content['event']['thread_ts'] ?? $content['event']['ts'] ?? null;
 
         // Dispatch the message to the queue
-        $this->messageBus->dispatch(new SlackMessage($incomingText, $channel, $threadTs));
+        $this->messageBus->dispatch(new SlackMessage($incomingText, $channel, $user, $threadTs));
         error_log('Message dispatched to queue: ' . json_encode([
             'text' => $incomingText,
             'channel' => $channel,
+            'user' => $user,
             'thread_ts' => $threadTs,
         ]));
 

@@ -5,6 +5,7 @@ namespace App\SlackAi;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
+use OpenAI\Client;
 
 class SlackMessageHandler implements MessageHandlerInterface
 {
@@ -28,7 +29,8 @@ class SlackMessageHandler implements MessageHandlerInterface
                         '', 
                         $message->getText()
                     )
-                )
+                ),
+                $message->getUser()
             );
 
             // Prepare payload for Slack response
@@ -58,15 +60,36 @@ class SlackMessageHandler implements MessageHandlerInterface
         }
     }
 
-    private function processMessage(string $text): string
+    private function processMessage(string $text, string $user): string
     {
-        // Simulate processing logic (e.g., OpenAI API call)
-        // Replace this with actual business logic
-        if (strtolower(trim($text)) === 'hello') {
-            return 'Hello! How can I assist you today?';
+        $db = \Pimcore\Db::get();
+
+        $client = new Client($_ENV['OPENAI_API_KEY'] ?? null);
+        if (!$client) {
+            throw new \RuntimeException('OPENAI_API_KEY is not defined in environment variables or Client init failed.');
         }
 
-        return "I received your message: $text";
+        $threadId = $db->fetchOne("SELECT thread_id FROM iwa_assistant_thread WHERE user_id = ?", [$user]);
+        $thread = $threadId ? $client->threads()->retrieve($threadId) : 
+            $client->threads()->create([
+                'assistant_id' => "asst_T2nK0kC27ON9TFTAKmFt0J7i",
+            ]);
+        
+        $db->executeQuery(
+            "INSERT INTO iwa_assistant_thread (thread_id, user_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE thread_id = ?", 
+            [$thread['id'], $user, $thread['id']]
+        );
+        
+        $client->threads()->addMessage($thread['id'], [
+            'role' => 'user',
+            'content' => $text,
+        ]);
+    
+        // Generate a response from the assistant
+        $response = $client->threads()->generateResponse($thread['id']);
+    
+        // Return the assistant's response
+        return $response['content'];
     }
 
     private function sendResponseToSlack(array $payload): void
