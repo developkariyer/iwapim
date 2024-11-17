@@ -71,15 +71,15 @@ class SlackMessageHandler implements MessageHandlerInterface
 
         $threadId = $db->fetchOne("SELECT thread_id FROM iwa_assistant_thread WHERE user_id = ?", [$user]);
         if ($threadId) {
-            $thread = $client->threads()->retrieve($threadId);
-            $client->threads()->addMessage($thread['id'], [
+            $messageResponse = $client->threads()->messages()->create($threadId, [
                 'role' => 'user',
                 'content' => $text,
             ]);
-            $response = $client->threads()->generateResponse($thread['id']);
-            return $response['content'];
+            $runResponse = $client->threads()->runs()->create($threadId, [
+                'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
+            ]);
         } else {
-            $response = $client->threads()->createAndRun([
+            $runResponse = $client->threads()->createAndRun([
                 'assistant_id' => $_ENV['OPENAI_ASSISTANT_ID'] ?? null,
                 'thread' => [
                     'messages' => [
@@ -92,10 +92,23 @@ class SlackMessageHandler implements MessageHandlerInterface
             ]);
             $db->executeQuery(
                 "INSERT INTO iwa_assistant_thread (thread_id, user_id) VALUES (?, ?)",
-                [$response->threadId, $user]
+                [$runResponse->threadId, $user]
             );
-            return $response->toArray()['choices'][0]['message']['content'];
         }        
+        $runStepList = $client->threads()->runs()->steps()->list($threadId, $runResponse->id);
+        $responseStep = null;
+        foreach ($runStepList->data as $step) {
+            if ($step->stepDetails->type === 'message_creation') {
+                $responseStep = $step;
+                break;
+            }
+        }
+        if ($responseStep) {
+            $messageId = $responseStep->stepDetails->messageCreation->messageId;
+            $assistantMessage = $client->threads()->messages()->retrieve($threadId, $messageId);
+            return $assistantMessage->content[0]->text->value;
+        }
+        return null;
     }
 
     private function sendResponseToSlack(array $payload): void
