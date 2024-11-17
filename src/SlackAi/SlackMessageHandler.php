@@ -147,7 +147,7 @@ class SlackMessageHandler implements MessageHandlerInterface
                 error_log("Tool outputs submitted successfully.");
             } else {
                 error_log("Assistant run completed successfully.");
-                if (!empty($responseContent) || $loopCounter > 10) {
+                if (!empty($responseContent) || $loopCounter > 20) {
                     break;
                 } else {
                     sleep(1);
