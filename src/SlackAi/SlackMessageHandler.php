@@ -108,6 +108,9 @@ class SlackMessageHandler implements MessageHandlerInterface
                     foreach ($toolCalls as $toolCall) {
                         $callId = $toolCall->id;
                         if ($toolCall->type === 'function') {
+                            if ($toolCall->function->output !== null) {
+                                continue;
+                            }
                             $functionName = $toolCall->function->name;
                             $arguments = $toolCall->function->arguments;
                             error_log("Function Call ID: {$callId}");
