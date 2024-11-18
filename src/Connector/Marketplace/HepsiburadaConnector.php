@@ -60,9 +60,20 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
+    protected function getUrlLink($url)
+    {
+        $response = @file_get_contents($url);
+
+        if ($response === FALSE) {
+            echo "Bir hata oluştu. URL'yi alamadım.";
+        } else {
+            echo $response;  
+        }
+    }
+
     public function import($updateFlag, $importFlag)
     {
-       if (empty($this->listings)) {
+       /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -70,9 +81,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
-        $index = 0;
+        $index = 0;*/
         foreach ($this->listings as $listing) {
-            echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
+            $this->getUrlLink("https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku']);
+            break;
+           /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
@@ -99,7 +112,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;
+            $index++;*/
         }  
         
     }
