@@ -60,31 +60,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    protected function getProduct()
-    {
-        $page = 0;
-        $size = 5;
-        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
-            'headers' => [
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-            ],
-            'query' => [
-                'page' => $page,
-                'size' => $size
-            ]
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        print_r($response->toArray());
-    }
-
     public function import($updateFlag, $importFlag)
     {
-        $this->getProduct();
 
        /* if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -95,8 +72,14 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         );
         $total = count($this->listings);
         $index = 0;*/
-
-
+        foreach ($this->listings as $listing) {
+            echo "url: " . "https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku'];
+            echo "salePrice: " . $listing['price'];
+            echo "saleCurrency: " . 'TRY';
+            echo "uniqueMarketplaceId: " . $listing['hepsiburadaSku'];
+            echo "published: " . $listing['isSalable'];
+             
+        }
         /*foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
