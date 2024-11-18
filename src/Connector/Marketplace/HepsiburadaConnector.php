@@ -17,43 +17,48 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $filename = 'tmp/' . urlencode($this->marketplace->getKey()) . '.json';
-        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
-            $this->listings = json_decode(file_get_contents($filename), true);
-            echo "Using cached data ";
-        } else {
-            $offset = 0;
-            $limit = 10;
-            $this->listings = [];
-            //do {
-                $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}", [
-                    'headers' => [
-                        'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                        "User-Agent" => "colorfullworlds_dev",
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json'
-                    ],
-                    'query' => [
-                        'offset' => $offset,
-                        'limit' => $limit
-                    ]
-                ]);
-                $statusCode = $response->getStatusCode();
-                /*if ($statusCode !== 200) {
-                    echo "Error: $statusCode\n";
-                    break;
-                }*/
-                print_r($response->getContent());
-                $data = $response->toArray();
-                $products = $data['listings'];
-                $this->listings = array_merge($this->listings, $products);
-                echo "Page: " . $offset . " " . count($this->listings) . " ";
-                $offset += $limit;
-                print_r($listing);
-            //} while (count($this->listings) < $totalItems);
-            //file_put_contents($filename, json_encode($this->listings));
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!(empty($this->listings) || $forceDownload)) {
+            echo "Using cached listings\n";
+            return;
         }
-        return count($this->listings);
+        $offset = 0;
+        $limit = 10;
+        $this->listings = [];
+        do {
+            $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                    "User-Agent" => "colorfullworlds_dev",
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'query' => [
+                    'offset' => $offset,
+                    'limit' => $limit
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            print_r($response->getContent());
+            $data = $response->toArray();
+            $products = $data['listings'];
+            $this->listings = array_merge($this->listings, $products);
+            $totalItems = $data['totalCount'];
+            echo "Offset: " . $offset . " " . count($this->listings) . " ";
+            echo "Total Items: " . $totalItems . "\n";
+            echo "Count: " . count($this->listings) . "\n";
+            $offset += $limit;
+        } while (count($this->listings) < $totalItems);
+        
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+        }
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     public function import($updateFlag, $importFlag)
