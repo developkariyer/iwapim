@@ -60,35 +60,32 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    protected function createAssets()
+    protected function getProduct()
     {
-        //title, parent, image, url
-        $link = "https://www.hepsiburada.com/-p-";
-        $variantLink ="";
-        foreach ($this->listings as &$listing) {
-            if ($listing['isSalable']) {
-                $variantLink .= $link . $listing['hepsiburadaSku'];
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $variantLink);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  // Cevabı döndür
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  // Yönlendirmeleri takip et
-                
-                $response = curl_exec($ch);
-                print_r($response);
-                $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-                curl_close($ch);
-
-                echo "Redirect url: " . $redirectUrl . "\n";
-                $variantLink ="";
-
-            } 
-            //$listing['link'] = $link;
+        $page = 0;
+        $size = 5;
+        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
+            'headers' => [
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ],
+            'query' => [
+                'page' => $offset,
+                'size' => $limit
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
         }
+        print_r($response->toArray());
     }
 
     public function import($updateFlag, $importFlag)
     {
-        $this->createAssets();
+        $this->getProduct();
 
        /* if (empty($this->listings)) {
             echo "Nothing to import\n";
