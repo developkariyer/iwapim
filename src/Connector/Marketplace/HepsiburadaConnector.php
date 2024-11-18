@@ -68,7 +68,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 "User-Agent" => "colorfullworlds_dev",
                 'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
             ],
             'query' => [
                 'page' => $page,
