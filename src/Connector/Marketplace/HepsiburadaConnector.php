@@ -63,8 +63,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     protected function createAssets()
     {
         //title, parent, image, url
+        $link = "https://www.hepsiburada.com/-p-";
         foreach ($this->listings as &$listing) {
-            $link = "https://www.hepsiburada.com/-p-";
             if ($listing['isSalable']) {
                 $link .= $listing['hepsiburadaSku'];
                 $response = $this->httpClient->request('GET', $link);
