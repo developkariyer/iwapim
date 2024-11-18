@@ -64,16 +64,15 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     {
         //title, parent, image, url
         $link = "https://www.hepsiburada.com/-p-";
-        foreach ($this->listings as $listing) {
+        foreach ($this->listings as &$listing) {
             print_r($listing);
             if ($listing['isSalable']) {
                 $link .= $listing['hepsiburadaSku'];
                 $response = $this->httpClient->request('GET', $link);
 
                 $redirectUrl = $response->getInfo('url');
-                //echo $redirectUrl;
-                echo $link;
-
+                echo $redirectUrl;
+                
 
             } 
             //$listing['link'] = $link;
@@ -82,10 +81,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        //$this->createAssets();
-        foreach ($this->listings as $listing) {
-            print_r($listing);
-        }
+        $this->createAssets();
+
        /* if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
