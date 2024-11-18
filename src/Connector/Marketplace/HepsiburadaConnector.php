@@ -63,7 +63,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     protected function getProduct($hbSku)
     {
         $page = 0;
-        $size = 1;
+        $size = 5;
         $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -73,8 +73,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ],
             'query' => [
                 'page' => $page,
-                'size' => $size,
-                'hbSku' => $hbSku
+                'size' => $size
             ]
         ]);
         print_r($response->getContent());
