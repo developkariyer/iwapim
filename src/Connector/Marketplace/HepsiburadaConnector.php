@@ -60,10 +60,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    protected function getProduct()
+    protected function getProduct($hbSku)
     {
         $page = 0;
-        $size = 5;
+        $size = 1;
         $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -73,7 +73,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ],
             'query' => [
                 'page' => $page,
-                'size' => $size
+                'size' => $size,
+                'hbSku' => $hbSku
             ]
         ]);
         print_r($response->getContent());
@@ -82,7 +83,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        $this->getProduct();
        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
@@ -93,6 +93,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;*/
         foreach ($this->listings as $listing) {
+            $this->getProduct($listing['hepsiburadaSku']);
 
             /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
