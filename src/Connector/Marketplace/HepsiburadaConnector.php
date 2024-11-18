@@ -67,6 +67,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         foreach ($this->listings as &$listing) {
             if ($listing['isSalable']) {
                 $link .= $listing['hepsiburadaSku'];
+                echo $link;
                 $response = $this->httpClient->request('GET', $link);
 
                 $redirectUrl = $response->getInfo('url');
