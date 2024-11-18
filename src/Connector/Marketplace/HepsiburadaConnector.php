@@ -94,6 +94,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $index = 0;*/
         foreach ($this->listings as $listing) {
             $this->getProduct($listing['hepsiburadaSku']);
+            break;
 
             /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
