@@ -71,8 +71,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ],
             'query' => [
-                'page' => $offset,
-                'size' => $limit
+                'page' => $page,
+                'size' => $size
             ]
         ]);
         $statusCode = $response->getStatusCode();
