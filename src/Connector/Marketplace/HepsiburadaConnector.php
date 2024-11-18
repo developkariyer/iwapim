@@ -68,13 +68,17 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             if ($listing['isSalable']) {
                 $link .= $listing['hepsiburadaSku'];
                 echo $link;
-                $response = $this->httpClient->request('GET', $link,[
-                    'headers' => [
-                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-                    ],
-                ]);
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $link);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Yönlendirmeleri takip eder
+                curl_setopt($ch, CURLOPT_HEADER, true); // Header'ı da döndürmek için
+                curl_setopt($ch, CURLOPT_NOBODY, true); // Sadece başlıkları almak için
 
-                $redirectUrl = $response->getInfo('url');
+                $response = curl_exec($ch);
+                $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL); // Yönlendirilmiş URL
+                curl_close($ch);
+
                 echo $redirectUrl;
                 
 
