@@ -90,7 +90,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     'attributes' =>$listing['productName'] ?? '',
                     'uniqueMarketplaceId' => $listing['hepsiburadaSku'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['isSalable'] === 'PUBLISHED' ? true : false,
+                    'published' => $listing['isSalable'],
                     'sku' => $listing['merchantSku'] ?? '',
                 ],
                 importFlag: $importFlag,
