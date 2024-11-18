@@ -43,7 +43,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 echo "Error: $statusCode\n";
                 break;
             }
-            print_r($response->getContent());
             $data = $response->toArray();
             $products = $data['listings'];
             $this->listings = array_merge($this->listings, $products);
@@ -53,7 +52,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($this->listings) . "\n";
             $offset += $limit;
         } while (count($this->listings) < $totalItems);
-        
+
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
