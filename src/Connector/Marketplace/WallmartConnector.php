@@ -136,15 +136,15 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
-       /* $marketplaceFolder = Utility::checkSetPath(
+        $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
-        $index = 0;*/
+        $index = 0;
         foreach ($this->listings as $listing) {
-            //echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
-            /*$parent = Utility::checkSetPath($marketplaceFolder);
+            echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
+            $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
                     Utility::sanitizeVariable($listing['variantGroupId']),
@@ -170,7 +170,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;*/
+            $index++;
         }    
     }
 
