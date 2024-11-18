@@ -128,7 +128,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $attributeString .= $attribute['value'] . '-';
             }
         }
-        return trim($attributeString);
+        return rtrim($attributeString, '-');
     }
 
     public function import($updateFlag, $importFlag)
