@@ -75,7 +75,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 curl_setopt($ch, CURLOPT_HEADER, true); 
                 curl_setopt($ch, CURLOPT_NOBODY, true);
                 $response = curl_exec($ch);
-                sleep(1);
+                print_r($response);
                 $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
                 curl_close($ch);
 
