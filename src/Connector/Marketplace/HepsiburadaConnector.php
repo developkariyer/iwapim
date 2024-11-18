@@ -70,7 +70,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 $response = $this->httpClient->request('GET', $link);
 
                 $redirectUrl = $response->getInfo('url');
-                print_r($redirectUrl);
+                //echo $redirectUrl;
+                echo $link;
+
 
             } 
             //$listing['link'] = $link;
