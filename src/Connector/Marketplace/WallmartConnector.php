@@ -131,23 +131,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return rtrim($attributeString, '-');
     }
 
-    protected function getImage($listing)
-    {
-        $url = "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid'];
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $htmlContent = curl_exec($ch);
-        curl_close($ch);
-
-        if ($htmlContent !== false) {
-            echo $htmlContent;
-        } else {
-            echo "HTML içeriği alınamadı.";
-        }
-    }
-
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -160,7 +143,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;*/
         foreach ($this->listings as $listing) {
-            $this->getImage($listing);
             //echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
             /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
