@@ -66,7 +66,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $link = "https://www.hepsiburada.com/-p-";
         foreach ($this->listings as &$listing) {
             if ($listing['isSalable']) {
-                $variantLink .= $listing['hepsiburadaSku'];
+                $variantLink .= $link . $listing['hepsiburadaSku'];
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $variantLink);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -78,7 +78,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 curl_close($ch);
 
                 echo "Redirect url: " . $redirectUrl . "\n";
-                
+                $variantLink ="";
 
             } 
             //$listing['link'] = $link;
