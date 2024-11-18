@@ -57,6 +57,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
+        $this->downloadAttributes();
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
@@ -86,6 +87,22 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return $data;
     }
 
+    public function downloadAttributes()
+    {
+        foreach ($this->listings as &$listing) {
+            $response = $this->getProduct($listing['hepsiburadaSku']);
+            if (empty($response)) {
+                echo "Failed to get product\n";
+                continue;
+            }
+            if (isset($response['data'][0])) {
+                $listing['attributes'] = $response['data'][0];
+            } else {
+                $listing['attributes'] = []; 
+            }
+        }
+    }
+
     public function import($updateFlag, $importFlag)
     {
        /*if (empty($this->listings)) {
@@ -99,13 +116,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $index = 0;*/
         //$first = false;
         foreach ($this->listings as $listing) {
-            $response = $this->getProduct($listing['hepsiburadaSku']);
-            if (empty($response)) {
-                echo "Failed to get product\n";
-                continue;
-            }
-            print_r($response['data'][0]);
-            break;
+           
 
             /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
