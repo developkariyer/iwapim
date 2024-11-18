@@ -60,25 +60,24 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    protected function getUrlLink($url)
+    protected function getProduct()
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Yönlendirmeleri takip et
-        curl_setopt($ch, CURLOPT_HEADER, false); // Başlıkları dahil etme
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // SSL sertifika doğrulamasını devre dışı bırak (isteğe bağlı)
+        $page = 0;
+        $size = 5;
+        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ],
+            'query' => [
+                'page' => $page,
+                'size' => $size
+            ]
+        ]);
+        print_r($response->getContent());
 
-        $response = curl_exec($ch);
-
-        // Hata kontrolü
-        if(curl_errno($ch)) {
-            echo 'cURL error: ' . curl_error($ch);
-        } else {
-            echo $response;  // Gelen yanıtı ekrana yazdır
-        }
-
-        curl_close($ch);
     }
 
     public function import($updateFlag, $importFlag)
@@ -93,9 +92,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;*/
         foreach ($this->listings as $listing) {
-            $this->getUrlLink("https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku']);
-            break;
-           /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
+
+            /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
