@@ -125,7 +125,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $attributeString = "";
         if (!empty($listing['variantGroupInfo']['groupingAttributes'])) {
             foreach ($listing['variantGroupInfo']['groupingAttributes'] as $attribute) {
-                $attributeString += $attribute['value'] . '-';
+                $attributeString .= $attribute['value'] . '-';
             }
         }
         return trim($attribute);
