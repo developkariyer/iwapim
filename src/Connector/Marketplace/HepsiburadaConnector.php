@@ -62,13 +62,23 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     protected function getUrlLink($url)
     {
-        $response = @file_get_contents($url);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Yönlendirmeleri takip et
+        curl_setopt($ch, CURLOPT_HEADER, false); // Başlıkları dahil etme
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // SSL sertifika doğrulamasını devre dışı bırak (isteğe bağlı)
 
-        if ($response === FALSE) {
-            echo "Bir hata oluştu. URL'yi alamadım.";
+        $response = curl_exec($ch);
+
+        // Hata kontrolü
+        if(curl_errno($ch)) {
+            echo 'cURL error: ' . curl_error($ch);
         } else {
-            echo $response;  
+            echo $response;  // Gelen yanıtı ekrana yazdır
         }
+
+        curl_close($ch);
     }
 
     public function import($updateFlag, $importFlag)
