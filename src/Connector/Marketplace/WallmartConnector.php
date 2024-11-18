@@ -131,6 +131,23 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return rtrim($attributeString, '-');
     }
 
+    protected function getImage($listing)
+    {
+        $url = "https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid'];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $htmlContent = curl_exec($ch);
+        curl_close($ch);
+
+        if ($htmlContent !== false) {
+            echo $htmlContent;
+        } else {
+            echo "HTML içeriği alınamadı.";
+        }
+    }
+
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -143,8 +160,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;*/
         foreach ($this->listings as $listing) {
+            $this->getImage($listing);
             //echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
-            echo $this->getAttributes($listing) . "\n";
             /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
@@ -159,7 +176,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'salePrice' => $listing['price']['amount'] ?? 0,
                     'saleCurrency' => 'USD',
                     'title' => $listing['productName'] ?? '',
-                    'attributes' =>$listing['productName'] ?? '',
+                    'attributes' => $this->getAttributes($listing) ?? '',
                     'uniqueMarketplaceId' => $listing['wpid'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
