@@ -64,7 +64,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     {
         $page = 0;
         $size = 5;
-        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
+        $response = $this->httpClient->request('GET', "https://mpop-sit.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
+            'headers' => [
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ],
             'query' => [
                 'page' => $page,
                 'size' => $size
