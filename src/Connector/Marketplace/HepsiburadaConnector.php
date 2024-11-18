@@ -63,7 +63,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     protected function getProduct($hbSku)
     {
         $page = 0;
-        $size = 3;
+        $size = 1;
         $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -73,7 +73,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ],
             'query' => [
                 'page' => $page,
-                'size' => $size
+                'size' => $size,
+                'hbSku' => $hbSku
             ]
         ]);
         print_r($response->getContent());
@@ -82,7 +83,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        $this->getProduct("a");
        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
@@ -92,10 +92,13 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         );
         $total = count($this->listings);
         $index = 0;*/
+        $a = 0;
         foreach ($this->listings as $listing) {
           //  echo "Processing Listing {$listing['hepsiburadaSku']} ...\n\n\n";
-           // $this->getProduct($listing['hepsiburadaSku']);
-            //break;
+            $this->getProduct($listing['hepsiburadaSku']);
+            $a++;
+            if ($a == 3)
+                break;
 
             /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
