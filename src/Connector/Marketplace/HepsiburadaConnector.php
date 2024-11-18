@@ -62,8 +62,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-
-       /* if (empty($this->listings)) {
+       if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -71,17 +70,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
-        $index = 0;*/
+        $index = 0;
         foreach ($this->listings as $listing) {
-            echo "url: " . "https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku'] . "\n";
-            echo "salePrice: " . $listing['price'] . "\n";
-            echo "saleCurrency: " . 'TRY' . "\n";
-            echo "uniqueMarketplaceId: " . $listing['hepsiburadaSku'] . "\n";
-            echo "published: " . $listing['isSalable'] . "\n";
-
-        }
-        /*foreach ($this->listings as $listing) {
-            echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
+            echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
@@ -92,15 +83,15 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
-                    'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
-                    'salePrice' => $listing['price']['amount'] ?? 0,
-                    'saleCurrency' => 'USD',
+                    'urlLink' => $this->getUrlLink("https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku']) ?? '',
+                    'salePrice' => $listing['price'] ?? 0,
+                    'saleCurrency' => 'TRY',
                     'title' => $listing['productName'] ?? '',
                     'attributes' =>$listing['productName'] ?? '',
-                    'uniqueMarketplaceId' => $listing['wpid'] ?? '',
+                    'uniqueMarketplaceId' => $listing['hepsiburadaSku'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
-                    'sku' => $listing['sku'] ?? '',
+                    'published' => $listing['isSalable'] === 'PUBLISHED' ? true : false,
+                    'sku' => $listing['merchantSku'] ?? '',
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
@@ -109,7 +100,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             );
             echo "OK\n";
             $index++;
-        }    */
+        }  
         
     }
 
