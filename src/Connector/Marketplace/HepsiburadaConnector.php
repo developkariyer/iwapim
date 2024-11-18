@@ -77,13 +77,17 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'hbSku' => $hbSku
             ]
         ]);
-        print_r($response->getContent());
-
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        return $data;
     }
 
     public function import($updateFlag, $importFlag)
     {
-        $this->getProduct("HBCV00000MEKZX");
        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
@@ -95,9 +99,14 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $index = 0;*/
         //$first = false;
         foreach ($this->listings as $listing) {
-          //  echo "Processing Listing {$listing['hepsiburadaSku']} ...\n\n\n";
-            
-            //$this->getProduct($listing['hepsiburadaSku']);
+            $response = $this->getProduct($listing['hepsiburadaSku']);
+            if (empty($response)) {
+                echo "Failed to get product\n";
+                continue;
+            }
+            print_r($response['data'][0]);
+            break;
+
             /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
