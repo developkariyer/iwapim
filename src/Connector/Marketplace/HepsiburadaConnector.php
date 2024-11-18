@@ -60,8 +60,67 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
+    protected function createAssets()
+    {
+        //title, parent, image, url
+        foreach ($this->listings as &$listing) {
+            $link = "https://www.hepsiburada.com/-p-";
+            if ($listing['isSalable']) {
+                $link .= $listing['hepsiburadaSku'];
+                $response = $this->httpClient->request('GET', $link);
+
+                $redirectUrl = $response->getInfo('url');
+                print_r($redirectUrl);
+
+            } 
+            //$listing['link'] = $link;
+        }
+    }
+
     public function import($updateFlag, $importFlag)
     {
+        $this->createAssets();
+       /* if (empty($this->listings)) {
+            echo "Nothing to import\n";
+        }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;*/
+
+
+        /*foreach ($this->listings as $listing) {
+            echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
+            $parent = Utility::checkSetPath($marketplaceFolder);
+            if (!empty($listing['variantGroupId'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($listing['variantGroupId']),
+                    $parent
+                );
+            }
+            VariantProduct::addUpdateVariant(
+                variant: [
+                    'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
+                    'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
+                    'salePrice' => $listing['price']['amount'] ?? 0,
+                    'saleCurrency' => 'USD',
+                    'title' => $listing['productName'] ?? '',
+                    'attributes' =>$listing['productName'] ?? '',
+                    'uniqueMarketplaceId' => $listing['wpid'] ?? '',
+                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
+                    'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
+                    'sku' => $listing['sku'] ?? '',
+                ],
+                importFlag: $importFlag,
+                updateFlag: $updateFlag,
+                marketplace: $this->marketplace,
+                parent: $parent
+            );
+            echo "OK\n";
+            $index++;
+        }    */
         
     }
 
