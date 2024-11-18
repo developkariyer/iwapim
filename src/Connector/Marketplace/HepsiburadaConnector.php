@@ -93,6 +93,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;*/
         foreach ($this->listings as $listing) {
+            echo "Processing Listing {$listing['hepsiburadaSku']} ...\n\n\n";
             $this->getProduct($listing['hepsiburadaSku']);
             break;
 
