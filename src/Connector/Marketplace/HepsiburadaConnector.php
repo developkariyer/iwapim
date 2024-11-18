@@ -70,6 +70,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 $variantLink .= $link . $listing['hepsiburadaSku'];
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $variantLink);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  // Cevabı döndür
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  // Yönlendirmeleri takip et
+                
                 $response = curl_exec($ch);
                 print_r($response);
                 $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
