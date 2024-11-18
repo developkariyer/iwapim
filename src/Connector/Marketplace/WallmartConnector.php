@@ -120,6 +120,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     }
 
+    protected function getAttributes($listing)
+    {
+    }
+
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
@@ -133,7 +137,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
-            $parent = Utility::checkSetPath($marketplaceFolder);
+            echo $listing['variantGroupInfo']['groupingAttributes'] ."\n ";
+            /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
                     Utility::sanitizeVariable($listing['variantGroupId']),
@@ -159,7 +164,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;
+            $index++;*/
         }    
     }
 
