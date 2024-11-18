@@ -73,12 +73,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;*/
         foreach ($this->listings as $listing) {
-            echo "url: " . "https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku'];
-            echo "salePrice: " . $listing['price'];
-            echo "saleCurrency: " . 'TRY';
-            echo "uniqueMarketplaceId: " . $listing['hepsiburadaSku'];
-            echo "published: " . $listing['isSalable'];
-             
+            echo "url: " . "https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku'] . "\n";
+            echo "salePrice: " . $listing['price'] . "\n";
+            echo "saleCurrency: " . 'TRY' . "\n";
+            echo "uniqueMarketplaceId: " . $listing['hepsiburadaSku'] . "\n";
+            echo "published: " . $listing['isSalable'] . "\n";
+
         }
         /*foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
