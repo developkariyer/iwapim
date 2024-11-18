@@ -73,7 +73,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ],
             'query' => [
                 'page' => $page,
-                'size' => $size
+                'size' => $size,
+                'hbSku' => $hbSku
             ]
         ]);
         print_r($response->getContent());
@@ -82,7 +83,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        $this->getProduct("HBCV00004KOQKL");
+        $this->getProduct("HBCV00000MEKZX");
        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
