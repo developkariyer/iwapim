@@ -82,7 +82,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        $this->createAssets();
+        //$this->createAssets();
+        foreach ($this->listings as $listing) {
+            print_r($listing);
+        }
        /* if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
