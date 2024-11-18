@@ -137,7 +137,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $index = 0;*/
         foreach ($this->listings as $listing) {
             //echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
-            echo $listing['variantGroupInfo']['groupingAttributes'] ."\n ";
+            if (isset($listing['variantGroupInfo']['groupingAttributes'])) {
+                echo $listing['variantGroupInfo']['groupingAttributes'] . "\n";
+            } else {
+                echo "variantGroupInfo veya groupingAttributes mevcut değil.\n";
+            }
             /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
