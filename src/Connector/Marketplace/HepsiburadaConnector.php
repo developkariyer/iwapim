@@ -28,8 +28,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             //do {
                 $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}", [
                     'headers' => [
-                        'accept' => 'application/json',
-                        'authorization' => 'Basic ' . base64_encode( $this->marketplace->getServiceKey()),
+                        'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                        "User-Agent" => $this->marketplace->getSellerId()  . " - " . "SelfIntegration",
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json'
                     ],
                     'query' => [
                         'offset' => $offset,
