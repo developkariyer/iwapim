@@ -89,6 +89,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function downloadAttributes()
     {
+        echo "Downloading Attributes\n";
         foreach ($this->listings as &$listing) {
             $response = $this->getProduct($listing['hepsiburadaSku']);
             if (empty($response)) {
@@ -101,6 +102,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 $listing['attributes'] = []; 
             }
         }
+        echo "Attributes Downloaded\n";
     }
 
     public function import($updateFlag, $importFlag)
