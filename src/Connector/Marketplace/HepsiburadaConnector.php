@@ -135,7 +135,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Title: " . $listing['attributes']['productName'] . "\n";
             echo "Attributes: " . $this->getAttributes($listing['attributes']['variantTypeAttributes']) . "\n";
             echo "Unique marketplace id: " . $listing['hepsiburadaSku'] . "\n";
-            echo "Api response json: " . json_encode($listing, JSON_PRETTY_PRINT) . "\n";
+            //echo "Api response json: " . json_encode($listing, JSON_PRETTY_PRINT) . "\n";
             echo "Published: " . $listing['isSalable'] . "\n";
             echo "Sku: " . $listing['merchantSku'] . "\n";
             echo "-----------------------------------\n";
