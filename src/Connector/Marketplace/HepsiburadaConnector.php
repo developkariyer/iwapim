@@ -9,10 +9,6 @@ use Pimcore\Model\DataObject\Data\Link;
 
 class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
-    /*private static $apiUrl = [
-        'offers' => "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getHepsiburadaMerchantId()}"
-    ];*/
-    
     public static $marketplaceType = 'Hepsiburada';
     
     public function download($forceDownload = false)
@@ -105,9 +101,18 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         echo "Attributes Downloaded\n";
     }
 
+    protected function getAttributes($variantTypeAttributes)
+    {
+        $attributeString = "";
+        foreach ($variantTypeAttributes as $attribute) {
+            $attributeString .= $attribute['value'] . "-";
+        }
+        return rtrim($attributeString, "-");
+    }
+
     public function import($updateFlag, $importFlag)
     {
-       /*if (empty($this->listings)) {
+       if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -115,27 +120,25 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
-        $index = 0;*/
-        //$first = false;
-        foreach ($this->listings as $listing) {
-           
+        $index = 0;
 
-            /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
+        foreach ($this->listings as $listing) {
+            echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
-            if (!empty($listing['variantGroupId'])) {
+            if (!empty($listing['attributes']['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($listing['variantGroupId']),
+                    Utility::sanitizeVariable($listing['attributes']['variantGroupId']),
                     $parent
                 );
             }
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
+                    'imageUrl' => Utility::getCachedImage($listing['attributes']['images'][0]) ?? '',
                     'urlLink' => $this->getUrlLink("https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku']) ?? '',
                     'salePrice' => $listing['price'] ?? 0,
                     'saleCurrency' => 'TRY',
-                    'title' => $listing['productName'] ?? '',
-                    'attributes' =>$listing['productName'] ?? '',
+                    'title' =>  $listing['attributes']['productName']  ?? '',
+                    'attributes' => $this->getAttributes($listing['attributes']['variantTypeAttributes']) ?? '',
                     'uniqueMarketplaceId' => $listing['hepsiburadaSku'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['isSalable'],
@@ -147,9 +150,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;*/
+            $index++;
         }  
-        
     }
 
     public function downloadOrders()

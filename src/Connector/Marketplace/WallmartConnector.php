@@ -120,7 +120,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         }
         $data = $response->toArray();
         print_r($data);
-
     }
 
     protected function getAttributes($listing)
