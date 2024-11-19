@@ -9,10 +9,6 @@ use Pimcore\Model\DataObject\Data\Link;
 
 class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
-    /*private static $apiUrl = [
-        'offers' => "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getHepsiburadaMerchantId()}"
-    ];*/
-    
     public static $marketplaceType = 'Hepsiburada';
     
     public function download($forceDownload = false)
