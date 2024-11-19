@@ -16,12 +16,8 @@ use App\Utils\Utility;
 
 
 #[AsCommand(
-    name: 'app:prepare-table',
-    description: 'Imports products from Shopify sites!'
+    name: 'app:prepare-table'
 )]
-
-// TODO : 1. current coin function error
-// 2. current coin automatic update
 
 class PrepareOrderTableCommand extends AbstractCommand
 {
