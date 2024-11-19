@@ -52,6 +52,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->extraColumns();
         }
         //$this->calculatePrice();
+        $this->insertClosedAtDiff();
         return Command::SUCCESS;
     }
     
