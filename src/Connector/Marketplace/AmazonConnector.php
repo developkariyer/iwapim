@@ -622,6 +622,8 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         );
         echo $patch->json()['status'] ?? " ??";
         echo " OK\n";
+        // fix $sku to generate a valid file name
+        $sku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$sku.json", json_encode($patch->json()));
     }
 
