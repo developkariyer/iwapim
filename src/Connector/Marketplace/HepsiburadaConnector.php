@@ -105,6 +105,15 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         echo "Attributes Downloaded\n";
     }
 
+    protected function getAttributes($variantTypeAttributes)
+    {
+        $attributeString = "";
+        foreach ($variantTypeAttributes as $attribute) {
+            $attributeString .= $attribute['value'] . "-";
+        }
+        return rtrim($attributeString, "-");
+    }
+
     public function import($updateFlag, $importFlag)
     {
        /*if (empty($this->listings)) {
@@ -118,7 +127,21 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $index = 0;*/
         //$first = false;
         foreach ($this->listings as $listing) {
-           
+            echo "Variant group id: " . $listing['attributes']['variantGroupId'] . "\n";
+            echo "Image url: " . $listing['attributes']['images'][0] . "\n";
+            echo "Url: " . $listing['attributes']['url'] . "\n";
+            echo "Price: " . $listing['price'] . "\n";
+            echo "Sale currency: TRY" . "\n";
+            echo "Title: " . $listing['attributes']['productName'] . "\n";
+            echo "Attributes: " . $this->getAttributes($listing['attributes']['variantTypeAttributes']) . "\n";
+            echo "Unique marketplace id: " . $listing['hepsiburadaSku'] . "\n";
+            echo "Api response json: " . json_encode($listing, JSON_PRETTY_PRINT) . "\n";
+            echo "Published: " . $listing['isSalable'] . "\n";
+            echo "Sku: " . $listing['merchantSku'] . "\n";
+            echo "-----------------------------------\n";
+
+
+
 
             /* echo "($index/$total) Processing Listing {$listing['merchantSku']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
