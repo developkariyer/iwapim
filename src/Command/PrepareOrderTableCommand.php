@@ -71,11 +71,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->productQuantity();
         $this->usaCode();
     }
-
-    protected function getEtsy()
-    {
-        
-    }
         
     protected function transferOrders()
     {
