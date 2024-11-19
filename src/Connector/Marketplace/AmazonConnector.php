@@ -602,7 +602,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => "responsible@iwaconcept.com",
+                        "value" => "handmadeworksshopeu@gmail.com",
                     ]
                 ]
             )
