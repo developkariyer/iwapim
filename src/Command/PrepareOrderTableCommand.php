@@ -52,7 +52,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->extraColumns();
         }
         //$this->calculatePrice();
-        $this->insertClosedAtDiff();
+        $this->discountValue();
         return Command::SUCCESS;
     }
     
@@ -816,7 +816,6 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function insertClosedAtDiff()
     {
         $db = \Pimcore\Db::get();
-
         $sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET completion_day = DATEDIFF(DATE(closed_at), DATE(created_at))
