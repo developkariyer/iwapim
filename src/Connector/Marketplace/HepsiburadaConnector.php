@@ -129,7 +129,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         foreach ($this->listings as $listing) {
             echo "Variant group id: " . $listing['attributes']['variantGroupId'] . "\n";
             echo "Image url: " . $listing['attributes']['images'][0] . "\n";
-            echo "Url: " . $listing['attributes']['url'] . "\n";
+            echo "Url: " . "https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku'] . "\n";
             echo "Price: " . $listing['price'] . "\n";
             echo "Sale currency: TRY" . "\n";
             echo "Title: " . $listing['attributes']['productName'] . "\n";
