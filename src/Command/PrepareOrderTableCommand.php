@@ -51,6 +51,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->calculatePrice();
         return Command::SUCCESS;
     }
     
