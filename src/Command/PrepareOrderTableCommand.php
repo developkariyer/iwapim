@@ -943,14 +943,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             } catch (Exception $e) {
                 echo "Error occurred: " . $e->getMessage() . "\n";
             }
-            echo "Update completed: $currency, $date\n";
-                    $sqlCheck = "
-                SELECT COUNT(*) 
+            $sqlCheckRate = "
+                SELECT currency_rate 
                 FROM iwa_marketplace_orders_line_items
                 WHERE DATE(created_at) = '$date'
             ";
-            $count = $db->fetchOne($sqlCheck);
-            echo "Found $count records with the date: $date\n";
+            $currentRate = $db->fetchOne($sqlCheckRate);
+            echo "Current currency rate for $date: $currentRate\n";
             break;
         }
         echo "All processes completed.\n";
