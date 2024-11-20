@@ -67,6 +67,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->usaCode();
     }
         
+    
     protected function transferOrders()
     {
         if (empty($this->marketplaceListWithIds)) {
