@@ -932,7 +932,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $updateSql = "
             UPDATE iwa_marketplace_orders_line_items
             SET currency_rate = $result
-            WHERE DATE(created_at) = $date
+            DATE_FORMAT(created_at, '%Y-%m-%d')  = $date
              ";
             
             echo "Updating... $updateSql\n";
@@ -946,7 +946,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $sqlCheckRate = "
                 SELECT currency_rate 
                 FROM iwa_marketplace_orders_line_items
-                WHERE DATE(created_at) = '$date'
+                WHERE DATE_FORMAT(created_at, '%Y-%m-%d')  = '$date'
             ";
             $currentRate = $db->fetchOne($sqlCheckRate);
             echo "Current currency rate for $date: $currentRate\n";
