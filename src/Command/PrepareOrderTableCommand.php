@@ -909,23 +909,15 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($results as $row) {
             $currency = $row['currency'];
             $date = $row['DATE(created_at)'];
-            if (strtotime($date) === false) {
-                echo "Invalid date format: $date\n";
-            } else {
-                // Proceed with the SQL update
-            }
-            /*echo "Processing... Currency: $currency, Date: $date\n";
+            echo "Processing... Currency: $currency, Date: $date\n";
             $sql = "
                 SELECT 
                     value
-                FROM 
+                FROM
                     iwa_currency_history
-                WHERE 
+                WHERE
                     currency = '$currency'
-                    AND DATE(date) <= '$date'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
-                LIMIT 1;
+                    AND DATE(date) = '$date';
             ";
             $result = $db->fetchOne($sql);
 
@@ -942,7 +934,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             ";
             echo "Updating... $updateSql\n";
             $db->executeStatement($updateSql);
-            echo "Update completed: $currency, $date\n";*/
+            echo "Update completed: $currency, $date\n";
         }
         echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
