@@ -923,7 +923,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 LIMIT 1;
             ";
             $result = $db->fetchOne($sql);
-
             if ($result) {
                 echo "Currency rate found: $result\n";
             } else {
@@ -931,18 +930,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         
             $updateSql = "
-                UPDATE iwa_marketplace_orders_line_items
-                SET currency_rate = :result
-                WHERE DATE(created_at) = :date
+            UPDATE iwa_marketplace_orders_line_items
+            SET currency_rate = :result
+            WHERE DATE(created_at) = :date
             ";
-
+            
             $params = [
-                ':result' => $result, 
-                ':date' => $date      
+                ':result' => $result, // currency_rate parametresi
+                ':date' => $date      // created_at parametresi
             ];
-
+            
+            // executeStatement ile sorguyu çalıştırma
+            echo "Updating... $updateSql\n";  // Bu satırı yorumda tutarak SQL sorgusunu yazdırabilirsiniz
             $db->executeStatement($updateSql, $params);
-            echo "Updating... $updateSql\n";
             echo "Update completed: $currency, $date\n";
         }
         echo "All processes completed.\n";
