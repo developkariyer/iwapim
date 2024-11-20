@@ -929,6 +929,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Currency rate not found, currency: $currency, date: $date\n";
             }
             $date = date('Y-m-d', strtotime($date));
+            echo "Date: $date\n";
             $updateSql = "
             UPDATE iwa_marketplace_orders_line_items
             SET currency_rate = $result
