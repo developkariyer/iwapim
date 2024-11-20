@@ -935,8 +935,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SET currency_rate = ?
             WHERE DATE(created_at) = ?
             ";
-        $params = [$result, $date];
-        $db->executeUpdate($updateSql, $params);
+            $params = [$result, '{$date}'];
+            $db->executeUpdate($updateSql, $params);
             
             $db->executeStatement($updateSql, $params);
             echo "Updating... $updateSql\n";
