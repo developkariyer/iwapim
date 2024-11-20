@@ -918,7 +918,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                     AND DATE(date) = '$date';
             ";
             $result = $db->fetchOne($sql);
-            print_r($result);
             $sql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET currency_rate = $result
