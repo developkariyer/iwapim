@@ -905,7 +905,23 @@ class PrepareOrderTableCommand extends AbstractCommand
                 iwa_marketplace_orders_line_items;
         ";
         $results = $db->fetchAllAssociative($sql);
-        print_r($results[0]);
+        foreach ($results as $row) {
+            $currency = $row['currency'];
+            $date = $row['DATE(created_at)'];
+            $sql = "
+                SELECT 
+                    value
+                FROM
+                    iwa_currency_history
+                WHERE
+                    currency = '$currency'
+                    AND DATE(date) = '$date';
+            ";
+            $result = $db->fetchOne($sql);
+            print_r($result);
+
+            break;
+        }
 
         /*$db = \Pimcore\Db::get();
         $sql = "
