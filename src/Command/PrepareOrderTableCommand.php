@@ -928,17 +928,16 @@ class PrepareOrderTableCommand extends AbstractCommand
             } else {
                 echo "Currency rate not found, currency: $currency, date: $date\n";
             }
-        
+            $date = date('Y-m-d', strtotime($date));
             $updateSql = "
             UPDATE iwa_marketplace_orders_line_items
             SET currency_rate = $result
-            WHERE DATE(created_at) = '2024-10-02'
+            WHERE DATE(created_at) = '$date'
              ";
             
             echo "Updating... $updateSql\n";
             $db->executeStatement($updateSql);
             echo "Update completed: $currency, $date\n";
-            break;
         }
         echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
