@@ -932,7 +932,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $updateSql = "
             UPDATE iwa_marketplace_orders_line_items
             SET currency_rate = $result
-            WHERE DATE(created_at) = '$date'
+            WHERE DATE(created_at) = $date
              ";
             
             echo "Updating... $updateSql\n";
