@@ -931,16 +931,18 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         
             $updateSql = "
-            UPDATE iwa_marketplace_orders_line_items
-            SET currency_rate = ?
-            WHERE DATE(created_at) = ?
+                UPDATE iwa_marketplace_orders_line_items
+                SET currency_rate = :result
+                WHERE DATE(created_at) = :date
             ";
-            $params = [$result, '{$date}'];
-            $db->executeUpdate($updateSql, $params);
-            
+
+            $params = [
+                ':result' => $result, 
+                ':date' => $date      
+            ];
+
             $db->executeStatement($updateSql, $params);
             echo "Updating... $updateSql\n";
-            $db->executeStatement($updateSql);
             echo "Update completed: $currency, $date\n";
         }
         echo "All processes completed.\n";
