@@ -913,11 +913,14 @@ class PrepareOrderTableCommand extends AbstractCommand
             $sql = "
                 SELECT 
                     value
-                FROM
+                FROM 
                     iwa_currency_history
-                WHERE
+                WHERE 
                     currency = '$currency'
-                    AND DATE(date) = '$date';
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
             ";
             $result = $db->fetchOne($sql);
 
@@ -928,10 +931,17 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         
             $updateSql = "
-                UPDATE iwa_marketplace_orders_line_items
-                SET currency_rate = $result
-                WHERE DATE(created_at) = '$date';
+            UPDATE iwa_marketplace_orders_line_items
+            SET currency_rate = :result
+            WHERE DATE(created_at) = :date
             ";
+            
+            $params = [
+                'result' => $result,
+                'date' => $date
+            ];
+            
+            $db->executeStatement($updateSql, $params);
             echo "Updating... $updateSql\n";
             $db->executeStatement($updateSql);
             echo "Update completed: $currency, $date\n";
