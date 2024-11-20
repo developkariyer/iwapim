@@ -930,36 +930,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
             $date = date('Y-m-d', strtotime($date));
             $updateSql = "
-                UPDATE iwa_marketplace_orders_line_items
-                SET currency_rate = :result
-                WHERE DATE(created_at) = :date
-            ";
-
-            // Parametreleri hazırlıyoruz
-            $params = [
-                ':result' => $result,
-                ':date' => $date
-            ];
-
+            UPDATE iwa_marketplace_orders_line_items
+            SET currency_rate = $result
+            WHERE DATE(created_at) = $date
+             ";
+            
             echo "Updating... $updateSql\n";
-
             try {
-                // Sorguyu çalıştırıyoruz
-                $affectedRows = $db->executeStatement($updateSql, $params);
-                
-                // Etkilenen satır sayısını ekrana yazıyoruz
+                $affectedRows = $db->executeStatement($updateSql);
                 echo "Rows affected: $affectedRows\n";
-                
-                if ($affectedRows > 0) {
-                    echo "Update successful\n";
-                } else {
-                    echo "No rows updated\n";
-                }
+                echo "Update successful\n";
             } catch (Exception $e) {
-                // Hata durumunda hata mesajını yazıyoruz
                 echo "Error occurred: " . $e->getMessage() . "\n";
             }
-
             echo "Update completed: $currency, $date\n";
         }
         echo "All processes completed.\n";
