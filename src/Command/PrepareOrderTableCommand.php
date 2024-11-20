@@ -919,13 +919,11 @@ class PrepareOrderTableCommand extends AbstractCommand
             ";
             $result = $db->fetchOne($sql);
             print_r($result);
-            // currency_rate
             $sql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET currency_rate = $result
                 WHERE created_at = '$date';
             ";
-            break;
         }
 
         /*$db = \Pimcore\Db::get();
