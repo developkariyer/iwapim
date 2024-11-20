@@ -900,7 +900,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $sql = "
             SELECT 
                 currency,
-                created_at
+                DATE(created_at)
             FROM
                 iwa_marketplace_orders_line_items;
         ";
