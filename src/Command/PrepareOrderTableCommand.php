@@ -913,13 +913,17 @@ class PrepareOrderTableCommand extends AbstractCommand
             $sql = "
                 SELECT 
                     value
-                FROM
+                FROM 
                     iwa_currency_history
-                WHERE
+                WHERE 
                     currency = '$currency'
-                    AND DATE(date) = '$date';
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
             ";
             $result = $db->fetchOne($sql);
+
             if ($result) {
                 echo "Currency rate found: $result\n";
             } else {
@@ -929,13 +933,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET currency_rate = $result
-                WHERE created_at = '$date';
+                WHERE DATE(created_at) = '$date';
             ";
             echo "Updating... $updateSql\n";
             $db->executeStatement($updateSql);
             echo "Update completed: $currency, $date\n";
         }
-
+        echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
         $sql = "
         UPDATE iwa_marketplace_orders_line_items AS items
