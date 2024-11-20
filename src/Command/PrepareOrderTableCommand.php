@@ -67,7 +67,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->usaCode();
     }
         
-    
     protected function transferOrders()
     {
         if (empty($this->marketplaceListWithIds)) {
@@ -898,6 +897,17 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "
+            SELECT 
+                currency,
+                created_at
+            FROM
+                iwa_marketplace_orders_line_items;
+        ";
+        $results = $db->fetchAllAssociative($sql);
+        print_r($results[0]);
+
+        /*$db = \Pimcore\Db::get();
+        $sql = "
         UPDATE iwa_marketplace_orders_line_items AS items
         JOIN iwa_currency_history AS currency_history
             ON items.currency = currency_history.currency
@@ -908,11 +918,11 @@ class PrepareOrderTableCommand extends AbstractCommand
         SET 
             items.product_price_usd = CASE 
                 WHEN items.currency = 'USD' THEN items.price
-                ELSE ROUND((items.price / usd_history.value), 2)
+                ELSE ROUND((items.price / NULLIF(usd_history.value, 0)), 2)
             END,
                 items.total_price_usd = CASE 
                     WHEN items.currency = 'USD' THEN items.total_price
-                    ELSE ROUND((items.total_price / usd_history.value), 2)
+                    ELSE ROUND((items.total_price / NULLIF(usd_history.value, 0)), 2)
             END;
         ";
         $stmt = $db->prepare($sql);
@@ -924,7 +934,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "SQL Query executed successfully. Affected rows: " . $affectedRows;
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
-        }
+        }*/
     }
 
     protected function countryCode()
