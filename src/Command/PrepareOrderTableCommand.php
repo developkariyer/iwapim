@@ -899,7 +899,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                currency,
+                DISTINCT currency,
                 DATE(created_at)
             FROM
                 iwa_marketplace_orders_line_items;
