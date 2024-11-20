@@ -944,6 +944,14 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Error occurred: " . $e->getMessage() . "\n";
             }
             echo "Update completed: $currency, $date\n";
+                    $sqlCheck = "
+                SELECT COUNT(*) 
+                FROM iwa_marketplace_orders_line_items
+                WHERE DATE(created_at) = '$date'
+            ";
+            $count = $db->fetchOne($sqlCheck);
+            echo "Found $count records with the date: $date\n";
+            break;
         }
         echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
