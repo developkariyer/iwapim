@@ -913,14 +913,11 @@ class PrepareOrderTableCommand extends AbstractCommand
             $sql = "
                 SELECT 
                     value
-                FROM 
+                FROM
                     iwa_currency_history
-                WHERE 
+                WHERE
                     currency = '$currency'
-                    AND DATE(date) <= '$date'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
-                LIMIT 1;
+                    AND DATE(date) = '$date';
             ";
             $result = $db->fetchOne($sql);
 
