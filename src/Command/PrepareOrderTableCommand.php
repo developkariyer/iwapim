@@ -936,7 +936,13 @@ class PrepareOrderTableCommand extends AbstractCommand
              ";
             
             echo "Updating... $updateSql\n";
-            $db->executeStatement($updateSql);
+            try {
+                $affectedRows = $db->executeStatement($updateSql);
+                echo "Rows affected: $affectedRows\n";
+                echo "Update successful\n";
+            } catch (Exception $e) {
+                echo "Error occurred: " . $e->getMessage() . "\n";
+            }
             echo "Update completed: $currency, $date\n";
         }
         echo "All processes completed.\n";
