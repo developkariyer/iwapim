@@ -932,12 +932,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             $updateSql = "
             UPDATE iwa_marketplace_orders_line_items
             SET currency_rate = $result
-            WHERE DATE(created_at) = '$date'
+            WHERE DATE(created_at) = '2024-10-02'
              ";
             
             echo "Updating... $updateSql\n";
             $db->executeStatement($updateSql);
             echo "Update completed: $currency, $date\n";
+            break;
         }
         echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
