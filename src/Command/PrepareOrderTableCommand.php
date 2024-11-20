@@ -905,9 +905,11 @@ class PrepareOrderTableCommand extends AbstractCommand
                 iwa_marketplace_orders_line_items;
         ";
         $results = $db->fetchAllAssociative($sql);
+        echo "Start: Updating currency rates...\n";
         foreach ($results as $row) {
             $currency = $row['currency'];
             $date = $row['DATE(created_at)'];
+            echo "Processing... Currency: $currency, Date: $date\n";
             $sql = "
                 SELECT 
                     value
@@ -918,11 +920,20 @@ class PrepareOrderTableCommand extends AbstractCommand
                     AND DATE(date) = '$date';
             ";
             $result = $db->fetchOne($sql);
-            $sql = "
+            if ($result) {
+                echo "Currency rate found: $result\n";
+            } else {
+                echo "Currency rate not found, currency: $currency, date: $date\n";
+            }
+        
+            $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET currency_rate = $result
                 WHERE created_at = '$date';
             ";
+            echo "Updating... $updateSql\n";
+            $db->executeStatement($updateSql);
+            echo "Update completed: $currency, $date\n";
         }
 
         /*$db = \Pimcore\Db::get();
