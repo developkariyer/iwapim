@@ -1000,7 +1000,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items
                     SET 
-                        currency_rate = $currencyRate
+                        currency_rate = $currencyRate,
                         current_USD = $usdRate
                     WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
                 ";    
@@ -1009,7 +1009,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items
                     SET 
-                        currency_rate = $currencyRate
+                        currency_rate = $currencyRate,
                         current_USD = $usdRate
                     WHERE DATE(created_at)  = '$date' AND currency = '$currency';
                 ";
