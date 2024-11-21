@@ -61,6 +61,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray();
+        $db = \Pimcore\Db::get();
         foreach ($rows as $key => $row) {
             if ($key === 0) {
                 continue;
@@ -69,8 +70,20 @@ class PrepareOrderTableCommand extends AbstractCommand
             $currency = $row[1];
             $value = $row[2];
             echo "Tarih: $tarih, Currency: $currency, Value: $value\n";
+            $sql = "
+            INSERT INTO iwa_currency_history (date, currency, value)
+            VALUES ('$tarih', '$currency', '$value')
+            ON DUPLICATE KEY UPDATE
+                value = '$value'
+            ";
+            try {
+                $db->executeStatement($sql);
+                echo "Data for $currency on $tarih inserted/updated successfully.\n";
+            } catch (Exception $e) {
+                echo "Error inserting/updating data for $currency on $tarih: " . $e->getMessage() . "\n";
+            }
         }
-    
+
     }
 
     protected function extraColumns()
