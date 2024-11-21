@@ -906,6 +906,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $totalPrice = $row['total_price'];
             $currency = $row['currency'];
             $currencyRate = $row['currency_rate'];
+            $currentUsd = $row['current_USD'];
             $productPriceUsd = null;
             $totalPriceUsd = null;
             if ($currency === 'USD') {
@@ -919,8 +920,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 else {
                     $priceTL = $price * $currencyRate;
                     $totalPriceTL = $totalPrice * $currencyRate;
-                    $productPriceUsd = round($priceTL / $currencyRate, 2);
-                    $totalPriceUsd = round($totalPriceTL / $currencyRate, 2);
+                    $productPriceUsd = round($priceTL / $currentUsd, 2);
+                    $totalPriceUsd = round($totalPriceTL / $currentUsd, 2);
                 }               
             }
             $updateSql = "
