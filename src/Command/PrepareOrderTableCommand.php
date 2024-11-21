@@ -51,9 +51,28 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->test();
         return Command::SUCCESS;
     }
     
+    protected function test()
+    {
+        $filePath = 'EVDSC.xlsx';
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+        foreach ($rows as $key => $row) {
+            if ($key === 0) {
+                continue;
+            }
+            $tarih = $row[0];
+            $currency = $row[1];
+            $value = $row[2];
+            echo "Tarih: $tarih, Currency: $currency, Value: $value\n";
+        }
+    
+    }
+
     protected function extraColumns()
     {
         echo "Calculating Closed At Diff\n";
