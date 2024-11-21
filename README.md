@@ -8,7 +8,7 @@
 - **Pimcore Integration**: Seamlessly connects to your Pimcore setup for retrieving and managing product information.
 - **Apache Superset Integration**: Provides fancy business information for all phases from production to consumer.
 - **ERP Capabilities**: Handles ERP-level data, providing actionable insights for marketplace management.
-- **Marketplace Listings Management**: Quickly retrieve distribution statistics and manage listings across multiple marketplaces.
+- **Marketplace Listings Management**: Manage and sync listings across multiple marketplaces.
 - **Cloud Ready**: Ready to be packed and deployed as Docker containers.
 
 ## 📖 Description
