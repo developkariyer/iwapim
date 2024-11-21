@@ -382,7 +382,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(currency_rate);
+                currency_rate = VALUES(currency_rate);
                 ";
         try {
             $db = \Pimcore\Db::get();
@@ -482,7 +482,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             discount_value = VALUES(discount_value),
             discount_value_type = VALUES(discount_value_type),
             current_USD = VALUES(current_USD),
-            current_EUR = VALUES(currency_rate);
+            currency_rate = VALUES(currency_rate);
             ";
         try {
             $db = \Pimcore\Db::get();
