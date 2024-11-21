@@ -51,7 +51,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->calculatePrice();
+        $this->currencyRate();
         return Command::SUCCESS;
     }
     
@@ -959,7 +959,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             if ($currency === 'TRY') {
                 $currency = 'USD';
             }
-            $sql = "
+            $rateSql = "
                 SELECT 
                     value
                 FROM 
@@ -971,23 +971,46 @@ class PrepareOrderTableCommand extends AbstractCommand
                     ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
                 LIMIT 1;
             ";
-            $result = $db->fetchOne($sql);
-            if ($result) {
-                echo "Currency rate found: $result\n";
-            } else {
-                echo "Currency rate not found, currency: $currency, date: $date\n";
+            $currencyRate  = $db->fetchOne($rateSql);
+            $usdRateSql = "
+                SELECT 
+                    value
+                FROM 
+                    iwa_currency_history
+                WHERE 
+                    currency = 'USD'
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
+            ";
+            $usdRate = $db->fetchOne($usdRateSql);
+        
+            if (!$currencyRate) {
+                echo "Currency rate not found for currency: $currency, date: $date\n";
+                continue;
             }
+        
+            if (!$usdRate) {
+                echo "USD rate not found for date: $date\n";
+                continue;
+            }
+
             if($row['currency'] === 'TRY') {
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items
-                    SET currency_rate = $result
+                    SET 
+                        currency_rate = $currencyRate
+                        current_USD = $usdRate
                     WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
                 ";    
             }
             else {
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items
-                    SET currency_rate = $result
+                    SET 
+                        currency_rate = $currencyRate
+                        current_USD = $usdRate
                     WHERE DATE(created_at)  = '$date' AND currency = '$currency';
                 ";
             }
