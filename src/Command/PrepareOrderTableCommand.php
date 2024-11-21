@@ -50,7 +50,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->discountValue();
+        $this->isfullfilled();
         return Command::SUCCESS;
     }
     
@@ -748,7 +748,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function insertClosedAtDiff()
+    protected function insertClosedAtDiff() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -760,7 +760,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function discountValue()
+    protected function discountValue() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
