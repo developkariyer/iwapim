@@ -43,7 +43,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->processVariantOrderData();
         }
 
-        // ERRORR!!!!!!!
         if($input->getOption('updateCoin')) {
             $this->updateCurrentCoin();
         }
@@ -51,7 +50,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->currencyRate();
+        $this->calculatePrice();
         return Command::SUCCESS;
     }
     
@@ -747,69 +746,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($marketplaceList as $marketplace) {
             $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
         }
-    }
-
-    protected static function exchangeCoin()
-    {
-        /*$filePath = PIMCORE_PROJECT_ROOT. '/src/Command/EVDS.xlsx';
-        $spreadsheet = IOFactory::load($filePath);
-        $worksheet = $spreadsheet->getActiveSheet();
-        $data = $worksheet->toArray();
-        $db = \Pimcore\Db::get();
-        foreach ($data as $row) {
-            // Excel'deki her satırdaki verilere karşılık gelen sütunları alalım
-            $date = $row[0];  // Tarih
-            $currency = $row[1];  // Döviz türü (USD, EUR, vb.)
-            $value = $row[2];  // Döviz değeri
-        
-            // SQL sorgusunu hazırlayın (veritabanına eklemek için)
-            $sql = "
-            INSERT INTO iwa_currency_history (date, currency, value)
-            VALUES (:date, :currency, :value)
-            ";
-        
-            // Sorguyu hazırlayın
-            $stmt = $db->prepare($sql);
-        
-            // Parametreleri bind edin
-            $stmt->bindParam(':date', $date);
-            $stmt->bindParam(':currency', $currency);
-            $stmt->bindParam(':value', $value);
-        
-            // Sorguyu çalıştırın
-            $stmt->execute();
-        }*/
-    }
-
-    protected static function updateCurrentCoin()
-    {
-        /*$db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items AS orders
-        JOIN iwa_currency_historyy AS history
-        ON DATE(orders.created_at) = history.date
-        SET orders.current_USD = history.usd, 
-            orders.current_EUR = history.eur
-        WHERE DATE(orders.created_at) = history.date;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();*/
-
-        /*
-        $coins = self::exchangeCoin();
-        $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET current_USD = ?, current_EUR = ?
-        WHERE DATE(created_at) = ?
-        ";
-        $stmt = $db->prepare($sql);
-        foreach ($coins as $date => $coin) {
-            $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
-            if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $stmt->execute([$coin['usd'], $coin['euro'], $date]);
-            }
-        }*/
     }
 
     protected function insertClosedAtDiff()
