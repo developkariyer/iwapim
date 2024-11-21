@@ -50,7 +50,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->countryCode();
+        $this->countryCodeTurkey();
         return Command::SUCCESS;
     }
     
@@ -60,7 +60,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->discountValue();
         $this->isfullfilled();
         $this->calculatePrice();
-        $this->countryCode();
+        $this->countryCodeTurkey();
         $this->parseUrl();  
         $this->productQuantity();
         $this->usaCode();
@@ -947,7 +947,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "All processes completed.\n";
     }
 
-    protected function countryCode()
+    protected function countryCodeTurkey()
     {
         $db = \Pimcore\Db::get();
         $sql = "
