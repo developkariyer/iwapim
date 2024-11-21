@@ -931,13 +931,20 @@ class PrepareOrderTableCommand extends AbstractCommand
             } else {
                 echo "Currency rate not found, currency: $currency, date: $date\n";
             }
-            
-            $updateSql = "
-            UPDATE iwa_marketplace_orders_line_items
-            SET currency_rate = $result
-            WHERE DATE(created_at)  = '$date' AND currency = '$currency';
-             ";
-            
+            if($row['currency'] === 'TRY') {
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET currency_rate = $result
+                    WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
+                ";    
+            }
+            else {
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET currency_rate = $result
+                    WHERE DATE(created_at)  = '$date' AND currency = '$currency';
+                ";
+            }
             echo "Updating... $updateSql\n";
             try {
                 $affectedRows = $db->executeStatement($updateSql);
