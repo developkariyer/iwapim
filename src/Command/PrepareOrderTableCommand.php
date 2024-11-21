@@ -932,13 +932,11 @@ class PrepareOrderTableCommand extends AbstractCommand
             } else {
                 echo "Currency rate not found, currency: $currency, date: $date\n";
             }
-            /*
-            $date = date('Y-m-d', strtotime($date));
-            echo "Date: $date\n";
+            
             $updateSql = "
             UPDATE iwa_marketplace_orders_line_items
             SET currency_rate = $result
-            DATE_FORMAT(created_at, '%Y-%m-%d')  = '$date'
+            WHERE DATE(created_at)  = '$date'
              ";
             
             echo "Updating... $updateSql\n";
@@ -949,13 +947,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             } catch (Exception $e) {
                 echo "Error occurred: " . $e->getMessage() . "\n";
             }
-            $sqlCheckRate = "
-                SELECT currency_rate 
-                FROM iwa_marketplace_orders_line_items
-                WHERE DATE_FORMAT(created_at, '%Y-%m-%d')  = '$date'
-            ";
-            $currentRate = $db->fetchOne($sqlCheckRate);
-            echo "Current currency rate for $date: $currentRate\n";*/
         }
         echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
