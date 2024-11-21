@@ -113,7 +113,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,currency_rate)
+            discount_code, discount_code_type, discount_value, discount_value_type)
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
@@ -148,9 +148,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 NULL AS discount_code,
                 NULL AS discount_code_type,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.shop_coupon')) AS discount_value,
-                NULL AS discount_value_type,
-                NULL AS current_USD,
-                NULL AS currency_rate
+                NULL AS discount_value_type
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.transactions[*]' COLUMNS (
@@ -212,7 +210,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,currency_rate)
+            discount_code, discount_code_type, discount_value, discount_value_type)
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
@@ -247,9 +245,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 NULL AS discount_code,
                 NULL AS discount_code_type,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
-                NULL AS discount_value_type,
-                NULL AS current_USD,
-                NULL AS currency_rate
+                NULL AS discount_value_type
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -309,8 +305,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
                 total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-                discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-                currency_rate
+                discount_code, discount_code_type, discount_value, discount_value_type
             )
             SELECT
                 '$marketplaceType',
@@ -346,9 +341,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.code')), NULL) AS discount_code,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.type')), NULL) AS discount_code_type,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')), NULL) AS discount_value,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type,
-                NULL AS current_USD,
-                NULL AS currency_rate
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -408,8 +401,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-            currency_rate
+            discount_code, discount_code_type, discount_value, discount_value_type
         )
         SELECT
             '$marketplaceType',
@@ -445,9 +437,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS discount_code,
             NULL AS discount_code_type,
             NULL AS discount_value,
-            NULL AS discount_value_type,
-            NULL AS current_USD,
-            NULL AS currency_rate
+            NULL AS discount_value_type
         FROM
             iwa_marketplace_orders
             CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
