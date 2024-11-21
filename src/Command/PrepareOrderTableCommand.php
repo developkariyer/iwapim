@@ -67,7 +67,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Complated is Fullfilled\n";
         echo "Calculating is Turkey Code\n";
         $this->countryCodeTurkey();
-        echo "Calculating is Turkey Code\n";
+        echo "Complated is Turkey Code\n";
         echo "Calculating is Parse URL\n";
         $this->parseUrl(); 
         echo "Complated Parse URL\n";
