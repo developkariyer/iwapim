@@ -193,9 +193,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_code = VALUES(discount_code),
                 discount_code_type = VALUES(discount_code_type),
                 discount_value = VALUES(discount_value),
-                discount_value_type = VALUES(discount_value_type),
-                current_USD = VALUES(current_USD),
-                currency_rate = VALUES(currency_rate);
+                discount_value_type = VALUES(discount_value_type);
         ";
         try {
             $db = \Pimcore\Db::get();
@@ -292,9 +290,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_code = VALUES(discount_code),
                 discount_code_type = VALUES(discount_code_type),
                 discount_value = VALUES(discount_value),
-                discount_value_type = VALUES(discount_value_type),
-                current_USD = VALUES(current_USD),
-                currency_rate = VALUES(currency_rate);
+                discount_value_type = VALUES(discount_value_type);
         ";
         try {
             $db = \Pimcore\Db::get();
@@ -393,9 +389,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_code = VALUES(discount_code),
                 discount_code_type = VALUES(discount_code_type),
                 discount_value = VALUES(discount_value),
-                discount_value_type = VALUES(discount_value_type),
-                current_USD = VALUES(current_USD),
-                currency_rate = VALUES(currency_rate);
+                discount_value_type = VALUES(discount_value_type)
                 ";
         try {
             $db = \Pimcore\Db::get();
@@ -493,9 +487,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             discount_code = VALUES(discount_code),
             discount_code_type = VALUES(discount_code_type),
             discount_value = VALUES(discount_value),
-            discount_value_type = VALUES(discount_value_type),
-            current_USD = VALUES(current_USD),
-            currency_rate = VALUES(currency_rate);
+            discount_value_type = VALUES(discount_value_type);
             ";
         try {
             $db = \Pimcore\Db::get();
@@ -519,7 +511,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
                 $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
             }
-            
         }
     }
 
@@ -760,71 +751,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function insertClosedAtDiff() // OK!!!
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET completion_day = DATEDIFF(DATE(closed_at), DATE(created_at))
-        WHERE DATE(closed_at) IS NOT NULL;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function discountValue() // OK!!!
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET has_discount = 
-        CASE 
-            WHEN discount_value IS NOT NULL AND discount_value <> 0.00 THEN TRUE
-            ELSE FALSE
-        END;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function isfullfilled() // OK!!!
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET is_fulfilled = 
-        CASE 
-            WHEN fulfillments_status = 'success' 
-            OR fulfillments_status = 'Delivered'
-            OR fulfillments_status = 'HANDLED'
-            THEN TRUE
-            ELSE FALSE
-        END;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function productQuantity()
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items AS orders
-            JOIN (
-                SELECT 
-                    order_id, 
-                    SUM(quantity) AS total_quantity
-                FROM 
-                    iwa_marketplace_orders_line_items
-                GROUP BY 
-                    order_id
-            ) AS order_totals ON orders.order_id = order_totals.order_id
-            SET orders.total_quantity = order_totals.total_quantity;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
     protected function calculatePrice()
     {
         $db = \Pimcore\Db::get();
@@ -959,8 +885,73 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         echo "All processes completed.\n";
     }
+    
+    protected function insertClosedAtDiff() 
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET completion_day = DATEDIFF(DATE(closed_at), DATE(created_at))
+        WHERE DATE(closed_at) IS NOT NULL;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
 
-    protected function countryCodeTurkey() // OK!!!
+    protected function discountValue() 
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET has_discount = 
+        CASE 
+            WHEN discount_value IS NOT NULL AND discount_value <> 0.00 THEN TRUE
+            ELSE FALSE
+        END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function isfullfilled() 
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET is_fulfilled = 
+        CASE 
+            WHEN fulfillments_status = 'success' 
+            OR fulfillments_status = 'Delivered'
+            OR fulfillments_status = 'HANDLED'
+            THEN TRUE
+            ELSE FALSE
+        END;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function productQuantity()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            UPDATE iwa_marketplace_orders_line_items AS orders
+            JOIN (
+                SELECT 
+                    order_id, 
+                    SUM(quantity) AS total_quantity
+                FROM 
+                    iwa_marketplace_orders_line_items
+                GROUP BY 
+                    order_id
+            ) AS order_totals ON orders.order_id = order_totals.order_id
+            SET orders.total_quantity = order_totals.total_quantity;
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function countryCodeTurkey() 
     {
         $db = \Pimcore\Db::get();
         $sql = "
