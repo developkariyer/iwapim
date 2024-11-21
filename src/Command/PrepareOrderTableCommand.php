@@ -50,7 +50,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->isfullfilled();
+        //$this->productCount();
         return Command::SUCCESS;
     }
     
@@ -59,7 +59,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->insertClosedAtDiff();
         $this->discountValue();
         $this->isfullfilled();
-        $this->productCount();
         $this->calculatePrice();
         $this->countryCode();
         $this->parseUrl();  
@@ -101,7 +100,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,currency_rate)
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
@@ -138,7 +137,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.shop_coupon')) AS discount_value,
                 NULL AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR
+                NULL AS currency_rate
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.transactions[*]' COLUMNS (
@@ -183,7 +182,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR);
+                currency_rate = VALUES(currency_rate);
         ";
         try {
             $db = \Pimcore\Db::get();
@@ -202,7 +201,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,currency_rate)
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
@@ -239,7 +238,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
                 NULL AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR
+                NULL AS currency_rate
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -282,7 +281,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR);
+                currency_rate = VALUES(currency_rate);
         ";
         try {
             $db = \Pimcore\Db::get();
@@ -302,7 +301,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
                 total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
                 discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-                current_EUR
+                currency_rate
             )
             SELECT
                 '$marketplaceType',
@@ -340,7 +339,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')), NULL) AS discount_value,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR
+                NULL AS currency_rate
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -383,7 +382,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR);
+                current_EUR = VALUES(currency_rate);
                 ";
         try {
             $db = \Pimcore\Db::get();
@@ -403,7 +402,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
             discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-            current_EUR
+            currency_rate
         )
         SELECT
             '$marketplaceType',
@@ -441,7 +440,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS discount_value,
             NULL AS discount_value_type,
             NULL AS current_USD,
-            NULL AS current_EUR
+            NULL AS currency_rate
         FROM
             iwa_marketplace_orders
             CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
@@ -483,7 +482,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             discount_value = VALUES(discount_value),
             discount_value_type = VALUES(discount_value_type),
             current_USD = VALUES(current_USD),
-            current_EUR = VALUES(current_EUR);
+            current_EUR = VALUES(currency_rate);
             ";
         try {
             $db = \Pimcore\Db::get();
@@ -775,7 +774,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function isfullfilled()
+    protected function isfullfilled() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -788,23 +787,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             THEN TRUE
             ELSE FALSE
         END;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function productCount()
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items AS orders
-            JOIN (
-                SELECT order_id, COUNT(*) AS product_count
-                FROM iwa_marketplace_orders_line_items
-                GROUP BY order_id
-            ) AS order_counts
-            ON orders.order_id = order_counts.order_id
-            SET orders.product_count = order_counts.product_count;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
