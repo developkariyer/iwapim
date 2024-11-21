@@ -914,7 +914,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Currency is TRY, skipping...\n";
                 continue;
             }
-            /*$sql = "
+            $sql = "
                 SELECT 
                     value
                 FROM 
@@ -932,6 +932,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             } else {
                 echo "Currency rate not found, currency: $currency, date: $date\n";
             }
+            /*
             $date = date('Y-m-d', strtotime($date));
             echo "Date: $date\n";
             $updateSql = "
