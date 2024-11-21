@@ -57,7 +57,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     
     protected function test()
     {
-        $filePath = 'EVDSC.xlsx';
+        $filePath = PIMCORE_PROJECT_ROOT. "/src/Command/EVDSC.xlsx";
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray();
