@@ -910,7 +910,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $currency = $row['currency'];
             $date = $row['DATE(created_at)'];
             echo "Processing... Currency: $currency, Date: $date\n";
-            $sql = "
+            /*$sql = "
                 SELECT 
                     value
                 FROM 
@@ -950,8 +950,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 WHERE DATE_FORMAT(created_at, '%Y-%m-%d')  = '$date'
             ";
             $currentRate = $db->fetchOne($sqlCheckRate);
-            echo "Current currency rate for $date: $currentRate\n";
-            break;
+            echo "Current currency rate for $date: $currentRate\n";*/
         }
         echo "All processes completed.\n";
         /*$db = \Pimcore\Db::get();
