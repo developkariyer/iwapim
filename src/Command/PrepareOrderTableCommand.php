@@ -51,19 +51,32 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->usaCode();
         return Command::SUCCESS;
     }
     
     protected function extraColumns()
     {
+        echo "Calculating Closed At Diff\n";
         $this->insertClosedAtDiff();
+        echo "Complated Closed At Diff\n";
+        echo "Calculating is Discount\n";
         $this->discountValue();
+        echo "Complated is Discount\n";
+        echo "Calculating is Fullfilled\n";
         $this->isfullfilled();
+        echo "Complated is Fullfilled\n";
+        echo "Calculating is Turkey Code\n";
         $this->countryCodeTurkey();
-        $this->parseUrl();  
+        echo "Calculating is Turkey Code\n";
+        echo "Calculating is Parse URL\n";
+        $this->parseUrl(); 
+        echo "Complated Parse URL\n";
+        echo "Calculating is Product Quantity\n";
         $this->productQuantity();
+        echo "Complated Product Quantity\n";
+        echo "Calculating USA Code\n";
         $this->usaCode();
+        echo "Complated USA Code\n";
     }
         
     protected function transferOrders()
