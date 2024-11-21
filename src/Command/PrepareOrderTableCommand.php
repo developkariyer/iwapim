@@ -923,6 +923,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             WHEN fulfillments_status = 'success' 
             OR fulfillments_status = 'Delivered'
             OR fulfillments_status = 'HANDLED'
+            OR fulfillments_status = 'Completed'
             THEN TRUE
             ELSE FALSE
         END;
