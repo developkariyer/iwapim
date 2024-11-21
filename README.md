@@ -1,12 +1,16 @@
 # IWAPIM
 
-**DO NOT USE INSTALLERS FOR THIS REPOSITORY. THIS IS HIGHLY MODIFIED AND EXPERIMENTAL!**
+IWAPIM (Intelligent Workflow Automation for Product Information Management) is an experimental project designed to streamline and simplify e-commerce management through cutting-edge integrations and automation.
 
-## To-Dos
-- Add all data in google product sheets
-- Find a way to add variations as new product
-- Find a way to re-establish inheritance of fields when content deleted
-- Build a directory structure for Assets
-- Install a local server in office
-- Ask for static IP
-- Migrate OpenOffice and PIMCore to office, keep Vaultwarden and IWABOT in AWS
+## 🚀 Features
+- **Slack Bot Integration**: Ask questions about your data directly in Slack, powered by OpenAI API.
+- **Pimcore Integration**: Seamlessly connects to your Pimcore setup for retrieving and managing product information.
+- **Apache Superset Integration**: Provides fancy business information for all phases from production to consumer.
+- **ERP Capabilities**: Handles ERP-level data, providing actionable insights for marketplace management.
+- **Marketplace Listings Management**: Quickly retrieve distribution statistics and manage listings across multiple marketplaces.
+- **Cloud Ready**: Ready to be packed in Docker
+
+## 📖 Description
+IWAPIM aims to simplify workflows for e-commerce managers by offering real-time access to key data. Whether it's understanding the distribution of product listings across marketplaces or accessing ERP-driven insights, IWAPIM makes the process more intuitive and efficient.
+
+> **Note:** This project is in its early experimental stages and is not ready for production use. While feedback is appreciated, **forking or deploying IWAPIM in production environments is not recommended at this time**.
