@@ -1,0 +1,10 @@
+# Ignore everything
+/*
+
+# Unignore src/ folder and its contents
+!src/
+!src/**
+!templates/
+!templates/**
+!README.md
+!.gitignore
