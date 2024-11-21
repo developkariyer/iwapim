@@ -835,6 +835,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT * FROM iwa_marketplace_orders_line_items
+            WHERE product_price_usd IS NULL OR total_price_usd IS NULL;
         ";
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $row) {
