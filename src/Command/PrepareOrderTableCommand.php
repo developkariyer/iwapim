@@ -911,8 +911,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $date = $row['DATE(created_at)'];
             echo "Processing... Currency: $currency, Date: $date\n";
             if ($currency === 'TRY') {
-                echo "Currency is TRY, skipping...\n";
-                continue;
+                $currency = 'USD';
             }
             $sql = "
                 SELECT 
