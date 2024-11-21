@@ -898,6 +898,52 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "
+            SELECT * FROM iwa_marketplace_orders_line_items
+        ";
+        $results = $db->fetchAllAssociative($sql);
+        foreach ($results as $row) {
+            $price = $row['price'];
+            $totalPrice = $row['total_price'];
+            $currency = $row['currency'];
+            $currencyRate = $row['currency_rate'];
+            $productPriceUsd = null;
+            $totalPriceUsd = null;
+            if ($currency === 'USD') {
+                $productPriceUsd = $price;
+                $totalPriceUsd = $totalPrice;
+            } else {
+                if ($currency === 'TRY') {
+                    $productPriceUsd = round($price / $currencyRate, 2);
+                    $totalPriceUsd = round($totalPrice / $currencyRate, 2);
+                }
+                else {
+                    $priceTL = $price * $currencyRate;
+                    $totalPriceTL = $totalPrice * $currencyRate;
+                    $productPriceUsd = round($priceTL / $currencyRate, 2);
+                    $totalPriceUsd = round($totalPriceTL / $currencyRate, 2);
+                }               
+            }
+            $updateSql = "
+                UPDATE iwa_marketplace_orders_line_items
+                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd
+                WHERE id = {$row['id']};
+            ";
+            echo "Updating... $updateSql\n";
+            try {
+                $affectedRows = $db->executeStatement($updateSql);
+                echo "Rows affected: $affectedRows\n";
+                echo "Update successful\n";
+            } catch (Exception $e) {
+                echo "Error occurred: " . $e->getMessage() . "\n";
+            }
+        }
+        echo "All processes completed.\n";
+    }
+
+    protected function currencyRate()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
             SELECT 
                 DISTINCT currency,
                 DATE(created_at)
@@ -955,35 +1001,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         }
         echo "All processes completed.\n";
-        /*$db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items AS items
-        JOIN iwa_currency_history AS currency_history
-            ON items.currency = currency_history.currency
-            AND DATE(items.created_at) = DATE(currency_history.date) 
-        JOIN iwa_currency_history AS usd_history
-            ON usd_history.currency = 'USD'
-            AND DATE(usd_history.date) = DATE(currency_history.date)
-        SET 
-            items.product_price_usd = CASE 
-                WHEN items.currency = 'USD' THEN items.price
-                ELSE ROUND((items.price / NULLIF(usd_history.value, 0)), 2)
-            END,
-                items.total_price_usd = CASE 
-                    WHEN items.currency = 'USD' THEN items.total_price
-                    ELSE ROUND((items.total_price / NULLIF(usd_history.value, 0)), 2)
-            END;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-        try {
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-            $affectedRows = $stmt->rowCount();
-            echo "SQL Query executed successfully. Affected rows: " . $affectedRows;
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }*/
     }
 
     protected function countryCode()
