@@ -43,9 +43,9 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->processVariantOrderData();
         }
 
-        // ERRORR!!!!!!!
         if($input->getOption('updateCoin')) {
-            $this->updateCurrentCoin();
+            $this->currencyRate();
+            $this->calculatePrice();
         }
 
         if($input->getOption('extraColumns')) {
@@ -56,18 +56,29 @@ class PrepareOrderTableCommand extends AbstractCommand
     
     protected function extraColumns()
     {
+        echo "Calculating Closed At Diff\n";
         $this->insertClosedAtDiff();
+        echo "Complated Closed At Diff\n";
+        echo "Calculating is Discount\n";
         $this->discountValue();
+        echo "Complated is Discount\n";
+        echo "Calculating is Fullfilled\n";
         $this->isfullfilled();
-        $this->productCount();
-        $this->calculatePrice();
-        $this->countryCode();
-        $this->parseUrl();  
+        echo "Complated is Fullfilled\n";
+        echo "Calculating is Turkey Code\n";
+        $this->countryCodeTurkey();
+        echo "Complated is Turkey Code\n";
+        echo "Calculating is Parse URL\n";
+        $this->parseUrl(); 
+        echo "Complated Parse URL\n";
+        echo "Calculating is Product Quantity\n";
         $this->productQuantity();
+        echo "Complated Product Quantity\n";
+        echo "Calculating USA Code\n";
         $this->usaCode();
+        echo "Complated USA Code\n";
     }
         
-    
     protected function transferOrders()
     {
         if (empty($this->marketplaceListWithIds)) {
@@ -102,7 +113,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,currency_rate)
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
@@ -139,7 +150,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.shop_coupon')) AS discount_value,
                 NULL AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR
+                NULL AS currency_rate
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.transactions[*]' COLUMNS (
@@ -184,7 +195,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR);
+                currency_rate = VALUES(currency_rate);
         ";
         try {
             $db = \Pimcore\Db::get();
@@ -203,7 +214,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,current_EUR)
+            discount_code, discount_code_type, discount_value, discount_value_type,current_USD,currency_rate)
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
@@ -240,7 +251,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
                 NULL AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR
+                NULL AS currency_rate
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -283,7 +294,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR);
+                currency_rate = VALUES(currency_rate);
         ";
         try {
             $db = \Pimcore\Db::get();
@@ -303,7 +314,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
                 total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
                 discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-                current_EUR
+                currency_rate
             )
             SELECT
                 '$marketplaceType',
@@ -341,7 +352,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')), NULL) AS discount_value,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type,
                 NULL AS current_USD,
-                NULL AS current_EUR
+                NULL AS currency_rate
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -384,7 +395,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 discount_value = VALUES(discount_value),
                 discount_value_type = VALUES(discount_value_type),
                 current_USD = VALUES(current_USD),
-                current_EUR = VALUES(current_EUR);
+                currency_rate = VALUES(currency_rate);
                 ";
         try {
             $db = \Pimcore\Db::get();
@@ -404,7 +415,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
             total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
             discount_code, discount_code_type, discount_value, discount_value_type, current_USD,
-            current_EUR
+            currency_rate
         )
         SELECT
             '$marketplaceType',
@@ -442,7 +453,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS discount_value,
             NULL AS discount_value_type,
             NULL AS current_USD,
-            NULL AS current_EUR
+            NULL AS currency_rate
         FROM
             iwa_marketplace_orders
             CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
@@ -484,7 +495,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             discount_value = VALUES(discount_value),
             discount_value_type = VALUES(discount_value_type),
             current_USD = VALUES(current_USD),
-            current_EUR = VALUES(current_EUR);
+            currency_rate = VALUES(currency_rate);
             ";
         try {
             $db = \Pimcore\Db::get();
@@ -749,70 +760,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function exchangeCoin()
-    {
-        /*$filePath = PIMCORE_PROJECT_ROOT. '/src/Command/EVDS.xlsx';
-        $spreadsheet = IOFactory::load($filePath);
-        $worksheet = $spreadsheet->getActiveSheet();
-        $data = $worksheet->toArray();
-        $db = \Pimcore\Db::get();
-        foreach ($data as $row) {
-            // Excel'deki her satırdaki verilere karşılık gelen sütunları alalım
-            $date = $row[0];  // Tarih
-            $currency = $row[1];  // Döviz türü (USD, EUR, vb.)
-            $value = $row[2];  // Döviz değeri
-        
-            // SQL sorgusunu hazırlayın (veritabanına eklemek için)
-            $sql = "
-            INSERT INTO iwa_currency_history (date, currency, value)
-            VALUES (:date, :currency, :value)
-            ";
-        
-            // Sorguyu hazırlayın
-            $stmt = $db->prepare($sql);
-        
-            // Parametreleri bind edin
-            $stmt->bindParam(':date', $date);
-            $stmt->bindParam(':currency', $currency);
-            $stmt->bindParam(':value', $value);
-        
-            // Sorguyu çalıştırın
-            $stmt->execute();
-        }*/
-    }
-
-    protected static function updateCurrentCoin()
-    {
-        /*$db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items AS orders
-        JOIN iwa_currency_historyy AS history
-        ON DATE(orders.created_at) = history.date
-        SET orders.current_USD = history.usd, 
-            orders.current_EUR = history.eur
-        WHERE DATE(orders.created_at) = history.date;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();*/
-
-        /*
-        $coins = self::exchangeCoin();
-        $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET current_USD = ?, current_EUR = ?
-        WHERE DATE(created_at) = ?
-        ";
-        $stmt = $db->prepare($sql);
-        foreach ($coins as $date => $coin) {
-            $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
-            if ($dateTime && $dateTime->format('Y-m-d') === $date) {
-                $stmt->execute([$coin['usd'], $coin['euro'], $date]);
-            }
-        }*/
-    }
-
-    protected function insertClosedAtDiff()
+    protected function insertClosedAtDiff() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -824,7 +772,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function discountValue()
+    protected function discountValue() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -839,7 +787,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function isfullfilled()
+    protected function isfullfilled() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -852,23 +800,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             THEN TRUE
             ELSE FALSE
         END;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function productCount()
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items AS orders
-            JOIN (
-                SELECT order_id, COUNT(*) AS product_count
-                FROM iwa_marketplace_orders_line_items
-                GROUP BY order_id
-            ) AS order_counts
-            ON orders.order_id = order_counts.order_id
-            SET orders.product_count = order_counts.product_count;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
@@ -898,36 +829,138 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "
-        UPDATE iwa_marketplace_orders_line_items AS items
-        JOIN iwa_currency_history AS currency_history
-            ON items.currency = currency_history.currency
-            AND DATE(items.created_at) = DATE(currency_history.date) 
-        JOIN iwa_currency_history AS usd_history
-            ON usd_history.currency = 'USD'
-            AND DATE(usd_history.date) = DATE(currency_history.date)
-        SET 
-            items.product_price_usd = CASE 
-                WHEN items.currency = 'USD' THEN items.price
-                ELSE ROUND((items.price / usd_history.value), 2)
-            END,
-                items.total_price_usd = CASE 
-                    WHEN items.currency = 'USD' THEN items.total_price
-                    ELSE ROUND((items.total_price / usd_history.value), 2)
-            END;
+            SELECT * FROM iwa_marketplace_orders_line_items
+            WHERE product_price_usd IS NULL OR total_price_usd IS NULL;
         ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-        try {
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-            $affectedRows = $stmt->rowCount();
-            echo "SQL Query executed successfully. Affected rows: " . $affectedRows;
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
+        $results = $db->fetchAllAssociative($sql);
+        foreach ($results as $row) {
+            $price = $row['price'];
+            $totalPrice = $row['total_price'];
+            $currency = $row['currency'];
+            $currencyRate = $row['currency_rate'];
+            $currentUsd = $row['current_USD'];
+            $productPriceUsd = null;
+            $totalPriceUsd = null;
+            if ($currency === 'USD') {
+                $productPriceUsd = $price;
+                $totalPriceUsd = $totalPrice;
+            } else {
+                if ($currency === 'TRY') {
+                    $productPriceUsd = round($price / $currencyRate, 2);
+                    $totalPriceUsd = round($totalPrice / $currencyRate, 2);
+                }
+                else {
+                    $priceTL = $price * $currencyRate;
+                    $totalPriceTL = $totalPrice * $currencyRate;
+                    $productPriceUsd = round($priceTL / $currentUsd, 2);
+                    $totalPriceUsd = round($totalPriceTL / $currentUsd, 2);
+                }               
+            }
+            $updateSql = "
+                UPDATE iwa_marketplace_orders_line_items
+                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd
+                WHERE id = {$row['id']};
+            ";
+            echo "Updating... $updateSql\n";
+            try {
+                $affectedRows = $db->executeStatement($updateSql);
+                echo "Rows affected: $affectedRows\n";
+                echo "Update successful\n";
+            } catch (Exception $e) {
+                echo "Error occurred: " . $e->getMessage() . "\n";
+            }
         }
+        echo "All processes completed.\n";
     }
 
-    protected function countryCode()
+    protected function currencyRate()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT 
+                DISTINCT currency,
+                DATE(created_at)
+            FROM
+                iwa_marketplace_orders_line_items
+            WHERE currency_rate IS NULL;
+        ";
+        $results = $db->fetchAllAssociative($sql);
+        echo "Start: Updating currency rates...\n";
+        foreach ($results as $row) {
+            $currency = $row['currency'];
+            $date = $row['DATE(created_at)'];
+            echo "Processing... Currency: $currency, Date: $date\n";
+            if ($currency === 'TRY') {
+                $currency = 'USD';
+            }
+            $rateSql = "
+                SELECT 
+                    value
+                FROM 
+                    iwa_currency_history
+                WHERE 
+                    currency = '$currency'
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
+            ";
+            $currencyRate  = $db->fetchOne($rateSql);
+            $usdRateSql = "
+                SELECT 
+                    value
+                FROM 
+                    iwa_currency_history
+                WHERE 
+                    currency = 'USD'
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
+            ";
+            $usdRate = $db->fetchOne($usdRateSql);
+        
+            if (!$currencyRate) {
+                echo "Currency rate not found for currency: $currency, date: $date\n";
+                continue;
+            }
+        
+            if (!$usdRate) {
+                echo "USD rate not found for date: $date\n";
+                continue;
+            }
+
+            if($row['currency'] === 'TRY') {
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET 
+                        currency_rate = $currencyRate,
+                        current_USD = $usdRate
+                    WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
+                ";    
+            }
+            else {
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET 
+                        currency_rate = $currencyRate,
+                        current_USD = $usdRate
+                    WHERE DATE(created_at)  = '$date' AND currency = '$currency';
+                ";
+            }
+            echo "Updating... $updateSql\n";
+            try {
+                $affectedRows = $db->executeStatement($updateSql);
+                echo "Rows affected: $affectedRows\n";
+                echo "Update successful\n";
+            } catch (Exception $e) {
+                echo "Error occurred: " . $e->getMessage() . "\n";
+            }
+        }
+        echo "All processes completed.\n";
+    }
+
+    protected function countryCodeTurkey() // OK!!!
     {
         $db = \Pimcore\Db::get();
         $sql = "
