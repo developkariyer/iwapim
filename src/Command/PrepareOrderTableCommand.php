@@ -766,10 +766,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                     $totalPriceUsd = round($totalPrice / $currencyRate, 2);
                 }
                 else {
-                    $priceTL = $price * $currencyRate;
-                    $totalPriceTL = $totalPrice * $currencyRate;
-                    $productPriceUsd = round($priceTL / $currentUsd, 2);
-                    $totalPriceUsd = round($totalPriceTL / $currentUsd, 2);
+                    $productPriceUsd = round($price * $currencyRate / $currentUsd, 2);
+                    $totalPriceUsd = round($totalPrice * $currencyRate / $currentUsd, 2);
                 }               
             }
             $updateSql = "
