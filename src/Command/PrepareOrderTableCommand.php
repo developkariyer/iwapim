@@ -59,7 +59,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->insertClosedAtDiff();
         $this->discountValue();
         $this->isfullfilled();
-        $this->calculatePrice();
         $this->countryCodeTurkey();
         $this->parseUrl();  
         $this->productQuantity();
