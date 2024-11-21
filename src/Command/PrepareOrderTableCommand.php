@@ -44,7 +44,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
 
         if($input->getOption('updateCoin')) {
-            $this->updateCurrentCoin();
+            $this->currencyRate();
+            $this->calculatePrice();
         }
 
         if($input->getOption('extraColumns')) {
