@@ -577,7 +577,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         */
         $patches = [
             new PatchOperation(
-                op: "replace",
+                op: "delete", // "replace",
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
                     [
@@ -587,7 +587,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 ]
             ),
             new PatchOperation(
-                op: "replace",
+                op: "delete", //"replace",
                 path: "/attributes/dsa_responsible_party_address",
                 value: [
                     [
@@ -597,7 +597,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 ]
             ),
             new PatchOperation(
-                op: "replace",
+                op: "delete", //"replace",
                 path: "/attributes/gpsr_manufacturer_reference",
                 value: [
                     [
