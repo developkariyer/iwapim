@@ -99,6 +99,7 @@ class ErrorListingsCommand extends AbstractCommand
                     echo " $country $sku ";
                     $amazonConnector[200568]->patchListing($sku, $country);
                     $patched["$country-$sku"] = true;
+                    return;
                 }
             }
         }
