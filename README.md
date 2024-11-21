@@ -1,6 +1,7 @@
-# IWAPIM
+<h1 align="center">✨ IWAPIM ✨</h1>
+<p align="center"><b>Intelligent Workflow Automation for Product Information Management</b></p>
+<p align="center">IWAPIM is an experimental project designed to streamline and simplify e-commerce management through cutting-edge integrations and automation.</p>
 
-IWAPIM (Intelligent Workflow Automation for Product Information Management) is an experimental project designed to streamline and simplify e-commerce management through cutting-edge integrations and automation.
 
 ## 🚀 Features
 - **Slack Bot Integration**: Ask questions about your data directly in Slack, powered by OpenAI API.
