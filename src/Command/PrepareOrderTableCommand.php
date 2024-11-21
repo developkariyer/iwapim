@@ -885,7 +885,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 DISTINCT currency,
                 DATE(created_at)
             FROM
-                iwa_marketplace_orders_line_items;
+                iwa_marketplace_orders_line_items
+            WHERE currency_rate IS NULL;
         ";
         $results = $db->fetchAllAssociative($sql);
         echo "Start: Updating currency rates...\n";
