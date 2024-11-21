@@ -582,7 +582,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => true,
+                        "value" => null, // true,
                     ]
                 ]
             ),
@@ -592,7 +592,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => "responsible@iwaconcept.com",
+                        "value" => "", //"responsible@iwaconcept.com",
                     ]
                 ]
             ),
@@ -602,7 +602,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => "handmadeworksshopeu@gmail.com",
+                        "value" => "", //"handmadeworksshopeu@gmail.com",
                     ]
                 ]
             )
