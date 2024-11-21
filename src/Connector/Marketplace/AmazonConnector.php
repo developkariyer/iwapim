@@ -577,32 +577,32 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         */
         $patches = [
             new PatchOperation(
-                op: "delete", // "replace",
+                op: "add", // "replace", // "delete",
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => null, // true,
+                        "value" => true,
                     ]
                 ]
             ),
             new PatchOperation(
-                op: "delete", //"replace",
+                op: "add", //"replace",
                 path: "/attributes/dsa_responsible_party_address",
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => "", //"responsible@iwaconcept.com",
+                        "value" => "responsible@iwaconcept.com",
                     ]
                 ]
             ),
             new PatchOperation(
-                op: "delete", //"replace",
+                op: "add", //"replace",
                 path: "/attributes/gpsr_manufacturer_reference",
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => "", //"handmadeworksshopeu@gmail.com",
+                        "value" => "handmadeworksshopeu@gmail.com",
                     ]
                 ]
             )

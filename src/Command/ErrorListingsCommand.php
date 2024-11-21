@@ -62,7 +62,7 @@ class ErrorListingsCommand extends AbstractCommand
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
         $variantObject = new VariantListing();
         $pageSize = 5;
-        $offset = 17621;
+        $offset = 0;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
         $index = $offset;
