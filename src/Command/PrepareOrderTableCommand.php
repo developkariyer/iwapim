@@ -1203,7 +1203,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $result) {
             $shippingCityRaw = $result['shipping_city']; 
-            $shippingCity = cleanCityName($shippingCityRaw);
+            $shippingCity = $this->cleanTurkeyCityName($shippingCityRaw);
             echo "Processing... $shippingCity\n";
             if (isset($isoCodes[$shippingCity])) {
                 echo "Eslesti\n";
