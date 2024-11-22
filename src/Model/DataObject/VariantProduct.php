@@ -141,7 +141,7 @@ class VariantProduct extends Concrete
         if ($variant['published'] ?? false) {
             $this->setParent($parent);
         } else {
-            $this->setParent(Utility::chekSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri"))));
+            $this->setParent(Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri"))));
         }
         $this->setLastUpdate(Carbon::now());
         try {
