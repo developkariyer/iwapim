@@ -682,6 +682,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $marketplaceKey = $marketplace->getKey(); 
         if (!$marketplaceKey) {
             echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            return;
         }
         
         $mainProductObjectArray = $variantObject->getMainProduct(); 
