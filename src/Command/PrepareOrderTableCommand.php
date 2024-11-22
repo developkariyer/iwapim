@@ -1201,7 +1201,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $result) {
             $shippingCityRaw = $result['shipping_city']; 
-            $extractedCity = extractCity($shippingCityRaw, $isoCodes);
+            $extractedCity = $this->extractCity($shippingCityRaw, $isoCodes);
             if ($extractedCity) {
                 echo "Bulunan Şehir: $extractedCity\n";
             } else {
