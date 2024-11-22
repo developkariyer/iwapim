@@ -228,7 +228,7 @@ class ListingSyncService
         };
         $storeId = $marketplace->getWisersellStoreId();
         $variantCode = match ($marketplaceType) {
-            'Etsy' => $parentResponse['listing_id'] ?? null,
+            'Etsy   ' => $parentResponse['listing_id'] ?? null,
             'Amazon' => null,
             'Shopify' => $apiResponse['id'] ?? null,
             'Trendyol' => $apiResponse['platformListingId'] ?? null,
@@ -359,12 +359,25 @@ class ListingSyncService
             if (is_array($mainProduct)) {
                 $mainProduct = reset($mainProduct);
             }
+            $wisersellProductId = $listing['product']['id'] ?? null;
             if (!$mainProduct instanceof Product) {
-                echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
+                if ($wisersellProductId) {
+                    echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
+                    echo "But it is connected to $wisersellProductId in WS. Let's try to connect in PIM\n";
+                    sleep(10);
+                    $mainProduct = Product::getByWisersellId($wisersellProductId, ['limit' => 1]);
+                    if ($mainProduct instanceof Product) {
+                        echo "Main product {$mainProduct->getId()} found in PIM and variant {$variantProduct->getId()} will be connected to it.\n";
+                        sleep(5);
+//                        $mainProduct->addVariantProduct($variantProduct);
+                    } else {
+                        echo "Main product not found in PIM for {$listing['code']}\n";
+                        sleep(5);
+                    }
+                }
                 continue;
             }
             $pimProductId = $mainProduct->getWisersellId();
-            $wisersellProductId = $listing['product']['id'] ?? null;
             if (empty($wisersellProductId) || (($wisersellProductId+0) != ($pimProductId+0))) {
                 echo "Product ID mismatch for {$listing['code']} and {$variantProduct->getId()}: WS:{$wisersellProductId} PIM:{$pimProductId}\n";
                 $this->updateWisersellListing($variantProduct);
