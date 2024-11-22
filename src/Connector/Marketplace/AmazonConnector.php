@@ -393,6 +393,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             $variantProduct->setPublished(true);
         } else {
             $variantProduct->setPublished(false);
+            $variantProduct->setParent(Utility::checkSetPath('_Pasif', Utility::checkSetPath('Amazon', Utility::checkSetPath('Pazaryerleri'))));
         }
         $variantProduct->save();
     }

@@ -139,7 +139,8 @@ class VariantProduct extends Concrete
         $this->setMarketplace($marketplace);
         $this->setPublished($variant['published'] ?? false);
         $passiveFolder = Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri")));
-        $this->setParent(($variant['published'] ?? false) ?  $parent : $passiveFolder);
+        $publishedStatus = $variant['published'] ?? false;
+        $this->setParent($publishedStatus ?  $parent : $passiveFolder);
         $this->setLastUpdate(Carbon::now());
         try {
             $result = $this->save();
