@@ -364,15 +364,12 @@ class ListingSyncService
                 if ($wisersellProductId) {
                     echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
                     echo "But it is connected to $wisersellProductId in WS. Let's try to connect in PIM\n";
-                    sleep(10);
                     $mainProduct = Product::getByWisersellId($wisersellProductId, ['limit' => 1]);
                     if ($mainProduct instanceof Product) {
                         echo "Main product {$mainProduct->getId()} found in PIM and variant {$variantProduct->getId()} will be connected to it.\n";
-                        sleep(5);
-//                        $mainProduct->addVariantProduct($variantProduct);
+                        $mainProduct->addVariantProduct($variantProduct);
                     } else {
                         echo "Main product not found in PIM for {$listing['code']}\n";
-                        sleep(5);
                     }
                 }
                 continue;
