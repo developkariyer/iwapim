@@ -108,7 +108,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $etsySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, iwasku, 	parent_identifier , product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -117,8 +117,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
-                NULL AS product_code,
-                NULL AS parent_product_code,
+                NULL AS iwasku,
+                NULL AS parent_identifier,
                 NULL AS product_type,
                 FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_timestamp')) AS UNSIGNED)) AS created_at,
                 FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.updated_timestamp')) AS UNSIGNED)) AS closed_at,         
@@ -205,7 +205,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -214,8 +214,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
-                NULL AS product_code,
-                NULL AS parent_product_code,
+                NULL AS iwasku,
+                NULL AS parent_identifier,
                 NULL AS product_type,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
@@ -300,7 +300,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+                marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
                 created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -310,8 +310,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
-                NULL AS product_code,
-                NULL AS parent_product_code,
+                NULL AS iwasku,
+                NULL AS parent_identifier,
                 NULL AS product_type,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.closed_at')) AS closed_at,               
@@ -396,7 +396,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $bolcomSql = "
         INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -406,8 +406,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         SELECT
             '$marketplaceType',
             NULL AS marketplace_key,
-            NULL AS product_code,
-            NULL AS parent_product_code,
+            NULL AS iwasku,
+            NULL AS parent_identifier,
             NULL AS product_type,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS created_at,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS closed_at,               
