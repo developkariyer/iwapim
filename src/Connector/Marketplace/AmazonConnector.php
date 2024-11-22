@@ -355,7 +355,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 $amazonCollection->setStatus($listing['status'] ?? '');
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
             } else {
-                if ($amazonCollection->getLastUpdate() > Carbon::now()->subDays(3)) {
+                if ($amazonCollection->getLastUpdate() === null || $amazonCollection->getLastUpdate() < Carbon::now()->subDays(3)) {
                     continue;
                 }
             }
