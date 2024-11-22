@@ -1205,7 +1205,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             if ($extractedCity) {
                 echo "Bulunan Şehir: $extractedCity\n";
             } else {
-                echo "Eşleşmeyen Girdi: $extractedCity\n";
+                echo "Eşleşmeyen Girdi: $shippingCityRaw\n";
             }
             
         
