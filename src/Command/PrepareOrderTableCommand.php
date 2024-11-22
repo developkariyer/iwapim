@@ -683,6 +683,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (!$marketplaceKey) {
             echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
         }
+        
 
         $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
         if(!$mainProductObjectArray) {
@@ -693,6 +694,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $mainProductObject = reset($mainProductObjectArray);
         if ($mainProductObject instanceof Product) {
             $productCode = $mainProductObject->getProductCode(); //field 2
+            echo "Product code: $mainProductObject->getIwasku()\n";
             if (!$productCode) {
                 echo "Product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
@@ -704,6 +706,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                     return;
                 }
                 $parentProductCode = $parent->getProductCode(); // field 3
+                echo "Product code: $mainProductObject->getProductIdentifier()\n";
+
                 if (!$parentProductCode) {
                     echo "Parent product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
@@ -718,7 +722,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 return;
             }
             $productType = strtok($productIdentifier,'-'); // field 4
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType);
+            //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType);
         }
     }
 
