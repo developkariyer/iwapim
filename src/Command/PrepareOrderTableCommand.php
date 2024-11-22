@@ -719,7 +719,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 return;
             }
             $productType = strtok($productIdentifier,'-'); 
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
+            echo "iwasku: $iwasku, identifier: $identifier\n";
+            //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
 
