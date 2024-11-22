@@ -223,6 +223,7 @@ class ListingSyncService
             'Amazon' => $variantProduct->getUniqueMarketplaceId(),
             'Shopify' => $apiResponse['product_id'] ?? null,
             'Trendyol' => $apiResponse['productCode'] ?? null,
+            'Hepsiburada' => $apiResponse['attributes']['hbSku'] ?? null,
             default => null,
         };
         $storeId = $marketplace->getWisersellStoreId();
@@ -231,6 +232,7 @@ class ListingSyncService
             'Amazon' => null,
             'Shopify' => $apiResponse['id'] ?? null,
             'Trendyol' => $apiResponse['platformListingId'] ?? null,
+            'Hepsiburada' => $apiResponse['attributes']['barcode'] ?? null,
             default => null,
         };
         if (empty($storeProductId) || empty($storeId) || (empty($variantCode) && $marketplaceType !== 'Amazon') || empty($productId)) {
