@@ -727,10 +727,15 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-            SET marketplace_key = ?, iwasku = ?, parent_identifier  = ?, product_type =?
-            WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
-            ";
-        echo "Updating... $sql\n";
+        SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType
+        WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
+        
+        echo "Updating... " . str_replace(
+            [':marketplaceKey', ':iwasku', ':identifier', ':productType', ':uniqueMarketplaceId', ':marketplaceType'],
+            [$marketplaceKey, $iwasku, $identifier, $productType, $uniqueMarketplaceId, $marketplaceType],
+            $sql
+        ) . "\n";
+
         //$stmt = $db->prepare($sql);
         //$stmt->execute([$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType]);
     }
