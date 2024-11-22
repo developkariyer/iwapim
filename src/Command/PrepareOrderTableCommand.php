@@ -1095,15 +1095,16 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function cleanTurkeyCityName($city) {
-        $cityParts = preg_split('/[\/\-]/', $city);
-        $cityName = trim(ucwords(strtolower(trim($cityParts[0]))));
-        $cityName = str_replace(
-            ['i', 'ç', 'ğ', 'ş', 'ü', 'ö', 'ı'],
-            ['İ', 'Ç', 'Ğ', 'Ş', 'Ü', 'Ö', 'I'],
-            $cityName
-        );
-        return $cityName;
+    protected function cleanTurkeyCityName($city) 
+    {
+        $city = trim($city);
+        $cityParts = preg_split('/[\/\- ]+/', $city);
+        $formattedParts = array_map(function ($part) {
+            $part = mb_strtolower($part, "UTF-8");
+            $part = mb_convert_case($part, MB_CASE_TITLE, "UTF-8");
+            return $part;
+        }, $cityParts);
+        return implode(" ", $formattedParts);
     }
 
     protected function turkeyCode()
