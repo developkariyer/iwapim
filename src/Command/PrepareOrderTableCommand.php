@@ -679,13 +679,12 @@ class PrepareOrderTableCommand extends AbstractCommand
             return;
         }
 
-        $marketplaceKey = $marketplace->getKey(); // field 1
+        $marketplaceKey = $marketplace->getKey(); 
         if (!$marketplaceKey) {
             echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
         }
         
-
-        $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
+        $mainProductObjectArray = $variantObject->getMainProduct(); 
         if(!$mainProductObjectArray) {
             echo "Main product not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
             return;
@@ -693,7 +692,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
         $mainProductObject = reset($mainProductObjectArray);
         if ($mainProductObject instanceof Product) {
-            $productCode = $mainProductObject->getProductCode(); //field 2
+            $productCode = $mainProductObject->getProductCode();
             $iwasku =  $mainProductObject->getIwasku();
             if (!$iwasku) {
                 echo "iwasku code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
@@ -719,7 +718,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Product identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
             }
-            $productType = strtok($productIdentifier,'-'); // field 4
+            $productType = strtok($productIdentifier,'-'); 
             self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
@@ -728,7 +727,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-            SET marketplace_key = ?, product_code = ?, parent_product_code = ?, product_type =?
+            SET marketplace_key = ?, iwasku = ?, parent_identifier = ?, product_type =?
             WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
             ";
         $stmt = $db->prepare($sql);
