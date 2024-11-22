@@ -228,7 +228,7 @@ class ListingSyncService
         };
         $storeId = $marketplace->getWisersellStoreId();
         $variantCode = match ($marketplaceType) {
-            'Etsy   ' => $parentResponse['listing_id'] ?? null,
+            'Etsy' => $parentResponse['listing_id'] ?? null,
             'Amazon' => null,
             'Shopify' => $apiResponse['id'] ?? null,
             'Trendyol' => $apiResponse['platformListingId'] ?? null,
