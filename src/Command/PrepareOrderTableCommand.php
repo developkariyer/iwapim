@@ -726,14 +726,14 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType)
     {
-        echo "Marketplace key: $marketplaceKey, iwasku: $iwasku, identifier: $identifier, product type: $productType, marketplace type: $marketplaceType\n";
-        /*$db = \Pimcore\Db::get();
+        $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
             SET marketplace_key = ?, iwasku = ?, parent_identifier  = ?, product_type =?
             WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
             ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType]);*/
+        echo "Updating... $sql\n";
+        //$stmt = $db->prepare($sql);
+        //$stmt->execute([$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType]);
     }
    
     protected function marketplaceList()
