@@ -730,12 +730,15 @@ class PrepareOrderTableCommand extends AbstractCommand
         SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
-        echo "Updating... " . str_replace(
-            [':marketplaceKey', ':iwasku', ':identifier', ':productType', ':uniqueMarketplaceId', ':marketplaceType'],
-            [$marketplaceKey, $iwasku, $identifier, $productType, $uniqueMarketplaceId, $marketplaceType],
-            $sql
-        ) . "\n";
-
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':marketplaceKey' => $marketplaceKey,
+            ':iwasku' => $iwasku,
+            ':identifier' => $identifier,
+            ':productType' => $productType,
+            ':uniqueMarketplaceId' => $uniqueMarketplaceId,
+            ':marketplaceType' => $marketplaceType,
+        ]);
         //$stmt = $db->prepare($sql);
         //$stmt->execute([$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType]);
     }
