@@ -695,9 +695,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($mainProductObject instanceof Product) {
             $productCode = $mainProductObject->getProductCode(); //field 2
             $iwasku =  $mainProductObject->getIwasku();
-            echo "Product code: $iwasku \n"; 
-            if (!$productCode) {
-                echo "Product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            if (!$iwasku) {
+                echo "iwasku code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
             }
             if ($mainProductObject->level() == 1) {
@@ -706,12 +705,9 @@ class PrepareOrderTableCommand extends AbstractCommand
                     echo "Parent is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
                 }
-                $parentProductCode = $parent->getProductCode(); // field 3
                 $identifier = $parent->getProductIdentifier();
-                echo "Product code: $identifier\n";
-
-                if (!$parentProductCode) {
-                    echo "Parent product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                if (!$identifier) {
+                    echo "Identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
                 }
             } else {
@@ -724,11 +720,11 @@ class PrepareOrderTableCommand extends AbstractCommand
                 return;
             }
             $productType = strtok($productIdentifier,'-'); // field 4
-            //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType);
+            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
 
-    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType)
+    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
@@ -736,7 +732,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
             ";
         $stmt = $db->prepare($sql);
-        $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType]);
+        $stmt->execute([$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType]);
     }
    
     protected function marketplaceList()
