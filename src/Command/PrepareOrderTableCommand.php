@@ -1096,12 +1096,16 @@ class PrepareOrderTableCommand extends AbstractCommand
     }
 
     protected function extractCity($input, $isoCodes) {
+        $normalizedInput = mb_strtolower($input, 'UTF-8');
         foreach (array_keys($isoCodes) as $cityName) {
-            if (stripos($input, $cityName) !== false) {
-                return $cityName; 
+            $normalizedCity = mb_strtolower($cityName, 'UTF-8');
+            if (strpos($normalizedInput, $normalizedCity) !== false) {
+                $formattedCity = mb_convert_case($cityName, MB_CASE_TITLE, 'UTF-8');
+                $formattedCity = str_replace('I', 'İ', $formattedCity);
+                return $formattedCity;
             }
         }
-        return null; 
+        return null;
     }
     
     protected function turkeyCode()
