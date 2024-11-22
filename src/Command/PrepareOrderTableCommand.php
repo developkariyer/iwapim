@@ -720,7 +720,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
             $productType = strtok($productIdentifier,'-'); 
             echo "iwasku: $iwasku, identifier: $identifier\n";
-            //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
+            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
 
@@ -728,7 +728,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-            SET marketplace_key = ?, iwasku = ?, parent_identifier = ?, product_type =?
+            SET marketplace_key = ?, iwasku = ?, parent_identifier  = ?, product_type =?
             WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
             ";
         $stmt = $db->prepare($sql);
