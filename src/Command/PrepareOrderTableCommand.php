@@ -108,7 +108,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $etsySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, iwasku, 	parent_identifier , product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -117,8 +117,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
-                NULL AS product_code,
-                NULL AS parent_product_code,
+                NULL AS iwasku,
+                NULL AS parent_identifier,
                 NULL AS product_type,
                 FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_timestamp')) AS UNSIGNED)) AS created_at,
                 FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.updated_timestamp')) AS UNSIGNED)) AS closed_at,         
@@ -205,7 +205,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -214,8 +214,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
-                NULL AS product_code,
-                NULL AS parent_product_code,
+                NULL AS iwasku,
+                NULL AS parent_identifier,
                 NULL AS product_type,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
@@ -300,7 +300,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+                marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
                 created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
                 vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -310,8 +310,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT
                 '$marketplaceType',
                 NULL AS marketplace_key,
-                NULL AS product_code,
-                NULL AS parent_product_code,
+                NULL AS iwasku,
+                NULL AS parent_identifier,
                 NULL AS product_type,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.closed_at')) AS closed_at,               
@@ -396,7 +396,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $bolcomSql = "
         INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_key, product_code, parent_product_code, product_type,
+            marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
             shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
@@ -406,8 +406,8 @@ class PrepareOrderTableCommand extends AbstractCommand
         SELECT
             '$marketplaceType',
             NULL AS marketplace_key,
-            NULL AS product_code,
-            NULL AS parent_product_code,
+            NULL AS iwasku,
+            NULL AS parent_identifier,
             NULL AS product_type,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS created_at,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS closed_at,               
@@ -679,12 +679,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             return;
         }
 
-        $marketplaceKey = $marketplace->getKey(); // field 1
+        $marketplaceKey = $marketplace->getKey(); 
         if (!$marketplaceKey) {
             echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            return;
         }
-
-        $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
+        
+        $mainProductObjectArray = $variantObject->getMainProduct(); 
         if(!$mainProductObjectArray) {
             echo "Main product not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
             return;
@@ -692,9 +693,10 @@ class PrepareOrderTableCommand extends AbstractCommand
 
         $mainProductObject = reset($mainProductObjectArray);
         if ($mainProductObject instanceof Product) {
-            $productCode = $mainProductObject->getProductCode(); //field 2
-            if (!$productCode) {
-                echo "Product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            $productCode = $mainProductObject->getProductCode();
+            $iwasku =  $mainProductObject->getInheritedField('Iwasku');
+            if (!$iwasku) {
+                echo "iwasku code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
             }
             if ($mainProductObject->level() == 1) {
@@ -703,9 +705,9 @@ class PrepareOrderTableCommand extends AbstractCommand
                     echo "Parent is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
                 }
-                $parentProductCode = $parent->getProductCode(); // field 3
-                if (!$parentProductCode) {
-                    echo "Parent product code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                $identifier = $parent->getInheritedField('ProductIdentifier');
+                if (!$identifier) {
+                    echo "Identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
                 }
             } else {
@@ -717,20 +719,27 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Product identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
             }
-            $productType = strtok($productIdentifier,'-'); // field 4
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType);
+            $productType = strtok($productIdentifier,'-'); 
+            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
 
-    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType)
+    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-            SET marketplace_key = ?, product_code = ?, parent_product_code = ?, product_type =?
-            WHERE variant_id = $uniqueMarketplaceId AND marketplace_type= ?;
-            ";
+        SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType
+        WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
+        
         $stmt = $db->prepare($sql);
-        $stmt->execute([$marketplaceKey, $productCode, $parentProductCode, $productType, $marketplaceType]);
+        $stmt->execute([
+            ':marketplaceKey' => $marketplaceKey,
+            ':iwasku' => $iwasku,
+            ':identifier' => $identifier,
+            ':productType' => $productType,
+            ':uniqueMarketplaceId' => $uniqueMarketplaceId,
+            ':marketplaceType' => $marketplaceType,
+        ]);
     }
    
     protected function marketplaceList()
