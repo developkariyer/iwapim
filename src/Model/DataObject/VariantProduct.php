@@ -137,8 +137,12 @@ class VariantProduct extends Concrete
         $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
-        $this->setParent($parent);
         $this->setPublished($variant['published'] ?? false);
+        if ($variant['published'] ?? false) {
+            $this->setParent($parent);
+        } else {
+            $this->setParent(Utility::chekSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri"))));
+        }
         $this->setLastUpdate(Carbon::now());
         try {
             $result = $this->save();
