@@ -279,12 +279,16 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $asin=>$listing) {
             $index++;
-            if (empty($listing) || empty($listing[$this->mainCountry]) || !is_array($listing[$this->mainCountry])) {
-                echo "($index/$total) $asin is empty in {$this->mainCountry}\n";
+            echo "($index/$total) Processing $asin ...";
+            if (empty($listing)) {
+                echo " $asin is empty\n";
                 continue;
             }
-            echo "($index/$total) Processing $asin ...";
-            $mainListings = $listing[$this->mainCountry];
+            $mainListings = (empty($listing[$this->mainCountry]) || !is_array($listing[$this->mainCountry])) ? reset($listing) : $listing[$this->mainCountry];
+            if (!is_array($mainListings)) {
+                echo " $asin is not an array\n";
+                continue;
+            }
             $mainListing = reset($mainListings);
             $variantProduct = VariantProduct::addUpdateVariant(
                 variant: [
