@@ -17,6 +17,7 @@ use Pimcore\Model\DataObject\Folder;
 
 use App\Connector\Marketplace\AmazonConstants;
 use App\Utils\Utility;
+use Carbon\Carbon;
 
 class AmazonConnector extends MarketplaceConnectorAbstract
 {
@@ -349,9 +350,14 @@ class AmazonConnector extends MarketplaceConnectorAbstract
                 $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
                 $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
+                $amazonCollection->setLastUpdate(Carbon::now());
                 $amazonCollection->setMarketplace($this->marketplace);
                 $amazonCollection->setStatus($listing['status'] ?? '');
                 $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+            } else {
+                if ($amazonCollection->getLastUpdate() > Carbon::now()->subDays(3)) {
+                    continue;
+                }
             }
             if ($amazonCollection->getStatus() === 'Active') {
                 $active = true;
@@ -361,6 +367,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         if (!$found) {
             $amazonCollection = new AmazonMarketplace();
             $amazonCollection->setMarketplaceId($country);
+            $amazonCollection->setLastUpdate(Carbon::now());
             $amazonCollection->setTitle($this->getTitle($listing));
             $amazonCollection->setUrlLink($this->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
             $amazonCollection->setSalePrice($listing['price'] ?? 0);
