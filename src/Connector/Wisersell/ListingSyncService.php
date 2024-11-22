@@ -367,7 +367,7 @@ class ListingSyncService
                     $mainProduct = Product::getByWisersellId($wisersellProductId, ['limit' => 1]);
                     if ($mainProduct instanceof Product) {
                         echo "Main product {$mainProduct->getId()} found in PIM and variant {$variantProduct->getId()} will be connected to it.\n";
-                        $mainProduct->addVariantProduct($variantProduct);
+                        $mainProduct->addVariant($variantProduct);
                     } else {
                         echo "Main product not found in PIM for {$listing['code']}\n";
                     }
