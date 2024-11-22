@@ -740,8 +740,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             ':uniqueMarketplaceId' => $uniqueMarketplaceId,
             ':marketplaceType' => $marketplaceType,
         ]);
-        //$stmt = $db->prepare($sql);
-        //$stmt->execute([$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType]);
     }
    
     protected function marketplaceList()
