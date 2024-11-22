@@ -62,7 +62,7 @@ class ErrorListingsCommand extends AbstractCommand
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
         $variantObject = new VariantListing();
         $pageSize = 5;
-        $offset = 17620;
+        $offset = 0;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
         $index = $offset;
@@ -86,7 +86,7 @@ class ErrorListingsCommand extends AbstractCommand
                 $amazonMarketplaces = $listing->getAmazonMarketplace();
                 foreach ($amazonMarketplaces as $amazonMarketplace) {
                     $country = $amazonMarketplace->getMarketplaceId();
-                    if (!in_array($country, $amazonEuMarkets) || $amazonMarketplace->getStatus() !== 'Active') {
+                    if (!in_array($country, $amazonEuMarkets) || $amazonMarketplace->getStatus() !== 'Inactive') {
                         continue;
                     }
                     $sku = $amazonMarketplace->getSku();
