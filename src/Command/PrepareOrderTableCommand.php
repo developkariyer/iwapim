@@ -1095,18 +1095,15 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function cleanTurkeyCityName($city) 
-    {
-        $city = trim($city);
-        $cityParts = preg_split('/[\/\- ]+/', $city);
-        $formattedParts = array_map(function ($part) {
-            $part = mb_strtolower($part, "UTF-8");
-            $part = mb_convert_case($part, MB_CASE_TITLE, "UTF-8");
-            return $part;
-        }, $cityParts);
-        return implode(" ", $formattedParts);
+    protected function extractCity($input, $isoCodes) {
+        foreach (array_keys($isoCodes) as $cityName) {
+            if (stripos($input, $cityName) !== false) {
+                return $cityName; 
+            }
+        }
+        return null; 
     }
-
+    
     protected function turkeyCode()
     {
         $isoCodes = [
@@ -1204,14 +1201,13 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $result) {
             $shippingCityRaw = $result['shipping_city']; 
-            $shippingCity = $this->cleanTurkeyCityName($shippingCityRaw);
-            echo "Processing... $shippingCity\n";
-            if (isset($isoCodes[$shippingCity])) {
-                echo "Eslesti\n";
+            $extractedCity = extractCity($shippingCityRaw, $isoCodes);
+            if ($extractedCity) {
+                echo "Bulunan Şehir: $extractedCity\n";
+            } else {
+                echo "Eşleşmeyen Girdi: $city\n";
             }
-            else {
-                echo "Eşleşmeyen şehir: $shippingCityRaw \n";
-            }   
+            
         
             /*if (isset($isoCodes[$shippingCity])) {
                 $cityCode = $isoCodes[$shippingCity];
