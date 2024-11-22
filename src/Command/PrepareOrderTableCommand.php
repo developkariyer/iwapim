@@ -1209,7 +1209,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Eslesti\n";
             }
             else {
-                echo "Eşleşmeyen şehir: $shippingCityRaw";
+                echo "Eşleşmeyen şehir: $shippingCityRaw \n";
             }   
         
             /*if (isset($isoCodes[$shippingCity])) {
