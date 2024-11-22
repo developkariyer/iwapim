@@ -86,7 +86,7 @@ class ErrorListingsCommand extends AbstractCommand
                 $amazonMarketplaces = $listing->getAmazonMarketplace();
                 foreach ($amazonMarketplaces as $amazonMarketplace) {
                     $country = $amazonMarketplace->getMarketplaceId();
-                    if (!in_array($country, $amazonEuMarkets) || $amazonMarketplace->getStatus() !== 'Inactive') {
+                    if (!in_array($country, $amazonEuMarkets)) {
                         continue;
                     }
                     $sku = $amazonMarketplace->getSku();
