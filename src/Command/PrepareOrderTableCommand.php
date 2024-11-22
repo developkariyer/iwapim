@@ -694,7 +694,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $mainProductObject = reset($mainProductObjectArray);
         if ($mainProductObject instanceof Product) {
             $productCode = $mainProductObject->getProductCode();
-            $iwasku =  $mainProductObject->getIwasku();
+            $iwasku =  $mainProductObject->getInheritedField('Iwasku');
             if (!$iwasku) {
                 echo "iwasku code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
@@ -705,7 +705,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     echo "Parent is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
                 }
-                $identifier = $parent->getProductIdentifier();
+                $identifier = $parent->getInheritedField('ProductIdentifier');
                 if (!$identifier) {
                     echo "Identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
