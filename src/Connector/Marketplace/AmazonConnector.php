@@ -279,6 +279,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $asin=>$listing) {
             $index++;
+            if ($index < 980) {
+                continue;
+            }
             echo "($index/$total) Processing $asin ...";
             if (empty($asin)) {
                 echo " $asin is really empty\n";
