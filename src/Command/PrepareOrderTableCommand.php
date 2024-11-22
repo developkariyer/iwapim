@@ -1095,6 +1095,17 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    protected function cleanTurkeyCityName($city) {
+        $cityParts = preg_split('/[\/\-]/', $city);
+        $cityName = trim(ucwords(strtolower(trim($cityParts[0]))));
+        $cityName = str_replace(
+            ['i', 'ç', 'ğ', 'ş', 'ü', 'ö', 'ı'],
+            ['İ', 'Ç', 'Ğ', 'Ş', 'Ü', 'Ö', 'I'],
+            $cityName
+        );
+        return $cityName;
+    }
+
     protected function turkeyCode()
     {
         $isoCodes = [
@@ -1180,6 +1191,39 @@ class PrepareOrderTableCommand extends AbstractCommand
             'Şanlıurfa' => 'TR-63',
             'Şırnak' => 'TR-73',
         ];
-        echo count($isoCodes);
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT DISTINCT shipping_city 
+            FROM iwa_marketplace_orders_line_items 
+            WHERE shipping_city IS NOT NULL 
+            AND shipping_city != '' 
+            AND shipping_city != 'null'
+            AND shipping_country_code = 'TR';
+            ";
+        $results = $db->fetchAllAssociative($sql);
+        foreach ($results as $result) {
+            $shippingCityRaw = $result['shipping_city']; 
+            $shippingCity = cleanCityName($shippingCityRaw);
+            echo "Processing... $shippingCity\n";
+            if (isset($isoCodes[$shippingCity])) {
+                echo "Eslesti\n";
+            }
+            else {
+                echo "Eşleşmeyen şehir: $shippingCityRaw";
+            }   
+        
+            /*if (isset($isoCodes[$shippingCity])) {
+                $cityCode = $isoCodes[$shippingCity];
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items 
+                    SET city_code = :city_code 
+                    WHERE shipping_city = :shipping_city
+                ";
+                $db->executeStatement($updateSql, [
+                    'city_code' => $cityCode,
+                    'shipping_city' => $shippingCity
+                ]);
+            }*/
+        }
     }
 }
