@@ -52,6 +52,7 @@ class CacheImagesCommand extends AbstractCommand
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
+        $listingObject->orderBy('id');
         $pageSize = 150;
         $offset = 0;
         $index = 0;
@@ -71,30 +72,31 @@ class CacheImagesCommand extends AbstractCommand
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
                     continue;
                 }
+                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com'])) {
+                    echo " $variantType ";
+                } else {
+                    continue;
+                }
                 switch ($variantType) {
                     case 'Amazon':
                         if ($input->getOption('amazon') || $input->getOption('all')) self::processAmazon(variant: $variant);
-                        echo "\n";
                         break;
                     case 'Etsy':
                         if ($input->getOption('etsy') || $input->getOption('all')) self::processEtsy($variant);
-                        echo "\n";
                         break;
                     case 'Shopify':
                         if ($input->getOption('shopify') || $input->getOption('all')) self::processShopify($variant);
-                        echo "\n";
                         break;
                     case 'Trendyol':
                         if ($input->getOption('trendyol') || $input->getOption('all')) self::processTrendyol($variant);
-                        echo "\n";
                         break;
                     case 'Bol.com':
                         if ($input->getOption('bolcom') || $input->getOption('all')) self::processBolCom($variant);
-                        echo "\n";
                         break;
                     default:
                         break;
                 }
+                echo "\n";
             }
             $offset += $pageSize;
         }
