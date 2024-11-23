@@ -54,7 +54,7 @@ class CacheImagesCommand extends AbstractCommand
         $listingObject->setUnpublished(false);
         $pageSize = 150;
         $offset = 0;
-
+        $index = 0;
         while (true) {
             $listingObject->setLimit($pageSize);
             $listingObject->setOffset($offset);
@@ -62,9 +62,10 @@ class CacheImagesCommand extends AbstractCommand
             if (empty($variants)) {
                 break;
             }
-            $totalCount = $listingObject->getTotalCount();
             foreach ($variants as $variant) {
-                $variantMarketplace = $variant->getMarketplace();
+                $index++;
+                echo "\rProcessing {$index} ...";
+                    $variantMarketplace = $variant->getMarketplace();
                 $variantType = (empty($variantMarketplace)) ? 'Amazon' : $variantMarketplace->getMarketPlaceType();
                 if (empty($variantType)) {
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
@@ -91,7 +92,6 @@ class CacheImagesCommand extends AbstractCommand
                 }
             }
             $offset += $pageSize;
-            echo "\nProcessed {$offset} of {$totalCount}\n";
         }
         return Command::SUCCESS;
     }
@@ -231,7 +231,6 @@ class CacheImagesCommand extends AbstractCommand
             }
             sleep(1);
             if ($imageData === false) {
-                echo "-";
                 return null;
             }
             $asset = new Asset\Image();
