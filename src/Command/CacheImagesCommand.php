@@ -74,18 +74,23 @@ class CacheImagesCommand extends AbstractCommand
                 switch ($variantType) {
                     case 'Amazon':
                         if ($input->getOption('amazon') || $input->getOption('all')) self::processAmazon(variant: $variant);
+                        echo "\n";
                         break;
                     case 'Etsy':
                         if ($input->getOption('etsy') || $input->getOption('all')) self::processEtsy($variant);
+                        echo "\n";
                         break;
                     case 'Shopify':
                         if ($input->getOption('shopify') || $input->getOption('all')) self::processShopify($variant);
+                        echo "\n";
                         break;
                     case 'Trendyol':
                         if ($input->getOption('trendyol') || $input->getOption('all')) self::processTrendyol($variant);
+                        echo "\n";
                         break;
                     case 'Bol.com':
                         if ($input->getOption('bolcom') || $input->getOption('all')) self::processBolCom($variant);
+                        echo "\n";
                         break;
                     default:
                         break;
