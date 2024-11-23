@@ -52,7 +52,8 @@ class CacheImagesCommand extends AbstractCommand
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->orderBy('id');
+        $listingObject->setOrderKey('id');
+        $listingObject->setOrder('DESC');
         $pageSize = 150;
         $offset = 0;
         $index = 0;
