@@ -38,11 +38,14 @@ class OrdersCalculator implements CalculatorClassInterface
     public function last30Orders(Concrete $object): string
     {
         $db = Db::get();
-        if ($object instanceof ShopifyVariant) {
+        $variantId = (string) $object->getUniqueMarketplaceId();
+        $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ? AND (created_at >= NOW() - INTERVAL 30 DAY)", [$variantId]);
+        return $result + 0;
+       /* if ($object instanceof ShopifyVariant) {
             $shopifyId = (string) $object->getShopifyId();
             $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_shopify_orders_line_items` WHERE variant_id = ? AND (created_at >= NOW() - INTERVAL 30 DAY) GROUP BY variant_id", [$shopifyId]);
             return $result + 0;
-        }
+        }*/
         return '';
     }
 
