@@ -8,7 +8,7 @@ use Pimcore\Model\DataObject\Data\CalculatedValue;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\ShopifyVariant;
 use Pimcore\Model\DataObject\TrendyolVariant;
-use App\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\VariantProduct;
 
 
 class OrdersCalculator implements CalculatorClassInterface
