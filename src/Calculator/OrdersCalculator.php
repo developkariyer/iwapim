@@ -24,12 +24,15 @@ class OrdersCalculator implements CalculatorClassInterface
     public function totalOrders(Concrete $object): string
     {
         $db = Db::get();
-        if ($object instanceof ShopifyVariant) {
+        $variantId = (string) $object->getUniqueMarketplaceId();
+        
+        $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
+        return $result + 0;
+        /*if ($object instanceof ShopifyVariant) {
             $shopifyId = (string) $object->getShopifyId();
             $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_shopify_orders_line_items` WHERE variant_id = ? GROUP BY variant_id", [$shopifyId]);
             return $result + 0;
-        }
-        return '';
+        }*/
     }
 
     public function last30Orders(Concrete $object): string
