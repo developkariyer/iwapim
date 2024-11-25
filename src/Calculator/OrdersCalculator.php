@@ -25,7 +25,9 @@ class OrdersCalculator implements CalculatorClassInterface
     {
         $db = Db::get();
         $variantId = (string) $object->getUniqueMarketplaceId();
-        if ($object instanceof TrendyolVariant) {
+        $marketplace = $object->getMarketplace();
+        $marketplaceType = $marketplace->getMarketPlaceType();
+        if ($marketplaceType === 'Trendyol') {
             $variantId = (string) $object->json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"];
         }
         
