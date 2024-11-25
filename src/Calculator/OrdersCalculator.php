@@ -30,7 +30,9 @@ class OrdersCalculator implements CalculatorClassInterface
         if ($marketplaceType === 'Trendyol') {
             $variantId = (string) $object->json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"];
         }
-        
+        if (!$variantId) {
+            return '';
+        }
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
         return $result + 0;
         /*if ($object instanceof ShopifyVariant) {
