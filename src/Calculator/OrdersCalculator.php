@@ -18,6 +18,7 @@ class OrdersCalculator implements CalculatorClassInterface
     {
         $returnValue = match ($context->getFieldname()) {
             'totalOrders' => $this->totalOrders($object),
+            'last7Orders' => $this->last7Orders($object),
             'last30Orders' => $this->last30Orders($object),
             default => '',
         };
@@ -42,6 +43,21 @@ class OrdersCalculator implements CalculatorClassInterface
             $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_shopify_orders_line_items` WHERE variant_id = ? GROUP BY variant_id", [$shopifyId]);
             return $result + 0;
         }*/
+    }
+
+    public function last7Orders(Concrete $object): string
+    {
+        $db = Db::get();
+        $marketplace = $object->getMarketplace();
+        $marketplaceType = $marketplace->getMarketPlaceType();
+        if ($marketplaceType === 'Trendyol') {
+            $variantId = (string) json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
+        }
+        else {
+            $variantId = (string) $object->getUniqueMarketplaceId();
+        }
+        $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ? AND (created_at >= NOW() - INTERVAL 7 DAY)", [$variantId]);
+        return $result + 0;
     }
 
     public function last30Orders(Concrete $object): string
