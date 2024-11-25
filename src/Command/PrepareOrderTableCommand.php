@@ -719,8 +719,12 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Product identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
             }
-            $productType = strtok($productIdentifier,'-'); 
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
+            $productType = strtok($productIdentifier,'-');
+            $varinatTitle = $variantObject->getTitle();
+            $mainTitle = $mainProductObject->getTitle();
+            echo "Main Title: $mainTitle\n";
+            echo "Variant Title: $varinatTitle\n"; 
+            //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
 
