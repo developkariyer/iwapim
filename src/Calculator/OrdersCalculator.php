@@ -31,7 +31,7 @@ class OrdersCalculator implements CalculatorClassInterface
         $marketplace = $object->getMarketplace();
         $marketplaceType = $marketplace->getMarketPlaceType();
         if ($marketplaceType === 'Trendyol') {
-            $variantId = (string) $object->json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"];
+            $variantId = (string) $object->json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
         }
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
         return $result + 0;
