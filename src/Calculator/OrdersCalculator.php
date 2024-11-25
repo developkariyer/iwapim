@@ -78,7 +78,6 @@ class OrdersCalculator implements CalculatorClassInterface
             $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_shopify_orders_line_items` WHERE variant_id = ? AND (created_at >= NOW() - INTERVAL 30 DAY) GROUP BY variant_id", [$shopifyId]);
             return $result + 0;
         }*/
-        return '';
     }
 
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string
