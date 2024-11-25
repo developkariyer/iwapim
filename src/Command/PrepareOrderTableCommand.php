@@ -51,7 +51,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->turkeyCode();
         return Command::SUCCESS;
     }
     
