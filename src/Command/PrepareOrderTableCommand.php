@@ -720,8 +720,9 @@ class PrepareOrderTableCommand extends AbstractCommand
                 return;
             }
             $productType = strtok($productIdentifier,'-');
+            $parentTitle = $paren->getInheritedField("name");
             $varinatTitle = $mainProductObject->getInheritedField("name");
-            echo "Main Title: $productIdentifier\n";
+            echo "Main Title: $parentTitle\n";
             echo "Variant Title: $varinatTitle\n"; 
             //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
