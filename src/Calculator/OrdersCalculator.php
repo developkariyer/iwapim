@@ -24,7 +24,7 @@ class OrdersCalculator implements CalculatorClassInterface
     public function totalOrders(Concrete $object): string
     {
         $db = Db::get();
-        if(!object) {
+        if(!$object) {
             return '';
         }
         $variantId = (string) $object->getUniqueMarketplaceId();
