@@ -722,20 +722,17 @@ class PrepareOrderTableCommand extends AbstractCommand
             $productType = strtok($productIdentifier,'-');
             $path = $mainProductObject->getFullPath(); 
             $parts = explode('/', trim($path, '/'));
-            $variantTitle = array_pop($parts);
-            $parentTitle = array_pop($parts); 
-
-            echo "Variant Title: " . $variantTitle . "\n";
-            echo "Parent Title: " . $parentTitle . "\n";
-//            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
+            $variantName = array_pop($parts);
+            $parentName = array_pop($parts); 
+            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
         }
     }
 
-    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType)
+    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-        SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType
+        SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
         $stmt = $db->prepare($sql);
@@ -744,6 +741,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             ':iwasku' => $iwasku,
             ':identifier' => $identifier,
             ':productType' => $productType,
+            ':variantName' => $variantName,
+            ':parentName' => $parentName,
             ':uniqueMarketplaceId' => $uniqueMarketplaceId,
             ':marketplaceType' => $marketplaceType,
         ]);
