@@ -720,7 +720,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 return;
             }
             $productType = strtok($productIdentifier,'-');
-            $varinatTitle = $variantObject->getTitle();
+            $varinatTitle = $variantObject->getName();
             echo "Main Title: $mainTitle\n";
             echo "Variant Title: $productIdentifier\n"; 
             //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
