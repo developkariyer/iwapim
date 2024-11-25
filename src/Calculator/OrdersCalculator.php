@@ -24,14 +24,14 @@ class OrdersCalculator implements CalculatorClassInterface
     public function totalOrders(Concrete $object): string
     {
         $db = Db::get();
+        if(!object) {
+            return '';
+        }
         $variantId = (string) $object->getUniqueMarketplaceId();
         $marketplace = $object->getMarketplace();
         $marketplaceType = $marketplace->getMarketPlaceType();
         if ($marketplaceType === 'Trendyol') {
             $variantId = (string) $object->json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"];
-        }
-        if (!$variantId) {
-            return '';
         }
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
         return $result + 0;
