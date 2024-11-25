@@ -724,8 +724,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             //$varinatTitle = $mainProductObject->getProductIdentifier();
             //echo "Main Title: $parentTitle\n";
             //echo "Variant Title: $varinatTitle\n"; 
-            echo $mainProductObject->getPath() . "\n";
-            echo $variantObject->getPath() . "\n";
+            echo $mainProductObject->getFullPath() . "\n";
+            echo $paren
             //self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
