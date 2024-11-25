@@ -8,6 +8,8 @@ use Pimcore\Model\DataObject\Data\CalculatedValue;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\ShopifyVariant;
 use Pimcore\Model\DataObject\TrendyolVariant;
+use App\Model\DataObject\VariantProduct;
+
 
 
 class OrdersCalculator implements CalculatorClassInterface
@@ -33,7 +35,9 @@ class OrdersCalculator implements CalculatorClassInterface
         $marketplaceType = $marketplace->getMarketPlaceType();
         if ($marketplaceType === 'Trendyol') {
             //$variantId = (string) $object->json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
-            $variantId = (string) $object->getApiResponseJson()["productCode"];
+            //$id = $object->getId();
+            //$variantProduct = VariantProduct::getById($id);
+            $variantId = (string) json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
         }
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
         return $result + 0;
