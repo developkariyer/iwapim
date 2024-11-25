@@ -27,17 +27,13 @@ class OrdersCalculator implements CalculatorClassInterface
     public function totalOrders(Concrete $object): string
     {
         $db = Db::get();
-        if(!$object) {
-            return '';
-        }
-        $variantId = (string) $object->getUniqueMarketplaceId();
         $marketplace = $object->getMarketplace();
         $marketplaceType = $marketplace->getMarketPlaceType();
         if ($marketplaceType === 'Trendyol') {
-            //$variantId = (string) $object->json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
-            //$id = $object->getId();
-            //$variantProduct = VariantProduct::getById($id);
             $variantId = (string) json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
+        }
+        else {
+            $variantId = (string) $object->getUniqueMarketplaceId();
         }
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
         return $result + 0;
@@ -51,7 +47,14 @@ class OrdersCalculator implements CalculatorClassInterface
     public function last30Orders(Concrete $object): string
     {
         $db = Db::get();
-        $variantId = (string) $object->getUniqueMarketplaceId();
+        $marketplace = $object->getMarketplace();
+        $marketplaceType = $marketplace->getMarketPlaceType();
+        if ($marketplaceType === 'Trendyol') {
+            $variantId = (string) json_decode($object->jsonRead('apiResponseJson'), true)["productCode"];
+        }
+        else {
+            $variantId = (string) $object->getUniqueMarketplaceId();
+        }
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ? AND (created_at >= NOW() - INTERVAL 30 DAY)", [$variantId]);
         return $result + 0;
        /* if ($object instanceof ShopifyVariant) {
