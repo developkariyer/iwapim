@@ -722,10 +722,12 @@ class PrepareOrderTableCommand extends AbstractCommand
             $productType = strtok($productIdentifier,'-');
             $path = $mainProductObject->getFullPath(); 
             $parts = explode('/', trim($path, '/'));
-            $variantTitle = array_pop($parts); 
-            $parentTitle = array_pop($parts);  
+            $variantTitle = array_pop($parts);
+            $parentTitle = array_pop($parts); 
+
             echo "Variant Title: " . $variantTitle . "\n";
             echo "Parent Title: " . $parentTitle . "\n";
+//            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $marketplaceType);
         }
     }
 
