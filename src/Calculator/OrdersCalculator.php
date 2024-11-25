@@ -7,7 +7,7 @@ use Pimcore\Model\DataObject\ClassDefinition\CalculatorClassInterface;
 use Pimcore\Model\DataObject\Data\CalculatedValue;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\ShopifyVariant;
-use Pimcore\Model\DataObject\EtsyVariant;
+use Pimcore\Model\DataObject\TrendyolVariant;
 
 class OrdersCalculator implements CalculatorClassInterface
 {
@@ -25,6 +25,9 @@ class OrdersCalculator implements CalculatorClassInterface
     {
         $db = Db::get();
         $variantId = (string) $object->getUniqueMarketplaceId();
+        if ($object instanceof TrendyolVariant) {
+            $variantId = (string) $object->json_decode($variantProduct->jsonRead('apiResponseJson'), true)["productCode"];
+        }
         
         $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
         return $result + 0;
