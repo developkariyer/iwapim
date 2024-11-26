@@ -209,7 +209,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
         $trendyolSql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
+            INSERT INTO iwa_trendyol_orders_line_items (
             marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
