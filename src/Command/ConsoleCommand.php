@@ -32,7 +32,7 @@ class ConsoleCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $amazon = new AmazonConnector(Marketplace::getById(149795)); // US: 149795  UK: 200568
-        $amazon->patchCustom(sku: "CA_41_Burgundy_XL_FBA", country: "US", attribute: "item_type_keyword", value: "");
+        $amazon->patchCustom(sku: "CA_41_Burgundy_XL_FBA", country: "US", attribute: "item_type_keyword", operation: "delete", value: "");
 
         $io = new SymfonyStyle($input, $output);
         $io->title('IWAPIM Interactive Shell');
