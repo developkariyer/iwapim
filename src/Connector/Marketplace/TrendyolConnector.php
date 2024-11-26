@@ -56,16 +56,16 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $db = \Pimcore\Db::get();
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
-        $page = 0;
-        $size = 200;
-        $now = strtotime('now');
+        $now = time();
+        $now = strtotime(date('Y-m-d 00:00:00', $now)); 
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
              FROM iwa_marketplace_orders 
              WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-        if ($lastUpdatedAt) {
+        echo "Last Updated At: $lastUpdatedAt\n";
+        /*if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
             $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
@@ -73,6 +73,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
+        $size = 200;
         do {
             $page = 0;
             do {
@@ -84,7 +85,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                         'page' => $page,
                         'size' => $size,
                         'startDate' => $startDate * 1000, 
-                        'endDate' => $endDate * 1000
+                        'endDate' => $endDate *1000
                     ]
                 ]);
 
@@ -93,14 +94,13 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }
-
                 try {
                     $data = $response->toArray();
                     $orders = $data['content'];
                     $db->beginTransaction();
                     foreach ($orders as $order) {
                         $db->executeStatement(
-                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
                                 $this->marketplace->getId(),
                                 $order['orderNumber'],
@@ -114,12 +114,18 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $page++;
-                $total = $data['totalElements'];
-                echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
-                sleep(1);
-
-            } while ($page <= $data['totalPages']);
-
+                $totalElements = $data['totalElements'];
+                $totalPages = $data['totalPages'];
+                $count = count($orders);
+                echo "-----------------------------\n";
+                echo "Total Elements: $totalElements\n"; 
+                echo "Total Pages: $totalPages\n";
+                echo "Current Page: $page\n"; 
+                echo "Items on this page: $count\n";
+                echo "Date Range: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n"; 
+                echo "-----------------------------\n";
+                sleep(0.06);
+            } while ($page < $data['totalPages']);
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
@@ -137,7 +143,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 return implode('-', $values);
             }
         }
-        return '';
+        return '';*/
     }
 
     private function getPublished($listing)
