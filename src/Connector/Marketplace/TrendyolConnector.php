@@ -72,9 +72,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        echo "start date: " . $startDate  * 1000 . " end date: " . $endDate * 1000 . "\n";
-        
-        /*$size = 200;
+        $size = 200;
         do {
             $page = 0;
             do {
@@ -117,16 +115,22 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 $page++;
                 $totalElements = $data['totalElements'];
                 $totalPages = $data['totalPages'];
-                echo "Total Elements: $totalElements, Total Pages: $totalPages, Date: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . ", Current Page: $page"  . "\n";
-                //echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+                $count = count($orders);
+                echo "-----------------------------\n";
+                echo "Total Elements: $totalElements\n"; 
+                echo "Total Pages: $totalPages\n";
+                echo "Current Page: $page\n"; 
+                echo "Items on this page: $count\n";
+                echo "Date Range: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n"; 
+                echo "-----------------------------\n";
                 sleep(0.06);
-            } while ($page <= $data['totalPages']);
+            } while ($page < $data['totalPages']);
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
                 break;
             }
-        } while ($startDate < strtotime('now'));*/
+        } while ($startDate < strtotime('now'));
     }
 
     private function getAttributes($listing) {
