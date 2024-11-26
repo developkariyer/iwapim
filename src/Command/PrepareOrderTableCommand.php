@@ -77,6 +77,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Calculating USA Code\n";
         $this->usaCode();
         echo "Complated USA Code\n";
+        echo "Calculating Bolcom Total Price\n";
+        $this->bolcomTotalPrice();
+        echo "Complated Bolcom Total Price\n";
+        echo "Fix Bolcom Orders\n";
+        $this->bolcomFixOrders();
+        echo "Complated Fix Bolcom Orders\n";
     }
         
     protected function transferOrders()
@@ -1098,6 +1104,38 @@ class PrepareOrderTableCommand extends AbstractCommand
                 ]);
             }
         }
+    }
+
+    protected function bolcomTotalPrice()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            UPDATE iwa_marketplace_orders_line_items as t1
+            INNER JOIN (
+                SELECT 
+                    order_id,
+                    SUM(product_price_usd) as total_price_usd
+                FROM iwa_marketplace_orders_line_items
+                WHERE marketplace_type = 'Bol.com'
+                GROUP BY order_id
+            ) as t2
+            ON t1.order_id = t2.order_id
+            SET t1.total_price_usd = t2.total_price_usd
+            WHERE t1.marketplace_type = 'Bol.com';
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
+    protected function bolcomFixOrders()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            DELETE FROM iwa_marketplace_orders_line_items
+            WHERE marketplace_type = 'Bol.com' AND order_id = '0';
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
     }
 
 }
