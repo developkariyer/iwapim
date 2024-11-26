@@ -604,6 +604,23 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/CUSTOM_PATCH_RESPONSE_$safeSku.json", json_encode($patchOperation->json()));        
     }
 
+    public function getInfo($sku, $country = null) 
+    {
+        if (empty($country)) {
+            $country = $this->mainCountry;
+        }
+        $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
+        $listing = $listingsApi->getListingsItem(
+            sellerId: $this->marketplace->getMerchantId(),
+            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+            sku: rawurlencode($sku),
+            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
+        );
+        echo json_encode($listing->json(), JSON_PRETTY_PRINT);
+        $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/INFO_$safeSku.json", json_encode($listing->json()));
+    }
+
     public function patchListing($sku, $country = null)
     {
         if (empty($country)) {
