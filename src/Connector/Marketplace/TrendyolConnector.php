@@ -93,8 +93,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }
-                print_r($response->getContent());
-                break;
                 try {
                     $data = $response->toArray();
                     $orders = $data['content'];
