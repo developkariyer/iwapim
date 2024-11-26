@@ -593,8 +593,15 @@ class AmazonConnector extends MarketplaceConnectorAbstract
             productType: $productType,
             patches: $patches,
         );
-        echo "Patch result:\n{$listingsItemPatchRequest->json()}\n";
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/CUSTOM_PATCH_RESPONSE_$safeSku.json", json_encode($listingsItemPatchRequest->json()));        
+        echo "Patching\n";
+        $patchOperation = $listingsApi->patchListingsItem(
+            sellerId: $this->marketplace->getMerchantId(),
+            sku: rawurlencode($sku),
+            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+            listingsItemPatchRequest: $listingsItemPatchRequest
+        );
+        echo json_encode($patchOperation->json(), JSON_PRETTY_PRINT);
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/CUSTOM_PATCH_RESPONSE_$safeSku.json", json_encode($patchOperation->json()));        
     }
 
     public function patchListing($sku, $country = null)
