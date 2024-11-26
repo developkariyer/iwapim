@@ -209,7 +209,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
         $trendyolSql = "
-            INSERT INTO iwa_trendyol_orders_line_items (
+            INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
@@ -252,7 +252,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
                 NULL AS discount_value_type
             FROM
-                iwa_trendyol_orders
+                iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
                     value JSON PATH '$'
                 )) AS line_item
@@ -666,10 +666,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            //'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            //'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
@@ -736,7 +736,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_trendyol_orders_line_items
+        $sql = "UPDATE iwa_marketplace_orders_line_items
         SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
