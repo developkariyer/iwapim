@@ -222,14 +222,14 @@ class CleanCommand extends AbstractCommand
                         if ($product->checkIwasku()) {
                             $dirty = true;
                             $dirtReason .= "IW ";
-                        }
+                        }/*
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 $dirty = true;
                                 $dirtReason .= "N1_$field ";
                                 $product->set($field, null);
                             }
-                        }
+                        }*/
                         if (!$product->getRequiresIwasku()) {
                             $dirty = true;
                             $dirtReason .= "RI ";
