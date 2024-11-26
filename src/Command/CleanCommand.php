@@ -213,7 +213,7 @@ class CleanCommand extends AbstractCommand
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 $dirty = true;
-                                $dirtReason .= "N0_".substr($field, 0, 2)." ";
+                                $dirtReason .= "N0_$field ";
                                 $product->set($field, null);
                             }
                         }
@@ -226,7 +226,7 @@ class CleanCommand extends AbstractCommand
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 $dirty = true;
-                                $dirtReason .= "N1_".substr($field, 0, 2)." ";
+                                $dirtReason .= "N1_$field ";
                                 $product->set($field, null);
                             }
                         }
