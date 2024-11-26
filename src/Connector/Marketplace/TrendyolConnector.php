@@ -95,7 +95,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 }
                 print_r($response->getContent());
                 break;
-               /* try {
+                try {
                     $data = $response->toArray();
                     $orders = $data['content'];
                     $db->beginTransaction();
@@ -115,16 +115,17 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $page++;
-                $total = $data['totalElements'];
-                echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
-                sleep(0.06);*/
+                $totalElements = $data['totalElements'];
+                $totalPages = $data['totalPages'];
+                echo "Total Elements: $totalElements, Total Pages: $totalPages, Date: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "Current Page: $page"  . "\n";
+                //echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+                sleep(0.06);
             } while ($page <= $data['totalPages']);
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
                 break;
             }
-            break;
         } while ($startDate < strtotime('now'));
     }
 
