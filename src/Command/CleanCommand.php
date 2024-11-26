@@ -251,8 +251,8 @@ class CleanCommand extends AbstractCommand
                         break;
                 }
                 if ($dirty) {
-                    echo "Saving... $dirtReason\n";
-                    $product->save();
+                    echo "Saving... $dirtReason ";
+                    echo $product->save() ? "OK\n" : "ERROR\n";
                 }
             }
             $offset += $pageSize;
