@@ -200,17 +200,20 @@ class CleanCommand extends AbstractCommand
                 break;
             }
             foreach ($products as $product) {
+                $dirtReason = "";
                 $index++;
                 echo "\rProcessing: {$index} {$product->getId()}   ";
                 $dirty = false;
                 if ($product->checkProductCode()) {
                     $dirty = true;
+                    $dirtReason .= "PC ";
                 }
                 switch ($product->level()) {
                     case 0:
                         foreach (Product::$level0NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 $dirty = true;
+                                $dirtReason .= "N0_".substr($field, 0, 2)." ";
                                 $product->set($field, null);
                             }
                         }
@@ -218,15 +221,18 @@ class CleanCommand extends AbstractCommand
                     case 1:
                         if ($product->checkIwasku()) {
                             $dirty = true;
+                            $dirtReason .= "IW ";
                         }
                         foreach (Product::$level1NullFields as $field) {
                             if (!empty($product->get($field))) {
                                 $dirty = true;
+                                $dirtReason .= "N1_".substr($field, 0, 2)." ";
                                 $product->set($field, null);
                             }
                         }
                         if (!$product->getRequiresIwasku()) {
                             $dirty = true;
+                            $dirtReason .= "RI ";
                             $product->setRequiresIwasku(true);
                         }
                         $listingUniqueIds = "";
@@ -236,6 +242,7 @@ class CleanCommand extends AbstractCommand
                         $listingUniqueIds = trim($listingUniqueIds);
                         if ($listingUniqueIds !== $product->getListingUniqueIds()) {
                             $dirty = true;
+                            $dirtReason .= "ID ";
                             $product->setListingUniqueIds($listingUniqueIds);
                         }
                         break;
@@ -244,7 +251,7 @@ class CleanCommand extends AbstractCommand
                         break;
                 }
                 if ($dirty) {
-                    echo "Saving...\n";
+                    echo "Saving... $dirtReason\n";
                     $product->save();
                 }
             }
