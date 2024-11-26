@@ -107,7 +107,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Complated: $marketplaceType\n";
             }
         }
-
     }
 
     protected static function transferOrdersEtsy($marketPlaceId,$marketplaceType)
@@ -1128,6 +1127,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function countryCodes()
     {
+        // ISO 3166-1 alpha-2
         $countries = array
         (
             'AF' => 'Afghanistan',
