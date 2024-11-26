@@ -26,11 +26,6 @@ IWAPIM aims to simplify workflows for e-commerce managers by offering real-time 
   - Pimcore API
 - **Containerization**: Docker-ready for deployment in cloud environments
 
-## ⚠️ Disclaimer
-This project is **experimental** and in active development. Breaking changes, incomplete features, and potential issues are expected. It is not ready for production deployment or extensive testing.
-
-**Use at your own risk.**
-
 ## 🤝 Contributing
 Contributions are currently not accepted as this project is still under heavy development. However, feedback and suggestions are always welcome! Please open an issue to share your thoughts.
 
@@ -59,5 +54,9 @@ The IWAPIM project acknowledges these tools and services but is not officially a
 
 ## ⚠️ Disclaimer
 This project is experimental and integrates tools under their respective licenses. IWAPIM is neither officially affiliated with nor endorsed by these tools and platforms. Proper attribution has been provided wherever required.
+
+This project is **experimental** and in active development. Breaking changes, incomplete features, and potential issues are expected. It is not ready for production deployment or extensive testing.
+
+**Use at your own risk.**
 
 > **Note:** IWAPIM extends Pimcore functionality through custom extensions and integrations, without modifying its core. Pimcore is used under the terms of the [GNU AGPLv3 License](https://pimcore.com/en/legal/licenses).
