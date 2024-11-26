@@ -666,10 +666,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
+            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            //'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            //'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
@@ -736,7 +736,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_orders_line_items
+        $sql = "UPDATE iwa_trendyol_orders_line_items
         SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
