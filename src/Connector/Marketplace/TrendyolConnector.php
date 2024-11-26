@@ -56,8 +56,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $db = \Pimcore\Db::get();
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
-        $page = 0;
-        $size = 200;
         $now = strtotime('now');
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
@@ -73,6 +71,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
+        $startDateGMT3 = (new DateTime())->setTimestamp($startDate)->setTimezone(new DateTimeZone('Europe/Istanbul'))->format('Y-m-d H:i:s');
+        $endDateGMT3 = (new DateTime())->setTimestamp($endDate)->setTimezone(new DateTimeZone('Europe/Istanbul'))->format('Y-m-d H:i:s');
+        echo "Fetching orders from $startDateGMT3 to $endDateGMT3\n";
+        $size = 200;
         do {
             $page = 0;
             do {
@@ -100,7 +102,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     $db->beginTransaction();
                     foreach ($orders as $order) {
                         $db->executeStatement(
-                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
                                 $this->marketplace->getId(),
                                 $order['orderNumber'],
