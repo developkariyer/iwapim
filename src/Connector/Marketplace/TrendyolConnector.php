@@ -83,8 +83,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'query' => [
                         'page' => $page,
                         'size' => $size,
-                        'startDate' => $startDate, 
-                        'endDate' => $endDate
+                        'startDate' => $startDate * 1000, 
+                        'endDate' => $endDate *1000
                     ]
                 ]);
 
