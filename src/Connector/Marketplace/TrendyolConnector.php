@@ -57,6 +57,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $db = \Pimcore\Db::get();
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $now = strtotime('now');
+        $now = time();
+        $now = strtotime(date('Y-m-d 00:00:00', $now)); 
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
              FROM iwa_marketplace_orders 
