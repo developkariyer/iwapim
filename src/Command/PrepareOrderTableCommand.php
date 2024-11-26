@@ -65,9 +65,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Calculating is Fullfilled\n";
         $this->isfullfilled();
         echo "Complated is Fullfilled\n";
-        echo "Calculating is Turkey Code\n";
-        $this->countryCodeTurkey();
-        echo "Complated is Turkey Code\n";
+        echo "Calculating is Country Name\n";
+        $this->countryCodes();
+        echo "Complated is Country Name\n";
         echo "Calculating is Parse URL\n";
         $this->parseUrl(); 
         echo "Complated Parse URL\n";
@@ -956,18 +956,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                     order_id
             ) AS order_totals ON orders.order_id = order_totals.order_id
             SET orders.total_quantity = order_totals.total_quantity;
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function countryCodeTurkey() 
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET shipping_country = 'Turkey'
-        WHERE shipping_country_code = 'TR';
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
