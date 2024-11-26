@@ -209,7 +209,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
         $trendyolSql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
+            INSERT INTO iwa_trendyol_orders_line_items (
             marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
             created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
             vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
@@ -252,7 +252,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
                 NULL AS discount_value_type
             FROM
-                iwa_marketplace_orders
+                iwa_trendyol_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
                     value JSON PATH '$'
                 )) AS line_item
