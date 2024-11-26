@@ -93,8 +93,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     break;
                 }
-
-                try {
+                print_r($response->getContent());
+                break;
+               /* try {
                     $data = $response->toArray();
                     $orders = $data['content'];
                     $db->beginTransaction();
@@ -116,13 +117,14 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 $page++;
                 $total = $data['totalElements'];
                 echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
-                sleep(0.06);
+                sleep(0.06);*/
             } while ($page <= $data['totalPages']);
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
                 break;
             }
+            break;
         } while ($startDate < strtotime('now'));
     }
 
