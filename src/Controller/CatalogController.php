@@ -8,10 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
 use Pimcore\Controller\FrontendController;
-use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\Currency;
-use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\Asset;
 
