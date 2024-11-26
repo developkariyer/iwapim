@@ -72,10 +72,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        $startDateGMT3 = date('Y-m-d H:i:s', $startDate + 3 * 60 * 60); 
-        $endDateGMT3 = date('Y-m-d H:i:s', $endDate + 3 * 60 * 60); 
-        echo "Fetching orders from $startDate to $endDate\n";
-        echo "Fetching orders from $startDateGMT3 to $endDateGMT3\n";
         $size = 200;
         do {
             $page = 0;
@@ -87,8 +83,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'query' => [
                         'page' => $page,
                         'size' => $size,
-                        'startDate' => $startDate * 1000, 
-                        'endDate' => $endDate * 1000
+                        'startDate' => $startDate, 
+                        'endDate' => $endDate
                     ]
                 ]);
 
@@ -120,10 +116,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 $page++;
                 $total = $data['totalElements'];
                 echo "Page $page for date range Size $total " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
-                sleep(1);
-
+                sleep(0.06);
             } while ($page <= $data['totalPages']);
-
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
