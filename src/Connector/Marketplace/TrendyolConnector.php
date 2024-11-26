@@ -71,8 +71,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        $startDateGMT3 = (new DateTime())->setTimestamp($startDate)->setTimezone(new DateTimeZone('Europe/Istanbul'))->format('Y-m-d H:i:s');
-        $endDateGMT3 = (new DateTime())->setTimestamp($endDate)->setTimezone(new DateTimeZone('Europe/Istanbul'))->format('Y-m-d H:i:s');
+        $startDateGMT3 = date('Y-m-d H:i:s', $startDate + 3 * 60 * 60); 
+        $endDateGMT3 = date('Y-m-d H:i:s', $endDate + 3 * 60 * 60); 
         echo "Fetching orders from $startDateGMT3 to $endDateGMT3\n";
         $size = 200;
         do {
