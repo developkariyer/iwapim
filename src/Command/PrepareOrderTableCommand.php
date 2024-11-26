@@ -1400,7 +1400,5 @@ class PrepareOrderTableCommand extends AbstractCommand
                 ]);
             }
         }
-        
-
     }
 }
