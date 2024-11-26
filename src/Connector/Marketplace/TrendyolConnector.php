@@ -56,7 +56,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $db = \Pimcore\Db::get();
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
-        $now = strtotime('now');
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now)); 
         $lastUpdatedAt = $db->fetchOne(
@@ -75,6 +74,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
         $startDateGMT3 = date('Y-m-d H:i:s', $startDate + 3 * 60 * 60); 
         $endDateGMT3 = date('Y-m-d H:i:s', $endDate + 3 * 60 * 60); 
+        echo "Fetching orders from $startDate to $endDate\n";
         echo "Fetching orders from $startDateGMT3 to $endDateGMT3\n";
         $size = 200;
         do {
