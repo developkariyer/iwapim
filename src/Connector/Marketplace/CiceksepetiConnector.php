@@ -127,8 +127,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'query' => [
                     'startDate' => 'startDate',
                     'endDate' => 'endDate',
-                    'Page' => $page,
-                    'PageSize' => $size
+                    'page' => $page,
+                    'pageSize' => $pageSize
                 ]
             ]);
             $statusCode = $response->getStatusCode();
