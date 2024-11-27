@@ -406,7 +406,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             NULL AS subtotal_price,  
             NULL AS shipping_country,
             NULL AS shipping_province,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_item.value, '$.cancellationRequest')) AS shipping_city,
+            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.cancellationRequest')), NULL) AS shipping_city,
             NULL AS shipping_company,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.countryCode')) AS shipping_country_code,
             NULL AS total_price,
