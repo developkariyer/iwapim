@@ -65,7 +65,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             [$this->marketplace->getId()]
         );
         echo "Last Updated At: $lastUpdatedAt\n";
-        /*if ($lastUpdatedAt) {
+        if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
             $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
@@ -73,7 +73,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        $size = 200;
+        echo "Start Date: " . date('Y-m-d', $startDate) . "\n";
+        echo "End Date: " . date('Y-m-d', $endDate) . "\n";
+        /*$size = 200;
         do {
             $page = 0;
             do {
