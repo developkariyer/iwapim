@@ -59,8 +59,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now)); 
         $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate'))), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
-             FROM iwa_marketplace_orders 
+            "SELECT COALESCE(
+            DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate') / 1000)), '%Y-%m-%d'),
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')
+            ) AS lastUpdatedAt FROM iwa_trendyol_orders
              WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
