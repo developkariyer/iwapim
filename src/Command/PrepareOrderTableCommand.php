@@ -161,6 +161,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 shipping_city = VALUES(shipping_city),
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
+                subtotal_price = VALUES(subtotal_price),
                 fulfillments_status = VALUES(fulfillments_status),
                 tracking_company = VALUES(tracking_company);";
         try {
