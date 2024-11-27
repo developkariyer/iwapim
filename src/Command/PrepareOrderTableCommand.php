@@ -266,7 +266,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 fulfillments_id = VALUES(fulfillments_id),
                 fulfillments_status = VALUES(fulfillments_status),
                 tracking_company = VALUES(tracking_company),
-                discount_value = VALUES(discount_value),
+                discount_value = VALUES(discount_value)
         ";
         try {
             $db = \Pimcore\Db::get();
