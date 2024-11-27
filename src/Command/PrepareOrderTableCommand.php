@@ -367,7 +367,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             foreach ($values as $row) {
                 $index++;
                 if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
-                $this->prepareOrderTable($row['variant_id'],$row['product_id'], $row['sku'],$marketplaceType);
+                $this->prepareOrderTable($row['variant_id'],$marketplaceType);
             }
         }
     }
@@ -377,9 +377,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                DISTINCT variant_id,
-                product_id,
-                sku
+                DISTINCT variant_id
             FROM
                 iwa_marketplace_orders_line_items
             WHERE 
@@ -408,91 +406,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku)
+    protected static function getShopifyVariantProduct($uniqueMarketplaceId)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
             return $variantProduct;
         }
-        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE (field_name = 'apiResponseJson' AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?)
-            LIMIT 1;
-        ";
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$productId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        return null;*/
-
-        /*$variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.product_id')) = ?
-            LIMIT 1; ";
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$productId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        $randomObject = VariantProduct::getById($objectId);
-        if (!$randomObject) {
-            return null;
-        }
-        $mainProductObjectArray = $randomObject->getMainProduct();
-        if (!$mainProductObjectArray) {
-            return null;
-        }
-        $mainProductObject = reset($mainProductObjectArray);
-        if (!$mainProductObject instanceof Product) {
-            return null;
-        }
-        $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable($randomObject->getMarketplace()->getKey(), 190),
-            Utility::checkSetPath('Pazaryerleri')
-        );
-        $path = Utility::sanitizeVariable('Diger');
-        $parent = Utility::checkSetPath($path, $marketplaceFolder);
-        $parent = Utility::checkSetPath(Utility::sanitizeVariable($productId), $parent);
-        $newVariantProduct  = VariantProduct::addUpdateVariant(
-            variant: [
-                'imageUrl' =>  '',
-                'urlLink' =>  null,
-                'salePrice' => 0,
-                'saleCurrency' => '',
-                'title' => $variantTitle,
-                'attributes' => '',
-                'uniqueMarketplaceId' => $uniqueMarketplaceId,
-                'apiResponseJson' => '',
-                'published' => false,
-                'sku' => '',
-            ],
-            importFlag: true,
-            updateFlag: true,
-            marketplace: $randomObject->getMarketplace(),
-            parent: $parent
-        );
-        if (!$newVariantProduct) {
-            return null;
-        }
-        try {
-            $result = $mainProductObject->addVariant($newVariantProduct);
-            echo "Result: $result\n";
-        } catch (\Throwable $e) {
-            echo "Error: {$e->getMessage()}\n";
-            return null;
-        }
-        return $newVariantProduct;*/
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
     }
 
     protected static function getBolcomVariantProduct($uniqueMarketplaceId)
@@ -524,12 +445,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($variantProduct) {
             return $variantProduct;
         }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
     }
 
-    protected static function prepareOrderTable($uniqueMarketplaceId, $productId, $sku, $marketplaceType)
+    protected static function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId, $productId, $sku),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
             'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
             'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
             'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
