@@ -125,8 +125,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
                 ],
                 'json' => [
-                    'startDate' => '2024-11-10T03:52:09.390Z',
-                    'endDate' => '2024-11-20T03:52:09.390Z',
+                    'startDate' => '2024-11-01T03:52:09.390Z',
+                    'endDate' => '2024-11-12T03:52:09.390Z',
                     'page' => $page,
                     'pageSize' => $pageSize
                 ]
