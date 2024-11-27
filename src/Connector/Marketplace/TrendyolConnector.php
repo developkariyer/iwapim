@@ -64,8 +64,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
              WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-        //echo "Last Updated At: $lastUpdatedAt\n";
-        if ($lastUpdatedAt) {
+        echo "Last Updated At: $lastUpdatedAt\n";
+        /*if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
             $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
@@ -143,7 +143,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 return implode('-', $values);
             }
         }
-        return '';
+        return '';*/
     }
 
     private function getPublished($listing)
