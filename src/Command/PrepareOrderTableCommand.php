@@ -237,7 +237,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             INSERT INTO iwa_marketplace_orders_line_items (
                 marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code, total_price, subtotal_price, 
-                fulfillments_status, tracking_company
+                fulfillments_status, tracking_company, fulfillments_status_control
             )
             SELECT
                 '$marketplaceType',
@@ -259,7 +259,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')), NULL) AS fulfillments_status,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelled_at')) AS fulfillments_status_control
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -289,7 +290,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
                 fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company)";
+                tracking_company = VALUES(tracking_company),
+                fulfillments_status_control = VALUES(fulfillments_status_control);";
         try {
             $db = \Pimcore\Db::get();
             $db->query($shopifySql);
@@ -303,7 +305,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $bolcomSql = "
         INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
-            variant_title,  shipping_city, shipping_country_code, fulfillments_status
+            variant_title,  shipping_city, shipping_country_code, fulfillments_status, fulfillments_status_control
         )
         SELECT
             '$marketplaceType',
@@ -318,7 +320,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.title')) AS variant_title,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.city')) AS shipping_city,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.countryCode')) AS shipping_country_code,
-            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status
+            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
+            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.cancellationRequest')) AS fulfillments_status_control
         FROM
             iwa_marketplace_orders
             CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
@@ -340,7 +343,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             variant_title = VALUES(variant_title),
             shipping_city = VALUES(shipping_city),
             shipping_country_code = VALUES(shipping_country_code),
-            fulfillments_status = VALUES(fulfillments_status);";
+            fulfillments_status = VALUES(fulfillments_status),
+            fulfillments_status_control = VALUES(fulfillments_status_control);";
         try {
             $db = \Pimcore\Db::get();
             $db->query($bolcomSql);
