@@ -113,8 +113,8 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $etsySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity, vendor, variant_title, 
-            total_discount, subtotal_price, shipping_country, shipping_city, shipping_country_code, total_price, fulfillments_status, tracking_company, discount_value)
+            marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
+            total_discount, shipping_city, shipping_country_code, total_price, subtotal_price, fulfillments_status, tracking_company)
             SELECT
                 '$marketplaceType',
                 FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_timestamp')) AS UNSIGNED)) AS created_at,
@@ -122,21 +122,17 @@ class PrepareOrderTableCommand extends AbstractCommand
                 order_id AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.listing_id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.amount')) / JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.divisor')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.currency_code')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.seller_email')) AS vendor,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.title')) AS variant_title,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.discount_amt.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.discount_amt.divisor'))  AS total_discount,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.divisor'))  AS subtotal_price,  
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.country_iso'))  AS shipping_country,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.city')) AS shipping_city,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.country_iso')) AS shipping_country_code,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price.divisor'))  AS total_price,  
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.grandtotal.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.grandtotal.divisor'))  AS total_price,  
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.divisor'))  AS subtotal_price,  
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(shipments.value, '$.carrier_name')) AS tracking_company,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.shop_coupon')) AS discount_value
+                JSON_UNQUOTE(JSON_EXTRACT(shipments.value, '$.carrier_name')) AS tracking_company
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.transactions[*]' COLUMNS (
@@ -150,28 +146,23 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != ''
                 AND marketplace_id = $marketPlaceId
-			ON DUPLICATE KEY UPDATE
+			ON DUPLICATE KEY UPDATE 
                 marketplace_type = VALUES(marketplace_type),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
-                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
-                vendor = VALUES(vendor),
                 variant_title = VALUES(variant_title),
                 total_discount = VALUES(total_discount),
-                subtotal_price = VALUES(subtotal_price),
                 shipping_country = VALUES(shipping_country),
                 shipping_city = VALUES(shipping_city),
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
                 fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company),
-                discount_value = VALUES(discount_value);
-        ";
+                tracking_company = VALUES(tracking_company);";
         try {
             $db = \Pimcore\Db::get();
             $db->query($etsySql);
@@ -184,9 +175,8 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type,created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
-            vendor, variant_title, total_discount, shipping_city, shipping_company, shipping_country_code,
-            total_price, fulfillments_id, fulfillments_status, tracking_company, discount_value)
+            marketplace_type,created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount, 
+            shipping_city, shipping_company, shipping_country_code,total_price, fulfillments_status, tracking_company)
             SELECT
                 '$marketplaceType',
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
@@ -194,21 +184,17 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.currencyCode')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.merchantId')) AS vendor,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productName')) AS variant_title,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS total_discount,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.city')) AS shipping_city,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.commercial')) AS shipping_company,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.countryCode')) AS shipping_country_code,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS fulfillments_id,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -226,22 +212,17 @@ class PrepareOrderTableCommand extends AbstractCommand
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
-                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
-                vendor = VALUES(vendor),
                 variant_title = VALUES(variant_title),
                 total_discount = VALUES(total_discount),
                 shipping_city = VALUES(shipping_city),
                 shipping_company = VALUES(shipping_company),
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
-                fulfillments_id = VALUES(fulfillments_id),
                 fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company),
-                discount_value = VALUES(discount_value)
-        ";
+                tracking_company = VALUES(tracking_company)";
         try {
             $db = \Pimcore\Db::get();
             $db->query($trendyolSql);
@@ -254,11 +235,9 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_type, created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
-                vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
-                shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
-                total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-                discount_code, discount_code_type, discount_value, discount_value_type
+                marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
+                shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code, total_price, subtotal_price, 
+                fulfillments_status, tracking_company
             )
             SELECT
                 '$marketplaceType',
@@ -267,30 +246,20 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS product_id,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.sku')) AS sku,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,        
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.vendor')) AS vendor,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_title')) AS variant_title,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.total_discount')) AS total_discount,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.referring_site')) AS referring_site,
-                COALESCE(LEFT(JSON_UNQUOTE(JSON_EXTRACT(json, '$.landing_site')), 255), NULL) AS landing_site,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,  
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.name')) AS variant_title,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_discounts')) AS total_discount,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country')) AS shipping_country,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.province')) AS shipping_province,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.city')) AS shipping_city,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.company')) AS shipping_company,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country_code')) AS shipping_country_code,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.source_name')) AS source_name,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.id')), NULL) AS fulfillments_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')), NULL) AS fulfillments_status,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.code')), NULL) AS discount_code,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.type')), NULL) AS discount_code_type,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value')), NULL) AS discount_value,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.value_type')), NULL) AS discount_value_type
+                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -308,31 +277,19 @@ class PrepareOrderTableCommand extends AbstractCommand
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
                 variant_id = VALUES(variant_id),
-                sku = VALUES(sku),
                 price = VALUES(price),
                 currency = VALUES(currency),
                 quantity = VALUES(quantity),
-                vendor = VALUES(vendor),
                 variant_title = VALUES(variant_title),
                 total_discount = VALUES(total_discount),
-                referring_site = VALUES(referring_site),
-                landing_site = VALUES(landing_site),
-                subtotal_price = VALUES(subtotal_price),
                 shipping_country = VALUES(shipping_country),
                 shipping_province = VALUES(shipping_province),
                 shipping_city = VALUES(shipping_city),
                 shipping_company = VALUES(shipping_company),
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
-                source_name = VALUES(source_name),
-                fulfillments_id = VALUES(fulfillments_id),
                 fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company),
-                discount_code = VALUES(discount_code),
-                discount_code_type = VALUES(discount_code_type),
-                discount_value = VALUES(discount_value),
-                discount_value_type = VALUES(discount_value_type)
-                ";
+                tracking_company = VALUES(tracking_company)";
         try {
             $db = \Pimcore\Db::get();
             $db->query($shopifySql);
@@ -346,7 +303,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $bolcomSql = "
         INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
-            vendor, variant_title,  shipping_city, shipping_country_code, fulfillments_status
+            variant_title,  shipping_city, shipping_country_code, fulfillments_status
         )
         SELECT
             '$marketplaceType',
@@ -358,7 +315,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.unitPrice')) AS price,
             'EUR' AS currency,        
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.quantity')) AS quantity,
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.offer.offerId')) AS vendor,
             JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.title')) AS variant_title,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.city')) AS shipping_city,
             JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.countryCode')) AS shipping_country_code,
@@ -381,7 +337,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             variant_id = VALUES(variant_id),
             price = VALUES(price),
             quantity = VALUES(quantity),
-            vendor = VALUES(vendor),
             variant_title = VALUES(variant_title),
             shipping_city = VALUES(shipping_city),
             shipping_country_code = VALUES(shipping_country_code),
