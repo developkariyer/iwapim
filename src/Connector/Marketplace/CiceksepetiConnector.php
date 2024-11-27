@@ -119,7 +119,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $page = 0;
         $pageSize = 100;
-        do {
+        //do {
             $response = $this->httpClient->request('POST', 'https://apis.ciceksepeti.com/api/v1/Order/GetOrders', [
                 'headers' => [
                     'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
@@ -132,15 +132,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             $statusCode = $response->getStatusCode();
-            print_r($response->getContent());
-            if ($statusCode !== 200) {
+            print_r($response);
+            /*if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
                 return;
             }
             $data = $response->toArray();
             $count = $data['orderListCount'];
-            $page++;
-        }while($count === $pageSize);
+            $page++;*/
+        //}while($count === $pageSize);
         
 
     }
