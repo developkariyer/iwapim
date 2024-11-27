@@ -316,7 +316,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.source_name')) AS source_name,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.id')), NULL) AS fulfillments_id,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.fulfillment_status')) AS fulfillments_status,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelled_at')) AS fulfillments_status,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.code')), NULL) AS discount_code,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(discount_application.value, '$.type')), NULL) AS discount_code_type,
