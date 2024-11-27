@@ -290,6 +290,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 shipping_company = VALUES(shipping_company),
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
+                subtotal_price = VALUES(subtotal_price),
                 fulfillments_status = VALUES(fulfillments_status),
                 tracking_company = VALUES(tracking_company),
                 fulfillments_status_control = VALUES(fulfillments_status_control);";
