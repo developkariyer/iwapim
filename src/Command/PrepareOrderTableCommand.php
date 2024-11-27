@@ -210,18 +210,11 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $trendyolSql = "
             INSERT INTO iwa_trendyol_orders_line_items (
-            marketplace_type, marketplace_key, iwasku, parent_identifier, product_type,
-            created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
-            vendor, variant_title, total_discount, referring_site, landing_site, subtotal_price,
-            shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code,
-            total_price, source_name, fulfillments_id, fulfillments_status, tracking_company,
-            discount_code, discount_code_type, discount_value, discount_value_type)
+            marketplace_type,created_at, closed_at, order_id, product_id, variant_id, sku, price, currency, quantity,
+            vendor, variant_title, total_discount, shipping_city, shipping_company, shipping_country_code,
+            total_price, fulfillments_id, fulfillments_status, tracking_company, discount_value)
             SELECT
                 '$marketplaceType',
-                NULL AS marketplace_key,
-                NULL AS iwasku,
-                NULL AS parent_identifier,
-                NULL AS product_type,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
@@ -234,23 +227,14 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.merchantId')) AS vendor,
                 JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productName')) AS variant_title,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS total_discount,
-                NULL AS referring_site,
-                NULL AS landing_site,
-                NULL AS subtotal_price,  
-                NULL AS shipping_country,
-                NULL AS shipping_province,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.city')) AS shipping_city,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.commercial')) AS shipping_company,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipmentAddress.countryCode')) AS shipping_country_code,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
-                NULL AS source_name,
-                NULL AS fulfillments_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS fulfillments_id,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company,
-                NULL AS discount_code,
-                NULL AS discount_code_type,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
-                NULL AS discount_value_type
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -275,23 +259,14 @@ class PrepareOrderTableCommand extends AbstractCommand
                 vendor = VALUES(vendor),
                 variant_title = VALUES(variant_title),
                 total_discount = VALUES(total_discount),
-                referring_site = VALUES(referring_site),
-                landing_site = VALUES(landing_site),
-                subtotal_price = VALUES(subtotal_price),
-                shipping_country = VALUES(shipping_country),
-                shipping_province = VALUES(shipping_province),
                 shipping_city = VALUES(shipping_city),
                 shipping_company = VALUES(shipping_company),
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
-                source_name = VALUES(source_name),
                 fulfillments_id = VALUES(fulfillments_id),
                 fulfillments_status = VALUES(fulfillments_status),
                 tracking_company = VALUES(tracking_company),
-                discount_code = VALUES(discount_code),
-                discount_code_type = VALUES(discount_code_type),
                 discount_value = VALUES(discount_value),
-                discount_value_type = VALUES(discount_value_type);
         ";
         try {
             $db = \Pimcore\Db::get();
