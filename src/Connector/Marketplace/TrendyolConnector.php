@@ -60,7 +60,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $now = strtotime(date('Y-m-d 00:00:00', $now)); 
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate') / 1000)), '%Y-%m-%d'),DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) AS lastUpdatedAt
-            FROM iwa_trendyol_orders
+            FROM iwa_marketplace_orders
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
@@ -100,7 +100,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     $db->beginTransaction();
                     foreach ($orders as $order) {
                         $db->executeStatement(
-                            "INSERT INTO iwa_trendyol_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
                                 $this->marketplace->getId(),
                                 $order['orderNumber'],
