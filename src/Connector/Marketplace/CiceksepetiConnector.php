@@ -132,13 +132,14 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             $statusCode = $response->getStatusCode();
+            print_r[$response];
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
                 return;
             }
             $data = $response->toArray();
             $count = $data['orderListCount'];
-            print_r[$response];
+            $page++;
         }while($count === $pageSize);
         
 
