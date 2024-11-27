@@ -73,9 +73,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        echo "Start Date: " . date('Y-m-d', $startDate) . "\n";
-        echo "End Date: " . date('Y-m-d', $endDate) . "\n";
-        /*$size = 200;
+        $size = 200;
         do {
             $page = 0;
             do {
@@ -145,7 +143,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 return implode('-', $values);
             }
         }
-        return '';*/
+        return '';
     }
 
     private function getPublished($listing)
