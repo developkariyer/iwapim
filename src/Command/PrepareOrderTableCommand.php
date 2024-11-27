@@ -234,7 +234,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS fulfillments_id,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS discount_value
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
