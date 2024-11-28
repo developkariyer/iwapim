@@ -15,6 +15,7 @@ use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
 use Pimcore\Model\DataObject\Folder;
 
+use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Reports as AmazonReports;
 use App\Utils\Utility;
