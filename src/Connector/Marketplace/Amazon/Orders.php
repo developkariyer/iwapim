@@ -27,14 +27,10 @@ class Orders
         do {
             $response = $nextToken ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
             $response = $response->json();
-            print_r($response['payload']);exit;
-            $orders = array_merge($orders, $response->json()['orders'] ?? [] );
-            $nextToken = $response->json()['nextToken'] ?? null;
-            if ($nextToken) {
-                echo "Next Token: $nextToken\n";
-            } else {
-                echo "No Next Token\n";
-            }
+            $orders = array_merge($orders, $response['payload']['orders'] ?? [] );
+            $nextToken = $response['payload']['nextToken'] ?? null;
+            echo ".";
+            usleep(100000);
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/amazon-orders.json", json_encode($orders));
