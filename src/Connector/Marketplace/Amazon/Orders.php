@@ -31,6 +31,7 @@ class Orders
             $nextToken = $response['payload']['nextToken'] ?? null;
             echo ".";
             usleep(100000);
+            print_r($response);exit;
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/amazon-orders.json", json_encode($orders));
