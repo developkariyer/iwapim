@@ -78,9 +78,9 @@ class Listings
     
     public function getListings($forceDownload = false)
     {
-        $this->processListingReport($this->amazonConnector->mainCountry, $this->amazonConnector->amazonReports->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
+        $this->processListingReport($this->amazonConnector->mainCountry, $this->amazonConnector->reportsHelper->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
         foreach ($this->amazonConnector->countryCodes as $country) {
-            $this->processListingReport($country, $this->amazonConnector->amazonReports->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
+            $this->processListingReport($country, $this->amazonConnector->reportsHelper->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
         }
 
         $totalCount = count($this->amazonConnector->listings);
