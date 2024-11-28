@@ -30,7 +30,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         $this->httpClient = HttpClient::create();
     }
 
-    protected function getUrlLink($url)
+    public function getUrlLink($url)
     {
         if (empty($url)) {
             return null;
@@ -40,7 +40,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         return $l;
     }
 
-    protected function getLatestOrderUpdate()
+    public function getLatestOrderUpdate()
     {
         $db = \Pimcore\Db::get();
         return $db->fetchOne(
@@ -49,7 +49,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         );
     }
 
-    protected function getMarketplace()
+    public function getMarketplace()
     {
         return $this->marketplace;
     }
