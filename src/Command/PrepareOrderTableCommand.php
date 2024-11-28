@@ -232,13 +232,13 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersFromShopifyOrderTable($marketPlaceId,$marketplaceType)
+    protected static function transferOrdersFromShopify($marketPlaceId,$marketplaceType)
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
                 marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
                 shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code, total_price, subtotal_price, 
-                fulfillments_status, tracking_company, fulfillments_status_control
+                fulfillments_status, tracking_company, fulfillments_status_control, referring_site, landing_site
             )
             SELECT
                 '$marketplaceType',
@@ -261,7 +261,9 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')), NULL) AS fulfillments_status,
                 COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelled_at')) AS fulfillments_status_control
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelled_at')) AS fulfillments_status_control,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.referring_site')) AS referring_site,
+                COALESCE(LEFT(JSON_UNQUOTE(JSON_EXTRACT(json, '$.landing_site')), 255), NULL) AS landing_site
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -293,7 +295,9 @@ class PrepareOrderTableCommand extends AbstractCommand
                 subtotal_price = VALUES(subtotal_price),
                 fulfillments_status = VALUES(fulfillments_status),
                 tracking_company = VALUES(tracking_company),
-                fulfillments_status_control = VALUES(fulfillments_status_control);";
+                fulfillments_status_control = VALUES(fulfillments_status_control)
+                referring_site = VALUES(referring_site),
+                landing_site = VALUES(landing_site);";
         try {
             $db = \Pimcore\Db::get();
             $db->query($shopifySql);
@@ -302,7 +306,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersFromBolcomOrderTable($marketPlaceId,$marketplaceType)
+    protected static function transferOrdersFromBolcom($marketPlaceId,$marketplaceType)
     {
         $bolcomSql = "
         INSERT INTO iwa_marketplace_orders_line_items (
@@ -710,7 +714,14 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function isfullfilled() 
     {
         $db = \Pimcore\Db::get();
-        $sql = "
+        $shopifySql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET is_canceled = CASE
+            WHEN fulfillments_status_control = 'null' THEN 'not_canceled'
+            ELSE 'cancelled'
+        END
+        WHERE marketplace_type = 'Shopify';";
+        /*$sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET is_fulfilled = 
         CASE 
@@ -721,7 +732,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             THEN TRUE
             ELSE FALSE
         END;
-        ";
+        ";*/
         $stmt = $db->prepare($sql);
         $stmt->execute();
     }
