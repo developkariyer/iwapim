@@ -8,8 +8,6 @@ use App\Command\CacheImagesCommand;
 use Pimcore\Model\DataObject\Data\Link;
 use Symfony\Component\HttpClient\HttpClient;
 
-
-
 abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInterface
 {
     public $marketplace = null;

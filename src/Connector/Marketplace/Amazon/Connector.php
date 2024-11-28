@@ -4,7 +4,6 @@ namespace App\Connector\Marketplace\Amazon;
 
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
-use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\PatchOperation;
 
