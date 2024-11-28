@@ -98,7 +98,7 @@ class Import
             $variantProduct = VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => null,
-                    'urlLink' => $this->getUrlLink(AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['url']."/dp/$asin"),
+                    'urlLink' => $this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['url']."/dp/$asin"),
                     'salePrice' => 0,
                     'saleCurrency' => '',
                     'title' => $this->getTitle($mainListing),
@@ -154,7 +154,7 @@ class Import
                 $found = true;
                 $amazonCollection->setMarketplaceId($country);
                 $amazonCollection->setTitle($this->getTitle($listing));
-                $amazonCollection->setUrlLink($this->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
+                $amazonCollection->setUrlLink($this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
                 $amazonCollection->setSalePrice($listing['price'] ?? 0);
                 $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
                 $amazonCollection->setSku($listing['seller-sku'] ?? '');
@@ -178,7 +178,7 @@ class Import
             $amazonCollection->setMarketplaceId($country);
             $amazonCollection->setLastUpdate(Carbon::now());
             $amazonCollection->setTitle($this->getTitle($listing));
-            $amazonCollection->setUrlLink($this->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
+            $amazonCollection->setUrlLink($this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
             $amazonCollection->setSalePrice($listing['price'] ?? 0);
             $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
             $amazonCollection->setSku($listing['seller-sku'] ?? '');
