@@ -37,7 +37,6 @@ class CleanCommand extends AbstractCommand
             ->addOption('product-fix', null, InputOption::VALUE_NONE, 'If set, inherited fields will be reset for Products.')
             ->addOption('translate-ai', null, InputOption::VALUE_NONE, 'If set, AI translations will be processed.')
             ->addOption('unpublish', null, InputOption::VALUE_NONE, 'If set, variantProducts not updated in last 3 days will be unpublished.')
-            ->addOption('bundle-fix', null, InputOption::VALUE_NONE, 'If set, bundle products will be fixed.')
             ->addOption('untag-only', null, InputOption::VALUE_NONE, 'If set, only existing tags will be processed.');
     }
 
@@ -73,48 +72,7 @@ class CleanCommand extends AbstractCommand
         if ($input->getOption('unpublish')) {
             self::unpublishOlderVariantProducts();
         }
-        if ($input->getOption('bundle-fix')) {
-            self::fixBundledProducts();
-        }
         return Command::SUCCESS;
-    }
-
-    private static function fixBundledProducts()
-    {
-        return; // does not work anymore, bundleItems field is deleted.
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(true);
-        $pageSize = 50;
-        $offset = 0;
-        while (true) {
-            $listingObject->setLimit($pageSize);
-            $listingObject->setOffset($offset);
-            $products = $listingObject->load();
-            if (empty($products)) {
-                break;
-            }
-            foreach ($products as $product) {
-                $bundleItems = $product->getBundleItems();
-                if (empty($bundleItems)) {
-                    continue;
-                }
-                echo "Found: {$product->getId()} {$product->getKey()}\n";
-                $bundleProducts = [];
-                $product->setBundleProducts([]);
-                $product->save();
-                echo "Cleared bundle products\n";
-                foreach ($bundleItems as $bundleItem) {
-                    $newBundleItem = new DataObject\Data\ObjectMetadata('bundleProducts', ['amount'],  $bundleItem);
-                    $newBundleItem->setAmount(1);
-                    $newBundleItem->setObject($bundleItem);
-                    $bundleProducts[] = $newBundleItem;
-                }
-                $product->setBundleProducts($bundleProducts);
-                $product->save();
-            }
-            $offset += $pageSize;
-            echo "Processed {$offset}\n";
-        }
     }
 
     private static function unpublishOlderVariantProducts()

@@ -17,6 +17,7 @@ use Pimcore\Model\DataObject\Folder;
 use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Reports as AmazonReports;
+use App\Connector\Marketplace\Amazon\Listings as AmazonListings;
 use App\Utils\Utility;
 use Carbon\Carbon;
 
@@ -25,11 +26,11 @@ class Connector extends MarketplaceConnectorAbstract
     public static $marketplaceType = 'Amazon';
 
     public $amazonReports;
+    public $amazonListings;
 
     public $amazonSellerConnector = null;
     public $countryCodes = [];
     public $mainCountry = null;
-    public $asinBucket = [];
     public $iwaskuList = [];
 
     public function __construct(Marketplace $marketplace) 
@@ -57,85 +58,7 @@ class Connector extends MarketplaceConnectorAbstract
             throw new \Exception("Amazon Seller Connector is not created");
         }
         $this->amazonReports = new AmazonReports($this);
-    }
-
-    protected function downloadAsinsInBucket()
-    {
-        if (empty($this->asinBucket)) {
-            return;
-        }
-        $catalogApi = $this->amazonSellerConnector->catalogItemsV20220401();
-        $response = $catalogApi->searchCatalogItems(
-            marketplaceIds: [AmazonConstants::amazonMerchant[$this->mainCountry]['id']],
-            identifiers: array_keys($this->asinBucket),
-            identifiersType: 'ASIN',
-            includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
-            sellerId: $this->marketplace->getMerchantId(),
-        );
-        $this->asinBucket = [];
-        $items = $response->json()['items'] ?? [];
-        foreach ($items as $item) {
-            $asin = $item['asin'] ?? '';
-            $this->listings[$asin]['catalog'] = $item;
-            Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($item));
-            Utility::storeJsonData($this->marketplace->getId(), $asin, $item);
-        }
-        sleep(1);
-    }
-
-    protected function addToAsinBucket($asin, $forceDownload = false)
-    {
-        $item = Utility::getCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()));
-        $item = json_decode($item, true);
-        if (empty($item) || $forceDownload) {
-            $this->asinBucket[$asin] = 1;
-            if (count($this->asinBucket) >= 10) {
-                $this->downloadAsinsInBucket();
-            }        
-        } else {
-            $this->listings[$asin]['catalog'] = $item;
-            Utility::storeJsonData($this->marketplace->getId(), $asin, $item);
-        }
-    }
-
-    protected function processListingReport($country, $report)
-    {
-        $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
-        $header = str_getcsv(array_shift($lines), "\t");
-        foreach ($lines as $line) {
-            $data = str_getcsv($line, "\t");
-            if (count($header) == count($data)) {
-                $rowData = array_combine($header, $data);
-                $asin = $rowData['asin1'] ?? '';
-                if (empty($this->listings[$asin][$country])) {
-                    if (empty($this->listings[$asin])) {
-                        $this->listings[$asin] = [];
-                    }
-                    $this->listings[$asin][$country] = [];  // Initialize country array
-                }
-                $this->listings[$asin][$country][] = $rowData;
-            }
-        }
-    }
-    
-    public function getListings($forceDownload = false)
-    {
-        $this->processListingReport($this->mainCountry, $this->amazonReports->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
-        foreach ($this->countryCodes as $country) {
-            $this->processListingReport($country, $this->amazonReports->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
-        }
-
-        $totalCount = count($this->listings);
-        $index = 0;
-        foreach ($this->listings as $asin=>$listing) {
-            $index++; /*
-            if (empty($listing[$this->mainCountry])) {
-                continue;
-            }*/
-            echo "($index/$totalCount) Downloading $asin ...\n";
-            $this->addToAsinBucket($asin, $forceDownload);
-        }
-        $this->downloadAsinsInBucket();
+        $this->amazonListings = new AmazonListings($this);
     }
 
     public function download($forceDownload = false): void
@@ -143,7 +66,7 @@ class Connector extends MarketplaceConnectorAbstract
         $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (empty($this->listings) || $forceDownload) {
             $this->amazonReports->downloadAllReports($forceDownload);
-            $this->getListings($forceDownload);
+            $this->amazonListings->getListings($forceDownload);
             Utility::setCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         }
         foreach ($this->listings as $asin=>$listing) {
