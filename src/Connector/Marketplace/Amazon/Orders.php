@@ -22,7 +22,7 @@ class Orders
         $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']];
         $nextToken = null;
         do {
-            $lastUpdatedAfter = date('c', strtotime('-1 day'));
+            $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 day'));
             echo "lastUpdatedAfter: $lastUpdatedAfter\n";
             $response = $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
             file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/amazon_order_test.txt", print_r($response, true));
