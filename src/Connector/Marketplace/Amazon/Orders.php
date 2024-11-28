@@ -22,7 +22,7 @@ class Orders
         $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']];
         $nextToken = null;
         do {
-            $response = $ordersApi->getOrders($marketplaceIds, $nextToken);
+            $response = $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken, lastUpdatedAfter: date('c', strtotime('-1 day')));
             file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/amazon_order_test.txt", print_r($response, true));
             return;
 //            $nextToken = $response->getNextToken();
