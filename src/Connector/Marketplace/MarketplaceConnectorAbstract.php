@@ -49,4 +49,9 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         );
     }
 
+    protected function getMarketplace()
+    {
+        return $this->marketplace;
+    }
+
 }

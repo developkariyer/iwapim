@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Connector\Marketplace;
+namespace App\Connector\Marketplace\Amazon;
 
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
@@ -15,32 +15,22 @@ use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
 use Pimcore\Model\DataObject\Fieldcollection;
 use Pimcore\Model\DataObject\Folder;
 
-use App\Connector\Marketplace\AmazonConstants;
+use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
+use App\Connector\Marketplace\Amazon\Reports as AmazonReports;
 use App\Utils\Utility;
 use Carbon\Carbon;
 
-class AmazonConnector extends MarketplaceConnectorAbstract
+class Connector extends MarketplaceConnectorAbstract
 {
     public static $marketplaceType = 'Amazon';
 
-    private array $amazonCountryReports = [
-        'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
-    ];
+    public $amazonReports;
 
-    private array $amazonReports = [
-        'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
-/*        'GET_FBA_MYI_ALL_INVENTORY_DATA' => [],
-        'GET_AFN_INVENTORY_DATA_BY_COUNTRY' => [],
-        'GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_GENERAL' => [],
-        'GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE' => [],
-        'GET_SELLER_FEEDBACK_DATA' => [],*/
-    ];
-
-    private $amazonSellerConnector = null;
-    private $countryCodes = [];
-    private $mainCountry = null;
-    private $asinBucket = [];
-    private $iwaskuList = [];
+    public $amazonSellerConnector = null;
+    public $countryCodes = [];
+    public $mainCountry = null;
+    public $asinBucket = [];
+    public $iwaskuList = [];
 
     public function __construct(Marketplace $marketplace) 
     {
@@ -66,65 +56,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
         if (!$this->amazonSellerConnector) {
             throw new \Exception("Amazon Seller Connector is not created");
         }
-    }
-
-    protected function downloadAmazonReport($reportType, $forceDownload, $country)
-    {
-        $marketplaceKey = urlencode( $this->marketplace->getKey());
-        echo "        Downloading Report $reportType ";
-        $report = Utility::getCustomCache(
-            "{$reportType}_{$country}.csv", 
-            PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}"
-        );
-        if ($report === false || $forceDownload) {
-            echo "Waiting Report ";
-            $reportsApi = $this->amazonSellerConnector->reportsV20210630();
-            $response = $reportsApi->createReport(new CreateReportSpecification($reportType, [AmazonConstants::amazonMerchant[$country]['id']]));
-            $reportId = $response->json()['reportId'];
-            while (true) {
-                sleep(10);
-                $reportStatus = $reportsApi->getReport($reportId);
-                $processingStatus = $reportStatus->json()['processingStatus'];
-                if ($processingStatus == 'DONE') {
-                    break;
-                }
-            }
-            $reportUrl = $reportsApi->getReportDocument($reportStatus->json()['reportDocumentId'] , $reportStatus->json()['reportType']);
-            $url = $reportUrl->json()['url'];
-            $report = file_get_contents(filename: $url);
-            if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
-                $report = gzdecode(data: $report);
-            }
-            Utility::setCustomCache(
-                "{$reportType}_{$country}.csv",
-                PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}",
-                $report
-            );
-            echo "OK ";
-        } else {
-            echo "Cached ";
-        }
-        if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
-            $report = gzdecode(data: $report);
-        }
-        if (substr(string: $report, offset: 0, length: 3) === "\xEF\xBB\xBF") {
-            $report = substr(string: $report, offset: 3);
-        }
-        return $report;
-    }
-
-    protected function downloadAllReports($forceDownload)
-    {
-        foreach (array_keys($this->amazonReports) as $reportType) {
-            echo "\n  Downloading {$reportType} for main Amazon region {$this->mainCountry}\n";
-            $this->amazonReports[$reportType] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $this->mainCountry);
-        }
-        foreach ($this->countryCodes as $country) {
-            foreach (array_keys($this->amazonCountryReports) as $reportType) {
-                echo "\n  Downloading {$reportType} for Amazon region $country\n";
-                $this->amazonCountryReports[$reportType][$country] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $country);
-            }
-        }
+        $this->amazonReports = new AmazonReports($this);
     }
 
     protected function downloadAsinsInBucket()
@@ -188,9 +120,9 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     
     public function getListings($forceDownload = false)
     {
-        $this->processListingReport($this->mainCountry, $this->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
+        $this->processListingReport($this->mainCountry, $this->amazonReports->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
         foreach ($this->countryCodes as $country) {
-            $this->processListingReport($country, $this->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
+            $this->processListingReport($country, $this->amazonReports->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
         }
 
         $totalCount = count($this->listings);
@@ -210,7 +142,7 @@ class AmazonConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (empty($this->listings) || $forceDownload) {
-            $this->downloadAllReports($forceDownload);
+            $this->amazonReport->downloadAllReports($forceDownload);
             $this->getListings($forceDownload);
             Utility::setCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         }

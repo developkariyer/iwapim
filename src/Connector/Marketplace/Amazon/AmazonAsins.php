@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Connector\Marketplace;
+namespace App\Connector\Marketplace\Amazon;
 
 class AmazonAsins
 {

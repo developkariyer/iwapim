@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Connector\Marketplace;
+namespace App\Connector\Marketplace\Amazon;
 
-class AmazonConstants
+class Constants
 {
     const amazonMerchant = [
         'CA' => [

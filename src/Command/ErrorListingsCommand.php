@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Marketplace;
-use App\Connector\Marketplace\AmazonConnector;
+use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
 use App\Utils\Utility;
 

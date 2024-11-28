@@ -13,7 +13,7 @@ use Pimcore\Model\DataObject\Folder as ObjectFolder;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject;
-use App\Connector\Marketplace\AmazonConnector;
+use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 use App\Utils\OpenAIChat;
 

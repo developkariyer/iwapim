@@ -12,7 +12,7 @@ use Pimcore\Model\DataObject\Marketplace;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\EventListener\DataObjectListener;
-use App\Connector\Marketplace\AmazonConnector;
+use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Connector\Marketplace\ShopifyConnector;
 use App\Connector\Marketplace\EtsyConnector;
 use App\Connector\Marketplace\TrendyolConnector;

@@ -11,8 +11,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
-use App\Connector\Marketplace\AmazonConnector;
-use App\Connector\Marketplace\AmazonConstants;
+use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
+use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 
 
 #[AsCommand(
