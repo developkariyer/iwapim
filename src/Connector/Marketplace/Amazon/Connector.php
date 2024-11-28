@@ -14,8 +14,8 @@ use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Reports as ReportsHelper;
 use App\Connector\Marketplace\Amazon\Listings as ListingsHelper;
 use App\Connector\Marketplace\Amazon\Import as ImportHelper;
+use App\Connector\Marketplace\Amazon\Orders as OrdersHelper;
 use App\Utils\Utility;
-use Carbon\Carbon;
 
 class Connector extends MarketplaceConnectorAbstract
 {
@@ -24,6 +24,7 @@ class Connector extends MarketplaceConnectorAbstract
     public $reportsHelper;
     public $listingsHelper;
     public $importHelper;
+    public $ordersHelper;
     
 
     public $amazonSellerConnector = null;
@@ -33,30 +34,35 @@ class Connector extends MarketplaceConnectorAbstract
     public function __construct(Marketplace $marketplace) 
     {
         parent::__construct($marketplace);
-
         $this->countryCodes = $marketplace->getMerchantIds() ?? [];
         if (!AmazonConstants::checkCountryCodes($this->countryCodes)) {
             throw new \Exception("Country codes are not valid");
         }
         $this->mainCountry = $marketplace->getMainMerchant();
-        $endpoint = match ($this->mainCountry) {
-            "CA", "US", "MX", "BR" => Endpoint::NA,
-            "SG", "AU", "JP", "IN" => Endpoint::FE,
-            "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" => Endpoint::EU,
-            default => Endpoint::NA,
-        };
-        $this->amazonSellerConnector = SellingPartnerApi::seller(
-            clientId: $marketplace->getClientId(),
-            clientSecret: $marketplace->getClientSecret(),
-            refreshToken: $marketplace->getRefreshToken(),
-            endpoint: $endpoint
-        );
+        $this->amazonSellerConnector = $this->initSellerConnector($marketplace);
         if (!$this->amazonSellerConnector) {
             throw new \Exception("Amazon Seller Connector is not created");
         }
         $this->reportsHelper = new ReportsHelper($this);
         $this->listingsHelper = new ListingsHelper($this);
         $this->importHelper = new ImportHelper($this);
+        $this->ordersHelper = new OrdersHelper($this);
+    }
+
+    private function initSellerConnector($marketplace)
+    {
+        $endpoint = match ($marketplace->getMainMerchant()) {
+            "CA", "US", "MX", "BR" => Endpoint::NA,
+            "SG", "AU", "JP", "IN" => Endpoint::FE,
+            "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" => Endpoint::EU,
+            default => Endpoint::NA,
+        };
+        return SellingPartnerApi::seller(
+            clientId: $marketplace->getClientId(),
+            clientSecret: $marketplace->getClientSecret(),
+            refreshToken: $marketplace->getRefreshToken(),
+            endpoint: $endpoint
+        );
     }
 
     public function download($forceDownload = false): void
@@ -83,49 +89,15 @@ class Connector extends MarketplaceConnectorAbstract
         $this->importHelper->import($updateFlag, $importFlag);
     }
 
-    public function catalogItems()
-    {/*
-        $catalogConnector = $this->amazonSellerConnector->catalogItemsV20220401();
-        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
-            $response = $catalogConnector->searchCatalogItems(
-                marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
-                identifiers: ['09-JWOX-4994'],
-                identifiersType: 'SKU',
-                includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
-                sellerId: $this->marketplace->getMerchantId(),
-            );
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_SKU_$country.json", json_encode($response->json()));
-            echo "$country OK\n";
-            sleep(1); 
-        }
-        foreach (array_merge([$this->mainCountry], $this->countryCodes) as $country) {
-            $response = $catalogConnector->searchCatalogItems(
-                marketplaceIds: [AmazonMerchantIdList::$amazonMerchantIdList[$country]],
-                identifiers: ['B08B5BJMR5'],
-                identifiersType: 'ASIN',
-                includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
-                sellerId: $this->marketplace->getMerchantId(),
-            );
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTcatalogItems_ASIN_$country.json", json_encode($response->json()));
-            echo "$country OK\n";    
-            sleep(1); 
-        }*/
-        $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
-        $listingItem = $listingsApi->getListingsItem(
-            sellerId: $this->marketplace->getMerchantId(),
-            marketplaceIds: [AmazonConstants::amazonMerchant['MX']['id']],
-            sku: rawurlencode("09-JWOX-4994"),
-            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
-        );
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/TESTlistingsItems_SKU.json", json_encode($listingItem->json()));
-    }
-
     public function downloadOrders(): void
     {
+        $this->ordersHelper->downloadOrders();
+    
+        /*
         $db = \Pimcore\Db::get();
         $lastUpdateAt = $this->getLatestOrderUpdate();
         echo "Last Update: $lastUpdateAt\n";
-        /*$ordersApi = $this->amazonSellerConnector->ordersV0();
+        $ordersApi = $this->amazonSellerConnector->ordersV0();
         $marketplaceIds = array_map(function($country) {
             return AmazonConstants::amazonMerchant[$country]['id'];
         }, $this->countryCodes);
@@ -235,15 +207,6 @@ class Connector extends MarketplaceConnectorAbstract
                 echo $e->getMessage();
             }
         }
-    }
-
-    private function getAllMarketplaceIds($asArray = false)
-    {
-        $ids = array_map(function($country) {
-            return AmazonConstants::amazonMerchant[$country]['id'];
-        }, $this->countryCodes);
-
-        return $asArray ? $ids : implode(',', $ids);
     }
 
     public function patchCustom($sku, $country = null, $attribute, $operation, $value = null)

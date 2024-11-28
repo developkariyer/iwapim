@@ -112,7 +112,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-       if (empty($this->listings)) {
+        if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
