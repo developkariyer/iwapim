@@ -718,14 +718,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         $sql = "
             UPDATE iwa_marketplace_orders_line_items
             SET is_canceled = CASE
-                WHEN marketplace_type = 'Shopify' AND fulfillments_status_control = 'null' THEN 'not_canceled'
+                WHEN marketplace_type = 'Shopify' AND fulfillments_status_control = 'null' THEN 'not_cancelled'
                 WHEN marketplace_type = 'Shopify' AND fulfillments_status_control != 'null' THEN 'cancelled'
                 WHEN marketplace_type = 'Trendyol' AND fulfillments_status = 'Cancelled' THEN 'cancelled'
                 WHEN marketplace_type = 'Trendyol' AND fulfillments_status != 'Cancelled' THEN 'not_cancelled'
                 WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control = 'true' THEN 'cancelled'
-                WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control != 'true' THEN 'not_canceled'
+                WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control != 'true' THEN 'not_cancelled'
                 WHEN marketplace_type = 'Etsy' AND fulfillments_status = 'Canceled' THEN 'cancelled'
-                WHEN marketplace_type = 'Etsy' AND fulfillments_status != 'Canceled' THEN 'not_canceled'
+                WHEN marketplace_type = 'Etsy' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'
             END;
         ";
         $stmt = $db->prepare($sql);
