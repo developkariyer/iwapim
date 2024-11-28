@@ -26,7 +26,8 @@ class Orders
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
         do {
             $response = $nextToken ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
-            echo array_keys($response->json()) . "\n"; return;
+            print_r($response); exit;
+            echo $response->json() . "\n"; exit;
             $orders = array_merge($orders, $response->json()['orders'] ?? [] );
             $nextToken = $response->json()['nextToken'] ?? null;
             if ($nextToken) {
