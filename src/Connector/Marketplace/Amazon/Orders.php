@@ -25,7 +25,7 @@ class Orders
             $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 day'));
             echo "lastUpdatedAfter: $lastUpdatedAfter\n";
             $response = $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
-            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/amazon_order_test.txt", print_r($response, true));
+            file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/amazon_order_test.txt", json_encode($response->json()));
             return;
 //            $nextToken = $response->getNextToken();
 //            $orders = array_merge($orders, $response->getOrders());
