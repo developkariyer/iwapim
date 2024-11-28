@@ -66,7 +66,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->countryCodes();
         echo "Complated is Country Name\n";
         echo "Calculating is Parse URL\n";
-        $this->parseUrl(); 
+        //$this->parseUrl(); 
         echo "Complated Parse URL\n";
         echo "Calculating USA Code\n";
         $this->usaCode();
