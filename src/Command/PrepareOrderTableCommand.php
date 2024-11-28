@@ -56,6 +56,9 @@ class PrepareOrderTableCommand extends AbstractCommand
     
     protected function extraColumns()
     {
+        echo "Calculating is Parse URL\n";
+        $this->parseUrl(); 
+        echo "Complated Parse URL\n";
         echo "Calculating Closed At Diff\n";
         $this->insertClosedAtDiff();
         echo "Complated Closed At Diff\n";
@@ -65,9 +68,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Calculating is Country Name\n";
         $this->countryCodes();
         echo "Complated is Country Name\n";
-        echo "Calculating is Parse URL\n";
-        //$this->parseUrl(); 
-        echo "Complated Parse URL\n";
         echo "Calculating USA Code\n";
         $this->usaCode();
         echo "Complated USA Code\n";
