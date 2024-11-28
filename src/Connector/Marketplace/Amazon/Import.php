@@ -76,12 +76,6 @@ class Import
 
     public function import($updateFlag, $importFlag)
     {
-        if (empty($this->listings)) {
-            echo "Nothing to import in {$this->amazonConnector->mainCountry}\n";
-            return;
-        } else {
-            echo "Importing {$this->amazonConnector->mainCountry}\n";
-        }
         $total = count($this->amazonConnector->listings);
         $index = 0;
         foreach ($this->amazonConnector->listings as $asin=>$listing) {
