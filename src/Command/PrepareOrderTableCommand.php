@@ -62,9 +62,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Calculating is Discount\n";
         $this->discountValue();
         echo "Complated is Discount\n";
-        echo "Calculating is Fullfilled\n";
-        $this->isfullfilled();
-        echo "Complated is Fullfilled\n";
         echo "Calculating is Country Name\n";
         $this->countryCodes();
         echo "Complated is Country Name\n";
