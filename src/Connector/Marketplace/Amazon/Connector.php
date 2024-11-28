@@ -143,7 +143,7 @@ class Connector extends MarketplaceConnectorAbstract
     {
         $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (empty($this->listings) || $forceDownload) {
-            $this->amazonReport->downloadAllReports($forceDownload);
+            $this->amazonReports->downloadAllReports($forceDownload);
             $this->getListings($forceDownload);
             Utility::setCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         }
