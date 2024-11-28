@@ -71,9 +71,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Calculating is Parse URL\n";
         $this->parseUrl(); 
         echo "Complated Parse URL\n";
-        echo "Calculating is Product Quantity\n";
-        $this->productQuantity();
-        echo "Complated Product Quantity\n";
         echo "Calculating USA Code\n";
         $this->usaCode();
         echo "Complated USA Code\n";
@@ -83,6 +80,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Fix Bolcom Orders\n";
         $this->bolcomFixOrders();
         echo "Complated Fix Bolcom Orders\n";
+        echo "Calculating is Cancelled\n";
+        $this->isCancelled();
+        echo "Complated is Cancelled\n";
     }
         
     protected function transferOrders()
@@ -703,7 +703,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         UPDATE iwa_marketplace_orders_line_items
         SET has_discount = 
         CASE 
-            WHEN discount_value IS NOT NULL AND discount_value <> 0.00 THEN TRUE
+            WHEN total_discount IS NOT NULL AND total_discount <> 0.00 THEN TRUE
             ELSE FALSE
         END;
         ";
@@ -714,53 +714,18 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function isCancelled() 
     {
         $db = \Pimcore\Db::get();
-        $shopifySql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET is_canceled = CASE
-            WHEN fulfillments_status_control = 'null' THEN 'not_canceled'
-            ELSE 'cancelled'
-        END
-        WHERE marketplace_type = 'Shopify';";
-
-        $trendyolSql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET is_canceled = CASE
-            WHEN fulfillments_status = 'Cancelled' THEN 'cancelled'
-            ELSE 'not_cancelled'
-        END
-        WHERE marketplace_type = 'Trendyol';
-        ";
-        /*$sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET is_fulfilled = 
-        CASE 
-            WHEN fulfillments_status = 'success' 
-            OR fulfillments_status = 'Delivered'
-            OR fulfillments_status = 'HANDLED'
-            OR fulfillments_status = 'Completed'
-            THEN TRUE
-            ELSE FALSE
-        END;
-        ";*/
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function productQuantity()
-    {
-        $db = \Pimcore\Db::get();
         $sql = "
-            UPDATE iwa_marketplace_orders_line_items AS orders
-            JOIN (
-                SELECT 
-                    order_id, 
-                    SUM(quantity) AS total_quantity
-                FROM 
-                    iwa_marketplace_orders_line_items
-                GROUP BY 
-                    order_id
-            ) AS order_totals ON orders.order_id = order_totals.order_id
-            SET orders.total_quantity = order_totals.total_quantity;
+            UPDATE iwa_marketplace_orders_line_items
+            SET is_canceled = CASE
+                WHEN marketplace_type = 'Shopify' AND fulfillments_status_control = 'null' THEN 'not_canceled'
+                WHEN marketplace_type = 'Shopify' AND fulfillments_status_control != 'null' THEN 'cancelled'
+                WHEN marketplace_type = 'Trendyol' AND fulfillments_status = 'Cancelled' THEN 'cancelled'
+                WHEN marketplace_type = 'Trendyol' AND fulfillments_status != 'Cancelled' THEN 'not_cancelled'
+                WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control = 'true' THEN 'cancelled'
+                WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control != 'true' THEN 'not_canceled'
+                WHEN marketplace_type = 'Etsy' AND fulfillments_status = 'Canceled' THEN 'cancelled'
+                WHEN marketplace_type = 'Etsy' AND fulfillments_status != 'Canceled' THEN 'not_canceled'
+            END;
         ";
         $stmt = $db->prepare($sql);
         $stmt->execute();
