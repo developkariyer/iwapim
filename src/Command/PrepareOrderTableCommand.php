@@ -562,6 +562,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($results as $row) {
             $price = $row['price'];
             $totalPrice = $row['total_price'];
+            $subtotalPrice = $row['subtotal_price'];
             $currency = $row['currency'];
             $currencyRate = $row['currency_rate'];
             $currentUsd = $row['current_USD'];
@@ -570,19 +571,22 @@ class PrepareOrderTableCommand extends AbstractCommand
             if ($currency === 'USD') {
                 $productPriceUsd = $price;
                 $totalPriceUsd = $totalPrice;
+                $subtotalPriceUsd = $subtotalPrice;
             } else {
                 if ($currency === 'TRY') {
                     $productPriceUsd = round($price / $currencyRate, 2);
                     $totalPriceUsd = round($totalPrice / $currencyRate, 2);
+                    $subtotalPriceUsd = round($subtotalPrice / $currencyRate, 2);
                 }
                 else {
                     $productPriceUsd = round($price * $currencyRate / $currentUsd, 2);
                     $totalPriceUsd = round($totalPrice * $currencyRate / $currentUsd, 2);
+                    $subtotalPriceUsd = round($subtotalPrice * $currencyRate / $currentUsd, 2);
                 }               
             }
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
-                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd
+                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
                 WHERE id = {$row['id']};
             ";
             echo "Updating... $updateSql\n";
