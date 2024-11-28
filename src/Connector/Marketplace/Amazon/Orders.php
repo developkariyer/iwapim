@@ -19,8 +19,7 @@ class Orders
     {
         //$db = \Pimcore\Db::get();
         $ordersApi = $this->amazonConnector->amazonSellerConnector->ordersV0();
-        $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']]|
-        $orders = [];
+        $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']];
         $nextToken = null;
         do {
             $response = $ordersApi->getOrders($marketplaceIds, $nextToken);
