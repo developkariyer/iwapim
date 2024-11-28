@@ -29,7 +29,7 @@ class Reports
         $this->amazonConnector = $amazonConnector;
     }
 
-    protected function downloadAmazonReport($reportType, $forceDownload, $country)
+    public function downloadAmazonReport($reportType, $forceDownload, $country)
     {
         $marketplaceKey = urlencode( $this->amazonConnector->getMarketplace()->getKey());
         echo "        Downloading Report $reportType ";
@@ -74,7 +74,7 @@ class Reports
         return $report;
     }
 
-    protected function downloadAllReports($forceDownload)
+    public function downloadAllReports($forceDownload)
     {
         foreach (array_keys($this->amazonReports) as $reportType) {
             echo "\n  Downloading {$reportType} for main Amazon region {$this->amazonConnector->mainCountry}\n";
