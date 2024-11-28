@@ -295,7 +295,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 subtotal_price = VALUES(subtotal_price),
                 fulfillments_status = VALUES(fulfillments_status),
                 tracking_company = VALUES(tracking_company),
-                fulfillments_status_control = VALUES(fulfillments_status_control)
+                fulfillments_status_control = VALUES(fulfillments_status_control),
                 referring_site = VALUES(referring_site),
                 landing_site = VALUES(landing_site);";
         try {
