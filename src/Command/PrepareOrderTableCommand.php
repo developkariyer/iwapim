@@ -711,7 +711,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function isfullfilled() 
+    protected function isCancelled() 
     {
         $db = \Pimcore\Db::get();
         $shopifySql = "
@@ -721,6 +721,15 @@ class PrepareOrderTableCommand extends AbstractCommand
             ELSE 'cancelled'
         END
         WHERE marketplace_type = 'Shopify';";
+
+        $trendyolSql = "
+        UPDATE iwa_marketplace_orders_line_items
+        SET is_canceled = CASE
+            WHEN fulfillments_status = 'Cancelled' THEN 'cancelled'
+            ELSE 'not_cancelled'
+        END
+        WHERE marketplace_type = 'Trendyol';
+        ";
         /*$sql = "
         UPDATE iwa_marketplace_orders_line_items
         SET is_fulfilled = 
