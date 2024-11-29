@@ -16,7 +16,7 @@ use App\Utils\Utility;
 
 
 #[AsCommand(
-    name: 'app:prepare-table'
+    name: 'app:prepare-order-table'
 )]
 
 
