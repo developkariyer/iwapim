@@ -9,6 +9,8 @@ use App\Utils\Utility;
 class Orders
 {
     public $amazonConnector;
+    public $ordersApi;
+    public $marketplaceIds;
 
     public $db;
     public $orders = [];
@@ -17,6 +19,8 @@ class Orders
     {
         $this->amazonConnector = $amazonConnector;
         $this->db = \Pimcore\Db::get();
+        $this->ordersApi = $amazonConnector->amazonSellerConnector->ordersV0();
+        $this->marketplaceIds = [AmazonConstants::amazonMerchant[$amazonConnector->mainCountry]['id']];
     }
 
     public function getLastUpdateTime()
@@ -33,13 +37,11 @@ class Orders
             WHERE marketplace_id = ?",
             [$this->amazonConnector->getMarketplace()->getId()]
         );
-        return $lastUpdateTime ?? gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 day'));
+        return $lastUpdateTime ?? gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 hour'));
     }
 
     public function getOrders()
     {
-        $ordersApi = $this->amazonConnector->amazonSellerConnector->ordersV0();
-        $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']];
         $nextToken = null;
         $orders = [];
         $lastUpdatedAfter = $this->getLastUpdateTime();
@@ -53,11 +55,10 @@ class Orders
             $tokensToAdd = floor(($currentTime - $lastRequestTime) / $rateLimitSleep);
             $tokens = min($burstLimit, $tokens + $tokensToAdd);
             $lastRequestTime += $tokensToAdd * $rateLimitSleep;
-        
             if ($tokens > 0) {
                 $response = $nextToken 
-                    ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) 
-                    : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
+                    ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
+                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
                 $responseJson = $response->json();
                 $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
@@ -72,9 +73,40 @@ class Orders
         $this->orders = $orders;
     }
 
-    public function getOrderItems()
+    public function getOrderItems($amazonOrderId)
     {
+        $nextToken = null;
+        $orderItems = [];
+        $rateLimitSleep = 2;
+        do {
+            $response = $nextToken 
+                ? $this->ordersApi->getOrderItems($amazonOrderId, nextToken: $nextToken) 
+                : $this->ordersApi->getOrderItems($amazonOrderId);
+            $responseJson = $response->json();
+            $orderItems = array_merge($orderItems, $responseJson['payload']['OrderItems'] ?? []);
+            $nextToken = $responseJson['payload']['NextToken'] ?? null;        
+            echo ".";
+            sleep($rateLimitSleep);
+        } while ($nextToken);
+        return $orderItems;
+    }
 
+    public function downloadOrderItems()
+    {
+        foreach ($this->orders as &$order) {
+            $order['OrderItems'] = $this->getOrderItems($order['AmazonOrderId']);
+        }
+    }
+
+    public function downloadOrders()
+    {
+        $this->getOrders();
+        $this->downloadOrderItems();
+        //$this->saveOrders();
+        file_put_contents(
+            PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->amazonConnector->getMarketplace()->getKey()).'/orders.json', 
+            json_encode($this->orders, JSON_PRETTY_PRINT)
+        );
     }
 
     public function saveOrders()
@@ -97,13 +129,6 @@ class Orders
             $this->db->rollBack();
             throw $e;
         }
-    }
-
-    public function downloadOrders()
-    {
-        $this->getOrders();
-        $this->getOrderItems();
-        $this->saveOrders();
     }
 
 }
