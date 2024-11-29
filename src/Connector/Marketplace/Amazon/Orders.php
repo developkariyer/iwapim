@@ -108,7 +108,7 @@ class Orders
         $index = 0;
         foreach ($this->orders as &$order) {
             $index++;
-            if (!$index%10) echo "#";
+            if ($index%10 == 0) echo "#";
             $order['OrderItems'] = $this->getOrderItems($order['AmazonOrderId']);
         }
     }
