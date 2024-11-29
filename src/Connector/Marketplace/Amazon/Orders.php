@@ -51,7 +51,7 @@ class Orders
         $nextToken = null;
         $orders = [];
         $lastUpdatedAfter = $this->getLastUpdateTime();
-        $date = new \DateTime($lastUpdatedAfter, new DateTimeZone('UTC'));
+        $date = new \DateTime($lastUpdatedAfter, new \DateTimeZone('UTC'));
         $date->modify('+1 week');
         $lastUpdateBefore = $date->format('Y-m-d\TH:i:s\Z');
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
