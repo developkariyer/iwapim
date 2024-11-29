@@ -130,7 +130,7 @@ class Connector extends MarketplaceConnectorAbstract
                     echo "Saved";
                 }
                 if (!empty($fnsku[$asin])) {
-                    Registry::setKey($fnsku[$asin], $asin, 'fnsku');
+                    Registry::setKey($fnsku[$asin], $asin, 'fnsku-to-asin');
                 }
                 echo "\n";
             }
