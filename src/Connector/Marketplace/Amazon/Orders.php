@@ -37,7 +37,7 @@ class Orders
             WHERE marketplace_id = ?",
             [$this->amazonConnector->getMarketplace()->getId()]
         );
-        return $lastUpdateTime ?? gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 hour'));
+        return $lastUpdateTime ?? gmdate('Y-m-d\TH:i:s\Z', strtotime('-10 years'));
     }
 
     public function getOrders()
@@ -102,7 +102,7 @@ class Orders
     {
         $this->getOrders();
         $this->downloadOrderItems();
-        //$this->saveOrders();
+        $this->saveOrders();
         file_put_contents(
             PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->amazonConnector->getMarketplace()->getKey()).'/orders.json', 
             json_encode($this->orders, JSON_PRETTY_PRINT)
