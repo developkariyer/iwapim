@@ -17,6 +17,7 @@ use App\Connector\Marketplace\Amazon\Listings as ListingsHelper;
 use App\Connector\Marketplace\Amazon\Import as ImportHelper;
 use App\Connector\Marketplace\Amazon\Orders as OrdersHelper;
 use App\Utils\Utility;
+use App\Utils\Registry;
 
 class Connector extends MarketplaceConnectorAbstract
 {
@@ -123,11 +124,13 @@ class Connector extends MarketplaceConnectorAbstract
                     echo "$country: $amount ";
                     Utility::upsertRow($newStock, [$country, $amount, gmdate('Y-m-d')]);
                 }
-                if ($oldStock !== $newStock || (!empty($fnsku[$asin]) && $variantObject->getFnsku() !== $fnsku[$asin])) {
+                if ($oldStock !== $newStock) {
                     $variantObject->setStock($newStock);
-                    $variantObject->setFnsku($fnsku[$asin]);
                     $variantObject->save();
                     echo "Saved";
+                }
+                if (!empty($fnsku[$asin])) {
+                    Registry::setKey($fnsku[$asin], $asin, 'fnsku');
                 }
                 echo "\n";
             }

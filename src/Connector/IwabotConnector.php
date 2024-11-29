@@ -4,6 +4,7 @@ namespace App\Connector;
 
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use App\Utils\Registry;
 
 class IwabotConnector
 {
@@ -17,9 +18,10 @@ class IwabotConnector
             $data = str_getcsv($line, ",");
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
-                $variantProduct = VariantProduct::getByFnsku($rowData['FNSKU'], ['limit' => 1]);
+                $asin = Registry::getKey($rowData['FNSKU'], 'fnsku');
+                $variantProduct = $asin ? VariantProduct::getByUniqueMarketplaceId($asin, ['limit' => 1]) : null;
                 if ($variantProduct) {
-                    echo "Updating {$rowData['FNSKU']} inventory ";
+                    echo "Updating $asin inventory ";
                     $oldStock = $variantProduct->getStock();
                     $newStock = $oldStock;
                     Utility::upsertRow($newStock, ['ABD Depo', $rowData['Count in Raf'], gmdate('Y-m-d')]);
