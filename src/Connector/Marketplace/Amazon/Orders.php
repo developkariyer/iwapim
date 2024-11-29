@@ -105,7 +105,10 @@ class Orders
 
     public function downloadOrderItems()
     {
+        $index = 0;
         foreach ($this->orders as &$order) {
+            $index++;
+            if (!$index%10) echo "#";
             $order['OrderItems'] = $this->getOrderItems($order['AmazonOrderId']);
         }
     }
