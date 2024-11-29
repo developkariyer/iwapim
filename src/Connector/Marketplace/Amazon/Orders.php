@@ -88,13 +88,14 @@ class Orders
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
                 $this->orderItemRateSuccess++;
-                if ($this->orderItemRateSuccess > 10 && $this->orderItemRateLimit > 1) {
+                if ($this->orderItemRateSuccess > 5 && $this->orderItemRateLimit > 1) {
                     $this->orderItemRateLimit--;
                     echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
                     $this->orderItemRateSuccess = 0;
                 }
             } catch (\Exception $e) {
-                $this->orderItemRateLimit++;
+                $this->orderItemRateLimit=5;
+                $this->orderItemRateSuccess = 0;
                 echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
             }
             sleep($this->orderItemRateLimit);
