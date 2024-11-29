@@ -98,6 +98,7 @@ class Connector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         $inventory = [];
+        $fnsku = [];
         $this->reportsHelper->downloadAllReports(forceDownload: false, silent: true);
         $lines = explode("\n", mb_convert_encoding(trim($this->reportsHelper->amazonReports['GET_AFN_INVENTORY_DATA_BY_COUNTRY']), 'UTF-8', 'UTF-8'));
         $header = str_getcsv(array_shift($lines), "\t");
@@ -108,7 +109,8 @@ class Connector extends MarketplaceConnectorAbstract
                 if (!isset($inventory[$rowData['asin']])) {
                     $inventory[$rowData['asin']] = [];
                 }
-                $inventory[$rowData['asin']][$rowData['country']] = $rowData['quantity-for-local-fulfillment'];                
+                $inventory[$rowData['asin']][$rowData['country']] = $rowData['quantity-for-local-fulfillment'];
+                $fnsku[$rowData['asin']] = $rowData['fnsku'];                
             }
         }
         foreach ($inventory as $asin=>$data) {
@@ -121,10 +123,11 @@ class Connector extends MarketplaceConnectorAbstract
                     echo "$country: $amount ";
                     Utility::upsertRow($newStock, [$country, $amount, gmdate('Y-m-d')]);
                 }
-                if ($oldStock !== $newStock) {
-                    echo "Saved";
+                if ($oldStock !== $newStock || (!empty($fnsku[$asin]) && $variantObject->getFnsku() !== $fnsku[$asin])) {
                     $variantObject->setStock($newStock);
+                    $variantObject->setFnsku($fnsku[$asin]);
                     $variantObject->save();
+                    echo "Saved";
                 }
                 echo "\n";
             }
