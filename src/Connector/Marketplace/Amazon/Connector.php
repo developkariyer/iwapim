@@ -133,9 +133,9 @@ class Connector extends MarketplaceConnectorAbstract
                 $newStock = $oldStock;
                 foreach ($data as $country=>$amount) {
                     echo "$country: $amount ";
-                    upsertRow($newStock, [$country, $amount]);
+                    upsertRow($newStock, [$country, $amount, gmdate('Y-m-d H:i:s') . 'Z']);
                 }
-                if ($oldStock != $newStock) {
+                if ($oldStock !== $newStock) {
                     echo "Saved";
                     $variantObject->setStock($newStock);
                     $variantObject->save();
