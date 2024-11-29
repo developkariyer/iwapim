@@ -50,27 +50,15 @@ class Orders
         $lastUpdatedAfter = $this->getLastUpdateTime();
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
         $rateLimitSleep = 60;
-        $burstLimit = 20;
-        $tokens = $burstLimit;
-        $lastRequestTime = microtime(true);
         do {
-            $currentTime = microtime(true);
-            $tokensToAdd = floor(($currentTime - $lastRequestTime) / $rateLimitSleep);
-            $tokens = min($burstLimit, $tokens + $tokensToAdd);
-            $lastRequestTime += $tokensToAdd * $rateLimitSleep;
-            if ($tokens > 0) {
-                $response = $nextToken 
-                    ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
-                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
-                $responseJson = $response->json();
-                $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
-                $nextToken = $responseJson['payload']['NextToken'] ?? null;        
-                echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
-                $tokens--;
-            } else {
-                $sleepDuration = $rateLimitSleep - ($currentTime - $lastRequestTime);
-                sleep(max(0, $sleepDuration));
-            }
+            $response = $nextToken 
+                ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
+                : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2023-01-01T00:00:00Z");
+            $responseJson = $response->json();
+            $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
+            $nextToken = $responseJson['payload']['NextToken'] ?? null;        
+            echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
+            sleep($rateLimitSleep);
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
         $this->orders = $orders;
