@@ -62,7 +62,7 @@ class Orders
                 echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
             } catch (\Exception $e) {
                 $this->orderRateLimit = 60;
-                echo $e->getMessage() . "\n";
+                echo "Order rate limit set to 60 seconds\n";
             }
             sleep($this->orderRateLimit);
         } while ($nextToken);
@@ -84,8 +84,8 @@ class Orders
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
             } catch (\Exception $e) {
-                $this->orderItemRateLimit = 2;
-                echo $e->getMessage() . "\n";
+                $this->orderItemRateLimit = 5;
+                echo "OrderItem rate limit set to 5 seconds\n";
             }
             sleep($this->orderItemRateLimit);
         } while ($nextToken);
