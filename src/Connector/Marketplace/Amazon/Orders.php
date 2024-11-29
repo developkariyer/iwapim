@@ -90,13 +90,13 @@ class Orders
                 $this->orderItemRateSuccess++;
                 if ($this->orderItemRateSuccess > 5 && $this->orderItemRateLimit > 1) {
                     $this->orderItemRateLimit = $this->orderItemRateLimit>5 ? 5 : $this->orderItemRateLimit-1;
-                    echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
+                    echo "{$this->orderItemRateLimit}";
                     $this->orderItemRateSuccess = 0;
                 }
             } catch (\Exception $e) {
                 $this->orderItemRateLimit= $this->orderItemRateLimit<5 ? 5 : $this->orderItemRateLimit+1;
                 $this->orderItemRateSuccess = 0;
-                echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
+                echo "-{$this->orderItemRateLimit}";
             }
             sleep($this->orderItemRateLimit);
         } while ($nextToken);
