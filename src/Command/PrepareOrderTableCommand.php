@@ -19,6 +19,7 @@ use App\Utils\Utility;
     name: 'app:prepare-table'
 )]
 
+
 class PrepareOrderTableCommand extends AbstractCommand
 {
     private $marketplaceListWithIds = [];
