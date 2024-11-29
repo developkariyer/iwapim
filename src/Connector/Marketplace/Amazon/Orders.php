@@ -49,15 +49,20 @@ class Orders
         $orders = [];
         $lastUpdatedAfter = $this->getLastUpdateTime();
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
-        $rateLimitSleep = 60;
+        $rateLimitSleep = 1; // normally set to 60
         do {
-            $response = $nextToken 
-                ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
-                : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2023-01-01T00:00:00Z");
-            $responseJson = $response->json();
-            $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
-            $nextToken = $responseJson['payload']['NextToken'] ?? null;        
-            echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
+            try {
+                $response = $nextToken 
+                    ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
+                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2023-01-01T00:00:00Z");
+                $responseJson = $response->json();
+                $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
+                $nextToken = $responseJson['payload']['NextToken'] ?? null;        
+                echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
+            } catch (\Exception $e) {
+                $rateLimitSleep = 60;
+                continue;
+            }
             sleep($rateLimitSleep);
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
