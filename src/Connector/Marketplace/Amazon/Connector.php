@@ -119,7 +119,7 @@ class Connector extends MarketplaceConnectorAbstract
                 $newStock = $oldStock;
                 foreach ($data as $country=>$amount) {
                     echo "$country: $amount ";
-                    Utility::upsertRow($newStock, [$country, $amount, gmdate('Y-m-d H:i:s') . 'Z']);
+                    Utility::upsertRow($newStock, [$country, $amount, gmdate('Y-m-d')]);
                 }
                 if ($oldStock !== $newStock) {
                     echo "Saved";
