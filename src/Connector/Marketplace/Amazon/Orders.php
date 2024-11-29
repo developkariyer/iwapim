@@ -11,6 +11,8 @@ class Orders
     public $amazonConnector;
     public $ordersApi;
     public $marketplaceIds;
+    public $orderItemRateLimit = 0;
+    public $orderRateLimit = 1;
 
     public $db;
     public $orders = [];
@@ -49,21 +51,20 @@ class Orders
         $orders = [];
         $lastUpdatedAfter = $this->getLastUpdateTime();
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
-        $rateLimitSleep = 1; // normally set to 60
         do {
             try {
                 $response = $nextToken 
                     ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
-                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2022-11-15T00:00:00Z");
+                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2022-11-08T00:00:00Z");
                 $responseJson = $response->json();
                 $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
             } catch (\Exception $e) {
-                $rateLimitSleep = 60;
+                $this->orderRateLimit = 60;
                 echo $e->getMessage() . "\n";
             }
-            sleep($rateLimitSleep);
+            sleep($this->orderRateLimit);
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
         $this->orders = $orders;
@@ -73,7 +74,6 @@ class Orders
     {
         $nextToken = null;
         $orderItems = [];
-        $rateLimitSleep = 2; // normally set to 2
         do {
             try {
                 $response = $nextToken 
@@ -84,10 +84,10 @@ class Orders
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
             } catch (\Exception $e) {
-                $rateLimitSleep = 3;
+                $this->orderItemRateLimit = 2;
                 echo $e->getMessage() . "\n";
             }
-            sleep($rateLimitSleep);
+            sleep($this->orderItemRateLimit);
         } while ($nextToken);
         return $orderItems;
     }
