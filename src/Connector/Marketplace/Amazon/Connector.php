@@ -8,6 +8,7 @@ use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\PatchOperation;
 
 use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
@@ -92,62 +93,24 @@ class Connector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $this->ordersHelper->downloadOrders();
-    
-        /*
-        $db = \Pimcore\Db::get();
-        $lastUpdateAt = $this->getLatestOrderUpdate();
-        echo "Last Update: $lastUpdateAt\n";
-        $ordersApi = $this->amazonSellerConnector->ordersV0();
-        $marketplaceIds = array_map(function($country) {
-            return AmazonConstants::amazonMerchant[$country]['id'];
-        }, $this->countryCodes);
-        $marketplaceIds[] = AmazonConstants::amazonMerchant[$this->mainCountry]['id'];
-
-        $orderIds = [];
-        $nextToken = null;
-        $burst = 0;
-    
-        do {
-            $orders = $nextToken ? $ordersApi->getOrders(nextToken: $nextToken, marketplaceIds: $marketplaceIds) : $ordersApi->getOrders(createdAfter: $lastUpdateAt, marketplaceIds: $marketplaceIds);
-            $orders = $orders->json();
-            $pageOrderIds = array_map(function($order) {
-                return $order['AmazonOrderId'];
-            }, $orders['payload']['Orders']);
-            $orderIds = array_merge($orderIds, $pageOrderIds);
-            echo "Total Orders so far: " . count($orderIds) . "\n";
-            $nextToken = $orders['payload']['NextToken'] ?? null;
-            $burst++;
-            sleep($burst>20 ? 60 : 1);
-        } while ($nextToken);
-        $orderIds = array_unique($orderIds);
-        $orderIds = array_filter($orderIds);
-        echo "Final total orders: " . count($orderIds) . "\n";
-    
-        $db->beginTransaction();
-        try {
-            foreach ($orderIds as $orderId) {
-                echo "    $orderId\n";
-                $order = $ordersApi->getOrder(orderId: $orderId);
-                $order = $order->json();
-                $db->executeStatement(
-                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                    [
-                        $this->marketplace->getId(),
-                        $order['payload']['AmazonOrderId'],
-                        json_encode($order['payload']),
-                    ]
-                );
-                sleep(2);
-            }
-            $db->commit();
-        } catch (\Exception $e) {
-            $db->rollBack();
-            echo $e->getMessage();
-        }*/
     }
 
     public function downloadInventory(): void
     {
+        function upsertRow(&$table, $newRow) {
+            $found = false;
+            foreach ($table as &$row) {
+                if ($row[0] === $newRow[0]) {
+                    $row[1] = $newRow[1];
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $table[] = $newRow;
+            }
+        }
+
         $inventory = [];
         $this->reportsHelper->downloadAllReports(forceDownload: false, silent: true);
         $lines = explode("\n", mb_convert_encoding(trim($this->reportsHelper->amazonReports['GET_AFN_INVENTORY_DATA_BY_COUNTRY']), 'UTF-8', 'UTF-8'));
@@ -160,6 +123,24 @@ class Connector extends MarketplaceConnectorAbstract
                     $inventory[$rowData['asin']] = [];
                 }
                 $inventory[$rowData['asin']][$rowData['country']] = $rowData['quantity-for-local-fulfillment'];                
+            }
+        }
+        foreach ($inventory as $asin=>$data) {
+            $variantObject = VariantObject::getByAsin($asin, ['limit' => 1]);
+            if ($variantObject) {
+                echo "Updating $asin inventory ";
+                $oldStock = $variantObject->getStock();
+                $newStock = $oldStock;
+                foreach ($data as $country=>$amount) {
+                    echo "$country: $amount ";
+                    upsertRow($newStock, [$country, $amount]);
+                }
+                if ($oldStock != $newStock) {
+                    echo "Saved";
+                    $variantObject->setStock($newStock);
+                    $variantObject->save();
+                }
+                echo "\n";
             }
         }
         file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/inventory_test.json", json_encode($inventory, JSON_PRETTY_PRINT));
