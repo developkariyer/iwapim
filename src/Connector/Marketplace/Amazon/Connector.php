@@ -148,65 +148,21 @@ class Connector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        foreach ($this->countryCodes as $country) {
-            echo "\n    - $country ";
-            $filename = PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode(string: $this->marketplace->getKey()).'_'.$country.'_inventory.json';
-            if (file_exists(filename: $filename) && filemtime(filename: $filename) > time() - 86400) {
-                echo " (cached) ";
-                $allInventorySummaries = json_decode(file_get_contents($filename), true);
-            } else {
-                $inventoryApi = $this->amazonSellerConnector->fbaInventoryV1();
-                $nextToken = null;
-                $allInventorySummaries = [];
-                do {
-                    $response = $inventoryApi->getInventorySummaries(
-                        granularityType: 'Marketplace',
-                        granularityId: AmazonConstants::amazonMerchant[$country]['id'],
-                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-                        details: true,
-                        nextToken: $nextToken
-                    );
-                    $responseData = $response->json();
-                    $inventorySummaries = $responseData['payload']['inventorySummaries'] ?? [];
-                    $allInventorySummaries = array_merge($allInventorySummaries, $inventorySummaries);
-                    $nextToken = $responseData['pagination']['nextToken'] ?? null;
-                    usleep(microseconds: 500000);
-                    echo ".";
-                } while ($nextToken);
-                file_put_contents(filename: $filename, data: json_encode(value: $allInventorySummaries));
-            }
-
-            $db = \Pimcore\Db::get();
-            $db->beginTransaction();
-            try {
-                foreach ($allInventorySummaries as $inventory) {
-                    $sql = "INSERT INTO iwa_amazon_inventory (";
-                    $dbFields = [];
-                    foreach ($inventory as $key=>$value) {
-                        if (is_array(value: $value)) {
-                            $value = json_encode(value: $value);
-                        }
-                        if ($key === 'condition') {
-                            $key = 'itemCondition';
-                        }
-                        $dbFields[$key] = $value;
-                    }
-                    $dbFields['countryCode'] = $country;
-                    $sql .= implode(separator: ',', array: array_keys($dbFields)) . ") VALUES (";
-                    $sql .= implode(separator: ',', array: array_fill(start_index: 0, count: count(value: $dbFields), value: '?')) . ")";
-                    $sql .= " ON DUPLICATE KEY UPDATE ";
-                    $sql .= implode(separator: ',', array: array_map(callback: function($key): string {
-                        return "$key=?";
-                    }, array: array_keys($dbFields)));
-                    $stmt = $db->prepare($sql);
-                    $stmt->execute(array_merge(arrays: array_values(array: $dbFields), array_array: values($dbFields)));
+        $inventory = [];
+        $this->reportsHelper->downloadAllReports(forceDownload: false, silent: true);
+        $lines = explode("\n", mb_convert_encoding(trim($this->reportsHelper->amazonReports['GET_AFN_INVENTORY_DATA_BY_COUNTRY']), 'UTF-8', 'UTF-8'));
+        $header = str_getcsv(array_shift($lines), "\t");
+        foreach ($lines as $line) {
+            $data = str_getcsv($line, "\t");
+            if (count($header) == count($data)) {
+                $rowData = array_combine($header, $data);
+                if (!isset($inventory[$rowData['asin']])) {
+                    $inventory[$rowData['asin']] = [];
                 }
-                $db->commit();
-            } catch (\Exception $e) {
-                $db->rollBack();
-                echo $e->getMessage();
+                $inventory[$rowData['asin']][$rowData['country']] = $rowData['quantity-for-local-fulfillment'];                
             }
         }
+        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/inventory_test.json", json_encode($inventory, JSON_PRETTY_PRINT));
     }
 
     public function patchCustom($sku, $country = null, $attribute, $operation, $value = null)

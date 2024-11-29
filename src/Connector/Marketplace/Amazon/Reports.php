@@ -31,10 +31,12 @@ class Reports
         $this->amazonConnector = $amazonConnector;
     }
 
-    public function downloadAmazonReport($reportType, $forceDownload, $country)
+    public function downloadAmazonReport($reportType, $forceDownload, $country, $silent = false)
     {
         $marketplaceKey = urlencode( $this->amazonConnector->getMarketplace()->getKey());
-        echo "        Downloading Report $reportType ";
+        if (!$silent) {
+            echo "        Downloading Report $reportType ";
+        }
         $report = Utility::getCustomCache(
             "{$reportType}_{$country}.csv", 
             PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}"
@@ -65,7 +67,9 @@ class Reports
             );
             echo "OK ";
         } else {
-            echo "Cached ";
+            if (!$silent) {
+                echo "Cached ";
+            }
         }
         if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
             $report = gzdecode(data: $report);
@@ -76,16 +80,20 @@ class Reports
         return $report;
     }
 
-    public function downloadAllReports($forceDownload)
+    public function downloadAllReports($forceDownload, $silent = false)
     {
         foreach (array_keys($this->amazonReports) as $reportType) {
-            echo "\n  Downloading {$reportType} for main Amazon region {$this->amazonConnector->mainCountry}\n";
-            $this->amazonReports[$reportType] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $this->amazonConnector->mainCountry);
+            if (!$silent) {
+                echo "\n  Downloading {$reportType} for main Amazon region {$this->amazonConnector->mainCountry}\n";
+            }
+            $this->amazonReports[$reportType] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $this->amazonConnector->mainCountry, silent: $silent);
         }
         foreach ($this->amazonConnector->countryCodes as $country) {
             foreach (array_keys($this->amazonCountryReports) as $reportType) {
-                echo "\n  Downloading {$reportType} for Amazon region $country\n";
-                $this->amazonCountryReports[$reportType][$country] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $country);
+                if (!$silent) {
+                    echo "\n  Downloading {$reportType} for Amazon region $country\n";
+                }
+                $this->amazonCountryReports[$reportType][$country] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $country, silent: $silent);
             }
         }
     }
