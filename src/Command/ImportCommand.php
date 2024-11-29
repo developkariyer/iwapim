@@ -22,7 +22,7 @@ use App\Connector\Marketplace\TakealotConnector;
 use App\Connector\Marketplace\WallmartConnector;
 use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Connector\Marketplace\HepsiburadaConnector;
-
+use App\Connector\IwabotConnector;
 
 
 
@@ -83,11 +83,10 @@ class ImportCommand extends AbstractCommand
             ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
             ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
             ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
+            ->addOption('iwabot', null, InputOption::VALUE_NONE, 'Downloads inventory from iwabot/USA warehouse')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Test command.')
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
-    
-    
 
     private static function getMarketplaceObjects($type = null): array
     {
@@ -208,6 +207,10 @@ class ImportCommand extends AbstractCommand
 
             if ($input->getOption('memory-table')) {
                 return self::prepareShopifyLineItems();
+            }
+
+            if ($input->getOption('iwabot')) {
+                IwabotConnector::downloadReport();
             }
 
             $marketplaces = self::getMarketplaceObjects();
