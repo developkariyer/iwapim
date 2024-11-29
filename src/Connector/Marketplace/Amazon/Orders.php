@@ -22,7 +22,7 @@ class Orders
         $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']];
         $nextToken = null;
         $orders = [];
-        $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 week'));
+        $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 month'));
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
         do {
             $response = $nextToken 
@@ -39,6 +39,8 @@ class Orders
             $remaining = $response->header('x-amzn-RateLimit-Remaining') ?? 0;
             $resetTime = $response->header('x-amzn-RateLimit-ResetTime') ?? null;
         
+            echo "Remaining: $remaining, Reset Time: $resetTime\n";
+
             // Calculate sleep time if rate limit is reached
             if ($remaining == 0 && $resetTime) {
                 $resetTimestamp = strtotime($resetTime); // Convert reset time to a timestamp
