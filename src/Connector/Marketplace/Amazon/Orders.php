@@ -10,48 +10,53 @@ class Orders
 {
     public $amazonConnector;
 
+    public $db;
+
     public function __construct(AmazonConnector $amazonConnector) 
     {
         $this->amazonConnector = $amazonConnector;
+        $this->db = \Pimcore\Db::get();
+    }
+
+    public function getLastUpdateTime()
+    {
+        $query = "SELECT MAX(last_updated) as last_updated FROM amazon_orders";
+        $stmt = $this->db->query($query);
+        $result = $stmt->fetch();
+        return $result['last_updated'];
     }
 
     public function downloadOrders()
     {
-        //$db = \Pimcore\Db::get();
         $ordersApi = $this->amazonConnector->amazonSellerConnector->ordersV0();
         $marketplaceIds = [AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['id']];
         $nextToken = null;
         $orders = [];
-        $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 month'));
+        $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-10 years'));
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
         $rateLimitSleep = 60;
-        $burstLimit = 20; 
-        $callCounter = 0; 
-        $burstWindowStart = microtime(true);
+        $burstLimit = 20;
+        $tokens = $burstLimit;
+        $lastRequestTime = microtime(true);
         do {
-            $response = $nextToken 
-                ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) 
-                : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
+            $currentTime = microtime(true);
+            $tokensToAdd = floor(($currentTime - $lastRequestTime) / $rateLimitSleep);
+            $tokens = min($burstLimit, $tokens + $tokensToAdd);
+            $lastRequestTime += $tokensToAdd * $rateLimitSleep;
         
-            $dto = $response->dto();
-            $orders = array_merge($orders, $dto->payload->orders ?? []);
-            $nextToken = $dto->payload->nextToken ?? null;
+            if ($tokens > 0) {
+                $response = $nextToken 
+                    ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) 
+                    : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
+                $dto = $response->dto();
+                $orders = array_merge($orders, $dto->payload->orders ?? []);
+                $nextToken = $dto->payload->nextToken ?? null;
         
-            echo ".";
-        
-            $callCounter++;
-        
-            if ($callCounter >= $burstLimit) {
-                $elapsedTime = microtime(true) - $burstWindowStart;
-                if ($elapsedTime < $rateLimitSleep) {
-                    $sleepDuration = $rateLimitSleep - $elapsedTime;
-                    echo "Burst limit reached. Sleeping for $sleepDuration seconds...\n";
-                    sleep($sleepDuration);
-                }
-                $callCounter = 0;
-                $burstWindowStart = microtime(true);
+                echo ".";
+                $tokens--;
             } else {
-                usleep(1e6);
+                $sleepDuration = $rateLimitSleep - ($currentTime - $lastRequestTime);
+                sleep(max(0, $sleepDuration));
             }
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
