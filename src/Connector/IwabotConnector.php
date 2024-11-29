@@ -19,7 +19,7 @@ class IwabotConnector
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
                 $asin = Registry::getKey($rowData['FNSKU'], 'fnsku-to-asin') ?? $rowData['FNSKU'];
-                $variantProduct = VariantProduct::getByUniqueMarketplaceId($asin, ['limit' => 1]) : null;
+                $variantProduct = VariantProduct::getByUniqueMarketplaceId($asin, ['limit' => 1]);
                 if ($variantProduct) {
                     echo "Updating $asin inventory ";
                     $oldStock = $variantProduct->getStock();
