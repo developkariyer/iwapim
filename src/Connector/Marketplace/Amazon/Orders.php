@@ -52,7 +52,7 @@ class Orders
         $orders = [];
         $lastUpdatedAfter = $this->getLastUpdateTime();
         $date = new \DateTime($lastUpdatedAfter, new \DateTimeZone('UTC'));
-        $date->modify('+3 days');
+        $date->modify('+2 days');
         $lastUpdateBefore = $date->format('Y-m-d\TH:i:s\Z');
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
         do {
