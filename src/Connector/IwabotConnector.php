@@ -13,6 +13,7 @@ class IwabotConnector
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/iwabot.csv", $report);
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
         $header = str_getcsv(array_shift($lines), "\t");
+        print_r($header);
         foreach ($lines as $line) {
             $data = str_getcsv($line, "\t");
             if (count($header) == count($data)) {
