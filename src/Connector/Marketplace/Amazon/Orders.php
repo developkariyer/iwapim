@@ -61,7 +61,7 @@ class Orders
                 echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
             } catch (\Exception $e) {
                 $rateLimitSleep = 60;
-                continue;
+                echo $e->getMessage() . "\n";
             }
             sleep($rateLimitSleep);
         } while ($nextToken);
@@ -73,15 +73,20 @@ class Orders
     {
         $nextToken = null;
         $orderItems = [];
-        $rateLimitSleep = 2;
+        $rateLimitSleep = 0; // normally set to 2
         do {
-            $response = $nextToken 
-                ? $this->ordersApi->getOrderItems($amazonOrderId, nextToken: $nextToken) 
-                : $this->ordersApi->getOrderItems($amazonOrderId);
-            $responseJson = $response->json();
-            $orderItems = array_merge($orderItems, $responseJson['payload']['OrderItems'] ?? []);
-            $nextToken = $responseJson['payload']['NextToken'] ?? null;        
-            echo ".";
+            try {
+                $response = $nextToken 
+                    ? $this->ordersApi->getOrderItems($amazonOrderId, nextToken: $nextToken) 
+                    : $this->ordersApi->getOrderItems($amazonOrderId);
+                $responseJson = $response->json();
+                $orderItems = array_merge($orderItems, $responseJson['payload']['OrderItems'] ?? []);
+                $nextToken = $responseJson['payload']['NextToken'] ?? null;        
+                echo ".";
+            } catch (\Exception $e) {
+                $rateLimitSleep = 2;
+                echo $e->getMessage() . "\n";
+            }
             sleep($rateLimitSleep);
         } while ($nextToken);
         return $orderItems;
