@@ -5,7 +5,7 @@ namespace App\Select;
 use Pimcore\Model\DataObject\ClassDefinition\Data;
 use Pimcore\Model\DataObject\ClassDefinition\DynamicOptionsProvider\SelectOptionsProviderInterface;
 
-use App\Connector\Marketplace\Amazon\AmazonConstants;
+use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 
 class AmazonMerchantIdList implements SelectOptionsProviderInterface
 {
