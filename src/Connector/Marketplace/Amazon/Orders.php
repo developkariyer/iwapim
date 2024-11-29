@@ -73,7 +73,7 @@ class Orders
     {
         $nextToken = null;
         $orderItems = [];
-        $rateLimitSleep = 0; // normally set to 2
+        $rateLimitSleep = 1; // normally set to 2
         do {
             try {
                 $response = $nextToken 
@@ -84,7 +84,7 @@ class Orders
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
             } catch (\Exception $e) {
-                $rateLimitSleep = 2;
+                $rateLimitSleep = 5;
                 echo $e->getMessage() . "\n";
             }
             sleep($rateLimitSleep);
