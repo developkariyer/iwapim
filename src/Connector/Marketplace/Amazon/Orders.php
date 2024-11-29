@@ -88,7 +88,7 @@ class Orders
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
                 $this->orderItemRateSuccess++;
-                if ($this->orderItemRateSuccess > 5 && $this->orderItemRateLimit > 1) {
+                if ($this->orderItemRateSuccess > 3 && $this->orderItemRateLimit > 1) {
                     $this->orderItemRateLimit = $this->orderItemRateLimit>5 ? 5 : $this->orderItemRateLimit-1;
                     echo "{$this->orderItemRateLimit}";
                     $this->orderItemRateSuccess = 0;
