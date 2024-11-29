@@ -13,12 +13,10 @@ class IwabotConnector
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/iwabot.csv", $report);
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
         $header = str_getcsv(array_shift($lines), ",");
-        print_r($header);
         foreach ($lines as $line) {
             $data = str_getcsv($line, ",");
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
-                print_r($rowData);
                 $variantProduct = VariantProduct::getByFnsku($rowData['FNSKU'], ['limit' => 1]);
                 if ($variantProduct) {
                     echo "Updating {$rowData['FNSKU']} inventory ";
