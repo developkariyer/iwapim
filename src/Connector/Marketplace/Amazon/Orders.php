@@ -21,6 +21,9 @@ class Orders
         $this->db = \Pimcore\Db::get();
         $this->ordersApi = $amazonConnector->amazonSellerConnector->ordersV0();
         $this->marketplaceIds = [AmazonConstants::amazonMerchant[$amazonConnector->mainCountry]['id']];
+        foreach ($amazonConnector->countryCodes as $countryCode) {
+            $this->marketplaceIds[] = AmazonConstants::amazonMerchant[$countryCode]['id'];
+        }
     }
 
     public function getLastUpdateTime()
