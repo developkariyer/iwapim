@@ -15,7 +15,7 @@ class Registry
     {
         $db = \Pimcore\Db::get();
         $sql = "INSERT INTO iwa_registry (regkey, regvalue, regtype) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE regvalue = ?";
-        $db->query($sql, [$regkey, $regvalue, $regtype, $regvalue]);
+        $db->executeStatement($sql, [$regkey, $regvalue, $regtype, $regvalue]);
     }
 
     public static function searchValue($regvalue, $regtype = 'DEFAULT')
