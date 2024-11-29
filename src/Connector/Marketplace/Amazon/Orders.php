@@ -74,6 +74,7 @@ class Orders
     {
         $nextToken = null;
         $orderItems = [];
+        $success = 0;
         do {
             try {
                 $response = $nextToken 
@@ -83,9 +84,15 @@ class Orders
                 $orderItems = array_merge($orderItems, $responseJson['payload']['OrderItems'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
+                $success++;
+                if ($success > 10 && $this->orderItemRateLimit > 1) {
+                    $this->orderItemRateLimit--;
+                    echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
+                    
+                }
             } catch (\Exception $e) {
-                $this->orderItemRateLimit = 5;
-                echo "OrderItem rate limit set to 5 seconds\n";
+                $this->orderItemRateLimit++;
+                echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
             }
             sleep($this->orderItemRateLimit);
         } while ($nextToken);
