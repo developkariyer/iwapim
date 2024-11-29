@@ -126,7 +126,7 @@ class Connector extends MarketplaceConnectorAbstract
             }
         }
         foreach ($inventory as $asin=>$data) {
-            $variantObject = VariantObject::getByAsin($asin, ['limit' => 1]);
+            $variantObject = VariantObject::getByUniqueMarketplaceId($asin, ['limit' => 1]);
             if ($variantObject) {
                 echo "Updating $asin inventory ";
                 $oldStock = $variantObject->getStock();
