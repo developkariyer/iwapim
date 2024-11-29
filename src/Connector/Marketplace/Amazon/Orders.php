@@ -12,6 +12,7 @@ class Orders
     public $ordersApi;
     public $marketplaceIds;
     public $orderItemRateLimit = 0;
+    public $orderItemRateSuccess = 0;
     public $orderRateLimit = 1;
 
     public $db;
@@ -74,7 +75,6 @@ class Orders
     {
         $nextToken = null;
         $orderItems = [];
-        $success = 0;
         do {
             try {
                 $response = $nextToken 
@@ -84,11 +84,11 @@ class Orders
                 $orderItems = array_merge($orderItems, $responseJson['payload']['OrderItems'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ".";
-                $success++;
-                if ($success > 10 && $this->orderItemRateLimit > 1) {
+                $this->orderItemRateSuccess++;
+                if ($this->orderItemRateSuccess > 10 && $this->orderItemRateLimit > 1) {
                     $this->orderItemRateLimit--;
                     echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
-                    $success = 0;
+                    $this->orderItemRateSuccess = 0;
                 }
             } catch (\Exception $e) {
                 $this->orderItemRateLimit++;
