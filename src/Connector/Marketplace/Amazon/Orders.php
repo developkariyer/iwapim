@@ -31,6 +31,8 @@ class Orders
 
             $dto = $response->dto();
 
+            print_r($dto->payload); exit;
+
             $orders = array_merge($orders, $dto->payload->Orders ?? []);
             $nextToken = $dto->payload->NextToken ?? null;
         
