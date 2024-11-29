@@ -36,7 +36,7 @@ class Orders
         
             // Extract rate limit information from headers
             
-            print_r($response->headers());exit;
+            print_r($response->headers());
 
             $remaining = $response->headers()['x-amzn-RateLimit-Remaining'] ?? 0;
             $resetTime = $response->headers()['x-amzn-RateLimit-ResetTime'] ?? null;
