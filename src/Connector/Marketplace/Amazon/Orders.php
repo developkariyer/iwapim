@@ -28,15 +28,16 @@ class Orders
             $response = $nextToken 
                 ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) 
                 : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
-        
-            $responseBody = $response->json();
-            $orders = array_merge($orders, $responseBody['payload']['Orders'] ?? []);
-            $nextToken = $responseBody['payload']['NextToken'] ?? null;
+
+            $dto = $response->dto();
+
+            $orders = array_merge($orders, $dto->payload->Orders ?? []);
+            $nextToken = $dto->payload->NextToken ?? null;
         
             // Extract rate limit information from headers
-            $headers = $response->headers();
-            $remaining = $headers['x-amzn-RateLimit-Remaining'] ?? 0;
-            $resetTime = $headers['x-amzn-RateLimit-ResetTime'] ?? null;
+            $headers = 
+            $remaining = $response->header('x-amzn-RateLimit-Remaining') ?? 0;
+            $resetTime = $response->header('x-amzn-RateLimit-ResetTime') ?? null;
         
             // Calculate sleep time if rate limit is reached
             if ($remaining == 0 && $resetTime) {
