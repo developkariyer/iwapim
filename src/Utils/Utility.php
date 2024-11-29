@@ -9,6 +9,20 @@ use App\Command\CacheImagesCommand;
 
 class Utility
 {
+    public static function upsertRow(&$table, $newRow) {
+        $found = false;
+        foreach ($table as &$row) {
+            if ($row[0] === $newRow[0]) {
+                $row = array_merge([$row[0]], array_slice($newRow, 1));
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $table[] = $newRow;
+        }
+    }
+
     public static function findImageByName($imageName)
     {
         if (strlen($imageName)) {

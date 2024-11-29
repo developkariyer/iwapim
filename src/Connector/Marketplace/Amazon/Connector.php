@@ -97,20 +97,6 @@ class Connector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        function upsertRow(&$table, $newRow) {
-            $found = false;
-            foreach ($table as &$row) {
-                if ($row[0] === $newRow[0]) {
-                    $row = array_merge([$row[0]], array_slice($newRow, 1));
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $table[] = $newRow;
-            }
-        }
-
         $inventory = [];
         $this->reportsHelper->downloadAllReports(forceDownload: false, silent: true);
         $lines = explode("\n", mb_convert_encoding(trim($this->reportsHelper->amazonReports['GET_AFN_INVENTORY_DATA_BY_COUNTRY']), 'UTF-8', 'UTF-8'));
@@ -133,7 +119,7 @@ class Connector extends MarketplaceConnectorAbstract
                 $newStock = $oldStock;
                 foreach ($data as $country=>$amount) {
                     echo "$country: $amount ";
-                    upsertRow($newStock, [$country, $amount, gmdate('Y-m-d H:i:s') . 'Z']);
+                    Utility::upsertRow($newStock, [$country, $amount, gmdate('Y-m-d H:i:s') . 'Z']);
                 }
                 if ($oldStock !== $newStock) {
                     echo "Saved";
