@@ -31,10 +31,8 @@ class Orders
 
             $dto = $response->dto();
 
-            print_r($dto->payload); exit;
-
-            $orders = array_merge($orders, $dto->payload->Orders ?? []);
-            $nextToken = $dto->payload->NextToken ?? null;
+            $orders = array_merge($orders, $dto->payload->orders ?? []);
+            $nextToken = $dto->payload->nextToken ?? null;
         
             // Extract rate limit information from headers
             $headers = 
