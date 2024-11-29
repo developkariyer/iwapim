@@ -51,7 +51,7 @@ class Orders
                 $callCounter = 0;
                 $burstWindowStart = microtime(true);
             } else {
-                usleep($rateLimitSleep * 1e6);
+                usleep(1e6);
             }
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
