@@ -88,7 +88,7 @@ class Orders
                 if ($success > 10 && $this->orderItemRateLimit > 1) {
                     $this->orderItemRateLimit--;
                     echo "OrderItem rate limit set to {$this->orderItemRateLimit} seconds\n";
-                    
+                    $success = 0;
                 }
             } catch (\Exception $e) {
                 $this->orderItemRateLimit++;
