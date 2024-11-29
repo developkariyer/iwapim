@@ -54,7 +54,7 @@ class Orders
             try {
                 $response = $nextToken 
                     ? $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, nextToken: $nextToken) 
-                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2023-01-01T00:00:00Z");
+                    : $this->ordersApi->getOrders(marketplaceIds: $this->marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter, lastUpdatedBefore: "2022-11-15T00:00:00Z");
                 $responseJson = $response->json();
                 $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
