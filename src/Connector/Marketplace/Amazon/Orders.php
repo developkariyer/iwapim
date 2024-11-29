@@ -24,38 +24,35 @@ class Orders
         $orders = [];
         $lastUpdatedAfter = gmdate('Y-m-d\TH:i:s\Z', strtotime('-1 month'));
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
+        $rateLimitSleep = 60;
+        $burstLimit = 20; 
+        $callCounter = 0; 
+        $burstWindowStart = microtime(true);
         do {
             $response = $nextToken 
                 ? $ordersApi->getOrders(marketplaceIds: $marketplaceIds, nextToken: $nextToken) 
                 : $ordersApi->getOrders(marketplaceIds: $marketplaceIds, lastUpdatedAfter: $lastUpdatedAfter);
-
+        
             $dto = $response->dto();
-
             $orders = array_merge($orders, $dto->payload->orders ?? []);
             $nextToken = $dto->payload->nextToken ?? null;
         
-            // Extract rate limit information from headers
-            
-            print_r($response->headers());
-
-            $remaining = $response->headers()['x-amzn-RateLimit-Remaining'] ?? 0;
-            $resetTime = $response->headers()['x-amzn-RateLimit-ResetTime'] ?? null;
+            echo ".";
         
-            echo "Remaining: $remaining, Reset Time: $resetTime\n";
-
-            // Calculate sleep time if rate limit is reached
-            if ($remaining == 0 && $resetTime) {
-                $resetTimestamp = strtotime($resetTime); // Convert reset time to a timestamp
-                $currentTimestamp = time();
-                $sleepDuration = $resetTimestamp - $currentTimestamp;
+            $callCounter++;
         
-                if ($sleepDuration > 0) {
-                    echo "Rate limit reached. Sleeping for $sleepDuration seconds...\n";
+            if ($callCounter >= $burstLimit) {
+                $elapsedTime = microtime(true) - $burstWindowStart;
+                if ($elapsedTime < $rateLimitSleep) {
+                    $sleepDuration = $rateLimitSleep - $elapsedTime;
+                    echo "Burst limit reached. Sleeping for $sleepDuration seconds...\n";
                     sleep($sleepDuration);
                 }
+                $callCounter = 0;
+                $burstWindowStart = microtime(true);
+            } else {
+                usleep($rateLimitSleep * 1e6);
             }
-        
-            echo "."; // Progress indicator
         } while ($nextToken);
         echo "Total Orders: " . count($orders) . "\n";
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/amazon-orders.json", json_encode($orders));
