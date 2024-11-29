@@ -110,7 +110,7 @@ class Connector extends MarketplaceConnectorAbstract
                     $inventory[$rowData['asin']] = [];
                 }
                 $inventory[$rowData['asin']][$rowData['country']] = $rowData['quantity-for-local-fulfillment'];
-                $fnsku[$rowData['asin']] = $rowData['fnsku'];                
+                $fnsku[$rowData['asin']] = $rowData['fulfillment-channel-sku'];                
             }
         }
         foreach ($inventory as $asin=>$data) {
