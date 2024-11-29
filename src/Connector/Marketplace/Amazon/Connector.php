@@ -101,7 +101,7 @@ class Connector extends MarketplaceConnectorAbstract
             $found = false;
             foreach ($table as &$row) {
                 if ($row[0] === $newRow[0]) {
-                    $row[1] = $newRow[1];
+                    $row = array_merge([$row[0]], array_slice($newRow, 1));
                     $found = true;
                     break;
                 }
