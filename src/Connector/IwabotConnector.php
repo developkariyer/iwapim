@@ -18,6 +18,7 @@ class IwabotConnector
             $data = str_getcsv($line, "\t");
             if (count($header) == count($data)) {
                 $rowData = array_combine($header, $data);
+                print_r($rowData);
                 $variantProduct = VariantProduct::getByFnsku($rowData['FNSKU'], ['limit' => 1]);
                 if ($variantProduct) {
                     echo "Updating {$rowData['FNSKU']} inventory ";
