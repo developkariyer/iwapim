@@ -10,6 +10,7 @@ class IwabotConnector
     public static function downloadReport()
     {
         $report = file_get_contents('https://iwarden.iwaconcept.com/iwabot/warehouse/report.php?csv=1');
+        file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/iwabot.csv", $report);
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
         $header = str_getcsv(array_shift($lines), "\t");
         foreach ($lines as $line) {
