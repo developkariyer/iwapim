@@ -65,7 +65,7 @@ class Orders
                 $responseJson = $response->json();
                 $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
-                echo ".";
+                echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
                 $tokens--;
             } else {
                 $sleepDuration = $rateLimitSleep - ($currentTime - $lastRequestTime);
