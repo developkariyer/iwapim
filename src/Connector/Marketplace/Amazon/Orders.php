@@ -35,9 +35,11 @@ class Orders
             $nextToken = $dto->payload->nextToken ?? null;
         
             // Extract rate limit information from headers
-            $headers = 
-            $remaining = $response->header('x-amzn-RateLimit-Remaining') ?? 0;
-            $resetTime = $response->header('x-amzn-RateLimit-ResetTime') ?? null;
+            
+            print_r($response->headers());exit;
+
+            $remaining = $response->headers()['x-amzn-RateLimit-Remaining'] ?? 0;
+            $resetTime = $response->headers()['x-amzn-RateLimit-ResetTime'] ?? null;
         
             echo "Remaining: $remaining, Reset Time: $resetTime\n";
 
