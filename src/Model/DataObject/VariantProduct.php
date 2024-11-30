@@ -129,6 +129,7 @@ class VariantProduct extends Concrete
         if (!empty($variant['imageUrl'])) {
             $this->setImageUrl($variant['imageUrl']);
         }
+        $this->setStock([]);
         $this->setUrlLink($variant['urlLink'] ?? null);
         $this->setSalePrice($variant['salePrice'] ?? '');
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
