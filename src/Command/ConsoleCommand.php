@@ -82,7 +82,7 @@ class ConsoleCommand extends AbstractCommand
         ];
         $variantObject = new VariantProduct\Listing();
         $pageSize = 5;
-        $offset = 0;
+        $offset = 14000;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
         $index = $offset;
