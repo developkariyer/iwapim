@@ -111,7 +111,7 @@ class ConsoleCommand extends AbstractCommand
                         if (empty($sku)) {
                             continue;
                         }
-                        echo " $country $sku ";
+                        echo " $country:$sku";
                         $connector['connector']->getInfo($sku, $country);
                     }
                 }
