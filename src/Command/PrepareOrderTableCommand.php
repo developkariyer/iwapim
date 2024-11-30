@@ -16,7 +16,8 @@ use App\Utils\Utility;
 
 
 #[AsCommand(
-    name: 'app:prepare-order-table'
+    name: 'app:prepare-order-table',
+    description: 'Prepare orderItems table from orders table',
 )]
 
 
