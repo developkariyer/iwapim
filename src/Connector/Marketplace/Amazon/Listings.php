@@ -59,7 +59,7 @@ class Listings
     protected function processListingReport($country, $report)
     {
         $encoding = ($country === 'FR') ? 'ISO-8859-1' : 'UTF-8';
-        $lines = explode("\n", mb_convert_encoding(trim($report), $encoding, 'UTF-8'));
+        $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', $encoding));
         $header = str_getcsv(array_shift($lines), "\t");
         foreach ($lines as $line) {
             $data = str_getcsv($line, "\t");
