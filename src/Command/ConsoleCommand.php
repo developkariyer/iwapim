@@ -11,6 +11,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\GroupProduct;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 
@@ -27,6 +28,30 @@ class ConsoleCommand extends AbstractCommand
         $jwt = explode('.', $jwt);
         $jwt = json_decode(base64_decode($jwt[1]), true);
         return $jwt['exp'] - time();
+    }
+
+    public function connectAmazonUs()
+    {
+        $grp = GroupProduct::getById(267975);
+        $grpArray = [];
+        $prdListObj = new Product\Listing();
+        $prdListObj->setUnpublished(false);
+        $prdList = $prdListObj->load();
+        foreach ($prdList as $prd) {
+            echo "{$prd->getId()} ";
+            $listings = $prd->getListingItems();
+            foreach ($listings as $listing) {
+                echo "{$listing->getId()} ";
+                if ($listing->getMarketplace()->getId() == 149795) {
+                    $grpArray[] = $prd;
+                    echo "added";
+                    break;
+                }
+            }
+            echo "\n";
+        }
+        $grp->setProducts($grpArray);
+        $grp->save();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
