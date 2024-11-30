@@ -108,10 +108,7 @@ class Listings
         $totalCount = count($this->amazonConnector->listings);
         $index = 0;
         foreach ($this->amazonConnector->listings as $asin=>$listing) {
-            $index++; /*
-            if (empty($listing[$this->mainCountry])) {
-                continue;
-            }*/
+            $index++;
             echo "($index/$totalCount) Downloading $asin ...\n";
             $this->addToAsinBucket($asin, $forceDownload);
         }
