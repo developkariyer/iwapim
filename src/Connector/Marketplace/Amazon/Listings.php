@@ -74,16 +74,16 @@ class Listings
             error_log("Ignoring report with no valid header for country: $country");
             return;
         }
-        foreach ($lines as $line) {
+        foreach ($lines as $index=>$line) {
             $data = str_getcsv($line, "\t");
             if (count($header) !== count($data)) {
-                error_log("Column mismatch in line: $line. Skipping this row.");
+                error_log("Column mismatch in line ($index): $line. Skipping this row.");
                 continue;
             }
             $rowData = array_combine($header, $data);
             $asin = $rowData['asin1'] ?? $rowData['product-id'] ??'';
             if (empty($asin)) {
-                error_log("Missing ASIN in line: " . json_encode($rowData) . ". Skipping this row.");
+                error_log("Missing ASIN in line ($index): " . json_encode($rowData) . ". Skipping this row.");
                 continue;
             }
             if (empty($this->listings[$asin][$country])) {
