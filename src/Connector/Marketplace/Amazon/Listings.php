@@ -35,7 +35,7 @@ class Listings
         foreach ($items as $item) {
             $asin = $item['asin'] ?? '';
             $this->amazonConnector->listings[$asin]['catalog'] = $item;
-            Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->amazonConnector->getMarketplace()->getKey()), json_encode($item));
+            Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->amazonConnector->getMarketplace()->getKey()), json_encode($item, JSON_PRETTY_PRINT));
             Utility::storeJsonData($this->amazonConnector->getMarketplace()->getId(), $asin, $item);
         }
         sleep(1);
