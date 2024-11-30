@@ -88,10 +88,8 @@ class Listings
                 error_log("Missing ASIN in line ($index): " . json_encode($rowData) . ". Skipping this row.");
                 continue;
             }
-            if (empty($this->listings[$asin][$country])) {
-                $this->amazonConnector->listings[$asin] = $this->amazonConnector->listings[$asin] ?? [];
-                $this->amazonConnector->listings[$asin][$country] = [];
-            }
+            $this->amazonConnector->listings[$asin] = $this->amazonConnector->listings[$asin] ?? [];
+            $this->amazonConnector->listings[$asin][$country] = $this->amazonConnector->listings[$asin][$country] ?? [];
             $this->amazonConnector->listings[$asin][$country][] = $rowData;
         }
     }
