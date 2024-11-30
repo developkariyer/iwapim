@@ -18,7 +18,7 @@ class Inventory
     public function downloadInventory()
     {
         $inventoryApi = $this->amazonConnector->amazonSellerConnector->fbaInventoryV1();
-        foreach ($this->getMarketplace()->getFbaRegions() ?? [] as $country) {
+        foreach ($this->amazonConnector->getMarketplace()->getFbaRegions() ?? [] as $country) {
             $nextToken = null;
             $summary = [];
             do {
