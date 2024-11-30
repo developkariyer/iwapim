@@ -97,6 +97,10 @@ class ConsoleCommand extends AbstractCommand
                 $index++;
                 echo "\rProcessing $index {$listing->getId()}";
                 $amazonMarketplaces = $listing->getAmazonMarketplace() ?? [];
+                if (empty($amazonMarketplaces)) {
+                    continue;
+                }
+                echo "\n";
                 foreach ($amazonMarketplaces as $amazonMarketplace) {
                     $country = $amazonMarketplace->getMarketplaceId();
                     foreach ($amazonConnector as $connector) {
@@ -119,7 +123,7 @@ class ConsoleCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $amazon = new AmazonConnector(Marketplace::getById(149795)); // US: 149795  UK: 200568
+        //$amazon = new AmazonConnector(Marketplace::getById(149795)); // US: 149795  UK: 200568
         //$amazon->patchCustom(sku: "CA_41_Burgundy_XL", country: "US", attribute: "item_type_keyword", operation: "delete", value: "");
 
         $io = new SymfonyStyle($input, $output);
