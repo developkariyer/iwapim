@@ -84,7 +84,7 @@ class Listings
             }
             $rowData = array_combine($header, $data);
             $asin = $rowData['asin1'] ?? $rowData['product-id'] ??'';
-            if (empty($asin)) {
+            if (empty($asin) || substr($asin, 0, 1) !== 'B') {
                 error_log("Missing ASIN in line ($index): " . json_encode($rowData) . ". Skipping this row.");
                 continue;
             }
