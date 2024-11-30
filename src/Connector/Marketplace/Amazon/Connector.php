@@ -195,7 +195,7 @@ class Connector extends MarketplaceConnectorAbstract
                 sellerId: $this->marketplace->getMerchantId(),
                 marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                 sku: rawurlencode($sku),
-                includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
+                includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement', 'safety_and_compliance']
             );
             $listing = $listing->json();
             Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", json_encode($listing, JSON_PRETTY_PRINT));
