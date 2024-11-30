@@ -74,7 +74,9 @@ class Listings
             error_log("Ignoring report with no valid header for country: $country");
             return;
         }
-        foreach ($lines as $index=>$line) {
+        $index = 0;
+        foreach ($lines as $line) {
+            $index++;
             $data = str_getcsv($line, "\t");
             if (count($header) !== count($data)) {
                 error_log("Column mismatch in line ($index): $line. Skipping this row.");
