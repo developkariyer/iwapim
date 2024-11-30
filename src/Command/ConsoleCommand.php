@@ -43,7 +43,7 @@ class ConsoleCommand extends AbstractCommand
             $listings = $prd->getListingItems();
             foreach ($listings as $listing) {
                 echo "{$listing->getId()} ";
-                $amazonMarketplaces = $listing->getAmazonMarketplace();
+                $amazonMarketplaces = $listing->getAmazonMarketplace() ?? [];
                 foreach ($amazonMarketplaces as $amazonMarketplace) {
                     echo "{$amazonMarketplace->getMarketplaceId()} ";
                     if ($amazonMarketplace->getStatus() === 'Active' && $amazonMarketplace->getMarketplaceId() === 'US') {
