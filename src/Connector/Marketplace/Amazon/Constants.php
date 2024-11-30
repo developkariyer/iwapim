@@ -8,7 +8,7 @@ class Constants
         'CA' => [
             'id' => 'A2EUQ1WTGCTBG2', // Canada
             'url' => 'https://www.amazon.ca',
-            'currency' => 'CAD'
+            'currency' => 'CAD',
         ],
         'US' => [
             'id' => 'ATVPDKIKX0DER', // United States

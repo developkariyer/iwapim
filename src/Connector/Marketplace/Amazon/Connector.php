@@ -186,16 +186,34 @@ class Connector extends MarketplaceConnectorAbstract
         if (empty($country)) {
             $country = $this->mainCountry;
         }
-        $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
-        $listing = $listingsApi->getListingsItem(
-            sellerId: $this->marketplace->getMerchantId(),
-            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-            sku: rawurlencode($sku),
-            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
-        );
-        echo json_encode($listing->json(), JSON_PRETTY_PRINT);
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/INFO_$safeSku.json", json_encode($listing->json()));
+
+        $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country");
+        if (empty($listing)) {
+            $listingsApi = $this->amazonSellerConnector->listingsItemsV20210801();
+            $listing = $listingsApi->getListingsItem(
+                sellerId: $this->marketplace->getMerchantId(),
+                marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+                sku: rawurlencode($sku),
+                includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
+            );
+            $listing = $listing->json();
+            Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", json_encode($listing, JSON_PRETTY_PRINT));
+        }
+        $productType = $listing['summaries'][0]['productType'] ?? '';
+        if (empty($productType)) { return; }
+
+        $safeProductType = preg_replace('/[^a-zA-Z0-9._-]/', '_', $productType);
+        $definition = Utility::getCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country");
+        if (empty($definition)) {
+            $productTypeDefinitionApi = $this->amazonSellerConnector->productTypeDefinitionsV20200901();
+            $definition = $productTypeDefinitionApi->getDefinitionsProductType(
+                marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+                sellerId: $this->marketplace->getMerchantId(),
+                productType: $productType
+            );
+            Utility::setCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country", json_encode($definition->json(), JSON_PRETTY_PRINT));
+        }
     }
 
     public function patchListing($sku, $country = null)

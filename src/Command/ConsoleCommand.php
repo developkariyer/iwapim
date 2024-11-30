@@ -63,6 +63,60 @@ class ConsoleCommand extends AbstractCommand
         $grp->save();
     }
 
+    public function getAmazonInfo()
+    {   // $this->getAmazonInfo();
+        
+        $amazonConnector = [
+            [
+                'connector' => new AmazonConnector(Marketplace::getById(200568)), // UK Amazon
+                'countries' => ['UK', 'DE', 'FR', 'IT', 'ES', 'NL', 'TR', 'SE', 'PL'],
+            ],
+            [
+                'connector' => new AmazonConnector(Marketplace::getById(149795)), // US Amazon
+                'countries' => ['US', 'MX'],
+            ],
+            [
+                'connector' => new AmazonConnector(Marketplace::getById(234692)), // CA Amazon
+                'countries' => ['CA'],
+            ]
+        ];
+        $variantObject = new VariantProduct\Listing();
+        $pageSize = 5;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(false);
+        $index = $offset;
+        while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($results as $listing) {
+                $index++;
+                echo "\rProcessing $index {$listing->getId()}";
+                $amazonMarketplaces = $listing->getAmazonMarketplace() ?? [];
+                foreach ($amazonMarketplaces as $amazonMarketplace) {
+                    $country = $amazonMarketplace->getMarketplaceId();
+                    foreach ($amazonConnector as $connector) {
+                        if (!in_array($country, $connector['countries'])) {
+                            continue;
+                        }
+                        $sku = $amazonMarketplace->getSku();
+                        if (empty($sku)) {
+                            continue;
+                        }
+                        echo " $country $sku ";
+                        $connector['connector']->getInfo($sku, $country);
+                    }
+                }
+                echo "\n";
+            }
+        }
+        echo "\nFinished\n";
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $amazon = new AmazonConnector(Marketplace::getById(149795)); // US: 149795  UK: 200568
