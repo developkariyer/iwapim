@@ -58,25 +58,42 @@ class Listings
 
     protected function processListingReport($country, $report)
     {
-        $encoding = ($country === 'FR') ? 'ISO-8859-1' : 'UTF-8';
+        $possibleEncodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252', 'ASCII'];
+        $encoding = mb_detect_encoding($report, $possibleEncodings, true) ?: 'UTF-8';
+        if (empty(trim($report))) {
+            error_log("Ignoring empty or invalid report for country: $country");
+            return;
+        }
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', $encoding));
+        if (empty($lines)) {
+            error_log("Ignoring report with no data lines for country: $country");
+            return;
+        }
         $header = str_getcsv(array_shift($lines), "\t");
+        if (empty($header)) {
+            error_log("Ignoring report with no valid header for country: $country");
+            return;
+        }
         foreach ($lines as $line) {
             $data = str_getcsv($line, "\t");
-            if (count($header) == count($data)) {
-                $rowData = array_combine($header, $data);
-                $asin = $rowData['asin1'] ?? '';
-                if (empty($this->listings[$asin][$country])) {
-                    if (empty($this->listings[$asin])) {
-                        $this->amazonConnector->listings[$asin] = [];
-                    }
-                    $this->amazonConnector->listings[$asin][$country] = [];  // Initialize country array
-                }
-                $this->amazonConnector->listings[$asin][$country][] = $rowData;
+            if (count($header) !== count($data)) {
+                error_log("Column mismatch in line: $line. Skipping this row.");
+                continue;
             }
+            $rowData = array_combine($header, $data);
+            $asin = $rowData['asin1'] ?? $rowData['product-id'] ??'';
+            if (empty($asin)) {
+                error_log("Missing ASIN in line: " . json_encode($rowData) . ". Skipping this row.");
+                continue;
+            }
+            if (empty($this->listings[$asin][$country])) {
+                $this->amazonConnector->listings[$asin] = $this->amazonConnector->listings[$asin] ?? [];
+                $this->amazonConnector->listings[$asin][$country] = [];
+            }
+            $this->amazonConnector->listings[$asin][$country][] = $rowData;
         }
     }
-    
+        
     public function getListings($forceDownload = false)
     {
         $this->processListingReport($this->amazonConnector->mainCountry, $this->amazonConnector->reportsHelper->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
