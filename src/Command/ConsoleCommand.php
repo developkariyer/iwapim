@@ -38,13 +38,22 @@ class ConsoleCommand extends AbstractCommand
         $prdListObj->setUnpublished(false);
         $prdList = $prdListObj->load();
         foreach ($prdList as $prd) {
+            $found = false;
             echo "{$prd->getId()} ";
             $listings = $prd->getListingItems();
             foreach ($listings as $listing) {
                 echo "{$listing->getId()} ";
-                if ($listing->getMarketplace()->getId() == 149795) {
-                    $grpArray[] = $prd;
-                    echo "added";
+                $amazonMarketplaces = $listing->getAmazonMarketplace();
+                foreach ($amazonMarketplaces as $amazonMarketplace) {
+                    echo "{$amazonMarketplace->getMarketplaceId()} ";
+                    if ($amazonMarketplace->getStatus() === 'Active' && $amazonMarketplace->getMarketplaceId() === 'US') {
+                        $grpArray[] = $prd;
+                        echo "added";
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
                     break;
                 }
             }
