@@ -79,7 +79,8 @@ class Listings
             $index++;
             $data = str_getcsv($line, "\t");
             if (count($header) !== count($data)) {
-                error_log("Column mismatch in line ($index): $line. Skipping this row.");
+                error_log("Column mismatch in line ($index): ".count($header)." != ".count($data)." Skipping this row.");
+                sleep(1);
                 continue;
             }
             $rowData = array_combine($header, $data);
