@@ -31,7 +31,7 @@ class ConsoleCommand extends AbstractCommand
     }
 
     public function connectAmazonUs()
-    {
+    {   // $this->connectAmazonUs();
         $grp = GroupProduct::getById(267975);
         $grpArray = [];
         $prdListObj = new Product\Listing();
