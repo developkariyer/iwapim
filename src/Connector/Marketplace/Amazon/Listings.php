@@ -81,7 +81,9 @@ class Listings
             $data = str_getcsv($line, "\t");
             if (count($header) !== count($data)) {
                 error_log("Column mismatch in line ($index): ".count($header)." != ".count($data)." Skipping this row.");
-                print_r($data);
+                for ($t = 0; $t < count($header); $t++) {
+                    echo $header[$t]." => ".($data[$t] ?? 'EMPTY')."\n";
+                }
                 sleep(1);
                 continue;
             }
