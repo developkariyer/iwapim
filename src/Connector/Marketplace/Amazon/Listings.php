@@ -79,14 +79,12 @@ class Listings
         foreach ($lines as $line) {
             $index++;
             $data = str_getcsv($line, "\t");
+            while (count($header) > count($data)) {
+                $data[] = '';
+            }
             if (count($header) !== count($data)) {
-                if (count($header) < count($data)) {
-                    error_log("Column mismatch in line ($index): ".count($header)." < ".count($data)." Skipping this row.");
-                    continue;
-                }
-                for ($t = 0; $t < count($header) - count($data); $t++) {
-                    $data[] = '';
-                }
+                error_log("Column mismatch in line ($index): ".count($header)." < ".count($data)." Skipping this row.");
+                continue;
             }
             $rowData = array_combine($header, $data);
             $asin = $rowData['asin1'] ?? $rowData['product-id'] ??'';
