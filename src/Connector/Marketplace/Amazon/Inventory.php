@@ -36,9 +36,8 @@ class Inventory
                             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                         );
                     $responseJson = $response->json();
-                    print_r($responseJson);
-                    $summary = array_merge($summary, $responseJson['payload']['InventorySummaries'] ?? []);
-                    $nextToken = $responseJson['pagination']['NextToken'] ?? null;
+                    $summary = array_merge($summary, $responseJson['payload']['inventorySummaries'] ?? []);
+                    $nextToken = $responseJson['pagination']['nextToken'] ?? null;
                     echo "+";
                 } catch (\Exception $e) {
                     $this->rateLimit++;
