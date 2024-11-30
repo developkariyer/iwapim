@@ -82,7 +82,7 @@ class ConsoleCommand extends AbstractCommand
         ];
         $variantObject = new VariantProduct\Listing();
         $pageSize = 5;
-        $offset = 14000;
+        $offset = 14700;
         $variantObject->setLimit($pageSize);
         $variantObject->setUnpublished(false);
         $index = $offset;
@@ -112,7 +112,7 @@ class ConsoleCommand extends AbstractCommand
                             continue;
                         }
                         echo " $country:$sku";
-                        $connector['connector']->getInfo($sku, $country);
+                        $connector['connector']->utilsHelper->getInfo($sku, $country);
                     }
                 }
                 echo "\n";
