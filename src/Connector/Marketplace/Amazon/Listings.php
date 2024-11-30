@@ -80,12 +80,13 @@ class Listings
             $index++;
             $data = str_getcsv($line, "\t");
             if (count($header) !== count($data)) {
-                error_log("Column mismatch in line ($index): ".count($header)." != ".count($data)." Skipping this row.");
-                for ($t = 0; $t < count($header); $t++) {
-                    echo $header[$t]." => ".($data[$t] ?? 'EMPTY')."\n";
+                if (count($header) < count($data)) {
+                    error_log("Column mismatch in line ($index): ".count($header)." < ".count($data)." Skipping this row.");
+                    continue;
                 }
-                sleep(1);
-                continue;
+                for ($t = 0; $t < count($header) - count($data); $t++) {
+                    $data[] = '';
+                }
             }
             $rowData = array_combine($header, $data);
             $asin = $rowData['asin1'] ?? $rowData['product-id'] ??'';
