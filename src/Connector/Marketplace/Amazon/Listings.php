@@ -74,6 +74,7 @@ class Listings
             error_log("Ignoring report with no valid header for country: $country");
             return;
         }
+        echo count($lines)." lines found in $country report. ".count($header)." headers.\n";
         $index = 0;
         foreach ($lines as $line) {
             $index++;
