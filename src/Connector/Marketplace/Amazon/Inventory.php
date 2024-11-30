@@ -29,7 +29,7 @@ class Inventory
                     ) :
                     $inventoryApi->getInventorySummaries(
                         granularityType: 'Marketplace', 
-                        granularityId: $country,
+                        granularityId: AmazonConstants::amazonMerchant[$country]['id'],
                         marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                     );
                 $responseJson = $response->json();
