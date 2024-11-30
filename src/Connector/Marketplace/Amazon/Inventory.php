@@ -24,11 +24,13 @@ class Inventory
             do {
                 $response = $nextToken ?
                     $inventoryApi->getInventorySummaries(
-                        nextToken: $nextToken
+                        nextToken: $nextToken,
+                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                     ) :
                     $inventoryApi->getInventorySummaries(
                         granularityType: 'Marketplace', 
                         granularityId: $country,
+                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                     );
                 $responseJson = $response->json();
                 echo json_encode($responseJson, JSON_PRETTY_PRINT);
