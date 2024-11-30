@@ -9,6 +9,7 @@ use App\Utils\Utility;
 class Inventory
 {
     public $amazonConnector;
+    public $rateLimit = 0;
 
     public function __construct(AmazonConnector $amazonConnector) 
     {
@@ -22,22 +23,33 @@ class Inventory
             $nextToken = null;
             $summary = [];
             do {
-                $response = $nextToken ?
-                    $inventoryApi->getInventorySummaries(
-                        nextToken: $nextToken,
-                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-                    ) :
-                    $inventoryApi->getInventorySummaries(
-                        granularityType: 'Marketplace', 
-                        granularityId: AmazonConstants::amazonMerchant[$country]['id'],
-                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-                    );
-                $responseJson = $response->json();
-                echo json_encode($responseJson, JSON_PRETTY_PRINT);
-                $summary = array_merge($summary, $response['payload']['InventorySummaries'] ?? []);
-                $nextToken = $response['pagination']['NextToken'] ?? null;
-                sleep(3);
+                try {
+                    $response = $nextToken ?
+                        $inventoryApi->getInventorySummaries(
+                            nextToken: $nextToken,
+                            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+                        ) :
+                        $inventoryApi->getInventorySummaries(
+                            granularityType: 'Marketplace', 
+                            granularityId: AmazonConstants::amazonMerchant[$country]['id'],
+                            details: true,
+                            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+                        );
+                    $responseJson = $response->json();
+                    $summary = array_merge($summary, $responseJson['payload']['InventorySummaries'] ?? []);
+                    $nextToken = $responseJson['pagination']['NextToken'] ?? null;
+                    echo "+";
+                } catch (\Exception $e) {
+                    $this->rateLimit++;
+                    echo "-{$this->rateLimit}";
+                }
+                sleep($this->rateLimit);
             } while ($nextToken);
+            Utility::setCustomCache(
+                "{$country}_inventory.json",
+                PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory", 
+                json_encode($summary, JSON_PRETTY_PRINT)
+            );   
         }
     }
 }
