@@ -24,17 +24,13 @@ class Inventory
             $summary = [];
             do {
                 try {
-                    $response = $nextToken ?
-                        $inventoryApi->getInventorySummaries(
-                            nextToken: $nextToken,
-                            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-                        ) :
-                        $inventoryApi->getInventorySummaries(
-                            granularityType: 'Marketplace', 
-                            granularityId: AmazonConstants::amazonMerchant[$country]['id'],
-                            details: true,
-                            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-                        );
+                    $response = $inventoryApi->getInventorySummaries(
+                        granularityType: 'Marketplace', 
+                        granularityId: AmazonConstants::amazonMerchant[$country]['id'],
+                        details: true,
+                        nextToken: $nextToken,
+                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+                    );
                     $responseJson = $response->json();
                     $summary = array_merge($summary, $responseJson['payload']['inventorySummaries'] ?? []);
                     $nextToken = $responseJson['pagination']['nextToken'] ?? null;
