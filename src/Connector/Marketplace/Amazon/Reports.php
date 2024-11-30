@@ -44,7 +44,7 @@ class Reports
         if ($report === false || $forceDownload) {
             echo "Waiting Report ";
             $reportsApi = $this->amazonConnector->amazonSellerConnector->reportsV20210630();
-            $response = $reportsApi->createReport(new CreateReportSpecification(ReportType: $reportType, marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']], reportOptions: ['custom' => true]));
+            $response = $reportsApi->createReport(new CreateReportSpecification(reportType: $reportType, marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']], reportOptions: ['custom' => true]));
             $reportId = $response->json()['reportId'];
             while (true) {
                 sleep(10);
