@@ -114,7 +114,7 @@ class Import
                 parent: $this->getFolder($asin),
             );
             $mainProduct = $variantProduct->getMainProduct();
-            if ($mainProduct instanceof Product && !empty($mainProduct->getIwasku())) {
+            if ($mainProduct instanceof Product) {
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
             }
             $skuRequired = empty($mainProduct) ? true : false;
