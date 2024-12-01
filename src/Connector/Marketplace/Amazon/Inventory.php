@@ -10,6 +10,7 @@ class Inventory
 {
     public $amazonConnector;
     public $rateLimit = 0;
+    public $inventory = [];
 
     public function __construct(AmazonConnector $amazonConnector) 
     {
@@ -18,8 +19,48 @@ class Inventory
 
     public function downloadInventory()
     {
+        $this->getInventory();
+        $this->processInventory();
+    }
+
+    public function processInventory()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, item_condition, json_data, total_quantity) ".
+                "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE item_condition = ?, total_quantity = ?, json_data = ?";
+        $inventoryType = 'AMAZON_FBA';
+        foreach ($this->inventory as $country => $inventory) {
+            $db->beginTransaction();
+            try {
+                $warehouse = $country;
+                foreach ($inventory as $item) {
+                    $asin = $item['asin'];
+                    $fnsku = $item['fnSku'];
+                    $itemCondition = $item['condition'];
+                    $totalQuantity = $item['totalQuantity'];
+                    $jsonData = json_encode($item);
+                    $db->executeStatement($sql, [
+                        $inventoryType, $warehouse, $asin, $fnsku, $itemCondition, $jsonData, $totalQuantity,
+                        $itemCondition, $totalQuantity, $jsonData
+                    ]);
+                }
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo $e->getMessage();
+            }
+        }
+    }
+
+    public function getInventory()
+    {
         $inventoryApi = $this->amazonConnector->amazonSellerConnector->fbaInventoryV1();
         foreach ($this->amazonConnector->getMarketplace()->getFbaRegions() ?? [] as $country) {
+            $summary = Utililty::getCustomCache("{$country}_inventory.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory");
+            if ($summary) {
+                $this->inventory[$country] = json_decode($summary, true);
+                continue;
+            }
             $nextToken = null;
             $summary = [];
             do {
@@ -42,10 +83,11 @@ class Inventory
                 sleep($this->rateLimit);
             } while ($nextToken);
             Utility::setCustomCache(
-                "{$country}_inventory.json",
-                PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory", 
-                json_encode($summary, JSON_PRETTY_PRINT)
-            );   
+                filename: "{$country}_inventory.json",
+                cachePath: PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory", 
+                stringToCache: json_encode($summary, JSON_PRETTY_PRINT)
+            );
+            $this->inventory[$country] = $summary;
         }
     }
 }
