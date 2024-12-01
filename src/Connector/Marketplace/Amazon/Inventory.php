@@ -29,7 +29,7 @@ class Inventory
         echo "Processing Inventory";
         $db = \Pimcore\Db::get();
         $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, iwasku, item_condition, json_data, total_quantity) ".
-                "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE iwasku = ?, item_condition = ?, total_quantity = ?, json_data = ?";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE iwasku = ?, item_condition = ?, total_quantity = ?, json_data = ?";
         $inventoryType = 'AMAZON_FBA';
         foreach ($this->inventory as $country => $inventory) {
             $db->beginTransaction();
