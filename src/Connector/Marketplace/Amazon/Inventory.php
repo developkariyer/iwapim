@@ -58,7 +58,7 @@ class Inventory
     {
         $inventoryApi = $this->amazonConnector->amazonSellerConnector->fbaInventoryV1();
         foreach ($this->amazonConnector->getMarketplace()->getFbaRegions() ?? [] as $country) {
-            $summary = Utililty::getCustomCache("{$country}_inventory.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory");
+            $summary = Utility::getCustomCache("{$country}_inventory.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory");
             if ($summary) {
                 $this->inventory[$country] = json_decode($summary, true);
                 continue;
