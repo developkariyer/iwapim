@@ -27,6 +27,9 @@ class IwabotConnector
                         continue;
                     }
                     $asin = Registry::getKey($fnsku, 'fnsku-to-asin');
+                    if (!$asin) {
+                        continue;
+                    }
                     $rowData['ASIN'] = $asin;
                     $jsonData = json_encode($rowData);
                     $db->executeStatement($sql, [$asin, $fnsku, $jsonData, $rowData['Total Count'], $jsonData, $rowData['Total Count']]);
