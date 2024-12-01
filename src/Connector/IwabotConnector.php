@@ -10,35 +10,32 @@ class IwabotConnector
 {
     public static function downloadReport()
     {
+        $db = \Pimcore\Db::get();
+        $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, json_data, total_quantity) VALUES ('IWA', 'NJ', ?, ?, ?, ?) ON DUPLICATE KEY UPDATE json_data = ?, total_quantity = ?";
         $report = file_get_contents('https://iwarden.iwaconcept.com/iwabot/warehouse/report.php?csv=1');
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/iwabot.csv", $report);
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
         $header = str_getcsv(array_shift($lines), ",");
-        foreach ($lines as $line) {
-            $data = str_getcsv($line, ",");
-            if (count($header) == count($data)) {
-                $rowData = array_combine($header, $data);
-                $variantProduct = VariantProduct::getByUniqueMarketplaceId($rowData['FNSKU'], ['limit' => 1]);
-                if (!$variantProduct) {
-                    $asin = Registry::getKey($rowData['FNSKU'], 'fnsku-to-asin');
-                    $variantProduct = $asin ? VariantProduct::getByUniqueMarketplaceId($asin, ['limit' => 1]) : null;
-                } else {
-                    $asin = $rowData['FNSKU'];
-                }
-                if ($variantProduct) {
-                    echo "Updating $asin inventory ";
-                    $oldStock = $variantProduct->getStock();
-                    $newStock = $oldStock;
-                    Utility::upsertRow($newStock, ['ABD Depo', $rowData['Count in Raf'], gmdate('Y-m-d')]);
-                    Utility::upsertRow($newStock, ['ABD Gemi', $rowData['Count in Ship'], gmdate('Y-m-d')]);
-                    if ($oldStock !== $newStock) {
-                        $variantProduct->setStock($newStock);
-                        $variantProduct->save();
-                        echo "Saved";
+        $db->beginTransaction();
+        try {
+            foreach ($lines as $line) {
+                $data = str_getcsv($line, ",");
+                if (count($header) == count($data)) {
+                    $rowData = array_combine($header, $data);
+                    $fnsku = $rowData['FNSKU'] ?? null;
+                    if (!$fnsku) {
+                        continue;
                     }
-                    echo "\n";
+                    $asin = Registry::getKey($fnsku, 'fnsku-to-asin');
+                    $rowData['ASIN'] = $asin;
+                    $jsonData = json_encode($rowData);
+                    $db->executeStatement($sql, [$asin, $fnsku, $jsonData, $rowData['Total Count'], $jsonData, $rowData['Total Count']]);
                 }
             }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            throw $e;
         }
 
     }
