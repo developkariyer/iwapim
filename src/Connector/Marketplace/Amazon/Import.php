@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
+use App\Utils\Registry;
 
 class Import
 {
@@ -113,6 +114,9 @@ class Import
                 parent: $this->getFolder($asin),
             );
             $mainProduct = $variantProduct->getMainProduct();
+            if ($mainProduct instanceof Product && !empty($mainProduct->getIwasku())) {
+                Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
+            }
             $skuRequired = empty($mainProduct) ? true : false;
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {

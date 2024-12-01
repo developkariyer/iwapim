@@ -129,7 +129,6 @@ class VariantProduct extends Concrete
         if (!empty($variant['imageUrl'])) {
             $this->setImageUrl($variant['imageUrl']);
         }
-        $this->setStock([]); // TODO delete me
         $this->setUrlLink($variant['urlLink'] ?? null);
         $this->setSalePrice($variant['salePrice'] ?? '');
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
@@ -138,6 +137,7 @@ class VariantProduct extends Concrete
         $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
+        $this->setMarketplaceType($marketplace->getMarketplaceType()); // might seem redundant but it's for caching purposes
         $this->setPublished($variant['published'] ?? false);
         $passiveFolder = Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri")));
         $publishedStatus = $variant['published'] ?? false;
