@@ -114,14 +114,14 @@ class Import
                 parent: $this->getFolder($asin),
             );
             $mainProduct = $variantProduct->getMainProduct();
+            $skuRequired = empty($mainProduct) ? true : false;
+            $mainProduct = is_array($mainProduct) ? reset($mainProduct) : $mainProduct;
             if ($mainProduct instanceof Product) {
-                echo "Reg";
+                echo "Reg ";
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
             } else {
-                echo "Unreg";
-                echo get_class($mainProduct);
+                echo "NoReg ";
             };
-            $skuRequired = empty($mainProduct) ? true : false;
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;
