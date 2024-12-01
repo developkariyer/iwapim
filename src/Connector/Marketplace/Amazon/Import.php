@@ -117,7 +117,10 @@ class Import
             if ($mainProduct instanceof Product) {
                 echo "Reg";
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
-            } else echo "NoReg";
+            } else {
+                echo "Unreg";
+                echo get_class($mainProduct);
+            };
             $skuRequired = empty($mainProduct) ? true : false;
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
