@@ -436,6 +436,9 @@ class Product extends Concrete
                 $newSize->checkProductCode();
                 $newSize->checkKey();
                 $newSize->save();
+                if ($newSize->checkIwasku()) {
+                    $newSize->save();
+                }
             }
         }
         $this->setFixVariations(false);
