@@ -32,6 +32,7 @@ class IwabotConnector
                     }
                     $iwasku = Registry::getKey($asin, 'asin-to-iwasku');
                     $rowData['ASIN'] = $asin;
+                    $rowData['IWASKU'] = $iwasku;
                     $jsonData = json_encode($rowData);
                     $db->executeStatement($sql, [$asin, $fnsku, $iwasku, $jsonData, $rowData['Total Count'], $iwasku, $jsonData, $rowData['Total Count']]);
                 }
