@@ -25,6 +25,7 @@ class Inventory
 
     public function processInventory()
     {
+        echo "Processing Inventory";
         $db = \Pimcore\Db::get();
         $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, item_condition, json_data, total_quantity) ".
                 "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE item_condition = ?, total_quantity = ?, json_data = ?";
@@ -50,6 +51,7 @@ class Inventory
                 echo $e->getMessage();
             }
         }
+        echo "\n";
     }
 
     public function getInventory()
