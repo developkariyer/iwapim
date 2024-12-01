@@ -121,7 +121,7 @@ class Import
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
             } else {
                 echo "NoReg ";
-            };/*
+            };
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;
@@ -142,7 +142,7 @@ class Import
                         }
                     }
                 }
-            }*/
+            }
             echo "{$variantProduct->getId()} ";
             echo " OK\n";
         }
