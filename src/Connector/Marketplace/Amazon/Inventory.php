@@ -28,22 +28,26 @@ class Inventory
     {
         echo "Processing Inventory";
         $db = \Pimcore\Db::get();
-        $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, item_condition, json_data, total_quantity) ".
-                "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE item_condition = ?, total_quantity = ?, json_data = ?";
+        $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, iwasku, item_condition, json_data, total_quantity) ".
+                "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE iwasku = ?, item_condition = ?, total_quantity = ?, json_data = ?";
         $inventoryType = 'AMAZON_FBA';
         foreach ($this->inventory as $country => $inventory) {
             $db->beginTransaction();
             try {
                 $warehouse = $country;
                 foreach ($inventory as $item) {
-                    $asin = $item['asin'];
-                    $fnsku = $item['fnSku'];
-                    $itemCondition = $item['condition'];
-                    $totalQuantity = $item['totalQuantity'];
+                    $asin = $item['asin'] ?? null;
+                    $fnsku = $item['fnSku'] ?? null;
+                    if (empty($asin) || empty($fnsku)) {
+                        continue;
+                    }
+                    $iwasku = Registry::getKey($asin, 'asin-to-iwasku');
+                    $itemCondition = $item['condition'] ?? null;
+                    $totalQuantity = $item['totalQuantity'] ?? 0;
                     $jsonData = json_encode($item);
                     $db->executeStatement($sql, [
-                        $inventoryType, $warehouse, $asin, $fnsku, $itemCondition, $jsonData, $totalQuantity,
-                        $itemCondition, $totalQuantity, $jsonData
+                        $inventoryType, $warehouse, $asin, $fnsku, $iwasku, $itemCondition, $jsonData, $totalQuantity,
+                        $iwasku, $itemCondition, $totalQuantity, $jsonData
                     ]);
                     Registry::setKey($fnsku, $asin, 'fnsku-to-asin');
                 }
