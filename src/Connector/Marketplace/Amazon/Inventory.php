@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace\Amazon;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
+use App\Utils\Registry;
 
 class Inventory
 {
@@ -44,6 +45,7 @@ class Inventory
                         $inventoryType, $warehouse, $asin, $fnsku, $itemCondition, $jsonData, $totalQuantity,
                         $itemCondition, $totalQuantity, $jsonData
                     ]);
+                    Registry::setKey($fnsku, $asin, 'fnsku-to-asin');
                 }
                 $db->commit();
             } catch (\Exception $e) {
