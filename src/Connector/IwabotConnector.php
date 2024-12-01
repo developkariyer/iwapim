@@ -11,7 +11,7 @@ class IwabotConnector
     public static function downloadReport()
     {
         $db = \Pimcore\Db::get();
-        $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, json_data, total_quantity, created_updated_at) VALUES ('IWA', 'NJ', ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE json_data = ?, total_quantity = ?, created_updated_at = NOW()";
+        $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, iwasku, json_data, total_quantity, created_updated_at) VALUES ('IWA', 'NJ', ?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE iwasku = ?, json_data = ?, total_quantity = ?, created_updated_at = NOW()";
         $report = file_get_contents('https://iwarden.iwaconcept.com/iwabot/warehouse/report.php?csv=1');
         file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/iwabot.csv", $report);
         $lines = explode("\n", mb_convert_encoding(trim($report), 'UTF-8', 'UTF-8'));
@@ -30,9 +30,10 @@ class IwabotConnector
                     if (!$asin) {
                         continue;
                     }
+                    $iwasku = Registry::getKey($asin, 'asin-to-iwasku');
                     $rowData['ASIN'] = $asin;
                     $jsonData = json_encode($rowData);
-                    $db->executeStatement($sql, [$asin, $fnsku, $jsonData, $rowData['Total Count'], $jsonData, $rowData['Total Count']]);
+                    $db->executeStatement($sql, [$asin, $fnsku, $iwasku, $jsonData, $rowData['Total Count'], $iwasku, $jsonData, $rowData['Total Count']]);
                 }
             }
             $db->commit();
