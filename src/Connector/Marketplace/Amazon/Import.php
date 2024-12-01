@@ -115,8 +115,9 @@ class Import
             );
             $mainProduct = $variantProduct->getMainProduct();
             if ($mainProduct instanceof Product) {
+                echo "Reg";
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
-            }
+            } else echo "NoReg";
             $skuRequired = empty($mainProduct) ? true : false;
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
