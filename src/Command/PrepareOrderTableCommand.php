@@ -515,13 +515,24 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
+    protected static function getAmazonVariantProduct($uniqueMarketplaceId)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
+    }
+
     protected static function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
-            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
+            //'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            //'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            //'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
@@ -588,7 +599,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_orders_line_items
+        $sql = "UPDATE iwa_amazon_orders_line_items
         SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
