@@ -101,7 +101,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Shopify' => $this->transferOrdersFromShopify($id,$marketplaceType),
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                     'Bol.com' => $this->transferOrdersFromBolcom($id,$marketplaceType),
-                    'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType)
+                    'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType),
+                    'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType)
                 };
                 echo "Complated: $marketplaceType\n";
             }
