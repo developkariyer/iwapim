@@ -35,6 +35,8 @@ class Utils
             );
             Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode($listing->json(), JSON_PRETTY_PRINT));
             $listing = $listing->json();
+        } else {
+            $listing = json_decode($listing, true);
         }
         $productType = $listing['summaries'][0]['productType'] ?? '';
         if (empty($productType)) { 
