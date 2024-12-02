@@ -55,7 +55,6 @@ class Utils
             listingsItemPatchRequest: $listingsItemPatchRequest
         );
         Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode($patchOperation->json(), JSON_PRETTY_PRINT));
-        print_r($patchOperation->json());
         echo $patchOperation->json()['status']."\n";
     }
 
