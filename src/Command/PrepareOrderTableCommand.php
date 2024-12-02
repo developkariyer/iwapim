@@ -112,7 +112,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersAmazon($marketPlaceId,$marketplaceType)
     {
         $amazonSql = "
-            INSERT INTO iwa_amazon_orders_line_items (
+            INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
             total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status)
             SELECT
@@ -445,7 +445,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             SELECT 
                 DISTINCT variant_id
             FROM
-                iwa_amazon_orders_line_items
+                iwa_marketplace_orders_line_items
             WHERE 
                 marketplace_type = '$marketplaceType'
             ";
@@ -528,10 +528,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
-            //'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            //'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            //'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
+            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
             'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
             default => null,
         };
@@ -599,7 +599,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_amazon_orders_line_items
+        $sql = "UPDATE iwa_marketplace_orders_line_items
         SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
@@ -802,6 +802,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control != 'true' THEN 'not_cancelled'
                 WHEN marketplace_type = 'Etsy' AND fulfillments_status = 'Canceled' THEN 'cancelled'
                 WHEN marketplace_type = 'Etsy' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'
+                WHEN marketplace_type = 'Amazon' AND fulfillments_status = 'Canceled' THEN 'cancelled'
+                WHEN marketplace_type = 'Amazon' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'  
             END;
         ";
         $stmt = $db->prepare($sql);
