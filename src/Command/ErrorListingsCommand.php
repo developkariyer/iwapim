@@ -57,7 +57,7 @@ class ErrorListingsCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
-        $skulist = $db->fetchAll("SELECT marketplaceId, sku FROM object_collection_AmazonMarketplace_varyantproduct WHERE fieldname = 'amazonMarketplace' AND status='Active'");
+        $skulist = $db->fetchAllAssociative("SELECT marketplaceId, sku FROM object_collection_AmazonMarketplace_varyantproduct WHERE fieldname = 'amazonMarketplace' AND status='Active'");
         $total = count($skulist);
         $index = 0;
         foreach ($skulist as $sku) {
