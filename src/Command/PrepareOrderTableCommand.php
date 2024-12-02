@@ -667,7 +667,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
-                WHERE id = {$row['id']};
+                WHERE id = $row['id'];
             ";
             echo "Updating... $updateSql\n";
             try {
