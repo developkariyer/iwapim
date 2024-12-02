@@ -664,6 +664,9 @@ class PrepareOrderTableCommand extends AbstractCommand
                     }
                 }
             }
+            if ($subtotalPriceUsd == 0) {
+                $subtotalPriceUsd = $totalPriceUsd;
+            }
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
