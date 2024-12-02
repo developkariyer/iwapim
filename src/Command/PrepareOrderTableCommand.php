@@ -136,7 +136,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.StateOrRegion'))
                 ) AS province_code,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderTotal.Amount')) AS total_price,  
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderStatus')) AS fulfillments_status,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderStatus')) AS fulfillments_status
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.OrderItems[*]' COLUMNS (
