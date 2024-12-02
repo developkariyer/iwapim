@@ -57,7 +57,15 @@ class ErrorListingsCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
-        $skulist = $db->fetchAllAssociative("SELECT marketplaceId, sku FROM object_collection_AmazonMarketplace_varyantproduct WHERE fieldname = 'amazonMarketplace' AND status='Active'");
+        $euMarketsPlaceholder = implode("','", $amazonEuMarkets);
+        $query = "
+            SELECT marketplaceId, sku
+            FROM object_collection_AmazonMarketplace_varyantproduct
+            WHERE fieldname = 'amazonMarketplace' 
+                AND status = 'Active' 
+                AND marketplaceId IN ('$euMarketsPlaceholder')
+        ";
+        $skulist = $db->fetchAllAssociative($query);
         $total = count($skulist);
         $index = 0;
         foreach ($skulist as $sku) {
@@ -70,7 +78,6 @@ class ErrorListingsCommand extends AbstractCommand
             $sku = $sku['sku'];
             echo " $country $sku ";
             $amazonConnector->utilsHelper->patchListing($sku, $country);
-            return;
         }
         echo "\nFinished\n";
     }
