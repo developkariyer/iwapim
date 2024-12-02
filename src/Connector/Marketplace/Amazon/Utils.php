@@ -18,47 +18,39 @@ class Utils
         $this->amazonConnector = $amazonConnector;
     }
 
-    public function patchCustom($sku, $country = null, $attribute, $operation, $value = null)
+    public function patchCustom($sku, $country = null, $patches) // $attribute, $operation, $value = null
     {
         if (empty($country)) {
             $country = $this->amazonConnector->mainCountry;
         }
-        $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
-        $listing = $listingsApi->getListingsItem(
-            sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
-            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-            sku: rawurlencode($sku),
-            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
-        );
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/CUSTOM_PATCH_LISTING_$safeSku.json", json_encode($listing->json()));
-        $productType = $listing->json()['summaries'][0]['productType'] ?? '';
+        $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", 86400*7);
+        if (empty($listing)) {
+            $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
+            $listing = $listingsApi->getListingsItem(
+                sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
+                marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
+                sku: rawurlencode($sku),
+                includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
+            );
+            Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode($listing->json(), JSON_PRETTY_PRINT));
+            $listing = $listing->json();
+        }
+        $productType = $listing['summaries'][0]['productType'] ?? '';
         if (empty($productType)) { return; }
-        $patches = [
-            new PatchOperation(
-                op: $operation,
-                path: "/attributes/$attribute",
-                value: [
-                    [
-                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
-                        "value" => $value,
-                    ]
-                ]
-            )
-        ];
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
             productType: $productType,
             patches: $patches,
         );
-        echo "Patching\n";
+        echo "Patching ";
         $patchOperation = $listingsApi->patchListingsItem(
             sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
             sku: rawurlencode($sku),
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
             listingsItemPatchRequest: $listingsItemPatchRequest
         );
-        echo json_encode($patchOperation->json(), JSON_PRETTY_PRINT);
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/CUSTOM_PATCH_RESPONSE_$safeSku.json", json_encode($patchOperation->json()));        
+        Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode($patchOperation->json(), JSON_PRETTY_PRINT));
+        echo $patchOperation->json()['status']."\n";
     }
 
     public function getInfo($sku, $country = null) 
@@ -101,24 +93,10 @@ class Utils
         if (empty($country)) {
             $country = $this->amazonConnector->mainCountry;
         }
-        $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
-        
-        echo "Processing $sku details";
-        $listing = $listingsApi->getListingsItem(
-            sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
-            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-            sku: rawurlencode($sku),
-            includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
-        );
-
-        $productType = $listing->json()['summaries'][0]['productType'] ?? '';
-
-        if (empty($productType)) { return; }
-        echo " $productType";
 
         $patches = [
             new PatchOperation(
-                op: "add", // "replace", // "delete",
+                op: "replace", // "replace", // "delete",
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
                     [
@@ -128,7 +106,7 @@ class Utils
                 ]
             ),
             new PatchOperation(
-                op: "add", //"replace",
+                op: "replace", //"replace",
                 path: "/attributes/dsa_responsible_party_address",
                 value: [
                     [
@@ -138,7 +116,7 @@ class Utils
                 ]
             ),
             new PatchOperation(
-                op: "add", //"replace",
+                op: "replace", //"replace",
                 path: "/attributes/gpsr_manufacturer_reference",
                 value: [
                     [
@@ -148,25 +126,7 @@ class Utils
                 ]
             )
         ];
-
-        $listingsItemPatchRequest = new ListingsItemPatchRequest(
-            productType: $productType,
-            patches: $patches,
-        );
-
-        echo " patching ";
-        $patch = $listingsApi->patchListingsItem(
-            sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
-            sku: rawurlencode($sku),
-            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-            listingsItemPatchRequest: $listingsItemPatchRequest
-        );
-        echo $patch->json()['status'] ?? " ??";
-        echo " OK\n";
-        // fix $sku to generate a valid file name
-        $sku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$sku.json", json_encode($patch->json()));
+        $this->patchCustom($sku, $country, $patches);
     }
-
 
 }

@@ -6,7 +6,6 @@ use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
 
 use Pimcore\Model\DataObject\Marketplace;
-use Pimcore\Model\DataObject\VariantProduct;
 
 use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
@@ -102,46 +101,6 @@ class Connector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         $this->inventoryHelper->downloadInventory();
-        /*
-        $inventory = [];
-        $fnsku = [];
-        $this->reportsHelper->downloadAllReports(forceDownload: false, silent: true);
-        $lines = explode("\n", mb_convert_encoding(trim($this->reportsHelper->amazonReports['GET_AFN_INVENTORY_DATA_BY_COUNTRY']), 'UTF-8', 'UTF-8'));
-        $header = str_getcsv(array_shift($lines), "\t");
-        foreach ($lines as $line) {
-            $data = str_getcsv($line, "\t");
-            if (count($header) == count($data)) {
-                $rowData = array_combine($header, $data);
-                if (!isset($inventory[$rowData['asin']])) {
-                    $inventory[$rowData['asin']] = [];
-                }
-                $inventory[$rowData['asin']][$rowData['country']] = $rowData['quantity-for-local-fulfillment'];
-                $fnsku[$rowData['asin']] = $rowData['fulfillment-channel-sku'];                
-            }
-        }
-        foreach ($inventory as $asin=>$data) {
-            $variantObject = VariantProduct::getByUniqueMarketplaceId($asin, ['limit' => 1]);
-            if ($variantObject) {
-                echo "Updating $asin inventory ";
-                $oldStock = $variantObject->getStock();
-                $newStock = $oldStock;
-                foreach ($data as $country=>$amount) {
-                    echo "$country: $amount ";
-                    Utility::upsertRow($newStock, [$country, $amount, gmdate('Y-m-d')]);
-                }
-                if ($oldStock !== $newStock) {
-                    $variantObject->setStock($newStock);
-                    $variantObject->save();
-                    echo "Saved";
-                }
-                if (!empty($fnsku[$asin])) {
-                    Registry::setKey($fnsku[$asin], $asin, 'fnsku-to-asin');
-                }
-                echo "\n";
-            }
-        }
-        file_put_contents(PIMCORE_PROJECT_ROOT."/tmp/inventory_test.json", json_encode($inventory, JSON_PRETTY_PRINT));
-        */
     }
 
 }

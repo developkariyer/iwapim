@@ -54,53 +54,23 @@ class ErrorListingsCommand extends AbstractCommand
 
     private function amazonSafetyFix()
     {
-        $amazonConnector = [
-            200568 => new AmazonConnector(Marketplace::getById(200568)), // UK Amazon
-            149795 => new AmazonConnector(Marketplace::getById(149795)), // US Amazon
-            234692 => new AmazonConnector(Marketplace::getById(234692)), // CA Amazon
-        ];
+        $db = \Pimcore\Db::get();
+        $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
         $amazonEuMarkets = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
-        $variantObject = new VariantListing();
-        $pageSize = 5;
-        $offset = 15697;
-        $variantObject->setLimit($pageSize);
-        $variantObject->setUnpublished(false);
-        $index = $offset;
-        $patched = [];
-        while (true) {
-            $variantObject->setOffset($offset);
-            $results = $variantObject->load();
-            if (empty($results)) {
-                break;
+        $skulist = $db->fetchAll("SELECT marketplaceId, sku FROM object_collection_AmazonMarketplace_varyantproduct WHERE fieldname = 'amazonMarketplace' AND status='Active'");
+        $total = count($skulist);
+        $index = 0;
+        foreach ($skulist as $sku) {
+            $index++;
+            echo "Processing $index/$total ";
+            $country = $sku['marketplaceId'];
+            if (!in_array($country, $amazonEuMarkets)) {
+                continue;
             }
-            $offset += $pageSize;
-            foreach ($results as $listing) {
-                $index++;
-                echo "\rProcessing $index {$listing->getId()}";
-                $marketplace = $listing->getMarketplace();
-                echo " {$marketplace->getMarketplaceType()}                ";
-                if ($marketplace->getMarketplaceType() !== 'Amazon') {
-                    continue;
-                }
-                echo "\n";
-                $amazonMarketplaces = $listing->getAmazonMarketplace();
-                foreach ($amazonMarketplaces as $amazonMarketplace) {
-                    $country = $amazonMarketplace->getMarketplaceId();
-                    if (!in_array($country, $amazonEuMarkets)) {
-                        continue;
-                    }
-                    $sku = $amazonMarketplace->getSku();
-                    if (empty($sku)) {
-                        continue;
-                    }
-                    if (isset($patched["$country-$sku"])) {
-                        continue;
-                    }
-                    echo " $country $sku ";
-                    $amazonConnector[200568]->patchListing($sku, $country);
-                    $patched["$country-$sku"] = true;
-                }
-            }
+            $sku = $sku['sku'];
+            echo " $country $sku ";
+            $amazonConnector->utilsHelper->patchListing($sku, $country);
+            return;
         }
         echo "\nFinished\n";
     }

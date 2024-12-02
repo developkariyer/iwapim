@@ -2,8 +2,6 @@
 
 namespace App\Connector;
 
-use Pimcore\Model\DataObject\VariantProduct;
-use App\Utils\Utility;
 use App\Utils\Registry;
 
 class IwabotConnector
