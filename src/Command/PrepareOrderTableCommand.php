@@ -647,15 +647,22 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $subtotalPriceUsd = $subtotalPrice;
             } else {
                 if ($currency === 'TRY') {
-                    $productPriceUsd = round($price / $currencyRate, 2);
-                    $totalPriceUsd = round($totalPrice / $currencyRate, 2);
-                    $subtotalPriceUsd = round($subtotalPrice / $currencyRate, 2);
+                    if ($currencyRate != 0) { 
+                        $productPriceUsd = round($price / $currencyRate, 2);
+                        $totalPriceUsd = round($totalPrice / $currencyRate, 2);
+                        $subtotalPriceUsd = round($subtotalPrice / $currencyRate, 2);
+                    } else {
+                        $productPriceUsd = $totalPriceUsd = $subtotalPriceUsd = 0; 
+                    }
+                } else {
+                    if ($currencyRate != 0 && $currentUsd != 0) { 
+                        $productPriceUsd = round($price * $currencyRate / $currentUsd, 2);
+                        $totalPriceUsd = round($totalPrice * $currencyRate / $currentUsd, 2);
+                        $subtotalPriceUsd = round($subtotalPrice * $currencyRate / $currentUsd, 2);
+                    } else {
+                        $productPriceUsd = $totalPriceUsd = $subtotalPriceUsd = 0; 
+                    }
                 }
-                else {
-                    $productPriceUsd = round($price * $currencyRate / $currentUsd, 2);
-                    $totalPriceUsd = round($totalPrice * $currencyRate / $currentUsd, 2);
-                    $subtotalPriceUsd = round($subtotalPrice * $currencyRate / $currentUsd, 2);
-                }               
             }
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
