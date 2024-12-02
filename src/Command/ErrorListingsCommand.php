@@ -64,6 +64,7 @@ class ErrorListingsCommand extends AbstractCommand
             WHERE fieldname = 'amazonMarketplace' 
                 AND status = 'Active' 
                 AND marketplaceId IN ('$euMarketsPlaceholder')
+            ORDER BY marketplaceId, sku
         ";
         $skulist = $db->fetchAllAssociative($query);
         $total = count($skulist);

@@ -64,7 +64,6 @@ class Utils
             $country = $this->amazonConnector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-
         $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", 86400*7);
         if (empty($listing)) {
             $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
