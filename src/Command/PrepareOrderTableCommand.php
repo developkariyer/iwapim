@@ -165,7 +165,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 province_code = VALUES(province_code);";
         try {
             $db = \Pimcore\Db::get();
-            $db->query($etsySql);
+            $db->query($amazonSql);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
