@@ -62,7 +62,7 @@ class ErrorListingsCommand extends AbstractCommand
         $index = 0;
         foreach ($skulist as $sku) {
             $index++;
-            echo "Processing $index/$total ";
+            echo "\rProcessing $index/$total ";
             $country = $sku['marketplaceId'];
             if (!in_array($country, $amazonEuMarkets)) {
                 continue;

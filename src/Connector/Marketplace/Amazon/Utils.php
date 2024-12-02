@@ -37,7 +37,10 @@ class Utils
             $listing = $listing->json();
         }
         $productType = $listing['summaries'][0]['productType'] ?? '';
-        if (empty($productType)) { return; }
+        if (empty($productType)) { 
+            echo "Empty product type\n";
+            return;
+        }
         $listingsItemPatchRequest = new ListingsItemPatchRequest(
             productType: $productType,
             patches: $patches,
@@ -50,6 +53,7 @@ class Utils
             listingsItemPatchRequest: $listingsItemPatchRequest
         );
         Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode($patchOperation->json(), JSON_PRETTY_PRINT));
+        print_r($patchOperation->json());
         echo $patchOperation->json()['status']."\n";
     }
 
