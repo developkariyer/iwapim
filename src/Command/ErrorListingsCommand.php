@@ -86,6 +86,11 @@ class ErrorListingsCommand extends AbstractCommand
         echo "\nFinished\n";
     }
 
+    public function amazonInfo()
+    {
+        
+    }
+
     private function updateMainProductCounts()
     {
         $variantObject = new VariantListing();

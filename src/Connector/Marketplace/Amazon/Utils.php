@@ -64,7 +64,7 @@ class Utils
             $country = $this->amazonConnector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", 86400*7);
+        $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", 86400);
         if (empty($listing)) {
             $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
             $listing = $listingsApi->getListingsItem(
@@ -80,7 +80,7 @@ class Utils
         if (empty($productType)) { return; }
 
         $safeProductType = preg_replace('/[^a-zA-Z0-9._-]/', '_', $productType);
-        $definition = Utility::getCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country", 86400*7);
+        $definition = Utility::getCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country");
         if (empty($definition)) {
             $productTypeDefinitionApi = $this->amazonConnector->amazonSellerConnector->productTypeDefinitionsV20200901();
             $definition = $productTypeDefinitionApi->getDefinitionsProductType(
