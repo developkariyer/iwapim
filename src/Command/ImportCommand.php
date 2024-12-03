@@ -22,6 +22,7 @@ use App\Connector\Marketplace\TakealotConnector;
 use App\Connector\Marketplace\WallmartConnector;
 use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Connector\Marketplace\HepsiburadaConnector;
+use App\Connector\Marketplace\WayfairConnector;
 use App\Connector\IwabotConnector;
 
 
@@ -50,6 +51,7 @@ class ImportCommand extends AbstractCommand
     private static $wallmartFlag = false;
     private static $ciceksepetiFlag = false;
     private static $hepsiburadaFlag = false;    
+    private static $wayfairFlag = false;
     private static $itemCodes = [];
 
     private EventDispatcherInterface $eventDispatcher;
@@ -77,6 +79,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('wallmart', null, InputOption::VALUE_NONE, 'If set, processes Wallmart objects.')
             ->addOption('ciceksepeti', null, InputOption::VALUE_NONE, 'If set, processes ciceksepeti objects.')
             ->addOption('hepsiburada', null, InputOption::VALUE_NONE, 'If set, processes hepsiburada objects.')
+            ->addOption('wayfair', null, InputOption::VALUE_NONE, 'If set, processes wayfair objects.')
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
@@ -190,6 +193,7 @@ class ImportCommand extends AbstractCommand
         self::$wallmartFlag = $input->getOption('wallmart');
         self::$ciceksepetiFlag = $input->getOption('ciceksepeti');
         self::$hepsiburadaFlag = $input->getOption('hepsiburada');
+        self::$wayfairFlag = $input->getOption('wayfair');
         self::$allFlag = $input->getOption('all');
 
         $this->removeListeners();
@@ -251,6 +255,9 @@ class ImportCommand extends AbstractCommand
                         if (!self::$hepsiburadaFlag && $marketplace->getMarketplaceType() === 'Hepsiburada') {
                             continue;
                         }
+                        if (!self::$wayfairFlag && $marketplace->getMarketplaceType() === 'Wayfair') {
+                            continue;
+                        }
                     }
                 }
                 
@@ -266,6 +273,7 @@ class ImportCommand extends AbstractCommand
                     'Wallmart' => new WallmartConnector($marketplace),
                     'Ciceksepeti' => new CiceksepetiConnector($marketplace),
                     'Hepsiburada' => new HepsiburadaConnector($marketplace),
+                    'Wayfair' => new WayfairConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {
