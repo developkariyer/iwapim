@@ -42,7 +42,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-      
+       $this->prepareToken();
     }
 
     public function import($updateFlag, $importFlag)
