@@ -36,7 +36,7 @@ class OrdersCalculator implements CalculatorClassInterface
         else {
             $variantId = (string) $object->getUniqueMarketplaceId();
         }
-        $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId]);
+        $result = $db->fetchOne("SELECT sum(quantity) FROM `iwa_marketplace_orders_line_items` WHERE variant_id = ?", [$variantId] AND marketplace_id = $marketplace->getId());
         return $result + 0;
         /*if ($object instanceof ShopifyVariant) {
             $shopifyId = (string) $object->getShopifyId();
