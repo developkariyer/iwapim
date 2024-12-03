@@ -40,8 +40,8 @@ class ApacheSupersetCommand extends AbstractCommand
     protected function test()
     {
         $httpClient = HttpClient::create();
-        $link = "http://192.168.1.248:8088/api/v1/chart";
-        $response = $httpClient->request('GET', $link,);
+        $link = "http://192.168.1.248:8088/api/v1/chart/export";
+        $response = $httpClient->request('GET', $link);
         $content = $response->getContent();
         echo $content;
     }
