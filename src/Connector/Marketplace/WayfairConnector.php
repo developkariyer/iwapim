@@ -49,8 +49,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        $this->getDropshipOrdersSandbox();  
-        //$this->sendShipmentSandbox();
+        //$this->getDropshipOrdersSandbox();  
+        $this->sendShipmentSandbox();
     }
 
     public function testEndpoint()
@@ -136,7 +136,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                         'items' => [
                             [
                                 'partNumber' => '1234567001',
-                                'quantity' => 1,
+                                'quantity' => '1',
                             ],
                         ],
                     ]
