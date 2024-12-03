@@ -107,7 +107,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         GRAPHQL;
         $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
             'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken,
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
                 'Content-Type' => 'application/json'
             ],
             'json' => ['query' => $query]
