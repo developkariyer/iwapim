@@ -58,7 +58,7 @@ class AmazonController extends FrontendController
     }
 
     /**
-     * @Route("/amazon/{query?all}/{category?all}/{page?0}/{pagesize?20}", name="catalog")
+     * @Route("/amazon/{query?all}/{category?all}/{page?0}/{pagesize?20}", name="amazon")
      */
     public function amazonAction(Request $request): Response
     {
