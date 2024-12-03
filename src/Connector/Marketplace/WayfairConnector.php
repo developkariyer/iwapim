@@ -85,7 +85,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         GRAPHQL;
         $variables = [
             'notice' => [
-                'poNumber' => 'TEST_95171143',
+                'poNumber' => 'TEST_52740640',
                 'supplierId' => 194115,
                 'packageCount' => 1,
                 'weight' => 184,
@@ -136,7 +136,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                         'items' => [
                             [
                                 'partNumber' => '1234567001',
-                                'quantity' => '1',
+                                'quantity' => 1,
                             ],
                         ],
                     ]
