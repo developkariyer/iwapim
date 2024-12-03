@@ -49,7 +49,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        $this->getDropshipOrdersSandbox();  
+        //$this->getDropshipOrdersSandbox();  
+        $this->sendShipmentSandbox();
     }
 
     public function testEndpoint()
@@ -62,6 +63,114 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
+    public function sendShipmentSandbox()
+    {
+        $query =  $query = <<<GRAPHQL
+        mutation shipment(\$notice: ShipNoticeInput!) {
+            purchaseOrders {
+                shipment(notice: \$notice) {
+                    handle,
+                    submittedAt,
+                    errors {
+                        key,
+                        message
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $variables = [
+            'notice' => [
+                'poNumber' => 'TEST_95171143',
+                'supplierId' => 194115,
+                'packageCount' => 2,
+                'weight' => 184,
+                'volume' => 22986.958176,
+                'carrierCode' => 'FDEG',
+                'shipSpeed' => 'SECOND_DAY_AIR',
+                'trackingNumber' => '210123456789',
+                'shipDate' => '2024-12-05 08:53:33.000000 +00:00',
+                'sourceAddress' => [
+                    'name' => 'Jane Doe',
+                    'streetAddress1' => '123 Main St.',
+                    'city' => 'Boston',
+                    'state' => 'MA',
+                    'postalCode' => '02122',
+                    'country' => 'USA',
+                ],
+                'destinationAddress' => [
+                    'name' => 'Wayfair',
+                    'streetAddress1' => '123 Test Street',
+                    'city' => 'Boston',
+                    'state' => 'MA',
+                    'postalCode' => '02116',
+                    'country' => 'USA',
+                ],
+                'largeParcelShipments' => [
+                    [
+                        'partNumber' => '1234567001',
+                        'packages' => [
+                            [
+                                'code' => [
+                                    'type' => 'TRACKING_NUMBER',
+                                    'value' => '210123456781',
+                                ],
+                                'weight' => 150,
+                            ],
+                        ],
+                    ]
+                ],
+                'smallParcelShipments' => [
+                    [
+                        'package' => [
+                            'code' => [
+                                'type' => 'TRACKING_NUMBER',
+                                'value' => '210123456783',
+                            ],
+                            'weight' => 92,
+                        ],
+                        'items' => [
+                            [
+                                'partNumber' => 'ABA1012GAD',
+                                'quantity' => 1,
+                            ],
+                        ],
+                    ],
+                    [
+                        'package' => [
+                            'code' => [
+                                'type' => 'TRACKING_NUMBER',
+                                'value' => '210123456784',
+                            ],
+                            'weight' => 92,
+                        ],
+                        'items' => [
+                            [
+                                'partNumber' => '1234567001',
+                                'quantity' => 1,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
