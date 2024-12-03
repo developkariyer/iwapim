@@ -46,6 +46,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
+        $this->testEndpoint();
     }
 
     public function testEndpoint()
