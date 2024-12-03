@@ -87,7 +87,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             'notice' => [
                 'poNumber' => 'TEST_95171143',
                 'supplierId' => 194115,
-                'packageCount' => 2,
+                'packageCount' => 1,
                 'weight' => 184,
                 'volume' => 22986.958176,
                 'carrierCode' => 'FDEG',
@@ -135,7 +135,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                         ],
                         'items' => [
                             [
-                                'partNumber' => 'ABA1012GAD',
+                                'partNumber' => '1234567001',
                                 'quantity' => 1,
                             ],
                         ],
