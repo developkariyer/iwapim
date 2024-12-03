@@ -42,7 +42,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-       $this->prepareToken();
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareToken();
+        }
+        echo "Token is valid. Proceeding with download...\n";
     }
 
     public function import($updateFlag, $importFlag)
