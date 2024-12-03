@@ -9,7 +9,8 @@ use Symfony\Component\HttpClient\HttpClient;
 class WayfairConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'oauth' => 'https://sso.auth.wayfair.com/oauth/token'
+        'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
+        'orders' => 'https://api.wayfair.com/v1/graphql',
     ];
     public static $marketplaceType = 'Wayfair';
     public static $expires_in;
@@ -46,7 +47,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
-        $this->testEndpoint();
+        //$this->testEndpoint();
+        $this->getDropshipOrdersSandbox();  
     }
 
     public function testEndpoint()
@@ -61,6 +63,60 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
         }
         print_r($response->getContent());
+    }
+
+    public function getDropshipOrdersSandbox()
+    {
+        $query = <<<GRAPHQL
+        query getDropshipPurchaseOrders {
+            getDropshipPurchaseOrders(
+                limit: 10,
+                hasResponse: false,
+                sortOrder: DESC
+            ) {
+                poNumber,
+                poDate,
+                estimatedShipDate,
+                customerName,
+                customerAddress1,
+                customerAddress2,
+                customerCity,
+                customerState,
+                customerPostalCode,
+                orderType,
+                shippingInfo {
+                    shipSpeed,
+                    carrierCode
+                },
+                packingSlipUrl,
+                warehouse {
+                    id,
+                    name
+                },
+                products {
+                    partNumber,
+                    quantity,
+                    price,
+                    event {
+                        startDate,
+                        endDate
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json'
+            ],
+            'json' => ['query' => $query]
+        ]);
+
+        if ($response->getStatusCode() === 200) {
+            print_r($response->getContent());
+        }
+
     }
 
     public function import($updateFlag, $importFlag)
