@@ -49,8 +49,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        //$this->getDropshipOrdersSandbox();  
-        $this->sendShipmentSandbox();
+        $this->getDropshipOrdersSandbox();  
+        //$this->sendShipmentSandbox();
     }
 
     public function testEndpoint()
