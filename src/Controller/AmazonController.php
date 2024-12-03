@@ -125,9 +125,16 @@ class AmazonController extends FrontendController
                 'traffic_light' => "green",
                 'image' => $imageUrl,
                 'warehouse' => [
-                    'id' => random_int(1, 1000000),
-                    'name' => "IWA",
-                    'status' => "green",
+                    [
+                        'id' => random_int(1, 1000000),
+                        'name' => "IWA",
+                        'status' => "green",
+                    ],
+                    [
+                        'id' => random_int(1, 1000000),
+                        'name' => "CA",
+                        'status' => "orange",
+                    ],
                 ]
             ];
         }
