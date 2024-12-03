@@ -78,7 +78,11 @@ class ErrorListingsCommand extends AbstractCommand
             }
             $sku = $sku['sku'];
             echo " $country $sku ";
-            $amazonConnector->utilsHelper->patchListing($sku, $country);
+            try {
+                $amazonConnector->utilsHelper->patchListing($sku, $country);
+            } catch (\Exception $e) {
+                echo "Error: ".$e->getMessage()."\n";
+            }
         }
         echo "\nFinished\n";
     }
