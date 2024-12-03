@@ -139,22 +139,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                                 'quantity' => 1,
                             ],
                         ],
-                    ],
-                    [
-                        'package' => [
-                            'code' => [
-                                'type' => 'TRACKING_NUMBER',
-                                'value' => '210123456784',
-                            ],
-                            'weight' => 92,
-                        ],
-                        'items' => [
-                            [
-                                'partNumber' => '1234567001',
-                                'quantity' => 1,
-                            ],
-                        ],
-                    ],
+                    ]
                 ],
             ],
         ];
