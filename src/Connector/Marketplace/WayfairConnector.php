@@ -48,6 +48,20 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
     }
 
+    public function testEndpoint()
+    {
+        $response = $this->httpClient->request('GET', 'https://sandbox.api.wayfair.com/v1/demo/clock',[
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
     public function import($updateFlag, $importFlag)
     {
        
