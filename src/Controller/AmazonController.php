@@ -132,7 +132,7 @@ class AmazonController extends FrontendController
             ];
         }
 
-        return $this->render('catalog/catalog.html.twig', [
+        return $this->render('amazon/amazon.html.twig', [
             'pageCount' => ceil($catalogCount/$pageSize),
             'query' => $query,
             'category' => $category,
