@@ -62,7 +62,7 @@ class ErrorListingsCommand extends AbstractCommand
             SELECT marketplaceId, sku
             FROM object_collection_AmazonMarketplace_varyantproduct
             WHERE fieldname = 'amazonMarketplace' 
-                AND status = 'Active' 
+                AND status <> 'Active' 
                 AND marketplaceId IN ('$euMarketsPlaceholder')
             ORDER BY marketplaceId, sku
         ";
