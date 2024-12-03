@@ -135,39 +135,4 @@ class DefaultController extends FrontendController
         return $this->redirectToRoute('default_login');
     }
 
-    /**
-     * @Route("/amazon", name="default_amazon")
-     */
-    public function amazonAction(Request $request): Response
-    {   // Burak için
-        $amazonListing = new AmazonVariantListing();
-        $amazonListing->setUnpublished(true);
-        $amazonListings = $amazonListing->load();
-        $amazonlist = [];
-        foreach ($amazonListings as $amazonListing) {
-            $sku = $amazonListing->getSku();
-            $summaries = json_decode($amazonListing->getSummaries(), true);
-            $attributes = json_decode($amazonListing->getAttributes(), true);
-            if ($summaries[0]['asin']==='B0B2F2V9F5') {
-                error_log($amazonListing->getAttributes());
-            }
-            $amazonlist[] = [
-                'sku' => $sku,
-                'name' => $attributes['item_name'][0]['value'] ?? '',
-                'asin' => $summaries[0]['asin'] ?? '',
-                'fnsku' => $summaries[0]['fnsku'] ?? '',
-                'eid' => $attributes['externally_assigned_product_identifier'][0]['value'] ?? '',
-                'eidType' => $attributes['externally_assigned_product_identifier'][0]['type'] ?? '',
-                'parent' => $attributes['child_parent_sku_relationship'][0]['parent_sku'] ?? '',
-                'status' => (empty($attributes) || empty($summaries)) ? 'Not Synced' : 'OK',
-            ];
-        }
-        return $this->render(
-            'iwapim/amazon.html.twig', 
-            [
-                'amazon_listings' => $amazonlist,
-            ]
-        );
-    }
-
 }
