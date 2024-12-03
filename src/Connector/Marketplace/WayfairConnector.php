@@ -87,11 +87,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         GRAPHQL;
         $variables = [
-            'poNumber' => 'TEST_68895983',
+            'poNumber' => 'TEST_23082207',
             'shipSpeed' => 'GROUND',
             'lineItems' => [
                 [
-                    'partNumber' => '2SIZEWLLMNTDESK',
+                    'partNumber' => '4KULKUFICINGOLDS70',
                     'quantity' => 1,
                     'unitPrice' => 9.99,
                     'estimatedShipDate' => '2024-12-05 08:53:33.000000 +00:00',
