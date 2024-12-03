@@ -116,6 +116,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         if ($response->getStatusCode() === 200) {
             print_r($response->getContent());
         }
+        echo "Error: " . print_r($response);
 
     }
 
