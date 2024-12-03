@@ -47,8 +47,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
+        $this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        $this->getDropshipOrdersSandbox();  
+        //$this->getDropshipOrdersSandbox();  
     }
 
     public function testEndpoint()
@@ -61,6 +62,55 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
+    public function acceptDropshipOrdersSandbox()
+    {
+        $query = <<<GRAPHQL
+        mutation acceptOrder(\$poNumber: String!, \$shipSpeed: ShipSpeed!, \$lineItems: [AcceptedLineItemInput!]!) {
+            purchaseOrders {
+                accept(
+                    poNumber: \$poNumber,
+                    shipSpeed: \$shipSpeed,
+                    lineItems: \$lineItems
+                ) {
+                    handle,
+                    submittedAt,
+                    errors {
+                        key,
+                        message
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $variables = [
+            'poNumber' => 'TEST_95171143',
+            'shipSpeed' => 'GROUND',
+            'lineItems' => [
+                [
+                    'partNumber' => '1234567001',
+                    'quantity' => 1,
+                    'unitPrice' => 9.99,
+                    'estimatedShipDate' => '2024-12-05 08:53:33.000000 +00:00',
+                ]
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
@@ -117,8 +167,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
-
-
     }
 
     public function import($updateFlag, $importFlag)
