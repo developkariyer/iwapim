@@ -47,9 +47,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             $this->prepareToken();
         }
         echo "Token is valid. Proceeding with download...\n";
-        //$this->acceptDropshipOrdersSandbox();
+        $this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        $this->getDropshipOrdersSandbox();  
+        //$this->getDropshipOrdersSandbox();  
     }
 
     public function testEndpoint()
@@ -87,11 +87,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         GRAPHQL;
         $variables = [
-            'poNumber' => 'TEST_95171143',
+            'poNumber' => 'TEST_52740640',
             'shipSpeed' => 'GROUND',
             'lineItems' => [
                 [
-                    'partNumber' => '1234567001',
+                    'partNumber' => '2S2CLRMTLAK3STRLB',
                     'quantity' => 1,
                     'unitPrice' => 9.99,
                     'estimatedShipDate' => '2024-12-05 08:53:33.000000 +00:00',
