@@ -170,6 +170,4 @@ class DefaultController extends FrontendController
         );
     }
 
-
-
 }

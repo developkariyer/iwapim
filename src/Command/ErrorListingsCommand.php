@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use Pimcore\Model\DataObject\VariantProduct\Listing as VariantListing; 
