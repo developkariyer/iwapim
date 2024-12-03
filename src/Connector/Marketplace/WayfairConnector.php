@@ -10,7 +10,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
-        'orders' => 'https://api.wayfair.com/v1/graphql',
+        'orders' => 'https://sandbox.api.wayfair.com/graphql',
     ];
     public static $marketplaceType = 'Wayfair';
     public static $expires_in;
