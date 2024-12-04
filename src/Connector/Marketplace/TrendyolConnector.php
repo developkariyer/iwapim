@@ -228,8 +228,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($data));
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetInventoryBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->getBatchRequestResult($data['batchRequestId'])));
+        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Inventory', json_encode($data));
+        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetInventoryBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Inventory', json_encode($this->getBatchRequestResult($data['batchRequestId'])));
         print_r($this->getBatchRequestResult($data['batchRequestId']));
     }
 
@@ -294,8 +294,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetPrice.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($data));
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetPriceBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->getBatchRequestResult($data['batchRequestId'])));
+        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetPrice.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Price' , json_encode($data));
+        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetPriceBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Price' , json_encode($this->getBatchRequestResult($data['batchRequestId'])));
         print_r($this->getBatchRequestResult($data['batchRequestId']));
     }
 
