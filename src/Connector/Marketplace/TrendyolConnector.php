@@ -209,7 +209,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         }
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
-        $response = $this->httpclient->request('POST', $apiUrl, [
+        $response = $this->httpClient->request('POST', $apiUrl, [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
             ],
@@ -273,8 +273,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         }
         $targetPrice = (string) $targetPrice;
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
-        $barcode = $listing->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
-        $response = $this->httpclient->request('POST', $apiUrl, [
+        $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
+        $response = $this->httpClient->request('POST', $apiUrl, [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
             ],
