@@ -74,7 +74,7 @@ class ConsoleCommand extends AbstractCommand
         while (true) {
             $listingObject->setOffset($offset);
             $products = $listingObject->load();
-            if (empty($results)) {
+            if (empty($products)) {
                 break;
             }
             $offset += $pageSize;
