@@ -123,24 +123,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                             ],
                         ],
                     ]
-                ],
-                'smallParcelShipments' => [
-                    [
-                        'package' => [
-                            'code' => [
-                                'type' => 'TRACKING_NUMBER',
-                                'value' => '210123456783',
-                            ],
-                            'weight' => 92,
-                        ],
-                        'items' => [
-                            [
-                                'partNumber' => '1234567001',
-                                'quantity' => 1,
-                            ],
-                        ],
-                    ]
-                ],
+                ]
             ],
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
