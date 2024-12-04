@@ -109,7 +109,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
                 'Content-Type' => 'application/json'
             ],
-            'json' => ['query' => $query]
+            'json' => ['query' => $query,
+            'variables' => $variables]
         ]);
 
         if ($response->getStatusCode() !== 200) {
