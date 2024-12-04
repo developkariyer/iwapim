@@ -67,6 +67,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
+        $this->test();
+
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -82,7 +84,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-
+        
     }
 
     public function downloadOrders()
@@ -188,6 +190,23 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "OK\n";
             $index++;
         }
+    }
+
+    public function test()
+    {
+        $response = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
+        if (empty($response)) {
+            echo "Failed to get locations\n";
+            return;
+        }
+        print_r($response->getContent());
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+        $response = $this->getFromShopifyApi('POST', "variants/{$listing->getUniqueMarketplaceId()}.json", ['inventory_item_id' => '', 'available' => $targetValue, 'location_id'=> '']
+        , 'inventory_level');
+        
     }
 
 }
