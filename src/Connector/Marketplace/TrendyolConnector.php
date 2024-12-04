@@ -213,7 +213,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     ]
                 ]
             ]
-        });
+        ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -275,7 +275,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     ]
                 ]
             ]
-        });
+        ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
