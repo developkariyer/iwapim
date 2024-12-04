@@ -18,7 +18,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         
         if ($this->marketplace->getKey() === 'TrendyolIwa') {
             $variantProduct = VariantProduct::getById(194109);
-            $this->setPrice($variantProduct, "70", "USD");
+            $this->setPrice($variantProduct, "72", "USD");
             $this->setInventory($variantProduct, 1555);
         }
         
