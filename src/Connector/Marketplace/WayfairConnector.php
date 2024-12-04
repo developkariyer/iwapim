@@ -100,7 +100,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'city' => 'Boston',
                     'state' => 'MA',
                     'postalCode' => '02116',
-                    'country' => 'USA',
+                    'country' => 'US',
                 ],
                 'destinationAddress' => [
                     'name' => 'John Smith',
@@ -108,7 +108,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'city' => 'Boston',
                     'state' => 'MA',
                     'postalCode' => '02116',
-                    'country' => 'USA',
+                    'country' => 'US',
                 ],
                 'largeParcelShipments' => [
                     [
