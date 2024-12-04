@@ -15,6 +15,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        echo "Price \n";
+        $this->setPrice("35","TRY");
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -44,8 +46,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             sleep(1);  
         } while ($page <= $data['totalPages']);
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
-        echo "Price \n";
-        $this->setPrice("35","TRY");
     }
 
     public function downloadInventory()
