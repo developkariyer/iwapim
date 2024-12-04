@@ -285,7 +285,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
     }
 
-    public getBatchRequestResult($batchRequestId)
+    public function getBatchRequestResult($batchRequestId)
     {
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/batch-requests/{$batchRequestId}";
         $response = $this->httpclient->request('GET', $apiUrl, [
