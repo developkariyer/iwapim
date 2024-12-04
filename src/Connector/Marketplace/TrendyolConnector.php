@@ -16,7 +16,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         echo "Price \n";
-        $this->setPrice("35","TRY");
+        $this->setPrice("35","USD");
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
