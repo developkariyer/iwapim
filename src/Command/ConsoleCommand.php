@@ -68,7 +68,7 @@ class ConsoleCommand extends AbstractCommand
         $pageSize = 5;
         $offset = 0;
         $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
+        $listingObject->setUnpublished(true);
         $listingObject->setLimit($pageSize);
         $index = $offset;
         while (true) {
