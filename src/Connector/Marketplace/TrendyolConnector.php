@@ -18,7 +18,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         
         if ($this->marketplace->getKey() === 'TrendyolIwa') {
             $variantProduct = VariantProduct::getById(194109);
-            print_r($variantProduct->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode']); 
+            print_r($variantProduct->json_decode($variantProduct->jsonRead('apiResponseJson'), true)['barcode']); 
             //$this->setInventory();
         }
         
