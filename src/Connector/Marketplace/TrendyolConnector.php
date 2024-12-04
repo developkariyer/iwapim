@@ -45,7 +45,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         } while ($page <= $data['totalPages']);
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         echo "Price \n";
-        echo $this->setPrice($targetPrice ="35",$targetCurrency = "TRY") . "\n";
+        echo $this->setPrice("35",$targetCurrency = "TRY") . "\n";
     }
 
     public function downloadInventory()
@@ -227,7 +227,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     // Trendyol update product service just createProduct V2 CREATE_PRODUCT_V2  
     
-    public function setPrice(VariantProduct $listing = null, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice($targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
         $currency = $targetCurrency ?? 'TL';
         if ($currency !== 'TRY') {
