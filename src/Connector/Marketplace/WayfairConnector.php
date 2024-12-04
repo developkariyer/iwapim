@@ -49,8 +49,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        $this->getDropshipOrdersSandbox();  
-        //$this->sendShipmentSandbox();
+        //$this->getDropshipOrdersSandbox();  
+        $this->sendShipmentSandbox();
     }
 
     public function testEndpoint()
@@ -95,7 +95,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'trackingNumber' => '210123456789',
                 'shipDate' => '2024-12-03 08:53:33.000000 +00:00',
                 'sourceAddress' => [
-                    'name' => 'Jane Doe',
+                    'name' => 'Wayfair',
                     'streetAddress1' => '123 Main St.',
                     'city' => 'Boston',
                     'state' => 'MA',
@@ -103,7 +103,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'country' => 'USA',
                 ],
                 'destinationAddress' => [
-                    'name' => 'Wayfair',
+                    'name' => 'Jane Doe',
                     'streetAddress1' => '123 Test Street',
                     'city' => 'Boston',
                     'state' => 'MA',
