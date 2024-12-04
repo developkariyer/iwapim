@@ -97,6 +97,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'sourceAddress' => [
                     'name' => 'John Smith',
                     'streetAddress1' => '123 Test Street',
+                    'streetAddress2' => '# 2',
                     'city' => 'Boston',
                     'state' => 'MA',
                     'postalCode' => '02116',
@@ -105,6 +106,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'destinationAddress' => [
                     'name' => 'John Smith',
                     'streetAddress1' => '123 Test Street',
+                    'streetAddress2' => '# 2',
                     'city' => 'Boston',
                     'state' => 'MA',
                     'postalCode' => '02116',
