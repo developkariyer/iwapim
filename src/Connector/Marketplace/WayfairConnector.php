@@ -200,7 +200,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         query getCastleGatePurchaseOrders  {
             getCastleGatePurchaseOrders(
                 limit: 10,
-                hasResponse: true,
+                hasResponse: false,
                 sortOrder: DESC
             ) {
                 poNumber,
