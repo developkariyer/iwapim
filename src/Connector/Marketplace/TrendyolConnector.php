@@ -282,7 +282,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 'items' => [
                     [
                         'barcode' => $barcode,
-                        'listPrice' => $targetPrice
+                        'salePrice' => $targetPrice
                     ]
                 ]
             ]
