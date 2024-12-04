@@ -63,6 +63,45 @@ class ConsoleCommand extends AbstractCommand
         $grp->save();
     }
 
+    public function addMatteToVariantColors()
+    {   // $this->addMatteToVariantColors();
+        $pageSize = 5;
+        $offset = 0;
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setLimit($pageSize);
+        $index = $offset;
+        while (true) {
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($results)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                $index++;
+                echo "\rProcessing $index {$product->getId()} ";
+                if ($product->level() < 1 || $product->getInheritedField('productCategory') !== 'IWA Metal') {
+                    continue;
+                }
+                $variationColor = $product->getVariationColor();
+                if (in_array($variationColor, ['Gold', 'Copper', 'Silver', 'IGOB', 'IGOS', 'ISOB', 'ISOG'])) {
+                    echo "{$product->getInheritedField('productCategory')} {$variationColor} ";
+                    $product->setVariationColor("Matte {$variationColor}");
+                    $product->save();
+                    echo "saved\n";
+                    file_put_contents(PIMCORE_PROJECT_ROOT . "/tmp/product_add_matte.log", json_encode([
+                        'timestamp' => date('Y-m-d H:i:s'),
+                        'product' => $product->getId(),
+                        'productCategory' => $product->getInheritedField('productCategory'),
+                        'oldVariationColor' => $variationColor,
+                        'newVariationColor' => "Matte {$variationColor}"
+                    ]) . "\n", FILE_APPEND);
+                }
+            }
+        }
+    }
+
     public function getAmazonInfo()
     {   // $this->getAmazonInfo();
         
