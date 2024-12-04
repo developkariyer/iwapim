@@ -230,6 +230,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function setPrice($targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
         $currency = $targetCurrency ?? 'TRY';
+        echo "Function called with price: $targetPrice and currency: $currency\n";
         if ($currency !== 'TRY') {
             $today = date('Y-m-d');
             $db = \Pimcore\Db::get();
