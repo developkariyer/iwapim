@@ -197,8 +197,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function getDropshipOrdersSandbox()
     {
         $query = <<<GRAPHQL
-        query getDropshipPurchaseOrders {
-            getDropshipPurchaseOrders(
+        query getCastleGatePurchaseOrders  {
+            getCastleGatePurchaseOrders(
                 limit: 10,
                 hasResponse: true,
                 sortOrder: DESC
@@ -247,6 +247,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         print_r($response->getContent());
     }
+
 
     public function import($updateFlag, $importFlag)
     {
