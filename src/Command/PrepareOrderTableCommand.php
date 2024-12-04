@@ -114,7 +114,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $amazonSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
-            total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status)
+            total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
             SELECT
                 '$marketplaceType',
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.PurchaseDate')) AS created_at,
@@ -136,7 +136,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                     JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.StateOrRegion'))
                 ) AS province_code,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderTotal.Amount')) AS total_price,  
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderStatus')) AS fulfillments_status
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderStatus')) AS fulfillments_status,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.FulfillmentChannel')) AS tracking_company
             FROM
                 iwa_marketplace_orders
                 CROSS JOIN JSON_TABLE(json, '$.OrderItems[*]' COLUMNS (
@@ -162,7 +163,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 shipping_country_code = VALUES(shipping_country_code),
                 total_price = VALUES(total_price),
                 fulfillments_status = VALUES(fulfillments_status),
-                province_code = VALUES(province_code);";
+                province_code = VALUES(province_code),
+                tracking_company = VALUES(tracking_company);";
         try {
             $db = \Pimcore\Db::get();
             $db->query($amazonSql);

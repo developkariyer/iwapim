@@ -50,7 +50,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
         //$this->getDropshipOrdersSandbox();  
-        $this->sendShipmentSandbox();
+        //$this->sendShipmentSandbox();
+        $this->saveInventorySandbox();
     }
 
     public function testEndpoint()
@@ -63,6 +64,98 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
+    public function saveInventorySandbox()
+    {
+        $query = <<<GRAPHQL
+        mutation inventory(\$inventory: [inventoryInput]!) {
+            inventory {
+                save(
+                    inventory: \$inventory,
+                    feed_kind: TRUE_UP
+                ) {
+                    handle,
+                    submittedAt,
+                    errors {
+                        key,
+                        message
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        
+        $variables = [
+            "inventory" => [
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "1234567001",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "2S2CLRMTLAK3STRLB",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "2S4CMASHLLHTBLAB",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "2SIZEWLLMNTDESK",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "4KULKUFICINGOLDS70",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                
+            ]
+        ];
+
+
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => ['query' => $query,
+            'variables' => $variables]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
@@ -85,26 +178,28 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         GRAPHQL;
         $variables = [
             'notice' => [
-                'poNumber' => 'TEST_52740640',
+                'poNumber' => 'TEST_23082207',
                 'supplierId' => 194115,
                 'packageCount' => 1,
                 'weight' => 184,
                 'volume' => 22986.958176,
                 'carrierCode' => 'FDEG',
-                'shipSpeed' => 'SECOND_DAY_AIR',
+                'shipSpeed' => 'GROUND',
                 'trackingNumber' => '210123456789',
                 'shipDate' => '2024-12-03 08:53:33.000000 +00:00',
                 'sourceAddress' => [
-                    'name' => 'Jane Doe',
-                    'streetAddress1' => '123 Main St.',
+                    'name' => 'John Smith',
+                    'streetAddress1' => '123 Test Street',
+                    'streetAddress2' => '# 2',
                     'city' => 'Boston',
                     'state' => 'MA',
-                    'postalCode' => '02122',
-                    'country' => 'USA',
+                    'postalCode' => '02116',
+                    'country' => 'US',
                 ],
                 'destinationAddress' => [
-                    'name' => 'Wayfair',
+                    'name' => 'John Smith',
                     'streetAddress1' => '123 Test Street',
+                    'streetAddress2' => '# 2',
                     'city' => 'Boston',
                     'state' => 'MA',
                     'postalCode' => '02116',
@@ -112,7 +207,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 ],
                 'largeParcelShipments' => [
                     [
-                        'partNumber' => '1234567001',
+                        'partNumber' => '4KULKUFICINGOLDS70',
                         'packages' => [
                             [
                                 'code' => [
@@ -123,24 +218,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                             ],
                         ],
                     ]
-                ],
-                'smallParcelShipments' => [
-                    [
-                        'package' => [
-                            'code' => [
-                                'type' => 'TRACKING_NUMBER',
-                                'value' => '210123456783',
-                            ],
-                            'weight' => 92,
-                        ],
-                        'items' => [
-                            [
-                                'partNumber' => '1234567001',
-                                'quantity' => 1,
-                            ],
-                        ],
-                    ]
-                ],
+                ]
             ],
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
@@ -262,6 +340,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         print_r($response->getContent());
     }
+    
 
     public function import($updateFlag, $importFlag)
     {
