@@ -45,7 +45,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         } while ($page <= $data['totalPages']);
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
         echo "Price \n";
-        $this->setPrice("35",$targetCurrency = "TRY") . "\n";
+        $this->setPrice("35","TRY");
     }
 
     public function downloadInventory()
