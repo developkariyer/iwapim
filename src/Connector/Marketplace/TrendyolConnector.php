@@ -217,7 +217,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
-            break;
+            return;
         }
         $data = $response->toArray();
         echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
@@ -279,7 +279,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
-            break;
+            return;
         }
         $data = $response->toArray();
         echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
