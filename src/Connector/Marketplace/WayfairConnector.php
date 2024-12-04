@@ -91,7 +91,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'weight' => 184,
                 'volume' => 22986.958176,
                 'carrierCode' => 'FDEG',
-                'shipSpeed' => 'SECOND_DAY_AIR',
+                'shipSpeed' => 'GROUND',
                 'trackingNumber' => '210123456789',
                 'shipDate' => '2024-12-03 08:53:33.000000 +00:00',
                 'sourceAddress' => [
@@ -108,7 +108,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'city' => 'Boston',
                     'state' => 'MA',
                     'postalCode' => '02116',
-                    'country' => 'US',
+                    'country' => 'USA',
                 ],
                 'largeParcelShipments' => [
                     [
