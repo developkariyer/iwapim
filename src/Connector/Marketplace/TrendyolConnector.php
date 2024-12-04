@@ -18,8 +18,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         
         if ($this->marketplace->getKey() === 'TrendyolIwa') {
             $variantProduct = VariantProduct::getById(194109);
-            print_r(json_decode($variantProduct->jsonRead('apiResponseJson'), true)['barcode']); 
-            //$this->setInventory();
+            $this->setInventory();
         }
         
         
@@ -209,7 +208,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
-        $barcode = $listing->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
+        $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         $response = $this->httpclient->request('POST', $apiUrl, [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
