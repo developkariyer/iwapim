@@ -15,8 +15,12 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        echo "Price \n";
-        $this->setPrice("35","USD");
+        
+        VariantProduct $variantProduct = VariantProduct::getById(194109);
+        print_r($variantProduct->jsonRead('apiResponseJson')); 
+        //$this->setInventory();
+        
+        
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -222,16 +226,18 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
+        Utility::setCustomCache('SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($data));
+        Utility::setCustomCache('SetInventoryBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->getBatchRequestResult($data['batchRequestId'])));
+        print_r($this->getBatchRequestResult($data['batchRequestId']));
     }
 
     // Trendyol update product service just createProduct V2 CREATE_PRODUCT_V2  
     
-    public function setPrice($targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-        $currency = $targetCurrency ?? 'TRY';
+        $currency = $targetCurrency ?? 'TL';
         echo "Function called with price: $targetPrice and currency: $currency\n";
-        if ($currency !== 'TRY') {
+        if ($currency !== 'TL') {
             $today = date('Y-m-d');
             $db = \Pimcore\Db::get();
             $sql = "
@@ -264,8 +270,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             }
         }
         $targetPrice = (string) $targetPrice;
-        echo $targetPrice . "\n";
-        /*$targetPrice = (string) $targetPrice;
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = $listing->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         $response = $this->httpclient->request('POST', $apiUrl, [
@@ -287,7 +291,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";*/
+        Utility::setCustomCache('SetPrice.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($data));
+        Utility::setCustomCache('SetPriceBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->getBatchRequestResult($data['batchRequestId'])));
+        print_r($this->getBatchRequestResult($data['batchRequestId']));
     }
 
     public function getBatchRequestResult($batchRequestId)
@@ -303,7 +309,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
             return;
         }
-        return $response->getContent();
+        return $response->toArray();
     }
 
 }
