@@ -241,9 +241,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     iwa_currency_history
                 WHERE 
                     currency = '$currency'
-                    AND DATE(date) <= '$date'
+                    AND DATE(date) <= '$today'
                 ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$today')) ASC
                 LIMIT 1;
             ";
             
