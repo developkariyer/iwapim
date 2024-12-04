@@ -14,38 +14,36 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $filename = 'tmp/' . urlencode($this->marketplace->getKey()) . '.json';
-        if (!$forceDownload && file_exists($filename) && filemtime($filename) > time() - 86400) {
-            $this->listings = json_decode(file_get_contents($filename), true);
-            echo "Using cached data ";
-        } else {
-            $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products?approved=true";
-            $page = 0;
-            $this->listings = [];
-            do {
-                $response = $this->httpClient->request('GET', $apiUrl, [
-                    'headers' => [
-                        'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-                    ],
-                    'query' => [
-                        'page' => $page
-                    ]
-                ]);
-                $statusCode = $response->getStatusCode();
-                if ($statusCode !== 200) {
-                    echo "Error: $statusCode\n";
-                    break;
-                }
-                $data = $response->toArray();
-                $products = $data['content'];
-                $this->listings = array_merge($this->listings, $products);
-                $page++;
-                echo ".";
-                sleep(1);  
-            } while ($page <= $data['totalPages']);
-            file_put_contents($filename, json_encode($this->listings));
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!(empty($this->listings) || $forceDownload)) {
+            echo "Using cached listings\n";
+            return;
         }
-        return count($this->listings);
+        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products?approved=true";
+        $page = 0;
+        $this->listings = [];
+        do {
+            $response = $this->httpClient->request('GET', $apiUrl, [
+                'headers' => [
+                    'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+                ],
+                'query' => [
+                    'page' => $page
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $products = $data['content'];
+            $this->listings = array_merge($this->listings, $products);
+            $page++;
+            echo ".";
+            sleep(1);  
+        } while ($page <= $data['totalPages']);
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     public function downloadInventory()
@@ -194,4 +192,113 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $index++;
         }
     }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null) // 15 dakika boyunca aynı isteği tekrarlı olarak atamazsınız!
+    {
+        if ($targetValue > 20000) {
+            echo "Error: Quantity cannot be more than 20000\n";
+            return;
+        }
+        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
+        $barcode = $listing->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
+        $response = $this->httpclient->request('POST', $apiUrl, [
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
+            ],
+            'json' => [
+                'items' => [
+                    [
+                        'barcode' => $barcode,
+                        'quantity' => $targetValue
+                    ]
+                ]
+            ]
+        });
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            break;
+        }
+        $data = $response->toArray();
+        echo $this->getBatchRequestResult($data['batchRequestId']) "\n";
+    }
+
+    // Trendyol update product service just createProduct V2 CREATE_PRODUCT_V2  
+    
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+        $currency = $targetCurrency ?? 'TL';
+        if ($currency !== 'TL') {
+            $today = date('Y-m-d');
+            $db = \Pimcore\Db::get();
+            $sql = "
+                SELECT
+                    value
+                FROM 
+                    iwa_currency_history
+                WHERE 
+                    currency = '$currency'
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
+            ";
+            
+            $result = $db->fetchOne($sql, [
+                'today' => $today,
+                'currency' => $currency
+            ]);
+
+            if ($result) {
+                $value = $result;  
+                $targetPrice = (float)$targetPrice;
+                $convertedPrice = $targetPrice * $value;
+                $convertedPrice = round($convertedPrice, 2);
+                $targetPrice = $convertedPrice;
+                echo "Converted Price in TL: " . $convertedPrice;
+            } else {
+                echo "No result found for currency: $currency.\n";
+            }
+        }
+        $targetPrice = (string) $targetPrice;
+        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
+        $barcode = $listing->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
+        $response = $this->httpclient->request('POST', $apiUrl, [
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
+            ],
+            'json' => [
+                'items' => [
+                    [
+                        'barcode' => $barcode,
+                        'listPrice' => $targetPrice
+                    ]
+                ]
+            ]
+        });
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            break;
+        }
+        $data = $response->toArray();
+        echo $this->getBatchRequestResult($data['batchRequestId']) "\n";
+    }
+
+    public getBatchRequestResult($batchRequestId)
+    {
+        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/batch-requests/{$batchRequestId}";
+        $response = $this->httpclient->request('GET', $apiUrl, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getTrendyolToken()
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            break;
+        }
+        return $response->getContent();
+    }
+
 }
