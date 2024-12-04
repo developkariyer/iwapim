@@ -94,22 +94,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'shipSpeed' => 'SECOND_DAY_AIR',
                 'trackingNumber' => '210123456789',
                 'shipDate' => '2024-12-03 08:53:33.000000 +00:00',
-                'sourceAddress' => [
-                    'name' => 'Shukran Islamic Decoration Arts LLC',
-                    'streetAddress1' => '123 Main St.',
-                    'city' => 'Boston',
-                    'state' => 'MA',
-                    'postalCode' => '02122',
-                    'country' => 'USA',
-                ],
-                'destinationAddress' => [
-                    'name' => 'John Smith',
-                    'streetAddress1' => '123 Test Street',
-                    'city' => 'Boston',
-                    'state' => 'MA',
-                    'postalCode' => '02116',
-                    'country' => 'USA',
-                ],
                 'largeParcelShipments' => [
                     [
                         'partNumber' => '1234567001',
