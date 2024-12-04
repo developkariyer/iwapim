@@ -282,7 +282,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             break;
         }
         $data = $response->toArray();
-        echo $this->getBatchRequestResult($data['batchRequestId']) "\n";
+        echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
     }
 
     public getBatchRequestResult($batchRequestId)
