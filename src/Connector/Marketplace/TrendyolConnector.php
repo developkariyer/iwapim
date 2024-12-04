@@ -272,6 +272,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             }
         }
         $targetPrice = (string) $targetPrice;
+        echo "Setting price to: $targetPrice\n";
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         $response = $this->httpClient->request('POST', $apiUrl, [
