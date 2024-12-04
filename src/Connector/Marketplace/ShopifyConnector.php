@@ -199,7 +199,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get locations\n";
             return;
         }
-        print_r($response->getContent());
+        print_r($response);
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
