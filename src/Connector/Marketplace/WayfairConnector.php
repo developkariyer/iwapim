@@ -67,6 +67,65 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         print_r($response->getContent());
     }
 
+    public function saveInventorySandbox()
+    {
+        $query = <<<GRAPHQL
+        mutation inventory(\$inventory: [inventoryInput]!) {
+            inventory {
+                save(
+                    inventory: \$inventory,
+                    feed_kind: DIFFERENTIAL
+                ) {
+                    handle,
+                    submittedAt,
+                    errors {
+                        key,
+                        message
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $variables = [
+            "inventory" => [
+                [
+                    "supplierId" => 5000,
+                    "supplierPartNumber" => "XXXXXXXX",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2021-05-31T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 5000,
+                    "supplierPartNumber" => "YYYYYYYY",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2021-05-31T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ]
+            ]
+        ];
+
+
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => ['query' => $query]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
     public function sendShipmentSandbox()
     {
         $query =  $query = <<<GRAPHQL
@@ -197,10 +256,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function getDropshipOrdersSandbox()
     {
         $query = <<<GRAPHQL
-        query getCastleGatePurchaseOrders  {
-            getCastleGatePurchaseOrders(
+        query getDropshipPurchaseOrders {
+            getDropshipPurchaseOrders(
                 limit: 10,
-                hasResponse: false,
+                hasResponse: true,
                 sortOrder: DESC
             ) {
                 poNumber,
@@ -247,7 +306,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         print_r($response->getContent());
     }
-
+    
 
     public function import($updateFlag, $importFlag)
     {
