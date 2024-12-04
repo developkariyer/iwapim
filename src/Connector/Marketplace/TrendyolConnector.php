@@ -18,7 +18,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         
         if ($this->marketplace->getKey() === 'TrendyolIwa') {
             $variantProduct = VariantProduct::getById(194109);
-            $this->setPrice($variantProduct, "2555", "TL");
+            $this->setPrice($variantProduct, "70", "USD");
         }
         
         
@@ -228,8 +228,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        Utility::setCustomCache('SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($data));
-        Utility::setCustomCache('SetInventoryBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->getBatchRequestResult($data['batchRequestId'])));
+        Utility::setCustomCache('SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()). "/" . $barcode, json_encode($data));
+        Utility::setCustomCache('SetInventoryBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()). "/" . $barcode, json_encode($this->getBatchRequestResult($data['batchRequestId'])));
         print_r($this->getBatchRequestResult($data['batchRequestId']));
     }
 
@@ -293,8 +293,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        Utility::setCustomCache('SetPrice.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($data));
-        Utility::setCustomCache('SetPriceBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->getBatchRequestResult($data['batchRequestId'])));
+        Utility::setCustomCache('SetPrice.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . "/" . $barcode, json_encode($data));
+        Utility::setCustomCache('SetPriceBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . "/" . $barcode, json_encode($this->getBatchRequestResult($data['batchRequestId'])));
         print_r($this->getBatchRequestResult($data['batchRequestId']));
     }
 
