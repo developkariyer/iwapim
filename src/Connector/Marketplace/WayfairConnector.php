@@ -71,47 +71,38 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function saveInventorySandbox()
     {
         $query = <<<GRAPHQL
-        mutation inventory(\$inventory: [inventoryInput]!) {
+        "query": "
+            mutation inventory($inventory: [inventoryInput]!) {
             inventory {
                 save(
-                    inventory: \$inventory,
-                    feed_kind: DIFFERENTIAL
+                inventory: $inventory,
+                feed_kind: DIFFERENTIAL
                 ) {
-                    handle,
-                    submittedAt,
-                    errors {
-                        key,
-                        message
-                    }
+                handle,
+                submittedAt,
+                errors {
+                    key,
+                    message
+                }
                 }
             }
+            }
+        ",
+        "variables": {
+            "inventory": [
+            {
+                "supplierId": 194115,
+                "supplierPartNumber": "XXXXXXXX",
+                "quantityOnHand": 5,
+                "quantityBackordered": 10,
+                "quantityOnOrder": 2,
+                "itemNextAvailabilityDate": "05-31-2021 00:00:00",
+                "discontinued": false,
+                "productNameAndOptions": "My Awesome Product"
+            }
+        ]
         }
         GRAPHQL;
-        $variables = [
-            "inventory" => [
-                [
-                    "supplierId" => 194115,
-                    "supplierPartNumber" => "XXXXXXXX",
-                    "quantityOnHand" => 5,
-                    "quantityBackordered" => 10,
-                    "quantityOnOrder" => 2,
-                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
-                    "discontinued" => false,
-                    "productNameAndOptions" => "My Awesome Product",
-                ],
-                [
-                    "supplierId" => 5000,
-                    "supplierPartNumber" => "1234567001",
-                    "quantityOnHand" => 5,
-                    "quantityBackordered" => 10,
-                    "quantityOnOrder" => 2,
-                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
-                    "discontinued" => false,
-                    "productNameAndOptions" => "My Awesome Product",
-                ]
-            ]
-        ];
-
 
         $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
             'headers' => [
