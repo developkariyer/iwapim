@@ -220,7 +220,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             break;
         }
         $data = $response->toArray();
-        echo $this->getBatchRequestResult($data['batchRequestId']) "\n";
+        echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
     }
 
     // Trendyol update product service just createProduct V2 CREATE_PRODUCT_V2  
