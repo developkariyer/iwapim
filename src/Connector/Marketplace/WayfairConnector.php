@@ -99,7 +99,48 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
                     "discontinued" => false,
                     "productNameAndOptions" => "My Awesome Product",
-                ]
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "2S2CLRMTLAK3STRLB",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "2S4CMASHLLHTBLAB",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "2SIZEWLLMNTDESK",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                [
+                    "supplierId" => 194115,
+                    "supplierPartNumber" => "4KULKUFICINGOLDS70",
+                    "quantityOnHand" => 5,
+                    "quantityBackordered" => 10,
+                    "quantityOnOrder" => 2,
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
+                    "discontinued" => false,
+                    "productNameAndOptions" => "My Awesome Product",
+                ],
+                
             ]
         ];
 
