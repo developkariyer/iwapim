@@ -95,12 +95,12 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'trackingNumber' => '210123456789',
                 'shipDate' => '2024-12-03 08:53:33.000000 +00:00',
                 'sourceAddress' => [
-                    'name' => 'Shukran Islamic Decoration Arts LLC',
-                    'streetAddress1' => '123 Main St.',
-                    'city' => 'Turkey',
-                    'state' => 'IST',
-                    'postalCode' => '02122',
-                    'country' => 'TR',
+                    'name' => 'John Smith',
+                    'streetAddress1' => '123 Test Street',
+                    'city' => 'Boston',
+                    'state' => 'MA',
+                    'postalCode' => '02116',
+                    'country' => 'USA',
                 ],
                 'destinationAddress' => [
                     'name' => 'John Smith',
