@@ -49,8 +49,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        $this->getDropshipOrdersSandbox();  
+        //$this->getDropshipOrdersSandbox();  
         //$this->sendShipmentSandbox();
+        $this->saveInventorySandbox();
     }
 
     public function testEndpoint()
@@ -89,22 +90,22 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $variables = [
             "inventory" => [
                 [
-                    "supplierId" => 5000,
+                    "supplierId" => 194115,
                     "supplierPartNumber" => "XXXXXXXX",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
                     "quantityOnOrder" => 2,
-                    "itemNextAvailabilityDate" => "2021-05-31T00:00:00+00:00", 
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
                     "discontinued" => false,
                     "productNameAndOptions" => "My Awesome Product",
                 ],
                 [
                     "supplierId" => 5000,
-                    "supplierPartNumber" => "YYYYYYYY",
+                    "supplierPartNumber" => "1234567001",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
                     "quantityOnOrder" => 2,
-                    "itemNextAvailabilityDate" => "2021-05-31T00:00:00+00:00", 
+                    "itemNextAvailabilityDate" => "2024-12-03T00:00:00+00:00", 
                     "discontinued" => false,
                     "productNameAndOptions" => "My Awesome Product",
                 ]
