@@ -97,10 +97,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'sourceAddress' => [
                     'name' => 'Shukran Islamic Decoration Arts LLC',
                     'streetAddress1' => '123 Main St.',
-                    'city' => 'Boston',
-                    'state' => 'MA',
+                    'city' => 'Turkey',
+                    'state' => 'IST',
                     'postalCode' => '02122',
-                    'country' => 'USA',
+                    'country' => 'TR',
                 ],
                 'destinationAddress' => [
                     'name' => 'John Smith',
