@@ -75,7 +75,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             inventory {
                 save(
                     inventory: \$inventory,
-                    feed_kind: DIFFERENTIAL
+                    feed_kind: TRUE_UP
                 ) {
                     handle,
                     submittedAt,
