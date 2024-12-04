@@ -54,6 +54,14 @@
         .traffic-light.red { background-color: #ff4d4d; }
         .traffic-light.orange { background-color: #ffa500; }
         .traffic-light.green { background-color: #28a745; }
+        .page-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .row.g-0 {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -89,6 +97,34 @@
         <div id="catalog-container">
             {% for product in products %}
                 <div class="card product-card">
+
+                    <table style="table-layout: fixed; width: 100%; height: 100%; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <tr>
+                            <td style="width: 150px; vertical-align: top; border: none; padding: 0;">
+                                <div style="height: 120px; width: 150px;">
+                                    <img src="{{ product.image }}" alt="Product Image" style="height: 100%; max-width: 150px; width: auto; display: block;">
+                                </div>
+                            </td>                                                        
+                            <td style="vertical-align: top; border: none; padding: 3px; overflow: hidden;">
+                                <div class="card-body product-info">
+                                    <h5 class="card-title">{{product.iwasku }} {{ product.productIdentifier }} {{ product.name }}</h5>
+                                    <div class="col-12" style="font-size: smaller;">
+                                        {{ product.asinList }} | {{ product.skuList }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell" style="width: 320px; vertical-align: top; border: none; padding: 0;">
+                                <div class="product-gallery">
+                                    {% for image in product.album %}
+                                        {{ image|raw }}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+
+
                     <div class="row g-0">
                         <div class="col-3">
                             <img src="{{ product.image }}" alt="Product Image" style="height: 100%; max-width: 150px; width: auto; display: block;">
@@ -114,6 +150,8 @@
                             </div>
                         </div>
                     </div>
+
+
 
                     <!-- Tabs in Expanded View -->
                     <div class="tab-content">
