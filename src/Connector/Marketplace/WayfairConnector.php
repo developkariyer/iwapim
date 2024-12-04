@@ -49,8 +49,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        //$this->getDropshipOrdersSandbox();  
-        $this->sendShipmentSandbox();
+        $this->getDropshipOrdersSandbox();  
+        //$this->sendShipmentSandbox();
     }
 
     public function testEndpoint()
@@ -85,7 +85,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         GRAPHQL;
         $variables = [
             'notice' => [
-                'poNumber' => 'TEST_52740640',
+                'poNumber' => 'TEST_95171143',
                 'supplierId' => 194115,
                 'packageCount' => 1,
                 'weight' => 184,
