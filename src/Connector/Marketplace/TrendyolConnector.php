@@ -16,9 +16,12 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         
-        VariantProduct $variantProduct = VariantProduct::getById(194109);
-        print_r($variantProduct->jsonRead('apiResponseJson')); 
-        //$this->setInventory();
+        if ($this->marketplace->getKey() === 'TrendyolIwa') {
+            VariantProduct $variantProduct = VariantProduct::getById(194109);
+            print_r($variantProduct->jsonRead('apiResponseJson')); 
+            //$this->setInventory();
+        }
+        
         
         
         if (!(empty($this->listings) || $forceDownload)) {
