@@ -118,12 +118,12 @@ class ExcelCommand extends AbstractCommand
         echo "\n";
         $flatfile = [];
         foreach ($data as $category=>$products) {
-            $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products_' . $category . '.csv', $products);
+            $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/tmp/products_' . $category . '.csv', $products);
             echo "Products dumped to products_$category.csv\n";
             $flatfile = array_merge($flatfile, $products);
         }
-        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/products.csv', $flatfile);
-        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/parent_products.csv', $parentProduct);
+        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/tmp/products.csv', $flatfile);
+        $this->writeCsv(PIMCORE_PROJECT_ROOT . '/public/tmp/parent_products.csv', $parentProduct);
         echo "Products dumped to products.csv, parents dumped to parent_products.csv\n";
     }
 
