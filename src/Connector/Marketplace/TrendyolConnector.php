@@ -15,6 +15,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        echo "Price \n";
+        $this->setPrice("35","USD");
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -225,10 +227,11 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     // Trendyol update product service just createProduct V2 CREATE_PRODUCT_V2  
     
-    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice($targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-        $currency = $targetCurrency ?? 'TL';
-        if ($currency !== 'TL') {
+        $currency = $targetCurrency ?? 'TRY';
+        echo "Function called with price: $targetPrice and currency: $currency\n";
+        if ($currency !== 'TRY') {
             $today = date('Y-m-d');
             $db = \Pimcore\Db::get();
             $sql = "
@@ -238,9 +241,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     iwa_currency_history
                 WHERE 
                     currency = '$currency'
-                    AND DATE(date) <= '$date'
+                    AND DATE(date) <= '$today'
                 ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$today')) ASC
                 LIMIT 1;
             ";
             
@@ -251,16 +254,18 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
             if ($result) {
                 $value = $result;  
-                $targetPrice = (float)$targetPrice;
-                $convertedPrice = $targetPrice * $value;
-                $convertedPrice = round($convertedPrice, 2);
-                $targetPrice = $convertedPrice;
-                echo "Converted Price in TL: " . $convertedPrice;
+                $scaledPrice = bcmul((string)$targetPrice, "100", 4); 
+                $convertedPrice = bcmul($scaledPrice, (string)$value, 4);
+                $roundedPrice = bcdiv($convertedPrice, "1", 0); 
+                $finalPrice = bcdiv($roundedPrice, "100", 2); 
+                $targetPrice = $finalPrice;
             } else {
                 echo "No result found for currency: $currency.\n";
             }
         }
         $targetPrice = (string) $targetPrice;
+        echo $targetPrice . "\n";
+        /*$targetPrice = (string) $targetPrice;
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = $listing->json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         $response = $this->httpclient->request('POST', $apiUrl, [
@@ -282,7 +287,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";
+        echo $this->getBatchRequestResult($data['batchRequestId']) . "\n";*/
     }
 
     public function getBatchRequestResult($batchRequestId)
