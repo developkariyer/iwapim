@@ -11,7 +11,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     private static $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
         'orders' => 'https://sandbox.api.wayfair.com/v1/graphql',
-        'catalog' => 'https://sandbox.api.wayfair.com/v1/supplier-catalog-api/graphql'
+        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql'
     ];
     public static $marketplaceType = 'Wayfair';
     public static $expires_in;
@@ -50,10 +50,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
         //$this->testEndpoint();
-        //$this->getDropshipOrdersSandbox();  
+        $this->getDropshipOrdersSandbox();  
         //$this->sendShipmentSandbox();
         //$this->saveInventorySandbox();
-        $this->getListingSandbox();
+        //$this->getListingSandbox();
     }
 
     public function testEndpoint()
@@ -348,7 +348,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         query getDropshipPurchaseOrders {
             getDropshipPurchaseOrders(
                 limit: 10,
-                hasResponse: true,
+                hasResponse: false,
                 sortOrder: DESC
             ) {
                 poNumber,
