@@ -25,7 +25,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $this->listings = [];
         $limit = 1000;
-        $response = $this->httpClient->request('GET', "https://api-seller.ozon.ru/v2/product/list", [
+        $response = $this->httpClient->request('POST', "https://api-seller.ozon.ru/v2/product/list", [
             'headers' => [
                 'Client-Id' => $this->marketplace->getOzonClientId(),
                 'Api-Key' => $this->marketplace->getOzonApiKey(),
