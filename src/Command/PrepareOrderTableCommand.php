@@ -112,7 +112,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersAmazon($marketPlaceId,$marketplaceType)
     {
         $amazonSql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
+            INSERT INTO iwa_amazon_orders_line_items (
             marketplace_type, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
             total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
             SELECT
