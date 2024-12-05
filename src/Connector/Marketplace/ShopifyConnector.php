@@ -82,9 +82,29 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-        //$this->test();
-        $response = $this->getFromShopifyApi('GET', 'inventory_levels.json', ['limit' => 50], 'inventory_levels');
-        print_r($response);
+        $inventory = json_decode(Utility::getCustomCache('INVENTORY.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!empty($inventory)) {
+            echo "Using cached inventory\n";
+            return;
+        }
+        $inventory = [];
+        $locations = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
+        if (empty($locations)) {
+            echo "Failed to get locations\n";
+            return;
+        }
+        foreach ($locations as $location) {
+            $inventoryLevels = $this->getFromShopifyApi('GET', "inventory_levels.json", ['limit' => 50, 'location_ids' => $location['id']], 'inventory_levels');
+            if (empty($inventoryLevels)) {
+                echo "Failed to get inventory levels for location {$location['id']}\n";
+                continue;
+            }
+            $inventory[] = [
+                'location' => $location,
+                'inventory_levels' => $inventoryLevels
+            ];
+        }
+        Utility::setCustomCache('INVENTORY.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($inventory));
     }
 
     public function downloadOrders()
