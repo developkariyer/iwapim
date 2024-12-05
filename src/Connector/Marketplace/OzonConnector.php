@@ -41,7 +41,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $data = $response->toArray();
         $products = $data['result']['items'];
-        print_r($data);
+        print_r($response);
         /*foreach ($products as &$product) {
             $detail = $this->httpClient->request('POST', "https://api-seller.ozon.ru/v2/product/info", [
                 'headers' => [
