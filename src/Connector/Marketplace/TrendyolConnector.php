@@ -16,14 +16,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         
-        if ($this->marketplace->getKey() === 'TrendyolIwa') {
-            $variantProduct = VariantProduct::getById(194109);
-            $this->setPrice($variantProduct, "55", "USD");
-            $this->setInventory($variantProduct, 1555);
-        }
-        
-        
-        
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;

@@ -82,7 +82,29 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-
+        $inventory = json_decode(Utility::getCustomCache('INVENTORY.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        if (!empty($inventory)) {
+            echo "Using cached inventory\n";
+            return;
+        }
+        $inventory = [];
+        $locations = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
+        if (empty($locations)) {
+            echo "Failed to get locations\n";
+            return;
+        }
+        foreach ($locations as $location) {
+            $inventoryLevels = $this->getFromShopifyApi('GET', "inventory_levels.json", ['limit' => 50, 'location_ids' => $location['id']], 'inventory_levels');
+            if (empty($inventoryLevels)) {
+                echo "Failed to get inventory levels for location {$location['id']}\n";
+                continue;
+            }
+            $inventory[] = [
+                'location' => $location,
+                'inventory_levels' => $inventoryLevels
+            ];
+        }
+        Utility::setCustomCache('INVENTORY.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($inventory));
     }
 
     public function downloadOrders()
@@ -188,6 +210,33 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "OK\n";
             $index++;
         }
+    }
+
+    public function test()
+    {
+        $response = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
+        if (empty($response)) {
+            echo "Failed to get locations\n";
+            return;
+        }
+        print_r($response);
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+        $response = $this->getFromShopifyApi('POST', "{$listing->getUniqueMarketplaceId()}/inventory_levels/set.json", ['inventory_item_id' => '', 'available' => $targetValue, 'location_id'=> '']
+        , 'inventory_level');
+        
+    }
+
+    public function setSku()
+    {
+        /*
+        curl -d '{"inventory_item":{"id":808950810,"sku":"new sku"}}' \
+        -X PUT "https://your-development-store.myshopify.com/admin/api/2024-10/inventory_items/808950810.json" \
+        -H "X-Shopify-Access-Token: {access_token}" \
+        -H "Content-Type: application/json"
+        */
     }
 
 }
