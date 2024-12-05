@@ -35,7 +35,6 @@ class OzonConnector extends MarketplaceConnectorAbstract
                 'limit' => $limit
             ]
         ]);
-        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
