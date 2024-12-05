@@ -19,7 +19,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             throw new \Exception("API URL is not set for Shopify marketplace {$this->marketplace->getKey()}");
         }
         if (strpos($this->apiUrl, 'https://') === false) {
-            $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-10";
+            $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
     }
     
