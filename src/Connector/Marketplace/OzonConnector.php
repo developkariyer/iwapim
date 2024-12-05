@@ -40,7 +40,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
         }
         $data = $response->toArray();
-        $products = $data['result']['items'];
+        $products = $data['result'];
         foreach ($products as &$product) {
             $detail = $this->httpClient->request('POST', "https://api-seller.ozon.ru/v2/product/info", [
                 'headers' => [
