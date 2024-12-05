@@ -36,12 +36,12 @@ class OzonConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getContent());
-        /*$statusCode = $response->getStatusCode();
+        $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
         }
         $data = $response->toArray();
-        $products = $data['items'];
+        $products = $data['result']['items'];
         foreach ($products as &$product) {
             $detail = $this->httpClient->request('POST', "https://api-seller.ozon.ru/v2/product/info", [
                 'headers' => [
@@ -64,7 +64,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $this->listings = array_merge($this->listings, $products);
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
-        */
+        
     }
 
     public function downloadInventory()
