@@ -82,7 +82,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-        
+        $response = $this->getFromShopifyApi('GET', 'inventory_levels.json', ['limit' => 50], 'inventory_levels');
+        if (empty($response)) {
+            echo "Failed to get inventory levels\n";
+            return;
+        }
+        print_r($response->getContent());
     }
 
     public function downloadOrders()
@@ -202,9 +207,19 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
     {
-        $response = $this->getFromShopifyApi('POST', "variants/{$listing->getUniqueMarketplaceId()}.json", ['inventory_item_id' => '', 'available' => $targetValue, 'location_id'=> '']
+        $response = $this->getFromShopifyApi('POST', "{$listing->getUniqueMarketplaceId()}/inventory_levels/set.json", ['inventory_item_id' => '', 'available' => $targetValue, 'location_id'=> '']
         , 'inventory_level');
         
+    }
+
+    public function setSku()
+    {
+        /*
+        curl -d '{"inventory_item":{"id":808950810,"sku":"new sku"}}' \
+        -X PUT "https://your-development-store.myshopify.com/admin/api/2024-10/inventory_items/808950810.json" \
+        -H "X-Shopify-Access-Token: {access_token}" \
+        -H "Content-Type: application/json"
+        */
     }
 
 }
