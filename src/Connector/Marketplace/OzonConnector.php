@@ -35,13 +35,12 @@ class OzonConnector extends MarketplaceConnectorAbstract
                 'limit' => $limit
             ]
         ]);
-        print_r($response);
-        /*$statusCode = $response->getStatusCode();
+        $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
         }
         $data = $response->toArray();
-        print_r($data);*/
+        print_r($data);
     }
 
     public function downloadInventory()
