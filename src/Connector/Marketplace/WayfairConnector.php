@@ -74,12 +74,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $query = <<<GRAPHQL
         query supplierCatalog(
             \$supplierId: Int!,
-            \$filter: ProductFilter,
             \$paginationOptions: PaginationOptions
         ) {
             supplierCatalog(
                 supplierId: \$supplierId,
-                filter: \$filter,
                 paginationOptions: \$paginationOptions
             ) {
                 supplierId
