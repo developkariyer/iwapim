@@ -50,8 +50,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ],
                 'json' => [
-                    'product_id' => $products['product_id'],
-                    'offer_id' => $products['offer_id']
+                    'product_id' => $products['product_id']
                 ]
             ]);
             $detailStatusCode = $detail->getStatusCode();
@@ -64,7 +63,6 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $this->listings = array_merge($this->listings, $products);
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
-        
     }
 
     public function downloadInventory()
