@@ -89,7 +89,7 @@ class ConsoleCommand extends AbstractCommand
             $sku = $sku['sku'];
             echo " $country $sku ";
             try {
-                $amazonConnector->utilsHelper->patchDeleteGPSR($sku, $country);
+                $amazonConnector->utilsHelper->patchGPSR($sku, $country);
             } catch (\Exception $e) {
                 echo "Error: ".$e->getMessage()."\n";
             }
