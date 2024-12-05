@@ -35,7 +35,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
                 'limit' => $limit
             ]
         ]);
-        $statusCode = $response->getStatusCode();
+        print_r($response->getContent());
+        /*$statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
         }
@@ -63,6 +64,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $this->listings = array_merge($this->listings, $products);
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        */
     }
 
     public function downloadInventory()
