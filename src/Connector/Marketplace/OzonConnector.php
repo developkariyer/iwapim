@@ -41,7 +41,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $data = $response->toArray();
         $products = $data['result']['items'];
-        foreach ($products as &$product) {
+        print_r($products);
+        /*foreach ($products as &$product) {
             $detail = $this->httpClient->request('POST', "https://api-seller.ozon.ru/v2/product/info", [
                 'headers' => [
                     'Client-Id' => $this->marketplace->getOzonClientId(),
@@ -63,7 +64,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
         }
         $this->listings = array_merge($this->listings, $products);
         print_r($this->listings);
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
     }
 
     public function downloadInventory()
