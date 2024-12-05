@@ -83,7 +83,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function downloadInventory()
     {
         //$this->test();
-        $response = $this->getFromShopifyApi('GET', 'inventory_levels.json', ['limit' => 50,'location_id' => 58167296175], 'inventory_levels');
+        $response = $this->getFromShopifyApi('GET', 'inventory_levels.json', ['location_id' => 58167296175], 'inventory_levels');
         print_r($response);
     }
 
