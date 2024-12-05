@@ -51,7 +51,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         //$this->testEndpoint();
         //$this->getDropshipOrdersSandbox();  
         //$this->sendShipmentSandbox();
-        $this->saveInventorySandbox();
+        //$this->saveInventorySandbox();
+        $this->getListingSandbox();
     }
 
     public function testEndpoint()
@@ -64,6 +65,61 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
+    public function getListingSandbox()
+    {
+        $query = <<<GRAPHQL
+        query supplierCatalog(
+            \$supplierId: Int!,
+            \$filter: ProductFilter,
+            \$paginationOptions: PaginationOptions
+        ) {
+            supplierCatalog(
+                supplierId: \$supplierId,
+                filter: \$filter,
+                paginationOptions: \$paginationOptions
+            ) {
+                supplierId
+                pageInfo {
+                    currentPage
+                    totalPages
+                    totalRecords
+                }
+                products {
+                    id
+                    name
+                    description
+                    price
+                    availability
+                }
+            }
+        }
+        GRAPHQL;
+
+        $variables = [
+            'supplierId' => 194115, 
+            'paginationOptions' => [
+                'page' => 1,
+                'limit' => 10,
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
+        ]);
+
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
@@ -91,7 +147,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $variables = [
             "inventory" => [
                 [
-                    "supplierId" => 194115,
+                    "supplierId" => 218846,
                     "supplierPartNumber" => "1234567001",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
@@ -101,7 +157,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     "productNameAndOptions" => "My Awesome Product",
                 ],
                 [
-                    "supplierId" => 194115,
+                    "supplierId" => 218846,
                     "supplierPartNumber" => "2S2CLRMTLAK3STRLB",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
@@ -111,7 +167,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     "productNameAndOptions" => "My Awesome Product",
                 ],
                 [
-                    "supplierId" => 194115,
+                    "supplierId" => 218846,
                     "supplierPartNumber" => "2S4CMASHLLHTBLAB",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
@@ -121,7 +177,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     "productNameAndOptions" => "My Awesome Product",
                 ],
                 [
-                    "supplierId" => 194115,
+                    "supplierId" => 218846,
                     "supplierPartNumber" => "2SIZEWLLMNTDESK",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
@@ -131,7 +187,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     "productNameAndOptions" => "My Awesome Product",
                 ],
                 [
-                    "supplierId" => 194115,
+                    "supplierId" => 218846,
                     "supplierPartNumber" => "4KULKUFICINGOLDS70",
                     "quantityOnHand" => 5,
                     "quantityBackordered" => 10,
@@ -355,6 +411,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function downloadInventory()
     {
 
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+        
     }
    
 }
