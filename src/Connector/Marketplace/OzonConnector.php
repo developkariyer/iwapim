@@ -62,7 +62,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             $product['detail'] = $detailData;
         }
         $this->listings = array_merge($this->listings, $products);
-        print_r($this->listings);
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     public function downloadInventory()
