@@ -101,7 +101,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             'supplierId' => 194115, 
             'paginationOptions' => [
                 'page' => 1,  
-                'limit' => 10
+                'pageSize' => 10
             ],
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
