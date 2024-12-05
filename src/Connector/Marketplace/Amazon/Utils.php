@@ -92,7 +92,7 @@ class Utils
         }
     }
 
-    public function patchListing($sku, $country = null)
+    public function patchGPSR($sku, $country = null)
     {
         if (empty($country)) {
             $country = $this->amazonConnector->mainCountry;
@@ -132,5 +132,45 @@ class Utils
         ];
         $this->patchCustom($sku, $country, $patches);
     }
+
+    public function patchDeleteGPSR($sku, $country = null)
+    {
+        if (empty($country)) {
+            $country = $this->amazonConnector->mainCountry;
+        }
+
+        $patches = [
+            new PatchOperation(
+                op: "delete",
+                path: "/attributes/gpsr_safety_attestation",
+                value: [
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                        "value" => true,
+                    ]
+                ]
+            ),
+            new PatchOperation(
+                op: "delete",
+                path: "/attributes/dsa_responsible_party_address",
+                value: [
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                    ]
+                ]
+            ),
+            new PatchOperation(
+                op: "delete",
+                path: "/attributes/gpsr_manufacturer_reference",
+                value: [
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                    ]
+                ]
+            )
+        ];
+        $this->patchCustom($sku, $country, $patches);
+    }
+
 
 }

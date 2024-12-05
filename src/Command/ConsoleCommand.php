@@ -63,6 +63,41 @@ class ConsoleCommand extends AbstractCommand
         $grp->save();
     }
 
+    public function deleteFr()
+    {   // $this->deleteFr();
+        $db = \Pimcore\Db::get();
+        $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
+        $amazonEuMarkets = ['FR']; //['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
+        $euMarketsPlaceholder = implode("','", $amazonEuMarkets);
+        $query = "
+            SELECT marketplaceId, sku
+            FROM object_collection_AmazonMarketplace_varyantproduct
+            WHERE fieldname = 'amazonMarketplace' 
+                AND status <> 'Active' 
+                AND marketplaceId IN ('$euMarketsPlaceholder')
+            ORDER BY marketplaceId, sku
+        ";
+        $skulist = $db->fetchAllAssociative($query);
+        $total = count($skulist);
+        $index = 0;
+        foreach ($skulist as $sku) {
+            $index++;
+            echo "\rProcessing $index/$total ";
+            $country = $sku['marketplaceId'];
+            if (!in_array($country, $amazonEuMarkets)) {
+                continue;
+            }
+            $sku = $sku['sku'];
+            echo " $country $sku ";
+            try {
+                $amazonConnector->utilsHelper->patchDeleteGPSR($sku, $country);
+            } catch (\Exception $e) {
+                echo "Error: ".$e->getMessage()."\n";
+            }
+        }
+        echo "\nFinished\n";
+    }
+
     public function addMatteToVariantColors()
     {   // $this->addMatteToVariantColors();
         $pageSize = 5;
