@@ -50,7 +50,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ],
                 'json' => [
-                    'product_id' => $products['product_id']
+                    'product_id' => $product['product_id'],
+                    'offer_id' => $product['offer_id']
                 ]
             ]);
             $detailStatusCode = $detail->getStatusCode();
