@@ -40,7 +40,29 @@ class OzonConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
         }
         $data = $response->toArray();
-        print_r($data);
+        $products = $data['items'];
+        foreach ($products as &$product) {
+            $detail = $this->httpClient->request('POST', "https://api-seller.ozon.ru/v2/product/info", [
+                'headers' => [
+                    'Client-Id' => $this->marketplace->getOzonClientId(),
+                    'Api-Key' => $this->marketplace->getOzonApiKey(),
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'product_id' => $products['product_id']
+                    'offer_id' => $products['offer_id']
+                ]
+            ]);
+            $detailStatusCode = $detail->getStatusCode();
+            if ($detailStatusCode !== 200) {
+                echo "Error: $detailStatusCode\n";
+                continue;
+            }
+            $detailData = $detail->toArray();
+            $product['detail'] = $detailData;
+        }
+        $this->listings = array_merge($this->listings, $products);
+        print_r($this->listings);
     }
 
     public function downloadInventory()
