@@ -49,7 +49,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ],
                 'json' => [
-                    'product_id' => $products['product_id']
+                    'product_id' => $products['product_id'],
                     'offer_id' => $products['offer_id']
                 ]
             ]);
