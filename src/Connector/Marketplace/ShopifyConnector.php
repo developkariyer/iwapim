@@ -87,7 +87,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory levels\n";
             return;
         }
-        print_r($response->getContent());
+        print_r($response);
     }
 
     public function downloadOrders()
