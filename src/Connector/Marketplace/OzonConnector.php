@@ -26,7 +26,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             }
             return $response->toArray();
         } catch (\Exception $e) {
-            echo "Error: ".$e->getMessage().json_encode($response->toArray())."\n";
+            echo "Error: ".$e->getMessage()."\n".$e->getCode()."\n";
             return [];
         }
     }
