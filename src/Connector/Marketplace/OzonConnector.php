@@ -113,8 +113,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
     {
         // $sc = new \App\Connector\Marketplace\OzonConnector(\Pimcore\Model\DataObject\Marketplace::getById(268776)); $sc->getCategoryTree();
         $response = $this->getApiResponse('GET', "https://api-seller.ozon.ru/v2/category/tree", [], ['language' => 'TR']);
-        Utility::setCustomCache('CATEGORY_TREE.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($response['result'], JSON_PRETTY_PRINT));
-        return $response['result'];
+        Utility::setCustomCache('CATEGORY_TREE.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($response, JSON_PRETTY_PRINT));
+        return $response;
     }
 
 }
