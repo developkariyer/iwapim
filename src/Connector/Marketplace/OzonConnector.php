@@ -51,7 +51,11 @@ class OzonConnector extends MarketplaceConnectorAbstract
             );
             $this->listings = array_merge($this->listings, $response['result']['items']);
             $lastId = $response['result']['last_id'];
-            echo "{$response['result']['total']} ";
+            $totalCount = $response['result']['total'];
+            echo " $totalCount";
+            if (count ($this->listings) >= $totalCount) {
+                break;
+            }
         } while ($lastId !== null);
         foreach ($this->listings as &$product) {
             $detail = $this->getApiResponse(
