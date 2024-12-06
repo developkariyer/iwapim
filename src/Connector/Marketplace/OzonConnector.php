@@ -11,19 +11,24 @@ class OzonConnector extends MarketplaceConnectorAbstract
 
     public function getApiResponse($url, $method = 'GET', $query = [])
     {
-        $response = $this->httpClient->request($method, $url, [
-            'headers' => [
-                'Client-Id' => $this->marketplace->getOzonClientId(),
-                'Api-Key' => $this->marketplace->getOzonApiKey(),
-                'Content-Type' => 'application/json'
-            ],
-            'query' => $query
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            throw new \Exception("Error: ".json_encode($response->toArray()));
+        try {
+            $response = $this->httpClient->request($method, $url, [
+                'headers' => [
+                    'Client-Id' => $this->marketplace->getOzonClientId(),
+                    'Api-Key' => $this->marketplace->getOzonApiKey(),
+                    'Content-Type' => 'application/json'
+                ],
+                'query' => $query
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                throw new \Exception("Error: ".json_encode($response->toArray()));
+            }
+            return $response->toArray();
+        } catch (\Exception $e) {
+            echo "Error: ".$e->getMessage()."\n";
+            return [];
         }
-        return $response->toArray();
     }
 
     /**
