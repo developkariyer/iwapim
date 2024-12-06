@@ -109,4 +109,11 @@ class OzonConnector extends MarketplaceConnectorAbstract
 
     }
 
+    public function getCategoryTree()
+    {
+        $response = $this->getApiResponse('GET', "https://api-seller.ozon.ru/v2/category/tree", [], ['language' => 'TR']);
+        Utility::setCustomCache('CATEGORY_TREE.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($response['result'], JSON_PRETTY_PRINT));
+        return $response['result'];
+    }
+
 }
