@@ -22,7 +22,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             ]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
-                throw new \Exception("Error: ".json_encode($response->toArray()));
+                echo "Error: ".json_encode($response->toArray())."\n";
             }
             return $response->toArray();
         } catch (\Exception $e) {
