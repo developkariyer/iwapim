@@ -52,7 +52,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         //$this->testEndpoint();
         //$this->getDropshipOrdersSandbox();  
         //$this->sendShipmentSandbox();
-        $this->saveInventorySandbox();
+        //$this->saveInventorySandbox();
         //$this->getListingSandbox();
     }
 
