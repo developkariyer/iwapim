@@ -100,7 +100,7 @@ class Utils
 
         $patches = [
             new PatchOperation(
-                op: "replace", // "replace", // "delete",
+                op: "add", // "replace", // "delete",
                 path: "/attributes/gpsr_safety_attestation",
                 value: [
                     [
@@ -110,7 +110,7 @@ class Utils
                 ]
             ),
             new PatchOperation(
-                op: "replace", //"replace",
+                op: "add", //"replace",
                 path: "/attributes/dsa_responsible_party_address",
                 value: [
                     [
@@ -120,7 +120,7 @@ class Utils
                 ]
             ),
             new PatchOperation(
-                op: "replace", //"replace",
+                op: "add", //"replace",
                 path: "/attributes/gpsr_manufacturer_reference",
                 value: [
                     [
