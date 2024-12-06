@@ -40,6 +40,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
+        $items = [];
         $this->listings = [];
         $limit = 1000;
         $lastId = null;
@@ -49,24 +50,25 @@ class OzonConnector extends MarketplaceConnectorAbstract
                 'POST',
                 $lastId ? ['last_id' => $lastId] : ['limit' => $limit]
             );
-            $this->listings = array_merge($this->listings, $response['result']['items']);
+            $items = array_merge($items, $response['result']['items']);
             $lastId = $response['result']['last_id'];
             $totalCount = $response['result']['total'];
             echo " $totalCount";
-            if (count ($this->listings) >= $totalCount) {
+            if (count ($items) >= $totalCount) {
                 break;
             }
         } while ($lastId !== null);
-        foreach ($this->listings as &$product) {
+        foreach ($items as $product) {
             $detail = $this->getApiResponse(
                 "https://api-seller.ozon.ru/v2/product/info",
                 'POST',
                 [
                     'product_id' => $product['product_id'],
-                    'offer_id' => $product['offer_id']
+                    //'offer_id' => $product['offer_id']
                 ]
             );
             $product['detail'] = $detail;
+            $this->listings[] = $product;
             echo ".";
         }
         echo "\n";
