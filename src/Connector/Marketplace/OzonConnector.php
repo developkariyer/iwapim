@@ -35,7 +35,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), 1), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
