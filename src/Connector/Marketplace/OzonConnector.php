@@ -9,7 +9,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
 {
     public static $marketplaceType = 'Ozon';
 
-    public function getApiResponse($url, $method = 'GET', $query = [])
+    public function getApiResponse($method = 'GET', $url, $query = [])
     {
         try {
             $response = $this->httpClient->request($method, $url, [
@@ -51,8 +51,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
         $lastId = null;
         do {
             $response = $this->getApiResponse(
-                "https://api-seller.ozon.ru/v2/product/list", 
                 'POST',
+                "https://api-seller.ozon.ru/v2/product/list", 
                 $lastId ? ['last_id' => $lastId] : ['limit' => $limit]
             );
             $items = array_merge($items, $response['result']['items']);
@@ -64,12 +64,13 @@ class OzonConnector extends MarketplaceConnectorAbstract
             }
         } while ($lastId !== null);
         foreach ($items as $product) {
+            print_r($product);
             $detail = $this->getApiResponse(
-                "https://api-seller.ozon.ru/v2/product/info",
                 'POST',
+                "https://api-seller.ozon.ru/v2/product/info",
                 [
                     'product_id' => $product['product_id'],
-                    //'offer_id' => $product['offer_id']
+                    'offer_id' => $product['offer_id']
                 ]
             );
             $product['detail'] = $detail;
