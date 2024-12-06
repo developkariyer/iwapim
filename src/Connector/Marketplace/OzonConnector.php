@@ -25,8 +25,13 @@ class OzonConnector extends MarketplaceConnectorAbstract
                 echo "Error: ".json_encode($response->toArray())."\n";
             }
             return $response->toArray();
+        } catch (\Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface $e) {
+            $response = $e->getResponse();
+            $content = $response ? $response->getContent(false) : null;
+            echo "Error response from API: $content\n";
+            return json_decode($content, true) ?: [];
         } catch (\Exception $e) {
-            echo "Error: ".$e->getMessage()."\n".$e->getCode()."\n";
+            echo "Unexpected error: " . $e->getMessage() . "\n" . $e->getCode() . "\n";
             return [];
         }
     }
