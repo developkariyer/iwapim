@@ -70,7 +70,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
                 "https://api-seller.ozon.ru/v2/product/info",
                 [
                     'product_id' => $product['product_id'],
-                    'offer_id' => $product['offer_id']
+                    'offer_id' => $product['offer_id'],
+                    'sku' => $product['sku'] ?? 0,
                 ]
             );
             $product['detail'] = $detail;
