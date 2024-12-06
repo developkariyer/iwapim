@@ -9,7 +9,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
 {
     public static $marketplaceType = 'Ozon';
 
-    public function getApiResponse($method = 'GET', $url, $query = [])
+    public function getApiResponse($method = 'GET', $url, $query = [], $data = [])
     {
         try {
             $response = $this->httpClient->request($method, $url, [
@@ -18,7 +18,8 @@ class OzonConnector extends MarketplaceConnectorAbstract
                     'Api-Key' => $this->marketplace->getOzonApiKey(),
                     'Content-Type' => 'application/json'
                 ],
-                'query' => $query
+                'query' => $query,
+                'json' => $data
             ]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
@@ -27,7 +28,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             return $response->toArray();
         } catch (\Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface $e) {
             $response = $e->getResponse();
-            $content = $response ? $response->getContent(false) : null;
+            $content = $response->getContent(false) ?? null;
             echo "Error response from API: $content\n";
             return json_decode($content, true) ?: [];
         } catch (\Exception $e) {
@@ -73,6 +74,7 @@ class OzonConnector extends MarketplaceConnectorAbstract
             $detail = $this->getApiResponse(
                 'POST',
                 "https://api-seller.ozon.ru/v2/product/info",
+                [],
                 [
                     'product_id' => $product['product_id'],
                     'offer_id' => $product['offer_id'],
