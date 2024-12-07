@@ -1,0 +1,52 @@
+<?php
+
+function giveAdviceOnWarehouse($currentStock, $plannedArrivals, $transportLeadTime, $transportPlanningTime, $shipmentInterval, $productionPlanningTime, $bufferPercentage) {
+    // Step 1: Calculate the total demand period for shipment and production planning
+    $shipmentHorizon = $transportPlanningTime + $transportLeadTime + $shipmentInterval;
+    $productionHorizon = $shipmentHorizon + $productionPlanningTime;
+
+    // Step 2: Calculate forecasted demand
+    $requiredStockForShipment = forecastTotalSales($shipmentHorizon, 0) * (1 + $bufferPercentage);
+    $requiredStockForProduction = forecastTotalSales($productionHorizon, 0) * (1 + $bufferPercentage);
+
+    // Step 3: Projected stock after shipment arrival
+    $projectedStockAfterShipment = $currentStock - forecastTotalSales($transportPlanningTime + $transportLeadTime, 0) + $plannedArrivals;
+
+    // Step 4: Calculate shipment and production quantities
+    $toShip = max(0, $requiredStockForShipment - $projectedStockAfterShipment);
+    $projectedStockAfterProduction = $projectedStockAfterShipment + $toShip;
+    $toProduce = max(0, $requiredStockForProduction - $projectedStockAfterProduction);
+
+    // Step 5: Determine warning level
+    $warningLevel = "Red";
+    $daysToDefer = null;
+
+    if ($projectedStockAfterShipment >= $requiredStockForShipment) {
+        $warningLevel = "Green";
+
+        // Step 6: Calculate days to defer
+        $remainingStock = $currentStock;
+        $daysToDefer = 0;
+
+        while ($remainingStock > $requiredStockForShipment) {
+            $daysToDefer++;
+            $dailyDemand = forecastTotalSales(1, $daysToDefer); // Daily demand starting from $daysToDefer
+            $remainingStock -= $dailyDemand;
+
+            // Stop if stock is depleted below threshold
+            if ($remainingStock <= $requiredStockForShipment) {
+                break;
+            }
+        }
+    } elseif ($projectedStockAfterShipment < $requiredStockForShipment && $toShip > 0) {
+        $warningLevel = "Orange"; // Action needed but manageable
+    }
+
+    // Return results
+    return [
+        "warningLevel" => $warningLevel,
+        "toShip" => round($toShip, 2), // Ensure values are cleanly formatted
+        "toProduce" => round($toProduce, 2),
+        "daysToDefer" => $daysToDefer // Days to defer checking the product
+    ];
+}
