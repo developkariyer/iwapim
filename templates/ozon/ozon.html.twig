@@ -75,7 +75,7 @@
                 $('#tree1').tree('getTree').iterate(function(node) {
                     if (node.name.toLowerCase().includes(searchTerm)) {
                         matchingNodes.push(node);
-                        return true;
+//                        return false;
                     }
                 });
                 console.log('matchingNodes:', matchingNodes);
