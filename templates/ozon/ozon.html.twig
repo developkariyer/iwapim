@@ -63,19 +63,22 @@
         $('#search').on('keypress', function(e) {
             if (e.which === 13) { // Check if Enter is pressed
                 const searchTerm = $(this).val().toLowerCase();
-                if (!treeInstance) return;
+                if (!treeInstance) {
+                    console.log('Tree instance is not ready yet.');
+                    return;
+                }
 
-                // Collapse all nodes
+                console.log('Collapsing all nodes...');
                 $('#tree1').tree('closeAll');
 
-                // Find and highlight matching nodes
                 const matchingNodes = [];
                 $('#tree1').tree('getTree').iterate(function(node) {
                     if (node.name.toLowerCase().includes(searchTerm)) {
                         matchingNodes.push(node);
-                        return true; // Continue iteration
+                        return true;
                     }
                 });
+                console.log('matchingNodes:', matchingNodes);
 
                 // Expand and highlight the matching nodes
                 matchingNodes.forEach(node => {
