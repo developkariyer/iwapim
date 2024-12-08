@@ -17,6 +17,14 @@
     </div> 
 </body>
 <script>
+    function transformData(data) {
+        if (data && data.result) {
+            data = data.result;
+        }
+        renameCategoryNameToName(data);
+        return data;
+    }
+    
     function renameCategoryNameToName(data) {
         if (Array.isArray(data)) {
             data.forEach(item => renameCategoryNameToName(item));
@@ -34,9 +42,9 @@
     $(document).ready(function() {
         $.getJSON('/tmp/categories.json')
             .done(function(data) {
-                renameCategoryNameToName(data);
+                    const transformedData = transformData(data);
                 $('#tree1').tree({
-                    data: data 
+                    data: transformedData
                 });
             })
             .fail(function(jqxhr, textStatus, error) {
