@@ -46,7 +46,7 @@
     }
 
     $(document).ready(function() {
-        console.log('Document is ready v.2');
+        console.log('Document is ready v.3');
         let treeInstance;
 
         $.getJSON('/tmp/categories.json')
@@ -76,6 +76,7 @@
                 $('#tree1').tree('getTree').iterate(function(node) {
                     if (node.name.toLowerCase().includes(searchTerm)) {
                         matchingNodes.push(node);
+                        return false; // Stop iteration
                     }
                 });
                 console.log('matchingNodes:', matchingNodes);
