@@ -33,8 +33,14 @@
                 data.name = data.category_name;
                 delete data.category_name; 
             }
-            if ('children' in data) {
+            if ('type_name' in data) {
+                data.name = data.type_name;
+                delete data.type_name;
+            }
+            if ('children' in data && Array.isArray(data.children) && data.children.length > 0) {
                 renameCategoryNameToName(data.children);
+            } else {
+                delete data.children;
             }
         }
     }
