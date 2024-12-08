@@ -15,4 +15,33 @@
         <div id="tree1"></div>
     </div> 
 </body>
+<script>
+    function renameCategoryNameToName(data) {
+        if (Array.isArray(data)) {
+            data.forEach(item => renameCategoryNameToName(item));
+        } else if (typeof data === 'object' && data !== null) {
+            if ('category_name' in data) {
+                data.name = data.category_name;
+                delete data.category_name; 
+            }
+            if ('children' in data) {
+                renameCategoryNameToName(data.children);
+            }
+        }
+    }
+
+    $(document).ready(function() {
+        $.getJSON('/tmp/categories.json')
+            .done(function(data) {
+                renameCategoryNameToName(data);
+                $('#tree1').tree({
+                    data: data 
+                });
+            })
+            .fail(function(jqxhr, textStatus, error) {
+                console.error("Failed to load JSON: ", textStatus, error);
+                alert("Failed to load data. Please try again later.");
+            });
+    });
+</script>
 </html>

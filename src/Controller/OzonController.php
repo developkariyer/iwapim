@@ -16,8 +16,9 @@ class OzonController extends FrontendController
     /**
      * @Route("/ozon", name="ozon_menu")
      */
-    public function defaultAction(Request $request): Response
+    public function ozonAction(Request $request): Response
     {
+        /*
         // ozon marketplace id is 268776
         $ozonMarketplace = Marketplace::getByMarketplaceType('Ozon', ['limit' => 1]);
         if (!$ozonMarketplace) {
@@ -26,9 +27,9 @@ class OzonController extends FrontendController
 
         $ozonConnector = new OzonConnector($ozonMarketplace);
         $categories = $ozonConnector->getCategories();
-        
+        */
 
-        return $this->render('default.html.twig');
+        return $this->render('ozon/ozon.html.twig');
     }
 
 }
