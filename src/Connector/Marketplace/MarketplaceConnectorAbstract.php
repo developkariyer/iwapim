@@ -81,12 +81,12 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
             
         $fromCurrencyValue = $db->fetchOne($sql, [
             'today' => $today,
-            'currency' => $currency
+            'currency' => $fromCurrency
         ]);
         
         $toCurrencyValue = $db->fetchOne($sql, [
             'today' => $today,
-            'currency' => $currency
+            'currency' => $toCurrency
         ]);
         echo $fromCurrencyValue . ' ' . $toCurrencyValue;
     }
