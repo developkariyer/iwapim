@@ -67,7 +67,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $listing = VariantProduct::getById(238746);
+        $this->setPrice($listing);
+        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -77,7 +79,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
     }
 
     public function downloadInventory()
@@ -212,16 +214,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function test()
-    {
-        $response = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
-        if (empty($response)) {
-            echo "Failed to get locations\n";
-            return;
-        }
-        print_r($response);
-    }
-
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
         $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
@@ -244,6 +236,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
         print_r($response);
         Utility::setCustomCache($inventoryItemId . '_' . date('Y-m-d H:i:s') . '_SetSku.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Skus', json_encode($response));
+    }
+
+    public function setPrice(VariantProduct $listing)
+    {
+        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
+        $marketplace = $listing->getMarketplace();
+        $marketplaceCurrency = $marketplace->getCurrency();
+        echo "{$marketplace->key()} - {$marketplaceCurrency} \n";
+
     }
 
 }
