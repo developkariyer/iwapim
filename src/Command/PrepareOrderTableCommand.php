@@ -73,10 +73,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             $marketplaceKey = $marketplace->getKey();
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
-                SET marketplace_key = $marketplaceKey
-                WHERE marketplace_id = $id;
+                SET marketplace_key = :marketplaceKey
+                WHERE marketplace_id = :id;
             ";
-            $db->executeStatement($updateSql);
+            $db->executeStatement($updateSql, [
+                'marketplaceKey' => $marketplaceKey,
+                'marketplaceId' => $id,
+            ]);
         }
     }
 
