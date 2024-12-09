@@ -23,7 +23,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
     
-    protected function getFromShopifyApi($method, $parameter, $query = [], $key = null)
+    public function getFromShopifyApi($method, $parameter, $query = [], $key = null)
     {
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";

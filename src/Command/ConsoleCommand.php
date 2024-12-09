@@ -67,7 +67,7 @@ class ConsoleCommand extends AbstractCommand
     {   // $this->deleteFr();
         $db = \Pimcore\Db::get();
         $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
-        $amazonEuMarkets = ['IT']; //['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
+        $amazonEuMarkets = ['IT', 'FR']; //['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
         $euMarketsPlaceholder = implode("','", $amazonEuMarkets);
         $query = "
             SELECT marketplaceId, sku
