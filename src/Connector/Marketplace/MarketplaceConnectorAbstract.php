@@ -63,6 +63,8 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
          * convert amount
          * return converted amount
          */
+        $fromCurrencyValue = null;
+        $toCurrencyValue = null;
         if ($fromCurrency === 'TRY')
            $fromCurrencyValue = 1;
         if ($toCurrency === 'TRY')
