@@ -640,6 +640,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 DISTINCT marketplace_id
             FROM
                 iwa_marketplace_orders_line_items
+            WHERE 
+                marketplace_id IS NOT NULL
             ";
         $values = $db->fetchAllAssociative($sql); 
         foreach ($values as $row) {
