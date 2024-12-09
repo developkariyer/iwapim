@@ -53,9 +53,27 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->test();
         return Command::SUCCESS;
     }
     
+    protected function test()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT 
+                DISTINCT marketplace_id
+            FROM
+                iwa_marketplace_orders_line_items
+            ";
+        $values = $db->fetchAllAssociative($sql); 
+        foreach ($values as $row) {
+            $id = $row['marketplace_id'];
+            $marketplace = Marketplace::getById($id)
+            print_r($marketplace->getKey());
+        }
+    }
+
     protected function extraColumns()
     {
         echo "Calculating is Parse URL\n";
@@ -558,12 +576,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "Marketplace not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
             return;
         }
-
-        $marketplaceKey = $marketplace->getKey(); 
-        if (!$marketplaceKey) {
-            echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-            return;
-        }
         
         $mainProductObjectArray = $variantObject->getMainProduct(); 
         if(!$mainProductObjectArray) {
@@ -604,20 +616,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             $parts = explode('/', trim($path, '/'));
             $variantName = array_pop($parts);
             $parentName = array_pop($parts); 
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
+            self::insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
         }
     }
 
-    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
+    protected static function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-        SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
+        SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':marketplaceKey' => $marketplaceKey,
             ':iwasku' => $iwasku,
             ':identifier' => $identifier,
             ':productType' => $productType,
