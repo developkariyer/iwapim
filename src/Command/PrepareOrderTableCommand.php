@@ -245,17 +245,13 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
-        if (is_null($marketPlaceId)) {
-            echo "marketPlaceId is null";
-            return;
-        }
-        /*$trendyolSql = "
+        $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount, 
             shipping_city, shipping_company, shipping_country_code,total_price, fulfillments_status, tracking_company)
             SELECT
-                '$marketplaceType',
-                '$marketPlaceId',
+                :marketplaceType,
+                :marketPlaceId,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
                 FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
@@ -282,7 +278,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
-                AND marketplace_id = $marketPlaceId
+                AND marketplace_id = :marketPlaceId
 			ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
                 marketplace_id = VALUES(marketplace_id),
@@ -303,10 +299,13 @@ class PrepareOrderTableCommand extends AbstractCommand
                 tracking_company = VALUES(tracking_company)";
         try {
             $db = \Pimcore\Db::get();
-            $db->query($trendyolSql);
+            $db->executeStatement($amazonSql, [
+                'marketplaceType' => $marketplaceType,
+                'marketPlaceId' => $marketPlaceId,
+            ]);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
-        }*/
+        }
     }
 
     protected static function transferOrdersFromShopify($marketPlaceId,$marketplaceType)
