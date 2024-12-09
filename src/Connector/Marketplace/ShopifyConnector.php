@@ -239,7 +239,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache($inventoryItemId . '_' . date('Y-m-d H:i:s') . '_SetSku.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Skus', json_encode($response));
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null)
+    public function setPrice(VariantProduct $listing)
     {
         $currencies = [
             'CANADIAN DOLLAR' => 'CAD',
