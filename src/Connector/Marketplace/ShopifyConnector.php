@@ -222,21 +222,28 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         print_r($response);
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
-        $response = $this->getFromShopifyApi('POST', "{$listing->getUniqueMarketplaceId()}/inventory_levels/set.json", ['inventory_item_id' => '', 'available' => $targetValue, 'location_id'=> '']
-        , 'inventory_level');
-        
+        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        $response = $this->getFromShopifyApi('POST', "inventory_levels/set.json", ['location_id' => $locationId, 'inventory_item_id' => $inventoryItemId, 'available' => $targetValue]);
+        if (empty($response)) {
+            echo "Failed to set inventory for {$listing->getKey()}\n";
+            return;
+        }
+        print_r($response);
+        Utility::setCustomCache($inventoryItemId . '_' . date('Y-m-d H:i:s') . '_SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Inventory', json_encode($response));
     }
 
-    public function setSku()
+    public function setSku(VariantProduct $listing, string $sku)
     {
-        /*
-        curl -d '{"inventory_item":{"id":808950810,"sku":"new sku"}}' \
-        -X PUT "https://your-development-store.myshopify.com/admin/api/2024-10/inventory_items/808950810.json" \
-        -H "X-Shopify-Access-Token: {access_token}" \
-        -H "Content-Type: application/json"
-        */
+        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item' => ['id' => $inventoryItemId, 'sku' => $sku]]);
+        if (empty($response)) {
+            echo "Failed to set SKU for {$listing->getKey()}\n";
+            return;
+        }
+        print_r($response);
+        Utility::setCustomCache($inventoryItemId . '_' . date('Y-m-d H:i:s') . '_SetSku.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Skus', json_encode($response));
     }
 
 }
