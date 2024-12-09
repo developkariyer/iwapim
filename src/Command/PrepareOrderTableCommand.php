@@ -245,7 +245,11 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
     {
-        $trendyolSql = "
+        if (is_null($marketPlaceId)) {
+            echo "marketPlaceId is null";
+            return;
+        }
+        /*$trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount, 
             shipping_city, shipping_company, shipping_country_code,total_price, fulfillments_status, tracking_company)
@@ -302,7 +306,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $db->query($trendyolSql);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
-        }
+        }*/
     }
 
     protected static function transferOrdersFromShopify($marketPlaceId,$marketplaceType)
