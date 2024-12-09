@@ -242,7 +242,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function setPrice(VariantProduct $listing)
     {
         $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
-        $marketplace = $listing->getMarketplaceType();
+        $marketplace = $listing->getMarketplace();
         $marketplaceCurrency = $marketplace->getCurrency();
         echo "{$marketplace->getMarketplaceType()} - {$marketplaceCurrency} \n";
 
