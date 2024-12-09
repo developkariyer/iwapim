@@ -70,7 +70,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($values as $row) {
             $id = $row['marketplace_id'];
             $marketplace = Marketplace::getById($id)
-            print_r($marketplace->getKey());
+            echo $marketplace->getKey() . "\n";
         }
     }
 
