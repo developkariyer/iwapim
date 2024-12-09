@@ -68,9 +68,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $listing = VariantProduct::getById(238746);
-        $this->setPrice($listing);
-        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        //$listing = VariantProduct::getById(238746);
+        //$this->setPrice($listing);
+        
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -80,7 +81,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     public function downloadInventory()
