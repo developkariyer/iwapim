@@ -69,7 +69,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $values = $db->fetchAllAssociative($sql); 
         foreach ($values as $row) {
             $id = $row['marketplace_id'];
-            $marketplace = Marketplace::getById($id)
+            $marketplace = Marketplace::getById($id);
             echo $marketplace->getKey() . "\n";
         }
     }
