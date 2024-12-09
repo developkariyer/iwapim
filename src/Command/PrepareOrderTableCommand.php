@@ -299,7 +299,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 tracking_company = VALUES(tracking_company)";
         try {
             $db = \Pimcore\Db::get();
-            $db->executeStatement($amazonSql, [
+            $db->executeStatement($trendyolSql, [
                 'marketplaceType' => $marketplaceType,
                 'marketPlaceId' => $marketPlaceId,
             ]);
