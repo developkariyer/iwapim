@@ -241,7 +241,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function setPrice(VariantProduct $listing)
     {
-        $currencies = [
+       /* $currencies = [
             'CANADIAN DOLLAR' => 'CAD',
             'TL' => 'TRY',
             'EURO' => 'EUR',
@@ -252,9 +252,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
         $marketplace = $listing->getMarketplace();
         $marketplaceCurrency = $marketplace->getCurrency();
-        $marketplaceCurrency = $currencies[$marketplaceCurrency];
-        echo $marketplaceCurrency;
-        
+        $marketplaceCurrency = $currencies[$marketplaceCurrency];*/
+
+        $this->convertCurrency("50", "USD", "EUR");
 
 
     }
