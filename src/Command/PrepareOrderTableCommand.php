@@ -53,42 +53,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->test();
         return Command::SUCCESS;
     }
     
-    protected function test()
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT 
-                DISTINCT marketplace_id
-            FROM
-                iwa_marketplace_orders_line_items
-            ";
-        $values = $db->fetchAllAssociative($sql); 
-        foreach ($values as $row) {
-            $id = $row['marketplace_id'];
-            $marketplace = Marketplace::getById($id);
-            if ($marketplace) {
-                $marketplaceKey = $marketplace->getKey();
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items
-                    SET marketplace_key = :marketplaceKey
-                    WHERE marketplace_id = :marketplaceId
-                ";
-                $db->executeStatement($updateSql, [
-                    'marketplaceKey' => $marketplaceKey,
-                    'marketplaceId' => $id,             
-                ]);
-            } else {
-                echo "Marketplace not found for ID: $id\n";
-            }
-        }
-    }
-
     protected function extraColumns()
     {
+        echo "Set Marketplace key\n";
+        $this->setMarketplaceKey();
+        echo "Complated Marketplace key\n";
         echo "Calculating is Parse URL\n";
         $this->parseUrl(); 
         echo "Complated Parse URL\n";
@@ -143,7 +115,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersAmazon($marketPlaceId,$marketplaceType)
     {
         $amazonSql = "
-            INSERT INTO iwa_amazon_orders_line_items (
+            INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
             total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
             SELECT
@@ -657,6 +629,36 @@ class PrepareOrderTableCommand extends AbstractCommand
         $marketplaceList = Marketplace::getMarketplaceList();
         foreach ($marketplaceList as $marketplace) {
             $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        }
+    }
+
+    protected function setMarketplaceKey()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT 
+                DISTINCT marketplace_id
+            FROM
+                iwa_marketplace_orders_line_items
+            ";
+        $values = $db->fetchAllAssociative($sql); 
+        foreach ($values as $row) {
+            $id = $row['marketplace_id'];
+            $marketplace = Marketplace::getById($id);
+            if ($marketplace) {
+                $marketplaceKey = $marketplace->getKey();
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET marketplace_key = :marketplaceKey
+                    WHERE marketplace_id = :marketplaceId
+                ";
+                $db->executeStatement($updateSql, [
+                    'marketplaceKey' => $marketplaceKey,
+                    'marketplaceId' => $id,             
+                ]);
+            } else {
+                echo "Marketplace not found for ID: $id\n";
+            }
         }
     }
 
