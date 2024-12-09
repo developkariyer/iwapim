@@ -63,6 +63,10 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
          * convert amount
          * return converted amount
          */
+        if ($fromCurrency === 'TRY')
+           $fromCurrencyValue = 1;
+        if ($toCurrency === 'TRY')
+           $toCurrencyValue = 1;
         $today = date('Y-m-d');
         $db = \Pimcore\Db::get();
         $sql = 
@@ -78,17 +82,23 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
             ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC
         LIMIT 1;
         ";
-            
-        $fromCurrencyValue = $db->fetchOne($sql, [
-            'today' => $today,
-            'currency' => $fromCurrency
-        ]);
+        if ($fromCurrencyValue === null) {
+            $fromCurrencyValue = $db->fetchOne($sql, [
+                'today' => $today,
+                'currency' => $fromCurrency
+            ]);
+        }
         
-        $toCurrencyValue = $db->fetchOne($sql, [
-            'today' => $today,
-            'currency' => $toCurrency
-        ]);
+        if ($toCurrencyValue === null) {
+            $toCurrencyValue = $db->fetchOne($sql, [
+                'today' => $today,
+                'currency' => $toCurrency
+            ]);    
+        }
         echo $fromCurrencyValue . ' ' . $toCurrencyValue;
+
+        
+
     }
 
 }
