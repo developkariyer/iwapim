@@ -150,6 +150,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) != ''
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE 
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -212,6 +214,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != ''
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE 
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -273,6 +277,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -341,6 +347,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -404,6 +412,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             AND CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS UNSIGNED) > 0
             AND marketplace_id = $marketPlaceId
         ON DUPLICATE KEY UPDATE
+            marketplace_type = VALUES(marketplace_type),
+            marketplace_id = VALUES(marketplace_id),    
             created_at = VALUES(created_at),
             closed_at = VALUES(closed_at),
             product_id = VALUES(product_id),
