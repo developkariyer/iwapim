@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace;
 
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
@@ -242,7 +243,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
         $marketplace = $listing->getMarketplace();
-        $marketplaceCurrency = $marketplace->getMarketplaceType();
+        $marketplaceCurrency = $marketplace->getCurrency();
         echo "{$marketplace->key()} - {$marketplaceCurrency} \n";
 
     }
