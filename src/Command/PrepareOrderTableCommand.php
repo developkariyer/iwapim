@@ -70,7 +70,13 @@ class PrepareOrderTableCommand extends AbstractCommand
         foreach ($values as $row) {
             $id = $row['marketplace_id'];
             $marketplace = Marketplace::getById($id);
-            echo $marketplace->getKey() . "\n";
+            $marketplaceKey = $marketplace->getKey();
+            $sql = "
+                UPDATE iwa_marketplace_orders_line_items
+                SET marketplace_key = $marketplaceKey
+                WHERE marketplace_id = $id;
+            ";
+            
         }
     }
 
