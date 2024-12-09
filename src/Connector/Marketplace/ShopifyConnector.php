@@ -242,7 +242,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
         $marketplace = $listing->getMarketplace();
-        $marketplaceCurrency = $marketplace->getInheritedField('currency');
+        $marketplaceCurrency = $marketplace->getMarketplaceType();
         echo "{$marketplace->key()} - {$marketplaceCurrency} \n";
 
     }
