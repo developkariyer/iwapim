@@ -254,7 +254,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $marketplaceCurrency = $marketplace->getCurrency();
         $marketplaceCurrency = $currencies[$marketplaceCurrency];*/
 
-        $this->convertCurrency("50", "USD", "EUR");
+        $this->convertCurrency("50", "TRY", "EUR");
 
 
     }
