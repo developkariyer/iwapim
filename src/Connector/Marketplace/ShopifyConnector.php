@@ -34,10 +34,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ]
+            ],
+            'json' => $body
         ];
         while ($nextLink) {
-            $response = $this->httpClient->request($method, $nextLink, $headersToApi, $body);
+            $response = $this->httpClient->request($method, $nextLink, $headersToApi);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
