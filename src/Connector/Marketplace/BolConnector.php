@@ -368,7 +368,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/stock', ['body' => ['amount' => $targetValue, 'managedByRetailer' => true]]);
+        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/stock', ['json' => ['amount' => $targetValue, 'managedByRetailer' => true]]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
