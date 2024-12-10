@@ -16,6 +16,7 @@ use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 use App\Utils\Registry;
+use Pimcore\Model\Element\DuplicateFullPathException;
 
 class Import
 {
@@ -43,6 +44,9 @@ class Import
         return trim(str_replace('('.$this->getAttributes($listing).')','',$listing['item-name'] ?? ''));
     }
 
+    /**
+     * @throws Exception|DuplicateFullPathException
+     */
     private function getFolder($asin): Folder
     {
         $folder = Utility::checkSetPath("Amazon", Utility::checkSetPath('Pazaryerleri'));
@@ -82,7 +86,7 @@ class Import
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|DuplicateFullPathException|\Exception
      */
     public function import($updateFlag, $importFlag): void
     {
@@ -152,11 +156,15 @@ class Import
                     }
                 }
             }
+            $variantProduct->save();
             echo "{$variantProduct->getId()} ";
             echo " OK\n";
         }
     }
 
+    /**
+     * @throws DuplicateFullPathException
+     */
     protected function processFieldCollection($variantProduct, $listing, $country): void
     {
         $collection = $variantProduct->getAmazonMarketplace();
@@ -193,7 +201,6 @@ class Import
             $variantProduct->setPublished(false);
             $variantProduct->setParent(Utility::checkSetPath('_Pasif', Utility::checkSetPath('Amazon', Utility::checkSetPath('Pazaryerleri'))));
         }
-        $variantProduct->save();
     }
 
     /**
