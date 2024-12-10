@@ -206,7 +206,8 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $response = $this->httpClient->request("PUT", static::$apiUrl['processStatusUrl'] .  '92372049493');
+        $url =static::$apiUrl['processStatusUrl'] .  '92372049493';
+        $response = $this->httpClient->request("GET", $url);
         print_r($response->getContent());
        
         /*$this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
