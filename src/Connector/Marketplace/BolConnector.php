@@ -18,7 +18,8 @@ class BolConnector extends MarketplaceConnectorAbstract
         'productsUrl' => "/retailer/products/",
         'catalogProductsUrl' => "/retailer/content/catalog-products/",
         'commissionUrl' => "/retailer/commission/",
-        'orders' => '/retailer/orders/'
+        'orders' => "/retailer/orders/",
+        "offers" => "/retailer/offers/"
     ];
     public static $marketplaceType = 'Bol.com';
 
@@ -205,7 +206,10 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $variant = VariantProduct::getById(267629);
+        $offerid = json_decode($variant->jsonRead('apiResponseJson'), true)['offerId'];
+        echo "OFFER ID: " . $offerId . "\n";
+        /*$this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -213,7 +217,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->getListings(
             $this->downloadOfferReport($forceDownload)
         );
-        Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
+        Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));*/
     }
 
     public function import($updateFlag, $importFlag)
@@ -346,5 +350,74 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadInventory()
     {
     }
+
+    
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    {
+        $this->prepareToken();
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetValue > 999) {
+            echo "Bol.com does not support inventory values greater than 999\n";
+            return;
+        }
+        $offerId = json_decode($listing->jsonRead('apiResponseJson'), true)['offerId'];
+        if (empty($offerId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/stock', ['body' => ['amount' => $targetValue, 'managedByRetailer' => true]]);
+        print_r($response->getContent());
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        echo "Inventory set\n";
+        $date = date('Y-m-d-H-i-s');
+        $filename = "{$offerId}-$date.json";  
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($data));
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+        $this->prepareToken();
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetPrice === null) {
+            echo "Error: Price cannot be null\n";
+            return;
+        }
+        if ($targetCurrency === null) {
+            $targetCurrency = $listing->getSaleCurrency();
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+        if ($finalPrice === null) {
+            echo "Error: Currency conversion failed\n";
+            return;
+        }
+        $offerId = json_decode($listing->jsonRead('apiResponseJson'), true)['offerId'];
+        if (empty($offerId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/price', ['body' => ['pricing' => ['bundlePrices' => [['unitPrice' => $finalPrice, 'quantity' => 1]]]]]);
+        print_r($response->getContent());
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        echo "Price set\n";
+        $date = date('Y-m-d-H-i-s');
+        $filename = "{$offerId}-$date.json";  
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($data));
+    } 
 
 }
