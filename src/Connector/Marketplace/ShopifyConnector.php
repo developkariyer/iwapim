@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace;
 
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
@@ -67,6 +68,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
+        //$listing = VariantProduct::getById(238746);
+        //$this->setPrice($listing);
+        
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -212,16 +216,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function test()
-    {
-        $response = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
-        if (empty($response)) {
-            echo "Failed to get locations\n";
-            return;
-        }
-        print_r($response);
-    }
-
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
         $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
@@ -262,6 +256,26 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
         print_r($response);
         Utility::setCustomCache("{$listing->getUniqueMarketplaceId()}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetSKU', json_encode($response));
+    }
+
+    public function setPrice(VariantProduct $listing)
+    {
+       /* $currencies = [
+            'CANADIAN DOLLAR' => 'CAD',
+            'TL' => 'TRY',
+            'EURO' => 'EUR',
+            'US DOLLAR' => 'USD',
+            'SWEDISH KRONA' => 'SEK',
+            'POUND STERLING' => 'GBP'
+        ];
+        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
+        $marketplace = $listing->getMarketplace();
+        $marketplaceCurrency = $marketplace->getCurrency();
+        $marketplaceCurrency = $currencies[$marketplaceCurrency];*/
+
+        $this->convertCurrency("50", "TRY", "EUR");
+
+
     }
 
 }

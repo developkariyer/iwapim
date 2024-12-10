@@ -58,6 +58,9 @@ class PrepareOrderTableCommand extends AbstractCommand
     
     protected function extraColumns()
     {
+        echo "Set Marketplace key\n";
+        $this->setMarketplaceKey();
+        echo "Complated Marketplace key\n";
         echo "Calculating is Parse URL\n";
         $this->parseUrl(); 
         echo "Complated Parse URL\n";
@@ -112,7 +115,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected static function transferOrdersAmazon($marketPlaceId,$marketplaceType)
     {
         $amazonSql = "
-            INSERT INTO iwa_amazon_orders_line_items (
+            INSERT INTO iwa_marketplace_orders_line_items (
             marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
             total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
             SELECT
@@ -150,6 +153,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) != ''
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE 
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -212,6 +217,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != ''
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE 
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -273,6 +280,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
 			ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -341,6 +350,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                 AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
                 created_at = VALUES(created_at),
                 closed_at = VALUES(closed_at),
                 product_id = VALUES(product_id),
@@ -404,6 +415,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             AND CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS UNSIGNED) > 0
             AND marketplace_id = $marketPlaceId
         ON DUPLICATE KEY UPDATE
+            marketplace_type = VALUES(marketplace_type),
+            marketplace_id = VALUES(marketplace_id),    
             created_at = VALUES(created_at),
             closed_at = VALUES(closed_at),
             product_id = VALUES(product_id),
@@ -548,12 +561,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "Marketplace not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
             return;
         }
-
-        $marketplaceKey = $marketplace->getKey(); 
-        if (!$marketplaceKey) {
-            echo "Marketplace key is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-            return;
-        }
         
         $mainProductObjectArray = $variantObject->getMainProduct(); 
         if(!$mainProductObjectArray) {
@@ -594,20 +601,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             $parts = explode('/', trim($path, '/'));
             $variantName = array_pop($parts);
             $parentName = array_pop($parts); 
-            self::insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
+            self::insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
         }
     }
 
-    protected static function insertIntoTable($uniqueMarketplaceId,$marketplaceKey, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
+    protected static function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
-        SET marketplace_key = :marketplaceKey, iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
+        SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':marketplaceKey' => $marketplaceKey,
             ':iwasku' => $iwasku,
             ':identifier' => $identifier,
             ':productType' => $productType,
@@ -623,6 +629,38 @@ class PrepareOrderTableCommand extends AbstractCommand
         $marketplaceList = Marketplace::getMarketplaceList();
         foreach ($marketplaceList as $marketplace) {
             $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        }
+    }
+
+    protected function setMarketplaceKey()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT 
+                DISTINCT marketplace_id
+            FROM
+                iwa_marketplace_orders_line_items
+            WHERE 
+                marketplace_id IS NOT NULL
+            ";
+        $values = $db->fetchAllAssociative($sql); 
+        foreach ($values as $row) {
+            $id = $row['marketplace_id'];
+            $marketplace = Marketplace::getById($id);
+            if ($marketplace) {
+                $marketplaceKey = $marketplace->getKey();
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET marketplace_key = :marketplaceKey
+                    WHERE marketplace_id = :marketplaceId
+                ";
+                $db->executeStatement($updateSql, [
+                    'marketplaceKey' => $marketplaceKey,
+                    'marketplaceId' => $id,             
+                ]);
+            } else {
+                echo "Marketplace not found for ID: $id\n";
+            }
         }
     }
 
