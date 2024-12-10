@@ -207,8 +207,8 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::getById(218571);
-        $this->setInventory($variant, 5);
-        //$this->setPrice($variant, '10.00');        
+        //$this->setInventory($variant, 5);
+        $this->setPrice($variant, '100');        
         /*$this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -371,7 +371,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/stock', ['json' => ['amount' => $targetValue, 'managedByRetailer' => true]]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
+        if ($statusCode !== 202) {
             echo "Error: $statusCode\n";
             return;
         }
@@ -406,10 +406,10 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/price', ['body' => ['pricing' => ['bundlePrices' => [['unitPrice' => $finalPrice, 'quantity' => 1]]]]]);
+        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/price', ['json' => ['pricing' => ['bundlePrices' => [['unitPrice' => $finalPrice, 'quantity' => 1]]]]]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
+        if ($statusCode !== 202) {
             echo "Error: $statusCode\n";
             return;
         }
