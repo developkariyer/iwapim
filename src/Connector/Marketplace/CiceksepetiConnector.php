@@ -2,7 +2,7 @@
 
 namespace App\Connector\Marketplace;
 
-use Pimcore\Model\DataObject\VariantProduct;
+use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
 
@@ -18,7 +18,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $variant = VariantProduct::findByField("id",266097);
+        $variant = VariantProduct::findOneByField("id",266097);
         print_r($variant);
         //$this->setInventory($variant, 299);
         //$this->setPrice($variant, 1150);
