@@ -18,11 +18,11 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $variant = VariantProduct::getById(266097);
+        $variant = VariantProduct::getById(266259);
         print_r($variant);
         //$this->setInventory($variant, 299);
         //$this->setPrice($variant, 1150);
-        
+
         /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
