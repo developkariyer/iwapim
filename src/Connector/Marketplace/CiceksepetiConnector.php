@@ -169,7 +169,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         }
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
             'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                'Content-Type' => 'application/json'
             ],
             'body' => json_encode([
                 'items' => [
