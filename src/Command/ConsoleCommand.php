@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Connector\Marketplace\ShopifyConnector;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,6 +29,71 @@ class ConsoleCommand extends AbstractCommand
         $jwt = explode('.', $jwt);
         $jwt = json_decode(base64_decode($jwt[1]), true);
         return $jwt['exp'] - time();
+    }
+
+    public function setShopifySku()
+    {   // $this->setShopifySku();
+
+        $shopifyConnectors = [
+            23978 => new ShopifyConnector(Marketplace::getById(23978)),
+            84124 => new ShopifyConnector(Marketplace::getById(84124)),
+            108415 => new ShopifyConnector(Marketplace::getById(108415)),
+            108416 => new ShopifyConnector(Marketplace::getById(108416)),
+            108417 => new ShopifyConnector(Marketplace::getById(108417)),
+            108418 => new ShopifyConnector(Marketplace::getById(108418)),
+            108419 => new ShopifyConnector(Marketplace::getById(108419)),
+        ];
+
+        $variantObject = new VariantProduct\Listing();
+        $pageSize = 5;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(false);
+        $index = $offset;
+        while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($results as $listing) {
+                $index++;
+                echo "\rProcessing $index {$listing->getId()} ";
+                if ($listing->getMarketplace()->getMarketplaceType() !== 'Shopify') {
+                    continue;
+                }
+                $marketplaceId = $listing->getMarketplace()->getId();
+                if ($marketplaceId != 84124) {
+                    continue;
+                }
+                $mainProduct = $listing->getMainProduct();
+                if (empty($mainProduct)) {
+                    echo "No Main Product\n";
+                    continue;
+                }
+                if (is_array($mainProduct)) {
+                    $mainProduct = reset($mainProduct);
+                }
+                if (!$mainProduct instanceof Product) {
+                    echo "Main Product is not an instance of Product\n";
+                    continue;
+                }
+                $iwasku = $mainProduct->getIwasku();
+                if (empty($iwasku)) {
+                    echo "No Iwasku\n";
+                    continue;
+                }
+                $connector = $shopifyConnectors[$marketplaceId] ?? null;
+                if (empty($connector)) {
+                    echo "No Connector\n";
+                    continue;
+                }
+                $connector->setSku($listing, $iwasku);
+            }
+        }
+        echo "\nFinished\n";
+
     }
 
     public function connectAmazonUs()
