@@ -171,14 +171,14 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
-            'body' => 
+            'json' => [
                 'items' => [
                     [
                         'stockCode' => $stockCode,
                         'stockQuantity' => $targetValue
                     ]
                 ]
-            
+            ]
         ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
