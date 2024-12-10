@@ -191,7 +191,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         echo "Inventory set\n";
         $date = date('Y-m-d-H-i-s');
         $filename = "{$stockCode}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($response));
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
     }
 
     public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
@@ -246,7 +246,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         echo "Price set\n";
         $date = date('Y-m-d-H-i-s');
         $filename = "{$stockCode}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($response));
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($combinedData));
     } 
 
     /*public function updateProduct(VariantProduct $listing, string $sku)
