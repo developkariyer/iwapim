@@ -206,11 +206,9 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $this->prepareToken();
-        $url = '' . static::$apiUrl['processStatusUrl'] .  '92372049493';
-        $response = $this->httpClient->request("GET", $url);
-        print_r($response->getContent());
-       
+        $variant = VariantProduct::getById(218571);
+       // $this->setInventory($variant, 0);
+        $this->setPrice($variant, '100');        
         /*$this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -399,7 +397,8 @@ class BolConnector extends MarketplaceConnectorAbstract
             $targetCurrency = $listing->getSaleCurrency();
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if ($finalPrice === null) {
+        echo "Final price: $finalPrice\n";
+       /* if ($finalPrice === null) {
             echo "Error: Currency conversion failed\n";
             return;
         }
@@ -419,7 +418,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         echo "Price set\n";
         $date = date('Y-m-d-H-i-s');
         $filename = "{$offerId}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($data));
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($data));*/
     } 
 
 }
