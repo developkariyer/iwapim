@@ -342,6 +342,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
             return;
         }
+        print_r($response->getContent());
         $data = $response->toArray();
         return $data;
     }
