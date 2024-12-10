@@ -2,7 +2,7 @@
 
 namespace App\Connector\Marketplace;
 
-use App\Model\DataObject\VariantProduct;
+use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
 
