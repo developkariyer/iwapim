@@ -24,7 +24,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
     
-    public function getFromShopifyApi($method, $parameter, $query = [], $key = null)
+    public function getFromShopifyApi($method, $parameter, $query = [], $key = null, $body = null)
     {
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
@@ -37,7 +37,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         while ($nextLink) {
-            $response = $this->httpClient->request($method, $nextLink, $headersToApi);
+            $response = $this->httpClient->request($method, $nextLink, $headersToApi, $body);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
@@ -249,7 +249,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item.id' => $inventoryItemId, 'inventory_item.sku' => $sku]);
+        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", [], null, ['inventory_item.id' => $inventoryItemId, 'inventory_item.sku' => $sku]);
         if (empty($response)) {
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
