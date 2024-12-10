@@ -63,6 +63,10 @@ class ConsoleCommand extends AbstractCommand
                 if ($listing->getMarketplace()->getMarketplaceType() !== 'Shopify') {
                     continue;
                 }
+                $marketplaceId = $listing->getMarketplace()->getId();
+                if ($marketplaceId != 84124) {
+                    continue;
+                }
                 $mainProduct = $listing->getMainProduct();
                 if (empty($mainProduct)) {
                     echo "No Main Product\n";
@@ -78,10 +82,6 @@ class ConsoleCommand extends AbstractCommand
                 $iwasku = $mainProduct->getIwasku();
                 if (empty($iwasku)) {
                     echo "No Iwasku\n";
-                    continue;
-                }
-                $marketplaceId = $listing->getMarketplace()->getId();
-                if ($marketplaceId != 84124) {
                     continue;
                 }
                 $connector = $shopifyConnectors[$marketplaceId] ?? null;
