@@ -19,7 +19,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::findOneByField("id",266097);
-        print_r($variant);
+        print_r($variant->getTitle());
         //$this->setInventory($variant, 299);
         //$this->setPrice($variant, 1150);
         
