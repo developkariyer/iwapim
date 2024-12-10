@@ -90,7 +90,6 @@ class ConsoleCommand extends AbstractCommand
                     continue;
                 }
                 $connector->setSku($listing, $iwasku);
-                echo "SKU set.\n";
             }
         }
         echo "\nFinished\n";
