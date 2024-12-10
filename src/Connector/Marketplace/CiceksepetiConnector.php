@@ -10,7 +10,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
         'offers' => "https://apis.ciceksepeti.com/api/v1/Products",
-        'updateInventoryPrice' => "https://sandbox-apis.ciceksepeti.com/api/v1/Products/price-and-stock",
+        'updateInventoryPrice' => "https://apis.ciceksepeti.com/api/v1/Products/price-and-stock",
         'batchStatus' => "https://apis.ciceksepeti.com/api/v1/Products/batch-status/"
     ];
     
@@ -169,13 +169,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         }
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
             'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
-                'Content-Type' => 'application/json'
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
-            'body' => json_encode([
+            'body' => 'items' => [
                     'stockCode' => $stockCode,
                     'stockQuantity' => $targetValue
-                ])
+                ]
+            ])
         ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
