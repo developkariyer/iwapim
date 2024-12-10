@@ -171,10 +171,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
-            'json' => [
+            'body' => json_encode([
                 'stockCode' => $stockCode,
                 'stockQuantity' => $targetValue
-            ]
+            ])
         ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
@@ -220,10 +220,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
-            'json' => [
+            'body' => json_encode([
                 'stockCode' => $stockCode,
                 'salesPrice ' => (float)$finalPrice
-            ]
+            ])
         ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
