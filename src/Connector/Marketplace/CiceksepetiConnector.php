@@ -172,12 +172,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
                 'Content-Type' => 'application/json'
             ],
-            'body' => json_encode([
+            'json' => [
                 'stockCode' => $stockCode,
                 'stockQuantity' => $targetValue
-            ])
+            ]
         ]);
-        print_r($response);
+        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
