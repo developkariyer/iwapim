@@ -9,7 +9,9 @@ use Symfony\Component\HttpClient\HttpClient;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "https://apis.ciceksepeti.com/api/v1/Products"
+        'offers' => "https://apis.ciceksepeti.com/api/v1/Products",
+        'updateInventoryPrice' => "https://apis.ciceksepeti.com/api/v1/Products/price-and-stock",
+        'batchStatus' => "https://apis.ciceksepeti.com/api/v1/Products/batch-status/"
     ];
     
     public static $marketplaceType = 'Ciceksepeti';
@@ -148,6 +150,185 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadInventory()
     {
 
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    {
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
+        if (empty($stockCode)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+            ],
+            'json' => [
+                'stockCode' => $stockCode,
+                'stockQuantity' => $targetValue
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $combinedData = [
+            'inventory' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+        ];
+        echo "Inventory set\n";
+        $date = date('Y-m-d-H-i-s');
+        $filename = "{$stockCode}-$date.json";  
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($response));
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetPrice === null) {
+            echo "Error: Price cannot be null\n";
+            return;
+        }
+        if ($targetCurrency === null) {
+            $targetCurrency = $listing->getSaleCurrency();
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, 'TL');
+        if ($finalPrice === null) {
+            echo "Error: Currency conversion failed\n";
+            return;
+        }
+        $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
+        if (empty($stockCode)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+            ],
+            'json' => [
+                'stockCode' => $stockCode,
+                'salesPrice ' => (float)$finalPrice
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $combinedData = [
+            'price' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+        ];
+        echo "Price set\n";
+        $date = date('Y-m-d-H-i-s');
+        $filename = "{$stockCode}-$date.json";  
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($response));
+    } 
+
+    /*public function updateProduct(VariantProduct $listing, string $sku)
+    {
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($sku === null) {
+            echo "Error: SKU cannot be null\n";
+            return;
+        }
+        $productName = json_decode($listing->jsonRead('apiResponseJson'), true)['productName'];
+        if (empty($productName) || $productName === null) {
+            echo "Failed to get product name for {$listing->getKey()}\n";
+            return;
+        }
+        $mainProductCode = json_decode($listing->jsonRead('apiResponseJson'), true)['mainProductCode'];
+        if (empty($mainProductCode) || $mainProductCode === null) {
+            echo "Failed to get main product code for {$listing->getKey()}\n";
+            return;
+        }
+        $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
+        if (empty($stockCode) || $stockCode === null) {
+            echo "Failed to get stock code for {$listing->getKey()}\n";
+            return;
+        }
+        $isActive = json_decode($listing->jsonRead('apiResponseJson'), true)['productStatusType'] === 'YAYINDA' ? 1 : 0;
+        $description = json_decode($listing->jsonRead('apiResponseJson'), true)['description'];
+        if (empty($description) || $description === null) {
+            echo "Failed to get description for {$listing->getKey()}\n";
+            return;
+        }
+        $images = json_decode($listing->jsonRead('apiResponseJson'), true)['images'];
+        if (empty($images) || $images === null) {
+            echo "Failed to get images for {$listing->getKey()}\n";
+            return;
+        }
+        $deliveryType = json_decode($listing->jsonRead('apiResponseJson'), true)['deliveryType'];
+        if (empty($deliveryType) || $deliveryType === null) {
+            echo "Failed to get delivery type for {$listing->getKey()}\n";
+            return;
+        }
+        $deliveryMessageType = json_decode($listing->jsonRead('apiResponseJson'), true)['deliveryMessageType'];
+        if (empty($deliveryMessageType) || $deliveryMessageType === null) {
+            echo "Failed to get delivery message type for {$listing->getKey()}\n";
+            return;
+        }
+        $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
+        $response = $this->httpClient->request('PUT', static::$apiUrl['offers'], [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+            ],
+            'json' => [
+                'productName' => $productName,
+                'mainProductCode' => $mainProductCode,
+                'stockCode' => $stockCode,
+                'isActive' => $isActive,
+                'description' => $description,
+                'images' => $images,
+                'deliveryType' => $deliveryType,
+                'deliveryMessageType' => $deliveryMessageType,
+                'attributes' => $attributes,
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $combinedData = [
+            'price' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+        ];
+        echo "Product Update \n";
+        $date = date('Y-m-d-H-i-s');
+        $filename = "{$stockCode}-$date.json";  
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/UpdateSku', json_encode($response));
+    }*/
+
+    public function getBatchRequestResult($batchId)
+    {
+        $response = $this->httpClient->request('GET', static::$apiUrl['batchStatus'] . $batchId, [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        return $data;
     }
 
 }
