@@ -99,7 +99,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         if ($report === false || $forceDownload) {
             echo "Requesting offer report from Bol.com\n";
             $entityId = $this->reportStatus($this->requestOfferReport());
-            $response = $this->->request('GET', static::$apiUrl['offerExportUrl'] . $entityId, ['headers' => ['Accept' => 'application/vnd.retailer.v10+csv']]);
+            $response = $this->request('GET', static::$apiUrl['offerExportUrl'] . $entityId, ['headers' => ['Accept' => 'application/vnd.retailer.v10+csv']]);
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
             }
