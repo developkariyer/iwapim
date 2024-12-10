@@ -200,8 +200,20 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Error: Quantity cannot be more than 20000\n";
             return;
         }
+        if ($targetValue < 0) {
+            echo "Error: Quantity cannot be less than 0\n";
+            return;
+        }
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
+        if ($barcode === null) {
+            echo "Error: Barcode is missing\n";
+            return;
+        }
         $response = $this->httpClient->request('POST', $apiUrl, [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
@@ -221,18 +233,40 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetInventory.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Inventory', json_encode($data));
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetInventoryBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Inventory', json_encode($this->getBatchRequestResult($data['batchRequestId'])));
-        print_r($this->getBatchRequestResult($data['batchRequestId']));
+        $combinedData = [
+            'inventory' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchRequestId']),
+        ];
+        $date = date('Y-m-d H:i:s');
+        $combinedJson = json_encode($combinedData);
+        $filename = "{$barcode}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetInventory', $combinedJson);
     }
 
-    // Trendyol update product service just createProduct V2 CREATE_PRODUCT_V2  
-    
     public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetPrice === null) {
+            echo "Error: Price cannot be null\n";
+            return;
+        }
+        if ($targetCurrency === null) {
+            $targetCurrency = 'TRY';
+        }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, 'TRY');
+        if ($finalPrice === null) {
+            echo "Error: Currency conversion failed\n";
+            return;
+        }
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
+        if ($barcode === null) {
+            echo "Error: Barcode is missing\n";
+            return;
+        }
         $response = $this->httpClient->request('POST', $apiUrl, [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
@@ -252,9 +286,14 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetPrice.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Price' , json_encode($data));
-        Utility::setCustomCache($barcode . '_' . date('Y-m-d H:i:s') . '_SetPriceBatchRequestResult.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Price' , json_encode($this->getBatchRequestResult($data['batchRequestId'])));
-        print_r($this->getBatchRequestResult($data['batchRequestId']));
+        $combinedData = [
+            'price' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchRequestId']),
+        ];
+        $date = date('Y-m-d H:i:s');
+        $combinedJson = json_encode($combinedData);
+        $filename = "{$barcode}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);
     }
 
     public function getBatchRequestResult($batchRequestId)
