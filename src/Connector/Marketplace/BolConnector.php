@@ -348,7 +348,6 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
     }
 
-    
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
         $this->prepareToken();
