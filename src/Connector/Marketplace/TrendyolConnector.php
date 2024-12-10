@@ -230,42 +230,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     
     public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-        $currency = $targetCurrency ?? 'TL';
-        echo "Function called with price: $targetPrice and currency: $currency\n";
-        if ($currency !== 'TL') {
-            $today = date('Y-m-d');
-            $db = \Pimcore\Db::get();
-            $sql = "
-                SELECT
-                    value
-                FROM 
-                    iwa_currency_history
-                WHERE 
-                    currency = '$currency'
-                    AND DATE(date) <= '$today'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$today')) ASC
-                LIMIT 1;
-            ";
-            
-            $result = $db->fetchOne($sql, [
-                'today' => $today,
-                'currency' => $currency
-            ]);
-
-            if ($result) {
-                $value = $result;  
-                $scaledPrice = bcmul((string)$targetPrice, "100", 4); 
-                $convertedPrice = bcmul($scaledPrice, (string)$value, 4);
-                $roundedPrice = bcdiv($convertedPrice, "1", 0); 
-                $finalPrice = bcdiv($roundedPrice, "100", 2); 
-                $targetPrice = $finalPrice;
-            } else {
-                echo "No result found for currency: $currency.\n";
-            }
-        }
-        $targetPrice = (string) $targetPrice;
-        echo "Setting price to: $targetPrice\n";
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, 'TRY');
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         $response = $this->httpClient->request('POST', $apiUrl, [
@@ -276,7 +241,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 'items' => [
                     [
                         'barcode' => $barcode,
-                        'salePrice' => $targetPrice
+                        'salePrice' => $finalPrice
                     ]
                 ]
             ]
