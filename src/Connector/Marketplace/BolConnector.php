@@ -207,7 +207,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::getById(267629);
-        $catalog = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $catalog = json_decode($variant->jsonRead('apiResponseJson'), true)['offerId'];
         print_r($catalog);
         /*$this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
