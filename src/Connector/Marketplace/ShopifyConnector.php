@@ -29,7 +29,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
         $headersToApi = [
-            'query' => json_encode($query),
+            'json' => $query,
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json',
