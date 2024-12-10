@@ -332,7 +332,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function getBatchRequestResult($batchId)
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['batchStatus'] . $batchId, [
+        $url = static::$apiUrl['batchStatus'] . $batchId;
+        $response = $this->httpClient->request('GET', $url, [
             'headers' => [
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ]
