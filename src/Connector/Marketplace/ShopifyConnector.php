@@ -236,14 +236,32 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function setSku(VariantProduct $listing, string $sku)
     {
-        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if (empty($sku)) {
+            echo "SKU is empty for {$listing->getKey()}\n";
+            return;
+        }
+        $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
+        $jsonSku = $apiResponse['sku'] ?? null;
+        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
+        if (!empty($jsonSku) && $jsonSku === $sku) {
+            echo "SKU is already set for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
         $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item' => ['id' => $inventoryItemId, 'sku' => $sku]]);
         if (empty($response)) {
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
         }
         print_r($response);
-        Utility::setCustomCache($inventoryItemId . '_' . date('Y-m-d H:i:s') . '_SetSku.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/Skus', json_encode($response));
+        Utility::setCustomCache("{$listing->getUniqueMarketplaceId()}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetSKU', json_encode($response));
     }
 
 }
