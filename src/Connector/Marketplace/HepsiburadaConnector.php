@@ -13,7 +13,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $variant = VariantProduct::getById(266750);
+        print_r($variant->jsonRead('apiResponseJson'));
+        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -54,7 +56,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->downloadAttributes();
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
     }
 
     protected function getProduct($hbSku)
@@ -152,6 +154,47 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "OK\n";
             $index++;
         }  
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    {
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
+        if (empty($stockCode)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}//stock-uploads", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ],
+            'body' => [
+                'hepsiburadaSku' => ,
+                'merchantSku' =>,
+                'availableStock' =>,
+            ]
+        ]);
+        print_r($response->getContent());
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $combinedData = [
+            'inventory' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+        ];
+        echo "Inventory set\n";
+        $date = date('Y-m-d-H-i-s');
+        $filename = "{$stockCode}-$date.json";  
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
     }
 
     public function downloadOrders()
