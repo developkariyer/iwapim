@@ -273,7 +273,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Listing is not a VariantProduct\n";
             return;
         }
-        currencies = [
+        $currencies = [
             'CANADIAN DOLLAR' => 'CAD',
             'TL' => 'TL',
             'EURO' => 'EUR',
