@@ -172,13 +172,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
             'body' => json_encode([
-            'items' => [
-                        [
-                            'stockCode' => $stockCode,
-                            'stockQuantity' => $targetValue,
-                        ]
+                'items' => [
+                    [
+                        'stockCode' => $stockCode,
+                        'stockQuantity' => $targetValue
                     ]
-                ])
+                ]
             ])
         ]);
         print_r($response->getContent());
