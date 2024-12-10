@@ -156,7 +156,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }  
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+   /* public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
         if (!$listing instanceof VariantProduct) {
             echo "Listing is not a VariantProduct\n";
@@ -195,7 +195,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $date = date('Y-m-d-H-i-s');
         $filename = "{$stockCode}-$date.json";  
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
-    }
+    }*/
 
     public function downloadOrders()
     {
