@@ -4,7 +4,7 @@ namespace App\Connector\Marketplace\Amazon;
 
 class Constants
 {
-    const amazonMerchant = [
+    const array amazonMerchant = [
         'CA' => [
             'id' => 'A2EUQ1WTGCTBG2', // Canada
             'url' => 'https://www.amazon.ca',
@@ -63,7 +63,7 @@ class Constants
         'SE' => [
             'id' => 'A2NODRKZP88ZB9', // Sweden
             'url' => 'https://www.amazon.se',
-            'currency' => 'SEK' // Swedish Krona
+            'currency' => 'SEK' // Swedish Króna
         ],
         'PL' => [
             'id' => 'A1C3SOZRARQ6R3', // Poland
@@ -132,7 +132,7 @@ class Constants
         ]
     ];
 
-    public static function checkCountryCodes($countryCodes) 
+    public static function checkCountryCodes($countryCodes): bool
     {
         if (!empty($countryCodes)) {
             $missingCodes = array_diff($countryCodes, array_keys(static::amazonMerchant));

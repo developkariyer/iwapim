@@ -2,6 +2,8 @@
 
 namespace App\Connector\Marketplace\Amazon;
 
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Fieldcollection\Data\AmazonMarketplace;
@@ -17,9 +19,9 @@ use App\Utils\Registry;
 
 class Import
 {
-    public $amazonConnector;
+    public AmazonConnector $amazonConnector;
 
-    public $iwaskuList = [];
+    public array $iwaskuList = [];
 
     public function __construct(AmazonConnector $amazonConnector) 
     {
@@ -27,15 +29,16 @@ class Import
     }
 
     
-    private function getAttributes($listing) {
+    private function getAttributes($listing): string
+    {
         $title = $listing['item-name'];
-        if (preg_match('/\(([^()]*)\)[^\(]*$/', $title, $matches)) {
+        if (preg_match('/\(([^()]*)\)[^(]*$/', $title, $matches)) {
             return trim($matches[1]);
         }
         return '';    
     }
 
-    private function getTitle($listing)
+    private function getTitle($listing): string
     {
         return trim(str_replace('('.$this->getAttributes($listing).')','',$listing['item-name'] ?? ''));
     }
@@ -65,17 +68,23 @@ class Import
         );
     }
 
-    protected function checkIwasku($iwasku)
+    /**
+     * @throws Exception
+     */
+    protected function checkIwasku($iwasku): bool
     {
         if (empty($this->iwaskuList)) {
-            $db = \Pimcore\Db::get();
+            $db = Db::get();
             $this->iwaskuList = $db->fetchFirstColumn("SELECT DISTINCT iwasku FROM object_store_product WHERE iwasku IS NOT NULL ORDER BY iwasku");
             $this->iwaskuList = array_filter( $this->iwaskuList);
         }
         return in_array($iwasku, $this->iwaskuList);
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
         $total = count($this->amazonConnector->listings);
         $index = 0;
@@ -114,14 +123,14 @@ class Import
                 parent: $this->getFolder($asin),
             );
             $mainProduct = $variantProduct->getMainProduct();
-            $skuRequired = empty($mainProduct) ? true : false;
+            $skuRequired = empty($mainProduct);
             $mainProduct = is_array($mainProduct) ? reset($mainProduct) : $mainProduct;
             if ($mainProduct instanceof Product) {
                 echo "Reg ";
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
             } else {
                 echo "NoReg ";
-            };
+            }
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;
@@ -132,7 +141,7 @@ class Import
                     if ($skuRequired) {
                         $sku = explode('_', $countryListing['seller-sku'] ?? '')[0] ?? '';
                         if ($this->checkIwasku($sku)) {
-                            $mainProduct = Product::getByIwasku($sku, ['limit' => 1]);
+                            $mainProduct = Product::getByIwasku($sku, 1);
                             if ($mainProduct instanceof Product) {
                                 echo "Adding variant {$variantProduct->getId()} to {$mainProduct->getId()} ";
                                 if ($mainProduct->addVariant($variantProduct)) {
@@ -148,7 +157,7 @@ class Import
         }
     }
 
-    protected function processFieldCollection($variantProduct, $listing, $country)
+    protected function processFieldCollection($variantProduct, $listing, $country): void
     {
         $collection = $variantProduct->getAmazonMarketplace();
         $newCollection = new Fieldcollection();
@@ -160,17 +169,7 @@ class Import
             }
             if ($amazonCollection->getListingId() === $listing['listing-id']) {
                 $found = true;
-                $amazonCollection->setMarketplaceId($country);
-                $amazonCollection->setTitle($this->getTitle($listing));
-                $amazonCollection->setUrlLink($this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
-                $amazonCollection->setSalePrice($listing['price'] ?? 0);
-                $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
-                $amazonCollection->setSku($listing['seller-sku'] ?? '');
-                $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
-                $amazonCollection->setLastUpdate(Carbon::now());
-                $amazonCollection->setMarketplace($this->amazonConnector->marketplace);
-                $amazonCollection->setStatus($listing['status'] ?? '');
-                $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+                $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->amazonConnector->marketplace);
             } else {
                 if ($amazonCollection->getLastUpdate() === null || $amazonCollection->getLastUpdate() < Carbon::now()->subDays(3)) {
                     continue;
@@ -183,18 +182,8 @@ class Import
         }
         if (!$found) {
             $amazonCollection = new AmazonMarketplace();
-            $amazonCollection->setMarketplaceId($country);
-            $amazonCollection->setLastUpdate(Carbon::now());
-            $amazonCollection->setTitle($this->getTitle($listing));
-            $amazonCollection->setUrlLink($this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'].'/dp/' . ($listing['asin1'] ?? '')));
-            $amazonCollection->setSalePrice($listing['price'] ?? 0);
-            $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
-            $amazonCollection->setSku($listing['seller-sku'] ?? '');
+            $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->amazonConnector->marketplace);
             $amazonCollection->setListingId($listing['listing-id'] ?? '');
-            $amazonCollection->setMarketplace($this->amazonConnector->marketplace);
-            $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0)+0);
-            $amazonCollection->setStatus($listing['status'] ?? '');
-            $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
             $newCollection->add($amazonCollection);
         }
         $variantProduct->setAmazonMarketplace($newCollection);
@@ -205,5 +194,27 @@ class Import
             $variantProduct->setParent(Utility::checkSetPath('_Pasif', Utility::checkSetPath('Amazon', Utility::checkSetPath('Pazaryerleri'))));
         }
         $variantProduct->save();
+    }
+
+    /**
+     * @param AmazonMarketplace $amazonCollection
+     * @param $listing
+     * @param $country
+     * @param $marketplace
+     * @return void
+     */
+    protected function setAmazonCollectionProperties(AmazonMarketplace $amazonCollection, $listing, $country, $marketplace): void
+    {
+        $amazonCollection->setLastUpdate(Carbon::now());
+        $amazonCollection->setMarketplaceId($country);
+        $amazonCollection->setTitle($this->getTitle($listing));
+        $amazonCollection->setUrlLink($this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'] . '/dp/' . ($listing['asin1'] ?? '')));
+        $amazonCollection->setSalePrice($listing['price'] ?? 0);
+        $amazonCollection->setStatus($listing['status'] ?? '');
+        $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0));
+        $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
+        $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+        $amazonCollection->setMarketplace($marketplace);
+        $amazonCollection->setSku($listing['seller-sku'] ?? '');
     }
 }

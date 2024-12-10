@@ -2,26 +2,32 @@
 
 namespace App\Connector\Marketplace\Amazon;
 
+use DateTime;
+use DateTimeZone;
+use Doctrine\DBAL\Exception;
+use SellingPartnerApi\Seller\OrdersV0\Api as SellerOrdersV0;
+use Doctrine\DBAL\Connection;
+use Pimcore\Db;
+
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
-use App\Utils\Utility;
 
 class Orders
 {
-    public $amazonConnector;
-    public $ordersApi;
-    public $marketplaceIds;
-    public $orderItemRateLimit = 0;
-    public $orderItemRateSuccess = 0;
-    public $orderRateLimit = 1;
+    public AmazonConnector $amazonConnector;
+    public SellerOrdersV0 $ordersApi;
+    public array $marketplaceIds;
+    public int $orderItemRateLimit = 0;
+    public int $orderItemRateSuccess = 0;
+    public int $orderRateLimit = 1;
 
-    public $db;
-    public $orders = [];
+    public Connection $db;
+    public array $orders = [];
 
     public function __construct(AmazonConnector $amazonConnector) 
     {
         $this->amazonConnector = $amazonConnector;
-        $this->db = \Pimcore\Db::get();
+        $this->db = Db::get();
         $this->ordersApi = $amazonConnector->amazonSellerConnector->ordersV0();
         $this->marketplaceIds = [AmazonConstants::amazonMerchant[$amazonConnector->mainCountry]['id']];
         foreach ($amazonConnector->countryCodes as $countryCode) {
@@ -29,6 +35,9 @@ class Orders
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function getLastUpdateTime()
     {
         $lastUpdateTime = $this->db->fetchOne(
@@ -46,14 +55,17 @@ class Orders
         return $lastUpdateTime ?? gmdate('Y-m-d\TH:i:s\Z', strtotime('-10 years'));
     }
 
-    public function getOrders()
+    /**
+     * @throws Exception
+     */
+    public function getOrders(): void
     {
         $nextToken = null;
         $orders = [];
         $lastUpdatedAfter = $this->getLastUpdateTime();
-        $date = new \DateTime($lastUpdatedAfter, new \DateTimeZone('UTC'));
+        $date = new DateTime($lastUpdatedAfter, new DateTimeZone('UTC'));
         $date->modify('+1 day');
-        $lastUpdateBefore = $date->format('Y-m-d\TH:i:s\Z');
+        //$lastUpdateBefore = $date->format('Y-m-d\TH:i:s\Z');
         echo "lastUpdatedAfter: $lastUpdatedAfter\n";
         do {
             try {
@@ -64,7 +76,7 @@ class Orders
                 $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $this->orderRateLimit = 60;
                 echo "Order rate limit set to 60 seconds\n";
             }
@@ -74,7 +86,7 @@ class Orders
         $this->orders = $orders;
     }
 
-    public function getOrderItems($amazonOrderId)
+    public function getOrderItems($amazonOrderId): array
     {
         $nextToken = null;
         $orderItems = [];
@@ -93,7 +105,7 @@ class Orders
                     echo "{$this->orderItemRateLimit}";
                     $this->orderItemRateSuccess = 0;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $this->orderItemRateLimit= $this->orderItemRateLimit<5 ? 5 : $this->orderItemRateLimit+1;
                 $this->orderItemRateSuccess = 0;
                 echo "-{$this->orderItemRateLimit}";
@@ -103,7 +115,7 @@ class Orders
         return $orderItems;
     }
 
-    public function downloadOrderItems()
+    public function downloadOrderItems(): void
     {
         $index = 0;
         foreach ($this->orders as &$order) {
@@ -113,7 +125,10 @@ class Orders
         }
     }
 
-    public function downloadOrders()
+    /**
+     * @throws Exception
+     */
+    public function downloadOrders(): void
     {
         $this->getOrders();
         $this->downloadOrderItems();
@@ -124,7 +139,10 @@ class Orders
         );
     }
 
-    public function saveOrders()
+    /**
+     * @throws Exception
+     */
+    public function saveOrders(): void
     {
         $this->db->beginTransaction();
         try {

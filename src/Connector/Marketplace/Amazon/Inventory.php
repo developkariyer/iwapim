@@ -6,28 +6,36 @@ use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 use App\Utils\Registry;
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 
 class Inventory
 {
-    public $amazonConnector;
-    public $rateLimit = 0;
-    public $inventory = [];
+    public AmazonConnector $amazonConnector;
+    public int $rateLimit = 0;
+    public array $inventory = [];
 
     public function __construct(AmazonConnector $amazonConnector) 
     {
         $this->amazonConnector = $amazonConnector;
     }
 
-    public function downloadInventory()
+    /**
+     * @throws Exception
+     */
+    public function downloadInventory(): void
     {
         $this->getInventory();
         $this->processInventory();
     }
 
-    public function processInventory()
+    /**
+     * @throws Exception
+     */
+    public function processInventory(): void
     {
         echo "Processing Inventory";
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, iwasku, item_condition, json_data, total_quantity) ".
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE iwasku = ?, item_condition = ?, total_quantity = ?, json_data = ?";
         $inventoryType = 'AMAZON_FBA';
@@ -60,7 +68,7 @@ class Inventory
         echo "\n";
     }
 
-    public function getInventory()
+    public function getInventory(): void
     {
         $inventoryApi = $this->amazonConnector->amazonSellerConnector->fbaInventoryV1();
         foreach ($this->amazonConnector->getMarketplace()->getFbaRegions() ?? [] as $country) {
@@ -74,17 +82,17 @@ class Inventory
             do {
                 try {
                     $response = $inventoryApi->getInventorySummaries(
-                        granularityType: 'Marketplace', 
+                        granularityType: 'Marketplace',
                         granularityId: AmazonConstants::amazonMerchant[$country]['id'],
+                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                         details: true,
                         nextToken: $nextToken,
-                        marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                     );
                     $responseJson = $response->json();
                     $summary = array_merge($summary, $responseJson['payload']['inventorySummaries'] ?? []);
                     $nextToken = $responseJson['pagination']['nextToken'] ?? null;
                     echo "+";
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     $this->rateLimit++;
                     echo "-{$this->rateLimit}";
                 }

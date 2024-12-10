@@ -2,6 +2,7 @@
 
 namespace App\Connector\Marketplace\Amazon;
 
+use JsonException;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
@@ -10,7 +11,7 @@ use App\Utils\Utility;
 
 class Reports 
 {
-    public $amazonConnector;
+    public AmazonConnector $amazonConnector;
 
     public array $amazonCountryReports = [
         'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
@@ -31,7 +32,10 @@ class Reports
         $this->amazonConnector = $amazonConnector;
     }
 
-    public function downloadAmazonReport($reportType, $forceDownload, $country, $silent = false)
+    /**
+     * @throws JsonException
+     */
+    public function downloadAmazonReport($reportType, $forceDownload, $country, $silent = false): bool|string
     {
         $marketplaceKey = urlencode( $this->amazonConnector->getMarketplace()->getKey());
         if (!$silent) {
@@ -57,7 +61,7 @@ class Reports
             $reportUrl = $reportsApi->getReportDocument($reportStatus->json()['reportDocumentId'] , $reportStatus->json()['reportType']);
             $url = $reportUrl->json()['url'];
             $report = file_get_contents(filename: $url);
-            if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
+            if (str_starts_with($report, "\x1f\x8b")) {
                 $report = gzdecode(data: $report);
             }
             Utility::setCustomCache(
@@ -71,16 +75,19 @@ class Reports
                 echo "Cached ";
             }
         }
-        if (substr(string: $report, offset: 0, length: 2) === "\x1f\x8b") {
+        if (str_starts_with($report, "\x1f\x8b")) {
             $report = gzdecode(data: $report);
         }
-        if (substr(string: $report, offset: 0, length: 3) === "\xEF\xBB\xBF") {
+        if (str_starts_with($report, "\xEF\xBB\xBF")) {
             $report = substr(string: $report, offset: 3);
         }
         return $report;
     }
 
-    public function downloadAllReports($forceDownload, $silent = false)
+    /**
+     * @throws JsonException
+     */
+    public function downloadAllReports($forceDownload, $silent = false): void
     {
         foreach (array_keys($this->amazonReports) as $reportType) {
             if (!$silent) {

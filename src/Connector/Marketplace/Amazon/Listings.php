@@ -5,19 +5,23 @@ namespace App\Connector\Marketplace\Amazon;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
+use JsonException;
 
 class Listings
 {
-    public $amazonConnector;
+    public AmazonConnector $amazonConnector;
 
-    public $asinBucket = [];
+    public array $asinBucket = [];
 
     public function __construct(AmazonConnector $amazonConnector) 
     {
         $this->amazonConnector = $amazonConnector;
     }
 
-    protected function downloadAsinsInBucket()
+    /**
+     * @throws JsonException
+     */
+    protected function downloadAsinsInBucket(): void
     {
         if (empty($this->asinBucket)) {
             return;
@@ -41,7 +45,10 @@ class Listings
         sleep(1);
     }
 
-    protected function addToAsinBucket($asin, $forceDownload = false)
+    /**
+     * @throws JsonException
+     */
+    protected function addToAsinBucket($asin, $forceDownload = false): void
     {
         $item = Utility::getCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->amazonConnector->getMarketplace()->getKey()));
         $item = json_decode($item, true);
@@ -56,7 +63,7 @@ class Listings
         }
     }
 
-    protected function processListingReport($country, $report)
+    protected function processListingReport($country, $report): void
     {
         $possibleEncodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252', 'ASCII'];
         $encoding = mb_detect_encoding($report, $possibleEncodings, true) ?: 'UTF-8';
@@ -88,7 +95,7 @@ class Listings
             }
             $rowData = array_combine($header, $data);
             $asin = $rowData['asin1'] ?? $rowData['product-id'] ??'';
-            if (empty($asin) || substr($asin, 0, 1) !== 'B') {
+            if (empty($asin) || !str_starts_with($asin, 'B')) {
                 error_log("Missing ASIN in line ($index): " . json_encode($rowData) . ". Skipping this row.");
                 continue;
             }
@@ -97,8 +104,11 @@ class Listings
             $this->amazonConnector->listings[$asin][$country][] = $rowData;
         }
     }
-        
-    public function getListings($forceDownload = false)
+
+    /**
+     * @throws JsonException
+     */
+    public function getListings($forceDownload = false): void
     {
         $this->processListingReport($this->amazonConnector->mainCountry, $this->amazonConnector->reportsHelper->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
         foreach ($this->amazonConnector->countryCodes as $country) {

@@ -2,6 +2,8 @@
 
 namespace App\Connector\Marketplace\Amazon;
 
+use Exception;
+use SellingPartnerApi\Seller\SellerConnector;
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
 
@@ -16,35 +18,34 @@ use App\Connector\Marketplace\Amazon\Orders as OrdersHelper;
 use App\Connector\Marketplace\Amazon\Utils as UtilsHelper;
 use App\Connector\Marketplace\Amazon\Inventory as InventoryHelper;
 use App\Utils\Utility;
-use App\Utils\Registry;
 
 class Connector extends MarketplaceConnectorAbstract
 {
     public static $marketplaceType = 'Amazon';
 
-    public $reportsHelper;
-    public $listingsHelper;
-    public $importHelper;
-    public $ordersHelper;
-    public $utilsHelper;
-    public $inventoryHelper;
+    public ReportsHelper $reportsHelper;
+    public ListingsHelper $listingsHelper;
+    public ImportHelper $importHelper;
+    public OrdersHelper $ordersHelper;
+    public UtilsHelper $utilsHelper;
+    public InventoryHelper $inventoryHelper;
 
-    public $amazonSellerConnector = null;
-    public $countryCodes = [];
-    public $mainCountry = null;
+    public ?SellerConnector $amazonSellerConnector = null;
+    public array $countryCodes = [];
+    public ?string $mainCountry = null;
 
-    public function __construct(Marketplace $marketplace) 
+    /**
+     * @throws Exception
+     */
+    public function __construct(Marketplace $marketplace)
     {
         parent::__construct($marketplace);
         $this->countryCodes = $marketplace->getMerchantIds() ?? [];
         if (!AmazonConstants::checkCountryCodes($this->countryCodes)) {
-            throw new \Exception("Country codes are not valid");
+            throw new Exception("Country codes are not valid");
         }
         $this->mainCountry = $marketplace->getMainMerchant();
         $this->amazonSellerConnector = $this->initSellerConnector($marketplace);
-        if (!$this->amazonSellerConnector) {
-            throw new \Exception("Amazon Seller Connector is not created");
-        }
         $this->reportsHelper = new ReportsHelper($this);
         $this->listingsHelper = new ListingsHelper($this);
         $this->importHelper = new ImportHelper($this);
@@ -53,13 +54,12 @@ class Connector extends MarketplaceConnectorAbstract
         $this->inventoryHelper = new InventoryHelper($this);
     }
 
-    private function initSellerConnector($marketplace)
+    private function initSellerConnector($marketplace): SellerConnector
     {
         $endpoint = match ($marketplace->getMainMerchant()) {
-            "CA", "US", "MX", "BR" => Endpoint::NA,
             "SG", "AU", "JP", "IN" => Endpoint::FE,
             "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" => Endpoint::EU,
-            default => Endpoint::NA,
+            default => Endpoint::NA,  //"CA", "US", "MX", "BR"
         };
         return SellingPartnerApi::seller(
             clientId: $marketplace->getClientId(),
@@ -82,7 +82,7 @@ class Connector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function import($updateFlag, $importFlag)
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import in {$this->mainCountry}\n";
