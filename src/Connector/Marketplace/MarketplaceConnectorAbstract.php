@@ -97,14 +97,13 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
                 'currency' => $toCurrency
             ]);    
         }
-        echo $fromCurrencyValue . ' ' . $toCurrencyValue . '\n';
         $scaledPrice = bcmul((string)$amount, "100", 2); 
         $convertedPrice = bcmul($scaledPrice, (string)$fromCurrencyValue, 2);
         $convertedPrice = bcdiv($convertedPrice, (string)$toCurrencyValue, 2);    
         $roundedPrice = bcdiv($convertedPrice, "1", 0); 
         $finalPrice = bcdiv($roundedPrice, "100", 2);
         $finalPrice = (string) $finalPrice;
-        echo 'Final Price: ' .  $finalPrice . '\n';
+        return $finalPrice;
     }
 
 }
