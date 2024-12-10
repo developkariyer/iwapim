@@ -255,7 +255,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
         }
-        print_r($response);
         Utility::setCustomCache("{$listing->getUniqueMarketplaceId()}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetSKU', json_encode($response));
     }
 

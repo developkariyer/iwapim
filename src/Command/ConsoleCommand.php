@@ -87,7 +87,6 @@ class ConsoleCommand extends AbstractCommand
                 }
                 $connector->setSku($listing, $iwasku);
                 echo "SKU set.\n";
-                return;
             }
         }
         echo "\nFinished\n";
