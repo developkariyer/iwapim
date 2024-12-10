@@ -19,8 +19,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::getById(266097);
-        $this->setInventory($variant, 299);
-        //$this->setPrice($variant, 1179);
+        //$this->setInventory($variant, 299);
+        $this->setPrice($variant, 1175);
         //$this->getBatchRequestResult("e68b2802-14fb-43a0-bd9a-8e91015aa675");
         
         /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
@@ -236,6 +236,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 ]
             ])
         ]);
+        echo $finalPrice . "\n";
+        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
