@@ -80,7 +80,11 @@ class ConsoleCommand extends AbstractCommand
                     echo "No Iwasku\n";
                     continue;
                 }
-                $connector = $shopifyConnectors[$listing->getMarketplace()->getId()] ?? null;
+                $marketplaceId = $listing->getMarketplace()->getId();
+                if ($marketplaceId != 84124) {
+                    continue;
+                }
+                $connector = $shopifyConnectors[$marketplaceId] ?? null;
                 if (empty($connector)) {
                     echo "No Connector\n";
                     continue;
