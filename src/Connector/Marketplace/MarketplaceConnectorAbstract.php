@@ -105,7 +105,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         $roundedPrice = bcdiv($convertedPrice, "1", 0); 
         $finalPrice = bcdiv($roundedPrice, "100", 2);
         $finalPrice = (string) $finalPrice;
-        echo $finalPrice
+        echo $finalPrice;
     }
 
 }
