@@ -256,7 +256,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         if ($targetCurrency === null) {
             $targetCurrency = $listing->getSaleCurrency();
         }
-        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, 'TL');
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
         if ($finalPrice === null) {
             echo "Error: Currency conversion failed\n";
             return;
