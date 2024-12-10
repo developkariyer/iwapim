@@ -14,7 +14,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::getById(266750);
-        $attributes = $variant->json_decode($variant->jsonRead('apiResponseJson'), true)['attributes'];
+        $attributes = json_decode($variant->jsonRead('apiResponseJson'), true)['attributes'];
         $hbsku = $attributes['hbSku'];
         $merchantSku = $attributes['merchantSku'];
         echo "HBSKU: $hbsku\n";
