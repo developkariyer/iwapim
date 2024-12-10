@@ -14,7 +14,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::getById(266750);
-        print_r($variant->jsonRead('apiResponseJson'));
+        $attributes = $variant->json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
+        $hbsku = $attributes['hbSku'];
+        $merchantSku = $attributes['merchantSku'];
+        echo "HBSKU: $hbsku\n";
+        echo "Merchant SKU: $merchantSku\n";
         /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
