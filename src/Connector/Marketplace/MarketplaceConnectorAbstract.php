@@ -97,7 +97,6 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
                 'currency' => $toCurrency
             ]);    
         }
-
         echo $fromCurrencyValue . ' ' . $toCurrencyValue . '\n';
         $scaledPrice = bcmul((string)$amount, "100", 2); 
         $convertedPrice = bcmul($scaledPrice, (string)$fromCurrencyValue, 2);
