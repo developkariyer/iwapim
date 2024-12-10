@@ -33,6 +33,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json',
+                'Content-Length' => 0,
                 'Accept' => 'application/json'
             ]
         ];
