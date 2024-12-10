@@ -249,7 +249,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item' => ['id' => $inventoryItemId, 'sku' => $sku]]);
+        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item.id' => $inventoryItemId, 'inventory_item.sku' => $sku]);
         if (empty($response)) {
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
