@@ -29,7 +29,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
         $headersToApi = [
-            'query' => $query,
+            'query' => json_encode($query),
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json',
@@ -249,7 +249,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item.id' => $inventoryItemId, 'inventory_item.sku' => $sku]);
+        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", ['inventory_item' => ['id' => $inventoryItemId, 'sku' => $sku]]);
         if (empty($response)) {
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
