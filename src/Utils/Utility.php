@@ -2,28 +2,21 @@
 
 namespace App\Utils;
 
+use Doctrine\DBAL\Exception;
+use PDOException;
+use Pimcore\Db;
+use Pimcore\Model\Asset;
+use Pimcore\Model\DataObject\Data\ExternalImage;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\Asset\Folder as AssetFolder;
 use Pimcore\Model\Asset\Listing as AssetListing;
 use App\Command\CacheImagesCommand;
+use Pimcore\Model\Element\DuplicateFullPathException;
 
 class Utility
 {
-    public static function upsertRow(&$table, $newRow) {
-        $found = false;
-        foreach ($table as &$row) {
-            if ($row[0] === $newRow[0]) {
-                $row = array_merge([$row[0]], array_slice($newRow, 1));
-                $found = true;
-                break;
-            }
-        }
-        if (!$found) {
-            $table[] = $newRow;
-        }
-    }
 
-    public static function findImageByName($imageName)
+    public static function findImageByName($imageName): false|Asset
     {
         if (strlen($imageName)) {
             $assetList = new AssetListing();
@@ -35,7 +28,7 @@ class Utility
         }
     }
 
-    public static function sanitizeVariable($variable, $length = 0)
+    public static function sanitizeVariable($variable, $length = 0): string
     {
         $ellipsis = '...';
         if (empty($variable)) {
@@ -50,11 +43,13 @@ class Utility
             $half = floor(($length - mb_strlen($ellipsis)) / 2);
             $sanitized = mb_substr($sanitized, 0, $half) . $ellipsis . mb_substr($sanitized, -$half);
         }
-        $sanitized = trim($sanitized, " -");
-        return $sanitized;
+        return trim($sanitized, " -");
     }
-    
-    public static function checkSetPath($name, $parent = null) 
+
+    /**
+     * @throws DuplicateFullPathException
+     */
+    public static function checkSetPath($name, $parent = null): ?Folder
     {
         $targetPath = $parent ? $parent->getFullPath()."/$name" : "/$name";
         $parent ??= Folder::getByPath('/');
@@ -68,7 +63,10 @@ class Utility
         return $folderObject;
     }
 
-    public static function checkSetAssetPath($name, $parent = null) 
+    /**
+     * @throws DuplicateFullPathException
+     */
+    public static function checkSetAssetPath($name, $parent = null): ?AssetFolder
     {
         $targetPath = $parent ? $parent->getFullPath()."/$name" : "/$name";
         $parent ??= AssetFolder::getByPath('/');
@@ -82,7 +80,7 @@ class Utility
         return $folderObject;
     }
 
-    protected static function customEncode($base, $characters, $data)
+    protected static function customEncode($base, $characters, $data): string
     {
         $result = '';
         while ($data > 0) {
@@ -93,7 +91,7 @@ class Utility
         return $result;
     }
 
-    protected static function customDecode($base, $characters, $data)
+    protected static function customDecode($base, $characters, $data): float|int
     {
         $length = strlen($data);
         $result = 0;
@@ -103,46 +101,46 @@ class Utility
         return $result;
     }
 
-    public static function customBase64Encode($data)
+    public static function customBase64Encode($data): string
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_';
         $base = 64;
         return static::customEncode($base, $characters, $data);
     }
     
-    public static function customBase64Decode($data)
+    public static function customBase64Decode($data): float|int
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_';
         $base = 64;
         return static::customDecode($base, $characters, $data);
     }
 
-    public static function encodeContainer($message)
+    public static function encodeContainer($message): string
     {
         [$part1, $part2] = explode('-', $message);
         return static::customBase64Encode($part1 . str_pad($part2, 5, '0', STR_PAD_LEFT));
     }
 
-    public static function decodeContainer($encodedMessage)
+    public static function decodeContainer($encodedMessage): string
     {
         $decodedNumber = static::customBase64Decode($encodedMessage);
         $decodedString = str_pad((string)$decodedNumber, 8, '0', STR_PAD_LEFT);
         return trim(substr($decodedString, 0, -5), '0'). '-' . intval(substr($decodedString, -5));
     }
 
-    public static function removeTRChars($str)
+    public static function removeTRChars($str): array|string
     {
         return str_ireplace(['ı', 'İ', 'ğ', 'Ğ', 'ü', 'Ü', 'ş', 'Ş', 'ö', 'Ö', 'ç', 'Ç'], ['i', 'I', 'g', 'G', 'u', 'U', 's', 'S', 'o', 'O', 'c', 'C'], $str);    
     }
 
-    public static function keepSafeChars($str)
+    public static function keepSafeChars($str): array|string
     {
         $safeChars = "\n abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
         $str = preg_replace("/[^$safeChars]/", '', $str);
         return str_replace("  ", " ", $str);
     }
 
-    public static function getSetCustomCache($filename, $cachePath, $stringToCache = null, $expiration = 86400)
+    public static function getSetCustomCache($filename, $cachePath, $stringToCache = null, $expiration = 86400): bool|string
     {
         $cachePath = rtrim($cachePath, '/');
         if (!is_dir($cachePath)) {
@@ -162,19 +160,22 @@ class Utility
         return false;
     }
 
-    public static function getCustomCache($filename, $cachePath, $expiration = 86400)
+    public static function getCustomCache($filename, $cachePath, $expiration = 86400): string
     {
         return static::getSetCustomCache($filename, $cachePath, null, $expiration);
     }
 
-    public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400)
+    public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400): bool
     {
         return static::getSetCustomCache($filename, $cachePath, $stringToCache, $expiration);
     }
 
+    /**
+     * @throws Exception
+     */
     public static function retrieveJsonData($fieldName)
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $sql = "SELECT json_data FROM iwa_json_store WHERE field_name=?";
         $result = $db->fetchAssociative($sql, [$fieldName]);
         if ($result) {
@@ -183,16 +184,16 @@ class Utility
         return null;
     }
 
-    public static function storeJsonData($objectId, $fieldName, $data)
+    public static function storeJsonData($objectId, $fieldName, $data): void
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         try {
             $sql = "INSERT INTO iwa_json_store (object_id, field_name, json_data) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json_data=?";
             $db->executeQuery($sql, [$objectId, $fieldName, json_encode($data), json_encode($data)]);
         } catch (\Exception $e) {
             echo $e->getMessage();
             echo $objectId, '-', $fieldName, '-', json_encode($data);
-            if ($e instanceof \PDOException) {
+            if ($e instanceof PDOException) {
                 echo "SQLSTATE code: " . $e->errorInfo[0] . "\n";
                 echo "SQL error: " . $e->errorInfo[2] . "\n"; 
             }
@@ -200,7 +201,7 @@ class Utility
         }
     }
 
-    public static function checkJwtTokenValidity($token) 
+    public static function checkJwtTokenValidity($token): bool
     {
         $tokenParts = explode(".", $token);
         if (count($tokenParts) !== 3) {
@@ -215,21 +216,21 @@ class Utility
         return true;
     }
 
-    public static function getCachedImage($url)
+    public static function getCachedImage($url): ?ExternalImage
     {
         if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
             return null;
         }
-        if (strpos($url, 'iwa.web.tr') !== false) {
-            return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+        if (str_contains($url, 'iwa.web.tr')) {
+            return new ExternalImage($url);
         }
         $imageAsset = Utility::findImageByName(CacheImagesCommand::createUniqueFileNameFromUrl($url));
         if ($imageAsset) {
-            return new \Pimcore\Model\DataObject\Data\ExternalImage(
+            return new ExternalImage(
                 "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $imageAsset->getFullPath())
             );
         }
-        return new \Pimcore\Model\DataObject\Data\ExternalImage($url);
+        return new ExternalImage($url);
     }
 
 }
