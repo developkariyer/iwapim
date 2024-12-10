@@ -65,9 +65,9 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
          */
         $fromCurrencyValue = null;
         $toCurrencyValue = null;
-        if ($fromCurrency === 'TRY')
+        if ($fromCurrency === 'TL')
            $fromCurrencyValue = 1;
-        if ($toCurrency === 'TRY')
+        if ($toCurrency === 'TL')
            $toCurrencyValue = 1;
         $today = date('Y-m-d');
         $db = \Pimcore\Db::get();

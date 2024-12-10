@@ -254,9 +254,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         if ($targetCurrency === null) {
-            $targetCurrency = 'TRY';
+            $targetCurrency = $listing->getSaleCurrency();
         }
-        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, 'TRY');
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, 'TL');
         if ($finalPrice === null) {
             echo "Error: Currency conversion failed\n";
             return;

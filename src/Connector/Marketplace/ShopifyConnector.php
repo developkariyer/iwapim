@@ -275,7 +275,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
         currencies = [
             'CANADIAN DOLLAR' => 'CAD',
-            'TL' => 'TRY',
+            'TL' => 'TL',
             'EURO' => 'EUR',
             'US DOLLAR' => 'USD',
             'SWEDISH KRONA' => 'SEK',
