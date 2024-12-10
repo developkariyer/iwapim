@@ -206,7 +206,8 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        $url =static::$apiUrl['processStatusUrl'] .  '92372049493';
+        $this->prepareToken();
+        $url = '' . static::$apiUrl['processStatusUrl'] .  '92372049493';
         $response = $this->httpClient->request("GET", $url);
         print_r($response->getContent());
        
