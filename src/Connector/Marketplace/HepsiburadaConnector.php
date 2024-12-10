@@ -13,13 +13,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $variant = VariantProduct::getById(266750);
-        $attributes = json_decode($variant->jsonRead('apiResponseJson'), true)['attributes'];
-        $hbsku = $attributes['hbSku'];
-        $merchantSku = $attributes['merchantSku'];
-        echo "HBSKU: $hbsku\n";
-        echo "Merchant SKU: $merchantSku\n";
-        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -60,7 +54,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->downloadAttributes();
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     protected function getProduct($hbSku)
@@ -160,18 +154,20 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }  
     }
 
-   /* public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
         if (!$listing instanceof VariantProduct) {
             echo "Listing is not a VariantProduct\n";
             return;
         }
-        $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
-        if (empty($stockCode)) {
+        $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
+        $hbsku = $attributes['hbSku'];
+        $merchantSku = $attributes['merchantSku'];
+        if (empty($hbsku) || empty($merchantSku)) {
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/products/all-products-of-merchant/{$this->marketplace->getSellerId()}//stock-uploads", [
+        $response = $this->httpClient->request('POST', "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/stock-uploads", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
@@ -179,9 +175,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ],
             'body' => [
-                'hepsiburadaSku' => ,
-                'merchantSku' =>,
-                'availableStock' =>,
+                'hepsiburadaSku' => $hbsku,
+                'merchantSku' => $merchantSku,
+                'availableStock' => $targetValue
             ]
         ]);
         print_r($response->getContent());
@@ -193,13 +189,91 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $data = $response->toArray();
         $combinedData = [
             'inventory' => $data,
-            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+            'batchRequestResult' => $this->getBatchRequestResult($data['id'],"stock-uploads"),
         ];
         echo "Inventory set\n";
         $date = date('Y-m-d-H-i-s');
-        $filename = "{$stockCode}-$date.json";  
+        $filename = "{$hbsku}-$date.json";  
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
-    }*/
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetPrice === null) {
+            echo "Error: Price cannot be null\n";
+            return;
+        }
+        if ($targetCurrency === null) {
+            $targetCurrency = $listing->getSaleCurrency();
+            if ($targetCurrency === "TRY") {
+                $targetCurrency = "TL";
+            }
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+        if ($finalPrice === null) {
+            echo "Error: Currency conversion failed\n";
+            return;
+        }
+
+        $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
+        $hbsku = $attributes['hbSku'];
+        $merchantSku = $attributes['merchantSku'];
+        if (empty($hbsku) || empty($merchantSku)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/price-uploads", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ],
+            'body' => [
+                'hepsiburadaSku' => $hbsku,
+                'merchantSku' => $merchantSku,
+                'price' =>(float) $finalPrice
+            ]
+        ]); 
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        echo "Price set\n";
+        $data = $response->toArray();
+        $combinedData = [
+            'price' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['id'],"price-uploads"),
+        ];
+        $date = date('Y-m-d H:i:s');
+        $combinedJson = json_encode($combinedData);
+        $filename = "{$hbsku}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);
+    }
+
+    public function getBatchRequestResult($id,$type)
+    {
+        $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/{$type}/id/{$id}", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        return $data;
+    }
 
     public function downloadOrders()
     {
