@@ -14,7 +14,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         $variant = VariantProduct::getById(266510);
-        print_r($variant->jsonRead('apiResponseJson'));
+        $this->setInventory($variant, 999);
         /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
