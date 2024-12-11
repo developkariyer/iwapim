@@ -4,18 +4,21 @@ namespace App\Connector\Wisersell;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
-use App\Connector\Wisersell\ProductSyncService;
-use App\Connector\Wisersell\CategorySyncService;
-use App\Connector\Wisersell\ListingSyncService;
-use App\Connector\Wisersell\StoreSyncService;
 use App\Utils\Utility;
 use Exception;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 
 class Connector
 {
-    public $env = '';
-    public static $apiUrl = [
+    public mixed $env = '';
+    public static array $apiUrl = [
         'productSearch' => 'product/search',
         'category' => 'category',
         'product'=> 'product',
@@ -23,15 +26,22 @@ class Connector
         'listingSearch' => 'listing/search',
         'listing' => 'listing'
     ];
-    private $httpClient = null;
-    private $wisersellCredentials = null;
-    public $wisersellToken = null;
+    private HttpClientInterface $httpClient;
+    private array $wisersellCredentials;
+    public mixed $wisersellToken = null;
 
-    public $storeSyncService = null;
-    public $categorySyncService = null;
-    public $productSyncService = null;
-    public $listingSyncService = null;
+    public ?StoreSyncService $storeSyncService = null;
+    public ?CategorySyncService $categorySyncService = null;
+    public ?ProductSyncService $productSyncService = null;
+    public ?ListingSyncService $listingSyncService = null;
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function __construct($env = 'prod')
     {
         $this->httpClient = HttpClient::create();
@@ -55,7 +65,14 @@ class Connector
         $this->listingSyncService = new ListingSyncService($this);
     }
 
-    protected function prepareToken()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    protected function prepareToken(): void
     {
         if (!empty($this->wisersellToken) && Utility::checkJwtTokenValidity($this->wisersellToken)) {
             return;
@@ -74,6 +91,13 @@ class Connector
         ); 
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     protected function getAccessToken()
     {
         $token = json_decode(Utility::getCustomCache('wisersell_access_token.json', PIMCORE_PROJECT_ROOT . '/tmp'), true);
@@ -85,6 +109,14 @@ class Connector
         return $this->fetchNewAccessToken();
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
     protected function fetchNewAccessToken()
     {
         $response = $this->httpClient->request(
@@ -113,7 +145,14 @@ class Connector
         return $result['token'];
     }
 
-    public function request($apiEndPoint, $type, $parameter = '', $json = [])
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface|DecodingExceptionInterface
+     * @throws Exception
+     */
+    public function request($apiEndPoint, $type, $parameter = '', $json = []): string|ResponseInterface
     {
         echo "Requesting: {$apiEndPoint} {$type} {$parameter} in time ".time();
         flush();
@@ -121,7 +160,7 @@ class Connector
         file_put_contents(PIMCORE_PROJECT_ROOT . '/var/log/wisersell.log', "=> ".date('Y-m-d H:i:s').", {$type}, {$apiEndPoint}/{$parameter}, ".json_encode($json)."\n", FILE_APPEND);
         $response = $this->httpClient->request($type, "{$apiEndPoint}/{$parameter}", ['json' => $json]);
         file_put_contents(PIMCORE_PROJECT_ROOT . '/var/log/wisersell.log', "<= ".date('Y-m-d H:i:s').", {$response->getStatusCode()}, {$response->getContent()}\n", FILE_APPEND);
-        if (strpos($apiEndPoint, 'listing') !== false) {
+        if (str_contains($apiEndPoint, 'listing')) {
             usleep(500000);
         } else {
             usleep(2000000);
@@ -144,6 +183,7 @@ class Connector
         if ($response->getStatusCode() == 200) {
             return $response;
         }
+        throw new Exception("Failed. HTTP Status Code: {$response->getContent()}");
     }
 
 }

@@ -2,22 +2,35 @@
 
 namespace App\Connector\Wisersell;
 
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\Product;
-use App\Connector\Wisersell\Connector;
 use App\Utils\Utility;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ProductSyncService
 {
-    protected $connector;
-    public $wisersellProducts = []; // id => wisersell product
-    public $pimProducts = []; // iwasku => pim ID for product, (iwasku is code in wisersell)
+    protected Connector $connector;
+    public array $wisersellProducts = []; // id => wisersell product
+    public array $pimProducts = []; // iwasku => pim ID for product, (iwasku is code in wisersell)
 
     public function __construct(Connector $connector)
     {
         $this->connector = $connector;
     }
 
-    public function loadWisersellProducts($force = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function loadWisersellProducts($force = false): int
     {
         if (!$force && !empty($this->wisersellProducts)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
@@ -31,12 +44,15 @@ class ProductSyncService
         return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
     }
 
-    public function loadPimProducts($force = false) 
+    /**
+     * @throws Exception
+     */
+    public function loadPimProducts($force = false): void
     {
         if (!$force && !empty($this->pimProducts)) {
             return;
         }
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $this->pimProducts = [];
         $products = $db->fetchAllAssociative('SELECT oo_id, iwasku FROM object_product WHERE iwasku IS NOT NULL AND published = 1');
         foreach ($products as $product) {
@@ -47,7 +63,16 @@ class ProductSyncService
         }
     }
 
-    public function status()
+    /**
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function status(): array
     {
         $cacheExpire = $this->load();
         return [
@@ -57,20 +82,48 @@ class ProductSyncService
         ];
     }
 
-    public function load($force = false)
+    /**
+     * @param bool $force
+     * @return int
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function load(bool $force = false): int
     {
         $this->loadPimProducts($force);
         return $this->loadWisersellProducts($force);
     }
 
-    public function dump()
+    /**
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function dump(): void
     {
         $this->load();
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.wisersell.txt', print_r($this->wisersellProducts, true));
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.pim.txt', print_r($this->pimProducts, true));        
     }
 
-    public function findWisersellProductWithCode($code)
+    /**
+     * @param $code
+     * @return mixed|null
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function findWisersellProductWithCode($code): mixed
     {
         $this->load();
         foreach ($this->wisersellProducts as $wisersellProduct) {
@@ -81,7 +134,17 @@ class ProductSyncService
         return null;
     }
 
-    public function addPimProductsToWisersell($products)
+    /**
+     * @param $products
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     */
+    public function addPimProductsToWisersell($products): void
     {
         if (!is_array($products)) {
             $products = [$products];
@@ -109,7 +172,16 @@ class ProductSyncService
         }
     }
 
-    public function addWisersellProductsToPim($wisersellProducts)
+    /**
+     * @param $wisersellProducts
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function addWisersellProductsToPim($wisersellProducts): void
     {
         $this->load();
         if (!is_array($wisersellProducts)) {
@@ -125,11 +197,11 @@ class ProductSyncService
                     $pimProduct = Product::getById($this->pimProducts[$wisersellProduct['code']]);
                 }
                 if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
-                    $pimProduct = Product::getByIwasku($wisersellProduct['code'], ['limit' => 1]);
+                    $pimProduct = Product::getByIwasku($wisersellProduct['code'], 1);
                 }
             }
             if (!isset($pimProduct) || !($pimProduct instanceof Product)) {
-                $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
+                $pimProduct = Product::getByWisersellId($wisersellProduct['id'], 1);
             }
             if ($pimProduct instanceof Product) {                    
                 $this->updatePimProduct($wisersellProduct);
@@ -155,33 +227,17 @@ class ProductSyncService
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.error.txt', json_encode($errorProducts));
     }
 
-    public function addProductToPim($wisersellProduct)
-    {
-        if (!isset($wisersellProduct['id'])) {
-            return;
-        }
-        if (empty($wisersellProduct['id'])) {
-            echo "Empty Wisersell ID: ".json_encode($wisersellProduct)."\n";
-            return;
-        }
-        $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
-        if (!($pimProduct instanceof Product)) {
-            $pimProduct = Product::getByPath("/Ürünler/WISERSELL ERROR/".$wisersellProduct['id']);
-        }
-        if (!$pimProduct instanceof Product) {
-            $pimProduct = new Product();
-            $pimProduct->setKey($wisersellProduct['id']);
-        }
-        $pimProduct->setParent(Utility::checkSetPath("WISERSELL ERROR", Utility::checkSetPath('Ürünler')));
-        $pimProduct->setPublished(false);
-        $pimProduct->setDescription(json_encode($wisersellProduct, JSON_PRETTY_PRINT));
-        $pimProduct->setWisersellJson(json_encode($wisersellProduct));
-        $pimProduct->setWisersellId($wisersellProduct['id']);
-        $pimProduct->save();
-        return $pimProduct;
-    }
-
-    public function updatePimProduct($wisersellProduct)
+    /**
+     * @param $wisersellProduct
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     */
+    public function updatePimProduct($wisersellProduct): void
     {
         $this->load();
         if (!isset($wisersellProduct['code']) || !isset($this->pimProducts[$wisersellProduct['code']])) {
@@ -194,7 +250,16 @@ class ProductSyncService
         }
     }
 
-    public function updateWisersellProduct($product, $error = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function updateWisersellProduct($product, $error = false): void
     {
         $this->load();
         if (!($product instanceof Product) || $product->level() != 1) {
@@ -218,6 +283,15 @@ class ProductSyncService
         }
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     * @throws \Exception
+     */
     public function postProductDataToWisersell($productData)
     {
         if (empty($productData)) {
@@ -245,7 +319,16 @@ class ProductSyncService
         }
     }
 
-    public function prepareProductData($product)
+    /**
+     * @param $product
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function prepareProductData($product): array
     {
         $this->connector->categorySyncService->load();
         $subProducts = $product->getBundleProducts();
@@ -281,7 +364,14 @@ class ProductSyncService
         ];
     }
 
-    public function search($searchData)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function search($searchData): array
     {
         $searchData['page'] = 0;
         $searchData['pageSize'] = 100;
@@ -305,7 +395,16 @@ class ProductSyncService
         return $retval;
     }
 
-    public function updatePimWisersellIds()
+    /**
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     */
+    public function updatePimWisersellIds(): void
     {
         $this->load();
         $pimProducts = $this->pimProducts;
@@ -327,7 +426,7 @@ class ProductSyncService
                     $product = Product::getById($this->pimProducts[$wisersellProduct['code']]);
                     $pimProductMatchingCode[] = $wisersellProduct['code'];
                 } else {
-                    $product = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
+                    $product = Product::getByWisersellId($wisersellProduct['id'], 1);
                     $pimProductMatchingId[] = $wisersellProduct['id'];
                 }
                 if ($product instanceof Product) {
@@ -374,7 +473,16 @@ class ProductSyncService
         print_r($pimProductMatchingId);
     }
 
-    public function sync($forceUpdate = false)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function sync($forceUpdate = false): void
     {
         $this->updatePimWisersellIds();
         $this->loadPimProducts(true);
@@ -383,7 +491,7 @@ class ProductSyncService
         $wisersellProducts = $this->wisersellProducts;
         $productBasket = [];
         $totalCount = count($this->pimProducts);
-        $index = $skippedPimProduct = $missingIwasku = $updatedPimProduct = 0;
+        $index = 0;
         foreach ($this->pimProducts as $pimId) {
             $index++;
             echo "\rProcessing $index / $totalCount";
@@ -391,7 +499,6 @@ class ProductSyncService
             $updatePimProduct = false;
             $pimProduct = Product::getById($pimId);
             if (!($pimProduct instanceof Product) || $pimProduct->level() != 1) {
-                $skippedPimProduct++;
                 continue;
             }
             $wisersellId = $pimProduct->getWisersellId();
@@ -452,7 +559,6 @@ class ProductSyncService
                     $pimProduct->save();
                     echo "Updated PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ") to match Wisersell {$wisersellProduct['id']}\n";
                 }
-                $updatedPimProduct++;
                 continue;
             }
             echo "Adding PIM Product " . $iwasku . " (" . $pimProduct->getId() . ") to basket\n";
@@ -466,7 +572,16 @@ class ProductSyncService
         $this->addWisersellProductsToPim($wisersellProducts);
     }
 
-    public function fixWisersellNames()
+    /**
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     */
+    public function fixWisersellNames(): void
     {
         $this->load();
         $bucket = [];
@@ -476,7 +591,7 @@ class ProductSyncService
         foreach ($this->wisersellProducts as $wisersellProduct) {
             $index++;
             echo "\rProcessing $index / $totalCount";
-            $pimProduct = Product::getByWisersellId($wisersellProduct['id'], ['limit' => 1]);
+            $pimProduct = Product::getByWisersellId($wisersellProduct['id'], 1);
             if (!$pimProduct instanceof Product) {
                 continue;
             }

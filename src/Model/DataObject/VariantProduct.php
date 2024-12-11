@@ -2,12 +2,19 @@
 
 namespace App\Model\DataObject;
 
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\Concrete;
+use Pimcore\Model\DataObject\Data\ExternalImage;
+use Pimcore\Model\DataObject\Data\Hotspotimage;
+use Pimcore\Model\DataObject\Data\ImageGallery;
 use Pimcore\Model\DataObject\VariantProduct\Listing;
 use App\Utils\Utility;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Asset;
 use Carbon\Carbon;
+use Pimcore\Model\Element\DuplicateFullPathException;
+use Throwable;
 
 class VariantProduct extends Concrete
 {
@@ -20,7 +27,7 @@ class VariantProduct extends Concrete
      * @param bool $unpublished Whether to include unpublished objects.
      * @return array An array of matching objects.
      */
-    public static function findByField($field, $value, $limit = 1, $unpublished = false)
+    public static function findByField(string $field, mixed $value, int $limit = 1, bool $unpublished = false): array
     {
         $list = new Listing();
         $list->setCondition("`$field` = ? COLLATE utf8mb4_general_ci", [$value]);
@@ -29,7 +36,7 @@ class VariantProduct extends Concrete
         return $list->load() ?: [];
     }
 
-    public static function findAsins($offset = 0, $limit = 100)
+    public static function findAsins($offset = 0, $limit = 100): array
     {
         $list = new Listing();
         $list->setCondition("field_name <> 'parentResponseJson' AND field_name <> 'apiResponseJson'");
@@ -46,12 +53,12 @@ class VariantProduct extends Concrete
      * @param mixed $value The value to query for.
      * @return Concrete|null The matching object or null if not found.
      */
-    public static function findOneByField($field, $value, $object = null, $unpublished = false)
+    public static function findOneByField(string $field, mixed $value, $object = null, $unpublished = false): ?Concrete
     {
         $list = \Pimcore\Model\DataObject\VariantProduct::findByField($field, $value, 1, $unpublished);
-        if (!empty($list) && is_array($list)) {
+        if (!empty($list)) {
             foreach ($list as $item) {
-                if (!$object || !$object instanceof \Pimcore\Model\DataObject\VariantProduct) {
+                if (!$object instanceof \Pimcore\Model\DataObject\VariantProduct) {
                     return $item;
                 }
                 if ($object->getId() !== $item->getId()) {
@@ -62,6 +69,9 @@ class VariantProduct extends Concrete
         return null;
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function addUpdateVariant($variant, $importFlag, $updateFlag, $marketplace, $parent)
     {
         $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
@@ -80,11 +90,11 @@ class VariantProduct extends Concrete
             if (!empty($variant['sku'])) {
                 $variant['sku'] = explode('_', $variant['sku'])[0];
                 if (!empty($variant['sku'])) {
-                    $product = Product::getByIwasku($variant['sku'], ['limit' => 1]);
+                    $product = Product::getByIwasku($variant['sku'], 1);
                 }
             }
             if (!empty($variant['ean'])) {
-                $product = Product::getByEanGtin($variant['ean'], ['limit' => 1]);
+                $product = Product::getByEanGtin($variant['ean'], 1);
             }
             if (isset($product) && $product instanceof Product) {
                 $product->addVariant($object);
@@ -94,21 +104,30 @@ class VariantProduct extends Concrete
         return $object;
     }
 
+    /**
+     * @throws Exception
+     */
     public function jsonRead($fieldName)
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         return $db->fetchOne("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = ?", [$this->getId(), $fieldName]);
     }
 
-    public function jsonWrite($fieldName, $data)
+    /**
+     * @throws Exception
+     */
+    public function jsonWrite($fieldName, $data): void
     {
-        $db = \Pimcore\Db::get();
-        $stmt = $db->prepare("INSERT INTO iwa_json_store (object_id, field_name, json_data) 
-            VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json_data = ?");
-        $stmt->execute([$this->getId(), $fieldName, $data, $data]);
+        $db = Db::get();
+        $db->executeStatement("INSERT INTO iwa_json_store (object_id, field_name, json_data) 
+            VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json_data = ?", [$this->getId(), $fieldName, $data, $data]);
     }
 
-    public function updateVariant($variant, $updateFlag, $marketplace, $parent)
+    /**
+     * @throws DuplicateFullPathException|Exception
+     * @throws \Exception
+     */
+    public function updateVariant($variant, $updateFlag, $marketplace, $parent): VariantProduct|bool
     {
         if (!$updateFlag) {
             return true;
@@ -145,23 +164,24 @@ class VariantProduct extends Concrete
         $this->setLastUpdate(Carbon::now());
         try {
             $result = $this->save();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             return false;
         }
-        if ($result) {
-            echo "{$this->getId()} ";
-            if (!empty($variant['apiResponseJson'])) {
-                $this->jsonWrite('apiResponseJson', $variant['apiResponseJson'] ?? '');
-            }
-            if (!empty($variant['parentResponseJson'])) {
-                $this->jsonWrite('parentResponseJson', $variant['parentResponseJson'] ?? '');
-            }
+        echo "{$this->getId()} ";
+        if (!isset($variant['apiResponseJson'])) {
+            $this->jsonWrite('apiResponseJson', $variant['apiResponseJson']);
+        }
+        if (!isset($variant['parentResponseJson'])) {
+            $this->jsonWrite('parentResponseJson', $variant['parentResponseJson']);
         }
         return $result;    
     }
 
-    public function fixImageCache(array $listingImageList, $variantImage = null)
+    /**
+     * @throws \Exception
+     */
+    public function fixImageCache(array $listingImageList, $variantImage = null): void
     {
         if (empty($listingImageList)) {
             return;
@@ -171,14 +191,14 @@ class VariantProduct extends Concrete
             if (empty($asset)) {
                 continue;
             }
-            $advancedImage = new \Pimcore\Model\DataObject\Data\Hotspotimage();
+            $advancedImage = new Hotspotimage();
             $advancedImage->setImage($asset);
             $items[] = $advancedImage;
         }
-        $this->setImageGallery(new \Pimcore\Model\DataObject\Data\ImageGallery($items));
+        $this->setImageGallery(new ImageGallery($items));
         $variantImage = $variantImage ?? reset($listingImageList);
         if ($variantImage instanceof Asset\Image) {
-            $urlImage = new \Pimcore\Model\DataObject\Data\ExternalImage(
+            $urlImage = new ExternalImage(
                 "https://mesa.iwa.web.tr/var/assets/".str_replace(" ", "%20", $variantImage->getFullPath())
             );
             $this->setImageUrl($urlImage);

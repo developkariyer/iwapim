@@ -2,23 +2,27 @@
 
 namespace App\Connector\Wisersell;
 
-use App\Connector\Wisersell\Connector;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 
 class StoreSyncService
 {
-    protected $connector;
-    public $wisersellStores = []; // [id => store]
-    public $pimStores = []; // [storeType => [storeId => store]]
+    protected Connector $connector;
+    public array $wisersellStores = []; // [id => store]
+    public array $pimStores = []; // [storeType => [storeId => store]]
 
     public function __construct(Connector $connector)
     {
         $this->connector = $connector;
     }
 
-    public function loadPimStores($force = false)
+    public function loadPimStores($force = false): void
     {
         if (!$force && !empty($this->pimStores)) {
             return;
@@ -30,8 +34,7 @@ class StoreSyncService
         foreach ($stores as $store) {
             $storeType = $store->getMarketplaceType();
             $storeId = match ($storeType) {
-                'Etsy' => $store->getShopId(),
-                'Shopify' => $store->getShopId(),
+                'Etsy', 'Shopify' => $store->getShopId(),
                 'Amazon' => $store->getMerchantId(),
                 'Trendyol' => $store->getTrendyolSellerId(),
                 default => null,
@@ -46,7 +49,14 @@ class StoreSyncService
         }
     }
 
-    public function loadWisersellStores($force = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function loadWisersellStores($force = false): int
     {
         if (!$force && !empty($this->wisersellStores)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
@@ -67,13 +77,27 @@ class StoreSyncService
         return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
     }
 
-    public function load($force = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function load($force = false): int
     {
         $this->loadPimStores($force);
         return $this->loadWisersellStores($force);
     }
 
-    public function status()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function status(): array
     {
         $cacheExpire = $this->load();
         return [
@@ -83,14 +107,28 @@ class StoreSyncService
         ];
     }
 
-    public function dump()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function dump(): void
     {
         $this->load();
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.wisersell.txt', print_r($this->wisersellStores, true));
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.pim.txt', print_r($this->pimStores, true));
     }
-    
-    public function sync()
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function sync(): void
     {
         $this->load();
         echo "Stores loaded: ";
@@ -117,7 +155,14 @@ class StoreSyncService
         }
     }
 
-    public function getAmazonStoreIds()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function getAmazonStoreIds(): array
     {
         $this->load();
         $storeIds = [];

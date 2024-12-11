@@ -2,22 +2,28 @@
 
 namespace App\Connector\Wisersell;
 
+use Exception;
 use Pimcore\Model\DataObject\Category;
-use App\Connector\Wisersell\Connector;
 use App\Utils\Utility;
+use Pimcore\Model\Element\DuplicateFullPathException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class CategorySyncService
 {
-    protected $connector;
-    public $pimCategories = []; // [categoryName => Category] 
-    public $wisersellCategories = []; // [categoryName => categoryId]
+    protected Connector $connector;
+    public array $pimCategories = []; // [categoryName => Category]
+    public array $wisersellCategories = []; // [categoryName => categoryId]
 
     public function __construct(Connector $connector)
     {   
         $this->connector = $connector;
     }
 
-    public function loadPimCategories($force = false)
+    public function loadPimCategories($force = false): void
     {
         if (!$force && !empty($this->pimCategories)) {
             return;
@@ -31,7 +37,14 @@ class CategorySyncService
         }
     }
 
-    public function loadWisersellCategories($force = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function loadWisersellCategories($force = false): int
     {
         if (!$force && !empty($this->wisersellCategories)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
@@ -55,13 +68,27 @@ class CategorySyncService
         return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
     }
 
-    public function load($force = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function load($force = false): int
     {
         $this->loadPimCategories($force);
         return $this->loadWisersellCategories($force);
     }
 
-    public function status()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function status(): array
     {
         $cacheExpire = $this->load();
         return [
@@ -71,14 +98,29 @@ class CategorySyncService
         ];
     }
 
-    public function dump()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function dump(): void
     {
         $this->load();
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.wisersell.txt', print_r($this->wisersellCategories, true));
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.pim.txt', print_r($this->pimCategories, true));
     }
 
-    public function addPimCategoryToWisersell($category)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function addPimCategoryToWisersell($category): void
     {
         if (!($category instanceof Category)) {
             return;
@@ -103,7 +145,14 @@ class CategorySyncService
         }
     }
 
-    public function updateWisersellCategory($categoryId, $categoryName)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function updateWisersellCategory($categoryId, $categoryName): void
     {
         $this->load();
         if (isset($this->wisersellCategories[$categoryName]) && $this->wisersellCategories[$categoryName] == $categoryId) {
@@ -119,7 +168,14 @@ class CategorySyncService
         }
     }
 
-    public function deleteWisersellCategory($categoryName = null, $categoryId = null)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function deleteWisersellCategory($categoryName = null, $categoryId = null): void
     {
         if (is_null($categoryName) ^ is_null($categoryId)) { // XOR
             return;
@@ -141,7 +197,7 @@ class CategorySyncService
         if (empty($idToDelete) || empty($nameToDelete)) {
             return;
         }
-        $response = $this->connector->request(Connector::$apiUrl['category'], 'DELETE', "/{$idToDelete}", []);
+        $response = $this->connector->request(Connector::$apiUrl['category'], 'DELETE', "/{$idToDelete}");
         if (empty($response)) {
             return;
         }
@@ -151,7 +207,16 @@ class CategorySyncService
         unset($this->wisersellCategories[$nameToDelete]);
     }
 
-    public function addWisersellCategoryToPim($categoryName, $categoryId)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws DuplicateFullPathException
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function addWisersellCategoryToPim($categoryName, $categoryId): void
     {
         $this->load();
         if (isset($this->pimCategories[$categoryName])) {
@@ -168,7 +233,15 @@ class CategorySyncService
         $this->pimCategories[$categoryName] = $category;
     }
 
-    public function sync()
+    /**
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws DuplicateFullPathException
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function sync(): void
     {
         $this->load();
         echo "Categories loaded Pim(".count($this->pimCategories).") Wisersell(".count($this->wisersellCategories).") categories.\n";
@@ -206,7 +279,15 @@ class CategorySyncService
         $this->loadPimCategories(true);
     }
 
-    public function getWisersellCategoryId($categoryName)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function getWisersellCategoryId($categoryName): ?string
     {
         $this->load();
         if (isset($this->pimCategories[$categoryName]) && $this->pimCategories[$categoryName] instanceof Category) {
@@ -215,7 +296,7 @@ class CategorySyncService
         if (isset($this->pimCategories['Diğer']) && $this->pimCategories['Diğer'] instanceof Category) {
             return $this->pimCategories['Diğer']->getWisersellCategoryId();
         }
-        throw new \Exception("$categoryName için Wisersell kategorisi bulunamadı. Ayrıca Diğer kategorisi de yok.");
+        throw new Exception("$categoryName için Wisersell kategorisi bulunamadı. Ayrıca Diğer kategorisi de yok.");
     }
 
 }

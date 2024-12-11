@@ -2,25 +2,39 @@
 
 namespace App\Connector\Wisersell;
 
-use App\Connector\Wisersell\Connector;
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
 use App\Utils\Utility;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ListingSyncService
 {
-    protected $connector;
-    public $wisersellListings = [];   // code => wisersell listing array (check swagger)
-    public $pimListings = [];   // calculatedWisersellCode => [oo_id, wisersellVariantCode, calculatedWisersellCode]
-    public $bucket = [];
-    public $amazonListings = [];
+    protected Connector $connector;
+    public array $wisersellListings = [];   // code => wisersell listing array (check swagger)
+    public array $pimListings = [];   // calculatedWisersellCode => [oo_id, wisersellVariantCode, calculatedWisersellCode]
+    public array $bucket = [];
+    public array $amazonListings = [];
+
     public function __construct(Connector $connector)
     {
         $this->connector = $connector;
     }
 
-    public function loadWisersell($force = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function loadWisersell($force = false): int
     {
         if (!$force && !empty($this->wisersellListings)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.json');
@@ -34,12 +48,15 @@ class ListingSyncService
         return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.json');
     }
 
-    public function loadPim($force = false) 
+    /**
+     * @throws Exception
+     */
+    public function loadPim($force = false): void
     {
         if (!$force && !empty($this->pimListings)) {
             return;
         }
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $this->pimListings = [];
         $listings = $db->fetchAllAssociative('SELECT oo_id, wisersellVariantCode, calculatedWisersellCode FROM object_varyantproduct WHERE published = 1');
         foreach ($listings as $listing) {
@@ -50,7 +67,16 @@ class ListingSyncService
         }
     }
 
-    public function syncAmazon($force = false)
+    /**
+     * @param bool $force
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function syncAmazon(bool $force = false): void
     {
         $this->load();
         if ($force || empty($this->amazonListings)) {
@@ -146,14 +172,22 @@ class ListingSyncService
                             'storeId' => $storeId,
                         ]
                     );
-                    continue;
                 }
             }
         }
         $this->flushListingBucketToWisersell(false);
     }
 
-    public function status()
+    /**
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function status(): array
     {
         $cacheExpire = $this->load();
         return [
@@ -163,20 +197,45 @@ class ListingSyncService
         ];
     }
 
-    public function load($force = false)
+    /**
+     * @param bool $force
+     * @return int
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function load(bool $force = false): int
     {
         $this->loadPim($force);
         return $this->loadWisersell($force);
     }
 
-    public function dump()
+    /**
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function dump(): void
     {
         $this->load();
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.wisersell.txt', print_r($this->wisersellListings, true));
         file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.pim.txt', print_r($this->pimListings, true));        
     }
 
-    public function search($params)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function search($params): array
     {
         $params['page'] = 0;
         $params['pageSize'] = 100;
@@ -200,16 +259,17 @@ class ListingSyncService
         return $retval;
     }
 
-    public function prepareListingData($variantProduct)
+    /**
+     * @throws Exception
+     */
+    public function prepareListingData($variantProduct): ?array
     {
         if (!$variantProduct instanceof VariantProduct) {
             echo "Not a variant product\n";
             return null;
         }
         $mainProduct = $variantProduct->getMainProduct();
-        if (is_array($mainProduct)) {
-            $mainProduct = reset($mainProduct);
-        }
+        $mainProduct = reset($mainProduct);
         if (!$mainProduct instanceof Product) {
             return null;
         }
@@ -219,9 +279,8 @@ class ListingSyncService
         $parentResponse = json_decode($variantProduct->jsonRead('parentResponseJson'), true);
         $productId = $mainProduct->getWisersellId();
         $storeProductId = match ($marketplaceType) {
-            'Etsy' => $apiResponse['product_id'] ?? null,
+            'Etsy', 'Shopify' => $apiResponse['product_id'] ?? null,
             'Amazon' => $variantProduct->getUniqueMarketplaceId(),
-            'Shopify' => $apiResponse['product_id'] ?? null,
             'Trendyol' => $apiResponse['productCode'] ?? null,
             'Hepsiburada' => $apiResponse['attributes']['hbSku'] ?? null,
             default => null,
@@ -229,7 +288,6 @@ class ListingSyncService
         $storeId = $marketplace->getWisersellStoreId();
         $variantCode = match ($marketplaceType) {
             'Etsy' => $parentResponse['listing_id'] ?? null,
-            'Amazon' => null,
             'Shopify' => $apiResponse['id'] ?? null,
             'Trendyol' => $apiResponse['platformListingId'] ?? null,
             'Hepsiburada' => $apiResponse['attributes']['barcode'] ?? null,
@@ -248,7 +306,16 @@ class ListingSyncService
         ];
     }
 
-    public function updateWisersellListing($variantProduct)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function updateWisersellListing($variantProduct): void
     {
         $this->load();
         $code = $variantProduct->getCalculatedWisersellCode();
@@ -271,14 +338,17 @@ class ListingSyncService
         $this->updatePimVariantProduct($response);
     }
 
-    public function updatePimVariantProduct($listing)
+    /**
+     * @throws \Exception
+     */
+    public function updatePimVariantProduct($listing): void
     {
         if (empty($listing['code'])) {
             print_r($listing);
             sleep(1);
             return;
         }
-        $variantProduct = VariantProduct::getByCalculatedWisersellCode($listing['code'], ['limit' => 1]);
+        $variantProduct = VariantProduct::getByCalculatedWisersellCode($listing['code'], 1);
         if (!$variantProduct instanceof VariantProduct) {
             return;
         }
@@ -287,7 +357,16 @@ class ListingSyncService
         $variantProduct->save();
     }
 
-    public function addVariantProductToWisersell($variantProduct)
+    /**
+     * @param $variantProduct
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function addVariantProductToWisersell($variantProduct): void
     {
         $listingData = $this->prepareListingData($variantProduct);
         if (empty($listingData) || empty($listingData['productId']) || empty($listingData['storeId'])) {
@@ -300,7 +379,15 @@ class ListingSyncService
         }
     }
 
-    public function flushListingBucketToWisersell($updatePim = true)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws \Exception
+     */
+    public function flushListingBucketToWisersell($updatePim = true): void
     {
         if (empty($this->bucket)) {
             return;
@@ -321,7 +408,16 @@ class ListingSyncService
         }
     }
 
-    public function sync()
+    /**
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     */
+    public function sync(): void
     {
         $this->updatePimCalculatedWisersellCodes();
         $this->loadPim(true);
@@ -329,7 +425,6 @@ class ListingSyncService
         $pimListings = $this->pimListings;
         $index = 0;
         $totalCount = count($this->wisersellListings);
-        $allStop = false;
         foreach ($this->wisersellListings as $listing) {
             $index++;
             echo "\rSyncing $index of $totalCount  ";
@@ -341,13 +436,13 @@ class ListingSyncService
                 $variantProduct = VariantProduct::getById($pimListings[$code]['oo_id']);
                 unset($pimListings[$code]);
             } else {
-                $variantProduct = VariantProduct::getByWisersellVariantCode($code, ['limit' => 1]);
+                $variantProduct = VariantProduct::getByWisersellVariantCode($code, 1);
             }
             if (!$variantProduct instanceof VariantProduct) {
                 echo "Variant product not found in PIM for {$code}: ".json_encode($listing)."\n";
                 $storeId = $listing['store']['id'] ?? null;
                 if ($storeId) {
-                    $marketplace = Marketplace::getByWisersellStoreId($storeId, ['limit' => 1]);
+                    $marketplace = Marketplace::getByWisersellStoreId($storeId, 1);
                     if ($marketplace instanceof Marketplace) {
                         echo "(SIMULATE) Deleting {$code} for {$marketplace->getKey()} from WS\n";
                         //$this->deleteFromWisersell($code);
@@ -356,15 +451,13 @@ class ListingSyncService
                 continue;
             }
             $mainProduct = $variantProduct->getMainProduct();
-            if (is_array($mainProduct)) {
-                $mainProduct = reset($mainProduct);
-            }
+            $mainProduct = reset($mainProduct);
             $wisersellProductId = $listing['product']['id'] ?? null;
             if (!$mainProduct instanceof Product) {
                 if ($wisersellProductId) {
                     echo "Variant product {$variantProduct->getId()} not connected in PIM for {$listing['code']}\n";
                     echo "But it is connected to $wisersellProductId in WS. Let's try to connect in PIM\n";
-                    $mainProduct = Product::getByWisersellId($wisersellProductId, ['limit' => 1]);
+                    $mainProduct = Product::getByWisersellId($wisersellProductId, 1);
                     if ($mainProduct instanceof Product) {
                         echo "Main product {$mainProduct->getId()} found in PIM and variant {$variantProduct->getId()} will be connected to it.\n";
                         $mainProduct->addVariant($variantProduct);
@@ -383,7 +476,6 @@ class ListingSyncService
             if (empty($variantProduct->getWisersellVariantCode())) {
                 echo "Variant code missing for {$listing['code']} in {$variantProduct->getId()}, updating\n";
                 $this->updatePimVariantProduct($listing);
-                continue;
             }
         }
         echo "\n";
@@ -405,7 +497,10 @@ class ListingSyncService
         $this->syncAmazon();
     }
 
-    public function calculateWisersellCode($variantProduct)
+    /**
+     * @throws Exception
+     */
+    public function calculateWisersellCode($variantProduct): string
     {
         $listingData = $this->prepareListingData($variantProduct);
         $storeId = $variantProduct->getMarketplace()->getWisersellStoreId();
@@ -415,7 +510,11 @@ class ListingSyncService
         return hash('sha1', $data);
     }
 
-    public function updatePimCalculatedWisersellCodes()
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function updatePimCalculatedWisersellCodes(): void
     {
         $vpl = new VariantProduct\Listing();
         $vpl->setUnpublished(true);
@@ -451,7 +550,12 @@ class ListingSyncService
         echo "\n";
     }
 
-    public function deleteFromWisersell($code)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     * @throws DecodingExceptionInterface
+     */
+    public function deleteFromWisersell($code): void
     {
         $response = $this->connector->request(Connector::$apiUrl['listing'], 'DELETE', $code);
         if (empty($response) || $response->getStatusCode() !== 200) {
