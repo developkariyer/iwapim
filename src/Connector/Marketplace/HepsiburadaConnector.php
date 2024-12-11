@@ -18,7 +18,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $variant = VariantProduct::getById(266510);
+        //$this->setInventory($variant, 999);
+        $this->setPrice($variant, 1789);
+        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -59,7 +62,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->downloadAttributes();
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
     }
 
     /**
@@ -178,18 +181,21 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request('POST', "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/stock-uploads", [
+        
+        $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/stock-uploads", [
             'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
+                'authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                'User-Agent' => "colorfullworlds_dev",
+                'accept' => 'application/json',
+                'content-type' => 'application/*+json'
             ],
-            'body' => [
-                'hepsiburadaSku' => $hbsku,
-                'merchantSku' => $merchantSku,
-                'availableStock' => $targetValue
-            ]
+            'body' => json_encode([ 
+                [
+                    'hepsiburadaSku' => $hbsku,         
+                    'merchantSku' => $merchantSku,      
+                    'availableStock' => $targetValue    
+                ]
+            ])
         ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
@@ -224,12 +230,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 $targetCurrency = "TL";
             }
         }
-        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $targetCurrency);
         if ($finalPrice === null) {
             echo "Error: Currency conversion failed\n";
             return;
-        }
-
+       }
         $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
         $hbsku = $attributes['hbSku'];
         $merchantSku = $attributes['merchantSku'];
@@ -239,16 +244,18 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }
         $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/price-uploads", [
             'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
+                'authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                'User-Agent' => "colorfullworlds_dev",
+                'accept' => 'application/json',
+                'content-type' => 'application/*+json'
             ],
-            'body' => [
-                'hepsiburadaSku' => $hbsku,
-                'merchantSku' => $merchantSku,
-                'price' =>(float) $finalPrice
-            ]
+            'body' => json_encode([
+                [
+                    'hepsiburadaSku' => $hbsku,
+                    'merchantSku' => $merchantSku,
+                    'price' =>(float) $finalPrice
+                ]
+            ])
         ]); 
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {

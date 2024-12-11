@@ -16,7 +16,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public static $marketplaceType = 'Wayfair';
     public static $expires_in;
 
-    public function prepareToken()
+    public function prepareTokenSanbox()
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
@@ -42,18 +42,93 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    public function prepareTokenProd()
+    {
+        try {
+            $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
+                'headers' => [
+                    'content-type' => 'application/json'
+                ],
+                'json' => [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => $this->marketplace->getWayfairClientIdProd(),
+                    'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
+                    'audience' => 'https://api.wayfair.com/'
+                ]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get token: ' . $response->getContent(false));
+            }
+            $data = $response->toArray();
+            static::$expires_in = time() + $data['expires_in'];
+            $this->marketplace->setWayfairAccessTokenProd($data['access_token']);
+            $this->marketplace->save();
+        } catch(\Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+        }
+    }
+
+    /*public function sandboxTestings()
+    {
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareTokenSanbox();
+        }
+        $this->acceptDropshipOrdersSandbox();
+        $this->testEndpoint();
+        $this->getDropshipOrdersSandbox();  
+        $this->sendShipmentSandbox();
+        $this->saveInventorySandbox();
+        $this->getListingSandbox();
+    }*/
+
     public function download($forceDownload = false)
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareToken();
+            $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
-        //$this->acceptDropshipOrdersSandbox();
-        //$this->testEndpoint();
-        //$this->getDropshipOrdersSandbox();  
-        //$this->sendShipmentSandbox();
-        //$this->saveInventorySandbox();
-        //$this->getListingSandbox();
+
+        $query = <<<GRAPHQL
+        query supplierCatalog(
+            \$supplierId: Int!,
+            \$paginationOptions: PaginationOptions
+        ) {
+            supplierCatalog(
+                supplierId: \$supplierId,
+                paginationOptions: \$paginationOptions
+            ) {
+                pageInfo {
+                    page
+                    pageSize
+                }
+            }
+        }
+        GRAPHQL;
+
+        $variables = [
+            'supplierId' => 194115, 
+            'paginationOptions' => [
+                'page' => 1,  
+                'pageSize' => 10
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
+        ]);
+
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+       
     }
 
     public function testEndpoint()
