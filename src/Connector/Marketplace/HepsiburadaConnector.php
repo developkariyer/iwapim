@@ -177,12 +177,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ],
-            'body' => [{
+            'body' => [[
                 'hepsiburadaSku' => $hbsku,
                 'merchantSku' => $merchantSku,
                 'availableStock' => $targetValue,
                 "maximumPurchasableQuantity" => null
-            }]
+            ]]
         ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
