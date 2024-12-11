@@ -133,7 +133,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         echo "Last Updated At: $lastUpdatedAt\n";
         if ($lastUpdatedAt) {
             $threeMonthsAgo = date('Y-m-d', strtotime('-3 months'));
-            $startDate = max($threeMonthsAgo, $threeMonthsAgo); 
+            $startDate = max($threeMonthsAgo, $lastUpdatedAt); 
         } else {
             $startDate = date('Y-m-d', strtotime('-3 months')); 
         }
