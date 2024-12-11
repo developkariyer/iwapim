@@ -119,6 +119,40 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
+        
+        /*$startDate = date('Y-m-d', strtotime('-3 month'));
+        $endDate = min(strtotime('+2 weeks', $startDate), $now);
+        $pageSize = 100;
+        do {
+            $page = 0;
+            do {
+                $response = $this->httpClient->request('POST', 'https://apis.ciceksepeti.com/api/v1/Order/GetOrders', [
+                    'headers' => [
+                        'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+                    ],
+                    'json' => [
+                        'startDate' => $startDate,
+                        'endDate' => $endDate,
+                        'page' => $page,
+                        'pageSize' => $pageSize
+                    ]
+                ]);
+                $statusCode = $response->getStatusCode();
+                if ($statusCode !== 200) {
+                    echo "Error: $statusCode\n";
+                    return;
+                }
+                print_r($response->getContent());
+                $page++;
+
+
+            }while();
+
+        }while();*/
+
+
+
+
         $page = 0;
         $pageSize = 100;
         //do {
