@@ -161,7 +161,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 sleep(5);
             }while($page < $totalPages);
             $startDate = $endDate;
-            $endDate = date('Y-m-d',min(strtotime('+2 weeks', $startDate), $now));
+            $endDateCandidate = date('Y-m-d', strtotime($startDate . ' +2 weeks'));
+            $endDate = ($endDateCandidate < $now) ? $endDateCandidate : $now;
+
             if ($startDate >= $now) {
                 break;
             }
