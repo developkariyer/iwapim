@@ -70,8 +70,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+        /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenSanbox();
+        }*/
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
         //$this->acceptDropshipOrdersSandbox();
