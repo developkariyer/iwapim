@@ -97,9 +97,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 supplierId: \$supplierId,
                 paginationOptions: \$paginationOptions
             ) {
-                supplierId
                 pageInfo {
-                    currentPage
                     totalPages
                     totalRecords
                 }
