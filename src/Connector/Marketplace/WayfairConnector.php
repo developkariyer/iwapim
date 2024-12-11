@@ -102,11 +102,12 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     totalRecords
                 }
                 products {
-                    id
-                    name
-                    description
-                    price
-                    availability
+                    productId
+                    upc
+                    supplierPartNumber
+                    status
+                    skus
+                    images
                 }
             }
         }
