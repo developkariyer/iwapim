@@ -181,6 +181,16 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $db->rollBack();
                     echo "Error: " . $e->getMessage() . "\n";
                 }
+                $totalElements = $data['orderListCount'];
+                $totalPages = $data['pageCount'];
+                $count = count($orders);
+                echo "-----------------------------\n";
+                echo "Total Elements: $totalElements\n"; 
+                echo "Total Pages: $totalPages\n";
+                echo "Current Page: $page\n"; 
+                echo "Items on this page: $count\n";
+                echo "Date Range: " . $startDate . " - " . $endDate . "\n"; 
+                echo "-----------------------------\n";
                 sleep(5);
             }while($page < $totalPages);
             $startDate = $endDate;
