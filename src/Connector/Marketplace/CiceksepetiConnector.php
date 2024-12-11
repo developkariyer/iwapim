@@ -152,7 +152,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
 
 
-
+        echo "Downloading Orders\n";
         $page = 0;
         $pageSize = 100;
         //do {
