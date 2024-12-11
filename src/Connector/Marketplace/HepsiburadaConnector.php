@@ -175,7 +175,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
                 'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/*+json'
             ],
             'body' => [[
                 'hepsiburadaSku' => $hbsku,
