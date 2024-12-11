@@ -143,6 +143,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         echo "Last Updated At: $lastUpdatedAt\n";
         echo "Start Date: $startDate\n";
         echo "End Date: $endDate\n";
+        if ($startDate === $endDate) {
+            echo "No orders to download\n";
+            return;
+        }
         do {
             $page = 0;
             do {
