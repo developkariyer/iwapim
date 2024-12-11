@@ -101,14 +101,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     totalPages
                     totalRecords
                 }
-                products {
-                    productId
-                    upc
-                    supplierPartNumber
-                    status
-                    skus
-                    images
-                }
             }
         }
         GRAPHQL;
