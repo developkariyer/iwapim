@@ -84,7 +84,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false)
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareTokenSanbox();
+            $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
 
@@ -114,7 +114,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
                 'Content-Type' => 'application/json'
             ],
             'json' => [
