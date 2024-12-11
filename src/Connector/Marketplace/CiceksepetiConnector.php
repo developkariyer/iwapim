@@ -170,7 +170,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                             "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
                             [
                                 $this->marketplace->getId(),
-                                $order['orderNumber'],
+                                $order['orderId'],
                                 json_encode($order)
                             ]
                         );
