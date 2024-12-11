@@ -27,7 +27,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         'orders' => "/retailer/orders/",
         "offers" => "/retailer/offers/"
     ];
-    public static $marketplaceType = 'Bol.com';
+    public static string $marketplaceType = 'Bol.com';
 
     /**
      * @throws TransportExceptionInterface

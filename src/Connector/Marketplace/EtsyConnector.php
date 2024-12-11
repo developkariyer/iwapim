@@ -2,14 +2,17 @@
 
 namespace App\Connector\Marketplace;
 
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use Pimcore\Model\Element\DuplicateFullPathException;
 
 class EtsyConnector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Etsy';
+    public static string $marketplaceType = 'Etsy';
 
-    public function download($forceDownload = false)
+    public function download($forceDownload = false): int
     {
         $filename = 'tmp/'.urlencode($this->marketplace->getShopId()).'.json';
         $jsonData = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
@@ -17,9 +20,12 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         return count($this->listings);
     }
 
-    public function downloadOrders()
+    /**
+     * @throws Exception
+     */
+    public function downloadOrders(): void
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $filename = 'tmp/'.urlencode($this->marketplace->getShopId()).'.json';
         $jsonData = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
         $orders = $jsonData['orders'] ?? [];
@@ -54,15 +60,15 @@ class EtsyConnector extends MarketplaceConnectorAbstract
     {
     }
 
-    protected function getAttributes($listing) {
+    protected function getAttributes($listing): string
+    {
         if (!empty($listing['property_values'])) {
             return implode(
                 ' ',
                 array_map(function($element) {
-                        $values = implode('-', array_map(function($value) {
+                    return implode('-', array_map(function ($value) {
                             return str_replace(' ', '', $value);
                         }, $element['values']));
-                        return $values;
                     }, $listing['property_values'])
             );
         }
@@ -80,7 +86,11 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         return '';
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";

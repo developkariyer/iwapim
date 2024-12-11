@@ -18,8 +18,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         'updateInventoryPrice' => "https://apis.ciceksepeti.com/api/v1/Products/price-and-stock",
         'batchStatus' => "https://apis.ciceksepeti.com/api/v1/Products/batch-status/"
     ];
-    
-    public static $marketplaceType = 'Ciceksepeti';
+
+    public static string $marketplaceType = 'Ciceksepeti';
     
     public function download($forceDownload = false)
     {        

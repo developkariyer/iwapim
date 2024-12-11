@@ -45,7 +45,7 @@ class Reports
             "{$reportType}_{$country}.csv", 
             PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}"
         );
-        if ($report === false || $forceDownload) {
+        if (empty($report) || $forceDownload) {
             echo "Waiting Report ";
             $reportsApi = $this->amazonConnector->amazonSellerConnector->reportsV20210630();
             $response = $reportsApi->createReport(new CreateReportSpecification(reportType: $reportType, marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']], reportOptions: ["custom" => "true"]));

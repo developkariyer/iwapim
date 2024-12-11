@@ -14,7 +14,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Hepsiburada';
+    public static string $marketplaceType = 'Hepsiburada';
     
     public function download($forceDownload = false)
     {

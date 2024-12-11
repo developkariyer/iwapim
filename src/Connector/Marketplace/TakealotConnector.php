@@ -12,8 +12,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         'offers' => "https://seller-api.takealot.com/v2/offers/",
         'orders' => "https://seller-api.takealot.com/v2/sales/summary",
     ];
-    
-    public static $marketplaceType = 'Takealot';
+
+    public static string $marketplaceType = 'Takealot';
     
     public function download($forceDownload = false)
     {

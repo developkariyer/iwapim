@@ -2,18 +2,18 @@
 
 namespace App\Calculator;
 
+use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\ClassDefinition\CalculatorClassInterface;
 use Pimcore\Model\DataObject\Data\CalculatedValue;
 use Pimcore\Db;
-use Pimcore\Model\DataObject\ShopifyVariant;
-use Pimcore\Model\DataObject\TrendyolVariant;
-use App\Model\DataObject\VariantProduct;
-
 
 
 class OrdersCalculator implements CalculatorClassInterface
 {
+    /**
+     * @throws Exception
+     */
     public function compute(Concrete $object, CalculatedValue $context): string
     {
         $returnValue = match ($context->getFieldname()) {
@@ -25,6 +25,9 @@ class OrdersCalculator implements CalculatorClassInterface
         return str_pad($returnValue, 7, '0', STR_PAD_LEFT);
     }
 
+    /**
+     * @throws Exception
+     */
     public function totalOrders(Concrete $object): string
     {
         $db = Db::get();
@@ -45,6 +48,9 @@ class OrdersCalculator implements CalculatorClassInterface
         }*/
     }
 
+    /**
+     * @throws Exception
+     */
     public function last7Orders(Concrete $object): string
     {
         $db = Db::get();
@@ -60,6 +66,9 @@ class OrdersCalculator implements CalculatorClassInterface
         return $result + 0;
     }
 
+    /**
+     * @throws Exception
+     */
     public function last30Orders(Concrete $object): string
     {
         $db = Db::get();
@@ -80,6 +89,9 @@ class OrdersCalculator implements CalculatorClassInterface
         }*/
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCalculatedValueForEditMode(Concrete $object, CalculatedValue $context): string
     {
         return $this->compute($object, $context);
