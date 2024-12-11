@@ -176,7 +176,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ],
-            'body' => [
+            'json' => [
                 'hepsiburadaSku' => $hbsku,
                 'merchantSku' => $merchantSku,
                 'availableStock' => $targetValue
