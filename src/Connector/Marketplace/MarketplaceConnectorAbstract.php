@@ -12,7 +12,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInterface
 {
     public ?Marketplace $marketplace = null;
-    public array $listings = [];
+    public ?array $listings = [];
     public ?HttpClientInterface $httpClient = null;
 
     public static string $marketplaceType = '';
