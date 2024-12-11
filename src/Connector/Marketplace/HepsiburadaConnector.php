@@ -224,8 +224,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Error: Currency conversion failed\n";
             return;
         }
-
-        $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
+        echo "Final Price: $finalPrice\n";
+        /*$attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
         $hbsku = $attributes['hbSku'];
         $merchantSku = $attributes['merchantSku'];
         if (empty($hbsku) || empty($merchantSku)) {
@@ -259,7 +259,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $date = date('Y-m-d H:i:s');
         $combinedJson = json_encode($combinedData);
         $filename = "{$hbsku}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);*/
     }
 
     public function getBatchRequestResult($id,$type)
