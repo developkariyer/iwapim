@@ -98,8 +98,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 paginationOptions: \$paginationOptions
             ) {
                 pageInfo {
-                    totalPages
-                    totalRecords
+                    page
+                    pageSize
                 }
             }
         }
