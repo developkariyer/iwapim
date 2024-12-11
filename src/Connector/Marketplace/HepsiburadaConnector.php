@@ -233,16 +233,16 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }
         $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/price-uploads", [
             'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
+                'authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                'User-Agent' => "colorfullworlds_dev",
+                'accept' => 'application/json',
+                'content-type' => 'application/*+json'
             ],
-            'body' => [
+            'body' => json_encode([
                 'hepsiburadaSku' => $hbsku,
                 'merchantSku' => $merchantSku,
                 'price' =>(float) $finalPrice
-            ]
+            ])
         ]); 
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
