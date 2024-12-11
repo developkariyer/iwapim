@@ -13,7 +13,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $variant = VariantProduct::getById(266510);
+        print_r($variant->jsonRead('apiResponseJson'));
+        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -54,7 +56,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->downloadAttributes();
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
     }
 
     protected function getProduct($hbSku)
@@ -167,7 +169,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request('POST', "https://listing-external-sit.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/stock-uploads", [
+        $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/stock-uploads", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
