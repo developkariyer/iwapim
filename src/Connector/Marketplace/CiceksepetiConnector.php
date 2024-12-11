@@ -154,7 +154,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 echo "Total Elements: $totalElements\n"; 
                 echo "Total Pages: $totalPages\n";
                 echo "Current Page: $page\n"; 
-                echo "Date Range: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n"; 
+                echo "Date Range: " . $startDate . " - " . $endDate . "\n"; 
                 echo "-----------------------------\n";
                 time.sleep(5);
             }while($page < $totalPages);
