@@ -239,12 +239,13 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'content-type' => 'application/*+json'
             ],
             'body' => json_encode([
-                'hepsiburadaSku' => $hbsku,
-                'merchantSku' => $merchantSku,
-                'price' =>(float) $finalPrice
+                [
+                    'hepsiburadaSku' => $hbsku,
+                    'merchantSku' => $merchantSku,
+                    'price' =>(float) $finalPrice
+                ]
             ])
         ]); 
-        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
