@@ -219,11 +219,13 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 $targetCurrency = "TL";
             }
         }
-        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if ($finalPrice === null) {
-            echo "Error: Currency conversion failed\n";
-            return;
-        }
+        echo "Target Price: $targetPrice\n";
+        echo "Target Currency: $targetCurrency\n";
+       // $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+       // if ($finalPrice === null) {
+         //   echo "Error: Currency conversion failed\n";
+           // return;
+       // }
         echo "Final Price: $finalPrice\n";
         /*$attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
         $hbsku = $attributes['hbSku'];
