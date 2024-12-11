@@ -176,11 +176,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ],
-            'json' => [
+            'body' => json_encode([
                 'hepsiburadaSku' => $hbsku,
                 'merchantSku' => $merchantSku,
                 'availableStock' => $targetValue
-            ]
+            ])
         ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
