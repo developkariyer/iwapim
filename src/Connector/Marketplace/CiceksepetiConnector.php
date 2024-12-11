@@ -131,7 +131,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             [$this->marketplace->getId()]
         );
         echo "Last Updated At: $lastUpdatedAt\n";
-        /*if ($lastUpdatedAt) {
+        if ($lastUpdatedAt) {
             $threeMonthsAgo = date('Y-m-d', strtotime('-3 months'));
             $startDate = max($threeMonthsAgo, $threeMonthsAgo); 
         } else {
@@ -201,13 +201,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
-        }while($startDate < $now);*/
-
-
-
-        
-          
-
+        }while($startDate < $now);
     }
     
     public function downloadInventory()
