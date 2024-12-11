@@ -130,7 +130,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-        if ($lastUpdatedAt) {
+        echo "Last Updated At: $lastUpdatedAt\n";
+        /*if ($lastUpdatedAt) {
             $threeMonthsAgo = date('Y-m-d', strtotime('-3 months'));
             $startDate = max($threeMonthsAgo, $threeMonthsAgo); 
         } else {
@@ -175,7 +176,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                                 json_encode($order)
                             ]
                         );
-                    }
+                    }    
                     $db->commit();
                 } catch (\Exception $e) {
                     $db->rollBack();
@@ -200,7 +201,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
-        }while($startDate < $now);
+        }while($startDate < $now);*/
 
 
 
