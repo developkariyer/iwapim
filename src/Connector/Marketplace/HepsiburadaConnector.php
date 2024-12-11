@@ -219,7 +219,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 $targetCurrency = "TL";
             }
         }
-        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $targetCurrency);
         if ($finalPrice === null) {
             echo "Error: Currency conversion failed\n";
             return;
