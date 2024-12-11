@@ -158,7 +158,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 echo "Current Page: $page\n"; 
                 echo "Date Range: " . $startDate . " - " . $endDate . "\n"; 
                 echo "-----------------------------\n";
-                time.sleep(5);
+                sleep(5);
             }while($page < $totalPages);
             $startDate = $endDate;
             $endDate = date('Y-m-d',min(strtotime('+2 weeks', $startDate), $now));
