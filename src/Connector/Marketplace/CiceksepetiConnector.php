@@ -120,7 +120,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadOrders()
     {
         
-        /*$startDate = date('Y-m-d', strtotime('-3 month'));
+        $startDate = date('Y-m-d', strtotime('-3 month'));
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
         $pageSize = 100;
         do {
@@ -144,40 +144,28 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 }
                 print_r($response->getContent());
                 $page++;
-
-
-            }while();
-
-        }while();*/
-
-
-
-        echo "Downloading Orders\n";
-        $page = 0;
-        $pageSize = 100;
-        //do {
-            $response = $this->httpClient->request('POST', 'https://apis.ciceksepeti.com/api/v1/Order/GetOrders', [
-                'headers' => [
-                    'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
-                ],
-                'json' => [
-                    'startDate' => '2024-10-03',
-                    'endDate' => '2024-10-15',
-                    'page' => $page,
-                    'pageSize' => $pageSize
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            print_r($response->getContent());
-            /*if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                return;
+                $data = $response->toArray();
+                $totalElements = $data['orderListCount'];
+                $totalPages = $data['pageCount'];
+                echo "-----------------------------\n";
+                echo "Total Elements: $totalElements\n"; 
+                echo "Total Pages: $totalPages\n";
+                echo "Current Page: $page\n"; 
+                echo "Date Range: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n"; 
+                echo "-----------------------------\n";
+                time.sleep(5);
+            }while($page < $totalPages);
+            $startDate = $endDate;
+            $endDate = min(strtotime('+2 weeks', $startDate), $now);
+            if ($startDate >= $now) {
+                break;
             }
-            $data = $response->toArray();
-            $count = $data['orderListCount'];
-            $page++;*/
-        //}while($count === $pageSize);
+        }while($startDate < strtotime('now'));
+
+
+
         
+          
 
     }
     
