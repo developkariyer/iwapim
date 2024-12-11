@@ -261,33 +261,33 @@ class ReportController extends FrontendController
     }
 
     /**
-     * @Route("/report/sticker/{group_id}/{type?iwasku}", name="report_sticker")
-     */
-    public function stickerAction(Request $request): Response
-    {
-        $groupId = $request->get('group_id');
-        $type = $request->get('type', 'iwasku');
-        $group = GroupProduct::getById($groupId);
-
-        if (!$group) {
-            return $this->render('202409/sticker.html.twig', ['title' => 'Group not found']);
-        }
-
-        $products = $group->getProducts();
-        $pricingModels = [];
-        $productTwig = $this->prepareProductsData($products, $pricingModels, false, $type);
-        $modelTwig = [];
-
-        unset($products);
-        unset($pricingModels);
-        gc_collect_cycles();
-
-        return $this->render('202409/group.html.twig', [
-            'title' => $group->getKey(),
-            'products' => $productTwig,
-            'models' => $modelTwig,
-            'markets' => [],
-        ]);
-    }
+     * @ Route("/report/sticker/{group_id}/{type?iwasku}", name="report_sticker")
+     * /
+     * public function stickerAction(Request $request): Response
+    * {
+        * $groupId = $request->get('group_id');
+        * $type = $request->get('type', 'iwasku');
+        * $group = GroupProduct::getById($groupId);
+ *
+* if (!$group) {
+            * return $this->render('202409/sticker.html.twig', ['title' => 'Group not found']);
+        * }
+ *
+* $products = $group->getProducts();
+        * $pricingModels = [];
+        * $productTwig = $this->prepareProductsData($products, $pricingModels, false, $type);
+        * $modelTwig = [];
+ *
+* unset($products);
+        * unset($pricingModels);
+        * gc_collect_cycles();
+ *
+* return $this->render('202409/group.html.twig', [
+            * 'title' => $group->getKey(),
+            * 'products' => $productTwig,
+            * 'models' => $modelTwig,
+            * 'markets' => [],
+     * ]);
+    * }*/
 
 }
