@@ -169,10 +169,10 @@ class VariantProduct extends Concrete
             return false;
         }
         echo "{$this->getId()} ";
-        if (!isset($variant['apiResponseJson'])) {
+        if (isset($variant['apiResponseJson'])) {
             $this->jsonWrite('apiResponseJson', $variant['apiResponseJson']);
         }
-        if (!isset($variant['parentResponseJson'])) {
+        if (isset($variant['parentResponseJson'])) {
             $this->jsonWrite('parentResponseJson', $variant['parentResponseJson']);
         }
         return $result;    
