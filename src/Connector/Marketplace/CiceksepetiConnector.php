@@ -130,7 +130,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-        echo "Last Updated At: $lastUpdatedAt\n";
         if ($lastUpdatedAt) {
             $threeMonthsAgo = date('Y-m-d', strtotime('-3 months'));
             $startDate = max($threeMonthsAgo, $threeMonthsAgo); 
@@ -139,8 +138,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         }
         $modifiedStartDate = date('Y-m-d', strtotime('+2 weeks', strtotime($startDate)));
         $endDate = ($modifiedStartDate < $now) ? $modifiedStartDate : $now;
-
         $pageSize = 100;
+        echo "Last Updated At: $lastUpdatedAt\n";
+        echo "Start Date: $startDate\n";
+        echo "End Date: $endDate\n";
         do {
             $page = 0;
             do {
