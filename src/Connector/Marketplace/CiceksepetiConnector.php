@@ -119,10 +119,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
-        $startDate = date('Y-m-d', strtotime('-3 month')); 
+        $startDate = date('Y-m-d', strtotime('-3 months')); 
         $now = date('Y-m-d'); 
-        $endDate = date('Y-m-d', min(strtotime('+2 weeks', strtotime($startDate)), strtotime($now)));
-        
+        $modifiedStartDate = date('Y-m-d', strtotime('+2 weeks', strtotime($startDate)));
+        $endDate = ($modifiedStartDate < $now) ? $modifiedStartDate : $now;
+
+
         $pageSize = 100;
         do {
             $page = 0;
