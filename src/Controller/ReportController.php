@@ -215,24 +215,24 @@ class ReportController extends FrontendController
     }
 
     /**
-     * @Route("/report/cost/{product_id}", name="report_cost")
-     */
-    public function costAction(Request $request): Response
-    {
-        $productId = $request->get('product_id');
-        $product = Product::getById($productId);
-
-        if (!$product) {
-            return $this->render('202409/cost.html.twig', ['title' => 'Product not found']);
-        }
-
-        $productTwig = $this->prepareSingleProductData($product);
-
-        return $this->render('202409/cost.html.twig', [
-            'title' => $product->getKey(),
-            'product' => $productTwig,
-        ]);
-    }
+     * @ Route("/report/cost/{product_id}", name="report_cost")
+     * /
+     * public function costAction(Request $request): Response
+    * {
+        * $productId = $request->get('product_id');
+        * $product = Product::getById($productId);
+ *
+* if (!$product) {
+            * return $this->render('202409/cost.html.twig', ['title' => 'Product not found']);
+        * }
+ *
+* $productTwig = $this->prepareSingleProductData($product);
+ *
+* return $this->render('202409/cost.html.twig', [
+            * 'title' => $product->getKey(),
+            * 'product' => $productTwig,
+     * ]);
+     * }*/
 
     /**
      * @Route("/report/group/{group_id}", name="report_group")

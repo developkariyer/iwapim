@@ -6,6 +6,11 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
 use Pimcore\Model\DataObject\Data\Link;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
@@ -57,7 +62,14 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    protected function getProduct($hbSku)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    protected function getProduct($hbSku): array
     {
         $page = 0;
         $size = 1;
@@ -77,13 +89,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
-            return;
+            return [];
         }
-        $data = $response->toArray();
-        return $data;
+        return $response->toArray();
     }
 
-    public function downloadAttributes()
+    public function downloadAttributes(): void
     {
         echo "Downloading Attributes\n";
         foreach ($this->listings as &$listing) {

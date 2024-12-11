@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Pimcore\Db;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Product\Listing;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +43,7 @@ class ProductsController extends FrontendController
             return $this->json([]);
         }
         $results = [];
-        foreach ($this->listProducts(level:1, search:$search) as $product) {
+        foreach ($this->listProducts(level: 1, search: $search) as $product) {
             $results[] = [
                 'id' => $product['id'],
                 'text' => $product['key']. ($product['published'] ? '' : ' (taslak)'),
@@ -147,7 +148,7 @@ class ProductsController extends FrontendController
         ];
         return $this->render('iwapim/product_sizes.html.twig', [
             'category' => $category,
-            'products' => $this->listProducts(level:3, otherConditions:$conditions, limit:500),
+            'products' => $this->listProducts(level: 3, search: $conditions, otherConditions: $conditions),
             'logged_in' => $request->cookies->get('id_token') ? true : false,
         ]);
     }
@@ -207,7 +208,7 @@ class ProductsController extends FrontendController
                         'text' => 'Product not found',
                     ],
                 ],
-                'logged_in' => $request->cookies->get('id_token') ? true : false,
+                'logged_in' => (bool)$request->cookies->get('id_token'),
             ]);
         }
         error_log("Product with id {$product->getId()} found for serial number $serialNumber");
@@ -216,17 +217,17 @@ class ProductsController extends FrontendController
 
     /**
      * Get a list of products for router functions
-     * @param int $level 0: all, 1: only first level, 2: only second level, 4: only third level, 3: only first and second level, 5: only first and third level, 6: only second and third level, 7: same as 0
-     * @param string $search search term to filter products, minimum 3 characters, multiple terms separated by space, case insensitive, search is done on product key
+     * @param int|null $level 0: all, 1: only first level, 2: only second level, 4: only third level, 3: only first and second level, 5: only first and third level, 6: only second and third level, 7: same as 0
+     * @param string $search search term to filter products, minimum 3 characters, multiple terms separated by space, case-insensitive, search is done on product key
      * @return array 
      */
-    private function listProducts($level = null, $search = '', $otherConditions = [], $limit = 500): array
+    private function listProducts(int $level = null, string $search = '', $otherConditions = []): array
     {
         $level ??= 7;
         $products = new Listing();
         $products->setOrderKey('key');
         $products->setOrder('asc');
-        $products->setObjectTypes([Product::OBJECT_TYPE_OBJECT]);
+        $products->setObjectTypes([AbstractObject::OBJECT_TYPE_OBJECT]);
         $conditions = $params = [];
         if (!empty($search)) {
             $searchTerms = explode(' ', $search);
@@ -248,7 +249,7 @@ class ProductsController extends FrontendController
             $products->setCondition(implode(' AND ', $conditions), $params);
         }
         $products->setUnpublished(true);
-        $products->setLimit($limit);
+        $products->setLimit(500);
         $productList = $products->load();
         $productArray = [];
         foreach ($productList as $product) {

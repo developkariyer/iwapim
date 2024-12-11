@@ -92,7 +92,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         return $decodedResponse['entityId'] ?? [];
     }
 
-    protected function downloadOfferReport($forceDownload = false)
+    public function downloadOfferReport($forceDownload = false)
     {
         $this->prepareToken();
         $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
