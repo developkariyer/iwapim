@@ -125,9 +125,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $endDate = ($modifiedStartDate < $now) ? $modifiedStartDate : $now;
         echo "Start Date: $startDate\n";
         echo "End Date: $endDate\n";
-        
 
-       /* $pageSize = 100;
+
+       $pageSize = 100;
         do {
             $page = 0;
             do {
@@ -161,11 +161,11 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 time.sleep(5);
             }while($page < $totalPages);
             $startDate = $endDate;
-            $endDate = min(strtotime('+2 weeks', $startDate), $now);
+            $endDate = date('Y-m-d',min(strtotime('+2 weeks', $startDate), $now));
             if ($startDate >= $now) {
                 break;
             }
-        }while($startDate < strtotime('now'));*/
+        }while($startDate < $now);
 
 
 
