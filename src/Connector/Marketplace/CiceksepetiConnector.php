@@ -199,6 +199,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
+            echo "New Date Range: " . $startDate . " - " . $endDate . "\n";
         }while($startDate < $now);
 
 
