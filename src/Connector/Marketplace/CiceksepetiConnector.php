@@ -120,6 +120,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadOrders()
     {
         $db = \Pimcore\Db::get();
+        $now = date('Y-m-d'); 
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(
                 DATE_FORMAT(MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderModifyDate')), '%d-%m-%Y')), '%Y-%m-%d'),
