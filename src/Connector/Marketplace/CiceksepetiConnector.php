@@ -119,15 +119,27 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
-        $startDate = date('Y-m-d', strtotime('-3 months')); 
-        $now = date('Y-m-d'); 
+        $db = \Pimcore\Db::get();
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(
+                DATE_FORMAT(MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderModifyDate')), '%d-%m-%Y')), '%Y-%m-%d'),
+                DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m-%d')
+            ) AS lastUpdatedAt
+            FROM iwa_marketplace_orders
+            WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+        echo "Last Updated At: $lastUpdatedAt\n";
+        if ($lastUpdatedAt) {
+            $threeMonthsAgo = date('Y-m-d', strtotime('-3 months'));
+            $startDate = max($threeMonthsAgo, $threeMonthsAgo); 
+        } else {
+            $startDate = date('Y-m-d', strtotime('-3 months')); 
+        }
         $modifiedStartDate = date('Y-m-d', strtotime('+2 weeks', strtotime($startDate)));
         $endDate = ($modifiedStartDate < $now) ? $modifiedStartDate : $now;
-        echo "Start Date: $startDate\n";
-        echo "End Date: $endDate\n";
 
-
-       $pageSize = 100;
+        $pageSize = 100;
         do {
             $page = 0;
             do {
@@ -148,22 +160,30 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     return;
                 }
                 print_r($response->getContent());
-                $page++;
-                $data = $response->toArray();
-                $totalElements = $data['orderListCount'];
-                $totalPages = $data['pageCount'];
-                echo "-----------------------------\n";
-                echo "Total Elements: $totalElements\n"; 
-                echo "Total Pages: $totalPages\n";
-                echo "Current Page: $page\n"; 
-                echo "Date Range: " . $startDate . " - " . $endDate . "\n"; 
-                echo "-----------------------------\n";
+                try {
+                    $data = $response->toArray();
+                    $orders = $data['supplierOrderListWithBranch'];
+                    $db->beginTransaction();
+                    foreach ($orders as $order) {
+                        $db->executeStatement(
+                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                            [
+                                $this->marketplace->getId(),
+                                $order['orderNumber'],
+                                json_encode($order)
+                            ]
+                        );
+                    }
+                    $db->commit();
+                } catch (\Exception $e) {
+                    $db->rollBack();
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
                 sleep(5);
             }while($page < $totalPages);
             $startDate = $endDate;
             $endDateCandidate = date('Y-m-d', strtotime($startDate . ' +2 weeks'));
             $endDate = ($endDateCandidate < $now) ? $endDateCandidate : $now;
-
             if ($startDate >= $now) {
                 break;
             }
