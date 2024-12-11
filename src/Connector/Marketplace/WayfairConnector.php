@@ -68,21 +68,76 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    /*public function sandboxTestings()
+    {
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareTokenSanbox();
+        }
+        $this->acceptDropshipOrdersSandbox();
+        $this->testEndpoint();
+        $this->getDropshipOrdersSandbox();  
+        $this->sendShipmentSandbox();
+        $this->saveInventorySandbox();
+        $this->getListingSandbox();
+    }*/
+
     public function download($forceDownload = false)
     {
-        /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareTokenSanbox();
-        }*/
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
-        //$this->acceptDropshipOrdersSandbox();
-        //$this->testEndpoint();
-        //$this->getDropshipOrdersSandbox();  
-        //$this->sendShipmentSandbox();
-        //$this->saveInventorySandbox();
-        //$this->getListingSandbox();
+
+        $query = <<<GRAPHQL
+        query supplierCatalog(
+            \$supplierId: Int!,
+            \$paginationOptions: PaginationOptions
+        ) {
+            supplierCatalog(
+                supplierId: \$supplierId,
+                paginationOptions: \$paginationOptions
+            ) {
+                supplierId
+                pageInfo {
+                    currentPage
+                    totalPages
+                    totalRecords
+                }
+                products {
+                    id
+                    name
+                    description
+                    price
+                    availability
+                }
+            }
+        }
+        GRAPHQL;
+
+        $variables = [
+            'supplierId' => 194115, 
+            'paginationOptions' => [
+                'page' => 1,  
+                'pageSize' => 10
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
+        ]);
+
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+       
     }
 
     public function testEndpoint()
