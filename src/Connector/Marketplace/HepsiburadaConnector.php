@@ -226,7 +226,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
          //   echo "Error: Currency conversion failed\n";
            // return;
        // }
-        echo "Final Price: $finalPrice\n";
+        //echo "Final Price: $finalPrice\n";
         /*$attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
         $hbsku = $attributes['hbSku'];
         $merchantSku = $attributes['merchantSku'];
