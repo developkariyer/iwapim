@@ -1,6 +1,7 @@
 from prophet import Prophet
 import pandas as pd
 import logging
+import math
 
 def generate_forecast(data, forecast_days=180):
     """
@@ -13,16 +14,21 @@ def generate_forecast(data, forecast_days=180):
     Returns:
         pd.DataFrame: A DataFrame containing the forecasted values with columns:
                       - 'ds': Date
-                      - 'yhat': Predicted sales
-                      - 'yhat_lower': Lower bound of prediction
-                      - 'yhat_upper': Upper bound of prediction
+                      - 'yhat': Predicted sales as an upper-rounded integer
     """
     if data.empty:
         raise ValueError("Input data is empty. Cannot generate a forecast.")
 
-    # Initialize the Prophet model
-    model = Prophet()
+    # Ensure sales data is non-zero and add a small constant if needed
+    data['y'] = data['y'].apply(lambda x: max(x, 0.1))
 
+    # Initialize the Prophet model
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=False)
+
+    # Add custom seasonality for Ramadan (approximately 354 days)
+    model.add_seasonality(name='Ramadan', period=354.37, fourier_order=5)
+
+    # Reduce verbosity of underlying logger
     cmdstanpy_logger = logging.getLogger("cmdstanpy")
     cmdstanpy_logger.setLevel(logging.WARNING)
     cmdstanpy_logger.propagate = False
@@ -32,10 +38,17 @@ def generate_forecast(data, forecast_days=180):
     # Fit the model on historical data
     model.fit(data)
 
+    # Create a dataframe for future dates
     future = model.make_future_dataframe(periods=forecast_days, freq='D')
 
+    # Predict future sales
     forecast = model.predict(future)
 
+    # Filter out only future predictions
     future_forecast = forecast[forecast['ds'] > pd.to_datetime(data['ds'].max())]
 
+    # Adjust negative predictions and round yhat to the nearest upper integer
+    future_forecast['yhat'] = future_forecast['yhat'].apply(lambda x: max(math.ceil(x), 1))
+
+    # Return only 'ds' and 'yhat'
     return future_forecast[['ds', 'yhat']]
