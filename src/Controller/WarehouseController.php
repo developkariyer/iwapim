@@ -45,11 +45,12 @@ class WarehouseController extends FrontendController
         $salesChannels = [];
         $asins = [];
         foreach ($sale_data as $data) {
+            $salesChannel = strtoupper(str_replace('Amazon.', '', $data['sales_channel']));
             if (!isset($asins[$data['asin']])) {
                 $asins[$data['asin']] = [];
             }
-            $asins[$data['asin']][] = $data['sales_channel'];
-            $salesChannels[$data['sales_channel']] = true;
+            $asins[$data['asin']][] = $salesChannel;
+            $salesChannels[$salesChannel] = true;
         }
 
         return $this->render('warehouse/chart_demo.html.twig', [

@@ -20,11 +20,14 @@
                 console.log('Badge clicked');
                 const warehouseId = $(this).data('warehouse');
                 const product = $(this).data('product');
+                const asin = $(this).data('asin');
+                const salesChannel = $(this).data('channel');
 
                 // Fetch data from the server
 //        $.getJSON(`/inventory/${warehouseId}`, function (data) {
                 //$.getJSON(`sales_dataset.json`, function (data) {
-                $.getJSON(`/warehouse/json/B08B59YMQJ/Amazon.com`, function (data) {
+//                $.getJSON(`/warehouse/json/B08B59YMQJ/Amazon.com`, function (data) {
+                $.getJSON(`/warehouse/json/${asin}/${salesChannel}`, function (data) {
                     // Populate modal with data
                     populateWarehouseModal(product, data);
 
@@ -250,7 +253,7 @@
                 {% for sales_channel in salesChannels %}
                     <td>
                         {% if sales_channel in channels %}
-                            ✓
+                            <span class="badge bg-success" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-asin="{{ asin }}" data-channel="Amazon.{{ sales_channel }}">✓</span>
                         {% else %}
                             -
                         {% endif %}
