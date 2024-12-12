@@ -215,6 +215,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             }
             echo "From date: $fromDate\n";
             echo "Orders downloaded: $ordersCount\n";
+            echo "Last date: $lastDate\n";
             $fromDate = $lastDate;
         }while($ordersCount === $limit);
     }
