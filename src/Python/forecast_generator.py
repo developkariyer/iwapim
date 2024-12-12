@@ -32,10 +32,10 @@ def generate_forecast(data, forecast_days=180):
     # Fit the model on historical data
     model.fit(data)
 
-    future = model.make_future_dataframe(periods=forecast_days, freq='D')  # Daily frequency
+    future = model.make_future_dataframe(periods=forecast_days, freq='D')
+
     forecast = model.predict(future)
 
-    forecast['ds'] = pd.to_datetime(forecast['ds'])
+    future_forecast = forecast[forecast['ds'] > data['ds'].max()]
 
-    #future = future[future['ds'] > data['ds'].max()]
-    return future[['ds', 'yhat']]
+    return future_forecast[['ds', 'yhat']]
