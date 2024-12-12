@@ -202,6 +202,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
         $limit = 200;
         $offset = 0;
+        echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
+        echo "Downloading orders...\n";
         do {
             do {
                 $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
