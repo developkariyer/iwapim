@@ -188,6 +188,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             $statusCode = $response->getStatusCode();
+            print_r($response->getContent());
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
                 break;
