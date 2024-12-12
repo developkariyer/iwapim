@@ -19,7 +19,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         'batchStatus' => "https://apis.ciceksepeti.com/api/v1/Products/batch-status/"
     ];
 
-    public static string $marketplaceType = 'Ciceksepeti';
+    public static $marketplaceType = 'Ciceksepeti';
     
     public function download($forceDownload = false)
     {        

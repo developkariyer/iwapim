@@ -7,7 +7,7 @@ use App\Utils\Utility;
 
 class OzonConnector extends MarketplaceConnectorAbstract
 {
-    public static string $marketplaceType = 'Ozon';
+    public static $marketplaceType = 'Ozon';
 
     public function getApiResponse($method = 'GET', $url, $query = [], $data = [])
     {

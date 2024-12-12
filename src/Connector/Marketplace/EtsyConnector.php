@@ -10,7 +10,7 @@ use Pimcore\Model\Element\DuplicateFullPathException;
 
 class EtsyConnector extends MarketplaceConnectorAbstract
 {
-    public static string $marketplaceType = 'Etsy';
+    public static $marketplaceType = 'Etsy';
 
     public function download($forceDownload = false): int
     {

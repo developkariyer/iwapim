@@ -8,7 +8,7 @@ use App\Utils\Utility;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
 {
-    public static string $marketplaceType = 'Shopify';
+    public static $marketplaceType = 'Shopify';
 
     private $apiUrl = null;
 
