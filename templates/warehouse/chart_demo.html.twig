@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charts in Hidden Cards</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const charts = {}; // Object to store Chart.js instances
+        let currentWarehouse = null; // Track the currently displayed warehouse
+
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip(); // Initialize tooltips
+
+            // Handle badge clicks
+            $('.badge').on('click', function () {
+                console.log('Badge clicked');
+                const warehouseId = $(this).data('warehouse');
+                const product = $(this).data('product');
+
+                // Fetch data from the server
+//        $.getJSON(`/inventory/${warehouseId}`, function (data) {
+                //$.getJSON(`sales_dataset.json`, function (data) {
+                $.getJSON(`/warehouse/json/B08B59YMQJ/Amazon.com`, function (data) {
+                    // Populate modal with data
+                    populateWarehouseModal(product, data);
+
+                    // Show the modal
+                    $('#warehouseModal').modal('show');
+                }).fail(function () {
+                    console.error(`Failed to load data for warehouse ${warehouseId}`);
+                });
+            });
+        });
+
+        // Populate warehouse card with dynamic data
+        function populateWarehouseModal(product, data) {
+            console.log(data);
+            $('#product-title').text(product);
+            //$('#warehouse-title').text(data.warehouse);
+
+            // Update stock status badge
+            const statusBadge = $('#stock-status');
+            if (data.stockStatus === 'danger') {
+                statusBadge.text(data.warehouse).removeClass().addClass('badge bg-danger position-absolute top-0 end-0 m-2');
+            } else if (data.stockStatus === 'warning') {
+                statusBadge.text(data.warehouse).removeClass().addClass('badge bg-warning position-absolute top-0 end-0 m-2');
+            } else {
+                statusBadge.text(data.warehouse).removeClass().addClass('badge bg-success position-absolute top-0 end-0 m-2');
+            }
+
+            // Update table values
+            $('#lastYearLast90').text(data.lastYearLast90);
+            $('#lastYearLast30').text(data.lastYearLast30);
+            $('#lastYearLast7').text(data.lastYearLast7);
+            $('#lastYearNext7').text(data.lastYearNext7);
+            $('#lastYearNext30').text(data.lastYearNext30);
+            $('#lastYearNext90').text(data.lastYearNext90);
+            $('#lastYearTotal').text(data.lastYearTotal);
+            $('#last90').text(data.last90);
+            $('#last30').text(data.last30);
+            $('#last7').text(data.last7);
+            $('#next7').text(data.next7);
+            $('#next30').text(data.next30);
+            $('#next90').text(data.next90);
+            $('#nextTotal').text(data.nextTotal);
+
+            // Update stock levels
+            $('#estimatedShipmentDays').text(data.estimatedShipmentDays);
+            $('#currentStock').text(data.currentStock);
+            $('#inboundStock').text(data.inboundStock);
+            $('#outboundStock').text(data.outboundStock);
+            $('#availableStock').text(data.availableStock);
+            $('#forecastedStock').text(data.forecastedStock);
+
+            // Render the chart
+            const ctx = document.getElementById('chart1').getContext('2d');
+            if (charts['chart1']) {
+                charts['chart1'].destroy();
+            }
+            charts['chart1'] = createChart(ctx, data);
+        }
+
+        function createChart(ctx, data) {
+            const annotations = [
+                { label: "", index: data.xAxisLabels.indexOf("Week 26"), color: "black" },
+                { label: "-7", index: data.xAxisLabels.indexOf("Week 25"), color: "rgba(0, 0, 0, 0.7)" },
+                { label: "-30", index: data.xAxisLabels.indexOf("Week 22"), color: "rgba(0, 0, 0, 0.4)" },
+                { label: "-90", index: data.xAxisLabels.indexOf("Week 17"), color: "rgba(0, 0, 0, 0.1)" },
+                { label: "+7", index: data.xAxisLabels.indexOf("Week 27"), color: "rgba(0, 0, 0, 0.7)" },
+                { label: "+30", index: data.xAxisLabels.indexOf("Week 30"), color: "rgba(0, 0, 0, 0.4)" },
+                { label: "+90", index: data.xAxisLabels.indexOf("Week 35"), color: "rgba(0, 0, 0, 0.1)" },
+            ];
+
+            const annotationConfig = annotations.map(item => [
+                {
+                    type: 'line',
+                    xMin: item.index,
+                    xMax: item.index,
+                    yMin: 0,
+                    borderColor: item.color,
+                    borderWidth: 2,
+                },
+                {
+                    type: 'label',
+                    xValue: item.index,
+                    yValue: '95%',
+                    rotation: 90,
+                    textAlign: "center",
+                    content: item.label,
+                    color: "black",
+                    font: {
+                        size: 12,
+                    },
+                }
+            ]).flat();
+
+            const datasets = [
+                {
+                    type: 'line',
+                    label: "Önceki Yıl Tarihler",
+                    data: data.previousYearData,
+                    borderColor: "gray",
+                    backgroundColor: "rgba(128, 128, 128, 0.3)",
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                },
+                {
+                    label: "Son 6 Ay",
+                    data: data.currentData,
+                    borderColor: "green",
+                    backgroundColor: "rgba(0, 128, 0, 0.3)",
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                },
+                {
+                    label: "Gelecek 6 Ay",
+                    data: data.forecastedData,
+                    borderColor: "blue",
+                    backgroundColor: "rgba(0, 0, 255, 0.3)",
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                },
+            ];
+
+            // Chart creation
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.xAxisLabels,
+                    datasets: datasets,
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { enabled: true },
+                        annotation: {
+                            annotations: Object.fromEntries(annotationConfig.map((a, i) => [`line${i}`, a])),
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: { display: false },
+                            grid: { display: false },
+                        },
+                        y: {
+                            min: 0,
+                            position: 'left',
+                            stacked: false,
+                            ticks: { display: true, align: 'right' },
+                            grid: { display: true },
+                        },
+                    }
+                }
+            });
+        }
+
+    </script>
+    <style>
+        canvas {
+            width: 100% !important;
+            height: 200px !important;
+        }
+
+        .badge {
+            cursor: pointer;
+        }
+
+        .product-card {
+            border-radius: 8px 0 0 8px;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .product-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .badge-group {
+            height: 100px;
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-rows: repeat(4, auto);
+            direction: rtl;
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .product-card img {
+                display: none; /* Hide image on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container my-4">
+
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+    <!-- First Product Card -->
+    <div class="card product-card w-100 mt-3 position-relative">
+        <div class="row g-0 align-items-top h-100">
+            <div class="col-auto">
+                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col">
+                <div class="card-body">
+                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
+                    <span class="small text-muted">
+                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
+                        </span>
+                </div>
+            </div>
+            <!-- Badge Group -->
+            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
+                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
+                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
+                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="warehouseModal" tabindex="-1" aria-labelledby="warehouseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="product-title">Warehouse Title</h5>
+                    <div class="badge bg-danger position-absolute top-50 start translate-middle" id="stock-status">Danger</div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <canvas id="chart1"></canvas>
+                            <div class="table-responsive mt-4">
+                                <table class="table table-bordered text-center mb-0" style="font-size: 0.85rem;">
+                                    <colgroup>
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                        <col style="width: 12.5%;">
+                                    </colgroup>
+                                    <tbody>
+                                    <tr>
+                                        <th class="bg-black text-white py-0 px-2"></th>
+                                        <th class="bg-black text-white py-0 px-2">-90</th>
+                                        <th class="bg-black text-white py-0 px-2">-30</th>
+                                        <th class="bg-black text-white py-0 px-2">-7</th>
+                                        <th class="bg-black text-white py-0 px-2">+7</th>
+                                        <th class="bg-black text-white py-0 px-2">+30</th>
+                                        <th class="bg-black text-white py-0 px-2">+90</th>
+                                        <th class="bg-black text-white py-0 px-2">Top</th>
+                                    </tr>
+                                    <!-- First Row: Last Year Values -->
+                                    <tr>
+                                        <th class="bg-black text-white py-0 px-2">Ö.Yıl</th>
+                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast90"></td>
+                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast30"></td>
+                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast7"></td>
+                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext7"></td>
+                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext30"></td>
+                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext90"></td>
+                                        <th class="bg-black text-white py-0 px-2" id="lastYearTotal"></th>
+                                    </tr>
+                                    <!-- Second Row: Current Year and Forecast Values -->
+                                    <tr>
+                                        <th class="bg-black text-white py-0 px-2">B.Yıl</th>
+                                        <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last90"></td>
+                                        <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last30"></td>
+                                        <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last7"></td>
+                                        <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next7"></td>
+                                        <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next30"></td>
+                                        <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next90"></td>
+                                        <th class="bg-black text-white py-0 px-2" id="nextTotal"></th>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 d-flex flex-column align-items-center justify-content-center">
+                            <button type="button" class="btn btn-sm btn-outline-secondary w-100 mb-2" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
+                            <form class="w-100">
+                                <table class="table table-bordered text-center mb-0 w-100" style="font-size: 0.85rem;">
+                                    <colgroup>
+                                        <col style="width: 50%;">
+                                        <col style="width: 50%;">
+                                    </colgroup>
+                                    <tbody>
+                                    <tr>
+                                        <th class="py-0 px-2">Buffer Days</th>
+                                        <th class="py-0 px-2">Forecast*</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-0 px-2" id="estimatedShipmentDays">7 gün</td>
+                                        <td class="py-0 px-2" id="forecastedStock">170</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="py-0 px-2">Inbound</th>
+                                        <th class="py-0 px-2">Outbound</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-0 px-2" id="inboundStock">150</td>
+                                        <td class="py-0 px-2" id="outboundStock">50</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="py-0 px-2">In Stock</th>
+                                        <th class="py-0 px-2">Available</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-0 px-2" id="currentStock">450</td>
+                                        <td class="py-0 px-2" id="availableStock">400</td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="2" class="bg-black text-white py-0 px-2">AI Suggestion **</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="py-0 px-2">Produce</th>
+                                        <th class="py-0 px-2">Send</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-0 px-2" id="productionAdvice">450</td>
+                                        <td class="py-0 px-2" id="shipmentAdvice">400</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row text-center">
+                                    <div class="col-12 mt-2">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">İşlem</button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="#">Üret</a></li>
+                                                <li><a class="dropdown-item" href="#">Gönder</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <p class="mb-0 mt-1 text-muted lh-1" style="font-size: 0.6rem !important;">
+                        Grafikte kırmızı çizgi bugünü, sağı ve solu ise 182 günü gösterir. Gri çizgi önceki 547-182 arası, yeşil çizgi önceki 182-1 arası, mavi çizgi sonraki (tahmini) 1-182 arası satışlardır.<br>
+                        * Forecast değeri Buffer süresi sonundaki tahmini stok seviyesidir. | ** AI tavsiyesi "Üret" veya "Gönder" şeklinde ayrı ayrı dikkate alınmalıdır.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+</body>
+</html>

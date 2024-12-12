@@ -35,6 +35,14 @@ class WarehouseController extends FrontendController
     }
 
     /**
+     * @Route("/warehouse/chart", name="chart_demo")
+     */
+    public function chartDemoAction(): Response
+    {
+        return $this->render('warehouse/chart_demo.html.twig');
+    }
+
+    /**
      * @Route("/warehouse/json/{asin}/{sales_channel}", name="sales_data")
      * @throws Exception
      * @throws \DateMalformedStringException
@@ -111,6 +119,8 @@ class WarehouseController extends FrontendController
             }
             $response['forecastedData'][$week - 53] += (int) $data['total_quantity'];
         }
+
+        $response['currentData'][27] = $response['forecastedData'][27];
 
         return $this->json($response);
     }
