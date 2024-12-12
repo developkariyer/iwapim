@@ -45,7 +45,6 @@ def fetch_pairs(yaml_path):
         FROM iwa_amazon_daily_sales_summary
         WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
           AND sale_date < CURDATE()
-        LIMIT 1
         """
 
         df = pd.read_sql(query, engine)
