@@ -485,6 +485,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "Error: " . $e->getMessage();
         }
     }
+
     protected function processVariantOrderData(): void
     {
         if (empty($this->marketplaceListWithIds)) {
@@ -492,6 +493,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
+            echo "Processing $marketplaceType\n";
             $values = $this->fetchVariantInfo($marketplaceType);
             $index = 0;
             foreach ($values as $row) {
