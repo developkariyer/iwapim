@@ -45,7 +45,7 @@ def run_forecast_pipeline(yaml_path):
             # Step 3: Fetch historical sales data
             data = fetch_data(asin, sales_channel, yaml_path)
 
-            if data.empty:
+            if data.empty or data.dropna().shape[0] < 2:
                 continue
 
             # Step 4: Generate forecast
