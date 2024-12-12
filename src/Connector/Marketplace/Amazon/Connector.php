@@ -3,8 +3,7 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use Exception;
-use JsonException;
-use Pimcore\Model\Element\DuplicateFullPathException;
+use Pimcore\Model\DataObject\VariantProduct;
 use SellingPartnerApi\Seller\SellerConnector;
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
@@ -23,7 +22,7 @@ use App\Utils\Utility;
 
 class Connector extends MarketplaceConnectorAbstract
 {
-    public static string $marketplaceType = 'Amazon';
+    public static $marketplaceType = 'Amazon';
 
     public ReportsHelper $reportsHelper;
     public ListingsHelper $listingsHelper;
@@ -71,9 +70,6 @@ class Connector extends MarketplaceConnectorAbstract
         );
     }
 
-    /**
-     * @throws JsonException
-     */
     public function download($forceDownload = false): void
     {
         $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
@@ -87,10 +83,6 @@ class Connector extends MarketplaceConnectorAbstract
         }
     }
 
-    /**
-     * @throws DuplicateFullPathException
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
@@ -102,20 +94,23 @@ class Connector extends MarketplaceConnectorAbstract
         $this->importHelper->import($updateFlag, $importFlag);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function downloadOrders(): void
     {
         $this->ordersHelper->downloadOrders();
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function downloadInventory(): void
     {
         $this->inventoryHelper->downloadInventory();
     }
 
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+
+    }
 }

@@ -23,9 +23,9 @@ use App\Utils\Utility;
 
 class PrepareOrderTableCommand extends AbstractCommand
 {
-    private $marketplaceListWithIds = [];
+    private array $marketplaceListWithIds = [];
 
-    protected function configure() 
+    protected function configure(): void
     {
         $this
             ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_orders to iwa_marketplace_orders_line_items')
@@ -56,7 +56,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return Command::SUCCESS;
     }
     
-    protected function extraColumns()
+    protected function extraColumns(): void
     {
         echo "Set Marketplace key\n";
         $this->setMarketplaceKey();
@@ -87,7 +87,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Complated is Cancelled\n";
     }
         
-    protected function transferOrders()
+    protected function transferOrders(): void
     {
         if (empty($this->marketplaceListWithIds)) {
             $this->marketplaceList();
@@ -105,14 +105,16 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
                     'Bol.com' => $this->transferOrdersFromBolcom($id,$marketplaceType),
                     'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType),
-                    'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType)
+                    'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType),
+                    'Takealot' => $this->transferOrdersTakealot($id,$marketplaceType),
+                    default => null,
                 };
                 echo "Complated: $marketplaceType\n";
             }
         }
     }
 
-    protected static function transferOrdersAmazon($marketPlaceId,$marketplaceType)
+    protected function transferOrdersAmazon($marketPlaceId, $marketplaceType): void
     {
         $amazonSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
@@ -178,7 +180,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersEtsy($marketPlaceId,$marketplaceType)
+    protected function transferOrdersEtsy($marketPlaceId, $marketplaceType): void
     {
         $etsySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
@@ -243,7 +245,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersTrendyol($marketPlaceId,$marketplaceType)
+    protected function transferOrdersTrendyol($marketPlaceId, $marketplaceType): void
     {
         $trendyolSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
@@ -305,7 +307,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersFromShopify($marketPlaceId,$marketplaceType)
+    protected function transferOrdersFromShopify($marketPlaceId, $marketplaceType): void
     {
         $shopifySql = "
             INSERT INTO iwa_marketplace_orders_line_items (
@@ -381,7 +383,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function transferOrdersFromBolcom($marketPlaceId,$marketplaceType)
+    protected function transferOrdersFromBolcom($marketPlaceId, $marketplaceType): void
     {
         $bolcomSql = "
         INSERT INTO iwa_marketplace_orders_line_items (
@@ -436,7 +438,55 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function processVariantOrderData()
+    protected function transferOrdersTakealot($marketPlaceId, $marketplaceType): void
+    {
+        $takealotSql = "
+            INSERT INTO iwa_marketplace_orders_line_items (
+                marketplace_type, marketplace_id, created_at, order_id, product_id, variant_id, price, 
+                currency, quantity, variant_title, fulfillments_status, tracking_company
+            )
+            SELECT
+                '$marketplaceType',
+                '$marketPlaceId',
+                DATE_FORMAT(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_date')), '%d %b %Y %H:%i:%s'), '%Y-%m-%d %H:%i:%s') AS created_at,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_id')) AS order_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_item_id')) AS product_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) AS variant_id,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.selling_price')) AS price,
+                'ZAR' AS currency,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.quantity')) AS quantity,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.product_title')) AS variant_title,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.sale_status')) AS fulfillments_status,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.dc')) AS tracking_company
+            FROM
+                iwa_marketplace_orders
+            WHERE
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) IS NOT NULL
+                AND JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) != 'null'
+                AND JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) != ''
+                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) AS UNSIGNED) > 0
+                AND marketplace_id = $marketPlaceId
+            ON DUPLICATE KEY UPDATE
+                marketplace_type = VALUES(marketplace_type),
+                marketplace_id = VALUES(marketplace_id),
+                created_at = VALUES(created_at),
+                product_id = VALUES(product_id),
+                variant_id = VALUES(variant_id),
+                price = VALUES(price),
+                currency = VALUES(currency),
+                quantity = VALUES(quantity),
+                variant_title = VALUES(variant_title),
+                fulfillments_status = VALUES(fulfillments_status),
+                tracking_company = VALUES(tracking_company);";
+        try {
+            $db = \Pimcore\Db::get();
+            $db->query($takealotSql);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
+    protected function processVariantOrderData(): void
     {
         if (empty($this->marketplaceListWithIds)) {
             $this->marketplaceList();
@@ -453,7 +503,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function fetchVariantInfo($marketplaceType)
+    protected function fetchVariantInfo($marketplaceType): array
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -468,7 +518,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return $values;
     }
 
-    protected static function getTrendyolVariantProduct($uniqueMarketplaceId)
+    protected function getTrendyolVariantProduct($uniqueMarketplaceId)
     {
         $sql = "
             SELECT object_id
@@ -487,7 +537,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getShopifyVariantProduct($uniqueMarketplaceId)
+    protected function getShopifyVariantProduct($uniqueMarketplaceId)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
@@ -497,7 +547,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getBolcomVariantProduct($uniqueMarketplaceId)
+    protected function getBolcomVariantProduct($uniqueMarketplaceId)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
@@ -520,7 +570,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getEtsyVariantProduct($uniqueMarketplaceId)
+    protected function getEtsyVariantProduct($uniqueMarketplaceId)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
@@ -530,7 +580,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function getAmazonVariantProduct($uniqueMarketplaceId)
+    protected function getAmazonVariantProduct($uniqueMarketplaceId)
     {
         $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         if ($variantProduct) {
@@ -540,7 +590,17 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected static function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
+    protected function getTakealotVariantProduct($uniqueMarketplaceId)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
+    }
+
+    protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
             'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
@@ -548,6 +608,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
             'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
             'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
+            'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
@@ -605,7 +666,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected static function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
+    protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
@@ -613,6 +674,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         
         $stmt = $db->prepare($sql);
+        /** @var TYPE_NAME $stmt */
         $stmt->execute([
             ':iwasku' => $iwasku,
             ':identifier' => $identifier,
@@ -1301,4 +1363,5 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         }
     }
+
 }

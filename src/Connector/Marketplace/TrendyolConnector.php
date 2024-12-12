@@ -10,7 +10,7 @@ use App\Utils\Utility;
 
 class TrendyolConnector extends MarketplaceConnectorAbstract
 {
-    public static string $marketplaceType = 'Trendyol';
+    public static $marketplaceType = 'Trendyol';
 
     public function download($forceDownload = false)
     {

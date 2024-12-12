@@ -13,7 +13,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         'loginTokenUrl' => "https://auth.ebay.com/oauth2/authorize"
     ];
 
-    public static string $marketplaceType = 'Ebay';
+    public static $marketplaceType = 'Ebay';
 
     protected function getConsentRequest()
     {
@@ -57,6 +57,14 @@ class EbayConnector extends MarketplaceConnectorAbstract
         
     }
 
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
 
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+
+    }
 
 }

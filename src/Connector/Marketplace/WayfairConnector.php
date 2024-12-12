@@ -5,18 +5,23 @@ namespace App\Connector\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class WayfairConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
-        'orders' => 'https://sandbox.api.wayfair.com/v1/graphql',
-        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql'
+        'sandbox' => 'https://sandbox.api.wayfair.com/v1/graphql',
+        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql',
+        'prod' => 'https://api.wayfair.com/v1/graphql',
     ];
-    public static string $marketplaceType = 'Wayfair';
+    public static $marketplaceType = 'Wayfair';
     public static $expires_in;
 
-    public function prepareTokenSanbox()
+    public function prepareTokenSandbox(): void
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
@@ -42,7 +47,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function prepareTokenProd()
+    public function prepareTokenProd(): void
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
@@ -81,13 +86,12 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $this->getListingSandbox();
     }*/
 
-    public function download($forceDownload = false)
+    public function download($forceDownload = false): void
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+        /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
-
         $query = <<<GRAPHQL
         query supplierCatalog(
             \$supplierId: Int!,
@@ -104,7 +108,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             }
         }
         GRAPHQL;
-
         $variables = [
             'supplierId' => 194115, 
             'paginationOptions' => [
@@ -122,15 +125,102 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-
-
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
-        print_r($response->getContent());
-       
+        print_r($response->getContent());*/
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \Exception
+     */
+    public function downloadOrders(): void
+    {
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareTokenProd();
+        }
+        $db = \Pimcore\Db::get();
+        $fromDate = "2024-05-01T00:00:00Z";
+        $limit = 200;
+        do {
+            $query = <<<GRAPHQL
+            query getDropshipPurchaseOrders {
+                getDropshipPurchaseOrders(
+                    limit: $limit,
+                    sortOrder: ASC,
+                    fromDate: "$fromDate"
+                ) {
+                    poNumber,
+                    poDate,
+                    estimatedShipDate,
+                    customerName,
+                    customerAddress1,
+                    customerAddress2,
+                    customerCity,
+                    customerState,
+                    customerPostalCode,
+                    orderType,
+                    shippingInfo {
+                        shipSpeed,
+                        carrierCode
+                    },
+                    packingSlipUrl,
+                    warehouse {
+                        id,
+                        name
+                    },
+                    products {
+                        partNumber,
+                        quantity,
+                        price,
+                        event {
+                            startDate,
+                            endDate
+                        }
+                    }
+                }
+            }
+            GRAPHQL;
+            $response = $this->httpClient->request('POST',static::$apiUrl['prod'], [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => ['query' => $query]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            }
+            try {
+                $data = $response->toArray();
+                $orders = $data['data']['getDropshipPurchaseOrders'];
+                $ordersCount = count($orders);
+                $lastDate = $orders[$ordersCount - 1]['poDate'];
+                $db->beginTransaction();
+                foreach ($orders as $order) {
+                    $db->executeStatement(
+                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        [
+                            $this->marketplace->getId(),
+                            $order['poNumber'],
+                            json_encode($order)
+                        ]
+                    );
+                }
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            echo "From date: $fromDate\n";
+            echo "Orders downloaded: $ordersCount\n";
+            $fromDate = $lastDate;
+        }while($ordersCount === $limit);
+    }
     public function testEndpoint()
     {
         $response = $this->httpClient->request('GET', 'https://sandbox.api.wayfair.com/v1/demo/clock',[
@@ -190,8 +280,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-
-
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
@@ -591,11 +679,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     {
        
     }
-
-    public function downloadOrders()
-    {
-        
-    }
     
     public function downloadInventory()
     {
@@ -604,7 +687,12 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
     {
-        
+
     }
-   
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+
+    }
+
 }

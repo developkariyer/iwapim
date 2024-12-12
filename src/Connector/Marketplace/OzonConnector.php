@@ -7,7 +7,7 @@ use App\Utils\Utility;
 
 class OzonConnector extends MarketplaceConnectorAbstract
 {
-    public static string $marketplaceType = 'Ozon';
+    public static $marketplaceType = 'Ozon';
 
     public function getApiResponse($method = 'GET', $url, $query = [], $data = [])
     {
@@ -115,6 +115,16 @@ class OzonConnector extends MarketplaceConnectorAbstract
         $response = $this->getApiResponse('POST', "https://api-seller.ozon.ru/v1/description-category/tree", [], ['language' => 'EN']);
         Utility::setCustomCache('CATEGORY_TREE.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($response, JSON_PRETTY_PRINT));
         return $response;
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+
     }
 
 }
