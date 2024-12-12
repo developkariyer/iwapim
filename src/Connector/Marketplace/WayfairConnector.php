@@ -5,15 +5,19 @@ namespace App\Connector\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class WayfairConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
-        'orders' => 'https://sandbox.api.wayfair.com/v1/graphql',
+        'sandbox' => 'https://sandbox.api.wayfair.com/v1/graphql',
         'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql'
     ];
-    public static string $marketplaceType = 'Wayfair';
+    public static $marketplaceType = 'Wayfair';
     public static $expires_in;
 
     public function prepareTokenSanbox()
@@ -87,7 +91,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
-
         $query = <<<GRAPHQL
         query supplierCatalog(
             \$supplierId: Int!,
@@ -104,7 +107,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             }
         }
         GRAPHQL;
-
         $variables = [
             'supplierId' => 194115, 
             'paginationOptions' => [
@@ -122,13 +124,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-
-
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
-       
     }
 
     public function testEndpoint()
@@ -190,8 +189,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-
-
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
