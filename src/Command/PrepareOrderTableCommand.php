@@ -485,7 +485,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             echo "Error: " . $e->getMessage();
         }
     }
-    protected function processVariantOrderData()
+    protected function processVariantOrderData(): void
     {
         if (empty($this->marketplaceListWithIds)) {
             $this->marketplaceList();
@@ -502,7 +502,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function fetchVariantInfo($marketplaceType)
+    protected function fetchVariantInfo($marketplaceType): array
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -589,14 +589,25 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
+    protected function getTakealotVariantProduct($uniqueMarketplaceId)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
+    }
+
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
-            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
-            'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
+            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
+            //'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            //'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            //'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            //'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
+            'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
