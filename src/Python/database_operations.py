@@ -105,7 +105,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, sale_date, total_quantity, data_source)
         VALUES (:asin, :sales_channel, :sale_date, :total_quantity, :data_source)
         ON DUPLICATE KEY UPDATE
-            total_quantity = VALUES(total_quantity),
+            total_quantity = VALUES(total_quantity)
         """)
 
         # Execute batch insert/update

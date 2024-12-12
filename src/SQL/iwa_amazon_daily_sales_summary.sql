@@ -114,7 +114,7 @@ SELECT
     a.sales_channel,
     b.generated_date AS sale_date,
     IFNULL(d.total_quantity, 0) AS total_quantity,
-    IF(d.total_quantity IS NULL, 0, 1) AS data_source -- 0 indicates forecasted or missing data
+    1 AS data_source -- 0 indicates forecasted or missing data
 FROM
     temp_expanded_asin_sales_channel a
         CROSS JOIN
