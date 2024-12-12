@@ -207,7 +207,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $data = $response->toArray();
                 $orders = $data['list']['elements'];
                 $db->beginTransaction();
-                foreach ($orders as $order) {
+                foreach ($orders as $key => $order) {
+                    echo "Key: $key\n";
+                    print_r($order);
+                }
+                /*foreach ($orders as $order) {
                     print_r($order['purchaseOrderId']);
                     $db->executeStatement(
                         "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
@@ -217,7 +221,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                             json_encode($order)
                         ]
                     );
-                }
+                }*/
                 $db->commit();
             } catch (\Exception $e) {
                 $db->rollBack();
