@@ -253,7 +253,7 @@
                 {% for sales_channel in salesChannels %}
                     <td>
                         {% if channels[sales_channel] is defined %}
-                            <span class="badge bg-success" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-asin="{{ asin }}" data-channel="Amazon.{{ sales_channel }}">channels[sales_channel]</span>
+                            <span class="badge bg-success" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-asin="{{ asin }}" data-channel="Amazon.{{ sales_channel }}">{{ channels[sales_channel] }}</span>
                         {% else %}
                             -
                         {% endif %}
