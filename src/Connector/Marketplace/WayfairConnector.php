@@ -88,7 +88,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false): void
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+        /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
@@ -128,7 +128,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to get orders: ' . $response->getContent(false));
         }
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
 
     /**
@@ -144,7 +144,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         query getDropshipPurchaseOrders {
             getDropshipPurchaseOrders(
                 limit: 5,
-                sortOrder: DESC
+                sortOrder: ASC
             ) {
                 poNumber,
                 poDate,
