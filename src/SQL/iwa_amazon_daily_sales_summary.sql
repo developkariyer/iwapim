@@ -47,7 +47,8 @@ WITH RECURSIVE
 (
 ), INTERVAL 80 WEEK) -- Past 80 weeks
     GROUP BY
-    asin, sales_channel, sale_date)
+    asin, sales_channel, sale_date
+    )
 SELECT asin,
        sales_channel,
        sale_date,
