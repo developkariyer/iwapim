@@ -215,8 +215,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     ],
                     'query' => [
                         'limit' => $limit,
-                        'createdStartDate' => $startDate,
-                        'createdEndDate' => $endDate
+                        'offset' => $offset,
+                        'createdStartDate' =>date('Y-m-d', $startDate),
+                        'createdEndDate' => date('Y-m-d', $endDate)
                     ]
                 ]);
                 $statusCode = $response->getStatusCode();
