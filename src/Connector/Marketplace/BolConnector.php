@@ -2,16 +2,22 @@
 
 namespace App\Connector\Marketplace;
 
-use Symfony\Component\HttpClient\HttpClient;
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
+use Pimcore\Model\DataObject\Folder;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
-use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
-use App\Connector\Marketplace\MarketplaceConnectorAbstract;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class BolConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'loginTokenUrl' => "https://login.bol.com/token?grant_type=client_credentials",
         'offerExportUrl' => "/retailer/offers/export/",
         'processStatusUrl' => "/shared/process-status/",
@@ -21,9 +27,16 @@ class BolConnector extends MarketplaceConnectorAbstract
         'orders' => "/retailer/orders/",
         "offers" => "/retailer/offers/"
     ];
-    public static $marketplaceType = 'Bol.com';
+    public static string $marketplaceType = 'Bol.com';
 
-    protected function prepareToken()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws \Exception
+     */
+    protected function prepareToken(): void
     {
         if (!Utility::checkJwtTokenValidity($this->marketplace->getBolJwtToken())) {
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
@@ -48,6 +61,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         ]);
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \Exception
+     */
     protected function requestOfferReport()
     {
         $this->prepareToken();
@@ -62,6 +82,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         return $decodedResponse;
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \Exception
+     */
     protected function reportStatus($decodedResponse)
     {
         $this->prepareToken();
@@ -76,27 +103,30 @@ class BolConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get offer report from Bol.com');
             }
             $decodedResponse = json_decode($response->getContent(), true);
-            switch ($decodedResponse['status'] ?? '') {
-                case 'SUCCESS':
-                    $status = true;
-                    break;
-                case 'PENDING':
-                    $status = false;
-                    break;
-                default: throw new \Exception('Failed to get offer report from Bol.com: '. $response->getContent());
-            }
+            $status = match ($decodedResponse['status'] ?? '') {
+                'SUCCESS' => true,
+                'PENDING' => false,
+                default => throw new \Exception('Failed to get offer report from Bol.com: ' . $response->getContent()),
+            };
         }
         if (empty($decodedResponse['entityId'])) {
             throw new \Exception('Failed to get offer report from Bol.com.');
         }
-        return $decodedResponse['entityId'] ?? [];
+        return $decodedResponse['entityId'];
     }
 
-    protected function downloadOfferReport($forceDownload = false)
+    /**
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Exception
+     */
+    public function downloadOfferReport($forceDownload = false): string
     {
         $this->prepareToken();
         $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
-        if ($report === false || $forceDownload) {
+        if (!$report || $forceDownload) {
             echo "Requesting offer report from Bol.com\n";
             $entityId = $this->reportStatus($this->requestOfferReport());
             $response = $this->httpClient->request('GET', static::$apiUrl['offerExportUrl'] . $entityId, ['headers' => ['Accept' => 'application/vnd.retailer.v10+csv']]);
@@ -111,6 +141,12 @@ class BolConnector extends MarketplaceConnectorAbstract
         return $report;
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
     protected function downloadExtra($apiEndPoint, $type, $parameter, $query = [])
     {
         $this->prepareToken();
@@ -124,7 +160,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         return json_decode($response->getContent(), true);
     }
 
-    protected function getListings($report)
+    /**
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    protected function getListings($report): void
     {
         $rows = array_map('str_getcsv', explode("\n", trim($report)));
         $headers = array_shift($rows);
@@ -149,7 +191,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    protected function getAttribute($listing, $id)
+    protected function getAttribute($listing, $id): string
     {
         $retval = '';
         if (!is_array($id)) {
@@ -172,7 +214,10 @@ class BolConnector extends MarketplaceConnectorAbstract
         return trim($retval);
     }
 
-    protected function getFolder($listing)
+    /**
+     * @throws DuplicateFullPathException
+     */
+    protected function getFolder($listing): ?Folder
     {
         $folder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
@@ -204,7 +249,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         return $folder;
     }
 
-    public function download($forceDownload = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function download($forceDownload = false): void
     {   
         $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
@@ -217,7 +268,11 @@ class BolConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -250,10 +305,18 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function downloadOrders()
+    /**
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     * @throws TransportExceptionInterface
+     */
+    public function downloadOrders(): void
     {
         $this->prepareToken();
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $now = strtotime('now');
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
@@ -348,7 +411,15 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
         $this->prepareToken();
         if (!$listing instanceof VariantProduct) {
@@ -378,7 +449,16 @@ class BolConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($data));
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
         $this->prepareToken();
         if (!$listing instanceof VariantProduct) {

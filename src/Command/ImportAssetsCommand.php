@@ -2,8 +2,11 @@
 
 namespace App\Command;
 
+use FilesystemIterator;
 use Pimcore\Model\Asset;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\Element\DuplicateFullPathException;
+use RecursiveDirectoryIterator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,10 +27,13 @@ class ImportAssetsCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    private function importAssets(string $sourceDir, string $targetDir)
+    /**
+     * @throws DuplicateFullPathException
+     */
+    private function importAssets(string $sourceDir, string $targetDir): void
     {
         $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($sourceDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            new RecursiveDirectoryIterator($sourceDir, FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
@@ -35,7 +41,7 @@ class ImportAssetsCommand extends AbstractCommand
             $relativePath = str_replace($sourceDir, '', $file->getPathname());
 
             // Skip files in _default_upload_bucket
-            if (strpos($relativePath, '_default_upload_bucket') !== false) {
+            if (str_contains($relativePath, '_default_upload_bucket')) {
                 continue;
             }
 

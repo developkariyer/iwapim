@@ -22,7 +22,8 @@ INSERT INTO iwa_assistant_product (
     packageDimension3,
     packageWeight
 )
-SELECT 
+
+SELECT
     o.id,
     o.parentId,
     p.iwasku,

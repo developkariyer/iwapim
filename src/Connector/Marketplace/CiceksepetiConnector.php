@@ -5,6 +5,11 @@ namespace App\Connector\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
@@ -13,8 +18,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         'updateInventoryPrice' => "https://apis.ciceksepeti.com/api/v1/Products/price-and-stock",
         'batchStatus' => "https://apis.ciceksepeti.com/api/v1/Products/batch-status/"
     ];
-    
-    public static $marketplaceType = 'Ciceksepeti';
+
+    public static string $marketplaceType = 'Ciceksepeti';
     
     public function download($forceDownload = false)
     {        
@@ -388,7 +393,14 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/UpdateSku', json_encode($response));
     }*/
 
-    public function getBatchRequestResult($batchId)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function getBatchRequestResult($batchId): array
     {
         $url = static::$apiUrl['batchStatus'] . $batchId;
         $response = $this->httpClient->request('GET', $url, [
@@ -399,10 +411,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
-            return;
+            return [];
         }
-        $data = $response->toArray();
-        return $data;
+        return $response->toArray();
     }
 
 }

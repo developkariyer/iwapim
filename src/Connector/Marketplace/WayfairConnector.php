@@ -13,7 +13,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         'orders' => 'https://sandbox.api.wayfair.com/v1/graphql',
         'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql'
     ];
-    public static $marketplaceType = 'Wayfair';
+    public static string $marketplaceType = 'Wayfair';
     public static $expires_in;
 
     public function prepareTokenSanbox()

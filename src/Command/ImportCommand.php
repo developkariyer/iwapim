@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use Pimcore\Model\DataObject\VariantProduct;
+use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -34,27 +34,25 @@ use App\Connector\IwabotConnector;
 )]
 class ImportCommand extends AbstractCommand
 {
-    private static $downloadFlag = false;
-    private static $importFlag = false;
-    private static $updateFlag = false;
-    private static $ordersFlag = false;
-    private static $inventoryFlag = false;
-    private static $resetVariantsFlag = null;
-    private static $marketplaceArg = null;
-    private static $amazonFlag = false;
-    private static $etsyFlag = false;
-    private static $shopifyFlag = false;
-    private static $trendyolFlag = false;
-    private static $allFlag = false;
-    private static $bolcomFlag = false;
-    private static $ebayFlag = false;
-    private static $takealotFlag = false;
-    private static $wallmartFlag = false;
-    private static $ciceksepetiFlag = false;
-    private static $hepsiburadaFlag = false;    
-    private static $wayfairFlag = false;
-    private static $ozonFlag = false;
-    private static $itemCodes = [];
+    private static bool $downloadFlag = false;
+    private static bool $importFlag = false;
+    private static bool $updateFlag = false;
+    private static bool $ordersFlag = false;
+    private static bool $inventoryFlag = false;
+    private static array $marketplaceArg = [];
+    private static bool $amazonFlag = false;
+    private static bool $etsyFlag = false;
+    private static bool $shopifyFlag = false;
+    private static bool $trendyolFlag = false;
+    private static bool $allFlag = false;
+    private static bool $bolcomFlag = false;
+    private static bool $ebayFlag = false;
+    private static bool $takealotFlag = false;
+    private static bool $wallmartFlag = false;
+    private static bool $ciceksepetiFlag = false;
+    private static bool $hepsiburadaFlag = false;
+    private static bool $wayfairFlag = false;
+    private static bool $ozonFlag = false;
 
     private EventDispatcherInterface $eventDispatcher;
     private DataObjectListener $dataObjectListener;
@@ -66,7 +64,7 @@ class ImportCommand extends AbstractCommand
         $this->dataObjectListener = $dataObjectListener;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'Specify the marketplace to import from. Leave empty to process all available marketplaces.')
@@ -94,22 +92,22 @@ class ImportCommand extends AbstractCommand
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
 
-    private static function getMarketplaceObjects($type = null): array
+    private static function getMarketplaceObjects(): array
     {
-        return Marketplace::getMarketplaceList($type);
+        return Marketplace::getMarketplaceList();
     }
 
-    private function removeListeners()
+    private function removeListeners(): void
     {
         $this->eventDispatcher->removeSubscriber($this->dataObjectListener);
     }
 
-    private function addListeners()
+    private function addListeners(): void
     {
         $this->eventDispatcher->addSubscriber($this->dataObjectListener);
     }
 
-    private static function listMarketplaces()
+    private static function listMarketplaces(): int
     {
         $marketplaces = self::getMarketplaceObjects();
         $mp = [];
@@ -125,56 +123,6 @@ class ImportCommand extends AbstractCommand
                 echo "    {$key}\n";
             }
         }
-        return Command::SUCCESS;
-    }
-
-    protected static function prepareOrderTable()
-    {
-        $uniqueMarketplaceId = '';
-        $variantObject = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId);
-        $marketplace = $variantObject->getMarketplace();
-        $marketplaceKey = $marketplace->getKey(); // field 1
-        $mainProductObjectArray = $variantObject->getMainProduct(); // [] veya null
-        $mainProductObject = reset($mainProductObjectArray);
-        $productCode = $mainProductObject->getProductCode(); //field 2
-        if ($mainProductObject->level() == 1) {
-            $parent = $mainProductObject->getParent();
-            $parentProductCode = $parent->getProductCode(); // field 3
-        } else {
-            $parentProductCode = $productCode;
-        }
-        $productIdentifier = $mainProductObject->getProductIdentifier();
-        $productType = strtok($productIdentifier,'-'); // field 4
-        // TODO:  verinin normalleştirilmesi: döviz kurları
-        // WARNING: para için asla float kullanma
-        // - bcmath fonksiyonlarını kullan
-        // - veritabanında decimal kullan
-        // - önce 100 ile çarp, işlemini yap, round et, 100'e böl
-    }
-
-    protected static function prepareShopifyLineItems()
-    {
-        $db = \Pimcore\Db::get();
-        echo "Truncating in-memory Shopify line_items table\n";
-        $db->query("DELETE FROM iwa_shopify_orders_line_items;");
-        echo "Populating in-memory Shopify line_items table\n";
-        $db->query("INSERT INTO iwa_shopify_orders_line_items (created_at, order_id, variant_id, quantity)
-            SELECT 
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity
-            FROM 
-                iwa_shopify_orders
-                CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS (
-                    value JSON PATH '$'
-                )) AS line_item
-            WHERE 
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0;"
-        );
         return Command::SUCCESS;
     }
 
@@ -211,10 +159,6 @@ class ImportCommand extends AbstractCommand
             }
             if ($input->getOption('list')) {
                 return self::listMarketplaces();
-            }
-
-            if ($input->getOption('memory-table')) {
-                return self::prepareShopifyLineItems();
             }
 
             if ($input->getOption('iwabot')) {
@@ -306,6 +250,7 @@ class ImportCommand extends AbstractCommand
                 }
                 echo "done.\n";
             }
+        } catch (Exception|\Exception) {
         } finally {
             $this->addListeners();
         }

@@ -3,6 +3,7 @@
 namespace App\Model\DataObject;
 
 use App\Utils\PdfGenerator;
+use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\DataObject\Product\Listing;
 use App\Utils\Utility;
@@ -213,7 +214,7 @@ class Product extends Concrete
     {
         $sizes = [];
         $colors = [];
-        $children = $this->getChildren([Product::OBJECT_TYPE_OBJECT], true);
+        $children = $this->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true);
         foreach ($children as $child) {
             if ($child instanceof Product) {
                 $sizes[] = $child->getVariationSize();

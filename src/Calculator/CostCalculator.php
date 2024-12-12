@@ -24,7 +24,7 @@ class CostCalculator implements CalculatorClassInterface
     {
         $totalCost = '0.00';
         $bundleItems = $object->getBundleProducts();
-        if (is_iterable($bundleItems)) {
+        if (!empty($bundleItems)) {
             foreach ($bundleItems as $bundleItem) {
                 $product = $bundleItem->getObject();
                 $bundleItemCost = $product->getProductCost() ?? '0.00';
