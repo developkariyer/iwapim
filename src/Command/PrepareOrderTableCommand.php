@@ -493,7 +493,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
-            echo "Processing $marketplaceType\n";
             $values = $this->fetchVariantInfo($marketplaceType);
             $index = 0;
             foreach ($values as $row) {
