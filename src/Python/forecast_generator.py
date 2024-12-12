@@ -32,12 +32,8 @@ def generate_forecast(data, forecast_days=180):
     # Fit the model on historical data
     model.fit(data)
 
-    # Create a future DataFrame for the next 6 months
-    future = model.make_future_dataframe(periods=forecast_days)
-
-    # Generate the forecast
+    future = model.make_future_dataframe(periods=forecast_days, freq='D')  # Daily frequency
     forecast = model.predict(future)
 
-    # Filter forecasted data for the next 6 months
-    forecasted_data = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].iloc[-forecast_days:]
-    return forecasted_data
+    # Return only the forecasted future dates
+    return forecast[forecast['ds'] > data['ds'].max()][['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
