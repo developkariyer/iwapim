@@ -1,123 +1,95 @@
 import pandas as pd
-from mysql.connector import connect, Error
+from sqlalchemy import create_engine
 from db_config_loader import get_mysql_config
 
 def fetch_data(asin, sales_channel, yaml_path):
-    """
-    Fetches 2 years of daily sales data for a specific asin and sales_channel from MySQL.
-
-    Args:
-        asin (str): The ASIN of the product.
-        sales_channel (str): The sales channel (e.g., 'Amazon.com').
-        yaml_path (str): Path to the YAML configuration file for MySQL connection.
-
-    Returns:
-        pd.DataFrame: A DataFrame with columns 'ds' (date) and 'y' (sales quantity).
-    """
+    engine = None
     try:
-        # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
 
-        # Connect to the database
-        connection = connect(**mysql_config)
+        db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        engine = create_engine(db_url)
+
         query = """
         SELECT sale_date AS ds, total_quantity AS y
         FROM iwa_amazon_daily_sales_summary
-        WHERE asin = %s AND sales_channel = %s
+        WHERE asin = :asin AND sales_channel = :sales_channel
           AND sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
           AND sale_date < CURDATE()
         ORDER BY sale_date ASC;
         """
-        # Execute the query and load data into a pandas DataFrame
-        df = pd.read_sql(query, connection, params=(asin, sales_channel))
+        params = {'asin': asin, 'sales_channel': sales_channel}
+
+        df = pd.read_sql(query, engine, params=params)
         return df
 
-    except Error as e:
-        print(f"Error fetching data for ASIN {asin} and sales channel {sales_channel}: {e}")
-        return pd.DataFrame()  # Return empty DataFrame in case of error
+    except Exception as e:
+        print(f"Error fetching data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
+        return pd.DataFrame()
 
     finally:
-        if connection and connection.is_connected():
-            connection.close()
+        if engine:
+            engine.dispose()
+
 
 def fetch_pairs(yaml_path):
-    """
-    Fetches the list of unique ASIN and sales_channel pairs from the database.
-
-    Args:
-        yaml_path (str): Path to the YAML configuration file for MySQL connection.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing unique pairs of 'asin' and 'sales_channel'.
-    """
+    engine = None  # Initialize engine
     try:
-        # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
 
-        # Connect to the database
-        connection = connect(**mysql_config)
+        db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        engine = create_engine(db_url)
+
         query = """
         SELECT DISTINCT asin, sales_channel
         FROM iwa_amazon_daily_sales_summary
-        WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR) AND sale_date < CURDATE()
+        WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
+          AND sale_date < CURDATE()
         LIMIT 1
         """
-        # Execute the query and load data into a pandas DataFrame
-        df = pd.read_sql(query, connection)
+
+        df = pd.read_sql(query, engine)
         return df
 
-    except Error as e:
+    except Exception as e:
         print(f"Error fetching ASIN/Sales Channel pairs: {e}")
-        return pd.DataFrame()  # Return empty DataFrame in case of error
+        return pd.DataFrame()
 
     finally:
-        if connection and connection.is_connected():
-            connection.close()
+        if engine:
+            engine.dispose()
+
 
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
-    """
-    Inserts forecasted data into the MySQL `iwa_amazon_daily_sales_summary` table.
-
-    Args:
-        forecast_data (pd.DataFrame): Forecasted data with columns:
-                                      - 'ds': Date
-                                      - 'yhat': Predicted sales
-        asin (str): The ASIN of the product.
-        sales_channel (str): The sales channel (e.g., 'Amazon.com').
-        yaml_path (str): Path to the YAML configuration file for MySQL connection.
-
-    Returns:
-        None
-    """
+    engine = None  # Initialize engine
+    connection = None
     try:
-        # Load MySQL configuration
-        from db_config_loader import get_mysql_config
         mysql_config = get_mysql_config(yaml_path)
 
-        # Connect to the database
-        connection = mysql.connector.connect(**mysql_config)
-        cursor = connection.cursor()
+        db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        engine = create_engine(db_url)
+        connection = engine.connect()
 
-        # Insert forecast data
-        insert_query = """
-        INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, sale_date, total_quantity, data_source)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        rows_to_insert = [
-            (asin, sales_channel, row['ds'], row['yhat'], 0)
-            for _, row in forecast_data.iterrows()
-        ]
+        forecast_data['asin'] = asin
+        forecast_data['sales_channel'] = sales_channel
+        forecast_data['data_source'] = 1  # 1 indicates forecasted data
+        forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
 
-        # Execute batch insert
-        cursor.executemany(insert_query, rows_to_insert)
-        connection.commit()
+        forecast_data[['asin', 'sales_channel', 'sale_date', 'total_quantity', 'data_source']].to_sql(
+            'iwa_amazon_daily_sales_summary',
+            con=connection,
+            if_exists='append',
+            index=False,
+            method='multi'
+        )
 
-        print(f"Inserted {cursor.rowcount} rows for ASIN {asin} and Sales Channel {sales_channel}.")
+        print(f"Inserted forecast data for ASIN {asin} and Sales Channel {sales_channel}.")
 
-    except Error as e:
+    except Exception as e:
         print(f"Error inserting forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
 
     finally:
-        if connection and connection.is_connected():
-            cursor.close()
+        if connection:
             connection.close()
+        if engine:
+            engine.dispose()
