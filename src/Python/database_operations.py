@@ -106,7 +106,6 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         VALUES (:asin, :sales_channel, :sale_date, :total_quantity, :data_source)
         ON DUPLICATE KEY UPDATE
             total_quantity = VALUES(total_quantity),
-            data_source = VALUES(data_source)
         """)
 
         # Execute batch insert/update
