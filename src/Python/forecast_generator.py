@@ -26,6 +26,9 @@ def generate_forecast(data, forecast_days=180):
     cmdstanpy_logger = logging.getLogger("cmdstanpy")
     cmdstanpy_logger.setLevel(logging.WARNING)
     cmdstanpy_logger.propagate = False
+    while cmdstanpy_logger.handlers:
+        cmdstanpy_logger.handlers.pop()
+
 
     # Fit the model on historical data
     model.fit(data)
