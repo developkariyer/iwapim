@@ -5,7 +5,9 @@ from database_operations import fetch_pairs, fetch_data, insert_forecast_data
 from forecast_generator import generate_forecast
 
 logging.getLogger().setLevel(logging.WARNING)
-logging.getLogger("cmdstanpy").setLevel(logging.WARNING)
+cmdstanpy_logger = logging.getLogger("cmdstanpy")
+cmdstanpy_logger.setLevel(logging.WARNING)
+cmdstanpy_logger.propagate = False
 
 def run_forecast_pipeline(yaml_path):
     """
