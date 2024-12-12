@@ -1,4 +1,4 @@
--- Step 1: Create a temporary table for weekly sales
+-- Step 1: Create a temporary table for daily sales
 DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary_temp;
 
 CREATE TABLE iwa_amazon_daily_sales_summary_temp AS
@@ -27,13 +27,16 @@ WITH RECURSIVE
                                 JOIN idx
                                      ON idx.n < JSON_LENGTH(s.asin_array)),
     daily_sales AS (SELECT asin,
-                            sales_channel,
+                           sales_channel,
     DATE
 (
     purchase_date
-) AS sale_date,
-                            SUM(quantity_shipped)      AS total_quantity
-                     FROM expanded_sales
+) AS sale_date, -- Removed second argument from DATE()
+    SUM
+(
+    quantity_shipped
+) AS total_quantity
+    FROM expanded_sales
     WHERE purchase_date >= DATE_SUB
 (
     CURDATE
