@@ -443,8 +443,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $takealotSql = "
             INSERT INTO iwa_marketplace_orders_line_items (
                 marketplace_type, marketplace_id, created_at, order_id, product_id, variant_id, price, 
-                currency, quantity, variant_title,
-                fulfillments_status, tracking_company, fulfillments_status_control, referring_site, landing_site
+                currency, quantity, variant_title, fulfillments_status, tracking_company
             )
             SELECT
                 '$marketplaceType',
