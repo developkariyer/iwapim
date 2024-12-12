@@ -180,7 +180,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
-
+        }
         $db = \Pimcore\Db::get();
         $limit = 5;
         $offset = 0;
@@ -225,7 +225,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $offset += $limit;
             $total = $data['list']['meta']['totalCount'];
         } while ($total == $limit);
-}
 
         echo "Orders downloaded\n";
     }
