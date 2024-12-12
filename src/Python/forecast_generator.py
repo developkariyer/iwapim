@@ -37,5 +37,5 @@ def generate_forecast(data, forecast_days=180):
 
     forecast['ds'] = pd.to_datetime(forecast['ds'])
 
-    future = future[future['ds'] > data['ds'].max()]
+    #future = future[future['ds'] > data['ds'].max()]
     return future[['ds', 'yhat']]

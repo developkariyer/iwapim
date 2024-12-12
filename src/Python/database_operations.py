@@ -110,8 +110,8 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         """)
 
         # Execute batch insert/update
-        with connection.begin() as transaction:
-            connection.execute(insert_query, [{'asin': row[0], 'sales_channel': row[1], 'sale_date': row[2], 'total_quantity': row[3], 'data_source': row[4]} for row in rows_to_insert])
+        #with connection.begin() as transaction:
+        #    connection.execute(insert_query, [{'asin': row[0], 'sales_channel': row[1], 'sale_date': row[2], 'total_quantity': row[3], 'data_source': row[4]} for row in rows_to_insert])
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
