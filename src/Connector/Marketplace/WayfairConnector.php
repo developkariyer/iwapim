@@ -140,11 +140,13 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
+        $fromDate = "2024-12-03T00:00:00Z";
         $query = <<<GRAPHQL
         query getDropshipPurchaseOrders {
             getDropshipPurchaseOrders(
-                limit: 1000,
-                sortOrder: DESC
+                limit: 10,
+                sortOrder: DESC,
+                fromDate: "$fromDate"
             ) {
                 poNumber,
                 poDate,
