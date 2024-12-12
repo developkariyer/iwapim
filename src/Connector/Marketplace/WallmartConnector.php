@@ -246,6 +246,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 }
                 $offset += $limit;
                 $total = $data['list']['meta']['totalCount'];
+                echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
                 echo "Offset: " . $offset . " " . count($orders) . " ";
                 echo "Total: " . $total . "\n";
                 echo ".";
