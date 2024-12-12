@@ -221,7 +221,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     ]
                 ]);
                 $statusCode = $response->getStatusCode();
-                print_r($response->getInfo());
                 if ($statusCode !== 200) {
                     echo "Error: $statusCode\n";
                     return;
