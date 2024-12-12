@@ -208,8 +208,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $orders = $data['list']['elements'];
                 $db->beginTransaction();
                 foreach ($orders as $order) {
-                    print_r($order[0]['purchaseOrderId']);
+                    echo $order['purchaseOrderId'] . "\n";
                 }
+
                 /*foreach ($orders as $order) {
                     print_r($order['purchaseOrderId']);
                     $db->executeStatement(
