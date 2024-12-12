@@ -41,7 +41,7 @@ class WarehouseController extends FrontendController
     public function chartDemoAction(): Response
     {
         $db = Db::get();
-        $sale_data = $db->fetchAllAssociative("SELECT asin, sales_channel, sum(total_quantity) AS total_sale FROM iwa_amazon_daily_sales_summary GROUP BY asin, sales_channel ORDER BY asin");
+        $sale_data = $db->fetchAllAssociative("SELECT asin, sales_channel, sum(total_quantity) AS total_sale FROM iwa_amazon_daily_sales_summary GROUP BY asin, sales_channel ORDER BY total_sale DESC");
         $salesChannels = [];
         $asins = [];
         $quantities = [];
