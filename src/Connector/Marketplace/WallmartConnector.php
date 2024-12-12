@@ -250,6 +250,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 echo "Total: " . $total . "\n";
                 echo ".";
             } while($total == $limit);
+            $offset = 0;
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
