@@ -219,6 +219,10 @@
             direction: rtl;
         }
 
+        .modal-xl-custom {
+            max-width: 90%;
+        }
+
         /* Mobile-specific styles */
         @media (max-width: 768px) {
             .product-card img {
@@ -469,7 +473,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="warehouseModal" tabindex="-1" aria-labelledby="warehouseModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-xl custom">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="product-title">Warehouse Title</h5>
@@ -480,7 +484,7 @@
 
                     </div>
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-9">
                             <canvas id="chart1"></canvas>
                             <div class="table-responsive mt-4">
                                 <table class="table table-bordered text-center mb-0" style="font-size: 0.85rem;">
@@ -531,7 +535,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col-lg-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="col-lg-3 d-flex flex-column align-items-center justify-content-center">
                             <button type="button" class="btn btn-sm btn-outline-secondary w-100 mb-2" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
                             <form class="w-100">
                                 <table class="table table-bordered text-center mb-0 w-100" style="font-size: 0.85rem;">
