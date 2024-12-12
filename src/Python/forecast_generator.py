@@ -37,6 +37,5 @@ def generate_forecast(data, forecast_days=180):
 
     forecast['ds'] = pd.to_datetime(forecast['ds'])
 
-    # Filter out historical data
-    future_forecast = forecast[forecast['ds'] > data['ds'].max()]
-    return future_forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+    future = future[future['ds'] > data['ds'].max()]
+    return future[['ds', 'yhat']]
