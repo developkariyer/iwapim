@@ -107,7 +107,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     //'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType),
                     //'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType),
                     'Takealot' => $this->transferOrdersTakealot($id,$marketplaceType),
-                    default => null;,
+                    default => null,
                 };
                 echo "Complated: $marketplaceType\n";
             }
