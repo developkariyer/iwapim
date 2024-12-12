@@ -458,7 +458,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.quantity')) AS quantity,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.product_title')) AS variant_title,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.sale_status')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.dc')) AS tracking_company,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.dc')) AS tracking_company
             FROM
                 iwa_marketplace_orders
             WHERE
