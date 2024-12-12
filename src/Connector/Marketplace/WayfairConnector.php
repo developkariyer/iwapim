@@ -140,7 +140,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        /*$db = \Pimcore\Db::get();
+        $db = \Pimcore\Db::get();
         $fromDate = "2024-05-01T00:00:00Z";
         $limit = 200;
         do {
@@ -216,58 +216,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             echo "From date: $fromDate\n";
             echo "Orders downloaded: $ordersCount\n";
             $fromDate = $lastDate;
-        }while($ordersCount === $limit);*/
-        $fromDate = "2024-05-01T00:00:00Z";
-        $query = <<<GRAPHQL
-            query getDropshipPurchaseOrders {
-                getDropshipPurchaseOrders(
-                    limit: 2000,
-                    sortOrder: ASC,
-                    fromDate: "$fromDate"
-                ) {
-                    poNumber,
-                    poDate,
-                    estimatedShipDate,
-                    customerName,
-                    customerAddress1,
-                    customerAddress2,
-                    customerCity,
-                    customerState,
-                    customerPostalCode,
-                    orderType,
-                    shippingInfo {
-                        shipSpeed,
-                        carrierCode
-                    },
-                    packingSlipUrl,
-                    warehouse {
-                        id,
-                        name
-                    },
-                    products {
-                        partNumber,
-                        quantity,
-                        price,
-                        event {
-                            startDate,
-                            endDate
-                        }
-                    }
-                }
-            }
-            GRAPHQL;
-        $response = $this->httpClient->request('POST',static::$apiUrl['prod'], [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
-                'Content-Type' => 'application/json'
-            ],
-            'json' => ['query' => $query]
-        ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
-        }
-        print_r($response->getContent());
-
+        }while($ordersCount === $limit);
     }
     public function testEndpoint()
     {
