@@ -35,5 +35,8 @@ def generate_forecast(data, forecast_days=180):
     future = model.make_future_dataframe(periods=forecast_days, freq='D')  # Daily frequency
     forecast = model.predict(future)
 
-    # Return only the forecasted future dates
-    return forecast[forecast['ds'] > data['ds'].max()][['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+    forecast['ds'] = pd.to_datetime(forecast['ds'])
+
+    # Filter out historical data
+    future_forecast = forecast[forecast['ds'] > data['ds'].max()]
+    return future_forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
