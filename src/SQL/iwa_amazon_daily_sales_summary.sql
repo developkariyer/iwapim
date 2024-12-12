@@ -1,7 +1,13 @@
 -- Step 1: Create a temporary table for daily sales
 DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary_temp;
 
-CREATE TABLE iwa_amazon_daily_sales_summary_temp AS
+CREATE TABLE iwa_amazon_daily_sales_summary_temp (
+                                                     asin VARCHAR(50),
+                                                     sales_channel VARCHAR(50),
+                                                     sale_date DATE,
+                                                     total_quantity INT,
+                                                     data_source TINYINT
+) AS
 WITH RECURSIVE
     idx AS (
         SELECT 0 AS n
@@ -41,53 +47,53 @@ WITH RECURSIVE
         SELECT
             asin,
             sales_channel,
-    DATE(purchase_date) AS sale_date, -- Extract only the date
-    SUM(quantity_shipped) AS total_quantity,
-    1 AS data_source -- 1 indicates gathered data
-    FROM
-    expanded_sales
-    WHERE
-    purchase_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR) -- Past 2 years
-    GROUP BY
-    asin, sales_channel, sale_date
+            DATE(purchase_date) AS sale_date,
+            SUM(quantity_shipped) AS total_quantity,
+            1 AS data_source -- 1 indicates gathered data
+        FROM
+            expanded_sales
+        WHERE
+            purchase_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR) -- Past 2 years
+        GROUP BY
+            asin, sales_channel, sale_date
     ),
     date_range AS (
-                      SELECT
-                      DATE_SUB(CURDATE(), INTERVAL 2 YEAR) AS start_date,
-    DATE_SUB(CURDATE(), INTERVAL 1 DAY) AS end_date
+        SELECT
+            DATE_SUB(CURDATE(), INTERVAL 2 YEAR) AS start_date,
+            DATE_SUB(CURDATE(), INTERVAL 1 DAY) AS end_date
     ),
     all_dates AS (
-                     SELECT start_date + INTERVAL seq DAY AS generated_date
-                     FROM date_range, (
-                     SELECT @row := @row + 1 AS seq
-                     FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
-(SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b,
-(SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c
-    CROSS JOIN (SELECT @row := -1) init
-    ) d
-    WHERE start_date + INTERVAL seq DAY <= end_date
+        SELECT start_date + INTERVAL seq DAY AS generated_date
+        FROM date_range, (
+            SELECT @row := @row + 1 AS seq
+            FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                 (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b,
+                 (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c
+            CROSS JOIN (SELECT @row := -1) init
+        ) d
+        WHERE start_date + INTERVAL seq DAY <= end_date
     ),
     expanded_asin_sales_channel AS (
-                                       SELECT DISTINCT asin, sales_channel
-                                       FROM daily_sales
-                                   ),
+        SELECT DISTINCT asin, sales_channel
+        FROM daily_sales
+    ),
     full_data_set AS (
-                         SELECT
-                         a.asin,
-                         a.sales_channel,
-                         b.generated_date AS sale_date,
-                         IFNULL(d.total_quantity, 0) AS total_quantity,
-    IF(d.total_quantity IS NULL, 0, 1) AS data_source -- 0 indicates forecasted or missing data
-    FROM
-    expanded_asin_sales_channel a
-    CROSS JOIN
-    all_dates b
-    LEFT JOIN
-    daily_sales d
-    ON
-    a.asin = d.asin
-    AND a.sales_channel = d.sales_channel
-    AND b.generated_date = d.sale_date
+        SELECT
+            a.asin,
+            a.sales_channel,
+            b.generated_date AS sale_date,
+            IFNULL(d.total_quantity, 0) AS total_quantity,
+            IF(d.total_quantity IS NULL, 0, 1) AS data_source -- 0 indicates forecasted or missing data
+        FROM
+            expanded_asin_sales_channel a
+        CROSS JOIN
+            all_dates b
+        LEFT JOIN
+            daily_sales d
+        ON
+            a.asin = d.asin
+            AND a.sales_channel = d.sales_channel
+            AND b.generated_date = d.sale_date
     )
 SELECT
     asin,
@@ -103,10 +109,6 @@ DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary;
 RENAME TABLE iwa_amazon_daily_sales_summary_temp TO iwa_amazon_daily_sales_summary;
 
 -- Step 3: Create indexes for faster querying
-ALTER TABLE iwa_amazon_daily_sales_summary
-    MODIFY asin VARCHAR(50),
-    MODIFY sales_channel VARCHAR(50);
-
 CREATE INDEX idx_asin ON iwa_amazon_daily_sales_summary (asin);
 CREATE INDEX idx_sales_channel ON iwa_amazon_daily_sales_summary (sales_channel);
 CREATE INDEX idx_sale_date ON iwa_amazon_daily_sales_summary (sale_date);
