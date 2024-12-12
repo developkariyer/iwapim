@@ -189,8 +189,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'Accept' => 'application/json'
             ],
             'query' => [
-                'limit' => $limit,
-                'offset' => $offset
+                'limit' => 10
             ]
         ]);
         $statusCode = $response->getStatusCode();
