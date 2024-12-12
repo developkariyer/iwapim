@@ -140,6 +140,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareTokenProd();
+        }
         $db = \Pimcore\Db::get();
         $fromDate = "2024-05-01T00:00:00Z";
         $limit = 200;
