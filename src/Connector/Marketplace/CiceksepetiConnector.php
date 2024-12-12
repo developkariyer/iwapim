@@ -62,23 +62,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    private function getAttributes($listing)
-    {
-        $color = '';
-        $size = '';
-        if (!empty($listing['attributes'])) {
-            foreach ($listing['attributes'] as $attribute) {
-                if ($attribute['parentName'] === 'Renk' && $attribute['type'] === 'Variant Özelliği') {
-                    $color = $attribute['name'];
-                }
-                if ($attribute['parentName'] === 'Ebat' || $attribute['parentName'] === 'Uzunluk' ) {
-                    $size = $attribute['name'];
-                }
-            }
-        }
-        return trim($color . '-' . $size, '-');
-    }
-
     public function import($updateFlag, $importFlag)
     {
         if (empty($this->listings)) {
