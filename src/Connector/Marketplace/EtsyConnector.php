@@ -157,4 +157,12 @@ class EtsyConnector extends MarketplaceConnectorAbstract
             $index++;
         }
     }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+    }
 }
