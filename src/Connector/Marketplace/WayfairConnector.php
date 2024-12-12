@@ -15,12 +15,13 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
         'sandbox' => 'https://sandbox.api.wayfair.com/v1/graphql',
-        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql'
+        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql',
+        'prod' => 'https://api.wayfair.com/v1/graphql',
     ];
     public static $marketplaceType = 'Wayfair';
     public static $expires_in;
 
-    public function prepareTokenSanbox()
+    public function prepareTokenSandbox(): void
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
@@ -46,7 +47,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function prepareTokenProd()
+    public function prepareTokenProd(): void
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
@@ -85,7 +86,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $this->getListingSandbox();
     }*/
 
-    public function download($forceDownload = false)
+    public function download($forceDownload = false): void
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
@@ -130,6 +131,64 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         print_r($response->getContent());
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \Exception
+     */
+    public function downloadOrders(): void
+    {
+        $query = <<<GRAPHQL
+        query getDropshipPurchaseOrders {
+            getDropshipPurchaseOrders(
+                limit: 5,
+                sortOrder: DESC
+            ) {
+                poNumber,
+                poDate,
+                estimatedShipDate,
+                customerName,
+                customerAddress1,
+                customerAddress2,
+                customerCity,
+                customerState,
+                customerPostalCode,
+                orderType,
+                shippingInfo {
+                    shipSpeed,
+                    carrierCode
+                },
+                packingSlipUrl,
+                warehouse {
+                    id,
+                    name
+                },
+                products {
+                    partNumber,
+                    quantity,
+                    price,
+                    event {
+                        startDate,
+                        endDate
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $response = $this->httpClient->request('POST',static::$apiUrl['prod'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => ['query' => $query]
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
     public function testEndpoint()
     {
         $response = $this->httpClient->request('GET', 'https://sandbox.api.wayfair.com/v1/demo/clock',[
@@ -587,11 +646,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function import($updateFlag, $importFlag)
     {
        
-    }
-
-    public function downloadOrders()
-    {
-        
     }
     
     public function downloadInventory()
