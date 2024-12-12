@@ -208,8 +208,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $orders = $data['list']['elements'];
                 $db->beginTransaction();
                 foreach ($orders as $key => $order) {
-                    echo "Key: $key\n";
-                    print_r($order);
+                    if (!isset($order['purchaseOrderId'])) {
+                        echo "Missing 'purchaseOrderId' at index $key\n";
+                        continue;
+                    }
+                    echo "Order ID: " . $order['purchaseOrderId'] . "\n";
                 }
                 /*foreach ($orders as $order) {
                     print_r($order['purchaseOrderId']);
