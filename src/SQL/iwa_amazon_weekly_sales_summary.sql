@@ -1,4 +1,6 @@
 -- Step 1: Create a temporary table for weekly sales
+DROP TABLE IF EXISTS iwa_amazon_weekly_sales_summary_temp;
+
 CREATE TABLE iwa_amazon_weekly_sales_summary_temp AS
 WITH RECURSIVE
     idx AS (SELECT 0 AS n
