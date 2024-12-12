@@ -194,7 +194,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             }
             try {
                 $data = $response->toArray();
-                print_r($data);
                 $orders = $data['sales'];
                 $db->beginTransaction();
                 foreach ($orders as $order) {
