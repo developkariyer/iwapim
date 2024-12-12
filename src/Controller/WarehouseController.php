@@ -41,16 +41,18 @@ class WarehouseController extends FrontendController
     public function chartDemoAction(): Response
     {
         $db = Db::get();
-        $sale_data = $db->fetchAllAssociative("SELECT DISTINCT asin, sales_channel FROM iwa_amazon_daily_sales_summary");
+        $sale_data = $db->fetchAllAssociative("SELECT asin, sales_channel, sum(total_quantity) AS total_sale FROM iwa_amazon_daily_sales_summary GROUP BY asin, sales_channel ORDER BY asin");
         $salesChannels = [];
         $asins = [];
+        $quantities = [];
         foreach ($sale_data as $data) {
             $salesChannel = strtoupper(str_replace('Amazon.', '', $data['sales_channel']));
             if (!isset($asins[$data['asin']])) {
                 $asins[$data['asin']] = [];
             }
-            $asins[$data['asin']][] = $salesChannel;
+            $asins[$data['asin']][$salesChannel] = $data['total_sale'];
             $salesChannels[$salesChannel] = true;
+
         }
 
         return $this->render('warehouse/chart_demo.html.twig', [
