@@ -172,7 +172,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function downloadOrders(): void
+    public function downloadOrders(): void // Does not contain a modifydate field
     {
         $db = \Pimcore\Db::get();
         $page = 1;
