@@ -289,7 +289,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Error: Barcode is missing\n";
             return;
         }
-        $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
+        $response = $this->httpClient->request('GET',  static::$apiUrl['inventory'], [
             'headers' => [
                 'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
                 'WM_QOS.CORRELATION_ID' => static::$correlationId,
