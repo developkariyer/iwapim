@@ -234,32 +234,32 @@
 <body>
 <div class="container my-4">
 
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
+    <table class="table table-bordered text-center">
+        <thead>
+        <tr>
+            <th>ASIN</th>
+            {% for sales_channel in salesChannels %}
+                <th>{{ sales_channel }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for asin, channels in asins %}
+            <tr>
+                <td>{{ asin }}</td>
+                {% for sales_channel in salesChannels %}
+                    <td>
+                        {% if sales_channel in channels %}
+                            ✓
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
     <!-- First Product Card -->
     <div class="card product-card w-100 mt-3 position-relative">
@@ -287,189 +287,6 @@
             </div>
         </div>
     </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-    <!-- First Product Card -->
-    <div class="card product-card w-100 mt-3 position-relative">
-        <div class="row g-0 align-items-top h-100">
-            <div class="col-auto">
-                <img src="https://mesa.iwa.web.tr/var/assets/fatiha.jpg" alt="Product Image" class="img-fluid">
-            </div>
-            <div class="col">
-                <div class="card-body">
-                    <h5 class="card-title">IWASKU Product Name Size Color</h5>
-                    <span class="small text-muted">
-                            All ASINs and SKUs related to this Product. Might be a long text. Used for in-page search and information.
-                        </span>
-                </div>
-            </div>
-            <!-- Badge Group -->
-            <div class="col-auto gap-1 me-3 align-items-center mt-2 badge-group">
-                <div class="badge bg-danger" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1">US - FBA</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-2">CA - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-3">EU - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-4">UK - FBA</div>
-                <div class="badge bg-success" data-warehouse="warehouse-5">NJ - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">UK - Yerel</div>
-                <div class="badge bg-warning" data-warehouse="warehouse-6">NL - Yerel</div>
-            </div>
-        </div>
-    </div>
-
 
     <!-- Modal -->
     <div class="modal fade" id="warehouseModal" tabindex="-1" aria-labelledby="warehouseModalLabel" aria-hidden="true">

@@ -36,10 +36,26 @@ class WarehouseController extends FrontendController
 
     /**
      * @Route("/warehouse/chart", name="chart_demo")
+     * @throws Exception
      */
     public function chartDemoAction(): Response
     {
-        return $this->render('warehouse/chart_demo.html.twig');
+        $db = Db::get();
+        $sale_data = $db->fetchAllAssociative("SELECT DISTINCT asin, sales_channel FROM iwa_amazon_daily_sales_summary");
+        $salesChannels = [];
+        $asins = [];
+        foreach ($sale_data as $data) {
+            if (!isset($asins[$data['asin']])) {
+                $asins[$data['asin']] = [];
+            }
+            $asins[$data['asin']][] = $data['sales_channel'];
+            $salesChannels[$data['sales_channel']] = true;
+        }
+
+        return $this->render('warehouse/chart_demo.html.twig', [
+            'salesChannels' => array_keys($salesChannels),
+            'asins' => $asins,
+        ]);
     }
 
     /**
