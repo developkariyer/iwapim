@@ -36,6 +36,6 @@ def generate_forecast(data, forecast_days=180):
 
     forecast = model.predict(future)
 
-    future_forecast = forecast[forecast['ds'] > data['ds'].max()]
+    future_forecast = forecast[forecast['ds'] > pd.to_datetime(data['ds'].max())]
 
     return future_forecast[['ds', 'yhat']]
