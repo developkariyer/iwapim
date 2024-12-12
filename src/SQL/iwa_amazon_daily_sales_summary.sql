@@ -52,8 +52,9 @@ WITH RECURSIVE
     asin, sales_channel, sale_date
     ),
     date_range AS (
-                      SELECT MIN(sale_date) AS start_date, MAX(sale_date) AS end_date
-    FROM daily_sales
+                      SELECT
+                      DATE_SUB(CURDATE(), INTERVAL 2 YEAR) AS start_date,
+    DATE_SUB(CURDATE(), INTERVAL 1 DAY) AS end_date
     ),
     all_dates AS (
                      SELECT start_date + INTERVAL seq DAY AS generated_date
