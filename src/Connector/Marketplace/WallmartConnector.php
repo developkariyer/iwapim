@@ -189,7 +189,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'Accept' => 'application/json'
             ],
             'query' => [
-                'limit' => 10
+                'limit' => 200,
+                'createdStartDate' => date('Y-m-d', strtotime('-180 day')),
             ]
         ]);
         $statusCode = $response->getStatusCode();
