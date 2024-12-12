@@ -1,5 +1,6 @@
 from prophet import Prophet
 import pandas as pd
+import logging
 
 def generate_forecast(data, forecast_days=180):
     """
