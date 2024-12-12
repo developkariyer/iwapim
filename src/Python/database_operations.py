@@ -94,7 +94,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
 
         # Convert DataFrame to a list of tuples
-        rows_to_insert = forecast_data[['asin', 'sales_channel', 'sale_date', 'total_quantity', 'data_source']].values.tolist()
+        rows_to_insert = list(forecast_data[['asin', 'sales_channel', 'sale_date', 'total_quantity', 'data_source']].itertuples(index=False, name=None))
 
         # SQL query for INSERT or UPDATE
         insert_query = """

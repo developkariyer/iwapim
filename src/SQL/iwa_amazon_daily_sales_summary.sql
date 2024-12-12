@@ -102,6 +102,10 @@ DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary;
 RENAME TABLE iwa_amazon_daily_sales_summary_temp TO iwa_amazon_daily_sales_summary;
 
 -- Step 3: Create indexes for faster querying
+ALTER TABLE iwa_amazon_daily_sales_summary
+    MODIFY asin VARCHAR(50),
+    MODIFY sales_channel VARCHAR(50);
+
 CREATE INDEX idx_asin ON iwa_amazon_daily_sales_summary (asin);
 CREATE INDEX idx_sales_channel ON iwa_amazon_daily_sales_summary (sales_channel);
 CREATE INDEX idx_sale_date ON iwa_amazon_daily_sales_summary (sale_date);
