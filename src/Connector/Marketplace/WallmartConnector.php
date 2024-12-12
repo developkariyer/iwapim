@@ -180,25 +180,54 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
-        }
-        $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
-            'query' => [
-                'limit' => 200,
-                'createdStartDate' => date('Y-m-d', strtotime('-180 day')),
-            ]
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        print_r($response->getContent());
+
+        $db = \Pimcore\Db::get();
+        $limit = 5;
+        $offset = 0;
+        do {
+            $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
+                'headers' => [
+                    'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                    'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                    'WM_SVC.NAME' => 'Walmart Marketplace',
+                    'Accept' => 'application/json'
+                ],
+                'query' => [
+                    'limit' => $limit,
+                    'offset' => $offset,
+                    'createdStartDate' => date('Y-m-d', strtotime('-180 day')),
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                return;
+            }
+            try {
+                $data = $response->toArray();
+                $orders = $data['list']['elements'];
+                $db->beginTransaction();
+                foreach ($orders as $order) {
+                    $db->executeStatement(
+                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        [
+                            $this->marketplace->getId(),
+                            $order['purchaseOrderId'],
+                            json_encode($order)
+                        ]
+                    );
+                }
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            $offset += $limit;
+            $total = $data['list']['meta']['totalCount'];
+        } while ($total == $limit);
+}
+
+        echo "Orders downloaded\n";
     }
     
     public function downloadInventory()
