@@ -22,6 +22,10 @@ def generate_forecast(data, forecast_days=180):
     # Initialize the Prophet model
     model = Prophet()
 
+    cmdstanpy_logger = logging.getLogger("cmdstanpy")
+    cmdstanpy_logger.setLevel(logging.WARNING)
+    cmdstanpy_logger.propagate = False
+
     # Fit the model on historical data
     model.fit(data)
 
