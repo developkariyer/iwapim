@@ -55,7 +55,7 @@ def run_forecast_pipeline(yaml_path):
             insert_forecast_data(forecast, asin, sales_channel, yaml_path)
 
         except Exception as e:
-            print(f"\nError processing ASIN {asin} and Sales Channel {sales_channel}: {e}")
+            #print(f"\nError processing ASIN {asin} and Sales Channel {sales_channel}: {e}")
 
     print("\nForecasting pipeline completed.")
 

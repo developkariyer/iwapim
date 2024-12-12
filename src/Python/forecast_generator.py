@@ -29,7 +29,6 @@ def generate_forecast(data, forecast_days=180):
     while cmdstanpy_logger.handlers:
         cmdstanpy_logger.handlers.pop()
 
-
     # Fit the model on historical data
     model.fit(data)
 
