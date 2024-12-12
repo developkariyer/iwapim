@@ -2,7 +2,10 @@
 
 namespace App\Command;
 
+use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\DataObject\Folder;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,18 +24,17 @@ use App\Utils\Utility;
 
 class CacheImagesCommand extends AbstractCommand
 {
-    
-    static $cacheFolder;
-    static $amazonFolder;
-    static $etsyFolder;
-    static $shopifyFolder;
-    static $trendyolFolder;
-    static $bolcomFolder;
 
-    protected function configure()
+    static ?Folder $cacheFolder;
+    static ?Folder $amazonFolder;
+    static ?Folder $etsyFolder;
+    static ?Folder $shopifyFolder;
+    static ?Folder $trendyolFolder;
+    static ?Folder $bolcomFolder;
+
+    protected function configure(): void
     {
         $this
-//            ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'The marketplace to import from.')
             ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, Amazon objects will be processed.')
             ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, Etsy objects will be processed.')
             ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
@@ -41,6 +43,9 @@ class CacheImagesCommand extends AbstractCommand
             ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
+    /**
+     * @throws DuplicateFullPathException|Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         static::$cacheFolder = Utility::checkSetAssetPath('Image Cache');
@@ -104,7 +109,11 @@ class CacheImagesCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    protected static function processTrendyol($variant)
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    protected static function processTrendyol(VariantProduct $variant): void
     {
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
@@ -116,7 +125,10 @@ class CacheImagesCommand extends AbstractCommand
         echo "{$variant->getId()} ";
     }
 
-    protected static function processAmazon($variant)
+    /**
+     * @throws Exception|DuplicateFullPathException
+     */
+    protected static function processAmazon($variant): void
     {
         $json = Utility::retrieveJsonData($variant->getUniqueMarketplaceId());
         if (empty($json)) {
@@ -135,13 +147,16 @@ class CacheImagesCommand extends AbstractCommand
         echo "{$variant->getId()} ";
     }
 
-    protected static function processShopify($variant)
+    /**
+     * @throws DuplicateFullPathException
+     */
+    protected static function processShopify($variant): void
     {
         $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
         $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $listingImageList = [];
         $variantImage = null;
-        foreach ($imageArray ?? [] as $image) {
+        foreach ($imageArray as $image) {
             $id = $image["id"] ?? '';
             $src = $image['src'] ??'';
             $variant_ids = $parentJson['variant_ids'] ?? [];
@@ -158,7 +173,10 @@ class CacheImagesCommand extends AbstractCommand
         echo "{$variant->getId()} ";
     }
 
-    protected static function processEtsy($variant)
+    /**
+     * @throws DuplicateFullPathException
+     */
+    protected static function processEtsy($variant): void
     {
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
@@ -189,7 +207,10 @@ class CacheImagesCommand extends AbstractCommand
         echo "{$variant->getId()} ";        
     }
 
-    protected static function processBolCom($variant)
+    /**
+     * @throws DuplicateFullPathException
+     */
+    protected static function processBolCom($variant): void
     {
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
@@ -209,7 +230,10 @@ class CacheImagesCommand extends AbstractCommand
         echo "{$variant->getId()}: ";
     }
 
-    protected static function processImage($url, $parent, $oldFileName = '')
+    /**
+     * @throws DuplicateFullPathException
+     */
+    protected static function processImage($url, $parent, $oldFileName = ''): false|Asset|Asset\Image|null
     {
         if (empty($url)) {
             return null;
@@ -225,7 +249,6 @@ class CacheImagesCommand extends AbstractCommand
                 if ($asset) {
                     $asset->setFilename($newFileName);
                     $asset->setParent($parent);
-                    $dirty = true;
                     echo 'R';
                 }
             }
@@ -275,8 +298,8 @@ class CacheImagesCommand extends AbstractCommand
         }
         return $asset;
     }
-    
-    protected static function findImageByName($imageName)
+
+    protected static function findImageByName($imageName): false|Asset
     {
         $assetList = new AssetListing();
         $assetList->setCondition("filename = ?", [$imageName]);
@@ -284,7 +307,7 @@ class CacheImagesCommand extends AbstractCommand
         return $assetList->current();
     }
 
-    public static function createUniqueFileNameFromUrl($url)
+    public static function createUniqueFileNameFromUrl($url): string
     {
         $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));        
         $hash = md5($url);
