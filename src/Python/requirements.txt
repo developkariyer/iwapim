@@ -1,0 +1,6 @@
+prophet==1.1.2
+mysql-connector-python==8.0.33
+pandas==1.5.3
+numpy==1.24.3
+matplotlib==3.7.2
+scikit-learn==1.0.2
