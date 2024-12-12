@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace;
 
 use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\DataObject\VariantProduct;
 
 interface MarketplaceConnectorInterface
 {
@@ -15,5 +16,9 @@ interface MarketplaceConnectorInterface
     public function downloadInventory();
 
     public function import($updateFlag, $importFlag);
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null);
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null);
 
 }

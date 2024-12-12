@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace;
 
 use App\Connector\Marketplace\MarketplaceConnectorInterface;
+use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Command\CacheImagesCommand;
 use Pimcore\Model\DataObject\Data\Link;
@@ -52,7 +53,10 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         return $this->marketplace;
     }
 
-    public function convertCurrency($amount, $fromCurrency, $toCurrency) //$amount:!String $fromCurrency:!String $toCurrency:!String
+    /**
+     * @throws Exception
+     */
+    public function convertCurrency($amount, $fromCurrency, $toCurrency): string //$amount:!String $fromCurrency:!String $toCurrency:!String
     {
         if ($fromCurrency === $toCurrency) {
             return $amount;
@@ -73,16 +77,16 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         $db = \Pimcore\Db::get();
         $sql = 
         "
-        SELECT
-            value
-        FROM 
-            iwa_currency_history
-        WHERE 
-            currency = :currency
-            AND DATE(date) <= :today
-        ORDER BY 
-            ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC
-        LIMIT 1;
+            SELECT
+                value
+            FROM 
+                iwa_currency_history
+            WHERE 
+                currency = :currency
+                AND DATE(date) <= :today
+            ORDER BY 
+                ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC
+            LIMIT 1;
         ";
         if ($fromCurrencyValue === null) {
             $fromCurrencyValue = $db->fetchOne($sql, [
@@ -102,8 +106,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         $convertedPrice = bcdiv($convertedPrice, (string)$toCurrencyValue, 2);    
         $roundedPrice = bcdiv($convertedPrice, "1", 0); 
         $finalPrice = bcdiv($roundedPrice, "100", 2);
-        $finalPrice = (string) $finalPrice;
-        return $finalPrice;
+        return (string) $finalPrice;
     }
 
 }

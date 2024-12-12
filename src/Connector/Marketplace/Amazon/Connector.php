@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use Exception;
+use Pimcore\Model\DataObject\VariantProduct;
 use SellingPartnerApi\Seller\SellerConnector;
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
@@ -101,6 +102,16 @@ class Connector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         $this->inventoryHelper->downloadInventory();
+    }
+
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+
+    }
+
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+
     }
 
 }
