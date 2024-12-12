@@ -2,20 +2,34 @@
 
 namespace App\Connector\Marketplace;
 
+use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TakealotConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'offers' => "https://seller-api.takealot.com/v2/offers/",
-        'orders' => "https://seller-api.takealot.com/v2/sales/summary",
+        'orders' => "https://seller-api.takealot.com/v2/sales/summary"
     ];
 
-    public static string $marketplaceType = 'Takealot';
-    
-    public function download($forceDownload = false)
+    public static $marketplaceType = 'Takealot';
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function download($forceDownload = false): void
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
@@ -55,29 +69,26 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    public function createUrlLink($url,$title)
+    public function createUrlLink($url,$title): string
     {
         $titleParts = explode('-', $title);
         $size = "";
         $colour_variant = "";
+        $lastPart = trim($titleParts[count($titleParts) - 1]);
         if (count($titleParts) >= 3) {
-            $lastPart = trim($titleParts[count($titleParts) - 1]);
-            if (strpos($lastPart, 'cm') !== false) {
+            if (str_contains($lastPart, 'cm')) {
                 $size = $lastPart;
                 $size = trim($size);
                 $size = str_replace(' ', '+', $size);
                 $colour_variant = trim($titleParts[count($titleParts) - 2]);
-                $colour_variant = trim($colour_variant);
-                $colour_variant = str_replace(' ', '+', $colour_variant);
             } else {
                 $colour_variant = $lastPart;
-                $colour_variant = trim($colour_variant);
-                $colour_variant = str_replace(' ', '+', $colour_variant);
             }
+            $colour_variant = trim($colour_variant);
+            $colour_variant = str_replace(' ', '+', $colour_variant);
         }
         else {
-            $lastPart = trim($titleParts[count($titleParts) - 1]);
-            if (strpos($lastPart, 'cm') !== false) {
+            if (str_contains($lastPart, 'cm')) {
                 $size = $lastPart;
                 $size = trim($size);
                 $size = str_replace(' ', '+', $size);
@@ -101,16 +112,18 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         return $newUrl;
     }
 
-    public function getParentId ($url)
+    public function getParentId ($url): string
     {   
         $urlParts = explode('/', $url);
-        $lastPart = $urlParts[count($urlParts) - 1];
-        return $lastPart;
+        return $urlParts[count($urlParts) - 1];
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
-        
         if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
@@ -152,7 +165,14 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         }    
     }
 
-    public function downloadOrders()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function downloadOrders(): void
     {
         $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
             'headers' => [
@@ -160,7 +180,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->toArray());
-        
     }
     
     public function downloadInventory()
@@ -168,14 +187,93 @@ class TakealotConnector extends MarketplaceConnectorAbstract
 
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws Exception
+     */
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
-
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        $offerId = json_decode($listing->jsonRead('apiResponseJson'), true)['offer_id'];
+        if (empty($offerId)) {
+            echo "Offer ID not found\n";
+            return;
+        }
+        $response = $this->httpClient->request('PATCH', static::$apiUrl['offers'], [
+            'headers' => [
+                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+            ],
+            'query' => [
+                'identifier' => $offerId
+            ],
+            'json' => [
+                'leadtime_stock' => [
+                    'merchant_warehouse_id' => "000000",
+                    'quantity' => $targetValue
+                ]
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $date = date('Y-m-d H:i:s');
+        $filename = "{$offerId}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetInventory', $data);
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * @throws Exception
+     * @throws TransportExceptionInterface
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetPrice === null) {
+            echo "Error: Price cannot be null\n";
+            return;
+        }
+        if ($targetCurrency === null) {
+            $targetCurrency = $listing->getSaleCurrency();
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+        if ($finalPrice === null) {
+            echo "Error: Currency conversion failed\n";
+            return;
+        }
+        $offerId = json_decode($listing->jsonRead('apiResponseJson'), true)['offer_id'];
+        if (empty($offerId)) {
+            echo "Offer ID not found\n";
+            return;
+        }
+        $response = $this->httpClient->request('PATCH', static::$apiUrl['offers'], [
+            'headers' => [
+                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+            ],
+            'query' => [
+                'identifier' => $offerId
+            ],
+            'json' => [
+                'selling_price' => $finalPrice
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $date = date('Y-m-d H:i:s');
+        $filename = "{$offerId}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $data);
     }
 
 }
