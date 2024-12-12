@@ -209,7 +209,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     );
                 }
                 $db->commit();
-
             } catch (\Exception $e) {
                 $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
