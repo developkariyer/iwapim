@@ -12,7 +12,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token",
         'offers' => 'https://marketplace.walmartapis.com/v3/items',
         'item' => 'https://marketplace.walmartapis.com/v3/items/',
-        'associations' => 'https://marketplace.walmartapis.com/v3/items/associations'
+        'associations' => 'https://marketplace.walmartapis.com/v3/items/associations',
+        'orders' => 'https://marketplace.walmartapis.com/v3/orders'
     ];
     public static $marketplaceType = 'Wallmart';
     public static $expires_in;
@@ -56,14 +57,13 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
-        }
-        echo "Token is valid. Proceeding with download...\n";
+       }
+       echo "Token is valid. Proceeding with download...\n";
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
         }
-         
         $offset = 0;
         $limit = 20;
         $this->listings = [];
@@ -103,7 +103,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
-    public function getAnItem($sku)
+    public function getAnItem($sku): void
     {
         $response = $this->httpClient->request('GET', static::$apiUrl['item'] . $sku, [
             'headers' => [
@@ -178,7 +178,27 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders()
     {
-        
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+            $this->prepareToken();
+        }
+        $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
+            ],
+            'query' => [
+                'limit' => $limit,
+                'offset' => $offset
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        print_r($response->getContent());
     }
     
     public function downloadInventory()
