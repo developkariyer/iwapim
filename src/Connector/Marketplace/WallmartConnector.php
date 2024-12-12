@@ -16,7 +16,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'item' => 'https://marketplace.walmartapis.com/v3/items/',
         'associations' => 'https://marketplace.walmartapis.com/v3/items/associations',
         'orders' => 'https://marketplace.walmartapis.com/v3/orders',
-        'inventory' => 'https://marketplace.walmartapis.com/v3/inventory'
+        'inventory' => 'https://marketplace.walmartapis.com/v3/inventory',
+        'price' => 'https://marketplace.walmartapis.com/v3/price'
     ];
     public static $marketplaceType = 'Wallmart';
     public static $expires_in;
@@ -299,7 +300,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'sku' => $sku
             ],
             'json' => [
-                'inventory' => $sku,
+                'sku' => $sku,
                 'quantity' => [
                     'unit' => 'EACH',
                     'amount' => $targetValue
@@ -320,7 +321,55 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-
+        if (!$listing instanceof VariantProduct) {
+            echo "Listing is not a VariantProduct\n";
+            return;
+        }
+        if ($targetPrice === null) {
+            echo "Error: Price cannot be null\n";
+            return;
+        }
+        if ($targetCurrency === null) {
+            $targetCurrency = $listing->getSaleCurrency();
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+        if ($finalPrice === null) {
+            echo "Error: Currency conversion failed\n";
+            return;
+        }
+        $sku = json_decode($listing->jsonRead('apiResponseJson'), true)['sku'];
+        if ($sku === null) {
+            echo "Error: Barcode is missing\n";
+            return;
+        }
+        $response = $this->httpClient->request('GET',  static::$apiUrl['price'], [
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
+            ],
+            'json' => [
+                'sku' => $sku,
+                'pricing' => [
+                    'currentPriceType' => 'BASE',
+                    'currentPrice' => [
+                        'currency' => $listing->getSaleCurrency(),
+                        'amount' => (float) $finalPrice
+                    ]
+                ]
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        echo "Price set to $finalPrice\n";
+        $date = date('Y-m-d H:i:s');
+        $data = $response->toArray();
+        $filename = "{$sku}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $data);
     }
    
 }
