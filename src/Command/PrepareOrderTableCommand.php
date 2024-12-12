@@ -101,11 +101,11 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    //'Shopify' => $this->transferOrdersFromShopify($id,$marketplaceType),
-                    //'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
-                    //'Bol.com' => $this->transferOrdersFromBolcom($id,$marketplaceType),
-                    //'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType),
-                    //'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType),
+                    'Shopify' => $this->transferOrdersFromShopify($id,$marketplaceType),
+                    'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
+                    'Bol.com' => $this->transferOrdersFromBolcom($id,$marketplaceType),
+                    'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType),
+                    'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType),
                     'Takealot' => $this->transferOrdersTakealot($id,$marketplaceType),
                     default => null,
                 };
@@ -603,11 +603,11 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
-            //'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            //'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            //'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
-            //'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
+            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
             'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
             default => null,
         };
@@ -1363,4 +1363,5 @@ class PrepareOrderTableCommand extends AbstractCommand
             }
         }
     }
+
 }
