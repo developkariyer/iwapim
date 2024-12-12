@@ -33,16 +33,16 @@ def run_forecast_pipeline(yaml_path):
     # Step 2: Iterate through each ASIN/Sales Channel pair
     for _, row in pairs.iterrows():
         asin = row['asin']
-       sales_channel = row['sales_channel']
+        sales_channel = row['sales_channel']
 
-       # Remove 'Amazon.' prefix from sales_channel for display
-       display_channel = sales_channel.replace('Amazon.', '')
+        # Remove 'Amazon.' prefix from sales_channel for display
+        display_channel = sales_channel.replace('Amazon.', '')
 
-       # Update progress display
-       channel_counts[display_channel] += 1
-       progress_summary = " | ".join(f"{channel} {count}" for channel, count in channel_counts.items())
-       sys.stdout.write(f"\r{progress_summary}")
-       sys.stdout.flush()
+        # Update progress display
+        channel_counts[display_channel] += 1
+        progress_summary = " | ".join(f"{channel} {count}" for channel, count in channel_counts.items())
+        sys.stdout.write(f"\r{progress_summary}")
+        sys.stdout.flush()
 
         try:
             # Step 3: Fetch historical sales data
