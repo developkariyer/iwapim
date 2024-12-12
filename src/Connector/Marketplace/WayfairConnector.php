@@ -148,7 +148,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             query getDropshipPurchaseOrders {
                 getDropshipPurchaseOrders(
                     limit: $limit,
-                    sortOrder: DESC,
+                    sortOrder: ASC,
                     fromDate: "$fromDate"
                 ) {
                     poNumber,
@@ -196,7 +196,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 $data = $response->toArray();
                 $orders = $data['data']['getDropshipPurchaseOrders'];
                 $ordersCount = count($orders);
-                $lastDate = $orders[0]['poDate'];
+                $lastDate = $orders[$ordersCount - 1]['poDate'];
                 $db->beginTransaction();
                 foreach ($orders as $order) {
                     $db->executeStatement(
