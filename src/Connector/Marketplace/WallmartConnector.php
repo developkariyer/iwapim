@@ -215,7 +215,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     ],
                     'query' => [
                         'limit' => $limit,
-                        'offset' => $offset,
                         'createdStartDate' => $startDate,
                         'createdEndDate' => $endDate
                     ]
