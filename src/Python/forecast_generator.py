@@ -23,7 +23,7 @@ def generate_forecast(data, forecast_days=180):
     model = Prophet()
 
     # Fit the model on historical data
-    model.fit(data)
+    model.fit(data, verbose=False)
 
     # Create a future DataFrame for the next 6 months
     future = model.make_future_dataframe(periods=forecast_days)
