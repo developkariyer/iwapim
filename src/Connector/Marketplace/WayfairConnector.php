@@ -140,57 +140,84 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        //$fromDate = "2024-05-01T00:00:00Z";
-        $fromDate = "2024-12-13T00:00:00Z";
-        $query = <<<GRAPHQL
-        query getDropshipPurchaseOrders {
-            getDropshipPurchaseOrders(
-                limit: 10,
-                sortOrder: ASC,
-                fromDate: "$fromDate"
-            ) {
-                poNumber,
-                poDate,
-                estimatedShipDate,
-                customerName,
-                customerAddress1,
-                customerAddress2,
-                customerCity,
-                customerState,
-                customerPostalCode,
-                orderType,
-                shippingInfo {
-                    shipSpeed,
-                    carrierCode
-                },
-                packingSlipUrl,
-                warehouse {
-                    id,
-                    name
-                },
-                products {
-                    partNumber,
-                    quantity,
-                    price,
-                    event {
-                        startDate,
-                        endDate
+        $db = \Pimcore\Db::get();
+        $fromDate = "2024-05-01T00:00:00Z";
+        $limit = 200;
+        do {
+            $query = <<<GRAPHQL
+            query getDropshipPurchaseOrders {
+                getDropshipPurchaseOrders(
+                    limit: $limit,
+                    sortOrder: DESC,
+                    fromDate: "$fromDate"
+                ) {
+                    poNumber,
+                    poDate,
+                    estimatedShipDate,
+                    customerName,
+                    customerAddress1,
+                    customerAddress2,
+                    customerCity,
+                    customerState,
+                    customerPostalCode,
+                    orderType,
+                    shippingInfo {
+                        shipSpeed,
+                        carrierCode
+                    },
+                    packingSlipUrl,
+                    warehouse {
+                        id,
+                        name
+                    },
+                    products {
+                        partNumber,
+                        quantity,
+                        price,
+                        event {
+                            startDate,
+                            endDate
+                        }
                     }
                 }
             }
-        }
-        GRAPHQL;
-        $response = $this->httpClient->request('POST',static::$apiUrl['prod'], [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
-                'Content-Type' => 'application/json'
-            ],
-            'json' => ['query' => $query]
-        ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
-        }
-        print_r($response->getContent());
+            GRAPHQL;
+            $response = $this->httpClient->request('POST',static::$apiUrl['prod'], [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => ['query' => $query]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            }
+            try {
+                $data = $response->toArray();
+                $orders = $data['data']['getDropshipPurchaseOrders'];
+                $ordersCount = count($orders);
+                $lastDate = $orders[0]['poDate'];
+                $db->beginTransaction();
+                foreach ($orders as $order) {
+                    $db->executeStatement(
+                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        [
+                            $this->marketplace->getId(),
+                            $order['poNumber'],
+                            json_encode($order)
+                        ]
+                    );
+                }
+                $db->commit();
+
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            echo "From date: $fromDate\n";
+            echo "Orders downloaded: $ordersCount\n";
+            $fromDate = $lastDate;
+        }while($ordersCount === $limit);
     }
     public function testEndpoint()
     {
