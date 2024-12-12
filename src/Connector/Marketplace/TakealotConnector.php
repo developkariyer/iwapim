@@ -17,7 +17,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
         'offers' => "https://seller-api.takealot.com/v2/offers/",
-        'orders' => "https://seller-api.takealot.com/v2/sales/summary"
+        'orders' => "https://seller-api.takealot.com/v2/sales"
     ];
 
     public static $marketplaceType = 'Takealot';
@@ -174,12 +174,48 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
-            'headers' => [
-                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-            ]
-        ]);
-        print_r($response->toArray());
+        $db = \Pimcore\Db::get();
+        $page = 1;
+        $size = 100;
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
+                'headers' => [
+                    'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+                ],
+                'query' => [
+                    'page_number' => $page,
+                    'page_size' => $size
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            try {
+                $data = $response->toArray();
+                $orders = $data['sales'];
+                $db->beginTransaction();
+                foreach ($orders as $order) {
+                    $db->executeStatement(
+                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                        [
+                            $this->marketplace->getId(),
+                            $order['order_id'],
+                            json_encode($order)
+                        ]
+                    );
+                }
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            echo "Page: " . $page . " ";
+            $page++;
+            echo ".";
+            sleep(1);
+        } while ($data['page_summary'] === $size);
     }
     
     public function downloadInventory()
