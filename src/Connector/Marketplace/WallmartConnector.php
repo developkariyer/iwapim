@@ -209,7 +209,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $db->beginTransaction();
                 foreach ($orders as $key => $order) {
                     echo "Key: $key\n";
-                    echo json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n";
+                    print_r($order[0]['purchaseOrderId']);
                 }
                 /*foreach ($orders as $order) {
                     print_r($order['purchaseOrderId']);
