@@ -64,13 +64,10 @@ def fetch_pairs(yaml_path):
             engine.dispose()
 
 
-from sqlalchemy import create_engine, text
-import pandas as pd
-import math
-
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     """
     Inserts or updates forecasted data into the MySQL `iwa_amazon_daily_sales_summary` table.
+
     Args:
         forecast_data (pd.DataFrame): Forecasted data with columns:
                                       - 'ds': Date
@@ -86,70 +83,77 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     if not required_columns.issubset(forecast_data.columns):
         raise ValueError(f"Forecast data must contain columns: {required_columns}")
 
-    engine = None
+    connection = None
     try:
         # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
 
-        # Create SQLAlchemy engine with pymysql
-        db_url = f"mysql+pymysql://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
-        engine = create_engine(db_url)
+        # Connect to the database
+        connection = pymysql.connect(
+            host=mysql_config['host'],
+            user=mysql_config['user'],
+            password=mysql_config['password'],
+            database=mysql_config['database'],
+            port=mysql_config.get('port', 3306),
+            cursorclass=pymysql.cursors.DictCursor,
+        )
 
         # SQL query for iwasku mapping
-        iwasku_query = text("""
+        iwasku_query = """
         SELECT COALESCE(
-            (SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin
+            (SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = %s), %s
         ) AS iwasku
-        """)
+        """
 
         # SQL query for inserting or updating forecast data
-        insert_query = text("""
+        insert_query = """
         INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, iwasku, sale_date, total_quantity, data_source)
-        VALUES (:asin, :sales_channel, :iwasku, :sale_date, :total_quantity, :data_source)
+        VALUES (%s, %s, %s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE
             total_quantity = VALUES(total_quantity),
-            data_source = VALUES(data_source);
-        """)
+            data_source = VALUES(data_source)
+        """
 
-        # Connect to the database
-        with engine.connect() as connection:
+        with connection.cursor() as cursor:
             # Fetch iwasku mapping
-            iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
-            iwasku = iwasku_result[0] if iwasku_result else asin
+            cursor.execute(iwasku_query, (asin, asin))
+            iwasku_result = cursor.fetchone()
+            iwasku = iwasku_result['iwasku'] if iwasku_result else asin
             print(f"Resolved iwasku: {iwasku}")
 
             # Prepare data for insertion
             forecast_data['asin'] = asin
             forecast_data['sales_channel'] = sales_channel
             forecast_data['iwasku'] = iwasku
-            forecast_data['data_source'] = 0
+            forecast_data['data_source'] = 0  # 0 indicates forecasted data
             forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
             forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
             forecast_data['sale_date'] = forecast_data['sale_date'].dt.strftime('%Y-%m-%d')  # Ensure DATE format
 
             # Insert rows
             rows_to_insert = [
-                {
-                    'asin': row.asin,
-                    'sales_channel': row.sales_channel,
-                    'iwasku': row.iwasku,
-                    'sale_date': row.sale_date,
-                    'total_quantity': row.total_quantity,
-                    'data_source': row.data_source,
-                }
+                (
+                    row.asin,
+                    row.sales_channel,
+                    row.iwasku,
+                    row.sale_date,
+                    row.total_quantity,
+                    row.data_source
+                )
                 for row in forecast_data.itertuples(index=False)
             ]
 
-            # Execute each insert query
             for row in rows_to_insert:
                 print(f"Inserting row: {row}")
-                result = connection.execute(insert_query, row)
-                print(f"Affected rows: {result.rowcount}")
+                cursor.execute(insert_query, row)
+
+            connection.commit()
+            print("Data inserted/updated successfully.")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data: {e}")
         raise
 
     finally:
-        if engine:
-            engine.dispose()
+        if connection:
+            connection.close()
