@@ -206,19 +206,18 @@ def delete_forecast_data(asin, sales_channel, yaml_path):
     conn = None
     try:
         # Load MySQL configuration from YAML file
-        with open(yaml_path, 'r') as file:
-            mysql_config = yaml.safe_load(file)
+        mysql_config = get_mysql_config(yaml_path)
 
-        # Connect to the database using PyMySQL
-        conn = pymysql.connect(
+        # Connect to the database
+        connection = pymysql.connect(
             host=mysql_config['host'],
             user=mysql_config['user'],
             password=mysql_config['password'],
             database=mysql_config['database'],
-            port=mysql_config['port'],
-            cursorclass=pymysql.cursors.DictCursor
+            port=mysql_config.get('port', 3306),
+            cursorclass=pymysql.cursors.DictCursor,
         )
-        cursor = conn.cursor()
+        cursor = connection.cursor()
 
         # Define the delete query
         query = """
@@ -230,12 +229,12 @@ def delete_forecast_data(asin, sales_channel, yaml_path):
 
         # Execute the delete query
         cursor.execute(query, (asin, sales_channel))
-        conn.commit()
+        connection.commit()
         print(f"Old forecast data deleted for ASIN: {asin}, Sales Channel: {sales_channel}.")
 
     except pymysql.MySQLError as e:
         print(f"Error deleting forecast data for ASIN {asin}, Sales Channel {sales_channel}: {e}")
 
     finally:
-        if conn:
-            conn.close()
+        if connection:
+            connection.close()
