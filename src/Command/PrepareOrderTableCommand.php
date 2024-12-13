@@ -95,18 +95,21 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
+        $filePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/';
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
             if (isset($this->marketplaceListWithIds[$id])) {
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersFromShopify($id,$marketplaceType),
-                    'Trendyol' => $this->transferOrdersTrendyol($id,$marketplaceType),
-                    'Bol.com' => $this->transferOrdersFromBolcom($id,$marketplaceType),
-                    'Etsy' => $this->transferOrdersEtsy($id,$marketplaceType),
-                    'Amazon' => $this->transferOrdersAmazon($id,$marketplaceType),
-                    'Takealot' => $this->transferOrdersTakealot($id,$marketplaceType),
+                    'Shopify' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_shopify.sql', $id, $marketplaceType),
+                    'Trendyol' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_trendyol.sql', $id,$marketplaceType),
+                    'Bol.com' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_bolcom.sql', $id,$marketplaceType),
+                    'Etsy' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_etsy.sql', $id,$marketplaceType),
+                    'Amazon' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_amazon.sql', $id,$marketplaceType),
+                    'Takealot' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_takealot.sql', $id,$marketplaceType),
+                    'Wallmart' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_wallmart.sql', $id,$marketplaceType),
+                    'Ciceksepeti' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_ciceksepeti.sql', $id,$marketplaceType),
                     default => null,
                 };
                 echo "Complated: $marketplaceType\n";
@@ -114,373 +117,16 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function transferOrdersAmazon($marketPlaceId, $marketplaceType): void
+    protected function transferOrdersExecute($sqlPath, $marketPlaceId, $marketPlaceType): void
     {
-        $amazonSql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
-            total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
-            SELECT
-                '$marketplaceType',
-                '$marketPlaceId',
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.PurchaseDate')) AS created_at,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.LastUpdateDate')) AS closed_at,                     
-                order_id AS order_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.OrderItemId')) AS product_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ItemPrice.Amount')) AS price,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ItemPrice.CurrencyCode')) AS currency,        
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.QuantityOrdered')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.Title')) AS variant_title,
-                (CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.PromotionDiscount.Amount')) AS DECIMAL(10,2)) + 
-                CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.PromotionDiscountTax.Amount')) AS DECIMAL(10,2))) AS total_discount,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.City')) as shipping_city,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.CountryCode')) AS shipping_country_code,
-               CONCAT(
-                    JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.CountryCode')),
-                    '-',
-                    JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.StateOrRegion'))
-                ) AS province_code,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderTotal.Amount')) AS total_price,  
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderStatus')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.FulfillmentChannel')) AS tracking_company
-            FROM
-                iwa_marketplace_orders
-                CROSS JOIN JSON_TABLE(json, '$.OrderItems[*]' COLUMNS (
-                    value JSON PATH '$'
-                )) AS line_item
-            WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) != ''
-                AND marketplace_id = $marketPlaceId
-			ON DUPLICATE KEY UPDATE 
-                marketplace_type = VALUES(marketplace_type),
-                marketplace_id = VALUES(marketplace_id),
-                created_at = VALUES(created_at),
-                closed_at = VALUES(closed_at),
-                product_id = VALUES(product_id),
-                variant_id = VALUES(variant_id),
-                price = VALUES(price),
-                currency = VALUES(currency),
-                quantity = VALUES(quantity),
-                variant_title = VALUES(variant_title),
-                total_discount = VALUES(total_discount),
-                shipping_city = VALUES(shipping_city),
-                shipping_country_code = VALUES(shipping_country_code),
-                total_price = VALUES(total_price),
-                fulfillments_status = VALUES(fulfillments_status),
-                province_code = VALUES(province_code),
-                tracking_company = VALUES(tracking_company);";
+        $sql = file_get_contents($sqlPath);
         try {
             $db = \Pimcore\Db::get();
-            $db->query($amazonSql);
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
-    protected function transferOrdersEtsy($marketPlaceId, $marketplaceType): void
-    {
-        $etsySql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, 
-            total_discount, shipping_city, shipping_country_code, total_price, subtotal_price, fulfillments_status, tracking_company)
-            SELECT
-                '$marketplaceType',
-                '$marketPlaceId',
-                FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_timestamp')) AS UNSIGNED)) AS created_at,
-                FROM_UNIXTIME(CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.updated_timestamp')) AS UNSIGNED)) AS closed_at,         
-                order_id AS order_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.listing_id')) AS product_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.amount')) / JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.divisor')) AS price,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price.currency_code')) AS currency,        
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.title')) AS variant_title,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.discount_amt.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.discount_amt.divisor'))  AS total_discount,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.city')) AS shipping_city,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.country_iso')) AS shipping_country_code,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.grandtotal.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.grandtotal.divisor'))  AS total_price,  
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.amount')) / JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal.divisor'))  AS subtotal_price,  
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(shipments.value, '$.carrier_name')) AS tracking_company
-            FROM
-                iwa_marketplace_orders
-                CROSS JOIN JSON_TABLE(json, '$.transactions[*]' COLUMNS (
-                    value JSON PATH '$'
-                )) AS line_item
-                CROSS JOIN JSON_TABLE(json, '$.shipments[*]' COLUMNS (
-                    value JSON PATH '$'
-                )) AS shipments
-            WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) != ''
-                AND marketplace_id = $marketPlaceId
-			ON DUPLICATE KEY UPDATE 
-                marketplace_type = VALUES(marketplace_type),
-                marketplace_id = VALUES(marketplace_id),
-                created_at = VALUES(created_at),
-                closed_at = VALUES(closed_at),
-                product_id = VALUES(product_id),
-                variant_id = VALUES(variant_id),
-                price = VALUES(price),
-                currency = VALUES(currency),
-                quantity = VALUES(quantity),
-                variant_title = VALUES(variant_title),
-                total_discount = VALUES(total_discount),
-                shipping_country = VALUES(shipping_country),
-                shipping_city = VALUES(shipping_city),
-                shipping_country_code = VALUES(shipping_country_code),
-                total_price = VALUES(total_price),
-                subtotal_price = VALUES(subtotal_price),
-                fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company);";
-        try {
-            $db = \Pimcore\Db::get();
-            $db->query($etsySql);
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
-    protected function transferOrdersTrendyol($marketPlaceId, $marketplaceType): void
-    {
-        $trendyolSql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount, 
-            shipping_city, shipping_company, shipping_country_code,total_price, fulfillments_status, tracking_company)
-            SELECT
-                '$marketplaceType',
-                '$marketPlaceId',
-                FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
-                FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.lastModifiedDate')) / 1000) AS closed_at,         
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderNumber')) AS order_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.id')) AS product_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.currencyCode')) AS currency,        
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productName')) AS variant_title,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalDiscount')) AS total_discount,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.invoiceAddress.city')) AS shipping_city,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.commercial')) AS shipping_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.invoiceAddress.countryCode')) AS shipping_country_code,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company
-            FROM
-                iwa_marketplace_orders
-                CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
-                    value JSON PATH '$'
-                )) AS line_item
-            WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
-                AND marketplace_id = $marketPlaceId
-			ON DUPLICATE KEY UPDATE
-                marketplace_type = VALUES(marketplace_type),
-                marketplace_id = VALUES(marketplace_id),
-                created_at = VALUES(created_at),
-                closed_at = VALUES(closed_at),
-                product_id = VALUES(product_id),
-                variant_id = VALUES(variant_id),
-                price = VALUES(price),
-                currency = VALUES(currency),
-                quantity = VALUES(quantity),
-                variant_title = VALUES(variant_title),
-                total_discount = VALUES(total_discount),
-                shipping_city = VALUES(shipping_city),
-                shipping_company = VALUES(shipping_company),
-                shipping_country_code = VALUES(shipping_country_code),
-                total_price = VALUES(total_price),
-                fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company)";
-        try {
-            $db = \Pimcore\Db::get();
-            $db->query($trendyolSql);
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
-    protected function transferOrdersFromShopify($marketPlaceId, $marketplaceType): void
-    {
-        $shopifySql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
-                shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code, total_price, subtotal_price, 
-                fulfillments_status, tracking_company, fulfillments_status_control, referring_site, landing_site
-            )
-            SELECT
-                '$marketplaceType',
-                '$marketPlaceId',
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.closed_at')) AS closed_at,               
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.id')) AS order_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.product_id')) AS product_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,        
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.name')) AS variant_title,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_discounts')) AS total_discount,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country')) AS shipping_country,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.province')) AS shipping_province,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.city')) AS shipping_city,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.company')) AS shipping_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country_code')) AS shipping_country_code,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')), NULL) AS fulfillments_status,
-                COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelled_at')) AS fulfillments_status_control,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.referring_site')) AS referring_site,
-                COALESCE(LEFT(JSON_UNQUOTE(JSON_EXTRACT(json, '$.landing_site')), 255), NULL) AS landing_site
-            FROM
-                iwa_marketplace_orders
-                CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
-                LEFT JOIN JSON_TABLE(json, '$.fulfillments[*]' COLUMNS ( value JSON PATH '$' )) AS fulfillments ON TRUE
-                LEFT JOIN JSON_TABLE(json, '$.discount_applications[*]' COLUMNS ( value JSON PATH '$' )) AS discount_application ON TRUE
-            WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
-                AND marketplace_id = $marketPlaceId
-            ON DUPLICATE KEY UPDATE
-                marketplace_type = VALUES(marketplace_type),
-                marketplace_id = VALUES(marketplace_id),
-                created_at = VALUES(created_at),
-                closed_at = VALUES(closed_at),
-                product_id = VALUES(product_id),
-                variant_id = VALUES(variant_id),
-                price = VALUES(price),
-                currency = VALUES(currency),
-                quantity = VALUES(quantity),
-                variant_title = VALUES(variant_title),
-                total_discount = VALUES(total_discount),
-                shipping_country = VALUES(shipping_country),
-                shipping_province = VALUES(shipping_province),
-                shipping_city = VALUES(shipping_city),
-                shipping_company = VALUES(shipping_company),
-                shipping_country_code = VALUES(shipping_country_code),
-                total_price = VALUES(total_price),
-                subtotal_price = VALUES(subtotal_price),
-                fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company),
-                fulfillments_status_control = VALUES(fulfillments_status_control),
-                referring_site = VALUES(referring_site),
-                landing_site = VALUES(landing_site);";
-        try {
-            $db = \Pimcore\Db::get();
-            $db->query($shopifySql);
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
-    protected function transferOrdersFromBolcom($marketPlaceId, $marketplaceType): void
-    {
-        $bolcomSql = "
-        INSERT INTO iwa_marketplace_orders_line_items (
-            marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
-            variant_title,  shipping_city, shipping_country_code, fulfillments_status, fulfillments_status_control
-        )
-        SELECT
-            '$marketplaceType',
-            '$marketPlaceId',
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS created_at,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderPlacedDateTime')) AS closed_at,               
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderId')) AS order_id,
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.ean')) AS product_id,
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS variant_id,
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.unitPrice')) AS price,
-            'EUR' AS currency,        
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.quantity')) AS quantity,
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.title')) AS variant_title,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.city')) AS shipping_city,
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.countryCode')) AS shipping_country_code,
-            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.cancellationRequest')) AS fulfillments_status_control
-        FROM
-            iwa_marketplace_orders
-            CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
-            CROSS JOIN JSON_TABLE(json, '$.orderDetail.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item_detail
-        WHERE
-            JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) IS NOT NULL
-            AND JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) != 'null'
-            AND JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) != ''
-            AND CAST(JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) AS UNSIGNED) > 0
-            AND marketplace_id = $marketPlaceId
-        ON DUPLICATE KEY UPDATE
-            marketplace_type = VALUES(marketplace_type),
-            marketplace_id = VALUES(marketplace_id),    
-            created_at = VALUES(created_at),
-            closed_at = VALUES(closed_at),
-            product_id = VALUES(product_id),
-            variant_id = VALUES(variant_id),
-            price = VALUES(price),
-            quantity = VALUES(quantity),
-            variant_title = VALUES(variant_title),
-            shipping_city = VALUES(shipping_city),
-            shipping_country_code = VALUES(shipping_country_code),
-            fulfillments_status = VALUES(fulfillments_status),
-            fulfillments_status_control = VALUES(fulfillments_status_control);";
-        try {
-            $db = \Pimcore\Db::get();
-            $db->query($bolcomSql);
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
-    protected function transferOrdersTakealot($marketPlaceId, $marketplaceType): void
-    {
-        $takealotSql = "
-            INSERT INTO iwa_marketplace_orders_line_items (
-                marketplace_type, marketplace_id, created_at, order_id, product_id, variant_id, price, 
-                currency, quantity, variant_title, fulfillments_status, tracking_company
-            )
-            SELECT
-                '$marketplaceType',
-                '$marketPlaceId',
-                DATE_FORMAT(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_date')), '%d %b %Y %H:%i:%s'), '%Y-%m-%d %H:%i:%s') AS created_at,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_id')) AS order_id,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.order_item_id')) AS product_id,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) AS variant_id,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.selling_price')) AS price,
-                'ZAR' AS currency,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.quantity')) AS quantity,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.product_title')) AS variant_title,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.sale_status')) AS fulfillments_status,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.dc')) AS tracking_company
-            FROM
-                iwa_marketplace_orders
-            WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(json, '$.tsin')) AS UNSIGNED) > 0
-                AND marketplace_id = $marketPlaceId
-            ON DUPLICATE KEY UPDATE
-                marketplace_type = VALUES(marketplace_type),
-                marketplace_id = VALUES(marketplace_id),
-                created_at = VALUES(created_at),
-                product_id = VALUES(product_id),
-                variant_id = VALUES(variant_id),
-                price = VALUES(price),
-                currency = VALUES(currency),
-                quantity = VALUES(quantity),
-                variant_title = VALUES(variant_title),
-                fulfillments_status = VALUES(fulfillments_status),
-                tracking_company = VALUES(tracking_company);";
-        try {
-            $db = \Pimcore\Db::get();
-            $db->query($takealotSql);
+            $statement = $db->prepare($sql);
+            $statement->executeStatement([
+                'marketPlaceId' => $marketPlaceId,
+                'marketplaceType' => $marketPlaceType,
+            ]);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
@@ -600,6 +246,35 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
+    protected function getWallmartVariantProduct($uniqueMarketplaceId)
+    {
+        $sql = "
+            SELECT object_id
+            FROM iwa_json_store
+            WHERE field_name = 'apiResponseJson'
+            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?
+            LIMIT 1;";
+
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        if ($objectId) {
+            return VariantProduct::getById($objectId);
+        }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
+    }
+
+    protected function getCiceksepetiVariantProduct($uniqueMarketplaceId)
+    {
+        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        if ($variantProduct) {
+            return $variantProduct;
+        }
+        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+        return null;
+    }
+
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
     {
         $variantObject = match ($marketplaceType) {
@@ -609,6 +284,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
             'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
             'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
+            'Wallmart' => self::getWallmartVariantProduct($uniqueMarketplaceId),
+            'Ciceksepeti' => self::getCiceksepetiVariantProduct($uniqueMarketplaceId),
             default => null,
         };
         
@@ -916,6 +593,10 @@ class PrepareOrderTableCommand extends AbstractCommand
                 WHEN marketplace_type = 'Etsy' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'
                 WHEN marketplace_type = 'Amazon' AND fulfillments_status = 'Canceled' THEN 'cancelled'
                 WHEN marketplace_type = 'Amazon' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'  
+                WHEN marketplace_type = 'Wallmart' AND fulfillments_status_control = 'null' THEN 'cancelled'
+                WHEN marketplace_type = 'Wallmart' AND fulfillments_status_control != 'null' THEN 'not_cancelled'
+                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control = 'null' THEN 'cancelled'
+                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control != 'null' THEN 'not_cancelled'
             END;
         ";
         $stmt = $db->prepare($sql);
