@@ -53,6 +53,10 @@ def run_forecast_pipeline(yaml_path):
                 print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Insufficient data.")
                 continue
 
+            if data['y'].sum() == 0:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - All values in 'y' are zero. Skipping forecast.")
+                continue
+
             # Remove uninterrupted leading zeros
             #first_non_zero_idx = data['y'].ne(0).idxmax()  # Find the first index where 'y' is non-zero
             #data = data.loc[first_non_zero_idx:]  # Keep rows from the first non-zero value onward
