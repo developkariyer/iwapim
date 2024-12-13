@@ -62,7 +62,9 @@
             $('#lastYearNext7').text(data.lastYearNext7);
             $('#lastYearNext30').text(data.lastYearNext30);
             $('#lastYearNext90').text(data.lastYearNext90);
-            $('#lastYearTotal').text(data.lastYearTotal);
+            $('#lastYearTotal1').text(data.lastYearTotal1);
+            $('#lastYearTotal2').text(data.lastYearTotal2);
+            $('#lastTotal').text(data.lastTotal);
             $('#last90').text(data.last90);
             $('#last30').text(data.last30);
             $('#last7').text(data.last7);
@@ -321,7 +323,7 @@
                                     </colgroup>
                                     <tbody>
                                     <tr>
-                                        <th class="bg-black text-white py-0 px-2"></th>
+                                        <th class="bg-black text-white py-0 px-2">Top</th>
                                         <th class="bg-black text-white py-0 px-2">-90</th>
                                         <th class="bg-black text-white py-0 px-2">-30</th>
                                         <th class="bg-black text-white py-0 px-2">-7</th>
@@ -332,18 +334,18 @@
                                     </tr>
                                     <!-- First Row: Last Year Values -->
                                     <tr>
-                                        <th class="bg-black text-white py-0 px-2">Ö.Yıl</th>
+                                        <td class="bg-black text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearTotal1"></td>
                                         <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast90"></td>
                                         <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast30"></td>
                                         <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast7"></td>
                                         <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext7"></td>
                                         <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext30"></td>
                                         <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext90"></td>
-                                        <th class="bg-black text-white py-0 px-2" id="lastYearTotal"></th>
+                                        <th class="bg-black text-white py-0 px-2" id="lastYearTotal2"></th>
                                     </tr>
                                     <!-- Second Row: Current Year and Forecast Values -->
                                     <tr>
-                                        <th class="bg-black text-white py-0 px-2">B.Yıl</th>
+                                        <td class="bg-black text-white py-0 px-2" data-bs-toggle="tooltip" id="lastTotal"></td>
                                         <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last90"></td>
                                         <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last30"></td>
                                         <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last7"></td>
