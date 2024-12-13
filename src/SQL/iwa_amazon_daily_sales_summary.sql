@@ -104,6 +104,7 @@ DROP TEMPORARY TABLE IF EXISTS temp_full_data_set;
 
 CREATE TEMPORARY TABLE temp_full_data_set (
     asin VARCHAR(50),
+    iwasku VARCHAR(50),
     sales_channel VARCHAR(50),
     sale_date DATE,
     total_quantity INT,
@@ -111,6 +112,7 @@ CREATE TEMPORARY TABLE temp_full_data_set (
 ) AS
 SELECT
     a.asin,
+    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = a.asin), a.asin) AS iwasku,
     a.sales_channel,
     b.generated_date AS sale_date,
     IFNULL(d.total_quantity, 0) AS total_quantity,
@@ -132,6 +134,7 @@ DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary_temp;
 CREATE TABLE iwa_amazon_daily_sales_summary_temp AS
 SELECT
     asin,
+    iwasku,
     sales_channel,
     sale_date,
     total_quantity,
@@ -145,7 +148,8 @@ RENAME TABLE iwa_amazon_daily_sales_summary_temp TO iwa_amazon_daily_sales_summa
 
 -- Step 9: Add indexes for faster querying
 CREATE INDEX idx_asin ON iwa_amazon_daily_sales_summary (asin);
+CREATE INDEX idx_iwasku ON iwa_amazon_daily_sales_summary (iwasku);
 CREATE INDEX idx_sales_channel ON iwa_amazon_daily_sales_summary (sales_channel);
 CREATE INDEX idx_sale_date ON iwa_amazon_daily_sales_summary (sale_date);
 CREATE INDEX idx_data_source ON iwa_amazon_daily_sales_summary (data_source);
-ALTER TABLE iwa_amazon_daily_sales_summary ADD UNIQUE KEY (asin, sales_channel, sale_date, data_source);
+ALTER TABLE iwa_amazon_daily_sales_summary ADD UNIQUE KEY (asin, iwasku, sales_channel, sale_date, data_source);
