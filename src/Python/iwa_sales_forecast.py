@@ -51,6 +51,13 @@ def run_forecast_pipeline(yaml_path):
             if data.empty or data.dropna().shape[0] < 2:
                 continue
 
+            # Step 3.1: Remove uninterrupted leading zeros
+            data = data.loc[data['y'].ne(0).cumsum() > 0]  # Trim only leading zeros
+
+            # Check again if the data is still valid after cleaning
+            if data.empty or data.dropna().shape[0] < 2:
+                continue
+
             # Step 4: Generate forecast
             forecast = generate_forecast(data, forecast_days=180)
 
