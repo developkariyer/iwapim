@@ -111,7 +111,8 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             data_source = VALUES(data_source);
         """)
 
-        print(rows_to_insert.head())
+        print(rows_to_insert)
+        quit()
 
         # Execute batch insert/update without explicit transaction
         connection.execute(insert_query, [
