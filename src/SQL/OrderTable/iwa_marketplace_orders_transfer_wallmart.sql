@@ -22,13 +22,10 @@ SELECT
 FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.orderLines.orderLine[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
-        LEFT JOIN JSON_TABLE(json, '$.fulfillments[*]' COLUMNS ( value JSON PATH '$' )) AS fulfillments ON TRUE
-        LEFT JOIN JSON_TABLE(json, '$.discount_applications[*]' COLUMNS ( value JSON PATH '$' )) AS discount_application ON TRUE
 WHERE
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) IS NOT NULL
     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) != 'null'
     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) != ''
-    AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) AS UNSIGNED) > 0
     AND marketplace_id = :marketPlaceId
 ON DUPLICATE KEY UPDATE
     marketplace_type = VALUES(marketplace_type),
