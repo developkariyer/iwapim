@@ -46,7 +46,7 @@ def run_forecast_pipeline(yaml_path):
 
         try:
             # Step 3: Fetch historical sales data
-            if asin = 'all':
+            if asin := 'all':
                 continue
 
             data = fetch_data(asin, sales_channel, yaml_path)
