@@ -82,6 +82,8 @@ def run_forecast_pipeline(yaml_path):
             print(data.count())
             # data has two columns: 'ds' and 'y'. Print count of NaN in y
             print(data['y'].isnull().sum())
+            # print sum of y values
+            print(data['y'].sum())
             # stop all script
             break
 
