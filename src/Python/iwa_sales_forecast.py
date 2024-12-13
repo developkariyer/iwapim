@@ -40,7 +40,7 @@ def run_forecast_pipeline(yaml_path):
 
         # Update progress display
         channel_counts[display_channel] += 1
-        progress_summary = " | ".join(f"{channel} {count}" for channel, count in channel_counts.items())
+        progress_summary = "|".join(f"{channel} {count}" for channel, count in channel_counts.items())
         sys.stdout.write(f"\r{progress_summary}")
         sys.stdout.flush()
 
