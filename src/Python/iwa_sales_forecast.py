@@ -83,10 +83,10 @@ def run_forecast_pipeline(yaml_path, scenario):
             forecast, forecast_plot = generate_forecast_neuralprophet(data, forecast_days=180)
 
             # Save the forecast plot
-            output_dir = "/var/www/iwapim/public/tmp/forecast"
-            os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
-            output_path = os.path.join(output_dir, f"{asin}_{sales_channel}.png")
-            forecast_plot.savefig(output_path)
+            #output_dir = "/var/www/iwapim/public/tmp/forecast"
+            #os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
+            #output_path = os.path.join(output_dir, f"{asin}_{sales_channel}.png")
+            #forecast_plot.savefig(output_path)
 
             # Step 5: Insert forecast into the database
             insert_forecast_data(forecast, asin, sales_channel, yaml_path)

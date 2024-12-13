@@ -202,8 +202,8 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
     forecast = model.predict(future)
 
     # Plot the forecast
-    forecast_plot_figure = model.plot(forecast)
-    plt.close(forecast_plot_figure)  # Prevent display in non-interactive environments
+    #forecast_plot_figure = model.plot(forecast)
+    #plt.close(forecast_plot_figure)  # Prevent display in non-interactive environments
 
     # Return the forecast DataFrame and plot
-    return forecast[['ds', 'yhat1']], forecast_plot_figure
+    return forecast[['ds', 'yhat1']], '' #forecast_plot_figure
