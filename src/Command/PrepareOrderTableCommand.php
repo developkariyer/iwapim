@@ -89,6 +89,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Ciceksepeti' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_ciceksepeti.sql', $id,$marketplaceType),
                     default => null,
                 };
+                echo "Result: $result\n";
                 echo "Complated: $marketplaceType\n";
             }
         }
