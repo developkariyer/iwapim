@@ -62,7 +62,6 @@ def fetch_pairs(yaml_path):
         if engine:
             engine.dispose()
 
-
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     """
     Inserts or updates forecasted data into the MySQL `iwa_amazon_daily_sales_summary` table.
@@ -81,7 +80,6 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         raise ValueError(f"Forecast data must contain columns: {required_columns}")
 
     engine = None  # Initialize engine
-    connection = None
     try:
         # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
@@ -89,27 +87,12 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         # Create SQLAlchemy engine
         db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         engine = create_engine(db_url)
-        #connection = engine.connect()
 
+        # SQL query for INSERT or UPDATE
         iwasku_query = text("""
         SELECT COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin) AS iwasku
         """)
-        iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
-        iwasku = iwasku_result[0] if iwasku_result else asin
 
-        # Prepare data for insertion
-        forecast_data['asin'] = asin
-        forecast_data['sales_channel'] = sales_channel
-        forecast_data['iwasku'] = iwasku
-        forecast_data['data_source'] = 0  # 0 indicates forecasted data
-        forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
-        forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
-
-        # Display the number of rows to process
-        print(f"Number of rows to process: {len(forecast_data)}")
-        print(forecast_data.head())  # Display first few rows for debugging
-
-        # SQL query for INSERT or UPDATE
         insert_query = text("""
         INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, iwasku, sale_date, total_quantity, data_source)
         VALUES (:asin, :sales_channel, :iwasku, :sale_date, :total_quantity, :data_source)
@@ -118,8 +101,23 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             data_source = VALUES(data_source);
         """)
 
-        # Execute the query directly using `forecast_data.itertuples` for named access
         with engine.connect() as connection:
+            # Fetch iwasku mapping within the connection context
+            iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
+            iwasku = iwasku_result[0] if iwasku_result else asin
+
+            # Prepare data for insertion
+            forecast_data['asin'] = asin
+            forecast_data['sales_channel'] = sales_channel
+            forecast_data['iwasku'] = iwasku
+            forecast_data['data_source'] = 0  # 0 indicates forecasted data
+            forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
+            forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
+
+            # Display the number of rows to process
+            print(f"Number of rows to process: {len(forecast_data)}")
+            print(forecast_data.head())  # Display first few rows for debugging
+
             transaction = connection.begin()
             try:
                 connection.execute(
@@ -147,7 +145,5 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
 
     finally:
-        if connection:
-            connection.close()
         if engine:
             engine.dispose()
