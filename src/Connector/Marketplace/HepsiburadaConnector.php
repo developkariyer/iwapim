@@ -18,10 +18,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function download($forceDownload = false)
     {
-        $variant = VariantProduct::getById(266510);
-        //$this->setInventory($variant, 999);
-        $this->setPrice($variant, 1789);
-        /*$this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
             return;
@@ -62,7 +59,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->downloadAttributes();
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));*/
+        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
     }
 
     /**
