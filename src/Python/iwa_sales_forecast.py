@@ -70,6 +70,14 @@ def run_forecast_pipeline(yaml_path):
 
         except Exception as e:
             print(f"\nError processing ASIN {asin} and Sales Channel {sales_channel}: {e}")
+            # print information on data and some sample rows for debugging
+            print(data.head(10))
+            # print column names of data
+            print(data.columns)
+            # print column counts of data
+            print(data.count())
+            # stop all script
+            break
 
     print("\nForecasting pipeline completed.")
 
