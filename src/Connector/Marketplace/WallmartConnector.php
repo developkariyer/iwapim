@@ -230,7 +230,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     echo "Error: $statusCode\n";
                     return;
                 }
-                print_r($response->getContent());
                 try {
                     $data = $response->toArray();
                     $orders = $data['list']['elements']['order'];
