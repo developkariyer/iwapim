@@ -108,6 +108,9 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         # Convert DataFrame to a list of tuples
         rows_to_insert = list(forecast_data[['asin', 'sales_channel', 'iwasku', 'sale_date', 'total_quantity', 'data_source']].itertuples(index=False, name=None))
 
+        # Display the number of rows to process
+        print(f"Number of rows to process: {len(rows_to_insert)}")
+
         # SQL query for INSERT or UPDATE
         insert_query = text("""
         INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, iwasku, sale_date, total_quantity, data_source)
@@ -117,14 +120,17 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             data_source = VALUES(data_source);
         """)
 
-        # Execute batch insert/update without explicit transaction
-        connection.execute(insert_query, [
+        # Execute batch insert/update and capture the result
+        result = connection.execute(insert_query, [
             {
                 'asin': row[0], 'sales_channel': row[1], 'iwasku': row[2],
                 'sale_date': row[3], 'total_quantity': row[4], 'data_source': row[5]
             }
             for row in rows_to_insert
         ])
+
+        # Print the number of rows affected
+        print(f"Number of rows inserted/updated: {result.rowcount}")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
