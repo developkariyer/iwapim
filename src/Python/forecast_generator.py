@@ -1,8 +1,11 @@
-import matplotlib.pyplot as plt
 from prophet import Prophet
 import pandas as pd
 import logging
 import math
+from pmdarima import auto_arima
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def generate_forecast(data, forecast_days=180):
     """
@@ -98,3 +101,62 @@ def generate_forecast(data, forecast_days=180):
 
     # Return only 'ds' and 'yhat', along with the forecast plot
     return future_forecast[['ds', 'yhat']], forecast_plot_figure
+
+
+
+
+def generate_forecast_arima(data, forecast_days=180):
+    """
+    Generates a sales forecast using Auto-ARIMA for the given data.
+
+    Args:
+        data (pd.DataFrame): Historical sales data with columns:
+                             - 'ds': Date (datetime format)
+                             - 'y': Sales quantity (numeric)
+        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+
+    Returns:
+        Tuple: (future_forecast, forecast_plot_figure)
+            - future_forecast (pd.DataFrame): A DataFrame containing forecasted values with columns:
+              - 'ds': Date
+              - 'yhat': Predicted sales quantity as a non-negative rounded value.
+            - forecast_plot_figure (matplotlib.figure.Figure): A Matplotlib figure of the forecast plot.
+    """
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+
+    # Ensure data is sorted by date
+    data = data.sort_values(by='ds')
+
+    # Fit the Auto-ARIMA model
+    print("Training Auto-ARIMA model...")
+    model = auto_arima(
+        data['y'],
+        seasonal=True,  # Enable seasonal ARIMA
+        m=365,          # Seasonal period (e.g., 365 for yearly seasonality in daily data)
+        stepwise=True,
+        suppress_warnings=True,
+        trace=True      # Set to False to reduce output verbosity
+    )
+
+    # Generate future forecasts
+    forecast = model.predict(n_periods=forecast_days)
+
+    # Create a DataFrame for future dates
+    last_date = pd.to_datetime(data['ds'].max())
+    future_dates = [last_date + pd.Timedelta(days=i) for i in range(1, forecast_days + 1)]
+    future_forecast = pd.DataFrame({'ds': future_dates, 'yhat': np.maximum(0, np.round(forecast))})
+
+    # Create a forecast plot
+    forecast_plot_figure, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(data['ds'], data['y'], label="Historical Data", color="blue")
+    ax.plot(future_forecast['ds'], future_forecast['yhat'], label="Forecast", color="orange")
+    ax.axvline(x=last_date, linestyle="--", color="gray", label="Forecast Start")
+    ax.set_title("Auto-ARIMA Sales Forecast")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Sales Quantity")
+    ax.legend()
+    plt.close(forecast_plot_figure)  # Prevent showing the plot in non-interactive environments
+
+    # Return the forecast DataFrame and plot
+    return future_forecast, forecast_plot_figure
