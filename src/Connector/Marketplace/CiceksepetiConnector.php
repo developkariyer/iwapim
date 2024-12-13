@@ -31,7 +31,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         parent::__construct($marketplace);
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
             'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                'Content-Type' => 'application/json'
             ],
         ]);
     }
@@ -47,7 +48,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
+            $response = $this->httpClient->request('GET','https://apis.ciceksepeti.com/api/v1/' . static::$apiUrl['offers'],
+                    [
+                        'query' =>
+                        [
+                            'Page' => $page,
+                            'PageSize' => $size
+                        ]
+                    ]
+            );
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
