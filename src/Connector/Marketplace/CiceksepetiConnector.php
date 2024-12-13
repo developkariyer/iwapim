@@ -49,10 +49,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->listings = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
-            print_r($response->getContent());
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
+                echo  $response->getContent();
                 break;
             }
             $data = $response->toArray();
