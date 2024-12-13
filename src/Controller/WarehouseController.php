@@ -41,23 +41,23 @@ class WarehouseController extends FrontendController
     public function chartDemoAction(): Response
     {
         $db = Db::get();
-        $sale_data = $db->fetchAllAssociative("SELECT asin, sales_channel, sum(total_quantity) AS total_sale FROM iwa_amazon_daily_sales_summary GROUP BY asin, sales_channel ORDER BY total_sale DESC");
+        $sale_data = $db->fetchAllAssociative("SELECT iwasku, sales_channel, sum(total_quantity) AS total_sale, GROUP_CONCAT(DISTINCT asin) AS asins
+                    FROM iwa_amazon_daily_sales_summary GROUP BY iwasku, sales_channel ORDER BY total_sale DESC");
         $salesChannels = [];
-        $asins = [];
-        $quantities = [];
+        $iwaskus = [];
         foreach ($sale_data as $data) {
             $salesChannel = strtoupper(str_replace('Amazon.', '', $data['sales_channel']));
-            if (!isset($asins[$data['asin']])) {
-                $asins[$data['asin']] = [];
+            if (!isset($iwaskus[$data['iwasku']])) {
+                $iwaskus[$data['iwasku']] = [];
             }
-            $asins[$data['asin']][$salesChannel] = $data['total_sale'];
+            $iwaskus[$data['iwasku']][$salesChannel] = ['total_sale' => $data['total_sale'], 'asins' => $data['asins']];
             $salesChannels[$salesChannel] = true;
 
         }
 
         return $this->render('warehouse/chart_demo.html.twig', [
             'salesChannels' => array_keys($salesChannels),
-            'asins' => $asins,
+            'iwaskus' => $iwaskus,
         ]);
     }
 
@@ -93,10 +93,11 @@ class WarehouseController extends FrontendController
         $startPreviousYearData = (clone $startCurrentData)->modify('-53 weeks');
 
         $salesData = $db->fetchAllAssociative(
-            "SELECT sale_date, total_quantity
+            "SELECT sale_date, sum(total_quantity) AS total_quantity
                 FROM iwa_amazon_daily_sales_summary
-                WHERE asin = :asin AND sales_channel = :sales_channel
-                    AND sale_date >= :start_previous_year 
+                WHERE iwasku = :iwasku AND sales_channel = :sales_channel
+                    AND sale_date >= :start_previous_year
+                GROUP BY sale_date
                 ORDER BY sale_date",
             [
                 'asin' => $asin,

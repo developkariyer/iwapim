@@ -247,13 +247,13 @@
         </tr>
         </thead>
         <tbody>
-        {% for asin, channels in asins %}
+        {% for iwasku, channels in iwaskus %}
             <tr>
-                <td>{{ asin }}</td>
+                <td>{{ iwasku }}</td>
                 {% for sales_channel in salesChannels %}
                     <td>
                         {% if channels[sales_channel] is defined %}
-                            <span class="badge bg-success" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-asin="{{ asin }}" data-channel="Amazon.{{ sales_channel }}">{{ channels[sales_channel] }}</span>
+                            <span class="badge bg-success" data-bs-toggle="tooltip" title="{{ channels[sales_channel][asins] }}" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-iwasku="{{ iwasku }}" data-channel="Amazon.{{ sales_channel }}">{{ channels[sales_channel][total_sale] }}</span>
                         {% else %}
                             -
                         {% endif %}
