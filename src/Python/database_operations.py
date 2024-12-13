@@ -94,7 +94,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         SELECT COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin) AS iwasku
         """)
         iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
-        iwasku = iwasku_result["iwasku"] if iwasku_result else asin
+        iwasku = iwasku_result[0] if iwasku_result else asin
 
         # Prepare data for insertion
         forecast_data['asin'] = asin
