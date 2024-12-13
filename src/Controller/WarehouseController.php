@@ -148,7 +148,7 @@ class WarehouseController extends FrontendController
             $response['lastYearNext30'] += ($days > -365 && $days <= -365+30) ? $quantity : 0;
             $response['lastYearNext90'] += ($days > -365 && $days <= -365+90) ? $quantity : 0;
             $response['lastYearTotal1'] += ($days <= -365) ? $quantity : 0;
-            $response['lastYearTotal2'] += ($days <= -182 && $days > -365) ? $quantity : 0;
+            $response['lastYearTotal2'] += ($days > -365 && $days <= -182) ? $quantity : 0;
             $response['lastTotal'] += ($days > -182 && $days <= 0) ? $quantity : 0;
             $response['last90'] += ($days > -90 && $days <= 0) ? $quantity : 0;
             $response['last30'] += ($days > -30 && $days <= 0) ? $quantity : 0;
