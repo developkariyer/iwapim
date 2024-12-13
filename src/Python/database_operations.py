@@ -63,7 +63,6 @@ def fetch_pairs(yaml_path):
             engine.dispose()
 
 
-
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     """
     Inserts or updates forecasted data into the MySQL `iwa_amazon_daily_sales_summary` table.
@@ -125,23 +124,22 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             print(f"Number of rows to process: {len(forecast_data)}")
             print(forecast_data.head())  # Display first few rows for debugging
 
-            # Use `with connection.begin()` to manage the transaction
-            with connection.begin():  # Explicit transaction management
-                connection.execute(
-                    insert_query,
-                    [
-                        {
-                            'asin': row.asin,
-                            'sales_channel': row.sales_channel,
-                            'iwasku': row.iwasku,
-                            'sale_date': row.sale_date,
-                            'total_quantity': row.total_quantity,
-                            'data_source': row.data_source,
-                        }
-                        for row in forecast_data.itertuples(index=False)
-                    ]
-                )
-                print("Data inserted/updated successfully")
+            # Execute batch insertion/updating
+            connection.execute(
+                insert_query,
+                [
+                    {
+                        'asin': row.asin,
+                        'sales_channel': row.sales_channel,
+                        'iwasku': row.iwasku,
+                        'sale_date': row.sale_date,
+                        'total_quantity': row.total_quantity,
+                        'data_source': row.data_source,
+                    }
+                    for row in forecast_data.itertuples(index=False)
+                ]
+            )
+            print("Data inserted/updated successfully")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
