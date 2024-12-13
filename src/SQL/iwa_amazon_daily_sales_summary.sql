@@ -168,6 +168,40 @@ GROUP BY
 ON DUPLICATE KEY UPDATE
     total_quantity = VALUES(total_quantity);
 
+INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
+SELECT
+    iwasku AS asin, -- Use iwasku as asin
+    iwasku,         -- Keep iwasku as is
+    'Amazon.eu' AS sales_channel, -- Unified sales_channel for EU markets
+    temp_calendar.sale_date,      -- Ensure date consistency using the calendar table
+    COALESCE(SUM(sales.total_quantity), 0) AS total_quantity, -- Aggregate total_quantity for EU markets
+    1 AS data_source
+FROM
+    temp_calendar
+        LEFT JOIN
+    iwa_amazon_daily_sales_summary AS sales
+    ON
+        temp_calendar.sale_date = sales.sale_date
+            AND sales.sales_channel IN (
+                                        'Amazon.de',
+                                        'Amazon.fr',
+                                        'Amazon.it',
+                                        'Amazon.es',
+                                        'Amazon.nl',
+                                        'Amazon.be',
+                                        'Amazon.ie',
+                                        'Amazon.se',
+                                        'Amazon.pl',
+                                        'Amazon.cz',
+                                        'Amazon.at',
+                                        'Amazon.hu'
+            )
+            AND sales.data_source = 1
+GROUP BY
+    iwasku, temp_calendar.sale_date
+    ON DUPLICATE KEY UPDATE
+         total_quantity = VALUES(total_quantity);
+
 
 -- Step 8: Drop the existing table and rename the temporary table
 DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary;
