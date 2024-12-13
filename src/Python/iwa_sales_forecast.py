@@ -74,17 +74,19 @@ def run_forecast_pipeline(yaml_path):
 
         except Exception as e:
             print(f"\nError processing ASIN {asin} and Sales Channel {sales_channel}: {e}")
-            # print information on data and some sample rows for debugging
+            # Print information on data and some sample rows for debugging
             print(data.head(10))
-            # print column names of data
-            print(data.columns)
-            # print column counts of data
-            print(data.count())
-            # data has two columns: 'ds' and 'y'. Print count of NaN in y
-            print(data['y'].isnull().sum())
-            # print sum of y values
-            print(data['y'].sum())
-            # stop all script
+            # Print column names of data
+            print("Column names:", data.columns)
+            # Print row counts of data
+            print("Row counts:", data.count())
+            # Print count of NaN in 'y'
+            print(f"Count of NaN values in 'y': {data['y'].isnull().sum()}")
+            # Print count of zero values in 'y'
+            print(f"Count of zero values in 'y': {(data['y'] == 0).sum()}")
+            # Print sum of 'y' values
+            print(f"Sum of 'y' values: {data['y'].sum()}")
+            # Stop all script
             break
 
     print("\nForecasting pipeline completed.")
