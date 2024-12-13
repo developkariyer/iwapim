@@ -230,7 +230,6 @@ def delete_forecast_data(asin, sales_channel, yaml_path):
         # Execute the delete query
         cursor.execute(query, (asin, sales_channel))
         connection.commit()
-        print(f"Old forecast data deleted for ASIN: {asin}, Sales Channel: {sales_channel}.")
 
     except pymysql.MySQLError as e:
         print(f"Error deleting forecast data for ASIN {asin}, Sales Channel {sales_channel}: {e}")
