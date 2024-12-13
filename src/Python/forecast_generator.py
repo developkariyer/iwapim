@@ -20,7 +20,7 @@ def generate_forecast(data, forecast_days=180):
         raise ValueError("Input data is empty. Cannot generate a forecast.")
 
     # Ensure sales data is non-zero and add a small constant if needed
-    data['y'] = data['y'].apply(lambda x: max(x, 0.1))
+    #data['y'] = data['y'].apply(lambda x: max(x, 0.1))
 
     # Initialize the Prophet model
     model = Prophet(yearly_seasonality=True, weekly_seasonality=False)
