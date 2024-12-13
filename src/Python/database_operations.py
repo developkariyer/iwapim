@@ -89,7 +89,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         # Create SQLAlchemy engine
         db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         engine = create_engine(db_url)
-        connection = engine.connect()
+        #connection = engine.connect()
 
         iwasku_query = text("""
         SELECT COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin) AS iwasku
@@ -105,11 +105,9 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
         forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
 
-        # Convert DataFrame to a list of tuples
-        rows_to_insert = list(forecast_data[['asin', 'sales_channel', 'iwasku', 'sale_date', 'total_quantity', 'data_source']].itertuples(index=False, name=None))
-
         # Display the number of rows to process
-        print(f"Number of rows to process: {len(rows_to_insert)}")
+        print(f"Number of rows to process: {len(forecast_data)}")
+        print(forecast_data.head())  # Display first few rows for debugging
 
         # SQL query for INSERT or UPDATE
         insert_query = text("""
@@ -120,17 +118,31 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             data_source = VALUES(data_source);
         """)
 
-        # Execute batch insert/update and capture the result
-        result = connection.execute(insert_query, [
-            {
-                'asin': row[0], 'sales_channel': row[1], 'iwasku': row[2],
-                'sale_date': row[3], 'total_quantity': row[4], 'data_source': row[5]
-            }
-            for row in rows_to_insert
-        ])
+        # Execute the query directly using `forecast_data.itertuples` for named access
+        with engine.connect() as connection:
+            transaction = connection.begin()
+            try:
+                connection.execute(
+                    insert_query,
+                    [
+                        {
+                            'asin': row.asin,
+                            'sales_channel': row.sales_channel,
+                            'iwasku': row.iwasku,
+                            'sale_date': row.sale_date,
+                            'total_quantity': row.total_quantity,
+                            'data_source': row.data_source,
+                        }
+                        for row in forecast_data.itertuples(index=False)
+                    ]
+                )
+                transaction.commit()
+                print("Transaction committed successfully")
 
-        # Print the number of rows affected
-        print(f"Number of rows inserted/updated: {result.rowcount}")
+    except Exception as e:
+        transaction.rollback()
+        print(f"Transaction rolled back due to error: {e}")
+        raise
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
