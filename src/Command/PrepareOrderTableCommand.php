@@ -144,14 +144,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType): void
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
-            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
-            'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
-            'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
-            'Wallmart' => self::getWallmartVariantProduct($uniqueMarketplaceId),
-            'Ciceksepeti' => self::getCiceksepetiVariantProduct($uniqueMarketplaceId),
+            'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti' => $this->findVariantProduct($uniqueMarketplaceId),
+            'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'productCode'),
+            'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'\"product-ids\".bolProductId'),
+            'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'sku'),
             default => null,
         };
         if(!$variantObject) {
@@ -223,7 +219,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         ]);
     }
 
-    protected function findVariantProduct($uniqueMarketplaceId, $marketplaceType, $field = null)
+    protected function findVariantProduct($uniqueMarketplaceId, $field = null)
     {
         $variantProduct = null;
         if ($field === null) {
@@ -235,121 +231,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $objectId = $result[0]['object_id'] ?? null;
         return VariantProduct::getById($objectId);
     }
-
-    protected function getTrendyolVariantProduct($uniqueMarketplaceId)
-    {
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.productCode')) = ?
-            LIMIT 1;
-        ";
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getShopifyVariantProduct($uniqueMarketplaceId)
-    {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getBolcomVariantProduct($uniqueMarketplaceId)
-    {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"product-ids\".bolProductId')) = ?
-            LIMIT 1;";
-        
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getEtsyVariantProduct($uniqueMarketplaceId)
-    {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getAmazonVariantProduct($uniqueMarketplaceId)
-    {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getTakealotVariantProduct($uniqueMarketplaceId)
-    {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getWallmartVariantProduct($uniqueMarketplaceId)
-    {
-        $sql = "
-            SELECT object_id
-            FROM iwa_json_store
-            WHERE field_name = 'apiResponseJson'
-            AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.sku')) = ?
-            LIMIT 1;";
-
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
-        $objectId = $result[0]['object_id'] ?? null;
-        if ($objectId) {
-            return VariantProduct::getById($objectId);
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-    protected function getCiceksepetiVariantProduct($uniqueMarketplaceId)
-    {
-        $variantProduct = VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
-        if ($variantProduct) {
-            return $variantProduct;
-        }
-        echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-        return null;
-    }
-
-
-
-
 
     protected function extraColumns(): void
     {
