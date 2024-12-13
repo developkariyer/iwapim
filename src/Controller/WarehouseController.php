@@ -75,6 +75,8 @@ class WarehouseController extends FrontendController
             return new JsonResponse(['error' => 'Missing required parameters'], 400);
         }
 
+        $salesChannel = "Amazon." . strtolower($salesChannel);
+
         $db = Db::get();
         $yesterdayQuery = "SELECT MAX(sale_date) AS latest_date
             FROM iwa_amazon_daily_sales_summary

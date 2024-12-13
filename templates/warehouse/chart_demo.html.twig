@@ -253,7 +253,7 @@
                 {% for sales_channel in salesChannels %}
                     <td>
                         {% if channels[sales_channel] is defined %}
-                            <span class="badge bg-success" data-bs-toggle="tooltip" title="{{ channels[sales_channel]['asins'] }}" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-iwasku="{{ iwasku }}" data-channel="Amazon.{{ sales_channel }}">{{ channels[sales_channel]['total_sale'] }}</span>
+                            <span class="badge bg-success" data-bs-toggle="tooltip" title="{{ channels[sales_channel]['asins'] }}" data-product="IWASKU Product Name Size Color" data-warehouse="warehouse-1" data-iwasku="{{ iwasku }}" data-channel="{{ sales_channel }}">{{ channels[sales_channel]['total_sale'] }}</span>
                         {% else %}
                             -
                         {% endif %}
