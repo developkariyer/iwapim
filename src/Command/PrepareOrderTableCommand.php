@@ -229,7 +229,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
         $objectId = $result[0]['object_id'] ?? null;
-        return VariantProduct::getById($objectId);
+        if ($objectId) {
+           return VariantProduct::getById($objectId);
+        }
+        return $variantProduct;
     }
 
     protected function extraColumns(): void
