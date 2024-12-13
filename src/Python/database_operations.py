@@ -119,7 +119,6 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             cursor.execute(iwasku_query, (asin, asin))
             iwasku_result = cursor.fetchone()
             iwasku = iwasku_result['iwasku'] if iwasku_result else asin
-            print(f"Resolved iwasku: {iwasku}")
 
             # Prepare data for insertion
             forecast_data['asin'] = asin
@@ -144,11 +143,9 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             ]
 
             for row in rows_to_insert:
-                print(f"Inserting row: {row}")
                 cursor.execute(insert_query, row)
 
             connection.commit()
-            print("Data inserted/updated successfully.")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data: {e}")
