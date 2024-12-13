@@ -15,10 +15,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "Products",
-        'updateInventoryPrice' => "Products/price-and-stock",
-        'batchStatus' => "Products/batch-status/",
-        'orders' => "Order/GetOrders"
+        'offers' => "/Products",
+        'updateInventoryPrice' => "/Products/price-and-stock",
+        'batchStatus' => "/Products/batch-status/",
+        'orders' => "/Order/GetOrders"
     ];
 
     public static $marketplaceType = 'Ciceksepeti';
