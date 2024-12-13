@@ -150,11 +150,13 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         """
 
         with connection.cursor() as cursor:
+            print("Fetching IWASKU mapping...")
             # Fetch iwasku mapping
             cursor.execute(iwasku_query, (asin, asin))
             iwasku_result = cursor.fetchone()
             iwasku = iwasku_result['iwasku'] if iwasku_result else asin
 
+            print("Preparing data for insertion...")
             # Prepare data for insertion
             forecast_data['asin'] = asin
             forecast_data['sales_channel'] = sales_channel
@@ -177,9 +179,11 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
                 for row in forecast_data.itertuples(index=False)
             ]
 
+            print("Inserting data into the database...")
             for row in rows_to_insert:
                 cursor.execute(insert_query, row)
 
+            print("Committing changes...")
             connection.commit()
 
     except Exception as e:
