@@ -47,9 +47,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     }
     public function download($forceDownload = false)
     {
-        $this->prepareToken();
-        echo "Url : " . static::$apiUrl['offers'] . "\n";
-
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -59,7 +56,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            /*$response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
@@ -72,7 +69,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Page: " . $page . " ";
             echo "Count: " . count($this->listings) . " / Total Count: " . $totalItems . "\n";
             $page++;
-            sleep(5);*/
+            sleep(5);
         } while (count($this->listings) < $totalItems);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
