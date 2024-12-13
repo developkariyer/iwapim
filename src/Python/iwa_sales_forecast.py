@@ -46,31 +46,24 @@ def run_forecast_pipeline(yaml_path):
 
         try:
             # Step 3: Fetch historical sales data
-            if sales_channel == 'all':
-                continue
-
             data = fetch_data(asin, sales_channel, yaml_path)
 
+            # Validate initial data
             if data.empty or data.dropna().shape[0] < 2:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Insufficient data.")
                 continue
 
-            # Step 3.1: Remove uninterrupted leading zeros
-            data = data.loc[data['y'].ne(0).cumsum() > 0]  # Trim only leading zeros
+            # Remove uninterrupted leading zeros and their corresponding dates
+            data = data.loc[data['y'].ne(0).cumsum() > 0]
 
-            # Check again if the data is still valid after cleaning
-            if data.empty or data.dropna().shape[0] < 2:
+            # Recheck data validity after cleaning
+            if data.empty or data.shape[0] < 2:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - No valid data after cleaning leading zeros.")
                 continue
 
-            print(f"Data for ASIN {asin}, Sales Channel {sales_channel}:")
-            print(data.head())
-            print(f"Shape of data: {data.shape}")
-
-            if 'ds' not in data.columns or 'y' not in data.columns:
-                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Missing required columns in data.")
-                continue
-
-            if data.shape[0] < 2:
-                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Not enough data for forecasting.")
+            # Ensure required columns exist
+            if not {'ds', 'y'}.issubset(data.columns):
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Missing required columns ('ds' or 'y').")
                 continue
 
             # Step 4: Generate forecast
