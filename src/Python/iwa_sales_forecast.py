@@ -58,8 +58,8 @@ def run_forecast_pipeline(yaml_path):
                 continue
 
             # Remove uninterrupted leading zeros
-            #first_non_zero_idx = data['y'].ne(0).idxmax()  # Find the first index where 'y' is non-zero
-            #data = data.loc[first_non_zero_idx:]  # Keep rows from the first non-zero value onward
+            first_non_zero_idx = data['y'].ne(0).idxmax()  # Find the first index where 'y' is non-zero
+            data = data.loc[first_non_zero_idx:]  # Keep rows from the first non-zero value onward
 
             # Recheck data validity after cleaning
             if data.empty or data.shape[0] < 2:
