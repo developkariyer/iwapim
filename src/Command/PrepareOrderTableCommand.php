@@ -55,38 +55,15 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         return Command::SUCCESS;
     }
-    
-    protected function extraColumns(): void
+
+    protected function marketplaceList(): void
     {
-        echo "Set Marketplace key\n";
-        $this->setMarketplaceKey();
-        echo "Complated Marketplace key\n";
-        echo "Calculating is Parse URL\n";
-        $this->parseUrl(); 
-        echo "Complated Parse URL\n";
-        echo "Calculating Closed At Diff\n";
-        $this->insertClosedAtDiff();
-        echo "Complated Closed At Diff\n";
-        echo "Calculating is Discount\n";
-        $this->discountValue();
-        echo "Complated is Discount\n";
-        echo "Calculating is Country Name\n";
-        $this->countryCodes();
-        echo "Complated is Country Name\n";
-        echo "Calculating USA Code\n";
-        $this->usaCode();
-        echo "Complated USA Code\n";
-        echo "Calculating Bolcom Total Price\n";
-        $this->bolcomTotalPrice();
-        echo "Complated Bolcom Total Price\n";
-        echo "Fix Bolcom Orders\n";
-        $this->bolcomFixOrders();
-        echo "Complated Fix Bolcom Orders\n";
-        echo "Calculating is Cancelled\n";
-        $this->isCancelled();
-        echo "Complated is Cancelled\n";
+        $marketplaceList = Marketplace::getMarketplaceList();
+        foreach ($marketplaceList as $marketplace) {
+            $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
+        }
     }
-        
+
     protected function transferOrders(): void
     {
         if (empty($this->marketplaceListWithIds)) {
@@ -162,6 +139,101 @@ class PrepareOrderTableCommand extends AbstractCommand
             ";
         $values = $db->fetchAllAssociative($sql); 
         return $values;
+    }
+
+    protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType): void
+    {
+        $variantObject = match ($marketplaceType) {
+            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
+            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
+            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
+            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
+            'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
+            'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
+            'Wallmart' => self::getWallmartVariantProduct($uniqueMarketplaceId),
+            'Ciceksepeti' => self::getCiceksepetiVariantProduct($uniqueMarketplaceId),
+            default => null,
+        };
+        if(!$variantObject) {
+            echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
+            return;
+        }
+        $marketplace = $variantObject->getMarketplace();
+        if (!$marketplace instanceof Marketplace) {
+            echo "Marketplace not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            return;
+        }
+        $mainProductObjectArray = $variantObject->getMainProduct();
+        if(!$mainProductObjectArray) {
+            echo "Main product not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+            return;
+        }
+        $mainProductObject = reset($mainProductObjectArray);
+        if ($mainProductObject instanceof Product) {
+            $productCode = $mainProductObject->getProductCode();
+            $iwasku =  $mainProductObject->getInheritedField('Iwasku');
+            if (!$iwasku) {
+                echo "iwasku code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                return;
+            }
+            if ($mainProductObject->level() == 1) {
+                $parent = $mainProductObject->getParent();
+                if(!$parent) {
+                    echo "Parent is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                    return;
+                }
+                $identifier = $parent->getInheritedField('ProductIdentifier');
+                if (!$identifier) {
+                    echo "Identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                    return;
+                }
+            } else {
+                echo "Main product is not a parent product for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                return;
+            }
+            $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
+            if (!$productIdentifier) {
+                echo "Product identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                return;
+            }
+            $productType = strtok($productIdentifier,'-');
+            $path = $mainProductObject->getFullPath();
+            $parts = explode('/', trim($path, '/'));
+            $variantName = array_pop($parts);
+            $parentName = array_pop($parts);
+            $this->insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
+        }
+    }
+
+    protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "UPDATE iwa_marketplace_orders_line_items
+        SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
+        WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
+        $statement = $db->prepare($sql);
+        $statement->executeStatement([
+            'iwasku' => $iwasku,
+            'identifier' => $identifier,
+            'productType' => $productType,
+            'variantName' => $variantName,
+            'parentName' => $parentName,
+            'uniqueMarketplaceId' => $uniqueMarketplaceId,
+            'marketplaceType' => $marketplaceType,
+        ]);
+    }
+
+    protected function findVariantProduct($uniqueMarketplaceId, $marketplaceType, $field = null)
+    {
+        $variantProduct = null;
+        if ($field === null) {
+            return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+        }
+        $sql = "SELECT object_id FROM iwa_json_store  WHERE field_name = 'apiResponseJson'  AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.$field')) = ? LIMIT 1;";
+        $db = \Pimcore\Db::get();
+        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $objectId = $result[0]['object_id'] ?? null;
+        return VariantProduct::getById($objectId);
     }
 
     protected function getTrendyolVariantProduct($uniqueMarketplaceId)
@@ -275,100 +347,39 @@ class PrepareOrderTableCommand extends AbstractCommand
         return null;
     }
 
-    protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType)
-    {
-        $variantObject = match ($marketplaceType) {
-            'Shopify' => self::getShopifyVariantProduct($uniqueMarketplaceId),
-            'Trendyol' => self::getTrendyolVariantProduct($uniqueMarketplaceId),
-            'Bol.com' => self::getBolcomVariantProduct($uniqueMarketplaceId),
-            'Etsy' => self::getEtsyVariantProduct($uniqueMarketplaceId),
-            'Amazon' => self::getAmazonVariantProduct($uniqueMarketplaceId),
-            'Takealot' => self::getTakealotVariantProduct($uniqueMarketplaceId),
-            'Wallmart' => self::getWallmartVariantProduct($uniqueMarketplaceId),
-            'Ciceksepeti' => self::getCiceksepetiVariantProduct($uniqueMarketplaceId),
-            default => null,
-        };
-        
-        if(!$variantObject) {
-            echo "VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId not found\n";
-            return;
-        }
 
-        $marketplace = $variantObject->getMarketplace();
-        if (!$marketplace instanceof Marketplace) {
-            echo "Marketplace not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-            return;
-        }
-        
-        $mainProductObjectArray = $variantObject->getMainProduct(); 
-        if(!$mainProductObjectArray) {
-            echo "Main product not found for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-            return;
-        }
 
-        $mainProductObject = reset($mainProductObjectArray);
-        if ($mainProductObject instanceof Product) {
-            $productCode = $mainProductObject->getProductCode();
-            $iwasku =  $mainProductObject->getInheritedField('Iwasku');
-            if (!$iwasku) {
-                echo "iwasku code is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-                return;
-            }
-            if ($mainProductObject->level() == 1) {
-                $parent = $mainProductObject->getParent();
-                if(!$parent) {
-                    echo "Parent is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-                    return;
-                }
-                $identifier = $parent->getInheritedField('ProductIdentifier');
-                if (!$identifier) {
-                    echo "Identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-                    return;
-                }
-            } else {
-                echo "Main product is not a parent product for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-                return;
-            }
-            $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
-            if (!$productIdentifier) {
-                echo "Product identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
-                return;
-            }
-            $productType = strtok($productIdentifier,'-');
-            $path = $mainProductObject->getFullPath(); 
-            $parts = explode('/', trim($path, '/'));
-            $variantName = array_pop($parts);
-            $parentName = array_pop($parts); 
-            self::insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType);
-        }
-    }
 
-    protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
+
+    protected function extraColumns(): void
     {
-        $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_orders_line_items
-        SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
-        WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
-        
-        $stmt = $db->prepare($sql);
-        /** @var TYPE_NAME $stmt */
-        $stmt->execute([
-            ':iwasku' => $iwasku,
-            ':identifier' => $identifier,
-            ':productType' => $productType,
-            ':variantName' => $variantName,
-            ':parentName' => $parentName,
-            ':uniqueMarketplaceId' => $uniqueMarketplaceId,
-            ':marketplaceType' => $marketplaceType,
-        ]);
-    }
-   
-    protected function marketplaceList()
-    {
-        $marketplaceList = Marketplace::getMarketplaceList();
-        foreach ($marketplaceList as $marketplace) {
-            $this->marketplaceListWithIds[$marketplace->getId()] = $marketplace->getMarketplaceType();
-        }
+        echo "Set Marketplace key\n";
+        $this->setMarketplaceKey();
+        echo "Complated Marketplace key\n";
+        echo "Calculating is Parse URL\n";
+        $this->parseUrl();
+        echo "Complated Parse URL\n";
+        echo "Calculating Closed At Diff\n";
+        $this->insertClosedAtDiff();
+        echo "Complated Closed At Diff\n";
+        echo "Calculating is Discount\n";
+        $this->discountValue();
+        echo "Complated is Discount\n";
+        echo "Calculating is Country Name\n";
+        $this->countryCodes();
+        echo "Complated is Country Name\n";
+        echo "Calculating USA Code\n";
+        $this->usaCode();
+        echo "Complated USA Code\n";
+        echo "Calculating Bolcom Total Price\n";
+        $this->bolcomTotalPrice();
+        echo "Complated Bolcom Total Price\n";
+        echo "Fix Bolcom Orders\n";
+        $this->bolcomFixOrders();
+        echo "Complated Fix Bolcom Orders\n";
+        echo "Calculating is Cancelled\n";
+        $this->isCancelled();
+        echo "Complated is Cancelled\n";
     }
 
     protected function setMarketplaceKey()
