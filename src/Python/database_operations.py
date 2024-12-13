@@ -124,22 +124,23 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             print(f"Number of rows to process: {len(forecast_data)}")
             print(forecast_data.head())  # Display first few rows for debugging
 
-            # Execute batch insertion/updating
-            connection.execute(
-                insert_query,
-                [
-                    {
-                        'asin': row.asin,
-                        'sales_channel': row.sales_channel,
-                        'iwasku': row.iwasku,
-                        'sale_date': row.sale_date,
-                        'total_quantity': row.total_quantity,
-                        'data_source': row.data_source,
-                    }
-                    for row in forecast_data.itertuples(index=False)
-                ]
-            )
-            print("Data inserted/updated successfully")
+            rows_to_insert = [
+                {
+                    'asin': row.asin,
+                    'sales_channel': row.sales_channel,
+                    'iwasku': row.iwasku,
+                    'sale_date': row.sale_date,
+                    'total_quantity': row.total_quantity,
+                    'data_source': row.data_source,
+                }
+                for row in forecast_data.itertuples(index=False)
+            ]
+
+            for row in rows_to_insert:
+                print(f"Inserting row: {row}")
+                connection.execute(insert_query, row)
+
+            print("Data inserted successfully.")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
