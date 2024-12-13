@@ -48,14 +48,18 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET','https://apis.ciceksepeti.com/api/v1/' . static::$apiUrl['offers'],
+            $response = $this->httpClient->request('GET','https://apis.ciceksepeti.com/api/v1/Products',
+                [
+                    'headers' => [
+                        'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                        'Content-Type' => 'application/json'
+                    ],
+                    'query' =>
                     [
-                        'query' =>
-                        [
-                            'Page' => $page,
-                            'PageSize' => $size
-                        ]
+                        'Page' => $page,
+                        'PageSize' => $size
                     ]
+                ]
             );
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
