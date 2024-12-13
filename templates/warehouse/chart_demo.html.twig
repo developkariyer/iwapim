@@ -20,14 +20,14 @@
                 console.log('Badge clicked');
                 const warehouseId = $(this).data('warehouse');
                 const product = $(this).data('product');
-                const asin = $(this).data('asin');
+                const iwasku = $(this).data('iwasku');
                 const salesChannel = $(this).data('channel');
 
                 // Fetch data from the server
 //        $.getJSON(`/inventory/${warehouseId}`, function (data) {
                 //$.getJSON(`sales_dataset.json`, function (data) {
 //                $.getJSON(`/warehouse/json/B08B59YMQJ/Amazon.com`, function (data) {
-                $.getJSON(`/warehouse/json/${asin}/${salesChannel}`, function (data) {
+                $.getJSON(`/warehouse/json/${iwasku}/${salesChannel}`, function (data) {
                     // Populate modal with data
                     populateWarehouseModal(product, data);
 
