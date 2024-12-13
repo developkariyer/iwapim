@@ -80,6 +80,7 @@ def run_forecast_pipeline(yaml_path, scenario):
                 continue
 
             # Step 4: Generate forecast
+            print (f"Generating forecast for ASIN {asin} and Sales Channel {sales_channel}...")
             forecast, forecast_plot = generate_forecast_neuralprophet(data, forecast_days=180)
 
             # Save the forecast plot

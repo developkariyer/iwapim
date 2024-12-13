@@ -201,6 +201,9 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
     # Generate the forecast
     forecast = model.predict(future)
 
+    print(forecast.columns)
+    print(forecast.head())
+
     if 'yhat1' in forecast.columns:
         forecast = forecast.rename(columns={'yhat1': 'yhat'})
 
