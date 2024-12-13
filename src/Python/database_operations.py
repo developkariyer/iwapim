@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 from db_config_loader import get_mysql_config
+import math
 
 def fetch_data(asin, sales_channel, yaml_path):
     engine = None  # Initialize engine
