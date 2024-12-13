@@ -53,8 +53,10 @@ def run_forecast_pipeline(yaml_path):
                 print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Insufficient data.")
                 continue
 
-            # Remove uninterrupted leading zeros and their corresponding dates
-            data = data.loc[data['y'].ne(0).cumsum() > 0]
+            # Remove uninterrupted leading zeros
+            non_zero_indices = data['y'].ne(0).cumsum() > 0
+            data = data.loc[non_zero_indices]
+
 
             # Recheck data validity after cleaning
             if data.empty or data.shape[0] < 2:
