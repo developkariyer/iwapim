@@ -191,6 +191,12 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
         daily_seasonality=False
     )
 
+    print(f"Fetched data type: {type(data)}")
+    if isinstance(data, pd.DataFrame):
+        print(f"Fetched data columns: {data.columns}")
+    else:
+        raise ValueError("Fetched data is not a DataFrame.")
+
     # Fit the model on historical data
     print("Training NeuralProphet model...")
     model.fit(data)
@@ -200,6 +206,7 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
 
     # Generate the forecast
     forecast = model.predict(future)
+    print(f"Forecast DataFrame: {forecast.head()}")
 
     # Ensure 'yhat1' exists and clean negative values
     if 'yhat1' in forecast.columns:
@@ -212,4 +219,4 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
     #plt.close(forecast_plot_figure)  # Prevent display in non-interactive environments
 
     # Return the forecast DataFrame and plot
-    return forecast[['ds', 'yhat']], '' #forecast_plot_figure
+    return forecast[['ds', 'yhat']]

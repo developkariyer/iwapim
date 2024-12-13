@@ -20,6 +20,8 @@ def run_forecast_pipeline(yaml_path, scenario, max_processes=8):
     # Step 1: Fetch ASIN/Sales Channel pairs
     print("Fetching ASIN/Sales Channel pairs...")
     pairs = fetch_pairs(yaml_path, scenario)
+    print(f"**********************Fetched pairs type: {type(pairs)}")
+
 
     if pairs.empty:
         print("No ASIN/Sales Channel pairs found. Exiting...")
