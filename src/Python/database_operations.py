@@ -1,7 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from db_config_loader import get_mysql_config
-from sqlalchemy.sql import text
 
 def fetch_data(asin, sales_channel, yaml_path):
     engine = None  # Initialize engine
@@ -78,55 +77,67 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     Returns:
         None
     """
-    engine = None  # Initialize engine
     connection = None
     try:
         # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
 
-        # Create SQLAlchemy engine
-        db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
-        engine = create_engine(db_url)
-        connection = engine.connect()
+        # Create MySQL connection
+        connection = mysql.connector.connect(
+            host=mysql_config['host'],
+            user=mysql_config['user'],
+            password=mysql_config['password'],
+            database=mysql_config['database'],
+            port=mysql_config['port']
+        )
 
-        # Fetch iwasku value from the database
-        iwasku_query = text("""
-        SELECT COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin) AS iwasku
-        """)
-        iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
-        iwasku = iwasku_result[0] if iwasku_result else asin
+        with connection.cursor(dictionary=True) as cursor:
+            # Debug: Log connection success
+            print("Connected to database successfully.")
 
-        # Prepare data for insertion
-        forecast_data['asin'] = asin
-        forecast_data['iwasku'] = iwasku
-        forecast_data['sales_channel'] = sales_channel
-        forecast_data['data_source'] = 0  # 0 indicates forecasted data
-        forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
+            # Fetch iwasku value from the database
+            iwasku_query = """
+            SELECT COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = %s), %s) AS iwasku
+            """
+            cursor.execute(iwasku_query, (asin, asin))
+            iwasku_result = cursor.fetchone()
+            iwasku = iwasku_result['iwasku'] if iwasku_result else asin
 
-        # Convert DataFrame to a list of tuples
-        rows_to_insert = list(forecast_data[['asin', 'iwasku', 'sales_channel', 'sale_date', 'total_quantity', 'data_source']].itertuples(index=False, name=None))
+            # Debug: Log fetched iwasku
+            print(f"IWASKU for ASIN {asin}: {iwasku}")
 
-        # SQL query for INSERT or UPDATE
-        insert_query = text("""
-        INSERT INTO iwa_amazon_daily_sales_summary (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
-        VALUES (:asin, :iwasku, :sales_channel, :sale_date, :total_quantity, :data_source)
-        ON DUPLICATE KEY UPDATE
-            total_quantity = VALUES(total_quantity),
-            data_source = VALUES(data_source)
-        """)
+            # Prepare data for insertion
+            forecast_data['asin'] = asin
+            forecast_data['iwasku'] = iwasku
+            forecast_data['sales_channel'] = sales_channel
+            forecast_data['data_source'] = 0  # 0 indicates forecasted data
+            forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
 
-        # Execute batch insert/update
-        connection.execute(insert_query, [
-            {
-                'asin': row[0],
-                'iwasku': row[1],
-                'sales_channel': row[2],
-                'sale_date': row[3],
-                'total_quantity': row[4],
-                'data_source': row[5]
-            }
-            for row in rows_to_insert
-        ])
+            # Debug: Log forecast data before insertion
+            print("Prepared forecast data:")
+            print(forecast_data.head())
+
+            # Convert DataFrame to a list of tuples
+            rows_to_insert = list(forecast_data[['asin', 'iwasku', 'sales_channel', 'sale_date', 'total_quantity', 'data_source']].itertuples(index=False, name=None))
+
+            # Debug: Log rows to insert
+            print(f"Rows to insert: {rows_to_insert[:5]} (showing up to 5 rows)")
+
+            # SQL query for INSERT or UPDATE
+            insert_query = """
+            INSERT INTO iwa_amazon_daily_sales_summary (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                total_quantity = VALUES(total_quantity),
+                data_source = VALUES(data_source)
+            """
+
+            # Execute batch insert/update
+            cursor.executemany(insert_query, rows_to_insert)
+            connection.commit()
+
+            # Debug: Log successful insertion
+            print(f"Successfully inserted/updated {cursor.rowcount} rows.")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
@@ -134,5 +145,4 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     finally:
         if connection:
             connection.close()
-        if engine:
-            engine.dispose()
+            print("Database connection closed.")
