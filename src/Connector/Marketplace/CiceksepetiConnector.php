@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -14,15 +15,41 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "https://apis.ciceksepeti.com/api/v1/Products",
-        'updateInventoryPrice' => "https://apis.ciceksepeti.com/api/v1/Products/price-and-stock",
-        'batchStatus' => "https://apis.ciceksepeti.com/api/v1/Products/batch-status/"
+        'offers' => "/Products",
+        'updateInventoryPrice' => "/Products/price-and-stock",
+        'batchStatus' => "/Products/batch-status/",
+        'orders' => "/Order/GetOrders"
     ];
 
     public static $marketplaceType = 'Ciceksepeti';
-    
+
+    /**
+     * @throws \Exception
+     */
+    public function __construct($marketplace)
+    {
+        parent::__construct($marketplace);
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                'Content-Type' => 'application/json'
+            ],
+        ]);
+    }
+    public function prepareToken()
+    {
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                'Content-Type' => 'application/json'
+            ],
+        ]);
+    }
     public function download($forceDownload = false)
-    {        
+    {
+        $this->prepareToken();
+        echo "Url : " . static::$apiUrl['offers'] . "\n";
+
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -32,15 +59,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                'headers' => [
-                    'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
-                ],
-                'query' => [
-                    'Page' => $page,
-                    'PageSize' => $size
-                ]
-            ]);
+            /*$response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
@@ -53,7 +72,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Page: " . $page . " ";
             echo "Count: " . count($this->listings) . " / Total Count: " . $totalItems . "\n";
             $page++;
-            sleep(5);
+            sleep(5);*/
         } while (count($this->listings) < $totalItems);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
@@ -138,17 +157,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         do {
             $page = 0;
             do {
-                $response = $this->httpClient->request('POST', 'https://apis.ciceksepeti.com/api/v1/Order/GetOrders', [
-                    'headers' => [
-                        'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
-                    ],
-                    'json' => [
-                        'startDate' => $startDate,
-                        'endDate' => $endDate,
-                        'page' => $page,
-                        'pageSize' => $pageSize
-                    ]
-                ]);
+                $response = $this->httpClient->request('POST', static::$apiUrl['orders'], ['json' => ['startDate' => $startDate, 'endDate' => $endDate, 'page' => $page, 'pageSize' => $pageSize]]);
                 $statusCode = $response->getStatusCode();
                 if ($statusCode !== 200) {
                     echo "Error: $statusCode\n";
@@ -212,10 +221,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             return;
         }
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
-            'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
-                'Content-Type' => 'application/json'
-            ],
             'body' => json_encode([
                 'items' => [
                     [
@@ -266,10 +271,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             return;
         }
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
-            'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
-                'Content-Type' => 'application/json'
-            ],
             'body' => json_encode([
                 'items' => [
                     [
@@ -386,11 +387,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function getBatchRequestResult($batchId): array
     {
         $url = static::$apiUrl['batchStatus'] . $batchId;
-        $response = $this->httpClient->request('GET', $url, [
-            'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
-            ]
-        ]);
+        $response = $this->httpClient->request('GET', $url);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
