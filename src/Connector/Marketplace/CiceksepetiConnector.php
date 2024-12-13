@@ -36,8 +36,18 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             ],
         ]);
     }
+    public function prepareToken()
+    {
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
+            'headers' => [
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                'Content-Type' => 'application/json'
+            ],
+        ]);
+    }
     public function download($forceDownload = false)
     {
+        $this->prepareToken();
         echo "Url : " . static::$apiUrl['offers'] . "\n";
 
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
