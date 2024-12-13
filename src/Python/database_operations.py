@@ -138,11 +138,10 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
                 )
                 transaction.commit()
                 print("Transaction committed successfully")
-
-    except Exception as e:
-        transaction.rollback()
-        print(f"Transaction rolled back due to error: {e}")
-        raise
+            except Exception as e:
+                transaction.rollback()
+                print(f"Transaction rolled back due to error: {e}")
+                raise
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
