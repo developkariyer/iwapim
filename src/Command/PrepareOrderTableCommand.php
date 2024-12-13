@@ -118,7 +118,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function transferOrdersAmazon($marketPlaceId, $marketplaceType): void
     {
-        $filePath = PIMCORE_PROJECT_ROOT . '/SQL/OrderTable/iwa_marketplace_orders_transfer_amazon.sql';
+        $filePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/iwa_marketplace_orders_transfer_amazon.sql';
         $amazonSql = file_get_contents($filePath);
         try {
             $db = \Pimcore\Db::get();
