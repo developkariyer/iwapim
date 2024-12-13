@@ -249,7 +249,7 @@
         <tbody>
         {% for iwasku, channels in iwaskus %}
             <tr>
-                <td>{{ iwasku }}</td>
+                <td><span class="badge bg-primary" data-iwasku="{{ iwasku }}" data-channel="all">{{ iwasku }}</span></td>
                 {% for sales_channel in salesChannels %}
                     <td>
                         {% if channels[sales_channel] is defined %}

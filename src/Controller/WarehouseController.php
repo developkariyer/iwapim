@@ -75,16 +75,20 @@ class WarehouseController extends FrontendController
             return new JsonResponse(['error' => 'Missing required parameters'], 400);
         }
 
-        $salesChannel = "Amazon." . strtolower($salesChannel);
+        $queryText = "iwasku = :iwasku";
+        $queryData = ['iwasku' => $iwasku];
+
+        if ($salesChannel !== 'all') {
+            $queryText .= " AND sales_channel = :sales_channel";
+            $salesChannel = "Amazon." . strtolower($salesChannel);
+            $queryData['sales_channel'] = $salesChannel;
+        }
 
         $db = Db::get();
         $yesterdayQuery = "SELECT MAX(sale_date) AS latest_date
             FROM iwa_amazon_daily_sales_summary
-            WHERE data_source = 1 AND iwasku = :iwasku AND sales_channel = :sales_channel";
-        $yesterday = $db->fetchOne($yesterdayQuery, [
-            'iwasku' => $iwasku,
-            'sales_channel' => $salesChannel,
-        ]);
+            WHERE data_source = 1 AND $queryText";
+        $yesterday = $db->fetchOne($yesterdayQuery, $queryData);
 
         if (!$yesterday) {
             return new JsonResponse(['error' => 'No valid data found for the given ASIN and sales channel'], 404);
@@ -93,19 +97,15 @@ class WarehouseController extends FrontendController
         $endCurrentData = new DateTime($yesterday);
         $startCurrentData = (clone $endCurrentData)->modify('-26 weeks');
         $startPreviousYearData = (clone $startCurrentData)->modify('-53 weeks');
+        $queryData['start_previous_year'] = $startPreviousYearData->format('Y-m-d');
 
         $salesData = $db->fetchAllAssociative(
             "SELECT sale_date, sum(total_quantity) AS total_quantity
                 FROM iwa_amazon_daily_sales_summary
-                WHERE iwasku = :iwasku AND sales_channel = :sales_channel
-                    AND sale_date >= :start_previous_year
+                WHERE $queryText AND sale_date >= :start_previous_year
                 GROUP BY sale_date
                 ORDER BY sale_date",
-            [
-                'iwasku' => $iwasku,
-                'sales_channel' => $salesChannel,
-                'start_previous_year' => $startPreviousYearData->format('Y-m-d'),
-            ]
+            $queryData
         );
 
         $response = [
