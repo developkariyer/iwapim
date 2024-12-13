@@ -47,8 +47,11 @@ def generate_forecast(data, forecast_days=180):
     # Filter out only future predictions
     future_forecast = forecast[forecast['ds'] > pd.to_datetime(data['ds'].max())].copy()
 
-    # Adjust negative predictions and round yhat to the nearest upper integer
-    future_forecast.loc[:, 'yhat'] = future_forecast['yhat'].apply(lambda x: max(math.ceil(x), 1))
+    # Adjust yhat based on yhat_upper, round up, and ensure non-negative integer
+    future_forecast['yhat'] = future_forecast.apply(
+        lambda row: int(math.ceil(max(0, row['yhat_upper']))) if row['yhat'] < 0 else int(math.ceil(max(0, row['yhat']))),
+        axis=1
+    )
 
     # Return only 'ds' and 'yhat'
     return future_forecast[['ds', 'yhat']]
