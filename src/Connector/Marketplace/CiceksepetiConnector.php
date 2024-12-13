@@ -39,6 +39,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false)
     {
+        echo "Tam URL: https://apis.ciceksepeti.com/api/v1/" . static::$apiUrl['offers'] . "\n";
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
