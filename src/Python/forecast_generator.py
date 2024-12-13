@@ -5,6 +5,8 @@ import math
 from pmdarima import auto_arima
 import matplotlib.pyplot as plt
 import numpy as np
+from neuralprophet import NeuralProphet
+
 
 
 def generate_forecast(data, forecast_days=180):
@@ -160,3 +162,48 @@ def generate_forecast_arima(data, forecast_days=180):
 
     # Return the forecast DataFrame and plot
     return future_forecast, forecast_plot_figure
+
+
+def generate_forecast_neuralprophet(data, forecast_days=180):
+    """
+    Generates a sales forecast using NeuralProphet for the given data.
+
+    Args:
+        data (pd.DataFrame): Historical sales data with columns:
+                             - 'ds': Date (datetime format)
+                             - 'y': Sales quantity (numeric)
+        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+
+    Returns:
+        Tuple: (future_forecast, forecast_plot_figure)
+            - future_forecast (pd.DataFrame): A DataFrame containing forecasted values with columns:
+              - 'ds': Date
+              - 'yhat1': Predicted sales quantity.
+            - forecast_plot_figure (matplotlib.figure.Figure): A Matplotlib figure of the forecast plot.
+    """
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+
+    # Initialize the NeuralProphet model
+    model = NeuralProphet(
+        yearly_seasonality=True,
+        weekly_seasonality=True,
+        daily_seasonality=False
+    )
+
+    # Fit the model on historical data
+    print("Training NeuralProphet model...")
+    model.fit(data)
+
+    # Create a future dataframe
+    future = model.make_future_dataframe(data, periods=forecast_days)
+
+    # Generate the forecast
+    forecast = model.predict(future)
+
+    # Plot the forecast
+    forecast_plot_figure = model.plot(forecast)
+    plt.close(forecast_plot_figure)  # Prevent display in non-interactive environments
+
+    # Return the forecast DataFrame and plot
+    return forecast[['ds', 'yhat1']], forecast_plot_figure

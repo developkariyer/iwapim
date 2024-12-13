@@ -3,7 +3,7 @@ import os
 import logging
 from collections import defaultdict
 from database_operations import fetch_pairs, fetch_data, insert_forecast_data, delete_forecast_data
-from forecast_generator import generate_forecast, generate_forecast_arima
+from forecast_generator import generate_forecast, generate_forecast_arima, generate_forecast_neuralprophet
 
 logging.getLogger().setLevel(logging.WARNING)
 cmdstanpy_logger = logging.getLogger("cmdstanpy")
@@ -80,7 +80,7 @@ def run_forecast_pipeline(yaml_path, scenario):
                 continue
 
             # Step 4: Generate forecast
-            forecast, forecast_plot = generate_forecast_arima(data, forecast_days=180)
+            forecast, forecast_plot = generate_forecast_neuralprophet(data, forecast_days=180)
 
             # Save the forecast plot
             output_dir = "/var/www/iwapim/public/tmp/forecast"
