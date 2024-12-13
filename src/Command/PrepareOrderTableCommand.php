@@ -573,14 +573,14 @@ class PrepareOrderTableCommand extends AbstractCommand
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderProductStatus')) AS fulfillments_status,
                 JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoCompany')) AS tracking_company,
-                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancellationResult')) AS fulfillments_status_control,
+                JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancellationResult')) AS fulfillments_status_control
             FROM
                 iwa_marketplace_orders
             WHERE
-                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
-                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != ''
-                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) AS UNSIGNED) > 0
+                JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) IS NOT NULL
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != 'null'
+                AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) != ''
+                AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.productCode')) AS UNSIGNED) > 0
                 AND marketplace_id = $marketPlaceId
             ON DUPLICATE KEY UPDATE
                 marketplace_type = VALUES(marketplace_type),
