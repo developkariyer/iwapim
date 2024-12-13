@@ -83,7 +83,7 @@ def run_forecast_pipeline(yaml_path, scenario):
             forecast, forecast_plot = generate_forecast(data, forecast_days=180)
 
             # Save the forecast plot
-            output_dir = "/var/www/iwapim/public/tmp"
+            output_dir = "/var/www/iwapim/public/tmp/forecast"
             os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
             output_path = os.path.join(output_dir, f"{asin}_{sales_channel}.png")
             forecast_plot.savefig(output_path)
