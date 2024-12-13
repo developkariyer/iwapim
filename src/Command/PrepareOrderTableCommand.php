@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
+use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\DataObject\Concrete;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -87,6 +89,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'Takealot' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_takealot.sql', $id,$marketplaceType),
                     'Wallmart' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_wallmart.sql', $id,$marketplaceType),
                     'Ciceksepeti' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_ciceksepeti.sql', $id,$marketplaceType),
+                    'Wayfair' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_wayfair.sql', $id,$marketplaceType),
                     default => null,
                 };
                 echo "Complated: $marketplaceType\n";
@@ -201,7 +204,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType)
+    protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType): void
     {
         $db = \Pimcore\Db::get();
         $sql = "UPDATE iwa_marketplace_orders_line_items
@@ -235,67 +238,91 @@ class PrepareOrderTableCommand extends AbstractCommand
         return $variantProduct;
     }
 
-    protected function extraColumns(): void
-    {
-        echo "Set Marketplace key\n";
-        $this->setMarketplaceKey();
-        echo "Complated Marketplace key\n";
-        echo "Calculating is Parse URL\n";
-        $this->parseUrl();
-        echo "Complated Parse URL\n";
-        echo "Calculating Closed At Diff\n";
-        $this->insertClosedAtDiff();
-        echo "Complated Closed At Diff\n";
-        echo "Calculating is Discount\n";
-        $this->discountValue();
-        echo "Complated is Discount\n";
-        echo "Calculating is Country Name\n";
-        $this->countryCodes();
-        echo "Complated is Country Name\n";
-        echo "Calculating USA Code\n";
-        $this->usaCode();
-        echo "Complated USA Code\n";
-        echo "Calculating Bolcom Total Price\n";
-        $this->bolcomTotalPrice();
-        echo "Complated Bolcom Total Price\n";
-        echo "Fix Bolcom Orders\n";
-        $this->bolcomFixOrders();
-        echo "Complated Fix Bolcom Orders\n";
-        echo "Calculating is Cancelled\n";
-        $this->isCancelled();
-        echo "Complated is Cancelled\n";
-    }
-
-    protected function setMarketplaceKey()
+    protected function currencyRate()
     {
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                DISTINCT marketplace_id
+                DISTINCT currency,
+                DATE(created_at)
             FROM
                 iwa_marketplace_orders_line_items
-            WHERE 
-                marketplace_id IS NOT NULL
+            WHERE currency_rate IS NULL;
+        ";
+        $results = $db->fetchAllAssociative($sql);
+        echo "Start: Updating currency rates...\n";
+        foreach ($results as $row) {
+            $currency = $row['currency'];
+            $date = $row['DATE(created_at)'];
+            echo "Processing... Currency: $currency, Date: $date\n";
+            if ($currency === 'TRY') {
+                $currency = 'USD';
+            }
+            $rateSql = "
+                SELECT 
+                    value
+                FROM 
+                    iwa_currency_history
+                WHERE 
+                    currency = '$currency'
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
             ";
-        $values = $db->fetchAllAssociative($sql); 
-        foreach ($values as $row) {
-            $id = $row['marketplace_id'];
-            $marketplace = Marketplace::getById($id);
-            if ($marketplace) {
-                $marketplaceKey = $marketplace->getKey();
+            $currencyRate  = $db->fetchOne($rateSql);
+            $usdRateSql = "
+                SELECT 
+                    value
+                FROM 
+                    iwa_currency_history
+                WHERE 
+                    currency = 'USD'
+                    AND DATE(date) <= '$date'
+                ORDER BY 
+                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
+                LIMIT 1;
+            ";
+            $usdRate = $db->fetchOne($usdRateSql);
+
+            if (!$currencyRate) {
+                echo "Currency rate not found for currency: $currency, date: $date\n";
+                continue;
+            }
+
+            if (!$usdRate) {
+                echo "USD rate not found for date: $date\n";
+                continue;
+            }
+
+            if($row['currency'] === 'TRY') {
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items
-                    SET marketplace_key = :marketplaceKey
-                    WHERE marketplace_id = :marketplaceId
+                    SET 
+                        currency_rate = $currencyRate,
+                        current_USD = $usdRate
+                    WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
                 ";
-                $db->executeStatement($updateSql, [
-                    'marketplaceKey' => $marketplaceKey,
-                    'marketplaceId' => $id,             
-                ]);
-            } else {
-                echo "Marketplace not found for ID: $id\n";
+            }
+            else {
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items
+                    SET 
+                        currency_rate = $currencyRate,
+                        current_USD = $usdRate
+                    WHERE DATE(created_at)  = '$date' AND currency = '$currency';
+                ";
+            }
+            echo "Updating... $updateSql\n";
+            try {
+                $affectedRows = $db->executeStatement($updateSql);
+                echo "Rows affected: $affectedRows\n";
+                echo "Update successful\n";
+            } catch (Exception $e) {
+                echo "Error occurred: " . $e->getMessage() . "\n";
             }
         }
+        echo "All processes completed.\n";
     }
 
     protected function calculatePrice()
@@ -358,93 +385,69 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "All processes completed.\n";
     }
 
-    protected function currencyRate()
+    protected function extraColumns(): void
+    {
+        echo "Set Marketplace key\n";
+        $this->setMarketplaceKey();
+        echo "Complated Marketplace key\n";
+        echo "Calculating is Parse URL\n";
+        $this->parseUrl();
+        echo "Complated Parse URL\n";
+        echo "Calculating Closed At Diff\n";
+        $this->insertClosedAtDiff();
+        echo "Complated Closed At Diff\n";
+        echo "Calculating is Discount\n";
+        $this->discountValue();
+        echo "Complated is Discount\n";
+        echo "Calculating is Country Name\n";
+        $this->countryCodes();
+        echo "Complated is Country Name\n";
+        echo "Calculating USA Code\n";
+        $this->usaCode();
+        echo "Complated USA Code\n";
+        echo "Calculating Bolcom Total Price\n";
+        $this->bolcomTotalPrice();
+        echo "Complated Bolcom Total Price\n";
+        echo "Fix Bolcom Orders\n";
+        $this->bolcomFixOrders();
+        echo "Complated Fix Bolcom Orders\n";
+        echo "Calculating is Cancelled\n";
+        $this->isCancelled();
+        echo "Complated is Cancelled\n";
+    }
+
+    protected function setMarketplaceKey()
     {
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT 
-                DISTINCT currency,
-                DATE(created_at)
+                DISTINCT marketplace_id
             FROM
                 iwa_marketplace_orders_line_items
-            WHERE currency_rate IS NULL;
-        ";
-        $results = $db->fetchAllAssociative($sql);
-        echo "Start: Updating currency rates...\n";
-        foreach ($results as $row) {
-            $currency = $row['currency'];
-            $date = $row['DATE(created_at)'];
-            echo "Processing... Currency: $currency, Date: $date\n";
-            if ($currency === 'TRY') {
-                $currency = 'USD';
-            }
-            $rateSql = "
-                SELECT 
-                    value
-                FROM 
-                    iwa_currency_history
-                WHERE 
-                    currency = '$currency'
-                    AND DATE(date) <= '$date'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
-                LIMIT 1;
+            WHERE 
+                marketplace_id IS NOT NULL
             ";
-            $currencyRate  = $db->fetchOne($rateSql);
-            $usdRateSql = "
-                SELECT 
-                    value
-                FROM 
-                    iwa_currency_history
-                WHERE 
-                    currency = 'USD'
-                    AND DATE(date) <= '$date'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
-                LIMIT 1;
-            ";
-            $usdRate = $db->fetchOne($usdRateSql);
-        
-            if (!$currencyRate) {
-                echo "Currency rate not found for currency: $currency, date: $date\n";
-                continue;
-            }
-        
-            if (!$usdRate) {
-                echo "USD rate not found for date: $date\n";
-                continue;
-            }
-
-            if($row['currency'] === 'TRY') {
+        $values = $db->fetchAllAssociative($sql);
+        foreach ($values as $row) {
+            $id = $row['marketplace_id'];
+            $marketplace = Marketplace::getById($id);
+            if ($marketplace) {
+                $marketplaceKey = $marketplace->getKey();
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items
-                    SET 
-                        currency_rate = $currencyRate,
-                        current_USD = $usdRate
-                    WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
-                ";    
-            }
-            else {
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items
-                    SET 
-                        currency_rate = $currencyRate,
-                        current_USD = $usdRate
-                    WHERE DATE(created_at)  = '$date' AND currency = '$currency';
+                    SET marketplace_key = :marketplaceKey
+                    WHERE marketplace_id = :marketplaceId
                 ";
-            }
-            echo "Updating... $updateSql\n";
-            try {
-                $affectedRows = $db->executeStatement($updateSql);
-                echo "Rows affected: $affectedRows\n";
-                echo "Update successful\n";
-            } catch (Exception $e) {
-                echo "Error occurred: " . $e->getMessage() . "\n";
+                $db->executeStatement($updateSql, [
+                    'marketplaceKey' => $marketplaceKey,
+                    'marketplaceId' => $id,
+                ]);
+            } else {
+                echo "Marketplace not found for ID: $id\n";
             }
         }
-        echo "All processes completed.\n";
     }
-    
+
     protected function insertClosedAtDiff() 
     {
         $db = \Pimcore\Db::get();
