@@ -74,6 +74,15 @@ def run_forecast_pipeline(yaml_path, scenario):
                 print(f"ASIN: {asin}, Sales Channel: {sales_channel} - No valid data after cleaning leading zeros.")
                 continue
 
+            # Deny processing if non-zero count is below 50 or grand total sales is below 100
+            if (data['y'] != 0).sum() < 50:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Less than 50 non-zero values in 'y'. Skipping forecast.")
+                continue
+
+            if data['y'].sum() < 100:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Grand total sales below 100. Skipping forecast.")
+                continue
+
             # Step 4: Generate forecast
             forecast = generate_forecast(data, forecast_days=180)
 
