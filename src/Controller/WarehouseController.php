@@ -75,14 +75,14 @@ class WarehouseController extends FrontendController
             return new JsonResponse(['error' => 'Missing required parameters'], 400);
         }
 
+        if ($salesChannel !== 'all') {
+            $salesChannel = "Amazon." . strtolower($salesChannel);
+        }
+
         $queryText = "iwasku = :iwasku";
         $queryData = ['iwasku' => $iwasku];
-
-        if ($salesChannel !== 'all') {
-            $queryText .= " AND sales_channel = :sales_channel";
-            $salesChannel = "Amazon." . strtolower($salesChannel);
-            $queryData['sales_channel'] = $salesChannel;
-        }
+        $queryText .= " AND sales_channel = :sales_channel";
+        $queryData['sales_channel'] = $salesChannel;
 
         $db = Db::get();
         $yesterdayQuery = "SELECT MAX(sale_date) AS latest_date
