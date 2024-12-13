@@ -15,10 +15,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "/Products",
-        'updateInventoryPrice' => "/Products/price-and-stock",
+        'offers' => "/Products/",
+        'updateInventoryPrice' => "/Products/price-and-stock/",
         'batchStatus' => "/Products/batch-status/",
-        'orders' => "/Order/GetOrders"
+        'orders' => "/Order/GetOrders/"
     ];
 
     public static $marketplaceType = 'Ciceksepeti';
@@ -36,18 +36,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             ],
         ]);
     }
-    public function prepareToken()
-    {
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
-            'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
-                'Content-Type' => 'application/json'
-            ],
-        ]);
-    }
+
     public function download($forceDownload = false)
     {
-        $this->prepareToken();
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
             echo "Using cached listings\n";
@@ -58,6 +49,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->listings = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
+            print_r($response->getContent());
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
