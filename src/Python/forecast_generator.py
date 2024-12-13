@@ -2,7 +2,7 @@ from prophet import Prophet
 import pandas as pd
 import logging
 import math
-from pmdarima import auto_arima
+#from pmdarima import auto_arima
 import matplotlib.pyplot as plt
 import numpy as np
 from neuralprophet import NeuralProphet
@@ -123,7 +123,6 @@ def generate_forecast_arima(data, forecast_days=180):
               - 'ds': Date
               - 'yhat': Predicted sales quantity as a non-negative rounded value.
             - forecast_plot_figure (matplotlib.figure.Figure): A Matplotlib figure of the forecast plot.
-    """
     if data.empty:
         raise ValueError("Input data is empty. Cannot generate a forecast.")
 
@@ -162,6 +161,7 @@ def generate_forecast_arima(data, forecast_days=180):
 
     # Return the forecast DataFrame and plot
     return future_forecast, forecast_plot_figure
+    """
 
 
 def generate_forecast_neuralprophet(data, forecast_days=180):
