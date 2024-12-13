@@ -37,22 +37,57 @@ def fetch_data(asin, sales_channel, yaml_path):
 
 
 
-def fetch_pairs(yaml_path):
+def fetch_pairs(yaml_path, scenario):
+    """
+    Fetch distinct ASIN and sales_channel pairs based on the specified scenario.
+
+    Parameters:
+        yaml_path (str): Path to the YAML configuration file.
+        scenario (int): Processing scenario (1 to 5).
+            1: Process Amazon.eu only
+            2: Process sales_channel = 'all' only
+            3: Process Amazon.com only
+            4: Process all other than Amazon.eu, Amazon.com, and 'all'
+            5: Process all channels without filter
+
+    Returns:
+        pd.DataFrame: DataFrame containing ASIN and sales_channel pairs.
+    """
     engine = None  # Initialize engine
     try:
+        # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
 
-        db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        # Build database connection URL
+        db_url = (
+            f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@"
+            f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        )
         engine = create_engine(db_url)
 
-        query = """
+        # Define base query
+        base_query = """
         SELECT DISTINCT asin, sales_channel
         FROM iwa_amazon_daily_sales_summary
         WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
           AND sale_date < CURDATE()
-          AND sales_channel <> 'Amazon.eu'
         """
 
+        # Add filters based on the scenario
+        if scenario == 1:
+            query = base_query + "AND sales_channel = 'Amazon.eu'"
+        elif scenario == 2:
+            query = base_query + "AND sales_channel = 'all'"
+        elif scenario == 3:
+            query = base_query + "AND sales_channel = 'Amazon.com'"
+        elif scenario == 4:
+            query = base_query + "AND sales_channel NOT IN ('Amazon.eu', 'Amazon.com', 'all')"
+        elif scenario == 5:
+            query = base_query  # No additional filters
+        else:
+            raise ValueError("Invalid scenario. Must be between 1 and 5.")
+
+        # Execute query and return results
         df = pd.read_sql(query, engine)
         return df
 

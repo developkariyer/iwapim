@@ -9,19 +9,25 @@ cmdstanpy_logger = logging.getLogger("cmdstanpy")
 cmdstanpy_logger.setLevel(logging.WARNING)
 cmdstanpy_logger.propagate = False
 
-def run_forecast_pipeline(yaml_path):
+def run_forecast_pipeline(yaml_path, scenario):
     """
     Executes the complete forecasting pipeline for all ASIN/Sales Channel pairs.
 
     Args:
         yaml_path (str): Path to the YAML configuration file for MySQL connection.
+        scenario (int): Processing scenario (1 to 5).
+            1: Process Amazon.eu only
+            2: Process sales_channel = 'all' only
+            3: Process Amazon.com only
+            4: Process all other than Amazon.eu, Amazon.com, and 'all'
+            5: Process all channels without filter.
 
     Returns:
         None
     """
-    # Step 1: Fetch ASIN/Sales Channel pairs
+    # Step 1: Fetch ASIN/Sales Channel pairs based on the scenario
     print("Fetching ASIN/Sales Channel pairs...")
-    pairs = fetch_pairs(yaml_path)
+    pairs = fetch_pairs(yaml_path, scenario)
 
     if pairs.empty:
         print("No ASIN/Sales Channel pairs found. Exiting...")
@@ -74,19 +80,13 @@ def run_forecast_pipeline(yaml_path):
 
         except Exception as e:
             print(f"\nError processing ASIN {asin} and Sales Channel {sales_channel}: {e}")
-            # Print information on data and some sample rows for debugging
+            # Debugging outputs
             print(data.head(10))
-            # Print column names of data
             print("Column names:", data.columns)
-            # Print row counts of data
             print("Row counts:", data.count())
-            # Print count of NaN in 'y'
             print(f"Count of NaN values in 'y': {data['y'].isnull().sum()}")
-            # Print count of zero values in 'y'
             print(f"Count of zero values in 'y': {(data['y'] == 0).sum()}")
-            # Print sum of 'y' values
             print(f"Sum of 'y' values: {data['y'].sum()}")
-            # Stop all script
             break
 
     print("\nForecasting pipeline completed.")
@@ -94,4 +94,19 @@ def run_forecast_pipeline(yaml_path):
 # Entry point for the script
 if __name__ == "__main__":
     yaml_path = '/var/www/iwapim/config/local/database.yaml'
-    run_forecast_pipeline(yaml_path)
+
+    # Parse command-line arguments
+    args = sys.argv[1:]
+    if '--eu' in args:
+        scenario = 1  # Process Amazon.eu only
+    elif '--all' in args:
+        scenario = 2  # Process sales_channel = 'all' only
+    elif '--us' in args:
+        scenario = 3  # Process Amazon.com only
+    elif '--others' in args:
+        scenario = 4  # Process all other than Amazon.eu, Amazon.com, and 'all'
+    else:
+        scenario = 5  # Process all channels without filter
+
+    # Run the pipeline with the selected scenario
+    run_forecast_pipeline(yaml_path, scenario)
