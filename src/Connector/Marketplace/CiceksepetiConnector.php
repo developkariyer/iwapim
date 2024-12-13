@@ -15,10 +15,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "Products/",
-        'updateInventoryPrice' => "Products/price-and-stock/",
-        'batchStatus' => "Products/batch-status/",
-        'orders' => "Order/GetOrders/"
+        'offers' => "/Products/",
+        'updateInventoryPrice' => "/Products/price-and-stock/",
+        'batchStatus' => "/Products/batch-status/",
+        'orders' => "/Order/GetOrders/"
     ];
 
     public static $marketplaceType = 'Ciceksepeti';
@@ -48,8 +48,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'],
+            $response = $this->httpClient->request('GET','https://apis.ciceksepeti.com/api/v1/Products',
                 [
+                    'headers' => [
+                        'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                        'Content-Type' => 'application/json'
+                    ],
                     'query' =>
                     [
                         'Page' => $page,
@@ -57,13 +61,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     ]
                 ]
             );
-            $data = $response->toArray();
-            print_r($data);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
                 break;
             }
+            $data = $response->toArray();
             $products = $data['products'];
             $this->listings = array_merge($this->listings, $products);
             $totalItems = $data['totalCount'];
