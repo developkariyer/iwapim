@@ -26,7 +26,6 @@ WHERE
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) IS NOT NULL
     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) != 'null'
     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) != ''
-    AND CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) AS UNSIGNED) > 0
     AND marketplace_id = :marketPlaceId
 ON DUPLICATE KEY UPDATE
     marketplace_type = VALUES(marketplace_type),
