@@ -62,25 +62,25 @@ class WarehouseController extends FrontendController
     }
 
     /**
-     * @Route("/warehouse/json/{asin}/{sales_channel}", name="sales_data")
+     * @Route("/warehouse/json/{iwasku}/{sales_channel}", name="sales_data")
      * @throws Exception
      * @throws \DateMalformedStringException
      */
     public function salesDataAction(Request $request): JsonResponse
     {
-        $asin = $request->get('asin');
+        $iwasku = $request->get('iwasku');
         $salesChannel = $request->get('sales_channel');
 
-        if (!$asin || !$salesChannel) {
+        if (!$iwasku || !$salesChannel) {
             return new JsonResponse(['error' => 'Missing required parameters'], 400);
         }
 
         $db = Db::get();
         $yesterdayQuery = "SELECT MAX(sale_date) AS latest_date
             FROM iwa_amazon_daily_sales_summary
-            WHERE data_source = 1 AND asin = :asin AND sales_channel = :sales_channel";
+            WHERE data_source = 1 AND iwasku = :iwasku AND sales_channel = :sales_channel";
         $yesterday = $db->fetchOne($yesterdayQuery, [
-            'asin' => $asin,
+            'iwasku' => $iwasku,
             'sales_channel' => $salesChannel,
         ]);
 
@@ -100,7 +100,7 @@ class WarehouseController extends FrontendController
                 GROUP BY sale_date
                 ORDER BY sale_date",
             [
-                'asin' => $asin,
+                'iwasku' => $iwasku,
                 'sales_channel' => $salesChannel,
                 'start_previous_year' => $startPreviousYearData->format('Y-m-d'),
             ]
