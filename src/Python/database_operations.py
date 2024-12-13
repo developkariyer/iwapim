@@ -63,6 +63,10 @@ def fetch_pairs(yaml_path):
             engine.dispose()
 
 
+from sqlalchemy import create_engine, text
+import pandas as pd
+import math
+
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     """
     Inserts or updates forecasted data into the MySQL `iwa_amazon_daily_sales_summary` table.
@@ -86,8 +90,8 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
 
-        # Create SQLAlchemy engine
-        db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        # Create SQLAlchemy engine with pymysql
+        db_url = f"mysql+pymysql://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         engine = create_engine(db_url)
 
         # SQL query for iwasku mapping
@@ -108,23 +112,21 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
 
         # Connect to the database
         with engine.connect() as connection:
-            # Fetch iwasku mapping within the connection context
+            # Fetch iwasku mapping
             iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
             iwasku = iwasku_result[0] if iwasku_result else asin
+            print(f"Resolved iwasku: {iwasku}")
 
             # Prepare data for insertion
             forecast_data['asin'] = asin
             forecast_data['sales_channel'] = sales_channel
             forecast_data['iwasku'] = iwasku
-            forecast_data['data_source'] = 0  # 0 indicates forecasted data
+            forecast_data['data_source'] = 0
             forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
-            forecast_data['sale_date'] = forecast_data['sale_date'].dt.strftime('%Y-%m-%d')
             forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
+            forecast_data['sale_date'] = forecast_data['sale_date'].dt.strftime('%Y-%m-%d')  # Ensure DATE format
 
-            # Display the number of rows to process
-            print(f"Number of rows to process: {len(forecast_data)}")
-            print(forecast_data.head())  # Display first few rows for debugging
-
+            # Insert rows
             rows_to_insert = [
                 {
                     'asin': row.asin,
@@ -137,14 +139,14 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
                 for row in forecast_data.itertuples(index=False)
             ]
 
+            # Execute each insert query
             for row in rows_to_insert:
                 print(f"Inserting row: {row}")
-                connection.execute(insert_query, row)
-
-            print("Data inserted successfully.")
+                result = connection.execute(insert_query, row)
+                print(f"Affected rows: {result.rowcount}")
 
     except Exception as e:
-        print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
+        print(f"Error inserting/updating forecast data: {e}")
         raise
 
     finally:
