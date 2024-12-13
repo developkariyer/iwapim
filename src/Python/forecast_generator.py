@@ -61,7 +61,8 @@ def generate_forecast(data, forecast_days=180):
     # Combine all holidays into a single DataFrame
     holidays = pd.concat([ramadan_dates, three_holy_months, christmas_dates], ignore_index=True)
 
-    model = Prophet(yearly_seasonality=True, weekly_seasonality=False, holidays=holidays)
+    #model = Prophet(yearly_seasonality=True, weekly_seasonality=False, holidays=holidays)
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=False)
 
     # Add custom seasonality
     model.add_seasonality(name='Ramadan', period=354.37, fourier_order=5)
