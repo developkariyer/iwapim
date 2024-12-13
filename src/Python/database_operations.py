@@ -36,7 +36,6 @@ def fetch_data(asin, sales_channel, yaml_path):
             engine.dispose()
 
 
-
 def fetch_pairs(yaml_path, scenario):
     """
     Fetch distinct ASIN and sales_channel pairs based on the specified scenario.
@@ -190,3 +189,53 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     finally:
         if connection:
             connection.close()
+
+
+def delete_forecast_data(asin, sales_channel, yaml_path):
+    """
+    Deletes old forecast data for the given ASIN and sales_channel from the database.
+
+    Args:
+        asin (str): The ASIN for which to delete forecast data.
+        sales_channel (str): The sales_channel for which to delete forecast data.
+        yaml_path (str): Path to the YAML configuration file for database connection.
+
+    Returns:
+        None
+    """
+    conn = None
+    try:
+        # Load MySQL configuration from YAML file
+        with open(yaml_path, 'r') as file:
+            mysql_config = yaml.safe_load(file)
+
+        # Connect to the database using PyMySQL
+        conn = pymysql.connect(
+            host=mysql_config['host'],
+            user=mysql_config['user'],
+            password=mysql_config['password'],
+            database=mysql_config['database'],
+            port=mysql_config['port'],
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        cursor = conn.cursor()
+
+        # Define the delete query
+        query = """
+        DELETE FROM iwa_amazon_daily_sales_summary
+        WHERE asin = %s
+          AND sales_channel = %s
+          AND data_source = 0
+        """
+
+        # Execute the delete query
+        cursor.execute(query, (asin, sales_channel))
+        conn.commit()
+        print(f"Old forecast data deleted for ASIN: {asin}, Sales Channel: {sales_channel}.")
+
+    except pymysql.MySQLError as e:
+        print(f"Error deleting forecast data for ASIN {asin}, Sales Channel {sales_channel}: {e}")
+
+    finally:
+        if conn:
+            conn.close()

@@ -51,6 +51,8 @@ def run_forecast_pipeline(yaml_path, scenario):
         sys.stdout.flush()
 
         try:
+            delete_forecast_data(asin, sales_channel, yaml_path)
+
             # Step 3: Fetch historical sales data
             data = fetch_data(asin, sales_channel, yaml_path)
 
