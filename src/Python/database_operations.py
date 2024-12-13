@@ -62,6 +62,8 @@ def fetch_pairs(yaml_path):
         if engine:
             engine.dispose()
 
+
+
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     """
     Inserts or updates forecasted data into the MySQL `iwa_amazon_daily_sales_summary` table.
@@ -107,7 +109,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
 
         # Connect to the database
         with engine.connect() as connection:
-            # Fetch iwasku mapping
+            # Fetch iwasku mapping within the connection context
             iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
             iwasku = iwasku_result[0] if iwasku_result else asin
 
@@ -123,7 +125,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             print(f"Number of rows to process: {len(forecast_data)}")
             print(forecast_data.head())  # Display first few rows for debugging
 
-            # Insert or update data
+            # Use `with connection.begin()` to manage the transaction
             with connection.begin():  # Explicit transaction management
                 connection.execute(
                     insert_query,
