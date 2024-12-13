@@ -19,32 +19,47 @@ def generate_forecast(data, forecast_days=180):
     if data.empty:
         raise ValueError("Input data is empty. Cannot generate a forecast.")
 
+    # Ramadan (30 days)
     ramadan_dates = pd.DataFrame({
         'holiday': 'ramadan',
-        'ds': pd.to_datetime(['2024-03-10', '2024-04-08', '2025-02-28']),  # Adjust with actual start dates
-        'lower_window': 0,
-        'upper_window': 29  # Assuming Ramadan lasts 30 days
+        'ds': pd.to_datetime([
+            '2022-04-02',  # 1443 Hijri
+            '2023-03-23',  # 1444 Hijri
+            '2024-03-10',  # 1445 Hijri
+            '2025-02-28',  # 1446 Hijri
+        ]),
+        'lower_window': [-7] * 4,  # Start on the first day
+        'upper_window': [29] * 4  # Lasts 30 days
     })
 
+    # Three Holy Months (90 days total)
     three_holy_months = pd.DataFrame({
         'holiday': 'three_holy_months',
-        'ds': pd.to_datetime(['2024-02-10', '2025-01-30']),  # Start of the 3 months
-        'lower_window': 0,
-        'upper_window': 89  # Length of the three holy months
+        'ds': pd.to_datetime([
+            '2022-02-03',  # Start of Rajab, 1443 Hijri
+            '2023-01-23',  # Start of Rajab, 1444 Hijri
+            '2024-01-11',  # Start of Rajab, 1445 Hijri
+            '2025-01-01',  # Start of Rajab, 1446 Hijri
+        ]),
+        'lower_window': [0] * 4,  # Start on the first day
+        'upper_window': [89] * 4  # Covers 3 months (Rajab, Sha'ban, Ramadan)
     })
 
+    # Christmas Season (24 days before and 7 days after)
     christmas_dates = pd.DataFrame({
-      'holiday': ['christmas', 'christmas_eve', 'new_year', 'christmas_season'] * 3,
-      'ds': pd.to_datetime([
-          '2024-12-25', '2024-12-24', '2024-12-31', '2024-12-01',  # Christmas season starts December 1
-          '2025-12-25', '2025-12-24', '2025-12-31', '2025-12-01',  # Repeat for next year
-          '2026-12-25', '2026-12-24', '2026-12-31', '2026-12-01'   # Extend if necessary
-      ]),
-      'lower_window': [0, 0, 0, -24],  # Adjust the season to start 24 days before
-      'upper_window': [0, 0, 1, 25]  # Christmas season lasts till Dec 25
+        'holiday': 'christmas_season',
+        'ds': pd.to_datetime([
+            '2022-12-25',  # Christmas 2022
+            '2023-12-25',  # Christmas 2023
+            '2024-12-25',  # Christmas 2024
+            '2025-12-25',  # Christmas 2025
+        ]),
+        'lower_window': [-24] * 4,  # Start 24 days before Christmas
+        'upper_window': [7] * 4    # Extend 7 days after Christmas
     })
 
-    holidays = pd.concat([ramadan_dates, three_holy_months, christmas_dates])
+    # Combine all holidays into a single DataFrame
+    holidays = pd.concat([ramadan_dates, three_holy_months, christmas_dates], ignore_index=True)
 
     model = Prophet(yearly_seasonality=True, weekly_seasonality=False, holidays=holidays)
 
