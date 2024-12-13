@@ -47,7 +47,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
+            echo "Url : " . static::$apiUrl['offers'] . "\n";
+            /*$response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
@@ -60,7 +61,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Page: " . $page . " ";
             echo "Count: " . count($this->listings) . " / Total Count: " . $totalItems . "\n";
             $page++;
-            sleep(5);
+            sleep(5);*/
         } while (count($this->listings) < $totalItems);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
