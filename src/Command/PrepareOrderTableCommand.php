@@ -54,7 +54,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->extraColumns();
         }
         return Command::SUCCESS;
-        echo  VariantProduct::getById(1123);
     }
 
     protected function marketplaceList(): void
