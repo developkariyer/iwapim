@@ -31,7 +31,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         parent::__construct($marketplace);
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
             'headers' => [
-                'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
+                'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
+                'Content-Type' => 'application/json'
             ],
         ]);
     }
