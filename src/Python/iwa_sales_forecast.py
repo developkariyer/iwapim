@@ -1,4 +1,5 @@
 import sys
+import os
 import logging
 from collections import defaultdict
 from database_operations import fetch_pairs, fetch_data, insert_forecast_data, delete_forecast_data
@@ -79,7 +80,13 @@ def run_forecast_pipeline(yaml_path, scenario):
                 continue
 
             # Step 4: Generate forecast
-            forecast = generate_forecast(data, forecast_days=180)
+            forecast, forecast_plot = generate_forecast(data, forecast_days=180)
+
+            # Save the forecast plot
+            output_dir = "/var/www/iwapim/public/tmp"
+            os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
+            output_path = os.path.join(output_dir, f"{asin}_{sales_channel}.png")
+            forecast_plot.savefig(output_path)
 
             # Step 5: Insert forecast into the database
             insert_forecast_data(forecast, asin, sales_channel, yaml_path)

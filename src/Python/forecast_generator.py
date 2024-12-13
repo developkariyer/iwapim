@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from prophet import Prophet
 import pandas as pd
 import logging
@@ -92,5 +93,8 @@ def generate_forecast(data, forecast_days=180):
         axis=1
     )
 
-    # Return only 'ds' and 'yhat'
-    return future_forecast[['ds', 'yhat']]
+    forecast_plot_figure = model.plot(forecast)
+    plt.close(forecast_plot_figure)  # Prevent showing the plot in non-interactive environments
+
+    # Return only 'ds' and 'yhat', along with the forecast plot
+    return future_forecast[['ds', 'yhat']], forecast_plot_figure
