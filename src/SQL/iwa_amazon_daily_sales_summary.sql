@@ -142,6 +142,33 @@ SELECT
 FROM
     temp_full_data_set;
 
+CREATE TEMPORARY TABLE temp_calendar AS
+SELECT DISTINCT sale_date
+FROM iwa_amazon_daily_sales_summary
+WHERE data_source = 1;
+
+INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
+SELECT
+    iwasku AS asin,
+    iwasku,
+    'all' AS sales_channel,
+    temp_calendar.sale_date,
+    COALESCE(SUM(sales.total_quantity), 0) AS total_quantity,
+    1 AS data_source
+FROM
+    temp_calendar
+        LEFT JOIN
+    iwa_amazon_daily_sales_summary AS sales
+    ON
+        temp_calendar.sale_date = sales.sale_date
+            AND sales.data_source = 1
+            AND sales.sales_channel <> 'all'
+GROUP BY
+    iwasku, temp_calendar.sale_date
+ON DUPLICATE KEY UPDATE
+    total_quantity = VALUES(total_quantity);
+
+
 -- Step 8: Drop the existing table and rename the temporary table
 DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary;
 RENAME TABLE iwa_amazon_daily_sales_summary_temp TO iwa_amazon_daily_sales_summary;

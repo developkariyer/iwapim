@@ -58,6 +58,18 @@ def run_forecast_pipeline(yaml_path):
             if data.empty or data.dropna().shape[0] < 2:
                 continue
 
+            print(f"Data for ASIN {asin}, Sales Channel {sales_channel}:")
+            print(data.head())
+            print(f"Shape of data: {data.shape}")
+
+            if 'ds' not in data.columns or 'y' not in data.columns:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Missing required columns in data.")
+                continue
+
+            if data.shape[0] < 2:
+                print(f"ASIN: {asin}, Sales Channel: {sales_channel} - Not enough data for forecasting.")
+                continue
+
             # Step 4: Generate forecast
             forecast = generate_forecast(data, forecast_days=180)
 
