@@ -136,6 +136,6 @@ if __name__ == "__main__":
         scenario = 5  # Process all channels without filter
 
     # Run the pipeline with the selected scenario
-    run_forecast_pipeline(yaml_path, scenario, 1)
+    run_forecast_pipeline(yaml_path, scenario, 5)
 
 
