@@ -113,6 +113,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     Returns:
         None
     """
+    print("Insert forecast data function triggered...")
     # Ensure the forecast_data contains the required columns
     required_columns = {'ds', 'yhat'}
     if not required_columns.issubset(forecast_data.columns):
