@@ -142,6 +142,7 @@ SELECT
 FROM
     temp_full_data_set;
 
+DROP TEMPORARY TABLE IF EXISTS temp_calendar;
 CREATE TEMPORARY TABLE temp_calendar AS
 SELECT DISTINCT sale_date
 FROM iwa_amazon_daily_sales_summary
