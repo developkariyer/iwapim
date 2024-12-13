@@ -75,11 +75,12 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     Returns:
         None
     """
+    # Ensure the forecast_data contains the required columns
     required_columns = {'ds', 'yhat'}
     if not required_columns.issubset(forecast_data.columns):
         raise ValueError(f"Forecast data must contain columns: {required_columns}")
 
-    engine = None  # Initialize engine
+    engine = None
     try:
         # Load MySQL configuration
         mysql_config = get_mysql_config(yaml_path)
@@ -88,11 +89,14 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         engine = create_engine(db_url)
 
-        # SQL query for INSERT or UPDATE
+        # SQL query for iwasku mapping
         iwasku_query = text("""
-        SELECT COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin) AS iwasku
+        SELECT COALESCE(
+            (SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = :asin), :asin
+        ) AS iwasku
         """)
 
+        # SQL query for inserting or updating forecast data
         insert_query = text("""
         INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, iwasku, sale_date, total_quantity, data_source)
         VALUES (:asin, :sales_channel, :iwasku, :sale_date, :total_quantity, :data_source)
@@ -101,8 +105,9 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             data_source = VALUES(data_source);
         """)
 
+        # Connect to the database
         with engine.connect() as connection:
-            # Fetch iwasku mapping within the connection context
+            # Fetch iwasku mapping
             iwasku_result = connection.execute(iwasku_query, {'asin': asin}).fetchone()
             iwasku = iwasku_result[0] if iwasku_result else asin
 
@@ -118,8 +123,8 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             print(f"Number of rows to process: {len(forecast_data)}")
             print(forecast_data.head())  # Display first few rows for debugging
 
-            transaction = connection.begin()
-            try:
+            # Insert or update data
+            with connection.begin():  # Explicit transaction management
                 connection.execute(
                     insert_query,
                     [
@@ -134,15 +139,11 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
                         for row in forecast_data.itertuples(index=False)
                     ]
                 )
-                transaction.commit()
-                print("Transaction committed successfully")
-            except Exception as e:
-                transaction.rollback()
-                print(f"Transaction rolled back due to error: {e}")
-                raise
+                print("Data inserted/updated successfully")
 
     except Exception as e:
         print(f"Error inserting/updating forecast data for ASIN {asin} and Sales Channel {sales_channel}: {e}")
+        raise
 
     finally:
         if engine:
