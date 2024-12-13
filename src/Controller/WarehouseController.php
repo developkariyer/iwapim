@@ -174,9 +174,10 @@ class WarehouseController extends FrontendController
             $response['forecastedData'][$week - 53] += $quantity;
         }
 
-        $response['currentData'][26] = $response['forecastedData'][26];
+        if ($response['forecastedData'][26]>0) {
+            $response['currentData'][26] = $response['forecastedData'][26];
+        }
 
         return $this->json($response);
     }
-
 }

@@ -148,8 +148,6 @@ RENAME TABLE iwa_amazon_daily_sales_summary_temp TO iwa_amazon_daily_sales_summa
 
 -- Step 9: Add indexes for faster querying
 CREATE INDEX idx_asin ON iwa_amazon_daily_sales_summary (asin);
-CREATE INDEX idx_iwasku ON iwa_amazon_daily_sales_summary (iwasku);
 CREATE INDEX idx_sales_channel ON iwa_amazon_daily_sales_summary (sales_channel);
 CREATE INDEX idx_sale_date ON iwa_amazon_daily_sales_summary (sale_date);
-CREATE INDEX idx_data_source ON iwa_amazon_daily_sales_summary (data_source);
-ALTER TABLE iwa_amazon_daily_sales_summary ADD UNIQUE KEY (asin, iwasku, sales_channel, sale_date, data_source);
+ALTER TABLE iwa_amazon_daily_sales_summary ADD UNIQUE KEY (iwasku, sales_channel, sale_date);
