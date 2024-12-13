@@ -75,6 +75,10 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
     Returns:
         None
     """
+    required_columns = {'ds', 'yhat'}
+    if not required_columns.issubset(forecast_data.columns):
+        raise ValueError(f"Forecast data must contain columns: {required_columns}")
+
     engine = None  # Initialize engine
     connection = None
     try:
@@ -98,6 +102,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         forecast_data['iwasku'] = iwasku
         forecast_data['data_source'] = 0  # 0 indicates forecasted data
         forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
+        forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
 
         # Convert DataFrame to a list of tuples
         rows_to_insert = list(forecast_data[['asin', 'sales_channel', 'iwasku', 'sale_date', 'total_quantity', 'data_source']].itertuples(index=False, name=None))
