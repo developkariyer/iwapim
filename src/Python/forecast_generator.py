@@ -201,23 +201,15 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
     # Generate the forecast
     forecast = model.predict(future)
 
-    print("Forecast columns before change:")
-    print(forecast.columns)
-    print(forecast.head())
-
     # Ensure 'yhat1' exists and clean negative values
     if 'yhat1' in forecast.columns:
         forecast['yhat'] = forecast['yhat1'].apply(lambda x: max(0, x) if pd.notnull(x) else x)
     else:
         raise ValueError("'yhat1' is missing from the forecast data.")
 
-    print("Forecast columns after change:")
-    print(forecast.columns)
-    print(forecast.head())
-
     # Plot the forecast
     #forecast_plot_figure = model.plot(forecast)
     #plt.close(forecast_plot_figure)  # Prevent display in non-interactive environments
 
     # Return the forecast DataFrame and plot
-    return forecast[['ds', 'yhat1']], '' #forecast_plot_figure
+    return forecast[['ds', 'yhat']], '' #forecast_plot_figure
