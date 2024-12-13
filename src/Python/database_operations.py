@@ -50,7 +50,7 @@ def fetch_pairs(yaml_path):
         FROM iwa_amazon_daily_sales_summary
         WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
           AND sale_date < CURDATE()
-          AND sales_channel = 'Amazon.eu'
+          AND sales_channel <> 'Amazon.eu'
         """
 
         df = pd.read_sql(query, engine)
