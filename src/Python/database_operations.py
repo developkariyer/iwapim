@@ -118,6 +118,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             forecast_data['iwasku'] = iwasku
             forecast_data['data_source'] = 0  # 0 indicates forecasted data
             forecast_data = forecast_data.rename(columns={'ds': 'sale_date', 'yhat': 'total_quantity'})
+            forecast_data['sale_date'] = forecast_data['sale_date'].dt.strftime('%Y-%m-%d')
             forecast_data['total_quantity'] = forecast_data['total_quantity'].apply(lambda x: int(math.ceil(max(x, 0))))
 
             # Display the number of rows to process
