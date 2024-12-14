@@ -22,6 +22,8 @@ def group_sales_data(df, period):
     next_date = aggregated_df['ds'].max() + pd.Timedelta(days=period)
     empty_frame = pd.DataFrame({'ds': [next_date], 'y': [None]})
     aggregated_df = pd.concat([aggregated_df, empty_frame], ignore_index=True)
+    print(f"Grouped data: {aggregated_df}")
+    quit()
     return aggregated_df
 
 
