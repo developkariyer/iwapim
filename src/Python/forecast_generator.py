@@ -71,12 +71,12 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         "upper_window": 29  # Extends for 30 days
     })
     model = NeuralProphet(
-        n_changepoints=20,
+        #n_changepoints=20,
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
-        seasonality_mode='multiplicative',
-        n_lags=10,
+        #seasonality_mode='multiplicative',
+        #n_lags=10,
     )
     #model = model.add_country_holidays(country_name='US')
     #model = model.add_events('ramadan')
@@ -100,7 +100,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
             last_year_half = last_year_prediction[0] / 2 if len(last_year_prediction) > 0 else 0
             forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
     '''
-    print(f"Forecast DataFrame: {forecast.head()}")
+    print(f"Forecast DataFrame: {forecast}")
     return forecast[['ds', 'yhat']]
 
 
