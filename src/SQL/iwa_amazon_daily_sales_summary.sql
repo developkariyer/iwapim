@@ -122,14 +122,18 @@ FROM
             AND a.sales_channel = d.sales_channel
             AND b.generated_date = d.sale_date;
 
+DO "Step 7: Create temporary table for date range";
 DROP TEMPORARY TABLE IF EXISTS temp_calendar;
 CREATE TEMPORARY TABLE temp_calendar AS
+WITH min_max_dates AS (
+    SELECT MIN(sale_date) AS min_date, MAX(sale_date) AS max_date
+    FROM temp_daily_sales
+)
 SELECT date AS sale_date
-FROM iwa_static_dates
-WHERE date >= (SELECT MIN(sale_date) FROM temp_daily_sales)
-  AND date <= (SELECT MAX(sale_date) FROM temp_daily_sales);
+FROM iwa_static_dates, min_max_dates
+WHERE date BETWEEN min_max_dates.min_date AND min_max_dates.max_date;
 
-DO "Step 7: Insert aggregated data for 'all' sales channels";
+DO "Step 8.1: Insert aggregated data for 'all' sales channels";
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
     tds.asin AS asin,
@@ -149,7 +153,7 @@ GROUP BY
     ON DUPLICATE KEY UPDATE
          total_quantity = VALUES(total_quantity);
 
-DO "Step 8: Insert aggregated data for 'Amazon.eu' sales channels";
+DO "Step 8.2: Insert aggregated data for 'Amazon.eu' sales channels";
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
     tds.asin AS asin,
