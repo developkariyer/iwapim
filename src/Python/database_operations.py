@@ -70,9 +70,9 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
 
         # Dynamically add conditions via string interpolation
         if asin:
-           base_query += f" AND asin = '{asin}'"
+            base_query += f" AND asin = '{asin}'"
         if sales_channel:
-           base_query += f" AND sales_channel = '{sales_channel}'"
+            base_query += f" AND sales_channel = '{sales_channel}'"
 
 
         # Execute query and return results
