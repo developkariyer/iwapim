@@ -37,18 +37,14 @@ def fetch_data(asin, sales_channel, yaml_path):
             engine.dispose()
 
 
-def fetch_pairs(yaml_path, scenario):
+def fetch_pairs(yaml_path, asin=None, sales_channel=None):
     """
-    Fetch distinct ASIN and sales_channel pairs based on the specified scenario.
+    Fetch distinct ASIN and sales_channel pairs based on the specified parameters.
 
     Parameters:
         yaml_path (str): Path to the YAML configuration file.
-        scenario (int): Processing scenario (1 to 5).
-            1: Process Amazon.eu only
-            2: Process sales_channel = 'all' only
-            3: Process Amazon.com only
-            4: Process all other than Amazon.eu, Amazon.com, and 'all'
-            5: Process all channels without filter
+        asin (str, optional): Specific ASIN to filter.
+        sales_channel (str, optional): Specific sales channel to filter.
 
     Returns:
         pd.DataFrame: DataFrame containing ASIN and sales_channel pairs.
@@ -65,30 +61,28 @@ def fetch_pairs(yaml_path, scenario):
         )
         engine = create_engine(db_url)
 
-        # Define base query
+        # Define base query with placeholders
         base_query = """
         SELECT DISTINCT asin, sales_channel
         FROM iwa_amazon_daily_sales_summary
-        WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
-          AND sale_date < CURDATE()
+        WHERE data_source = 1
         """
+        filters = []
+        params = {}
 
-        # Add filters based on the scenario
-        if scenario == 1:
-            query = base_query + "AND sales_channel = 'Amazon.eu'"
-        elif scenario == 2:
-            query = base_query + "AND sales_channel = 'all'"
-        elif scenario == 3:
-            query = base_query + "AND sales_channel = 'Amazon.com'"
-        elif scenario == 4:
-            query = base_query + "AND sales_channel NOT IN ('Amazon.eu', 'Amazon.com', 'all')"
-        elif scenario == 5:
-            query = base_query  # No additional filters
-        else:
-            raise ValueError("Invalid scenario. Must be between 1 and 5.")
+        # Add conditions dynamically with parameterized placeholders
+        if asin:
+            filters.append("asin = :asin")
+            params["asin"] = asin
+        if sales_channel:
+            filters.append("sales_channel = :sales_channel")
+            params["sales_channel"] = sales_channel
+
+        if filters:
+            base_query += " AND " + " AND ".join(filters)
 
         # Execute query and return results
-        df = pd.read_sql(query, engine)
+        df = pd.read_sql(base_query, engine, params=params)
         return df
 
     except Exception as e:
@@ -98,6 +92,7 @@ def fetch_pairs(yaml_path, scenario):
     finally:
         if engine:
             engine.dispose()
+
 
 
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
