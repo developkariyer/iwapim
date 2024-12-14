@@ -129,7 +129,7 @@ class WarehouseController extends FrontendController
         }
 
         foreach ($salesData as $data) {
-            $quantity = (int) $data['total_quantity'];
+            $quantity = $data['total_quantity'];
             $date = new DateTime($data['sale_date']);
             $days = (int) $yesterdayDate->diff($date)->format('%r%a');
             $dataSource = (int) $data['data_source'];

@@ -56,22 +56,18 @@
             }
 
             // Update table values
-            $('#lastYearLast90').text(data.lastYearLast90);
-            $('#lastYearLast30').text(data.lastYearLast30);
-            $('#lastYearLast7').text(data.lastYearLast7);
-            $('#lastYearNext7').text(data.lastYearNext7);
-            $('#lastYearNext30').text(data.lastYearNext30);
-            $('#lastYearNext90').text(data.lastYearNext90);
-            $('#lastYearTotal1').text(data.lastYearTotal1);
-            $('#lastYearTotal2').text(data.lastYearTotal2);
-            $('#lastTotal').text(data.lastTotal);
-            $('#last90').text(data.last90);
-            $('#last30').text(data.last30);
-            $('#last7').text(data.last7);
-            $('#next7').text(data.next7);
-            $('#next30').text(data.next30);
-            $('#next90').text(data.next90);
-            $('#nextTotal').text(data.nextTotal);
+            $('#lastYearLast90').text(data.lastYearLast90.round());
+            $('#lastYearLast30').text(data.lastYearLast30.round());
+            $('#lastYearLast7').text(data.lastYearLast7.round());
+            $('#lastYearNext7').text(data.lastYearNext7.round());
+            $('#lastYearNext30').text(data.lastYearNext30.round());
+            $('#lastYearNext90').text(data.lastYearNext90.round());
+            $('#last90').text(data.last90.round());
+            $('#last30').text(data.last30.round());
+            $('#last7').text(data.last7.round());
+            $('#next7').text(data.next7.round());
+            $('#next30').text(data.next30.round());
+            $('#next90').text(data.next90.round());
 
             // Update stock levels
             $('#estimatedShipmentDays').text(data.estimatedShipmentDays);
