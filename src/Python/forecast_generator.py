@@ -19,8 +19,6 @@ def group_sales_data(df, period):
     }).reset_index(drop=True)
     aggregated_df = aggregated_df.rename(columns={'ds': 'ds', 'y': 'y'})
     aggregated_df = aggregated_df.sort_values(by='ds', ascending=True).reset_index(drop=True)
-    print(f"Grouped data: {aggregated_df}")
-    quit()
     return aggregated_df
 
 
