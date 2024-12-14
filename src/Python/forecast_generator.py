@@ -71,10 +71,12 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         ])
     })
     model = NeuralProphet(
+        n_changepoints=10,
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
         seasonality_mode='multiplicative',
+        n_lags=10,
     )
     model = model.add_country_holidays(country_name='US')
     model = model.add_events('ramadan')
