@@ -55,7 +55,7 @@ CREATE TEMPORARY TABLE temp_daily_sales (
     asin VARCHAR(50),
     sales_channel VARCHAR(50),
     sale_date DATE,
-    total_quantity INT,
+    total_quantity DECIMAL(10, 4),
     data_source TINYINT
 ) AS
 SELECT
@@ -107,7 +107,7 @@ CREATE TEMPORARY TABLE temp_full_data_set (
     iwasku VARCHAR(50),
     sales_channel VARCHAR(50),
     sale_date DATE,
-    total_quantity INT,
+    total_quantity DECIMAL(10,4),
     data_source TINYINT
 ) AS
 SELECT
