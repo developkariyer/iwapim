@@ -99,7 +99,9 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
         if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
             forecast = generate_forecase_ets(data, forecast_days=forecast_days)
         else:
-            forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
+            continue
+            #forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
+
 
         # Step 7: Insert forecast data into the database
         insert_forecast_data(forecast, asin, sales_channel, yaml_path)
