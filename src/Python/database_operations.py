@@ -67,18 +67,13 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
         FROM iwa_amazon_daily_sales_summary
         WHERE data_source = 1
         """
-        filters = []
-        params = []
 
-        # Add conditions dynamically with parameterized placeholders
-        if asin:
-            filters.append("asin = %s")
-            params.append(asin)
-        if sales_channel:
-            filters.append("sales_channel = %s")
-            params.append(sales_channel)
-        if filters:
-            base_query += " AND " + " AND ".join(filters)
+       # Dynamically add conditions via string interpolation
+       if asin:
+           base_query += f" AND asin = '{asin}'"
+       if sales_channel:
+           base_query += f" AND sales_channel = '{sales_channel}'"
+
 
         # Execute query and return results
         df = pd.read_sql(base_query, engine, params=params)
