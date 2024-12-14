@@ -71,7 +71,6 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         ])
     })
     model = NeuralProphet(
-        n_changepoints=10,
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
