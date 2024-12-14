@@ -1,3 +1,4 @@
+from croston import croston
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from prophet import Prophet
 import pandas as pd
@@ -268,4 +269,40 @@ def generate_forecast_ets(data, forecast_days=180):
 
     print(f"Forecast DataFrame: {forecast_df.head()}")
 
+    return forecast_df
+
+
+
+def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
+    """
+    Generates a sales forecast using Croston's Method for intermittent demand.
+
+    Args:
+        data (pd.DataFrame): Historical sales data with columns:
+                             - 'ds': Date (datetime format)
+                             - 'y': Sales quantity (numeric).
+        forecast_days (int): Number of days to forecast. Default is 180.
+        alpha (float): Smoothing parameter for Croston's method.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing forecasted values with columns:
+                      - 'ds': Date
+                      - 'yhat': Predicted sales quantity.
+    """
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+
+    # Ensure 'y' column contains numeric values
+    if not pd.api.types.is_numeric_dtype(data['y']):
+        raise ValueError("'y' column must be numeric.")
+
+    # Fit Croston's method
+    print("Fitting Croston's Method...")
+    forecast_values = croston(data['y'].values, alpha=alpha, kind='original', n_periods=forecast_days)
+
+    # Generate future dates
+    future_dates = pd.date_range(start=data['ds'].max() + pd.Timedelta(days=1), periods=forecast_days)
+
+    # Prepare the forecast DataFrame
+    forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': forecast_values})
     return forecast_df
