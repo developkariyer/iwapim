@@ -68,7 +68,7 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
         WHERE data_source = 1
         """
         filters = []
-        params = {}
+        params = []
 
         # Add conditions dynamically with parameterized placeholders
         if asin:
