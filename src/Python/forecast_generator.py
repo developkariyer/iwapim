@@ -74,9 +74,9 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
-    #    seasonality_mode='multiplicative',
+        seasonality_mode='multiplicative',
     )
-    #model = model.add_country_holidays(country_name='US')
+    model = model.add_country_holidays(country_name='US')
     #model = model.add_events(df_events)
     if isinstance(data, pd.DataFrame):
         print(f"Fetched data columns: {data.columns}")
