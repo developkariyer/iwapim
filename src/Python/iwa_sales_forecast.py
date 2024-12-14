@@ -97,7 +97,7 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
         # Step 6: Generate forecast
         print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel}...")
         if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
-            forecast = generate_forecase_ets(data, forecast_days=forecast_days)
+            forecast = generate_forecast_ets(data, forecast_days=forecast_days)
         else:
             return
             #forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
@@ -133,6 +133,6 @@ if __name__ == "__main__":
         scenario = 5  # Process all channels without filter
 
     # Run the pipeline with the selected scenario
-    run_forecast_pipeline(yaml_path, scenario, 8)
+    run_forecast_pipeline(yaml_path, scenario, 1)
 
 
