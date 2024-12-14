@@ -19,9 +19,6 @@ def group_sales_data(df, period):
     }).reset_index(drop=True)
     aggregated_df = aggregated_df.rename(columns={'ds': 'ds', 'y': 'y'})
     aggregated_df = aggregated_df.sort_values(by='ds', ascending=True).reset_index(drop=True)
-    next_dates = [aggregated_df['ds'].max() + pd.Timedelta(days=period * i) for i in range(1, 4)]
-    empty_frame = pd.DataFrame({'ds': next_dates, 'y': [None, None, None]})
-    aggregated_df = pd.concat([aggregated_df, empty_frame], ignore_index=True)
     print(f"Grouped data: {aggregated_df}")
     quit()
     return aggregated_df
