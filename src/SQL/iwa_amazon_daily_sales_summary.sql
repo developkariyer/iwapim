@@ -1,3 +1,4 @@
+SET GLOBAL innodb_parallel_read_threads = 8;
 SELECT "Step 1: Create temp_sales_data temporary table";
 DROP TEMPORARY TABLE IF EXISTS temp_sales_data;
 CREATE TEMPORARY TABLE temp_sales_data (
