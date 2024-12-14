@@ -23,8 +23,8 @@ def group_sales_data(df, period):
 
 
 def generate_forecast_using_groups(data, forecast_days=90):
-    forecast_weekly = generate_group_forecast_neuralprophet(group_sales_data(data, 'W', 1))
-    forecast_monthly = generate_group_forecast_neuralprophet(group_sales_data(data, 'M', 3))
+    forecast_weekly = generate_group_forecast_neuralprophet(group_sales_data(data, 7), 'W', 1))
+    forecast_monthly = generate_group_forecast_neuralprophet(group_sales_data(data, 30), 'M', 3))
     forecast_7 = forecast_weekly['yhat'].values[0]
     forecast_30 = forecast_monthly['yhat'].values[0]
     forecast_90 = forecast_monthly['yhat'].sum()
