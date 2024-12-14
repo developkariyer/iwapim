@@ -193,7 +193,6 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
         daily_seasonality=False
     )
 
-    print(f"Fetched data type: {type(data)}")
     if isinstance(data, pd.DataFrame):
         print(f"Fetched data columns: {data.columns}")
     else:
@@ -208,19 +207,26 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
 
     # Generate the forecast
     forecast = model.predict(future)
-    print(f"Forecast DataFrame: {forecast.head()}")
 
-    # Ensure 'yhat1' exists and clean negative values
-    if 'yhat1' in forecast.columns:
-        forecast['yhat'] = forecast['yhat1'].apply(lambda x: max(0, x) if pd.notnull(x) else x)
-    else:
+    # Ensure 'yhat1' exists
+    if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
 
-    # Plot the forecast
-    #forecast_plot_figure = model.plot(forecast)
-    #plt.close(forecast_plot_figure)  # Prevent display in non-interactive environments
+    # Replace negative predictions with custom logic
+    forecast['yhat'] = forecast['yhat1']
+    for i in range(len(forecast)):
+        if forecast.loc[i, 'yhat'] <= 0:
+            # Get the day before's prediction
+            day_before = forecast.loc[i - 1, 'yhat'] if i > 0 else 0
 
-    # Return the forecast DataFrame and plot
+            # Get last year's same day's prediction divided by 2
+            last_year_date = forecast.loc[i, 'ds'] - pd.Timedelta(days=365)
+            last_year_prediction = forecast.loc[forecast['ds'] == last_year_date, 'yhat'].values
+            last_year_half = last_year_prediction[0] / 2 if len(last_year_prediction) > 0 else 0
+
+            # Replace with the mean of the two
+            forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
+
     return forecast[['ds', 'yhat']]
 
 
