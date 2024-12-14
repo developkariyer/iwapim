@@ -1,6 +1,5 @@
 -- Step 1: Create temp_sales_data temporary table
 DROP TEMPORARY TABLE IF EXISTS temp_sales_data;
-
 CREATE TEMPORARY TABLE temp_sales_data (
     asin_array JSON,
     quantity_array JSON,
@@ -22,7 +21,6 @@ WHERE
 
 -- Step 2: Create temp_expanded_sales temporary table
 DROP TEMPORARY TABLE IF EXISTS temp_expanded_sales;
-
 CREATE TEMPORARY TABLE temp_expanded_sales (
     asin VARCHAR(50),
     quantity_shipped INT,
@@ -50,7 +48,6 @@ FROM
 
 -- Step 3: Create temp_daily_sales temporary table
 DROP TEMPORARY TABLE IF EXISTS temp_daily_sales;
-
 CREATE TEMPORARY TABLE temp_daily_sales (
     asin VARCHAR(50),
     sales_channel VARCHAR(50),
@@ -73,7 +70,6 @@ GROUP BY
 
 -- Step 4: Generate the full date range in temp_all_dates
 DROP TEMPORARY TABLE IF EXISTS temp_all_dates;
-
 CREATE TEMPORARY TABLE temp_all_dates (
     generated_date DATE
 ) AS
@@ -91,7 +87,6 @@ FROM
 
 -- Step 5: Create temp_expanded_asin_sales_channel
 DROP TEMPORARY TABLE IF EXISTS temp_expanded_asin_sales_channel;
-
 CREATE TEMPORARY TABLE temp_expanded_asin_sales_channel (
     asin VARCHAR(50),
     sales_channel VARCHAR(50)
@@ -99,10 +94,9 @@ CREATE TEMPORARY TABLE temp_expanded_asin_sales_channel (
 SELECT DISTINCT asin, sales_channel
 FROM temp_daily_sales;
 
--- Step 6: Combine all data into temp_full_data_set
-DROP TEMPORARY TABLE IF EXISTS temp_full_data_set;
-
-CREATE TEMPORARY TABLE temp_full_data_set (
+-- Step 6: Combine all data into iwa_amazon_daily_sales_summary_temp
+DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary_temp;
+CREATE TABLE iwa_amazon_daily_sales_summary_temp (
     asin VARCHAR(50),
     iwasku VARCHAR(50),
     sales_channel VARCHAR(50),
@@ -129,79 +123,67 @@ FROM
             AND b.generated_date = d.sale_date;
 
 -- Step 7: Insert final result into the main table
-DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary_temp;
-
-CREATE TABLE iwa_amazon_daily_sales_summary_temp AS
-SELECT
-    asin,
-    iwasku,
-    sales_channel,
-    sale_date,
-    total_quantity,
-    data_source
-FROM
-    temp_full_data_set;
 
 DROP TEMPORARY TABLE IF EXISTS temp_calendar;
+
 CREATE TEMPORARY TABLE temp_calendar AS
-SELECT DISTINCT sale_date
-FROM iwa_amazon_daily_sales_summary
-WHERE data_source = 1;
+SELECT date AS sale_date
+FROM iwa_static_dates
+WHERE date >= (SELECT MIN(sale_date) FROM temp_daily_sales)
+  AND date <= (SELECT MAX(sale_date) FROM temp_daily_sales);
 
+-- Insert aggregated data for `sales_channel = 'all'` based on temp_daily_sales
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
-    iwasku AS asin,
-    iwasku,
+    tds.asin AS asin,
+    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = tds.asin), tds.asin) AS iwasku,
     'all' AS sales_channel,
-    temp_calendar.sale_date,
-    COALESCE(SUM(sales.total_quantity), 0) AS total_quantity,
+    cal.sale_date AS sale_date,
+    COALESCE(SUM(tds.total_quantity), 0) AS total_quantity,
     1 AS data_source
 FROM
-    temp_calendar
+    temp_calendar cal
         LEFT JOIN
-    iwa_amazon_daily_sales_summary AS sales
+    temp_daily_sales tds
     ON
-        temp_calendar.sale_date = sales.sale_date
-            AND sales.data_source = 1
-            AND sales.sales_channel <> 'all'
+        cal.sale_date = tds.sale_date
 GROUP BY
-    iwasku, temp_calendar.sale_date
-ON DUPLICATE KEY UPDATE
-    total_quantity = VALUES(total_quantity);
-
-INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
-SELECT
-    iwasku AS asin, -- Use iwasku as asin
-    iwasku,         -- Keep iwasku as is
-    'Amazon.eu' AS sales_channel, -- Unified sales_channel for EU markets
-    temp_calendar.sale_date,      -- Ensure date consistency using the calendar table
-    COALESCE(SUM(sales.total_quantity), 0) AS total_quantity, -- Aggregate total_quantity for EU markets
-    1 AS data_source
-FROM
-    temp_calendar
-        LEFT JOIN
-    iwa_amazon_daily_sales_summary AS sales
-    ON
-        temp_calendar.sale_date = sales.sale_date
-            AND sales.sales_channel IN (
-                                        'Amazon.de',
-                                        'Amazon.fr',
-                                        'Amazon.it',
-                                        'Amazon.es',
-                                        'Amazon.nl',
-                                        'Amazon.be',
-                                        'Amazon.ie',
-                                        'Amazon.se',
-                                        'Amazon.pl',
-                                        'Amazon.cz',
-                                        'Amazon.at',
-                                        'Amazon.hu'
-            )
-            AND sales.data_source = 1
-GROUP BY
-    iwasku, temp_calendar.sale_date
+    tds.asin, cal.sale_date
     ON DUPLICATE KEY UPDATE
          total_quantity = VALUES(total_quantity);
+
+INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
+SELECT
+    tds.asin AS asin,
+    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = tds.asin), tds.asin) AS iwasku,
+    'Amazon.eu' AS sales_channel,
+    temp_calendar.sale_date,
+    COALESCE(SUM(tds.total_quantity), 0) AS total_quantity,
+    1 AS data_source
+FROM
+    temp_calendar
+        LEFT JOIN
+    temp_daily_sales tds
+    ON
+        temp_calendar.sale_date = tds.sale_date
+            AND tds.sales_channel IN (
+                                      'Amazon.de',
+                                      'Amazon.fr',
+                                      'Amazon.it',
+                                      'Amazon.es',
+                                      'Amazon.nl',
+                                      'Amazon.be',
+                                      'Amazon.ie',
+                                      'Amazon.se',
+                                      'Amazon.pl',
+                                      'Amazon.cz',
+                                      'Amazon.at',
+                                      'Amazon.hu'
+            )
+GROUP BY
+    tds.asin, temp_calendar.sale_date
+    ON DUPLICATE KEY UPDATE
+        total_quantity = VALUES(total_quantity);
 
 
 -- Step 8: Drop the existing table and rename the temporary table
@@ -211,5 +193,4 @@ RENAME TABLE iwa_amazon_daily_sales_summary_temp TO iwa_amazon_daily_sales_summa
 -- Step 9: Add indexes for faster querying
 CREATE INDEX idx_iwasku ON iwa_amazon_daily_sales_summary (iwasku);
 CREATE INDEX idx_sales_channel ON iwa_amazon_daily_sales_summary (sales_channel);
-CREATE INDEX idx_sale_date ON iwa_amazon_daily_sales_summary (sale_date);
 ALTER TABLE iwa_amazon_daily_sales_summary ADD UNIQUE KEY (asin, sales_channel, sale_date);
