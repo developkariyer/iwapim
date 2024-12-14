@@ -272,10 +272,9 @@ def generate_forecast_ets(data, forecast_days=180):
     return forecast_df
 
 
-
-def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
+def generate_forecast_croston(data, forecast_days=180, alpha=0.1, max_forecast_ratio=1.5):
     """
-    Generates a sales forecast using Croston's Method for intermittent demand (manual implementation).
+    Generates a sales forecast using Croston's Method with adjustments to control overestimation.
 
     Args:
         data (pd.DataFrame): Historical sales data with columns:
@@ -283,6 +282,7 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
                              - 'y': Sales quantity (numeric).
         forecast_days (int): Number of days to forecast. Default is 180.
         alpha (float): Smoothing parameter for Croston's method.
+        max_forecast_ratio (float): Maximum allowed forecast as a multiple of total sales.
 
     Returns:
         pd.DataFrame: A DataFrame containing forecasted values with columns:
@@ -311,7 +311,12 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
         interval += 1  # Increment interval for zero demand
 
     # Calculate the forecast as demand size divided by demand interval
+    total_sales = data['y'].sum()  # Historical total sales
+    max_forecast = total_sales * max_forecast_ratio  # Cap based on total sales
     forecast_value = (demand_size / demand_interval) if demand_interval > 0 else 0
+
+    # Apply forecast cap
+    forecast_value = min(forecast_value, max_forecast)
 
     # Generate future dates
     future_dates = pd.date_range(start=data['ds'].max() + pd.Timedelta(days=1), periods=forecast_days)
