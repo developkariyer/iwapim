@@ -77,12 +77,13 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         seasonality_mode='multiplicative',
     )
     model = model.add_country_holidays(country_name='US')
-    #model = model.add_events(df_events)
+    model = model.add_events('ramadan')
     if isinstance(data, pd.DataFrame):
         print(f"Fetched data columns: {data.columns}")
     else:
         raise ValueError("Fetched data is not a DataFrame.")
-    model.fit(data)
+    data_all = model.create_df_with_events(data, df_events)
+    model.fit(data_all, freq='D')
     future = model.make_future_dataframe(data, periods=forecast_days)
     forecast = model.predict(future)
     if 'yhat1' not in forecast.columns:
