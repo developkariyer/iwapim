@@ -189,7 +189,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
     # Initialize the NeuralProphet model
     model = NeuralProphet(
         yearly_seasonality=True,
-        weekly_seasonality=False,
+        weekly_seasonality=True,
         daily_seasonality=False
     )
 
