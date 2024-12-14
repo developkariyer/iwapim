@@ -298,11 +298,14 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
 
     # Fit Croston's method
     print("Fitting Croston's Method...")
-    forecast_values = croston(data['y'].values, alpha=alpha, kind='original', n_periods=forecast_days)
+    forecast_values = croston(data['y'].values, alpha=alpha)
+
+    # Croston returns a NumPy array with forecasted values
+    future_forecast = [forecast_values] * forecast_days
 
     # Generate future dates
     future_dates = pd.date_range(start=data['ds'].max() + pd.Timedelta(days=1), periods=forecast_days)
 
     # Prepare the forecast DataFrame
-    forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': forecast_values})
+    forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': future_forecast})
     return forecast_df
