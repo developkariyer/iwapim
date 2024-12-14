@@ -59,9 +59,6 @@ def generate_group_forecast_neuralprophet(data, freq='D', periods=3):
 def generate_forecast_neuralprophet(data, forecast_days=90):
     if data.empty:
         raise ValueError("Input data is empty. Cannot generate a forecast.")
-    confidence_level = 0.9
-    boundaries = round((1 - confidence_level) / 2, 2)
-    quantiles = [boundaries, confidence_level + boundaries]
     df_events = pd.DataFrame({
         'event': 'ramadan',
         'ds': pd.to_datetime([
@@ -79,7 +76,6 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         weekly_seasonality=True,
         daily_seasonality=False,
         n_lags=10,
-        quantiles=quantiles
     )
     model = model.add_country_holidays(country_name='US')
     model = model.add_events(df_events)
