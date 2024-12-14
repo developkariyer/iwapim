@@ -25,8 +25,8 @@ def group_sales_data(df, period):
 
 
 def generate_forecast_using_groups(data, forecast_days=90):
-    forecast_weekly = generate_group_forecast_neuralprophet(group_sales_data(data, 'W'))
-    forecast_monthly = generate_group_forecast_neuralprophet(group_sales_data(data, 'M'))
+    forecast_weekly = generate_group_forecast_neuralprophet(group_sales_data(data, 'W', 1))
+    forecast_monthly = generate_group_forecast_neuralprophet(group_sales_data(data, 'M', 3))
     forecast_7 = forecast_weekly['yhat'].values[0]
     forecast_30 = forecast_monthly['yhat'].values[0]
     forecast_90 = forecast_monthly['yhat'].sum()
@@ -39,7 +39,7 @@ def generate_forecast_using_groups(data, forecast_days=90):
     return future_data
 
 
-def generate_group_forecast_neuralprophet(data):
+def generate_group_forecast_neuralprophet(data, freq='D', periods=3):
     if data.empty:
         raise ValueError("Input data is empty. Cannot generate a forecast.")
     model = NeuralProphet(
@@ -49,8 +49,8 @@ def generate_group_forecast_neuralprophet(data):
     )
     if not isinstance(data, pd.DataFrame):
         raise ValueError("Fetched data is not a DataFrame.")
-    model.fit(data.dropna())
-    future = data.tail(1)
+    model.fit(data, freq=freq)
+    future = model.make_future_dataframe(data, periods=periods)
     forecast = model.predict(future)
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
