@@ -15,10 +15,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
-        'offers' => "/Products/",
-        'updateInventoryPrice' => "/Products/price-and-stock/",
-        'batchStatus' => "/Products/batch-status/",
-        'orders' => "/Order/GetOrders/"
+        'offers' => "Products/",
+        'updateInventoryPrice' => "Products/price-and-stock/",
+        'batchStatus' => "Products/batch-status/",
+        'orders' => "Order/GetOrders/"
     ];
 
     public static $marketplaceType = 'Ciceksepeti';
@@ -48,8 +48,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $size = 60;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], ['query' => ['Page' => $page, 'PageSize' => $size]]);
-            print_r($response->getContent());
+            $response = $this->httpClient->request('GET',static::$apiUrl['offers'],
+                [
+                    'query' =>
+                    [
+                        'Page' => $page,
+                        'PageSize' => $size
+                    ]
+                ]
+            );
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
