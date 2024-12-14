@@ -99,7 +99,7 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
         if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
             forecast = generate_forecase_ets(data, forecast_days=forecast_days)
         else:
-            continue
+            return
             #forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
 
 
