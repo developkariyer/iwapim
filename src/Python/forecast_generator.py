@@ -254,8 +254,8 @@ def generate_forecast_ets(data, forecast_days=180):
     model = ExponentialSmoothing(
         data['y'],
         trend='add',
-        seasonal='add',
-        seasonal_periods=355
+#        seasonal='add',
+#        seasonal_periods=355
     )
     model_fit = model.fit()
 
