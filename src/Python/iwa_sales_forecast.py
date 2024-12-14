@@ -99,8 +99,7 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
         if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
             forecast = generate_forecast_croston(data, forecast_days=forecast_days)
         else:
-            return
-            #forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
+            forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
 
 
         # Step 7: Insert forecast data into the database
@@ -133,6 +132,6 @@ if __name__ == "__main__":
         scenario = 5  # Process all channels without filter
 
     # Run the pipeline with the selected scenario
-    run_forecast_pipeline(yaml_path, scenario, 1)
+    run_forecast_pipeline(yaml_path, scenario, 8)
 
 
