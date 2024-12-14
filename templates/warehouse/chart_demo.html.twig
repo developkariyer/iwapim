@@ -294,144 +294,143 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="warehouseModal" tabindex="-1" aria-labelledby="warehouseModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl custom">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="product-title">Warehouse Title</h5>
-                    <div class="badge bg-danger position-absolute top-50 start translate-middle" id="stock-status">Danger</div>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
+</div>
 
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-9">
-                            <canvas id="chart1"></canvas>
-                            <div class="table-responsive mt-4">
-                                <table class="table table-bordered text-center mb-0" style="font-size: 0.85rem;">
-                                    <colgroup>
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                        <col style="width: 12.5%;">
-                                    </colgroup>
-                                    <tbody>
-                                    <tr>
-                                        <th class="bg-black text-white py-0 px-2">Top</th>
-                                        <th class="bg-black text-white py-0 px-2">-90</th>
-                                        <th class="bg-black text-white py-0 px-2">-30</th>
-                                        <th class="bg-black text-white py-0 px-2">-7</th>
-                                        <th class="bg-black text-white py-0 px-2">+7</th>
-                                        <th class="bg-black text-white py-0 px-2">+30</th>
-                                        <th class="bg-black text-white py-0 px-2">+90</th>
-                                        <th class="bg-black text-white py-0 px-2">Top</th>
-                                    </tr>
-                                    <!-- First Row: Last Year Values -->
-                                    <tr>
-                                        <td class="bg-black text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearTotal1"></td>
-                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast90"></td>
-                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast30"></td>
-                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast7"></td>
-                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext7"></td>
-                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext30"></td>
-                                        <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext90"></td>
-                                        <th class="bg-black text-white py-0 px-2" id="lastYearTotal2"></th>
-                                    </tr>
-                                    <!-- Second Row: Current Year and Forecast Values -->
-                                    <tr>
-                                        <td class="bg-black text-white py-0 px-2" data-bs-toggle="tooltip" id="lastTotal"></td>
-                                        <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last90"></td>
-                                        <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last30"></td>
-                                        <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last7"></td>
-                                        <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next7"></td>
-                                        <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next30"></td>
-                                        <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next90"></td>
-                                        <th class="bg-black text-white py-0 px-2" id="nextTotal"></th>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+<!-- Modal -->
+<div class="modal fade" id="warehouseModal" tabindex="-1" aria-labelledby="warehouseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl custom">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="product-title">Warehouse Title</h5>
+                <div class="badge bg-danger position-absolute top-50 start translate-middle" id="stock-status">Danger</div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-9">
+                        <canvas id="chart1"></canvas>
+                        <div class="table-responsive mt-4">
+                            <table class="table table-bordered text-center mb-0" style="font-size: 0.85rem;">
+                                <colgroup>
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                    <col style="width: 12.5%;">
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="bg-black text-white py-0 px-2">Top</th>
+                                    <th class="bg-black text-white py-0 px-2">-90</th>
+                                    <th class="bg-black text-white py-0 px-2">-30</th>
+                                    <th class="bg-black text-white py-0 px-2">-7</th>
+                                    <th class="bg-black text-white py-0 px-2">+7</th>
+                                    <th class="bg-black text-white py-0 px-2">+30</th>
+                                    <th class="bg-black text-white py-0 px-2">+90</th>
+                                    <th class="bg-black text-white py-0 px-2">Top</th>
+                                </tr>
+                                <!-- First Row: Last Year Values -->
+                                <tr>
+                                    <td class="bg-black text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearTotal1"></td>
+                                    <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast90"></td>
+                                    <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast30"></td>
+                                    <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearLast7"></td>
+                                    <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext7"></td>
+                                    <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext30"></td>
+                                    <td class="bg-secondary text-white py-0 px-2" data-bs-toggle="tooltip" id="lastYearNext90"></td>
+                                    <th class="bg-black text-white py-0 px-2" id="lastYearTotal2"></th>
+                                </tr>
+                                <!-- Second Row: Current Year and Forecast Values -->
+                                <tr>
+                                    <td class="bg-black text-white py-0 px-2" data-bs-toggle="tooltip" id="lastTotal"></td>
+                                    <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last90"></td>
+                                    <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last30"></td>
+                                    <td class="bg-success text-white py-0 px-2" data-bs-toggle="tooltip" id="last7"></td>
+                                    <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next7"></td>
+                                    <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next30"></td>
+                                    <td class="bg-primary text-white py-0 px-2" data-bs-toggle="tooltip" id="next90"></td>
+                                    <th class="bg-black text-white py-0 px-2" id="nextTotal"></th>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-lg-3 d-flex flex-column align-items-center justify-content-center">
-                            <button type="button" class="btn btn-sm btn-outline-secondary w-100 mb-2" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
-                            <form class="w-100">
-                                <table class="table table-bordered text-center mb-0 w-100" style="font-size: 0.85rem;">
-                                    <colgroup>
-                                        <col style="width: 50%;">
-                                        <col style="width: 50%;">
-                                    </colgroup>
-                                    <tbody>
-                                    <tr>
-                                        <th class="py-0 px-2">Buffer Days</th>
-                                        <th class="py-0 px-2">Forecast*</th>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-0 px-2" id="estimatedShipmentDays"></td>
-                                        <td class="py-0 px-2" id="forecastedStock"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="py-0 px-2">Inbound</th>
-                                        <th class="py-0 px-2">Outbound</th>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-0 px-2" id="inboundStock"></td>
-                                        <td class="py-0 px-2" id="outboundStock"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="py-0 px-2">In Stock</th>
-                                        <th class="py-0 px-2">Available</th>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-0 px-2" id="currentStock"></td>
-                                        <td class="py-0 px-2" id="availableStock"></td>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="2" class="bg-black text-white py-0 px-2">AI Suggestion **</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="py-0 px-2">Produce</th>
-                                        <th class="py-0 px-2">Send</th>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-0 px-2" id="productionAdvice"></td>
-                                        <td class="py-0 px-2" id="shipmentAdvice"></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div class="row text-center">
-                                    <div class="col-12 mt-2">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">İşlem</button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="#">Üret</a></li>
-                                                <li><a class="dropdown-item" href="#">Gönder</a></li>
-                                            </ul>
-                                        </div>
+                    </div>
+                    <div class="col-lg-3 d-flex flex-column align-items-center justify-content-center">
+                        <button type="button" class="btn btn-sm btn-outline-secondary w-100 mb-2" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
+                        <form class="w-100">
+                            <table class="table table-bordered text-center mb-0 w-100" style="font-size: 0.85rem;">
+                                <colgroup>
+                                    <col style="width: 50%;">
+                                    <col style="width: 50%;">
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="py-0 px-2">Buffer Days</th>
+                                    <th class="py-0 px-2">Forecast*</th>
+                                </tr>
+                                <tr>
+                                    <td class="py-0 px-2" id="estimatedShipmentDays"></td>
+                                    <td class="py-0 px-2" id="forecastedStock"></td>
+                                </tr>
+                                <tr>
+                                    <th class="py-0 px-2">Inbound</th>
+                                    <th class="py-0 px-2">Outbound</th>
+                                </tr>
+                                <tr>
+                                    <td class="py-0 px-2" id="inboundStock"></td>
+                                    <td class="py-0 px-2" id="outboundStock"></td>
+                                </tr>
+                                <tr>
+                                    <th class="py-0 px-2">In Stock</th>
+                                    <th class="py-0 px-2">Available</th>
+                                </tr>
+                                <tr>
+                                    <td class="py-0 px-2" id="currentStock"></td>
+                                    <td class="py-0 px-2" id="availableStock"></td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" class="bg-black text-white py-0 px-2">AI Suggestion **</th>
+                                </tr>
+                                <tr>
+                                    <th class="py-0 px-2">Produce</th>
+                                    <th class="py-0 px-2">Send</th>
+                                </tr>
+                                <tr>
+                                    <td class="py-0 px-2" id="productionAdvice"></td>
+                                    <td class="py-0 px-2" id="shipmentAdvice"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="row text-center">
+                                <div class="col-12 mt-2">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">İşlem</button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="#">Üret</a></li>
+                                            <li><a class="dropdown-item" href="#">Gönder</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
-                    <p class="mb-0 mt-1 text-muted lh-1" style="font-size: 0.6rem !important;">
-                        Grafikte kırmızı çizgi bugünü, sağı ve solu ise 182 günü gösterir. Gri çizgi önceki 547-182 arası, yeşil çizgi önceki 182-1 arası, mavi çizgi sonraki (tahmini) 1-182 arası satışlardır.<br>
-                        * Forecast değeri Buffer süresi sonundaki tahmini stok seviyesidir. | ** AI tavsiyesi "Üret" veya "Gönder" şeklinde ayrı ayrı dikkate alınmalıdır.
-                    </p>
-
                 </div>
+                <p class="mb-0 mt-1 text-muted lh-1" style="font-size: 0.6rem !important;">
+                    Grafikte kırmızı çizgi bugünü, sağı ve solu ise 182 günü gösterir. Gri çizgi önceki 547-182 arası, yeşil çizgi önceki 182-1 arası, mavi çizgi sonraki (tahmini) 1-182 arası satışlardır.<br>
+                    * Forecast değeri Buffer süresi sonundaki tahmini stok seviyesidir. | ** AI tavsiyesi "Üret" veya "Gönder" şeklinde ayrı ayrı dikkate alınmalıdır.
+                </p>
+
             </div>
         </div>
     </div>
-
-
-
 </div>
+
 
 <!-- Bootstrap Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
