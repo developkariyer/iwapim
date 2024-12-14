@@ -275,7 +275,7 @@ def generate_forecast_ets(data, forecast_days=180):
 
 def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
     """
-    Generates a sales forecast using Croston's Method for intermittent demand.
+    Generates a sales forecast using Croston's Method for intermittent demand (manual implementation).
 
     Args:
         data (pd.DataFrame): Historical sales data with columns:
@@ -296,16 +296,27 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1):
     if not pd.api.types.is_numeric_dtype(data['y']):
         raise ValueError("'y' column must be numeric.")
 
-    # Fit Croston's method
-    print("Fitting Croston's Method...")
-    forecast_values = croston(data['y'].values, alpha=alpha)
+    # Convert the target column to a NumPy array
+    demand = data['y'].values
 
-    # Croston returns a NumPy array with forecasted values
-    future_forecast = [forecast_values] * forecast_days
+    # Initialize Croston variables
+    demand_size, demand_interval, interval = 0, 0, 1
+
+    # Process the data to calculate demand size and interval
+    for i in range(len(demand)):
+        if demand[i] > 0:  # Non-zero demand
+            demand_size = alpha * demand[i] + (1 - alpha) * demand_size
+            demand_interval = alpha * interval + (1 - alpha) * demand_interval
+            interval = 0  # Reset interval
+        interval += 1  # Increment interval for zero demand
+
+    # Calculate the forecast as demand size divided by demand interval
+    forecast_value = (demand_size / demand_interval) if demand_interval > 0 else 0
 
     # Generate future dates
     future_dates = pd.date_range(start=data['ds'].max() + pd.Timedelta(days=1), periods=forecast_days)
 
     # Prepare the forecast DataFrame
-    forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': future_forecast})
+    forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': [forecast_value] * forecast_days})
+
     return forecast_df
