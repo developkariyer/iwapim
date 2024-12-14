@@ -1,4 +1,4 @@
-SELECT "Step 1: Create temp_sales_data temporary table"
+SELECT "Step 1: Create temp_sales_data temporary table";
 DROP TEMPORARY TABLE IF EXISTS temp_sales_data;
 CREATE TEMPORARY TABLE temp_sales_data (
     asin_array JSON,
@@ -19,7 +19,7 @@ WHERE
     REGEXP_LIKE(o.order_id, '^[0-9]{3}-[0-9]{7}-[0-9]{7}$') -- Validate Amazon Order ID format
   AND JSON_UNQUOTE(JSON_EXTRACT(o.json, '$.OrderStatus')) = 'Shipped';
 
-SELECT "Step 2: Create temp_expanded_sales temporary table"
+SELECT "Step 2: Create temp_expanded_sales temporary table";
 DROP TEMPORARY TABLE IF EXISTS temp_expanded_sales;
 CREATE TEMPORARY TABLE temp_expanded_sales (
     asin VARCHAR(50),
@@ -46,7 +46,7 @@ FROM
         JOIN idx
              ON idx.n < JSON_LENGTH(s.asin_array);
 
-SELECT "Step 3: Create temp_daily_sales temporary table"
+SELECT "Step 3: Create temp_daily_sales temporary table";
 DROP TEMPORARY TABLE IF EXISTS temp_daily_sales;
 CREATE TEMPORARY TABLE temp_daily_sales (
     asin VARCHAR(50),
@@ -68,7 +68,7 @@ WHERE
 GROUP BY
     asin, sales_channel, sale_date;
 
-SELECT "Step 4: Generate the full date range in temp_all_dates"
+SELECT "Step 4: Generate the full date range in temp_all_dates";
 DROP TEMPORARY TABLE IF EXISTS temp_all_dates;
 CREATE TEMPORARY TABLE temp_all_dates (
     generated_date DATE
@@ -85,7 +85,7 @@ SELECT
 FROM
     seq;
 
-SELECT "Step 5: Create temp_expanded_asin_sales_channel"
+SELECT "Step 5: Create temp_expanded_asin_sales_channel";
 DROP TEMPORARY TABLE IF EXISTS temp_expanded_asin_sales_channel;
 CREATE TEMPORARY TABLE temp_expanded_asin_sales_channel (
     asin VARCHAR(50),
@@ -94,7 +94,7 @@ CREATE TEMPORARY TABLE temp_expanded_asin_sales_channel (
 SELECT DISTINCT asin, sales_channel
 FROM temp_daily_sales;
 
-SELECT "Step 6: Combine all data into iwa_amazon_daily_sales_summary_temp"
+SELECT "Step 6: Combine all data into iwa_amazon_daily_sales_summary_temp";
 DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary_temp;
 CREATE TABLE iwa_amazon_daily_sales_summary_temp (
     asin VARCHAR(50),
@@ -129,7 +129,7 @@ FROM iwa_static_dates
 WHERE date >= (SELECT MIN(sale_date) FROM temp_daily_sales)
   AND date <= (SELECT MAX(sale_date) FROM temp_daily_sales);
 
-SELECT "Step 7: Insert aggregated data for 'all' sales channels"
+SELECT "Step 7: Insert aggregated data for 'all' sales channels";
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
     tds.asin AS asin,
@@ -149,7 +149,7 @@ GROUP BY
     ON DUPLICATE KEY UPDATE
          total_quantity = VALUES(total_quantity);
 
-SELECT "Step 8: Insert aggregated data for 'Amazon.eu' sales channels"
+SELECT "Step 8: Insert aggregated data for 'Amazon.eu' sales channels";
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
     tds.asin AS asin,
