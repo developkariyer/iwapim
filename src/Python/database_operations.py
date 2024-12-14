@@ -74,6 +74,7 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
         if sales_channel:
             base_query += f" AND sales_channel = '{sales_channel}'"
 
+        print(f"Base query: {base_query}")
 
         # Execute query and return results
         df = pd.read_sql(base_query, engine)
