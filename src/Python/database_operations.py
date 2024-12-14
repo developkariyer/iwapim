@@ -37,7 +37,7 @@ def fetch_data(asin, sales_channel, yaml_path):
             engine.dispose()
 
 
-def fetch_pairs(yaml_path, asin=None, sales_channel=None):
+def fetch_pairs(yaml_path, asin=None, sales_channel=None, iwasku=None):
     """
     Fetch distinct ASIN and sales_channel pairs based on the specified parameters.
 
@@ -73,6 +73,8 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
             base_query += f" AND asin = '{asin}'"
         if sales_channel:
             base_query += f" AND sales_channel = '{sales_channel}'"
+        if iwasku:
+            base_query += f" AND iwasku = '{iwasku}'"
 
         print(f"Base query: {base_query}")
 
