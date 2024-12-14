@@ -35,7 +35,7 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=90):
         if data.empty or data.dropna().shape[0] < 2 or data['y'].sum() == 0:
             print(f"Insufficient data for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
             return
-        if data['y'].astype(bool).sum(axis=0) > 100:
+        if (data['y'] > 1e-10).sum(axis=0) > 100:
             print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel} using NeuralProphet...")
             forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
         else:
