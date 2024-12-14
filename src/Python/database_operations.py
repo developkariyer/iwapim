@@ -68,10 +68,10 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
         WHERE data_source = 1
         """
 
-       # Dynamically add conditions via string interpolation
-       if asin:
+        # Dynamically add conditions via string interpolation
+        if asin:
            base_query += f" AND asin = '{asin}'"
-       if sales_channel:
+        if sales_channel:
            base_query += f" AND sales_channel = '{sales_channel}'"
 
 
