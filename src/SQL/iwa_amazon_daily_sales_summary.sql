@@ -137,38 +137,45 @@ WHERE date BETWEEN min_max_dates.min_date AND min_max_dates.max_date;
 SELECT "Step 8.1: Insert aggregated data for 'all' sales channels";
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
-    tds.asin AS asin,
-    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = tds.asin), tds.asin) AS iwasku,
+    ec.asin AS asin,
+    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = ec.asin), ec.asin) AS iwasku,
     'all' AS sales_channel,
     cal.sale_date AS sale_date,
     COALESCE(SUM(tds.total_quantity), 0) AS total_quantity,
     1 AS data_source
 FROM
     temp_calendar cal
+        CROSS JOIN
+    (SELECT DISTINCT asin FROM temp_expanded_asin_sales_channel) ec
         LEFT JOIN
     temp_daily_sales tds
     ON
-        cal.sale_date = tds.sale_date
+        ec.asin = tds.asin
+            AND cal.sale_date = tds.sale_date
 GROUP BY
-    tds.asin, cal.sale_date
+    ec.asin, cal.sale_date
     ON DUPLICATE KEY UPDATE
-         total_quantity = VALUES(total_quantity);
+                         total_quantity = VALUES(total_quantity);
+
 
 SELECT "Step 8.2: Insert aggregated data for 'Amazon.eu' sales channels";
 INSERT INTO iwa_amazon_daily_sales_summary_temp (asin, iwasku, sales_channel, sale_date, total_quantity, data_source)
 SELECT
-    tds.asin AS asin,
-    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = tds.asin), tds.asin) AS iwasku,
+    ec.asin AS asin,
+    COALESCE((SELECT regvalue FROM iwa_registry WHERE regtype = 'asin-to-iwasku' AND regkey = ec.asin), ec.asin) AS iwasku,
     'Amazon.eu' AS sales_channel,
-    temp_calendar.sale_date,
+    cal.sale_date AS sale_date,
     COALESCE(SUM(tds.total_quantity), 0) AS total_quantity,
     1 AS data_source
 FROM
-    temp_calendar
+    temp_calendar cal
+        CROSS JOIN
+    (SELECT DISTINCT asin FROM temp_expanded_asin_sales_channel) ec
         LEFT JOIN
     temp_daily_sales tds
     ON
-        temp_calendar.sale_date = tds.sale_date
+        ec.asin = tds.asin
+            AND cal.sale_date = tds.sale_date
             AND tds.sales_channel IN (
                                       'Amazon.de',
                                       'Amazon.fr',
@@ -184,9 +191,9 @@ FROM
                                       'Amazon.hu'
             )
 GROUP BY
-    tds.asin, temp_calendar.sale_date
+    ec.asin, cal.sale_date
     ON DUPLICATE KEY UPDATE
-        total_quantity = VALUES(total_quantity);
+                         total_quantity = VALUES(total_quantity);
 
 
 SELECT "Step 9: Drop the existing table and rename the temporary table";
