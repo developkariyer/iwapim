@@ -60,23 +60,21 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
     if data.empty:
         raise ValueError("Input data is empty. Cannot generate a forecast.")
     df_events = pd.DataFrame({
-        'event': 'ramadan',
-        'ds': pd.to_datetime([
-            '2022-04-02',  # 1443 Hijri
-            '2023-03-23',  # 1444 Hijri
-            '2024-03-10',  # 1445 Hijri
-            '2025-02-28',  # 1446 Hijri
-            '2026-02-17',  # 1447 Hijri
-            '2027-02-06',  # 1448 Hijri
-        ])
+        "event": "ramadan",
+        "ds": pd.to_datetime([
+            "2022-04-02",  # 1443 Hijri
+            "2023-03-23",  # 1444 Hijri
+            "2024-03-10",  # 1445 Hijri
+            "2025-02-28",  # 1446 Hijri
+        ]),
+        "lower_window": 0,  # Event starts on the given date
+        "upper_window": 29  # Extends for 30 days
     })
     model = NeuralProphet(
-        n_changepoints=10,
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
         seasonality_mode='multiplicative',
-        n_lags=10,
     )
     model = model.add_country_holidays(country_name='US')
     model = model.add_events('ramadan')
