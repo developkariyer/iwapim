@@ -19,8 +19,8 @@ def group_sales_data(df, period):
     }).reset_index(drop=True)
     aggregated_df = aggregated_df.rename(columns={'ds': 'ds', 'y': 'y'})
     aggregated_df = aggregated_df.sort_values(by='ds', ascending=True).reset_index(drop=True)
-    next_date = aggregated_df['ds'].max() + pd.Timedelta(days=period)
-    empty_frame = pd.DataFrame({'ds': [next_date], 'y': [None]})
+    next_dates = [aggregated_df['ds'].max() + pd.Timedelta(days=period * i) for i in range(1, 4)]
+    empty_frame = pd.DataFrame({'ds': next_dates, 'y': [None, None, None]})
     aggregated_df = pd.concat([aggregated_df, empty_frame], ignore_index=True)
     print(f"Grouped data: {aggregated_df}")
     quit()
@@ -28,10 +28,11 @@ def group_sales_data(df, period):
 
 
 def generate_forecast_using_groups(data, forecast_days=90):
-    forecast_7 = generate_group_forecast_neuralprophet(group_sales_data(data, 7))
-    forecast_30 = generate_group_forecast_neuralprophet(group_sales_data(data, 30))
-    forecast_90 = generate_group_forecast_neuralprophet(group_sales_data(data, 90))
-
+    forecast_weekly = generate_group_forecast_neuralprophet(group_sales_data(data, 'W'))
+    forecast_monthly = generate_group_forecast_neuralprophet(group_sales_data(data, 'M'))
+    forecast_7 = forecast_weekly['yhat'].values[0]
+    forecast_30 = forecast_monthly['yhat'].values[0]
+    forecast_90 = forecast_monthly['yhat'].sum()
     next_day_in_data = data['ds'].max() + pd.Timedelta(days=1)
     future_data = pd.DataFrame({'ds': pd.date_range(start=next_day_in_data, periods=forecast_days, freq='D')})
     future_data['y'] = 0
@@ -56,7 +57,7 @@ def generate_group_forecast_neuralprophet(data):
     forecast = model.predict(future)
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
-    return forecast['yhat1'].iloc[0]
+    return forecast[['ds', 'yhat']]
 
 
 
