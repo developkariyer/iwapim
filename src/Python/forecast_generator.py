@@ -214,6 +214,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
 
     # Replace negative predictions with custom logic
     forecast['yhat'] = forecast['yhat1']
+    '''
     for i in range(len(forecast)):
         if forecast.loc[i, 'yhat'] <= 0:
             # Get the day before's prediction
@@ -226,7 +227,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
 
             # Replace with the mean of the two
             forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
-
+    '''
     return forecast[['ds', 'yhat']]
 
 
