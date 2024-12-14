@@ -76,7 +76,7 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
 
 
         # Execute query and return results
-        df = pd.read_sql(base_query, engine, params=params)
+        df = pd.read_sql(base_query, engine)
         return df
 
     except Exception as e:
