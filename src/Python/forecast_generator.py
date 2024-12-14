@@ -44,7 +44,7 @@ def generate_group_forecast_neuralprophet(data):
         raise ValueError("Input data is empty. Cannot generate a forecast.")
     model = NeuralProphet(
         yearly_seasonality=True,
-        weekly_seasonality=True,
+        weekly_seasonality=False,
         daily_seasonality=False
     )
     if not isinstance(data, pd.DataFrame):
@@ -55,9 +55,6 @@ def generate_group_forecast_neuralprophet(data):
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
     return forecast['yhat1'].iloc[0]
-
-
-
 
 
 
