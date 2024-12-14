@@ -72,12 +72,11 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None):
 
         # Add conditions dynamically with parameterized placeholders
         if asin:
-            filters.append("asin = :asin")
-            params["asin"] = asin
+            filters.append("asin = %s")
+            params.append(asin)
         if sales_channel:
-            filters.append("sales_channel = :sales_channel")
-            params["sales_channel"] = sales_channel
-
+            filters.append("sales_channel = %s")
+            params.append(sales_channel)
         if filters:
             base_query += " AND " + " AND ".join(filters)
 
