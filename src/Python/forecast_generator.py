@@ -91,6 +91,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
     forecast['yhat'] = forecast['yhat1']
+    '''
     for i in range(len(forecast)):
         if forecast.loc[i, 'yhat'] <= 0:
             day_before = forecast.loc[i - 1, 'yhat'] if i > 0 else 0
@@ -98,6 +99,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
             last_year_prediction = forecast.loc[forecast['ds'] == last_year_date, 'yhat'].values
             last_year_half = last_year_prediction[0] / 2 if len(last_year_prediction) > 0 else 0
             forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
+    '''
     return forecast[['ds', 'yhat']]
 
 
