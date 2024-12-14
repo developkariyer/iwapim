@@ -10,6 +10,92 @@ import numpy as np
 from neuralprophet import NeuralProphet
 
 
+def group_sales_data(df, period):
+    df = df.sort_values(by='ds', ascending=False).reset_index(drop=True)
+    df['group'] = (df.index // period)
+    aggregated_df = df.groupby('group').agg({
+        'ds': 'first',
+        'y': 'sum'
+    }).reset_index(drop=True)
+    aggregated_df = aggregated_df.rename(columns={'ds': 'ds', 'y': 'y'})
+    aggregated_df = aggregated_df.sort_values(by='ds', ascending=True).reset_index(drop=True)
+    next_date = aggregated_df['ds'].max() + pd.Timedelta(days=1)
+    empty_frame = pd.DataFrame({'ds': [next_date], 'y': [None]})
+    aggregated_df = pd.concat([aggregated_df, empty_frame], ignore_index=True)
+    return aggregated_df
+
+
+def generate_forecast_using_groups(data):
+    forecast_7 = generate_group_forecast_neuralprophet(group_sales_data(data, 7))
+    forecast_30 = generate_group_forecast_neuralprophet(group_sales_data(data, 30))
+    forecast_90 = generate_group_forecast_neuralprophet(group_sales_data(data, 90))
+
+    next_day_in_data = data['ds'].max() + pd.Timedelta(days=1)
+    future_data = pd.DataFrame({'ds': pd.date_range(start=next_day_in_data, periods=90, freq='D')})
+    future_data['y'] = 0
+    future_data.loc[:6, 'y'] = forecast_7 / 7
+    future_data.loc[7:29, 'y'] = (forecast_30 - forecast_7) / 23
+    future_data.loc[30:, 'y'] = (forecast_90 - forecast_30) / 60
+    return future_data
+
+
+def generate_group_forecast_neuralprophet(data):
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+    model = NeuralProphet(
+        yearly_seasonality=True,
+        weekly_seasonality=True,
+        daily_seasonality=False
+    )
+    if not isinstance(data, pd.DataFrame):
+        raise ValueError("Fetched data is not a DataFrame.")
+    model.fit(data.dropna())
+    future = data.tail(1)
+    forecast = model.predict(future)
+    if 'yhat1' not in forecast.columns:
+        raise ValueError("'yhat1' is missing from the forecast data.")
+    return forecast['yhat1'].iloc[0]
+
+
+
+
+
+
+def generate_forecast_neuralprophet(data, forecast_days=90):
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+    model = NeuralProphet(
+        yearly_seasonality=True,
+        weekly_seasonality=True,
+        daily_seasonality=False
+    )
+    if isinstance(data, pd.DataFrame):
+        print(f"Fetched data columns: {data.columns}")
+    else:
+        raise ValueError("Fetched data is not a DataFrame.")
+    model.fit(data)
+    future = model.make_future_dataframe(data, periods=forecast_days)
+    forecast = model.predict(future)
+    if 'yhat1' not in forecast.columns:
+        raise ValueError("'yhat1' is missing from the forecast data.")
+    forecast['yhat'] = forecast['yhat1']
+    for i in range(len(forecast)):
+        if forecast.loc[i, 'yhat'] <= 0:
+            day_before = forecast.loc[i - 1, 'yhat'] if i > 0 else 0
+            last_year_date = forecast.loc[i, 'ds'] - pd.Timedelta(days=365)
+            last_year_prediction = forecast.loc[forecast['ds'] == last_year_date, 'yhat'].values
+            last_year_half = last_year_prediction[0] / 2 if len(last_year_prediction) > 0 else 0
+            forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
+    return forecast[['ds', 'yhat']]
+
+
+
+
+
+
+
+
+
 
 def generate_forecast(data, forecast_days=90):
     """
@@ -166,69 +252,6 @@ def generate_forecast_arima(data, forecast_days=90):
     """
 
 
-def generate_forecast_neuralprophet(data, forecast_days=90):
-    """
-    Generates a sales forecast using NeuralProphet for the given data.
-
-    Args:
-        data (pd.DataFrame): Historical sales data with columns:
-                             - 'ds': Date (datetime format)
-                             - 'y': Sales quantity (numeric)
-        forecast_days (int): Number of days to forecast. Default is 90 (6 months).
-
-    Returns:
-        Tuple: (future_forecast, forecast_plot_figure)
-            - future_forecast (pd.DataFrame): A DataFrame containing forecasted values with columns:
-              - 'ds': Date
-              - 'yhat1': Predicted sales quantity.
-            - forecast_plot_figure (matplotlib.figure.Figure): A Matplotlib figure of the forecast plot.
-    """
-    if data.empty:
-        raise ValueError("Input data is empty. Cannot generate a forecast.")
-
-    # Initialize the NeuralProphet model
-    model = NeuralProphet(
-        yearly_seasonality=True,
-        weekly_seasonality=True,
-        daily_seasonality=False
-    )
-
-    if isinstance(data, pd.DataFrame):
-        print(f"Fetched data columns: {data.columns}")
-    else:
-        raise ValueError("Fetched data is not a DataFrame.")
-
-    # Fit the model on historical data
-    print("Training NeuralProphet model...")
-    model.fit(data)
-
-    # Create a future dataframe
-    future = model.make_future_dataframe(data, periods=forecast_days)
-
-    # Generate the forecast
-    forecast = model.predict(future)
-
-    # Ensure 'yhat1' exists
-    if 'yhat1' not in forecast.columns:
-        raise ValueError("'yhat1' is missing from the forecast data.")
-
-    # Replace negative predictions with custom logic
-    forecast['yhat'] = forecast['yhat1']
-
-    for i in range(len(forecast)):
-        if forecast.loc[i, 'yhat'] <= 0:
-            # Get the day before's prediction
-            day_before = forecast.loc[i - 1, 'yhat'] if i > 0 else 0
-
-            # Get last year's same day's prediction divided by 2
-            last_year_date = forecast.loc[i, 'ds'] - pd.Timedelta(days=365)
-            last_year_prediction = forecast.loc[forecast['ds'] == last_year_date, 'yhat'].values
-            last_year_half = last_year_prediction[0] / 2 if len(last_year_prediction) > 0 else 0
-
-            # Replace with the mean of the two
-            forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
-
-    return forecast[['ds', 'yhat']]
 
 
 def generate_forecast_ets(data, forecast_days=90):
