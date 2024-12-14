@@ -4,7 +4,7 @@ import logging
 from multiprocessing import Process
 from collections import defaultdict
 from database_operations import fetch_pairs, fetch_data, insert_forecast_data, delete_forecast_data
-from forecast_generator import generate_forecast, generate_forecast_arima, generate_forecast_neuralprophet
+from forecast_generator import generate_forecast, generate_forecast_arima, generate_forecast_neuralprophet, generate_forecase_ets
 
 def run_forecast_pipeline(yaml_path, scenario, max_processes=8):
     """
@@ -94,17 +94,12 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
             return
 
         # Step 5: Deny processing if non-zero count is below 50 or grand total sales is below 100
-        if (data['y'] != 0).sum() < 50:
-            print(f"Non-zero sales count < 50 for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
-            return
-
-        if data['y'].sum() < 100:
-            print(f"Total sales < 100 for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
-            return
-
         # Step 6: Generate forecast
         print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel}...")
-        forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
+        if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
+            forecast = generate_forecase_ets(data, forecast_days=forecast_days)
+        else:
+            forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
 
         # Step 7: Insert forecast data into the database
         insert_forecast_data(forecast, asin, sales_channel, yaml_path)

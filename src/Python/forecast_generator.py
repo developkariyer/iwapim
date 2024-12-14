@@ -1,3 +1,4 @@
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from prophet import Prophet
 import pandas as pd
 import logging
@@ -220,3 +221,51 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
 
     # Return the forecast DataFrame and plot
     return forecast[['ds', 'yhat']]
+
+
+def generate_forecast_ets(data, forecast_days=180):
+    """
+    Generates a sales forecast using Exponential Smoothing (ETS) for the given data.
+
+    Args:
+        data (pd.DataFrame): Historical sales data with columns:
+                             - 'ds': Date (datetime format)
+                             - 'y': Sales quantity (numeric)
+        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+
+    Returns:
+        pd.DataFrame: A DataFrame containing forecasted values with columns:
+                      - 'ds': Date
+                      - 'yhat': Predicted sales quantity.
+    """
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+
+    # Ensure 'y' column is numeric and check for missing values
+    if data['y'].isnull().any():
+        raise ValueError("Input data contains missing values in 'y' column.")
+
+    # Ensure 'ds' is the index
+    if 'ds' in data.columns:
+        data.set_index('ds', inplace=True)
+
+    # Fit the ETS model
+    print("Fitting Exponential Smoothing (ETS) model...")
+    model = ExponentialSmoothing(
+        data['y'],
+        trend='add',
+        seasonal='add',
+        seasonal_periods=355
+    )
+    model_fit = model.fit()
+
+    # Generate future forecasts
+    forecast = model_fit.forecast(steps=forecast_days)
+
+    # Prepare the forecast DataFrame
+    future_dates = pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=forecast_days)
+    forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': forecast})
+
+    print(f"Forecast DataFrame: {forecast_df.head()}")
+
+    return forecast_df
