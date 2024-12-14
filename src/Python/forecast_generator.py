@@ -25,13 +25,13 @@ def group_sales_data(df, period):
     return aggregated_df
 
 
-def generate_forecast_using_groups(data):
+def generate_forecast_using_groups(data, forecast_days=90):
     forecast_7 = generate_group_forecast_neuralprophet(group_sales_data(data, 7))
     forecast_30 = generate_group_forecast_neuralprophet(group_sales_data(data, 30))
     forecast_90 = generate_group_forecast_neuralprophet(group_sales_data(data, 90))
 
     next_day_in_data = data['ds'].max() + pd.Timedelta(days=1)
-    future_data = pd.DataFrame({'ds': pd.date_range(start=next_day_in_data, periods=90, freq='D')})
+    future_data = pd.DataFrame({'ds': pd.date_range(start=next_day_in_data, periods=forecast_days, freq='D')})
     future_data['y'] = 0
     future_data.loc[:6, 'y'] = forecast_7 / 7
     future_data.loc[7:29, 'y'] = (forecast_30 - forecast_7) / 23
