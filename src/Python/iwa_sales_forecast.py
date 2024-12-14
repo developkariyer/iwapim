@@ -53,7 +53,7 @@ def run_forecast_pipeline(yaml_path, scenario, max_processes=8):
     print("\nForecasting pipeline completed.")
 
 
-def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
+def worker_process(asin, sales_channel, yaml_path, forecast_days=90):
     """
     Worker function to be run as a separate process. Fetches data for a specific ASIN and sales channel,
     processes it, and saves the results.
@@ -62,7 +62,7 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=180):
         asin (str): ASIN to process.
         sales_channel (str): Sales channel to process.
         yaml_path (str): Path to the YAML configuration for database connection.
-        forecast_days (int): Number of days to forecast. Default is 180.
+        forecast_days (int): Number of days to forecast. Default is 90.
 
     Returns:
         None

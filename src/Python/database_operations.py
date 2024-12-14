@@ -18,13 +18,14 @@ def fetch_data(asin, sales_channel, yaml_path):
         SELECT sale_date AS ds, total_quantity AS y
         FROM iwa_amazon_daily_sales_summary
         WHERE asin = %s AND sales_channel = %s
-          AND sale_date >= DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
-          AND sale_date < CURDATE()
           AND data_source = 1
         ORDER BY sale_date ASC;
         """
         # Execute the query and load data into a pandas DataFrame
         df = pd.read_sql(query, engine, params=(asin, sales_channel))
+        if not df.empty:
+            latest_date = df['ds'].max()
+            df = df[df['ds'] != latest_date]
         return df
 
     except Exception as e:

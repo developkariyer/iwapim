@@ -91,13 +91,13 @@
 
         function createChart(ctx, data) {
             const annotations = [
-                { label: "", index: data.xAxisLabels.indexOf("Week 26"), color: "black" },
-                { label: "-7", index: data.xAxisLabels.indexOf("Week 25"), color: "rgba(0, 0, 0, 0.7)" },
-                { label: "-30", index: data.xAxisLabels.indexOf("Week 22"), color: "rgba(0, 0, 0, 0.4)" },
-                { label: "-90", index: data.xAxisLabels.indexOf("Week 17"), color: "rgba(0, 0, 0, 0.1)" },
-                { label: "+7", index: data.xAxisLabels.indexOf("Week 27"), color: "rgba(0, 0, 0, 0.7)" },
-                { label: "+30", index: data.xAxisLabels.indexOf("Week 30"), color: "rgba(0, 0, 0, 0.4)" },
-                { label: "+90", index: data.xAxisLabels.indexOf("Week 35"), color: "rgba(0, 0, 0, 0.1)" },
+                { label: "", index: data.xAxisLabels.indexOf("275"), color: "black" },
+                { label: "-7", index: data.xAxisLabels.indexOf("268"), color: "rgba(0, 0, 0, 0.7)" },
+                { label: "-30", index: data.xAxisLabels.indexOf("245"), color: "rgba(0, 0, 0, 0.4)" },
+                { label: "-90", index: data.xAxisLabels.indexOf("185"), color: "rgba(0, 0, 0, 0.1)" },
+                { label: "+7", index: data.xAxisLabels.indexOf("282"), color: "rgba(0, 0, 0, 0.7)" },
+                { label: "+30", index: data.xAxisLabels.indexOf("305"), color: "rgba(0, 0, 0, 0.4)" },
+                { label: "+90", index: data.xAxisLabels.indexOf("365"), color: "rgba(0, 0, 0, 0.1)" },
             ];
 
             const annotationConfig = annotations.map(item => [
@@ -127,7 +127,7 @@
             const datasets = [
                 {
                     type: 'line',
-                    label: "Önceki Yıl Tarihler",
+                    label: "Önceki Yıl Aynı Gün",
                     data: data.previousYearData,
                     borderColor: "gray",
                     backgroundColor: "rgba(128, 128, 128, 0.3)",
@@ -137,7 +137,7 @@
                     fill: false,
                 },
                 {
-                    label: "Son 6 Ay",
+                    label: "Son 275 gün",
                     data: data.currentData,
                     borderColor: "green",
                     backgroundColor: "rgba(0, 128, 0, 0.3)",
@@ -147,7 +147,7 @@
                     fill: false,
                 },
                 {
-                    label: "Gelecek 6 Ay",
+                    label: "Gelecek 90 gün",
                     data: data.forecastedData,
                     borderColor: "blue",
                     backgroundColor: "rgba(0, 0, 255, 0.3)",

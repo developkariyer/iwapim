@@ -79,10 +79,8 @@ class WarehouseController extends FrontendController
             $salesChannel = "Amazon." . strtolower($salesChannel);
         }
 
-        $queryText = "iwasku = :iwasku";
-        $queryData = ['iwasku' => $iwasku];
-        $queryText .= " AND sales_channel = :sales_channel";
-        $queryData['sales_channel'] = $salesChannel;
+        $queryText = "iwasku = :iwasku AND sales_channel = :sales_channel";
+        $queryData = ['iwasku' => $iwasku, 'sales_channel' => $salesChannel];
 
         $db = Db::get();
         $yesterdayQuery = "SELECT MAX(sale_date) AS latest_date
@@ -94,16 +92,15 @@ class WarehouseController extends FrontendController
             return new JsonResponse(['error' => 'No valid data found for the given ASIN and sales channel'], 404);
         }
 
-        $endCurrentData = new DateTime($yesterday);
-        $startCurrentData = (clone $endCurrentData)->modify('-26 weeks');
-        $startPreviousYearData = (clone $startCurrentData)->modify('-53 weeks');
-        $queryData['start_previous_year'] = $startPreviousYearData->format('Y-m-d');
+        $twoYearsAgo = (new DateTime($yesterday))->modify('-640 days');
+        $yesterdayDate = (new DateTime($yesterday));
+        $queryData['start_previous_year'] = $twoYearsAgo->format('Y-m-d');
 
         $salesData = $db->fetchAllAssociative(
-            "SELECT sale_date, sum(total_quantity) AS total_quantity
+            "SELECT sale_date, data_source, sum(total_quantity) AS total_quantity
                 FROM iwa_amazon_daily_sales_summary
                 WHERE $queryText AND sale_date >= :start_previous_year
-                GROUP BY sale_date
+                GROUP BY sale_date, data_source
                 ORDER BY sale_date",
             $queryData
         );
@@ -115,31 +112,27 @@ class WarehouseController extends FrontendController
             'lastYearNext7' => 0,
             'lastYearNext30' => 0,
             'lastYearNext90' => 0,
-            'lastYearTotal1' => 0,
-            'lastYearTotal2' => 0,
-            'lastTotal' => 0,
             'last90' => 0,
             'last30' => 0,
             'last7' => 0,
             'next7' => 0,
             'next30' => 0,
             'next90' => 0,
-            'nextTotal' => 0,
             'xAxisLabels' => [],
-            'previousYearData' => array_fill(0, 53, null),
-            'currentData' => array_fill(0, 53, null),
-            'forecastedData' => array_fill(0, 53, null),
+            'previousYearData' => array_fill(0, 365, null),
+            'currentData' => array_fill(0, 365, null),
+            'forecastedData' => array_fill(0, 365, null),
         ];
 
-        for ($week = 0; $week <= 53; $week++) {
-            $response['xAxisLabels'][] = "Week $week";
+        for ($day = 1; $day <= 365; $day++) {
+            $response['xAxisLabels'][] = "$day";
         }
 
         foreach ($salesData as $data) {
-            $date = new DateTime($data['sale_date']);
-            $days = (int) $endCurrentData->diff($date)->format('%r%a');
-            $week = (int) $startPreviousYearData->diff($date)->format('%r%a') / 7;
             $quantity = (int) $data['total_quantity'];
+            $date = new DateTime($data['sale_date']);
+            $days = (int) $yesterdayDate->diff($date)->format('%r%a');
+            $dataSource = (int) $data['data_source'];
 
             $response['lastYearLast90'] += ($days <= -365 && $days > -365-90) ? $quantity : 0;
             $response['lastYearLast30'] += ($days <= -365 && $days > -365-30) ? $quantity : 0;
@@ -147,39 +140,22 @@ class WarehouseController extends FrontendController
             $response['lastYearNext7'] += ($days > -365 && $days <= -365+7) ? $quantity : 0;
             $response['lastYearNext30'] += ($days > -365 && $days <= -365+30) ? $quantity : 0;
             $response['lastYearNext90'] += ($days > -365 && $days <= -365+90) ? $quantity : 0;
-            $response['lastYearTotal1'] += ($days <= -365) ? $quantity : 0;
-            $response['lastYearTotal2'] += ($days > -365 && $days <= -182) ? $quantity : 0;
-            $response['lastTotal'] += ($days > -182 && $days <= 0) ? $quantity : 0;
-            $response['last90'] += ($days > -90 && $days <= 0) ? $quantity : 0;
-            $response['last30'] += ($days > -30 && $days <= 0) ? $quantity : 0;
-            $response['last7'] += ($days > -7 && $days <= 0) ? $quantity : 0;
-            $response['next7'] += ($days > 0 && $days <= 7) ? $quantity : 0;
-            $response['next30'] += ($days > 0 && $days <= 30) ? $quantity : 0;
-            $response['next90'] += ($days > 0 && $days <= 90) ? $quantity : 0;
-            $response['nextTotal'] += ($days > 0) ? $quantity : 0;
+            $response['last90'] += ($dataSource == 1 && $days > -90 && $days <= 0) ? $quantity : 0;
+            $response['last30'] += ($dataSource == 1 && $days > -30 && $days <= 0) ? $quantity : 0;
+            $response['last7'] += ($dataSource == 1 && $days > -7 && $days <= 0) ? $quantity : 0;
+            $response['next7'] += ($dataSource == 0 && $days > 0 && $days <= 7) ? $quantity : 0;
+            $response['next30'] += ($dataSource == 0 && $days > 0 && $days <= 30) ? $quantity : 0;
+            $response['next90'] += ($dataSource == 0 && $days > 0 && $days <= 90) ? $quantity : 0;
 
-            if ($week < 53) {
-                if (is_null($response['previousYearData'][$week])) {
-                    $response['previousYearData'][$week] = 0;
-                }
-                $response['previousYearData'][$week] += $quantity;
+            if ($days < -275) {
+                $response['previousYearData'][640 + $days] = $quantity;
                 continue;
             }
-            if ($week < 79) {
-                if (is_null($response['currentData'][$week - 53])) {
-                    $response['currentData'][$week - 53] = 0;
-                }
-                $response['currentData'][$week - 53] += $quantity;
-                continue;
+            if ($dataSource == 1) {
+                $response['currentData'][275 + $days] = $quantity;
+            } else {
+                $response['forecastedData'][275 + $days] = $quantity;
             }
-            if (is_null($response['forecastedData'][$week - 53])) {
-                $response['forecastedData'][$week - 53] = 0;
-            }
-            $response['forecastedData'][$week - 53] += $quantity;
-        }
-
-        if ($response['forecastedData'][26]>0) {
-            $response['currentData'][26] = $response['forecastedData'][26];
         }
 
         return $this->json($response);

@@ -11,13 +11,13 @@ from neuralprophet import NeuralProphet
 
 
 
-def generate_forecast(data, forecast_days=180):
+def generate_forecast(data, forecast_days=90):
     """
     Generates a 6-month (daily) sales forecast using Prophet for the given data.
 
     Args:
         data (pd.DataFrame): Historical sales data with columns 'ds' (date) and 'y' (sales quantity).
-        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+        forecast_days (int): Number of days to forecast. Default is 90 (6 months).
 
     Returns:
         pd.DataFrame: A DataFrame containing the forecasted values with columns:
@@ -109,7 +109,7 @@ def generate_forecast(data, forecast_days=180):
 
 
 
-def generate_forecast_arima(data, forecast_days=180):
+def generate_forecast_arima(data, forecast_days=90):
     """
     Generates a sales forecast using Auto-ARIMA for the given data.
 
@@ -117,7 +117,7 @@ def generate_forecast_arima(data, forecast_days=180):
         data (pd.DataFrame): Historical sales data with columns:
                              - 'ds': Date (datetime format)
                              - 'y': Sales quantity (numeric)
-        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+        forecast_days (int): Number of days to forecast. Default is 90 (6 months).
 
     Returns:
         Tuple: (future_forecast, forecast_plot_figure)
@@ -166,7 +166,7 @@ def generate_forecast_arima(data, forecast_days=180):
     """
 
 
-def generate_forecast_neuralprophet(data, forecast_days=180):
+def generate_forecast_neuralprophet(data, forecast_days=90):
     """
     Generates a sales forecast using NeuralProphet for the given data.
 
@@ -174,7 +174,7 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
         data (pd.DataFrame): Historical sales data with columns:
                              - 'ds': Date (datetime format)
                              - 'y': Sales quantity (numeric)
-        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+        forecast_days (int): Number of days to forecast. Default is 90 (6 months).
 
     Returns:
         Tuple: (future_forecast, forecast_plot_figure)
@@ -230,7 +230,7 @@ def generate_forecast_neuralprophet(data, forecast_days=180):
     return forecast[['ds', 'yhat']]
 
 
-def generate_forecast_ets(data, forecast_days=180):
+def generate_forecast_ets(data, forecast_days=90):
     """
     Generates a sales forecast using Exponential Smoothing (ETS) for the given data.
 
@@ -238,7 +238,7 @@ def generate_forecast_ets(data, forecast_days=180):
         data (pd.DataFrame): Historical sales data with columns:
                              - 'ds': Date (datetime format)
                              - 'y': Sales quantity (numeric)
-        forecast_days (int): Number of days to forecast. Default is 180 (6 months).
+        forecast_days (int): Number of days to forecast. Default is 90 (3 months).
 
     Returns:
         pd.DataFrame: A DataFrame containing forecasted values with columns:
@@ -278,7 +278,7 @@ def generate_forecast_ets(data, forecast_days=180):
     return forecast_df
 
 
-def generate_forecast_croston(data, forecast_days=180, alpha=0.1, min_non_zero_sales=5):
+def generate_forecast_croston(data, forecast_days=90, alpha=0.1, min_non_zero_sales=5):
     """
     Generates a sales forecast using Croston's Method with handling for sparse data.
 
@@ -286,7 +286,7 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1, min_non_zero_s
         data (pd.DataFrame): Historical sales data with columns:
                              - 'ds': Date (datetime format)
                              - 'y': Sales quantity (numeric).
-        forecast_days (int): Number of days to forecast. Default is 180.
+        forecast_days (int): Number of days to forecast. Default is 90.
         alpha (float): Smoothing parameter for Croston's method.
         min_non_zero_sales (int): Minimum non-zero sales required to apply Croston's Method.
 
