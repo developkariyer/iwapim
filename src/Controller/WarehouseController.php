@@ -157,6 +157,15 @@ class WarehouseController extends FrontendController
                 $response['forecastedData'][275 + $days] = $quantity;
             }
         }
+        if (is_null(['forecastedData'][275]) && is_null(['currentData'][275])) {
+            $response['forecastedData'][275] = $response['currentData'][275] = ($response['forecastedData'][276] ?? 0 + $response['currentData'][274] ?? 0) / 2;
+        }
+        if (is_null(['forecastedData'][275])) {
+            $response['forecastedData'][275] = $response['currentData'][275];
+        }
+        if (is_null(['currentData'][275])) {
+            $response['currentData'][275] = $response['forecastedData'][275];
+        }
 
         return $this->json($response);
     }
