@@ -127,7 +127,7 @@ DROP TEMPORARY TABLE IF EXISTS temp_calendar;
 CREATE TEMPORARY TABLE temp_calendar AS
 WITH min_max_dates AS (
     SELECT MIN(sale_date) AS min_date, MAX(sale_date) AS max_date
-    FROM temp_daily_sales
+    FROM iwa_amazon_daily_sales_summary_temp
 )
 SELECT date AS sale_date
 FROM iwa_static_dates, min_max_dates
