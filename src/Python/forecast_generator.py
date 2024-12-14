@@ -272,9 +272,9 @@ def generate_forecast_ets(data, forecast_days=180):
     return forecast_df
 
 
-def generate_forecast_croston(data, forecast_days=180, alpha=0.1, max_forecast_ratio=1.5):
+def generate_forecast_croston(data, forecast_days=180, alpha=0.1, min_non_zero_sales=5):
     """
-    Generates a sales forecast using Croston's Method with adjustments to control overestimation.
+    Generates a sales forecast using Croston's Method with handling for sparse data.
 
     Args:
         data (pd.DataFrame): Historical sales data with columns:
@@ -282,7 +282,7 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1, max_forecast_r
                              - 'y': Sales quantity (numeric).
         forecast_days (int): Number of days to forecast. Default is 180.
         alpha (float): Smoothing parameter for Croston's method.
-        max_forecast_ratio (float): Maximum allowed forecast as a multiple of total sales.
+        min_non_zero_sales (int): Minimum non-zero sales required to apply Croston's Method.
 
     Returns:
         pd.DataFrame: A DataFrame containing forecasted values with columns:
@@ -295,6 +295,13 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1, max_forecast_r
     # Ensure 'y' column contains numeric values
     if not pd.api.types.is_numeric_dtype(data['y']):
         raise ValueError("'y' column must be numeric.")
+
+    # Check if there are enough non-zero sales to apply Croston
+    non_zero_sales = (data['y'] > 0).sum()
+    if non_zero_sales < min_non_zero_sales:
+        print(f"Insufficient non-zero sales ({non_zero_sales}). Defaulting to zero forecast.")
+        future_dates = pd.date_range(start=data['ds'].max() + pd.Timedelta(days=1), periods=forecast_days)
+        return pd.DataFrame({'ds': future_dates, 'yhat': [0] * forecast_days})
 
     # Convert the target column to a NumPy array
     demand = data['y'].values
@@ -311,12 +318,8 @@ def generate_forecast_croston(data, forecast_days=180, alpha=0.1, max_forecast_r
         interval += 1  # Increment interval for zero demand
 
     # Calculate the forecast as demand size divided by demand interval
-    total_sales = data['y'].sum()  # Historical total sales
-    max_forecast = total_sales * max_forecast_ratio  # Cap based on total sales
-    forecast_value = (demand_size / demand_interval) if demand_interval > 0 else 0
-
-    # Apply forecast cap
-    forecast_value = min(forecast_value, max_forecast)
+    demand_interval = max(demand_interval, 1)  # Avoid division by zero
+    forecast_value = max(demand_size / demand_interval, 0)  # Avoid negative or NaN forecasts
 
     # Generate future dates
     future_dates = pd.date_range(start=data['ds'].max() + pd.Timedelta(days=1), periods=forecast_days)
