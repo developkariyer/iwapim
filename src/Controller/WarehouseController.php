@@ -42,7 +42,7 @@ class WarehouseController extends FrontendController
     {
         $db = Db::get();
         $sale_data = $db->fetchAllAssociative("SELECT iwasku, sales_channel, sum(total_quantity) AS total_sale, GROUP_CONCAT(DISTINCT asin) AS asins
-                    FROM iwa_amazon_daily_sales_summary GROUP BY iwasku, sales_channel ORDER BY total_sale DESC");
+                    FROM iwa_amazon_daily_sales_summary  WHERE data_source = 1 AND sale_date > CURDATE() - INTERVAL 365 DAY GROUP BY iwasku, sales_channel ORDER BY total_sale DESC");
         $salesChannels = [];
         $iwaskus = [];
         foreach ($sale_data as $data) {
