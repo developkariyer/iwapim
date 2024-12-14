@@ -85,22 +85,21 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=90):
             return
 
         # Step 4: Remove uninterrupted leading zeros
-        first_non_zero_idx = data['y'].ne(0).idxmax()  # Find the first non-zero index
-        data = data.loc[first_non_zero_idx:]  # Keep rows starting from the first non-zero value
+        #first_non_zero_idx = data['y'].ne(0).idxmax()  # Find the first non-zero index
+        #data = data.loc[first_non_zero_idx:]  # Keep rows starting from the first non-zero value
 
         # Revalidate data after cleaning
-        if data.empty or data.shape[0] < 2:
-            print(f"No valid data after cleaning for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
-            return
+        #if data.empty or data.shape[0] < 2:
+        #    print(f"No valid data after cleaning for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
+        #    return
 
         # Step 5: Deny processing if non-zero count is below 50 or grand total sales is below 100
         # Step 6: Generate forecast
         print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel}...")
-        if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
-            forecast = generate_forecast_croston(data, forecast_days=forecast_days)
-        else:
-            forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
-
+        #if ((data['y'] != 0).sum() < 50) or (data['y'].sum() < 100):
+        #    forecast = generate_forecast_croston(data, forecast_days=forecast_days)
+        #else:
+        forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
 
         # Step 7: Insert forecast data into the database
         insert_forecast_data(forecast, asin, sales_channel, yaml_path)
