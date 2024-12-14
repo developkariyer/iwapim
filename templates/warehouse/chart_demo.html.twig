@@ -134,7 +134,7 @@
                     tension: 0.4,
                     borderWidth: 2,
                     pointRadius: 0,
-                    fill: false,
+                    fill: true,
                 },
                 {
                     label: "Son 275 gün",
@@ -160,7 +160,7 @@
 
             // Chart creation
             return new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: data.xAxisLabels,
                     datasets: datasets,
@@ -173,6 +173,9 @@
                         tooltip: { enabled: true },
                         annotation: {
                             annotations: Object.fromEntries(annotationConfig.map((a, i) => [`line${i}`, a])),
+                        },
+                        filler: {
+                            drawTime: 'beforeDraw'
                         }
                     },
                     scales: {
