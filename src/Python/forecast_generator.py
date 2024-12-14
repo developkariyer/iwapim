@@ -214,7 +214,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
 
     # Replace negative predictions with custom logic
     forecast['yhat'] = forecast['yhat1']
-    '''
+
     for i in range(len(forecast)):
         if forecast.loc[i, 'yhat'] <= 0:
             # Get the day before's prediction
@@ -227,7 +227,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
 
             # Replace with the mean of the two
             forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
-    '''
+
     return forecast[['ds', 'yhat']]
 
 
@@ -279,7 +279,7 @@ def generate_forecast_ets(data, forecast_days=90):
     return forecast_df
 
 
-def generate_forecast_croston(data, forecast_days=90, alpha=0.1, min_non_zero_sales=5):
+def generate_forecast_croston(data, forecast_days=90, alpha=0.1, min_non_zero_sales=10):
     """
     Generates a sales forecast using Croston's Method with handling for sparse data.
 
@@ -333,5 +333,17 @@ def generate_forecast_croston(data, forecast_days=90, alpha=0.1, min_non_zero_sa
 
     # Prepare the forecast DataFrame
     forecast_df = pd.DataFrame({'ds': future_dates, 'yhat': [forecast_value] * forecast_days})
+
+    # Adjust future forecast based on last year's corresponding period
+    for days_range in [7, 30, 90]:
+        next_period = forecast_df.loc[:days_range - 1]
+        last_year_period = data.loc[data['ds'].isin(future_dates[:days_range] - pd.Timedelta(days=365))]
+
+        if not last_year_period.empty:
+            last_year_values = last_year_period['y'].values
+
+            # Check if last year's values exist for the same period
+            if next_period['yhat'].sum() > last_year_values.sum() and data['y'].tail(7).sum() == 0:
+                forecast_df.loc[:days_range - 1, 'yhat'] = last_year_values
 
     return forecast_df
