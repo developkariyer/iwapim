@@ -1,7 +1,7 @@
 import sys, os, logging
 from multiprocessing import Process
 from collections import defaultdict
-from database_operations import fetch_pairs, fetch_data, insert_forecast_data, delete_forecast_data, fetch_groups, fetch_group_data
+from database_operations import fetch_pairs, insert_forecast_data, delete_forecast_data, fetch_group_data
 from forecast_generator import generate_forecast_neuralprophet, generate_group_model_neuralprophet
 #from darts_forecasts import generate_forecast_xgboost # too slow without GPU
 
