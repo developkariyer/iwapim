@@ -14,10 +14,13 @@ import os
 
 def generate_group_forecast_neuralprophet(data, group_id):
     try:
+        print("*Checking if data is empty...")
         if data.empty:
             raise ValueError("Input data is empty. Cannot generate a forecast.")
+        print("*Checking if data is a DataFrame...")
         if not isinstance(data, pd.DataFrame):
             raise ValueError("Fetched data is not a DataFrame.")
+        print("*Initializing NeuralProphet model...")
         model = NeuralProphet(
             yearly_seasonality=True,
             weekly_seasonality=True,
