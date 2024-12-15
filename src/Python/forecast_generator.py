@@ -15,11 +15,11 @@ import plotly.io as pio
 
 
 
-def save_neuralprophet_model(model, data, future, file_path):
+def save_neuralprophet_model(model, data, forecast, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     torch.save(model.model.state_dict(), file_path+".pt")
     data.to_csv(file_path+".csv", index=False)
-    future.to_csv(file_path+"_future.csv", index=False)
+    forecast.to_csv(file_path+"_forecast.csv", index=False)
     print(f"Model saved to: {file_path}")
     try:
         print("Generating forecast plot...")
@@ -34,15 +34,17 @@ def save_neuralprophet_model(model, data, future, file_path):
 def load_neuralprophet_model(model, file_path):
     model_file = file_path + ".pt"
     data_file = file_path + ".csv"
-    if not os.path.exists(model_file) or not os.path.exists(data_file):
+    forecast_file = file_path + "_forecast.csv"
+    if not os.path.exists(model_file) or not os.path.exists(data_file) or not os.path.exists(forecast_file):
         raise FileNotFoundError(f"Model files not found at: {file_path}")
     # load model
-    model.model.load_state_dict(torch.load(file_path))
+    model.model.load_state_dict(torch.load(model_file))
     print(f"Model loaded from: {file_path}")
     # load data
     data = pd.read_csv(data_file)
-    print(f"Data loaded from: {data_file}")
-    return model, data
+    forecast = pd.read_csv(forecast_file)
+    print(f"Data loaded from: {file_path}")
+    return model, data, forecast
 
 
 def generate_group_model_neuralprophet(data, group_id, forecast_days=90):
@@ -63,9 +65,8 @@ def generate_group_model_neuralprophet(data, group_id, forecast_days=90):
         model.fit(data, freq='D')
         future = model.make_future_dataframe(data, periods=forecast_days)
         forecast = model.predict(future)
-        os.makedirs(output_path, exist_ok=True)
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
-        save_neuralprophet_model(model, data, future, model_path)
+        save_neuralprophet_model(model, data, forecast, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
