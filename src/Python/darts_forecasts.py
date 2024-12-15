@@ -11,6 +11,9 @@ def generate_forecast_xgboost(data, forecast_days=90):
     else:
         raise ValueError("Fetched data is not a DataFrame.")
 
+    # Ensure 'ds' is in datetime format
+    data['ds'] = pd.to_datetime(data['ds'])
+
     # Convert data to Darts TimeSeries
     series = TimeSeries.from_dataframe(data, time_col='ds', value_cols='y')
 
