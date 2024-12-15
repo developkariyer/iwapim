@@ -50,7 +50,7 @@ def load_neuralprophet_model(model, file_path):
     return model, data, forecast
 
 
-def generate_group_model_neuralprophet(data, group_id, forecast_days=90):
+def generate_group_model_neuralprophet(data, group_id, forecast_days=90, load=False):
     try:
         print("*Checking if data is empty...")
         if data.empty:
@@ -58,17 +58,24 @@ def generate_group_model_neuralprophet(data, group_id, forecast_days=90):
         print("*Checking if data is a DataFrame...")
         if not isinstance(data, pd.DataFrame):
             raise ValueError("Fetched data is not a DataFrame.")
+        model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
         print("*Initializing NeuralProphet model...")
         model = NeuralProphet(
             yearly_seasonality=True,
             weekly_seasonality=True,
             daily_seasonality=False,
         )
+        # check both .pt, .csv and _forecast.csv files exist
+        if load and os.path.exists(model_path + ".pt") and os.path.exists(model_path + ".csv") and os.path.exists(model_path + "_forecast.csv"):
+            print(f"*Loading existing model for group {group_id}...")
+            model, data, forecast = load_neuralprophet_model(model, model_path)
+            print(f"*Model for group {group_id} loaded successfully. Generating plot...")
+            save_neuralprophet_plot(model, forecast, model_path)
+            return
         print(f"*Training model for group {group_id}...")
         model.fit(data, freq='D')
         future = model.make_future_dataframe(data, periods=forecast_days)
         forecast = model.predict(future)
-        model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
         save_neuralprophet_model(model, data, forecast, model_path)
         save_neuralprophet_plot(model, forecast, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")

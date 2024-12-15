@@ -7,7 +7,7 @@ from config import yaml_path
 #from darts_forecasts import generate_forecast_xgboost # too slow without GPU
 
 
-def run_groups_forecast_pipeline(yaml_path, group_id=None):
+def run_groups_forecast_pipeline(yaml_path, group_id=None, load=False):
     print("*Fetching groups...")
     groups = fetch_groups(yaml_path, group_id)
     print(f"*Found {len(groups)} groups.")
@@ -21,12 +21,12 @@ def run_groups_forecast_pipeline(yaml_path, group_id=None):
             print(f"*Insufficient data for group {group_id}. Skipping...")
             continue
         print(f"*Generating forecast for group {group_id} using NeuralProphet...")
-        generate_group_model_neuralprophet(data, group_id)
+        generate_group_model_neuralprophet(data, group_id, load=load)
         print(f"*Forecast model saved for group {group_id}.")
 
 
 
-def run_forecast_pipeline(yaml_path, max_processes=8, asin=None, sales_channel=None, iwasku=None):
+def run_forecast_pipeline(yaml_path, max_processes=8, asin=None, sales_channel=None, iwasku=None, load=False):
     print("*Fetching ASIN/Sales Channel pairs...")
     pairs = fetch_pairs(yaml_path, asin, sales_channel, iwasku)
     if pairs.empty:
@@ -74,19 +74,21 @@ if __name__ == "__main__":
     group_param = next((arg.split('=')[1] for arg in args if arg.startswith('--group=')), None)
     groups_flag = any(arg == '--groups' for arg in args)
 
+    # Check for --load flag
+    load_flag = any(arg == '--load' for arg in args)
+
     if group_param:
         # Run group-based pipeline for a specific group
-        print(f"*Running group-based forecast pipeline for group: {group_param}")
-        run_groups_forecast_pipeline(yaml_path, group_param)  # Pass group_param to the pipeline
+        print(f"*Running group-based forecast pipeline for group: {group_param}, load: {load_flag}")
+        run_groups_forecast_pipeline(yaml_path, group_id=group_param, load=load_flag)
     elif groups_flag:
         # Run group-based pipeline for all groups
-        print("*Running group-based forecast pipeline for all groups")
-        run_groups_forecast_pipeline(yaml_path)
+        print(f"*Running group-based forecast pipeline for all groups, load: {load_flag}")
+        run_groups_forecast_pipeline(yaml_path, load=load_flag)
     else:
         # Default to product-based processing
         asin = next((arg.split('=')[1] for arg in args if arg.startswith('--asin=')), None)
         sales_channel = next((arg.split('=')[1] for arg in args if arg.startswith('--channel=')), None)
         iwasku = next((arg.split('=')[1] for arg in args if arg.startswith('--iwasku=')), None)
-        print("*Running product-based forecast pipeline")
-        run_forecast_pipeline(yaml_path, 8, asin, sales_channel, iwasku)
-
+        print(f"*Running product-based forecast pipeline, load: {load_flag}")
+        run_forecast_pipeline(yaml_path, 8, asin, sales_channel, iwasku, load=load_flag)
