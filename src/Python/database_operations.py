@@ -56,10 +56,9 @@ def fetch_group_data(group, sales_channel = None):
         print(f"IDs with all zero values: {zero_ids_list}")
         filtered_data = data[~data["ID"].isin(zero_ids_list)]
         print(f"Filtered data shape: {filtered_data.shape}")
-        return data
+        return filtered_data
     except Exception as e:
         print(f"*Error fetching data for group: {e}")
-        return pd.DataFrame()
     finally:
         if engine:
             engine.dispose()
