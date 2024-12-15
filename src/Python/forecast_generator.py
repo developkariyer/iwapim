@@ -10,6 +10,54 @@ import numpy as np
 from neuralprophet import NeuralProphet
 
 
+def generate_forecast_neuralprophet(data, forecast_days=90):
+    if data.empty:
+        raise ValueError("Input data is empty. Cannot generate a forecast.")
+    df_events = pd.DataFrame({
+        "event": "ramadan",
+        "ds": pd.to_datetime([
+            "2022-04-02",  # 1443 Hijri
+            "2023-03-23",  # 1444 Hijri
+            "2024-03-10",  # 1445 Hijri
+            "2025-02-28",  # 1446 Hijri
+        ]),
+        "lower_window": 0,  # Event starts on the given date
+        "upper_window": 29  # Extends for 30 days
+    })
+    model = NeuralProphet(
+        n_changepoints=5,
+        yearly_seasonality=True,
+        weekly_seasonality=True,
+        daily_seasonality=False,
+        seasonality_mode='multiplicative',
+    )
+    model = model.add_country_holidays(country_name='US')
+    #model = model.add_events('ramadan')
+    if isinstance(data, pd.DataFrame):
+        print(f"Fetched data columns: {data.columns}")
+    else:
+        raise ValueError("Fetched data is not a DataFrame.")
+    #data = model.create_df_with_events(data, df_events)
+    model.fit(data, freq='D')
+    future = model.make_future_dataframe(data, periods=forecast_days)
+    forecast = model.predict(future)
+    forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
+    forecast_long = forecast[['ds'] + forecast_columns]
+    forecast_melted = forecast_long.melt(
+        id_vars='ds',
+        value_vars=forecast_columns,
+        var_name='step',
+        value_name='yhat'
+    )
+    forecast_melted = forecast_melted[forecast_melted['yhat'].notna()]
+    forecast_melted = forecast_melted.sort_values(['ds', 'step']).reset_index(drop=True)
+    forecast_final = forecast_melted[['ds', 'yhat']]
+    print(forecast_final)
+    return forecast_final[['ds', 'yhat']]
+
+
+
+
 def group_sales_data(df, period):
     df = df.sort_values(by='ds', ascending=False).reset_index(drop=True)
     df['group'] = (df.index // period)
@@ -53,54 +101,6 @@ def generate_group_forecast_neuralprophet(data, freq='D', periods=3):
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
     return forecast[['ds', 'yhat']]
-
-
-
-def generate_forecast_neuralprophet(data, forecast_days=90):
-    if data.empty:
-        raise ValueError("Input data is empty. Cannot generate a forecast.")
-    df_events = pd.DataFrame({
-        "event": "ramadan",
-        "ds": pd.to_datetime([
-            "2022-04-02",  # 1443 Hijri
-            "2023-03-23",  # 1444 Hijri
-            "2024-03-10",  # 1445 Hijri
-            "2025-02-28",  # 1446 Hijri
-        ]),
-        "lower_window": 0,  # Event starts on the given date
-        "upper_window": 29  # Extends for 30 days
-    })
-    model = NeuralProphet(
-        n_changepoints=5,
-        yearly_seasonality=True,
-        weekly_seasonality=True,
-        daily_seasonality=False,
-        seasonality_mode='multiplicative',
-    )
-    #model = model.add_country_holidays(country_name='US')
-    #model = model.add_events('ramadan')
-    if isinstance(data, pd.DataFrame):
-        print(f"Fetched data columns: {data.columns}")
-    else:
-        raise ValueError("Fetched data is not a DataFrame.")
-    #data = model.create_df_with_events(data, df_events)
-    model.fit(data, freq='D')
-    future = model.make_future_dataframe(data, periods=forecast_days)
-    forecast = model.predict(future)
-    forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
-    forecast_long = forecast[['ds'] + forecast_columns]
-    forecast_melted = forecast_long.melt(
-        id_vars='ds',
-        value_vars=forecast_columns,
-        var_name='step',
-        value_name='yhat'
-    )
-    forecast_melted = forecast_melted[forecast_melted['yhat'].notna()]
-    forecast_melted = forecast_melted.sort_values(['ds', 'step']).reset_index(drop=True)
-    forecast_final = forecast_melted[['ds', 'yhat']]
-    print(forecast_final)
-    return forecast_final[['ds', 'yhat']]
-
 
 
 
