@@ -10,6 +10,7 @@ from neuralprophet import NeuralProphet
 from config import output_path, yaml_path, islamic_events
 import os
 
+logging.getLogger("neuralprophet").setLevel(logging.ERROR)
 
 def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
     try:
