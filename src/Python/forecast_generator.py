@@ -51,7 +51,7 @@ def load_neuralprophet_model(model, file_path):
     return model, data, forecast
 
 
-def generate_group_model_neuralprophet(data, group_id, forecast_days=90, load=False):
+def generate_group_model_neuralprophet(group_id, forecast_days=90, load=False):
     try:
         data = fetch_group_data(group_id, yaml_path)
         if data.empty or data.dropna().shape[0] < 2 or data['y'].sum() == 0:
