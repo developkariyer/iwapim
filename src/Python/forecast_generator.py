@@ -13,10 +13,11 @@ import os
 import torch
 
 
-def save_neuralprophet_model(model, data, file_path):
+def save_neuralprophet_model(model, data, future, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     torch.save(model.model.state_dict(), file_path+".pt")
     data.to_csv(file_path+".csv", index=False)
+    future.to_csv(file_path+"_future.csv", index=False)
     print(f"Model saved to: {file_path}")
     try:
         print("Generating model components graph...")
@@ -43,7 +44,7 @@ def load_neuralprophet_model(model, file_path):
     return model, data
 
 
-def generate_group_model_neuralprophet(data, group_id):
+def generate_group_model_neuralprophet(data, group_id, forecast_days=90):
     try:
         print("*Checking if data is empty...")
         if data.empty:
@@ -59,9 +60,11 @@ def generate_group_model_neuralprophet(data, group_id):
         )
         print(f"*Training model for group {group_id}...")
         model.fit(data, freq='D')
+        future = model.make_future_dataframe(data, periods=forecast_days)
+        forecast = model.predict(future)
         os.makedirs(output_path, exist_ok=True)
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
-        save_neuralprophet_model(model, data, model_path)
+        save_neuralprophet_model(model, data, future, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
