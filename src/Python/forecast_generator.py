@@ -31,6 +31,7 @@ def generate_group_forecast_neuralprophet(data, group_id):
         print(f"Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
+        print(data)
 
 
 def generate_forecast_neuralprophet(data, forecast_days=90):
