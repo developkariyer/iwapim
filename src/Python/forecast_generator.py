@@ -71,12 +71,12 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         "upper_window": 29  # Extends for 30 days
     })
     model = NeuralProphet(
-        n_changepoints=15,
+        n_changepoints=5,
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
         seasonality_mode='multiplicative',
-        n_lags=5,
+        n_lags=90,
         n_forecasts=forecast_days
     )
     #model = model.add_country_holidays(country_name='US')
