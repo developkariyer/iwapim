@@ -15,14 +15,15 @@ def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
     try:
         print("*Initializing global NeuralProphet model...")
         model = NeuralProphet(
-            yearly_seasonality=True,        # Capture yearly seasonality
+            yearly_seasonality=20,        # Capture yearly seasonality
             weekly_seasonality=True,        # Capture weekly patterns
             daily_seasonality=False,        # Avoid overfitting to daily noise
             trend_global_local="global",    # Shared trends across all IDs
             season_global_local="global",   # Shared seasonality across all IDs
-            changepoints_range=0.9,         # Focus more on recent data for changepoints
+            changepoints_range=0.8,         # Focus more on recent data for changepoints
+            seasonality_reg=0.1,           # Reduce regularization on seasonality
             #epochs=5,                      # Longer training for richer datasets
-            trend_reg=5,                    # Smooth but responsive trends
+            trend_reg=10,                    # Smooth but responsive trends
         )
         model = model.add_country_holidays(country_name='US')
         if islamic:
