@@ -87,24 +87,23 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         raise ValueError("Fetched data is not a DataFrame.")
     #data = model.create_df_with_events(data, df_events)
     model.fit(data, freq='D')
-    future = model.make_future_dataframe(data, periods=forecast_days, n_historic_predictions=False)
+    future = model.make_future_dataframe(data, periods=forecast_days)
     forecast = model.predict(future)
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
-    forecast['yhat'] = forecast['yhat1']
-    '''
-    for i in range(len(forecast)):
-        if forecast.loc[i, 'yhat'] <= 0:
-            day_before = forecast.loc[i - 1, 'yhat'] if i > 0 else 0
-            last_year_date = forecast.loc[i, 'ds'] - pd.Timedelta(days=365)
-            last_year_prediction = forecast.loc[forecast['ds'] == last_year_date, 'yhat'].values
-            last_year_half = last_year_prediction[0] / 2 if len(last_year_prediction) > 0 else 0
-            forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
-    '''
-    print(f"Forecast DataFrame: {forecast}")
-    filtered_forecast = forecast[forecast['yhat'].notnull()]
-    print(f"Forecast DataFrame: {filtered_forecast}")
-    return filtered_forecast[['ds', 'yhat']]
+    forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
+    forecast_long = forecast[['ds'] + forecast_columns]
+    forecast_melted = forecast_long.melt(
+        id_vars='ds',
+        value_vars=forecast_columns,
+        var_name='step',
+        value_name='yhat'
+    )
+    forecast_melted = forecast_melted[forecast_melted['yhat'].notna()]
+    forecast_melted = forecast_melted.sort_values(['ds', 'step']).reset_index(drop=True)
+    forecast_final = forecast_melted[['ds', 'yhat']]
+    print(forecast_final)
+    return forecast_final[['ds', 'yhat']]
 
 
 
