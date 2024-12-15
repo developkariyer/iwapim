@@ -42,6 +42,7 @@ def fetch_groups(yaml_path):
         engine = create_engine(db_url)
         query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1 ORDER BY group_id"
         df = pd.read_sql(query, engine)
+        print(", ".join(df['group_id'].tolist()))
         return df['group_id'].tolist()
     except Exception as e:
         print(f"*Error fetching groups: {e}")
