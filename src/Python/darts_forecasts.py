@@ -23,8 +23,8 @@ def generate_forecast_xgboost(data, forecast_days=90):
     # Initialize and fit the XGBoost model
     model = XGBModel(
         input_chunk_length=15,
-        output_chunk_length=30,
-        lags=[-1, -7]  # Add lagged variables for the model
+        output_chunk_length=7,
+        lags=[-7]  # Add lagged variables for the model
     )
     model.fit(train)
 
