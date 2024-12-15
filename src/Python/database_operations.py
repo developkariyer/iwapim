@@ -72,6 +72,7 @@ def fetch_group_data(group_id, yaml_path):
             # Remove the latest date if data might be incomplete
             latest_date = df['ds'].max()
             df = df[df['ds'] != latest_date]
+        print(df)
         return df
     except Exception as e:
         print(f"Error fetching data for group {group_id}: {e}")
