@@ -89,8 +89,6 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
     model.fit(data, freq='D')
     future = model.make_future_dataframe(data, periods=forecast_days)
     forecast = model.predict(future)
-    if 'yhat1' not in forecast.columns:
-        raise ValueError("'yhat1' is missing from the forecast data.")
     forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
     forecast_long = forecast[['ds'] + forecast_columns]
     forecast_melted = forecast_long.melt(
