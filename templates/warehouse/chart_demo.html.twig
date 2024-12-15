@@ -78,8 +78,16 @@
             $('#availableStock').text(data.availableStock);
             $('#forecastedStock').text(data.forecastedStock);
 
-            data.forecastedMinData = data.forecastedData.map(value => Math.max(0, value * 0.75));
-            data.forecastedMaxData = data.forecastedData.map(value => value * 1.25);
+            let size = data.forecastedData.length;
+            data.forecastedMinData = data.forecastedData.map((value, index) => {
+                let coefficient = 0.95 + (index / (size - 1)) * (0.05 - 0.95); // Transition from 0.95 to 0.05
+                return Math.max(0, value * coefficient); // Apply coefficient and ensure non-negative
+            });
+
+            data.forecastedMaxData = data.forecastedData.map((value, index) => {
+                let coefficient = 1.05 + (index / (size - 1)) * (1.95 - 1.05); // Transition from 1.05 to 1.95
+                return value * coefficient; // Apply coefficient
+            });
 
             // Render the chart
             const ctx = document.getElementById('chart1').getContext('2d');
