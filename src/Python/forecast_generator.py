@@ -77,6 +77,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         daily_seasonality=False,
         seasonality_mode='multiplicative',
         n_lags=10,
+        n_forecasts=forecast_days
     )
     #model = model.add_country_holidays(country_name='US')
     #model = model.add_events('ramadan')
@@ -86,7 +87,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         raise ValueError("Fetched data is not a DataFrame.")
     #data = model.create_df_with_events(data, df_events)
     model.fit(data, freq='D')
-    future = model.make_future_dataframe(data, periods=forecast_days)
+    future = model.make_future_dataframe(data, periods=forecast_days, n_historic_predictions=False)
     forecast = model.predict(future)
     if 'yhat1' not in forecast.columns:
         raise ValueError("'yhat1' is missing from the forecast data.")
