@@ -21,7 +21,11 @@ def generate_forecast_xgboost(data, forecast_days=90):
     train = series[:-forecast_days]
 
     # Initialize and fit the XGBoost model
-    model = XGBModel(input_chunk_length=30, output_chunk_length=forecast_days)
+    model = XGBModel(
+        input_chunk_length=30,
+        output_chunk_length=forecast_days,
+        lags=[-1, -7, -30]  # Add lagged variables for the model
+    )
     model.fit(train)
 
     # Forecast the future
