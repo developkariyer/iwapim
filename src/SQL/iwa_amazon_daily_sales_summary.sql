@@ -11,7 +11,7 @@ CREATE TEMPORARY TABLE temp_sales_data (
 ) AS
 SELECT
     JSON_EXTRACT(o.json, '$.OrderItems[*].ASIN') AS asin_array,
-    JSON_EXTRACT(o.json, '$.OrderItems[*].QuantityShipped') AS quantity_array,
+    JSON_EXTRACT(o.json, '$.OrderItems[*].QuantityOrdered') AS quantity_array,
     REPLACE(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(o.json, '$.PurchaseDate')), 'T', ' '), 'Z', '') AS purchase_date,
     JSON_UNQUOTE(JSON_EXTRACT(o.json, '$.SalesChannel')) AS sales_channel,
     o.order_id
@@ -19,7 +19,7 @@ FROM
     iwa_marketplace_orders o
 WHERE
     REGEXP_LIKE(o.order_id, '^[0-9]{3}-[0-9]{7}-[0-9]{7}$') -- Validate Amazon Order ID format
-  AND JSON_UNQUOTE(JSON_EXTRACT(o.json, '$.OrderStatus')) = 'Shipped';
+  AND JSON_UNQUOTE(JSON_EXTRACT(o.json, '$.OrderStatus')) <> 'Cancelled';
 
 SELECT "Step 2: Create temp_expanded_sales temporary table";
 DROP TEMPORARY TABLE IF EXISTS temp_expanded_sales;
