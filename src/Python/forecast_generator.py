@@ -10,7 +10,17 @@ import numpy as np
 from neuralprophet import NeuralProphet
 from config import output_path
 import os
+import torch
 
+def save_neuralprophet_model(model, file_path):
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    torch.save(model.model.state_dict(), file_path)
+    print(f"Model saved to: {file_path}")
+
+def load_neuralprophet_model(model, file_path):
+    model.model.load_state_dict(torch.load(file_path))
+    print(f"Model loaded from: {file_path}")
+    return model
 
 def generate_group_model_neuralprophet(data, group_id):
     try:
@@ -30,7 +40,7 @@ def generate_group_model_neuralprophet(data, group_id):
         model.fit(data, freq='D')
         os.makedirs(output_path, exist_ok=True)
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}.np')
-        model.save(model_path)
+        save_neuralprophet_model(model, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
