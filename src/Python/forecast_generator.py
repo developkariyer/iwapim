@@ -23,12 +23,12 @@ def generate_group_forecast_neuralprophet(data, group_id):
             weekly_seasonality=True,
             daily_seasonality=False,
         )
-        print(f"Training model for group {group_id}...")
+        print(f"*Training model for group {group_id}...")
         model.fit(data, freq='D')
         os.makedirs(output_path, exist_ok=True)
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}.np')
         model.save(model_path)
-        print(f"Model for group {group_id} saved at: {model_path}")
+        print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
         print(data)

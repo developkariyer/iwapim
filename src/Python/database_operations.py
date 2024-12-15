@@ -24,7 +24,7 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None, iwasku=None):
         df = pd.read_sql(base_query, engine)
         return df
     except Exception as e:
-        print(f"Error fetching ASIN/Sales Channel pairs: {e}")
+        print(f"*Error fetching ASIN/Sales Channel pairs: {e}")
         return pd.DataFrame()
     finally:
         if engine:
@@ -44,7 +44,7 @@ def fetch_groups(yaml_path):
         df = pd.read_sql(query, engine)
         return df['group_id'].tolist()
     except Exception as e:
-        print(f"Error fetching groups: {e}")
+        print(f"*Error fetching groups: {e}")
         return []
     finally:
         if engine:
@@ -75,7 +75,7 @@ def fetch_group_data(group_id, yaml_path):
         print(df)
         return df
     except Exception as e:
-        print(f"Error fetching data for group {group_id}: {e}")
+        print(f"*Error fetching data for group {group_id}: {e}")
         return pd.DataFrame()
     finally:
         if engine:
