@@ -21,9 +21,9 @@ def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
             trend_global_local="global",    # Shared trends across all IDs
             season_global_local="global",   # Shared seasonality across all IDs
             #changepoints_range=0.8,         # Focus more on recent data for changepoints
-            #seasonality_reg=0.1,           # Reduce regularization on seasonality
-            #epochs=120,                      # Longer training for richer datasets
-            #trend_reg=10,                    # Smooth but responsive trends
+            #seasonality_reg=0.1,            # Reduce regularization on seasonality
+            #epochs=120,                     # Longer training for richer datasets
+            #trend_reg=10,                   # Smooth but responsive trends
         )
         model = model.add_country_holidays(country_name='US')
         if islamic:
@@ -41,8 +41,21 @@ def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
 def generate_forecast_neuralprophet(model, df, forecast_days=90):
     set_log_level("ERROR")
     try:
+        # Create future dataframe
         future = model.make_future_dataframe(df=df, periods=forecast_days)
+
+        # Predict future values
         forecast = model.predict(future)
+
+        # Denormalize predictions if normalization was applied during training
+        if model.config_train.normalization:
+            y_mean = model.config_train.data_params["y"]["mean"]
+            y_std = model.config_train.data_params["y"]["std"]
+            forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
+            for col in forecast_columns:
+                forecast[col] = forecast[col] * y_std + y_mean
+
+        # Process forecast for output
         forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
         forecast_long = forecast[['ds'] + forecast_columns]
         forecast_melted = forecast_long.melt(
@@ -59,6 +72,7 @@ def generate_forecast_neuralprophet(model, df, forecast_days=90):
     except Exception as e:
         print(f"Error generating forecast: {e}")
         quit()
+
 
 
 
