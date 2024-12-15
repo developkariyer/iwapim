@@ -8,7 +8,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from neuralprophet import NeuralProphet
-from config import output_path
+from config import output_path, yaml_path
 import os
 import torch
 import plotly.io as pio
