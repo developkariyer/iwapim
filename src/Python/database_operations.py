@@ -31,6 +31,57 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None, iwasku=None):
             engine.dispose()
 
 
+def fetch_groups(yaml_path):
+    engine = None
+    try:
+        mysql_config = get_mysql_config(yaml_path)
+        db_url = (
+            f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@"
+            f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        )
+        engine = create_engine(db_url)
+        query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1 ORDER BY group_id"
+        df = pd.read_sql(query, engine)
+        return df['group_id'].tolist()
+    except Exception as e:
+        print(f"Error fetching groups: {e}")
+        return []
+    finally:
+        if engine:
+            engine.dispose()
+
+
+def fetch_group_data(group_id, yaml_path):
+    engine = None
+    try:
+        mysql_config = get_mysql_config(yaml_path)
+        db_url = (
+            f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@"
+            f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
+        )
+        engine = create_engine(db_url)
+        query = (
+            "SELECT sale_date AS ds, SUM(total_quantity) AS y "
+            "FROM iwa_amazon_daily_sales_summary "
+            "WHERE LEFT(iwasku, 2) = %s AND data_source = 1 "
+            "GROUP BY sale_date "
+            "ORDER BY sale_date ASC"
+        )
+        df = pd.read_sql(query, engine, params=(group_id,))
+        if not df.empty:
+            # Remove the latest date if data might be incomplete
+            latest_date = df['ds'].max()
+            df = df[df['ds'] != latest_date]
+        return df
+    except Exception as e:
+        print(f"Error fetching data for group {group_id}: {e}")
+        return pd.DataFrame()
+    finally:
+        if engine:
+            engine.dispose()
+
+
+
 def fetch_data(asin, sales_channel, yaml_path):
     engine = None
     try:
@@ -49,6 +100,8 @@ def fetch_data(asin, sales_channel, yaml_path):
     finally:
         if engine:
             engine.dispose()
+
+
 
 
 def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):

@@ -8,6 +8,30 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from neuralprophet import NeuralProphet
+from config import output_path
+import os
+
+
+def generate_group_forecast_neuralprophet(data, group_id):
+    try:
+        if data.empty:
+            raise ValueError("Input data is empty. Cannot generate a forecast.")
+        if not isinstance(data, pd.DataFrame):
+            raise ValueError("Fetched data is not a DataFrame.")
+        model = NeuralProphet(
+            yearly_seasonality=True,
+            weekly_seasonality=False,
+            daily_seasonality=,
+            n_lags=90,
+        )
+        print(f"Training model for group {group_id}...")
+        model.fit(data, freq='D')
+        os.makedirs(output_path, exist_ok=True)
+        model_path = os.path.join(output_path, f'group_forecast_model_{group_id}.np')
+        model.save(model_path)
+        print(f"Model for group {group_id} saved at: {model_path}")
+    except Exception as e:
+        print(f"Error training and saving model for group {group_id}: {e}")
 
 
 def generate_forecast_neuralprophet(data, forecast_days=90):
@@ -52,6 +76,16 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
     forecast_final = forecast_melted[['ds', 'yhat']]
     print(forecast_final)
     return forecast_final[['ds', 'yhat']]
+
+
+
+
+
+
+
+
+
+
 
 
 
