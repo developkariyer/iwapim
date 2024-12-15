@@ -10,9 +10,8 @@ from neuralprophet import NeuralProphet, set_log_level
 from config import output_path, yaml_path, islamic_events
 import os
 
-set_log_level("ERROR")
-
 def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
+    set_log_level("ERROR")
     try:
         print("*Initializing global NeuralProphet model...")
         model = NeuralProphet(
@@ -39,6 +38,7 @@ def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
 
 
 def generate_forecast_neuralprophet(model, df, forecast_days=90):
+    set_log_level("ERROR")
     try:
         future = model.make_future_dataframe(df=df, periods=forecast_days)
         forecast = model.predict(future)
