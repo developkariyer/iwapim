@@ -78,17 +78,6 @@
             $('#availableStock').text(data.availableStock);
             $('#forecastedStock').text(data.forecastedStock);
 
-            let size = data.forecastedData.length;
-            data.forecastedMinData = data.forecastedData.map((value, index) => {
-                let coefficient = 0.05 + (index / (size - 1)) * (0.95 - 0.05); // Transition from 0.05 to 0.95
-                return Math.max(0, value * coefficient); // Apply coefficient and ensure non-negative
-            });
-
-            data.forecastedMaxData = data.forecastedData.map((value, index) => {
-                let coefficient = 1.05 + (index / (size - 1)) * (1.95 - 1.05); // Transition from 1.05 to 1.95
-                return value * coefficient; // Apply coefficient
-            });
-
             // Render the chart
             const ctx = document.getElementById('chart1').getContext('2d');
             if (charts['chart1']) {
@@ -155,16 +144,6 @@
                     fill: false,
                 },
                 {
-                    label: "+",
-                    data: data.forecastedMaxData,
-                    borderColor: "rgba(0, 0, 255, 0.3)",
-                    backgroundColor: "rgba(0, 0, 255, 0.3)",
-                    tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false,
-                },
-                {
                     label: "Gelecek 90 gün",
                     data: data.forecastedData,
                     borderColor: "blue",
@@ -173,16 +152,6 @@
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
-                },
-                {
-                    label: "-",
-                    data: data.forecastedMinData,
-                    borderColor: "rgba(0, 0, 255, 0.3)",
-                    backgroundColor: "rgba(0, 0, 255, 0.3)",
-                    tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: +2,
                 },
             ];
 
