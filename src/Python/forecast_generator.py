@@ -12,10 +12,21 @@ from config import output_path
 import os
 import torch
 
+
 def save_neuralprophet_model(model, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    torch.save(model.model.state_dict(), file_path)
+    torch.save(model.model.state_dict(), file_path+".pt")
     print(f"Model saved to: {file_path}")
+    try:
+        print("Generating model components graph...")
+        fig = model.plot_components(data)
+        fig.savefig(file_path + ".png")
+        print(f"Model graph saved to: {file_path}.png")
+    except Exception as e:
+        print(f"Error generating or saving model graph: {e}")
+    finally:
+        plt.close('all')
+
 
 def load_neuralprophet_model(model, file_path):
     model.model.load_state_dict(torch.load(file_path))
@@ -39,7 +50,7 @@ def generate_group_model_neuralprophet(data, group_id):
         print(f"*Training model for group {group_id}...")
         model.fit(data, freq='D')
         os.makedirs(output_path, exist_ok=True)
-        model_path = os.path.join(output_path, f'group_forecast_model_{group_id}.np')
+        model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
         save_neuralprophet_model(model, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
