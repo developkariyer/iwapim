@@ -40,7 +40,7 @@ def fetch_groups(yaml_path, group_id=None):
             f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         )
         engine = create_engine(db_url)
-        query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1
+        query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1"
         if group_id:
             query += f" AND LEFT(iwasku, 2) = '{group_id}'"
         query += "ORDER BY group_id"
