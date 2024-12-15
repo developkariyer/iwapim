@@ -50,7 +50,13 @@ def fetch_group_data(group, sales_channel = None):
             query += "AND sales_channel = %s "
             params = (group+"%",sales_channel,)
         query += "GROUP BY sale_date, asin, sales_channel ORDER BY sale_date ASC"
-        return pd.read_sql(query, engine, params=params)
+        data = pd.read_sql(query, engine, params=params)
+        zero_ids = data.groupby("ID")["y"].apply(lambda x: (x == 0).all())
+        zero_ids_list = zero_ids[zero_ids].index.tolist()
+        print(f"IDs with all zero values: {zero_ids_list}")
+        filtered_data = data[~data["ID"].isin(zero_ids_list)]
+        print(f"Filtered data shape: {filtered_data.shape}")
+        return data
     except Exception as e:
         print(f"*Error fetching data for group: {e}")
         return pd.DataFrame()
