@@ -95,11 +95,12 @@ class WarehouseController extends FrontendController
         $twoYearsAgo = (new DateTime($yesterday))->modify('-640 days');
         $yesterdayDate = (new DateTime($yesterday));
         $queryData['start_previous_year'] = $twoYearsAgo->format('Y-m-d');
+        $queryData['yesterday'] = $yesterday;
 
         $salesData = $db->fetchAllAssociative(
             "SELECT sale_date, data_source, sum(total_quantity) AS total_quantity
                 FROM iwa_amazon_daily_sales_summary
-                WHERE $queryText AND sale_date >= :start_previous_year
+                WHERE $queryText AND sale_date >= :start_previous_year AND sale_date <= :yesterday
                 GROUP BY sale_date, data_source
                 ORDER BY sale_date",
             $queryData
