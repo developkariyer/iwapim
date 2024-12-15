@@ -12,6 +12,7 @@ from config import output_path
 import os
 import torch
 import plotly.io as pio
+from database_operations import fetch_group_data
 
 
 def save_neuralprophet_plot(model, forecast, file_path):
@@ -52,12 +53,10 @@ def load_neuralprophet_model(model, file_path):
 
 def generate_group_model_neuralprophet(data, group_id, forecast_days=90, load=False):
     try:
-        print("*Checking if data is empty...")
-        if data.empty:
-            raise ValueError("Input data is empty. Cannot generate a forecast.")
-        print("*Checking if data is a DataFrame...")
-        if not isinstance(data, pd.DataFrame):
-            raise ValueError("Fetched data is not a DataFrame.")
+        data = fetch_group_data(group_id, yaml_path)
+        if data.empty or data.dropna().shape[0] < 2 or data['y'].sum() == 0:
+            print(f"*Insufficient data for group {group_id}. Skipping...")
+            return
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
         print("*Initializing NeuralProphet model...")
         model = NeuralProphet(

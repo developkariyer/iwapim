@@ -15,13 +15,8 @@ def run_groups_forecast_pipeline(yaml_path, group_id=None, load=False):
         print("*No groups found. Exiting...")
         return
     for group_id in groups:
-        print(f"*Processing group {group_id}...")
-        data = fetch_group_data(group_id, yaml_path)
-        if data.empty or data.dropna().shape[0] < 2 or data['y'].sum() == 0:
-            print(f"*Insufficient data for group {group_id}. Skipping...")
-            continue
         print(f"*Generating forecast for group {group_id} using NeuralProphet...")
-        generate_group_model_neuralprophet(data, group_id, load=load)
+        generate_group_model_neuralprophet(group_id, load=load)
         print(f"*Forecast model saved for group {group_id}.")
 
 
