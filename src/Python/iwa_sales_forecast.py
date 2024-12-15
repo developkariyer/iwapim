@@ -31,6 +31,9 @@ def run_forecast_pipeline(group=None, forecast_days=90, max_processes=8, asin=No
             task = task_queue.pop(0)
             asin, sales_channel = task['asin'], task['sales_channel']
             df = data.query("ID == @asin + '_' + @sales_channel")[['ds', 'y', 'ID']].copy()
+            if df.empty or df.dropna().shape[0] < 2 or df['y'].sum() == 0:
+                print(f"*No data found for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
+                continue
             print(f"*Starting process for ASIN {asin}, Sales Channel {sales_channel}...")
             process = Process(target=worker_process_for_forecast_pipeline, args=(model, asin, sales_channel, df, forecast_days))
             process.start()
