@@ -31,7 +31,7 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None, iwasku=None):
             engine.dispose()
 
 
-def fetch_groups(yaml_path):
+def fetch_groups(yaml_path, group_id=None):
     engine = None
     try:
         mysql_config = get_mysql_config(yaml_path)
@@ -40,7 +40,10 @@ def fetch_groups(yaml_path):
             f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         )
         engine = create_engine(db_url)
-        query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1 ORDER BY group_id"
+        query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1
+        if group_id:
+            query += f" AND LEFT(iwasku, 2) = '{group_id}'"
+        query += "ORDER BY group_id"
         df = pd.read_sql(query, engine)
         print(", ".join(df['group_id'].tolist()))
         return df['group_id'].tolist()

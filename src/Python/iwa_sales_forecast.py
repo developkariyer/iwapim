@@ -7,9 +7,9 @@ from config import yaml_path
 #from darts_forecasts import generate_forecast_xgboost # too slow without GPU
 
 
-def run_groups_forecast_pipeline(yaml_path):
+def run_groups_forecast_pipeline(yaml_path, group_id=None):
     print("*Fetching groups...")
-    groups = fetch_groups(yaml_path)
+    groups = fetch_groups(yaml_path, group_id)
     print(f"*Found {len(groups)} groups.")
     if not groups:
         print("*No groups found. Exiting...")
@@ -69,10 +69,18 @@ def worker_process_for_forecast_pipeline(asin, sales_channel, yaml_path, forecas
 # Entry point for the script
 if __name__ == "__main__":
     args = sys.argv[1:]
-    groups_flag = any(arg == '--groups' for arg in args)  # Check for --groups flag
-    if groups_flag:
-        # Run group-based training/forecasting
-        print("*Running group-based forecast pipeline")
+
+    # Check for --group flag or --group=<value>
+    group_param = next((arg.split('=')[1] for arg in args if arg.startswith('--group=')), None)
+    groups_flag = any(arg == '--groups' for arg in args)
+
+    if group_param:
+        # Run group-based pipeline for a specific group
+        print(f"*Running group-based forecast pipeline for group: {group_param}")
+        run_groups_forecast_pipeline(yaml_path, group_param)  # Pass group_param to the pipeline
+    elif groups_flag:
+        # Run group-based pipeline for all groups
+        print("*Running group-based forecast pipeline for all groups")
         run_groups_forecast_pipeline(yaml_path)
     else:
         # Default to product-based processing

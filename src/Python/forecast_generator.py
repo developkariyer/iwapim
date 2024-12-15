@@ -14,12 +14,8 @@ import torch
 import plotly.io as pio
 
 
-def save_neuralprophet_model(model, data, forecast, file_path):
+def save_neuralprophet_plot(model, forecast, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    torch.save(model.model.state_dict(), file_path+".pt")
-    data.to_csv(file_path+".csv", index=False)
-    forecast.to_csv(file_path+"_forecast.csv", index=False)
-    print(f"Model saved to: {file_path}")
     try:
         print("Generating forecast plot...")
         model.set_plotting_backend("matplotlib")
@@ -28,6 +24,14 @@ def save_neuralprophet_model(model, data, forecast, file_path):
         print(f"Forecast plot saved to: {file_path}.png")
     except Exception as e:
         print(f"Error generating or saving forecast plot: {e}")
+
+
+def save_neuralprophet_model(model, data, forecast, file_path):
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    torch.save(model.model.state_dict(), file_path+".pt")
+    data.to_csv(file_path+".csv", index=False)
+    forecast.to_csv(file_path+"_forecast.csv", index=False)
+    print(f"Model saved to: {file_path}")
 
 
 def load_neuralprophet_model(model, file_path):
@@ -66,6 +70,7 @@ def generate_group_model_neuralprophet(data, group_id, forecast_days=90):
         forecast = model.predict(future)
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
         save_neuralprophet_model(model, data, forecast, model_path)
+        save_neuralprophet_plot(model, forecast, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
