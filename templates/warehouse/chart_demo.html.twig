@@ -78,6 +78,9 @@
             $('#availableStock').text(data.availableStock);
             $('#forecastedStock').text(data.forecastedStock);
 
+            data.forecastedMinData = data.forecastedData.map(value => Math.max(0, value * 0.75));
+            data.forecastedMaxData = data.forecastedData.map(value => value * 1.25);
+
             // Render the chart
             const ctx = document.getElementById('chart1').getContext('2d');
             if (charts['chart1']) {
@@ -144,6 +147,16 @@
                     fill: false,
                 },
                 {
+                    label: "+",
+                    data: data.forecastedMaxData,
+                    borderColor: "rgba(0, 0, 255, 0.3)",
+                    backgroundColor: "rgba(0, 0, 255, 0.3)",
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                },
+                {
                     label: "Gelecek 90 gün",
                     data: data.forecastedData,
                     borderColor: "blue",
@@ -152,6 +165,16 @@
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
+                },
+                {
+                    label: "-",
+                    data: data.forecastedMinData,
+                    borderColor: "rgba(0, 0, 255, 0.3)",
+                    backgroundColor: "rgba(0, 0, 255, 0.3)",
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: +2,
                 },
             ];
 
