@@ -12,7 +12,7 @@ from config import output_path
 import os
 
 
-def generate_group_forecast_neuralprophet(data, group_id):
+def generate_group_model_neuralprophet(data, group_id):
     try:
         print("*Checking if data is empty...")
         if data.empty:

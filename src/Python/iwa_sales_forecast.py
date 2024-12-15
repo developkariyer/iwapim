@@ -2,7 +2,7 @@ import sys, os, logging
 from multiprocessing import Process
 from collections import defaultdict
 from database_operations import fetch_pairs, fetch_data, insert_forecast_data, delete_forecast_data, fetch_groups, fetch_group_data
-from forecast_generator import generate_forecast_neuralprophet, generate_group_forecast_neuralprophet
+from forecast_generator import generate_forecast_neuralprophet, generate_group_model_neuralprophet
 from config import yaml_path
 #from darts_forecasts import generate_forecast_xgboost # too slow without GPU
 
@@ -21,7 +21,7 @@ def run_groups_forecast_pipeline(yaml_path):
             print(f"*Insufficient data for group {group_id}. Skipping...")
             continue
         print(f"*Generating forecast for group {group_id} using NeuralProphet...")
-        generate_group_forecast_neuralprophet(data, group_id)
+        generate_group_model_neuralprophet(data, group_id)
         print(f"*Forecast model saved for group {group_id}.")
 
 
