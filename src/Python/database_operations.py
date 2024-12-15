@@ -56,8 +56,7 @@ def fetch_group_data(group, sales_channel = None):
         valid_ids = id_non_zero_counts[id_non_zero_counts >= 50].index.tolist()
         print(f"IDs with at least 50 non-zero values: {valid_ids}")
         # Filter the data to include only valid IDs
-        filtered_data = data[data["ID"].isin(valid_ids)]
-        print(f"Filtered data shape: {filtered_data.shape}")        return filtered_data
+        return data[data["ID"].isin(valid_ids)]
     except Exception as e:
         print(f"*Error fetching data for group: {e}")
     finally:
