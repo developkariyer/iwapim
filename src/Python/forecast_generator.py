@@ -101,8 +101,8 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
             forecast.loc[i, 'yhat'] = (day_before + last_year_half) / 2
     '''
     print(f"Forecast DataFrame: {forecast}")
-    return forecast[['ds', 'yhat']]
-
+    filtered_forecast = forecast[forecast['yhat'].notnull()]
+    return filtered_forecast[['ds', 'yhat']]
 
 
 
