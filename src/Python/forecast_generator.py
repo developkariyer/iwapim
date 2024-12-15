@@ -13,9 +13,10 @@ import os
 import torch
 
 
-def save_neuralprophet_model(model, file_path, data):
+def save_neuralprophet_model(model, data, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     torch.save(model.model.state_dict(), file_path+".pt")
+    data.to_csv(file_path+".csv", index=False)
     print(f"Model saved to: {file_path}")
     try:
         print("Generating model components graph...")
@@ -29,9 +30,18 @@ def save_neuralprophet_model(model, file_path, data):
 
 
 def load_neuralprophet_model(model, file_path):
+    model_file = file_path + ".pt"
+    data_file = file_path + ".csv"
+    if not os.path.exists(model_file) or not os.path.exists(data_file):
+        raise FileNotFoundError(f"Model files not found at: {file_path}")
+    # load model
     model.model.load_state_dict(torch.load(file_path))
     print(f"Model loaded from: {file_path}")
-    return model
+    # load data
+    data = pd.read_csv(data_file)
+    print(f"Data loaded from: {data_file}")
+    return model, data
+
 
 def generate_group_model_neuralprophet(data, group_id):
     try:
@@ -51,7 +61,7 @@ def generate_group_model_neuralprophet(data, group_id):
         model.fit(data, freq='D')
         os.makedirs(output_path, exist_ok=True)
         model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
-        save_neuralprophet_model(model, model_path, data)
+        save_neuralprophet_model(model, data, model_path)
         print(f"*Model for group {group_id} saved at: {model_path}")
     except Exception as e:
         print(f"Error training and saving model for group {group_id}: {e}")
