@@ -21,23 +21,19 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
             "2024-03-10",  # 1445 Hijri
             "2025-02-28",  # 1446 Hijri
         ]),
-        "lower_window": 0,  # Event starts on the given date
-        "upper_window": 29  # Extends for 30 days
     })
     model = NeuralProphet(
-        n_changepoints=3,
         yearly_seasonality=True,
         weekly_seasonality=True,
         daily_seasonality=False,
-        seasonality_mode='multiplicative',
     )
     model = model.add_country_holidays(country_name='US')
-    #model = model.add_events('ramadan')
     if isinstance(data, pd.DataFrame):
         print(f"Fetched data columns: {data.columns}")
     else:
         raise ValueError("Fetched data is not a DataFrame.")
-    #data = model.create_df_with_events(data, df_events)
+    model = model.add_events(['ramadan'])
+    data = model.create_df_with_events(data, df_events)
     model.fit(data, freq='D')
     future = model.make_future_dataframe(data, periods=forecast_days)
     forecast = model.predict(future)
