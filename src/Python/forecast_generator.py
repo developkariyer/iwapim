@@ -102,6 +102,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
     '''
     print(f"Forecast DataFrame: {forecast}")
     filtered_forecast = forecast[forecast['yhat'].notnull()]
+    print(f"Forecast DataFrame: {filtered_forecast}")
     return filtered_forecast[['ds', 'yhat']]
 
 
