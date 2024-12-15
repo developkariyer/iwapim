@@ -3,6 +3,7 @@ from multiprocessing import Process
 from collections import defaultdict
 from database_operations import fetch_pairs, fetch_data, insert_forecast_data, delete_forecast_data
 from forecast_generator import generate_forecast_neuralprophet, generate_forecast_using_groups
+from darts_forecasts import generate_forecast_xgboost
 
 def run_forecast_pipeline(yaml_path, max_processes=8, asin=None, sales_channel=None, iwasku=None):
     print("Fetching ASIN/Sales Channel pairs...")
@@ -35,12 +36,16 @@ def worker_process(asin, sales_channel, yaml_path, forecast_days=90):
         if data.empty or data.dropna().shape[0] < 2 or data['y'].sum() == 0:
             print(f"Insufficient data for ASIN {asin}, Sales Channel {sales_channel}. Skipping...")
             return
+        '''
         if True: #(data['y'] > 1e-10).sum(axis=0) > 100:
             print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel} using NeuralProphet...")
             forecast = generate_forecast_neuralprophet(data, forecast_days=forecast_days)
         else:
             print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel} using Grouped Forecast...")
             foreast = generate_forecast_using_groups(data, forecast_days=forecast_days)
+        '''
+        print(f"Generating forecast for ASIN {asin}, Sales Channel {sales_channel} using XGBoost...")
+        forecast = generate_forecast_xgboost(data, forecast_days=forecast_days)
         insert_forecast_data(forecast, asin, sales_channel, yaml_path)
         print(f"Forecast data saved for ASIN {asin}, Sales Channel {sales_channel}.")
     except Exception as e:
