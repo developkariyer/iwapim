@@ -76,7 +76,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         weekly_seasonality=True,
         daily_seasonality=False,
         seasonality_mode='multiplicative',
-        n_lags=10,
+        n_lags=5,
         n_forecasts=forecast_days
     )
     #model = model.add_country_holidays(country_name='US')
