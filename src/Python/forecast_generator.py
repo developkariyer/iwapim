@@ -36,6 +36,7 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
         raise ValueError("Fetched data is not a DataFrame.")
     model = model.add_events(['ramadan'])
     data = model.create_df_with_events(data, df_events)
+    model = model.add_lagged_regressor(names=["y"], lags=[365])
     model.fit(data, freq='D')
     future = model.make_future_dataframe(data, periods=forecast_days)
     forecast = model.predict(future)
