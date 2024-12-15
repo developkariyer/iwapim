@@ -22,7 +22,6 @@ def generate_group_forecast_neuralprophet(data, group_id):
             yearly_seasonality=True,
             weekly_seasonality=True,
             daily_seasonality=False,
-            n_lags=90,
         )
         print(f"Training model for group {group_id}...")
         model.fit(data, freq='D')
