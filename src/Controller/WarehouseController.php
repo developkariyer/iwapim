@@ -83,9 +83,9 @@ class WarehouseController extends FrontendController
         $queryData = ['iwasku' => $iwasku, 'sales_channel' => $salesChannel];
 
         $db = Db::get();
-        $yesterdayQuery = "SELECT MAX(sale_date) AS latest_date
+        $yesterdayQuery = "SELECT DISTINCT sale_date 
             FROM iwa_amazon_daily_sales_summary
-            WHERE data_source = 1 AND $queryText";
+            WHERE data_source = 1 AND $queryText ORDER BY sale_date DESC LIMIT 1 OFFSET 1";
         $yesterday = $db->fetchOne($yesterdayQuery, $queryData);
 
         if (!$yesterday) {
