@@ -21,6 +21,8 @@ def generate_forecast_neuralprophet(data, forecast_days=90):
             "2024-03-10",  # 1445 Hijri
             "2025-02-28",  # 1446 Hijri
         ]),
+        "lower_window": -7,
+        "upper_window": 29
     })
     model = NeuralProphet(
         yearly_seasonality=True,
