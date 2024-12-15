@@ -5,22 +5,25 @@ import math
 import pymysql
 
 
-def fetch_pairs(yaml_path, asin=None, sales_channel=None, iwasku=None):
+def fetch_pairs(group=None, asin=None, sales_channel=None, iwasku=None):
     engine = None
     try:
-        mysql_config = get_mysql_config(yaml_path)
+        mysql_config = get_mysql_config()
         db_url = (
             f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@"
             f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         )
         engine = create_engine(db_url)
         base_query = "SELECT DISTINCT asin, sales_channel FROM iwa_amazon_daily_sales_summary WHERE data_source = 1"
+        if group:
+            base_query += f" AND iwasku LIKE '{group}%'"
         if asin:
             base_query += f" AND asin = '{asin}'"
         if sales_channel:
             base_query += f" AND sales_channel = '{sales_channel}'"
         if iwasku:
             base_query += f" AND iwasku = '{iwasku}'"
+        base_query += " ORDER BY asin, sales_channel"
         df = pd.read_sql(base_query, engine)
         return df
     except Exception as e:
@@ -31,54 +34,25 @@ def fetch_pairs(yaml_path, asin=None, sales_channel=None, iwasku=None):
             engine.dispose()
 
 
-def fetch_groups(yaml_path, group_id=None):
+
+def fetch_group_data(group, sales_channel = None):
     engine = None
     try:
-        mysql_config = get_mysql_config(yaml_path)
+        mysql_config = get_mysql_config()
         db_url = (
             f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@"
             f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         )
         engine = create_engine(db_url)
-        query = "SELECT DISTINCT LEFT(iwasku, 2) AS group_id FROM iwa_amazon_daily_sales_summary WHERE data_source = 1"
-        if group_id:
-            query += f" AND LEFT(iwasku, 2) = '{group_id}'"
-        query += "ORDER BY group_id"
-        df = pd.read_sql(query, engine)
-        print(", ".join(df['group_id'].tolist()))
-        return df['group_id'].tolist()
+        params = (group+"%",)
+        query = "SELECT sale_date AS ds, SUM(total_quantity) AS y, CONCAT(asin, '_', sales_channel) AS ID FROM iwa_amazon_daily_sales_summary WHERE iwasku LIKE %s AND data_source = 1 "
+        if sales_channel:
+            query += "AND sales_channel = %s "
+            params = (group+"%",sales_channel,)
+        query += "GROUP BY sale_date, asin, sales_channel ORDER BY sale_date ASC"
+        return pd.read_sql(query, engine, params=params)
     except Exception as e:
-        print(f"*Error fetching groups: {e}")
-        return []
-    finally:
-        if engine:
-            engine.dispose()
-
-
-def fetch_group_data(group_id, yaml_path):
-    engine = None
-    try:
-        mysql_config = get_mysql_config(yaml_path)
-        db_url = (
-            f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@"
-            f"{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
-        )
-        engine = create_engine(db_url)
-        query = (
-            "SELECT sale_date AS ds, SUM(total_quantity) AS y "
-            "FROM iwa_amazon_daily_sales_summary "
-            "WHERE LEFT(iwasku, 2) = %s AND data_source = 1 "
-            "GROUP BY sale_date "
-            "ORDER BY sale_date ASC"
-        )
-        df = pd.read_sql(query, engine, params=(group_id,))
-        if not df.empty:
-            # Remove the latest date if data might be incomplete
-            latest_date = df['ds'].max()
-            df = df[df['ds'] != latest_date]
-        return df
-    except Exception as e:
-        print(f"*Error fetching data for group {group_id}: {e}")
+        print(f"*Error fetching data for group: {e}")
         return pd.DataFrame()
     finally:
         if engine:
@@ -86,10 +60,10 @@ def fetch_group_data(group_id, yaml_path):
 
 
 
-def fetch_data(asin, sales_channel, yaml_path):
+def fetch_data(asin, sales_channel):
     engine = None
     try:
-        mysql_config = get_mysql_config(yaml_path)
+        mysql_config = get_mysql_config()
         db_url = f"mysql+mysqlconnector://{mysql_config['user']}:{mysql_config['password']}@{mysql_config['host']}:{mysql_config['port']}/{mysql_config['database']}"
         engine = create_engine(db_url)
         query = "SELECT sale_date AS ds, total_quantity AS y FROM iwa_amazon_daily_sales_summary WHERE asin = %s AND sales_channel = %s AND data_source = 1 ORDER BY sale_date ASC;"
@@ -108,13 +82,13 @@ def fetch_data(asin, sales_channel, yaml_path):
 
 
 
-def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
+def insert_forecast_data(forecast_data, asin, sales_channel):
     required_columns = {'ds', 'yhat'}
     if not required_columns.issubset(forecast_data.columns):
         raise ValueError(f"Forecast data must contain columns: {required_columns}")
     connection = None
     try:
-        mysql_config = get_mysql_config(yaml_path)
+        mysql_config = get_mysql_config()
         connection = pymysql.connect(
             host=mysql_config['host'],
             user=mysql_config['user'],
@@ -165,10 +139,10 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
             connection.close()
 
 
-def delete_forecast_data(asin, sales_channel, yaml_path):
+def delete_forecast_data(asin, sales_channel):
     conn = None
     try:
-        mysql_config = get_mysql_config(yaml_path)
+        mysql_config = get_mysql_config()
         connection = pymysql.connect(
             host=mysql_config['host'],
             user=mysql_config['user'],

@@ -1,6 +1,7 @@
 import yaml
+from config import yaml_path
 
-def get_mysql_config(yaml_path):
+def get_mysql_config():
     """
     Parses the Pimcore YAML configuration file to extract MySQL connection details.
 

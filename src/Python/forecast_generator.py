@@ -5,126 +5,55 @@ import pandas as pd
 import logging
 import math
 #from pmdarima import auto_arima
-import matplotlib.pyplot as plt
 import numpy as np
 from neuralprophet import NeuralProphet
-from config import output_path, yaml_path
+from config import output_path, yaml_path, islamic_events
 import os
-import torch
-import plotly.io as pio
-from database_operations import fetch_group_data
 
 
-def save_neuralprophet_plot(model, forecast, file_path):
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
     try:
-        print("Generating forecast plot...")
-        model.set_plotting_backend("matplotlib")
-        fig = model.plot(forecast)
-        fig.savefig(file_path + ".png")
-        print(f"Forecast plot saved to: {file_path}.png")
-    except Exception as e:
-        print(f"Error generating or saving forecast plot: {e}")
-
-
-def save_neuralprophet_model(model, data, forecast, file_path):
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    torch.save(model.model.state_dict(), file_path+".pt")
-    data.to_csv(file_path+".csv", index=False)
-    forecast.to_csv(file_path+"_forecast.csv", index=False)
-    print(f"Model saved to: {file_path}")
-
-
-def load_neuralprophet_model(model, file_path):
-    model_file = file_path + ".pt"
-    data_file = file_path + ".csv"
-    forecast_file = file_path + "_forecast.csv"
-    if not os.path.exists(model_file) or not os.path.exists(data_file) or not os.path.exists(forecast_file):
-        raise FileNotFoundError(f"Model files not found at: {file_path}")
-    # load model
-    model.model.load_state_dict(torch.load(model_file))
-    print(f"Model loaded from: {file_path}")
-    # load data
-    data = pd.read_csv(data_file)
-    forecast = pd.read_csv(forecast_file)
-    print(f"Data loaded from: {file_path}")
-    return model, data, forecast
-
-
-def generate_group_model_neuralprophet(group_id, forecast_days=90, load=False):
-    try:
-        data = fetch_group_data(group_id, yaml_path)
-        if data.empty or data.dropna().shape[0] < 2 or data['y'].sum() == 0:
-            print(f"*Insufficient data for group {group_id}. Skipping...")
-            return
-        model_path = os.path.join(output_path, f'group_forecast_model_{group_id}')
-        print("*Initializing NeuralProphet model...")
+        print("*Initializing global NeuralProphet model...")
         model = NeuralProphet(
-            yearly_seasonality=True,
-            weekly_seasonality=True,
-            daily_seasonality=False,
+            yearly_seasonality=True,        # Capture yearly seasonality
+            weekly_seasonality=True,        # Capture weekly patterns
+            daily_seasonality=False,        # Avoid overfitting to daily noise
+            trend_global_local="global",    # Shared trends across all IDs
+            season_global_local="global",   # Shared seasonality across all IDs
+            changepoints_range=0.9,         # Focus more on recent data for changepoints
+            epochs=50,                      # Longer training for richer datasets
+            trend_reg=5,                    # Smooth but responsive trends
         )
-        # check both .pt, .csv and _forecast.csv files exist
-        if load and os.path.exists(model_path + ".pt") and os.path.exists(model_path + ".csv") and os.path.exists(model_path + "_forecast.csv"):
-            print(f"*Loading existing model for group {group_id}...")
-            model, data, forecast = load_neuralprophet_model(model, model_path)
-            print(f"*Model for group {group_id} loaded successfully. Generating plot...")
-            save_neuralprophet_plot(model, forecast, model_path)
-            return
-        print(f"*Training model for group {group_id}...")
+        model = model.add_country_holidays(country_name='US')
+        if islamic:
+            print(f"*Finetuning global model with Islamic holidays...")
+            model = model.add_events(['ramadan'])
+            data = model.create_df_with_events(data, islamic_events)
+        print(f"*Training global model...")
         model.fit(data, freq='D')
-        future = model.make_future_dataframe(data, periods=forecast_days)
-        forecast = model.predict(future)
-        save_neuralprophet_model(model, data, forecast, model_path)
-        save_neuralprophet_plot(model, forecast, model_path)
-        print(f"*Model for group {group_id} saved at: {model_path}")
+        return model
     except Exception as e:
-        print(f"Error training and saving model for group {group_id}: {e}")
+        print(f"Error training and saving global model: {e}")
         print(data)
 
 
-def generate_forecast_neuralprophet(data, forecast_days=90):
-    if data.empty:
-        raise ValueError("Input data is empty. Cannot generate a forecast.")
-    df_events = pd.DataFrame({
-        "event": "ramadan",
-        "ds": pd.to_datetime([
-            "2022-04-02",  # 1443 Hijri
-            "2023-03-23",  # 1444 Hijri
-            "2024-03-10",  # 1445 Hijri
-            "2025-02-28",  # 1446 Hijri
-        ]),
-        "lower_window": -7,
-        "upper_window": 29
-    })
-    model = NeuralProphet(
-        yearly_seasonality=True,
-        weekly_seasonality=True,
-        daily_seasonality=False,
-    )
-    model = model.add_country_holidays(country_name='US')
-    if isinstance(data, pd.DataFrame):
-        print(f"Fetched data columns: {data.columns}")
-    else:
-        raise ValueError("Fetched data is not a DataFrame.")
-    model = model.add_events(['ramadan'])
-    data = model.create_df_with_events(data, df_events)
-    model.fit(data, freq='D')
-    future = model.make_future_dataframe(data, periods=forecast_days)
-    forecast = model.predict(future)
-    forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
-    forecast_long = forecast[['ds'] + forecast_columns]
-    forecast_melted = forecast_long.melt(
-        id_vars='ds',
-        value_vars=forecast_columns,
-        var_name='step',
-        value_name='yhat'
-    )
-    forecast_melted = forecast_melted[forecast_melted['yhat'].notna()]
-    forecast_melted = forecast_melted.sort_values(['ds', 'step']).reset_index(drop=True)
-    forecast_final = forecast_melted[['ds', 'yhat']]
-    print(forecast_final)
-    return forecast_final[['ds', 'yhat']]
+def generate_forecast_neuralprophet(model, df, forecast_days=90):
+    try:
+        future = model.make_future_dataframe(df=df, periods=forecast_days)
+        forecast = model.predict(future)
+        forecast_columns = [col for col in forecast.columns if col.startswith("yhat")]
+        forecast_long = forecast[['ds'] + forecast_columns]
+        forecast_melted = forecast_long.melt(
+            id_vars='ds',
+            value_vars=forecast_columns,
+            var_name='step',
+            value_name='yhat'
+        )
+        forecast_melted = forecast_melted[forecast_melted['yhat'].notna()]
+        forecast_melted = forecast_melted.sort_values(['ds', 'step']).reset_index(drop=True)
+        forecast_final = forecast_melted[['ds', 'yhat']]
+        print(forecast_final)
+        return forecast_final[['ds', 'yhat']]
 
 
 
