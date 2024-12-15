@@ -14,7 +14,6 @@ import torch
 import plotly.io as pio
 
 
-
 def save_neuralprophet_model(model, data, forecast, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     torch.save(model.model.state_dict(), file_path+".pt")
@@ -23,9 +22,9 @@ def save_neuralprophet_model(model, data, forecast, file_path):
     print(f"Model saved to: {file_path}")
     try:
         print("Generating forecast plot...")
-        model.set_plotting_backend("plotly-static")
+        model.set_plotting_backend("matplotlib")
         fig = model.plot(forecast)
-        pio.write_image(fig, file_path + ".png")  # Save the plot as a PNG file
+        fig.savefig(file_path + ".png")
         print(f"Forecast plot saved to: {file_path}.png")
     except Exception as e:
         print(f"Error generating or saving forecast plot: {e}")
