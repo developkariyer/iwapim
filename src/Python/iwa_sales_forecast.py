@@ -65,4 +65,4 @@ if __name__ == "__main__":
     sales_channel = next((arg.split('=')[1] for arg in args if arg.startswith('--channel=')), None)
     iwasku = next((arg.split('=')[1] for arg in args if arg.startswith('--iwasku=')), None)
     print(f"*Running forecast pipeline using group {group}, ASIN {asin}, Sales Channel {sales_channel}, IWASKU {iwasku}...")
-    run_forecast_pipeline(group=group, max_processes=1, forecast_days=90, asin=asin, sales_channel=sales_channel, iwasku=iwasku)
+    run_forecast_pipeline(group=group, max_processes=6, forecast_days=90, asin=asin, sales_channel=sales_channel, iwasku=iwasku)
