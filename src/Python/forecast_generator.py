@@ -11,6 +11,8 @@ from neuralprophet import NeuralProphet
 from config import output_path
 import os
 import torch
+import plotly.io as pio
+
 
 
 def save_neuralprophet_model(model, data, future, file_path):
@@ -20,14 +22,13 @@ def save_neuralprophet_model(model, data, future, file_path):
     future.to_csv(file_path+"_future.csv", index=False)
     print(f"Model saved to: {file_path}")
     try:
-        print("Generating model components graph...")
-        fig = model.plot_components(data)
-        fig.savefig(file_path + ".png")
-        print(f"Model graph saved to: {file_path}.png")
+        print("Generating forecast plot...")
+        model.set_plotting_backend("plotly-static")
+        fig = model.plot(forecast)
+        pio.write_image(fig, file_path + ".png")  # Save the plot as a PNG file
+        print(f"Forecast plot saved to: {file_path}.png")
     except Exception as e:
-        print(f"Error generating or saving model graph: {e}")
-    finally:
-        plt.close('all')
+        print(f"Error generating or saving forecast plot: {e}")
 
 
 def load_neuralprophet_model(model, file_path):
