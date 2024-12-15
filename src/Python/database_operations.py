@@ -51,12 +51,13 @@ def fetch_group_data(group, sales_channel = None):
             params = (group+"%",sales_channel,)
         query += "GROUP BY sale_date, asin, sales_channel ORDER BY sale_date ASC"
         data = pd.read_sql(query, engine, params=params)
-        zero_ids = data.groupby("ID")["y"].apply(lambda x: (x == 0).all())
-        zero_ids_list = zero_ids[zero_ids].index.tolist()
-        print(f"IDs with all zero values: {zero_ids_list}")
-        filtered_data = data[~data["ID"].isin(zero_ids_list)]
-        print(f"Filtered data shape: {filtered_data.shape}")
-        return filtered_data
+        # Filter IDs with fewer than 50 non-zero 'y' values
+        id_non_zero_counts = data[data["y"] > 0].groupby("ID").size()
+        valid_ids = id_non_zero_counts[id_non_zero_counts >= 50].index.tolist()
+        print(f"IDs with at least 50 non-zero values: {valid_ids}")
+        # Filter the data to include only valid IDs
+        filtered_data = data[data["ID"].isin(valid_ids)]
+        print(f"Filtered data shape: {filtered_data.shape}")        return filtered_data
     except Exception as e:
         print(f"*Error fetching data for group: {e}")
     finally:
