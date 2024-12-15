@@ -151,9 +151,10 @@ class WarehouseController extends FrontendController
                 $response['previousYearData'][640 + $days] = $quantity;
                 continue;
             }
-            if ($dataSource == 1) {
+            if ($dataSource == 1 && $days <= 0) {
                 $response['currentData'][275 + $days] = $quantity;
-            } else {
+            }
+            if ($dataSource == 0 && $days >= 0) {
                 $response['forecastedData'][275 + $days] = $quantity;
             }
         }
