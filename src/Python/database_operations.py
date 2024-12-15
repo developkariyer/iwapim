@@ -54,8 +54,6 @@ def fetch_group_data(group, sales_channel = None):
         # Filter IDs with fewer than 50 non-zero 'y' values
         id_non_zero_counts = data[data["y"] > 0].groupby("ID").size()
         valid_ids = id_non_zero_counts[id_non_zero_counts >= 50].index.tolist()
-        print(f"IDs with at least 50 non-zero values: {valid_ids}")
-        # Filter the data to include only valid IDs
         return data[data["ID"].isin(valid_ids)]
     except Exception as e:
         print(f"*Error fetching data for group: {e}")
