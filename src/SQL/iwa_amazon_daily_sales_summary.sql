@@ -160,7 +160,7 @@ CREATE INDEX idx_sales_channel ON iwa_amazon_daily_sales_summary_temp (sales_cha
 SELECT "Step 7.3: Add sale_date index to improve query performance";
 CREATE INDEX idx_sale_date ON iwa_amazon_daily_sales_summary_temp (sale_date);
 SELECT "Step 7.4: Add unique index to improve query performance";
-ALTER TABLE iwa_amazon_daily_sales_summary_temp ADD UNIQUE KEY (asin, sales_channel, sale_date);
+ALTER TABLE iwa_amazon_daily_sales_summary_temp ADD UNIQUE KEY (asin, sales_channel, sale_date, data_source);
 
 SELECT "Step 8: Replace original table with the updated one";
 DROP TABLE IF EXISTS iwa_amazon_daily_sales_summary;

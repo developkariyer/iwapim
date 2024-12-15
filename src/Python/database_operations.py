@@ -71,8 +71,7 @@ def insert_forecast_data(forecast_data, asin, sales_channel, yaml_path):
         INSERT INTO iwa_amazon_daily_sales_summary (asin, sales_channel, iwasku, sale_date, total_quantity, data_source)
         VALUES (%s, %s, %s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE
-            total_quantity = VALUES(total_quantity),
-            data_source = VALUES(data_source)
+            total_quantity = VALUES(total_quantity)
         """
         with connection.cursor() as cursor:
             cursor.execute(iwasku_query, (asin, asin))
