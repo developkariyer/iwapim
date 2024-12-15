@@ -20,8 +20,8 @@ def generate_group_forecast_neuralprophet(data, group_id):
             raise ValueError("Fetched data is not a DataFrame.")
         model = NeuralProphet(
             yearly_seasonality=True,
-            weekly_seasonality=False,
-            daily_seasonality=,
+            weekly_seasonality=True,
+            daily_seasonality=False,
             n_lags=90,
         )
         print(f"Training model for group {group_id}...")
