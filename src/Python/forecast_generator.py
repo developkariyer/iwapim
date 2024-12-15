@@ -54,6 +54,8 @@ def generate_forecast_neuralprophet(model, df, forecast_days=90):
         forecast_final = forecast_melted[['ds', 'yhat']]
         print(forecast_final)
         return forecast_final[['ds', 'yhat']]
+    except Exception as e:
+        print(f"Error generating forecast: {e}")
 
 
 
