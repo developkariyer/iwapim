@@ -53,6 +53,7 @@ def worker_process_for_forecast_pipeline(model, asin, sales_channel, df, forecas
         print(f"*Forecast data saved for ASIN {asin}, Sales Channel {sales_channel}.")
     except Exception as e:
         logging.error(f"*Error processing ASIN {asin}, Sales Channel {sales_channel}: {e}")
+        quit()
 
 
 

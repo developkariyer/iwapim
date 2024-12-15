@@ -28,7 +28,7 @@ def fetch_pairs(group=None, asin=None, sales_channel=None, iwasku=None):
         return df
     except Exception as e:
         print(f"*Error fetching ASIN/Sales Channel pairs: {e}")
-        return pd.DataFrame()
+        quit()
     finally:
         if engine:
             engine.dispose()
@@ -59,6 +59,7 @@ def fetch_group_data(group, sales_channel = None):
         return data[data["ID"].isin(valid_ids)]
     except Exception as e:
         print(f"*Error fetching data for group: {e}")
+        quit()
     finally:
         if engine:
             engine.dispose()

@@ -35,7 +35,7 @@ def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
         return model
     except Exception as e:
         print(f"Error training and saving global model: {e}")
-        print(data)
+        quit()
 
 
 def generate_forecast_neuralprophet(model, df, forecast_days=90):
@@ -58,6 +58,7 @@ def generate_forecast_neuralprophet(model, df, forecast_days=90):
         return forecast_final[['ds', 'yhat']]
     except Exception as e:
         print(f"Error generating forecast: {e}")
+        quit()
 
 
 
