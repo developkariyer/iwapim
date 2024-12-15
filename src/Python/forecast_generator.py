@@ -22,7 +22,7 @@ def generate_group_model_neuralprophet(data, forecast_days=90, islamic=False):
             season_global_local="global",   # Shared seasonality across all IDs
             #changepoints_range=0.8,         # Focus more on recent data for changepoints
             #seasonality_reg=0.1,           # Reduce regularization on seasonality
-            #epochs=20,                      # Longer training for richer datasets
+            epochs=120,                      # Longer training for richer datasets
             trend_reg=10,                    # Smooth but responsive trends
         )
         model = model.add_country_holidays(country_name='US')
