@@ -67,14 +67,16 @@ class Products
 
         $db = Db::get();
         $db->executeQuery("TRUNCATE TABLE ozon_category_tree");
+        $db->beginTransaction();
         foreach ($serializedCategoryTree as $item) {
-            $db->insert('iwa_ozon_description_category_tree', [
-                'description_category_id' => $item['description_category_id'],
-                'category_name' => $item['category_name'],
-                'type_id' => $item['type_id'],
-                'type_name' => $item['type_name'],
-                'parent_id' => $item['parent_id'],
+            $db->executeQuery("INSERT INTO iwa_ozon_description_category_tree (description_category_id, category_name, type_id, type_name, parent_id) VALUES (?, ?, ?, ?, ?)", [
+                $item['description_category_id'],
+                $item['category_name'],
+                $item['type_id'],
+                $item['type_name'],
+                $item['parent_id'],
             ]);
         }
+        $db->commit();
     }
 }
