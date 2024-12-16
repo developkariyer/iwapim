@@ -65,15 +65,16 @@ class ImportCommand extends AbstractCommand
             ->addOption('hepsiburada', null, InputOption::VALUE_NONE, 'If set, processes hepsiburada objects.')
             ->addOption('wayfair', null, InputOption::VALUE_NONE, 'If set, processes wayfair objects.')
             ->addOption('ozon', null, InputOption::VALUE_NONE, 'If set, processes ozon objects.')
+            ->addOption('iwabot', null, InputOption::VALUE_NONE, 'Downloads inventory from iwabot/USA warehouse')
+
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
             ->addOption('download', null, InputOption::VALUE_NONE, 'Downloads listing data from the specified marketplace.')
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
             ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
             ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
             ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
-            ->addOption('iwabot', null, InputOption::VALUE_NONE, 'Downloads inventory from iwabot/USA warehouse')
-            ->addOption('test', null, InputOption::VALUE_NONE, 'Test command.')
-            ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
+            ->addOption('attributes', null, InputOption::VALUE_NONE, 'Download marketplace information required for making listings.')
+        ;
     }
 
     private function removeListeners(): void
@@ -90,10 +91,11 @@ class ImportCommand extends AbstractCommand
     {
         $mp = [];
         foreach ($marketplaces as $marketplace) {
-            if (!isset($mp[$marketplace->getMarketplaceType()])) {
-                $mp[$marketplace->getMarketplaceType()] = [];
+            $marketplaceType = $marketplace->getMarketplaceType();
+            if (!isset($mp[$marketplaceType])) {
+                $mp[$marketplaceType] = [];
             }
-            $mp[$marketplace->getMarketplaceType()][] = "{$marketplace->getKey()}  ({$marketplace->getMarketplaceUrl()})";
+            $mp[$marketplaceType][] = "{$marketplace->getKey()}  ({$marketplace->getMarketplaceUrl()})";
         }
         foreach ($mp as $type => $keys) {
             echo "{$type}:\n";
@@ -118,6 +120,8 @@ class ImportCommand extends AbstractCommand
         $updateFlag = $input->getOption('update');
         $ordersFlag = $input->getOption('orders');
         $inventoryFlag = $input->getOption('inventory');
+        $attributesFlag = $input->getOption('attributes');
+
         $marketplaceArg = $input->getArgument('marketplace');
         $amazonFlag = $input->getOption('amazon');
         $etsyFlag = $input->getOption('etsy');
@@ -136,13 +140,6 @@ class ImportCommand extends AbstractCommand
         $this->removeListeners();
 
         try {
-            if ($input->getOption('test')) {
-                $marketplace = Marketplace::getById(199128);
-                $connector = new BolConnector($marketplace);
-                $connector->downloadOfferReport();
-                return Command::SUCCESS;
-            }
-
             if ($input->getOption('iwabot')) {
                 IwabotConnector::downloadReport();
             }
@@ -154,53 +151,54 @@ class ImportCommand extends AbstractCommand
             }
 
             foreach ($marketplaces as $marketplace) {
+                $marketplaceType = $marketplace->getMarketplaceType();
                 if (!$allFlag) {
                     if (!empty($marketplaceArg)) {
                         if (!in_array($marketplace->getKey(), $marketplaceArg)) {
                             continue;
                         }
                     } else {
-                        if (!$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
+                        if (!$amazonFlag && $marketplaceType === 'Amazon') {
                             continue;
                         }
-                        if (!$etsyFlag && $marketplace->getMarketplaceType() === 'Etsy') {
+                        if (!$etsyFlag && $marketplaceType === 'Etsy') {
                             continue;
                         }
-                        if (!$shopifyFlag && $marketplace->getMarketplaceType() === 'Shopify') {
+                        if (!$shopifyFlag && $marketplaceType === 'Shopify') {
                             continue;
                         }
-                        if (!$trendyolFlag && $marketplace->getMarketplaceType() === 'Trendyol') {
+                        if (!$trendyolFlag && $marketplaceType === 'Trendyol') {
                             continue;
                         }
-                        if (!$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
+                        if (!$bolcomFlag && $marketplaceType === 'Bol.com') {
                             continue;
                         }
-                        if (!$ebayFlag && $marketplace->getMarketplaceType() === 'Ebay') {
+                        if (!$ebayFlag && $marketplaceType === 'Ebay') {
                             continue;
                         }
-                        if (!$takealotFlag && $marketplace->getMarketplaceType() === 'Takealot') {
+                        if (!$takealotFlag && $marketplaceType === 'Takealot') {
                             continue;
                         }
-                        if (!$wallmartFlag && $marketplace->getMarketplaceType() === 'Wallmart') {
+                        if (!$wallmartFlag && $marketplaceType === 'Wallmart') {
                             continue;
                         }
-                        if (!$ciceksepetiFlag && $marketplace->getMarketplaceType() === 'Ciceksepeti') {
+                        if (!$ciceksepetiFlag && $marketplaceType === 'Ciceksepeti') {
                             continue;
                         }
-                        if (!$hepsiburadaFlag && $marketplace->getMarketplaceType() === 'Hepsiburada') {
+                        if (!$hepsiburadaFlag && $marketplaceType === 'Hepsiburada') {
                             continue;
                         }
-                        if (!$wayfairFlag && $marketplace->getMarketplaceType() === 'Wayfair') {
+                        if (!$wayfairFlag && $marketplaceType === 'Wayfair') {
                             continue;
                         }
-                        if (!$ozonFlag && $marketplace->getMarketplaceType() === 'Ozon') {
+                        if (!$ozonFlag && $marketplaceType === 'Ozon') {
                             continue;
                         }
                     }
                 }
                 
-                echo "Processing {$marketplace->getMarketplaceType()} Marketplace {$marketplace->getKey()} ...\n";
-                $connector = match ($marketplace->getMarketplaceType()) {
+                echo "Processing {$marketplaceType} Marketplace {$marketplace->getKey()} ...\n";
+                $connector = match ($marketplaceType) {
                     'Amazon' => new AmazonConnector($marketplace),
                     'Etsy' => new EtsyConnector($marketplace),
                     'Shopify' => new ShopifyConnector($marketplace),
@@ -234,6 +232,10 @@ class ImportCommand extends AbstractCommand
                 if ($inventoryFlag) {
                     echo "    Getting inventory... ";
                     $connector->downloadInventory();
+                }
+                if ($attributesFlag) {
+                    echo "    Getting attributes... ";
+                    $connector->downloadAttributes();
                 }
                 echo "done.\n";
             }

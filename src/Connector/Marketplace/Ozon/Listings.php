@@ -67,7 +67,7 @@ class Listings
                 'visibility' => $visibility,
             ],
         ];
-        return $this->connector->getApiMultiPageResponse('POST',  self::API_OZON_PRODUCT_LIST_URL, $query);
+        return $this->connector->getApiMultiPageResponse('POST', self::API_OZON_PRODUCT_LIST_URL, $query);
     }
 
     /**

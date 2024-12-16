@@ -87,15 +87,18 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
 
     public function putListingsToCache(): void
     {
-        $cachePath = self::MARKETPLACE_TEMP_PATH.urlencode($this->marketplace->getKey());
-        Utility::setCustomCache(self::LISTINGS_FILE_NAME, $cachePath, json_encode($this->listings, JSON_PRETTY_PRINT));
+        Utility::setCustomCache(self::LISTINGS_FILE_NAME, $this->getTempPath(), json_encode($this->listings, JSON_PRETTY_PRINT));
     }
 
     public function getListingsFromCache($expiration = 86000): bool
     {
-        $cachePath = self::MARKETPLACE_TEMP_PATH.urlencode($this->marketplace->getKey());
-        $this->listings = json_decode(Utility::getCustomCache(self::LISTINGS_FILE_NAME, $cachePath, $expiration), true) ?? [];
+        $this->listings = json_decode(Utility::getCustomCache(self::LISTINGS_FILE_NAME, $this->getTempPath(), $expiration), true) ?? [];
         return !empty($this->listings);
+    }
+
+    public function getTempPath(): string
+    {
+        return self::MARKETPLACE_TEMP_PATH.urlencode($this->marketplace->getKey());
     }
 
 }

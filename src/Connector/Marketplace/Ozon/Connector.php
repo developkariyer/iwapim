@@ -17,6 +17,7 @@ class Connector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Ozon';
 
     public Listings $listingsHelper;
+    public Products $productsHelper;
 
     /**
      * @throws Exception
@@ -25,21 +26,20 @@ class Connector extends MarketplaceConnectorAbstract
     {
         parent::__construct($marketplace);
         $this->listingsHelper = new Listings($this);
+        $this->productsHelper = new Products($this);
     }
 
     /**
      * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface
      */
-    public function getApiResponse($method, $url, $query = []): array
+    public function getApiResponse($method, $url, $query = [], $returnKey = 'result'): array
     {
-        echo "\ngetApiResponse: $method $url ".json_encode($query)."\n\n";
         $options = [
             'headers' => [
                 'Client-Id' => $this->marketplace->getOzonClientId(),
                 'Api-Key' => $this->marketplace->getOzonApiKey(),
             ],
         ];
-
         if (!empty($query)) {
             if ($method === 'POST' || $method === 'PUT') {
                 $options['headers']['Content-Type'] = 'application/json';
@@ -48,39 +48,29 @@ class Connector extends MarketplaceConnectorAbstract
                 $options['query'] = $query;
             }
         }
-
         try {
             $response = $this->httpClient->request($method, $url, $options);
             $statusCode = $response->getStatusCode();
-
             if ($statusCode < 200 || $statusCode >= 300) {
                 echo "Error: " . json_encode($response->toArray(false)) . "\n";
-                exit;
-                //return [];
+                exit; // return [];
             }
-
             try {
                 $responseArray = $response->toArray();
-                return $responseArray['result'] ?? [];
+                return empty($returnKey) ? $responseArray : ($responseArray[$returnKey] ?? []);
             } catch (DecodingExceptionInterface) {
                 echo "Failed to decode response: " . $response->getContent(false) . "\n";
-                exit;
-                //return [];
+                exit; // return [];
             }
         } catch (Exception $e) {
             echo "Unexpected error: " . $e->getMessage() . "\n";
-            exit;
-            //return [];
+            exit; // return [];
         }
     }
 
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface
      */
     public function getApiMultiPageResponse($method, $url, $query = [], $itemsKey = 'items'): array
     {
@@ -109,11 +99,7 @@ class Connector extends MarketplaceConnectorAbstract
 
     /**
      * @param bool $forceDownload
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface
      */
     public function download($forceDownload = false): void
     {
@@ -130,6 +116,17 @@ class Connector extends MarketplaceConnectorAbstract
 
     }
 
+    /**
+     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function downloadAttributes(): void
+    {
+        $this->productsHelper->getCategoryTreeFromApi();
+        $this->productsHelper->saveCategoryTreeToDb();
+    }
+
+
     public function import($updateFlag, $importFlag)
     {
 
@@ -142,7 +139,7 @@ class Connector extends MarketplaceConnectorAbstract
 
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
 
     }
