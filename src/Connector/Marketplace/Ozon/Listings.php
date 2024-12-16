@@ -46,7 +46,6 @@ class Listings
             }
             $this->connector->listings[$productId] = $product;
             $this->connector->listings[$productId]['info'] = $this->getProductInfo($product);
-            //echo " {$this->connector->listings[$productId]['info']['sku']} ";
             $productBucket[] = $productId;
             if (count($productBucket) >= 1000) {
                 $this->getProductAttributes($productBucket);
@@ -56,7 +55,6 @@ class Listings
         }
         $this->getProductAttributes($productBucket);
         $this->connector->putListingsToCache();
-        print_r($this->connector->listings);
     }
 
     /**
@@ -79,8 +77,6 @@ class Listings
     {
         $query = [
             'product_id' => $product['product_id'],
-            //'offer_id' => $product['offer_id'] ?? '',
-            //'sku' => 0,
         ];
         return $this->connector->getApiResponse('POST', self::API_OZON_PRODUCT_INFO_URL, $query);
     }
