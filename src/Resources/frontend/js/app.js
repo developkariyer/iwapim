@@ -17,16 +17,25 @@ $(document).ready(function () {
             console.error('Failed to load categories:', err);
         });
 
-    // Recursive function to render the category list
+    // Render categories into the list
     function renderCategories(categories) {
-        const renderItems = (items) => {
-            return items.map(item => {
+        categoryList.html(renderItems(categories)); // Render items and populate the list
+    }
+
+    // Recursive function to render items
+    function renderItems(items) {
+        if (!Array.isArray(items)) {
+            return ''; // If items is not an array, return an empty string
+        }
+
+        return items
+            .map(item => {
                 if (item.category_name) {
                     // Render parent category (unselectable)
                     return `
                         <li class="parent">
                             ${item.category_name}
-                            <ul>${renderItems(item.children || []).join('')}</ul>
+                            <ul>${renderItems(item.children || [])}</ul>
                         </li>
                     `;
                 }
@@ -38,12 +47,10 @@ $(document).ready(function () {
                         </li>
                     `;
                 }
-                return '';
-            }).join('');
-        };
-
-        // Clear and re-render the list
-        categoryList.html(renderItems(categories));
+                return ''; // Fallback for unexpected data
+            })
+            .filter(Boolean) // Remove undefined or null values
+            .join(''); // Join valid strings to build the HTML
     }
 
     // Filter categories on search input
