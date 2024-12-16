@@ -28,7 +28,7 @@ class OzonProductTypes implements SelectOptionsProviderInterface
                 } else {
                     $options[] = [
                         'key' => $parent_text . $child['type_name'],
-                        'value' => "{$child['id']}_{$child['type_id']}",
+                        'value' => "{$node['id']}_{$child['type_id']}",
                     ];
                 }
                 if (!empty($child['children'])) {
