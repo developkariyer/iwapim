@@ -7,7 +7,7 @@ $(document).ready(function () {
         placeholder: "Search or select a category...",
         width: '100%',
         ajax: {
-            url: '/api/categories', // Your API endpoint
+            url: '/ozon/category-tree', // Your actual API endpoint
             dataType: 'json',
             processResults: function (data) {
                 // Convert nested categories to Select2 format
