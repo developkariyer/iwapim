@@ -27,7 +27,7 @@ class Listings
     public function getListings($forceDownload = false): void
     {
         echo "Getting listings\n";
-        if (!($forceDownload || $this->connector->getListingsFromCache())) {
+        if (!$forceDownload && $this->connector->getListingsFromCache()) {
             echo "  Using cached copy\n";
             return;
         }
