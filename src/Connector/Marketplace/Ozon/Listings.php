@@ -94,8 +94,8 @@ class Listings
                 'visibility' => 'ALL'
             ],
         ];
-        $productAttributes = $this->connector->getApiMultiPageResponse('POST', self::API_OZON_PRODUCT_ATTRIBUTES_URL, $query);
-        foreach ($productAttributes as $product) {
+        $products = $this->connector->getApiMultiPageResponse('POST', self::API_OZON_PRODUCT_ATTRIBUTES_URL, $query, '');
+        foreach ($products as $product) {
             if (!isset($this->connector->listings[$product['id']])) {
                 echo "Product {$product['id']} not found in listings.\n";
                 continue;
