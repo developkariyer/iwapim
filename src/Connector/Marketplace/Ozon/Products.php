@@ -31,8 +31,7 @@ class Products
     public function getCategoryTreeFromApi(): void
     {
         $this->categoryTree = json_decode(Utility::getCustomCache('CATEGORY_TREE.json', $this->connector->getTempPath()), true) ?? [];
-        if (empty($categoryTree)) {
-            echo "  Getting category tree\n";
+        if (empty($this->categoryTree)) {
             $this->categoryTree = $this->connector->getApiResponse('POST', self::API_CATEGORY_TREE_URL, ['language' => 'EN']);
             Utility::setCustomCache('CATEGORY_TREE.json', $this->connector->getTempPath(), json_encode($this->categoryTree, JSON_PRETTY_PRINT));
         } else {
