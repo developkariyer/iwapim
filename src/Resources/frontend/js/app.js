@@ -6,7 +6,7 @@ $(document).ready(function () {
     $('#category-select').select2({
         placeholder: "Search or select a category...",
         ajax: {
-            url: '/api/categories',
+            url: '/ozon/category-tree',
             dataType: 'json',
             processResults: (data) => {
                 return {
