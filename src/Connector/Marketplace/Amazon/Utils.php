@@ -7,16 +7,15 @@ use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\PatchOperation;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 
 class Utils
 {
-    public AmazonConnector $amazonConnector;
+    public Connector $connector;
 
-    public function __construct(AmazonConnector $amazonConnector) 
+    public function __construct(Connector $connector)
     {
-        $this->amazonConnector = $amazonConnector;
+        $this->connector = $connector;
     }
 
     /**
@@ -24,15 +23,15 @@ class Utils
      */
     public function patchCustom($sku, $country, $patches): void // $attribute, $operation, $value = null
     {
-        $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
+        $listingsApi = $this->connector->amazonSellerConnector->listingsItemsV20210801();
         if (empty($country)) {
-            $country = $this->amazonConnector->mainCountry;
+            $country = $this->connector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
         $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", 86400*7);
         if (empty($listing)) {
             $listing = $listingsApi->getListingsItem(
-                sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
+                sellerId: $this->connector->getMarketplace()->getMerchantId(),
                 sku: rawurlencode($sku),
                 marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                 includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
@@ -53,7 +52,7 @@ class Utils
         );
         echo "Patching ";
         $patchOperation = $listingsApi->patchListingsItem(
-            sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
+            sellerId: $this->connector->getMarketplace()->getMerchantId(),
             sku: rawurlencode($sku),
             listingsItemPatchRequest: $listingsItemPatchRequest,
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']]
@@ -68,14 +67,14 @@ class Utils
     public function getInfo($sku, $country = null): void
     {
         if (empty($country)) {
-            $country = $this->amazonConnector->mainCountry;
+            $country = $this->connector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
         $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country");
         if (empty($listing)) {
-            $listingsApi = $this->amazonConnector->amazonSellerConnector->listingsItemsV20210801();
+            $listingsApi = $this->connector->amazonSellerConnector->listingsItemsV20210801();
             $listing = $listingsApi->getListingsItem(
-                sellerId: $this->amazonConnector->getMarketplace()->getMerchantId(),
+                sellerId: $this->connector->getMarketplace()->getMerchantId(),
                 sku: rawurlencode($sku),
                 marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                 includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
@@ -89,11 +88,11 @@ class Utils
         $safeProductType = preg_replace('/[^a-zA-Z0-9._-]/', '_', $productType);
         $definition = Utility::getCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country");
         if (empty($definition)) {
-            $productTypeDefinitionApi = $this->amazonConnector->amazonSellerConnector->productTypeDefinitionsV20200901();
+            $productTypeDefinitionApi = $this->connector->amazonSellerConnector->productTypeDefinitionsV20200901();
             $definition = $productTypeDefinitionApi->getDefinitionsProductType(
                 productType: $productType,
                 marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
-                sellerId: $this->amazonConnector->getMarketplace()->getMerchantId()
+                sellerId: $this->connector->getMarketplace()->getMerchantId()
             );
             Utility::setCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country", json_encode($definition->json(), JSON_PRETTY_PRINT));
         }
@@ -105,7 +104,7 @@ class Utils
     public function patchGPSR($sku, $country = null): void
     {
         if (empty($country)) {
-            $country = $this->amazonConnector->mainCountry;
+            $country = $this->connector->mainCountry;
         }
 
         $patches = [
@@ -149,7 +148,7 @@ class Utils
     public function patchDeleteGPSR($sku, $country = null): void
     {
         if (empty($country)) {
-            $country = $this->amazonConnector->mainCountry;
+            $country = $this->connector->mainCountry;
         }
 
         $patches = [

@@ -2,13 +2,14 @@
 
 namespace App\Connector\Marketplace;
 
+use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Shopify';
+    public static string $marketplaceType = 'Shopify';
 
     private $apiUrl = null;
 
@@ -216,21 +217,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
         if (empty($inventoryItemId)) {
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
         $response = $this->getFromShopifyApi('POST', "inventory_levels/set.json", [], null, ['location_id' => $locationId, 'inventory_item_id' => $inventoryItemId, 'available' => $targetValue]);
-        $responseCode = $response->getStatusCode();
-        if ($responseCode !== 200) {
-            echo "Failed to set inventory for {$listing->getKey()}: {$response->getContent()}\n";
-            return;
-        }
         echo "Inventory set\n";
         $date = date('Y-m-d-H-i-s');
         $filename = "{$inventoryItemId}-$date.json";  
@@ -239,10 +231,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function setSku(VariantProduct $listing, string $sku)
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         if (empty($sku)) {
             echo "SKU is empty for {$listing->getKey()}\n";
             return;
@@ -267,12 +255,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache("{$listing->getUniqueMarketplaceId()}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetSKU', json_encode($response));
     }
 
-    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * @throws Exception
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         $currencies = [
             'CANADIAN DOLLAR' => 'CAD',
             'TL' => 'TL',
@@ -286,7 +273,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get variant id for {$listing->getKey()}\n";
             return;
         }
-        if ($targetPrice === null) {
+        if (empty($targetPrice)) {
             echo "Price is empty for {$listing->getKey()}\n";
             return;
         }
@@ -302,16 +289,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $marketplaceCurrency);
-        if ($finalPrice === null) {
+        if (empty($finalPrice)) {
             echo "Failed to convert currency for {$listing->getKey()}\n";
             return;
         }
         $response = $this->getFromShopifyApi('PUT', "variants/{$variantId}.json", [], null, ['variant' => ['id' => $variantId, 'price' => $finalPrice]]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Failed to set price for {$listing->getKey()}: {$response->getContent()}\n";
-            return;
-        }
         echo "Price set\n";
         $date = date('Y-m-d-H-i-s');
         $filename = "{$variantId}-$date.json";  

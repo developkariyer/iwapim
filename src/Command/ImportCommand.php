@@ -2,30 +2,34 @@
 
 namespace App\Command;
 
+use App\Connector\IwabotConnector;
+use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
+use App\Connector\Marketplace\BolConnector;
+use App\Connector\Marketplace\CiceksepetiConnector;
+use App\Connector\Marketplace\EbayConnector;
+use App\Connector\Marketplace\EtsyConnector;
+use App\Connector\Marketplace\HepsiburadaConnector;
+use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
+use App\Connector\Marketplace\ShopifyConnector;
+use App\Connector\Marketplace\TakealotConnector;
+use App\Connector\Marketplace\TrendyolConnector;
+use App\Connector\Marketplace\WallmartConnector;
+use App\Connector\Marketplace\WayfairConnector;
+use App\EventListener\DataObjectListener;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\DataObject\Marketplace;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Pimcore\Model\DataObject\Marketplace;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use App\EventListener\DataObjectListener;
-use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
-use App\Connector\Marketplace\ShopifyConnector;
-use App\Connector\Marketplace\EtsyConnector;
-use App\Connector\Marketplace\TrendyolConnector;
-use App\Connector\Marketplace\BolConnector;
-use App\Connector\Marketplace\EbayConnector;
-use App\Connector\Marketplace\TakealotConnector;
-use App\Connector\Marketplace\WallmartConnector;
-use App\Connector\Marketplace\CiceksepetiConnector;
-use App\Connector\Marketplace\HepsiburadaConnector;
-use App\Connector\Marketplace\WayfairConnector;
-use App\Connector\Marketplace\OzonConnector;
-use App\Connector\IwabotConnector;
-
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 
 #[AsCommand(
@@ -34,26 +38,6 @@ use App\Connector\IwabotConnector;
 )]
 class ImportCommand extends AbstractCommand
 {
-    private static bool $downloadFlag = false;
-    private static bool $importFlag = false;
-    private static bool $updateFlag = false;
-    private static bool $ordersFlag = false;
-    private static bool $inventoryFlag = false;
-    private static array $marketplaceArg = [];
-    private static bool $amazonFlag = false;
-    private static bool $etsyFlag = false;
-    private static bool $shopifyFlag = false;
-    private static bool $trendyolFlag = false;
-    private static bool $allFlag = false;
-    private static bool $bolcomFlag = false;
-    private static bool $ebayFlag = false;
-    private static bool $takealotFlag = false;
-    private static bool $wallmartFlag = false;
-    private static bool $ciceksepetiFlag = false;
-    private static bool $hepsiburadaFlag = false;
-    private static bool $wayfairFlag = false;
-    private static bool $ozonFlag = false;
-
     private EventDispatcherInterface $eventDispatcher;
     private DataObjectListener $dataObjectListener;
 
@@ -92,11 +76,6 @@ class ImportCommand extends AbstractCommand
             ->addOption('memory-table', null, InputOption::VALUE_NONE, 'Populates the in-memory table for Shopify line items.');
     }
 
-    private static function getMarketplaceObjects(): array
-    {
-        return Marketplace::getMarketplaceList();
-    }
-
     private function removeListeners(): void
     {
         $this->eventDispatcher->removeSubscriber($this->dataObjectListener);
@@ -107,9 +86,8 @@ class ImportCommand extends AbstractCommand
         $this->eventDispatcher->addSubscriber($this->dataObjectListener);
     }
 
-    private static function listMarketplaces(): int
+    private static function listMarketplaces($marketplaces): int
     {
-        $marketplaces = self::getMarketplaceObjects();
         $mp = [];
         foreach ($marketplaces as $marketplace) {
             if (!isset($mp[$marketplace->getMarketplaceType()])) {
@@ -126,27 +104,34 @@ class ImportCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        self::$downloadFlag = $input->getOption('download');
-        self::$importFlag = $input->getOption('import');
-        self::$updateFlag = $input->getOption('update');
-        self::$ordersFlag = $input->getOption('orders');
-        self::$inventoryFlag = $input->getOption('inventory');
-        self::$marketplaceArg = $input->getArgument('marketplace');
-        self::$amazonFlag = $input->getOption('amazon');
-        self::$etsyFlag = $input->getOption('etsy');
-        self::$shopifyFlag = $input->getOption('shopify');
-        self::$trendyolFlag = $input->getOption('trendyol');
-        self::$bolcomFlag = $input->getOption('bolcom');
-        self::$ebayFlag = $input->getOption('ebay');
-        self::$takealotFlag = $input->getOption('takealot');
-        self::$wallmartFlag = $input->getOption('wallmart');
-        self::$ciceksepetiFlag = $input->getOption('ciceksepeti');
-        self::$hepsiburadaFlag = $input->getOption('hepsiburada');
-        self::$wayfairFlag = $input->getOption('wayfair');
-        self::$ozonFlag = $input->getOption('ozon');
-        self::$allFlag = $input->getOption('all');
+        $downloadFlag = $input->getOption('download');
+        $importFlag = $input->getOption('import');
+        $updateFlag = $input->getOption('update');
+        $ordersFlag = $input->getOption('orders');
+        $inventoryFlag = $input->getOption('inventory');
+        $marketplaceArg = $input->getArgument('marketplace');
+        $amazonFlag = $input->getOption('amazon');
+        $etsyFlag = $input->getOption('etsy');
+        $shopifyFlag = $input->getOption('shopify');
+        $trendyolFlag = $input->getOption('trendyol');
+        $bolcomFlag = $input->getOption('bolcom');
+        $ebayFlag = $input->getOption('ebay');
+        $takealotFlag = $input->getOption('takealot');
+        $wallmartFlag = $input->getOption('wallmart');
+        $ciceksepetiFlag = $input->getOption('ciceksepeti');
+        $hepsiburadaFlag = $input->getOption('hepsiburada');
+        $wayfairFlag = $input->getOption('wayfair');
+        $ozonFlag = $input->getOption('ozon');
+        $allFlag = $input->getOption('all');
 
         $this->removeListeners();
 
@@ -157,56 +142,58 @@ class ImportCommand extends AbstractCommand
                 $connector->downloadOfferReport();
                 return Command::SUCCESS;
             }
-            if ($input->getOption('list')) {
-                return self::listMarketplaces();
-            }
 
             if ($input->getOption('iwabot')) {
                 IwabotConnector::downloadReport();
             }
 
-            $marketplaces = self::getMarketplaceObjects();
+            $marketplaces = Marketplace::getMarketplaceList();
+
+            if ($input->getOption('list')) {
+                return self::listMarketplaces($marketplaces);
+            }
+
             foreach ($marketplaces as $marketplace) {
-                if (!self::$allFlag) {
-                    if (!empty(self::$marketplaceArg)) {
-                        if (!in_array($marketplace->getKey(), self::$marketplaceArg)) {
+                if (!$allFlag) {
+                    if (!empty($marketplaceArg)) {
+                        if (!in_array($marketplace->getKey(), $marketplaceArg)) {
                             continue;
                         }
                     } else {
-                        if (!self::$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
+                        if (!$amazonFlag && $marketplace->getMarketplaceType() === 'Amazon') {
                             continue;
                         }
-                        if (!self::$etsyFlag && $marketplace->getMarketplaceType() === 'Etsy') {
+                        if (!$etsyFlag && $marketplace->getMarketplaceType() === 'Etsy') {
                             continue;
                         }
-                        if (!self::$shopifyFlag && $marketplace->getMarketplaceType() === 'Shopify') {
+                        if (!$shopifyFlag && $marketplace->getMarketplaceType() === 'Shopify') {
                             continue;
                         }
-                        if (!self::$trendyolFlag && $marketplace->getMarketplaceType() === 'Trendyol') {
+                        if (!$trendyolFlag && $marketplace->getMarketplaceType() === 'Trendyol') {
                             continue;
                         }
-                        if (!self::$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
+                        if (!$bolcomFlag && $marketplace->getMarketplaceType() === 'Bol.com') {
                             continue;
                         }
-                        if (!self::$ebayFlag && $marketplace->getMarketplaceType() === 'Ebay') {
+                        if (!$ebayFlag && $marketplace->getMarketplaceType() === 'Ebay') {
                             continue;
                         }
-                        if (!self::$takealotFlag && $marketplace->getMarketplaceType() === 'Takealot') {
+                        if (!$takealotFlag && $marketplace->getMarketplaceType() === 'Takealot') {
                             continue;
                         }
-                        if (!self::$wallmartFlag && $marketplace->getMarketplaceType() === 'Wallmart') {
+                        if (!$wallmartFlag && $marketplace->getMarketplaceType() === 'Wallmart') {
                             continue;
                         }
-                        if (!self::$ciceksepetiFlag && $marketplace->getMarketplaceType() === 'Ciceksepeti') {
+                        if (!$ciceksepetiFlag && $marketplace->getMarketplaceType() === 'Ciceksepeti') {
                             continue;
                         }
-                        if (!self::$hepsiburadaFlag && $marketplace->getMarketplaceType() === 'Hepsiburada') {
+                        if (!$hepsiburadaFlag && $marketplace->getMarketplaceType() === 'Hepsiburada') {
                             continue;
                         }
-                        if (!self::$wayfairFlag && $marketplace->getMarketplaceType() === 'Wayfair') {
+                        if (!$wayfairFlag && $marketplace->getMarketplaceType() === 'Wayfair') {
                             continue;
                         }
-                        if (!self::$ozonFlag && $marketplace->getMarketplaceType() === 'Ozon') {
+                        if (!$ozonFlag && $marketplace->getMarketplaceType() === 'Ozon') {
                             continue;
                         }
                     }
@@ -233,18 +220,18 @@ class ImportCommand extends AbstractCommand
                     continue;
                 }
                 echo "    Downloading... ";
-                $connector->download(self::$downloadFlag);
+                $connector->download($downloadFlag);
                 echo "done.\n";
-                if (self::$updateFlag || self::$importFlag) {
+                if ($updateFlag || $importFlag) {
                     echo "    Importing...";
-                    $connector->import(self::$updateFlag, self::$importFlag);
+                    $connector->import($updateFlag, $importFlag);
                     echo "done.\n";
                 }
-                if (self::$ordersFlag) {
+                if ($ordersFlag) {
                     echo "    Getting orders... ";
                     $connector->downloadOrders();
                 }
-                if (self::$inventoryFlag) {
+                if ($inventoryFlag) {
                     echo "    Getting inventory... ";
                     $connector->downloadInventory();
                 }

@@ -4,7 +4,6 @@ namespace App\Connector\Marketplace;
 
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -14,14 +13,14 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'offers' => "Products/",
         'updateInventoryPrice' => "Products/price-and-stock/",
         'batchStatus' => "Products/batch-status/",
         'orders' => "Order/GetOrders/"
     ];
 
-    public static $marketplaceType = 'Ciceksepeti';
+    public static string $marketplaceType = 'Ciceksepeti';
 
     /**
      * @throws \Exception

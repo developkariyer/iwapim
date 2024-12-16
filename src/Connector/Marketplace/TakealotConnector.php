@@ -20,7 +20,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         'orders' => "https://seller-api.takealot.com/v2/sales"
     ];
 
-    public static $marketplaceType = 'Takealot';
+    public static string $marketplaceType = 'Takealot';
 
     /**
      * @throws TransportExceptionInterface

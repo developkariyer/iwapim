@@ -3,7 +3,9 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use Exception;
+use JsonException;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use SellingPartnerApi\Seller\SellerConnector;
 use SellingPartnerApi\SellingPartnerApi;
 use SellingPartnerApi\Enums\Endpoint;
@@ -12,24 +14,18 @@ use Pimcore\Model\DataObject\Marketplace;
 
 use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Connector\Marketplace\Amazon\Reports as ReportsHelper;
-use App\Connector\Marketplace\Amazon\Listings as ListingsHelper;
-use App\Connector\Marketplace\Amazon\Import as ImportHelper;
-use App\Connector\Marketplace\Amazon\Orders as OrdersHelper;
-use App\Connector\Marketplace\Amazon\Utils as UtilsHelper;
-use App\Connector\Marketplace\Amazon\Inventory as InventoryHelper;
 use App\Utils\Utility;
 
 class Connector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Amazon';
+    public static string $marketplaceType = 'Amazon';
 
-    public ReportsHelper $reportsHelper;
-    public ListingsHelper $listingsHelper;
-    public ImportHelper $importHelper;
-    public OrdersHelper $ordersHelper;
-    public UtilsHelper $utilsHelper;
-    public InventoryHelper $inventoryHelper;
+    public Reports $reportsHelper;
+    public Listings $listingsHelper;
+    public Import $importHelper;
+    public Orders $ordersHelper;
+    public Utils $utilsHelper;
+    public Inventory $inventoryHelper;
 
     public ?SellerConnector $amazonSellerConnector = null;
     public array $countryCodes = [];
@@ -47,12 +43,12 @@ class Connector extends MarketplaceConnectorAbstract
         }
         $this->mainCountry = $marketplace->getMainMerchant();
         $this->amazonSellerConnector = $this->initSellerConnector($marketplace);
-        $this->reportsHelper = new ReportsHelper($this);
-        $this->listingsHelper = new ListingsHelper($this);
-        $this->importHelper = new ImportHelper($this);
-        $this->ordersHelper = new OrdersHelper($this);
-        $this->utilsHelper = new UtilsHelper($this);
-        $this->inventoryHelper = new InventoryHelper($this);
+        $this->reportsHelper = new Reports($this);
+        $this->listingsHelper = new Listings($this);
+        $this->importHelper = new Import($this);
+        $this->ordersHelper = new Orders($this);
+        $this->utilsHelper = new Utils($this);
+        $this->inventoryHelper = new Inventory($this);
     }
 
     private function initSellerConnector($marketplace): SellerConnector
@@ -70,6 +66,9 @@ class Connector extends MarketplaceConnectorAbstract
         );
     }
 
+    /**
+     * @throws JsonException
+     */
     public function download($forceDownload = false): void
     {
         $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
@@ -83,6 +82,10 @@ class Connector extends MarketplaceConnectorAbstract
         }
     }
 
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
@@ -94,11 +97,17 @@ class Connector extends MarketplaceConnectorAbstract
         $this->importHelper->import($updateFlag, $importFlag);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function downloadOrders(): void
     {
         $this->ordersHelper->downloadOrders();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function downloadInventory(): void
     {
         $this->inventoryHelper->downloadInventory();

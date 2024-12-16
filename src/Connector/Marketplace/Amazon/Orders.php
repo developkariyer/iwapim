@@ -10,11 +10,10 @@ use Doctrine\DBAL\Connection;
 use Pimcore\Db;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 
 class Orders
 {
-    public AmazonConnector $amazonConnector;
+    public Connector $connector;
     public SellerOrdersV0 $ordersApi;
     public array $marketplaceIds;
     public int $orderItemRateLimit = 0;
@@ -24,13 +23,13 @@ class Orders
     public Connection $db;
     public array $orders = [];
 
-    public function __construct(AmazonConnector $amazonConnector) 
+    public function __construct(Connector $connector)
     {
-        $this->amazonConnector = $amazonConnector;
+        $this->connector = $connector;
         $this->db = Db::get();
-        $this->ordersApi = $amazonConnector->amazonSellerConnector->ordersV0();
-        $this->marketplaceIds = [AmazonConstants::amazonMerchant[$amazonConnector->mainCountry]['id']];
-        foreach ($amazonConnector->countryCodes as $countryCode) {
+        $this->ordersApi = $connector->amazonSellerConnector->ordersV0();
+        $this->marketplaceIds = [AmazonConstants::amazonMerchant[$connector->mainCountry]['id']];
+        foreach ($connector->countryCodes as $countryCode) {
             $this->marketplaceIds[] = AmazonConstants::amazonMerchant[$countryCode]['id'];
         }
     }
@@ -50,7 +49,7 @@ class Orders
             ) AS lastUpdatedAt
             FROM iwa_marketplace_orders
             WHERE marketplace_id = ?",
-            [$this->amazonConnector->getMarketplace()->getId()]
+            [$this->connector->getMarketplace()->getId()]
         );
         return $lastUpdateTime ?? gmdate('Y-m-d\TH:i:s\Z', strtotime('-10 years'));
     }
@@ -134,7 +133,7 @@ class Orders
         $this->downloadOrderItems();
         $this->saveOrders();
         file_put_contents(
-            PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->amazonConnector->getMarketplace()->getKey()).'/orders.json', 
+            PIMCORE_PROJECT_ROOT.'/tmp/marketplaces/'.urlencode($this->connector->getMarketplace()->getKey()).'/orders.json',
             json_encode($this->orders, JSON_PRETTY_PRINT)
         );
     }
@@ -150,7 +149,7 @@ class Orders
                 $this->db->executeStatement(
                     "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = ?",
                     [
-                        $this->amazonConnector->getMarketplace()->getId(),
+                        $this->connector->getMarketplace()->getId(),
                         $order['AmazonOrderId'],
                         json_encode($order),
                         json_encode($order)

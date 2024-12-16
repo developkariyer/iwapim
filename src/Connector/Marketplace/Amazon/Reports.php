@@ -6,12 +6,11 @@ use JsonException;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 
 class Reports 
 {
-    public AmazonConnector $amazonConnector;
+    public Connector $connector;
 
     public array $amazonCountryReports = [
         'GET_MERCHANT_LISTINGS_ALL_DATA' => [],
@@ -27,9 +26,9 @@ class Reports
         'GET_SELLER_FEEDBACK_DATA' => [],*/
     ];
 
-    public function __construct(AmazonConnector $amazonConnector) 
+    public function __construct(Connector $connector)
     {
-        $this->amazonConnector = $amazonConnector;
+        $this->connector = $connector;
     }
 
     /**
@@ -37,7 +36,7 @@ class Reports
      */
     public function downloadAmazonReport($reportType, $forceDownload, $country, $silent = false): bool|string
     {
-        $marketplaceKey = urlencode( $this->amazonConnector->getMarketplace()->getKey());
+        $marketplaceKey = urlencode( $this->connector->getMarketplace()->getKey());
         if (!$silent) {
             echo "        Downloading Report $reportType ";
         }
@@ -47,7 +46,7 @@ class Reports
         );
         if (empty($report) || $forceDownload) {
             echo "Waiting Report ";
-            $reportsApi = $this->amazonConnector->amazonSellerConnector->reportsV20210630();
+            $reportsApi = $this->connector->amazonSellerConnector->reportsV20210630();
             $response = $reportsApi->createReport(new CreateReportSpecification(reportType: $reportType, marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']], reportOptions: ["custom" => "true"]));
             $reportId = $response->json()['reportId'];
             while (true) {
@@ -91,11 +90,11 @@ class Reports
     {
         foreach (array_keys($this->amazonReports) as $reportType) {
             if (!$silent) {
-                echo "\n  Downloading {$reportType} for main Amazon region {$this->amazonConnector->mainCountry}\n";
+                echo "\n  Downloading {$reportType} for main Amazon region {$this->connector->mainCountry}\n";
             }
-            $this->amazonReports[$reportType] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $this->amazonConnector->mainCountry, silent: $silent);
+            $this->amazonReports[$reportType] = $this->downloadAmazonReport(reportType: $reportType, forceDownload: $forceDownload, country: $this->connector->mainCountry, silent: $silent);
         }
-        foreach ($this->amazonConnector->countryCodes as $country) {
+        foreach ($this->connector->countryCodes as $country) {
             foreach (array_keys($this->amazonCountryReports) as $reportType) {
                 if (!$silent) {
                     echo "\n  Downloading {$reportType} for Amazon region $country\n";

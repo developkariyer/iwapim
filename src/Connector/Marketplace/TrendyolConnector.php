@@ -7,10 +7,15 @@ use Pimcore\Model\DataObject\VariantProduct;
 use Symfony\Component\HttpClient\HttpClient;
 
 use App\Utils\Utility;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TrendyolConnector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Trendyol';
+    public static string $marketplaceType = 'Trendyol';
 
     public function download($forceDownload = false)
     {
@@ -296,7 +301,14 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);
     }
 
-    public function getBatchRequestResult($batchRequestId)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function getBatchRequestResult($batchRequestId): array
     {
         $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/batch-requests/{$batchRequestId}";
         $response = $this->httpClient->request('GET', $apiUrl, [
@@ -307,7 +319,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
-            return;
+            return [];
         }
         return $response->toArray();
     }

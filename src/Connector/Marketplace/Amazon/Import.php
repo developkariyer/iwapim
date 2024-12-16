@@ -13,20 +13,19 @@ use Pimcore\Model\DataObject\Folder;
 use Carbon\Carbon;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 use App\Utils\Registry;
 use Pimcore\Model\Element\DuplicateFullPathException;
 
 class Import
 {
-    public AmazonConnector $amazonConnector;
+    public Connector $connector;
 
     public array $iwaskuList = [];
 
-    public function __construct(AmazonConnector $amazonConnector) 
+    public function __construct(Connector $connector)
     {
-        $this->amazonConnector = $amazonConnector;
+        $this->connector = $connector;
     }
 
     
@@ -90,9 +89,9 @@ class Import
      */
     public function import($updateFlag, $importFlag): void
     {
-        $total = count($this->amazonConnector->listings);
+        $total = count($this->connector->listings);
         $index = 0;
-        foreach ($this->amazonConnector->listings as $asin=>$listing) {
+        foreach ($this->connector->listings as $asin=> $listing) {
             $index++;
             echo "($index/$total) Processing $asin ...";
             if (empty($asin)) {
@@ -103,7 +102,7 @@ class Import
                 echo " $asin is empty\n";
                 continue;
             }
-            $mainListings = (empty($listing[$this->amazonConnector->mainCountry]) || !is_array($listing[$this->amazonConnector->mainCountry])) ? reset($listing) : $listing[$this->amazonConnector->mainCountry];
+            $mainListings = (empty($listing[$this->connector->mainCountry]) || !is_array($listing[$this->connector->mainCountry])) ? reset($listing) : $listing[$this->connector->mainCountry];
             if (!is_array($mainListings)) {
                 echo " $asin is not an array\n";
                 continue;
@@ -112,7 +111,7 @@ class Import
             $variantProduct = VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => null,
-                    'urlLink' => $this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$this->amazonConnector->mainCountry]['url']."/dp/$asin"),
+                    'urlLink' => $this->connector->getUrlLink(AmazonConstants::amazonMerchant[$this->connector->mainCountry]['url']."/dp/$asin"),
                     'salePrice' => 0,
                     'saleCurrency' => '',
                     'title' => $this->getTitle($mainListing),
@@ -123,7 +122,7 @@ class Import
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
-                marketplace: $this->amazonConnector->getMarketplace(),
+                marketplace: $this->connector->getMarketplace(),
                 parent: $this->getFolder($asin),
             );
             $mainProduct = $variantProduct->getMainProduct();
@@ -177,7 +176,7 @@ class Import
             }
             if ($amazonCollection->getListingId() === $listing['listing-id']) {
                 $found = true;
-                $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->amazonConnector->marketplace);
+                $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->connector->marketplace);
             } else {
                 if ($amazonCollection->getLastUpdate() === null || $amazonCollection->getLastUpdate() < Carbon::now()->subDays(3)) {
                     continue;
@@ -190,7 +189,7 @@ class Import
         }
         if (!$found) {
             $amazonCollection = new AmazonMarketplace();
-            $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->amazonConnector->marketplace);
+            $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->connector->marketplace);
             $amazonCollection->setListingId($listing['listing-id'] ?? '');
             $newCollection->add($amazonCollection);
         }
@@ -215,7 +214,7 @@ class Import
         $amazonCollection->setLastUpdate(Carbon::now());
         $amazonCollection->setMarketplaceId($country);
         $amazonCollection->setTitle($this->getTitle($listing));
-        $amazonCollection->setUrlLink($this->amazonConnector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'] . '/dp/' . ($listing['asin1'] ?? '')));
+        $amazonCollection->setUrlLink($this->connector->getUrlLink(AmazonConstants::amazonMerchant[$country]['url'] . '/dp/' . ($listing['asin1'] ?? '')));
         $amazonCollection->setSalePrice($listing['price'] ?? 0);
         $amazonCollection->setStatus($listing['status'] ?? '');
         $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0));

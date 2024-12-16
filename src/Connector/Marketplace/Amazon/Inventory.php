@@ -3,7 +3,6 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Utils\Utility;
 use App\Utils\Registry;
 use Doctrine\DBAL\Exception;
@@ -11,13 +10,13 @@ use Pimcore\Db;
 
 class Inventory
 {
-    public AmazonConnector $amazonConnector;
+    public Connector $connector;
     public int $rateLimit = 0;
     public array $inventory = [];
 
-    public function __construct(AmazonConnector $amazonConnector) 
+    public function __construct(Connector $connector)
     {
-        $this->amazonConnector = $amazonConnector;
+        $this->connector = $connector;
     }
 
     /**
@@ -70,8 +69,8 @@ class Inventory
 
     public function getInventory(): void
     {
-        $inventoryApi = $this->amazonConnector->amazonSellerConnector->fbaInventoryV1();
-        foreach ($this->amazonConnector->getMarketplace()->getFbaRegions() ?? [] as $country) {
+        $inventoryApi = $this->connector->amazonSellerConnector->fbaInventoryV1();
+        foreach ($this->connector->getMarketplace()->getFbaRegions() ?? [] as $country) {
             $summary = Utility::getCustomCache("{$country}_inventory.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory");
             if ($summary) {
                 $this->inventory[$country] = json_decode($summary, true);

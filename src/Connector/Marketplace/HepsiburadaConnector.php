@@ -4,8 +4,8 @@ namespace App\Connector\Marketplace;
 
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
-use Symfony\Component\HttpClient\HttpClient;
-use Pimcore\Model\DataObject\Data\Link;
+use Exception;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -14,9 +14,16 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
-    public static $marketplaceType = 'Hepsiburada';
-    
-    public function download($forceDownload = false)
+    public static string $marketplaceType = 'Hepsiburada';
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function download($forceDownload = false): void
     {
         $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
         if (!(empty($this->listings) || $forceDownload)) {
@@ -94,6 +101,13 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return $response->toArray();
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadAttributes(): void
     {
         echo "Downloading Attributes\n";
@@ -112,7 +126,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         echo "Attributes Downloaded\n";
     }
 
-    protected function getAttributes($variantTypeAttributes)
+    protected function getAttributes($variantTypeAttributes): string
     {
         $attributeString = "";
         foreach ($variantTypeAttributes as $attribute) {
@@ -121,7 +135,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return rtrim($attributeString, "-");
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -165,12 +183,16 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }  
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    /**
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \Doctrine\DBAL\Exception
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
         $hbsku = $attributes['hbSku'];
         $merchantSku = $attributes['merchantSku'];
@@ -211,13 +233,17 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
-        if ($targetPrice === null) {
+        if (empty($targetPrice)) {
             echo "Error: Price cannot be null\n";
             return;
         }
@@ -228,7 +254,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             }
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $targetCurrency);
-        if ($finalPrice === null) {
+        if (empty($finalPrice)) {
             echo "Error: Currency conversion failed\n";
             return;
        }
@@ -271,7 +297,14 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);
     }
 
-    public function getBatchRequestResult($id,$type)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function getBatchRequestResult($id, $type): array
     {
         $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/{$type}/id/{$id}", [
             'headers' => [
@@ -284,10 +317,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
-            return;
+            return [];
         }
-        $data = $response->toArray();
-        return $data;
+        return $response->toArray();
     }
 
     public function downloadOrders()

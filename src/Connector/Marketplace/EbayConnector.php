@@ -13,7 +13,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         'loginTokenUrl' => "https://auth.ebay.com/oauth2/authorize"
     ];
 
-    public static $marketplaceType = 'Ebay';
+    public static string $marketplaceType = 'Ebay';
 
     protected function getConsentRequest()
     {
