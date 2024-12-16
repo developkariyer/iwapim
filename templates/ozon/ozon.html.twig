@@ -3,22 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category Selector</title>
-
-    {% block stylesheets %}
-        {{ encore_entry_link_tags('app') }}
-    {% endblock %}
+    <title>Select2 Easy Start</title>
+    <!-- Select2 CSS (via CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
-<div>
+<div style="width: 300px; margin: 50px auto;">
     <h1>Select a Category</h1>
-    <div style="width: 100%; max-width: 500px; margin: 0 auto;">
-        <select id="category-select"></select>
-    </div>
+    <!-- Dropdown -->
+    <select id="category-select" style="width: 100%;">
+        <option value="1">Electronics</option>
+        <option value="2">Books</option>
+        <option value="3">Clothing</option>
+    </select>
 </div>
 
-{% block javascripts %}
-    {{ encore_entry_script_tags('app') }}
-{% endblock %}
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS (via CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#category-select').select2({
+            placeholder: "Search or select a category...",
+            width: '100%' // Ensure full width
+        });
+    });
+</script>
 </body>
 </html>
