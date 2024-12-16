@@ -65,12 +65,12 @@ class Connector extends MarketplaceConnectorAbstract
             } catch (DecodingExceptionInterface) {
                 echo "Failed to decode response: " . $response->getContent(false) . "\n";
                 exit;
-                return [];
+                //return [];
             }
         } catch (Exception $e) {
             echo "Unexpected error: " . $e->getMessage() . "\n";
             exit;
-            return [];
+            //return [];
         }
     }
 

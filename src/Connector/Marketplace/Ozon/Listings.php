@@ -12,7 +12,7 @@ class Listings
 {
     public Connector $connector;
 
-    const string API_PRODUCT_LIST_URL = "https://api-seller.ozon.ru/v3/product/list";
+    const string API_PRODUCT_LIST_URL = "https://api-seller.ozon.ru/v2/product/list";
     const string API_PRODUCT_ATTRIBUTES_URL = "https://api-seller.ozon.ru/v4/product/info/attributes";
     const string API_PRODUCT_INFO_URL = "https://api-seller.ozon.ru/v2/product/info";
 
