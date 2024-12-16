@@ -7,7 +7,7 @@ $(document).ready(function () {
     let cachedData = []; // To store the JSON data in memory
 
     // Fetch categories once on page load
-    fetch('/ozon/category-tree')
+    fetch('/ozon/category-tree', { cache: 'no-store' })
         .then(response => response.json())
         .then(data => {
             cachedData = data; // Cache the data
@@ -17,47 +17,72 @@ $(document).ready(function () {
             console.error('Failed to load categories:', err);
         });
 
-    // Render categories into the list
-    function renderCategories(categories, filter = '') {
-        // Recursive rendering function
+    // Recursive function to render the category list
+    function renderCategories(categories) {
         const renderItems = (items) => {
-            return items
-                .filter(item =>
-                    // Filter by category_name or type_name
-                    item.category_name?.toLowerCase().includes(filter) ||
-                    item.type_name?.toLowerCase().includes(filter)
-                )
-                .map(item => {
-                    if (item.category_name) {
-                        // Render parent category (unselectable)
-                        return `
-                            <li class="parent">
-                                ${item.category_name}
-                                <ul>${renderItems(item.children || []).join('')}</ul>
-                            </li>
-                        `;
-                    }
-                    if (item.type_name) {
-                        // Render selectable type
-                        return `
-                            <li class="child" data-id="${item.type_id}">
-                                ${item.type_name}
-                            </li>
-                        `;
-                    }
-                    return '';
-                });
+            return items.map(item => {
+                if (item.category_name) {
+                    // Render parent category (unselectable)
+                    return `
+                        <li class="parent">
+                            ${item.category_name}
+                            <ul>${renderItems(item.children || []).join('')}</ul>
+                        </li>
+                    `;
+                }
+                if (item.type_name) {
+                    // Render selectable type
+                    return `
+                        <li class="child" data-id="${item.type_id}">
+                            ${item.type_name}
+                        </li>
+                    `;
+                }
+                return '';
+            }).join('');
         };
 
         // Clear and re-render the list
-        categoryList.html(renderItems(categories).join(''));
+        categoryList.html(renderItems(categories));
     }
 
-    // Filter categories locally on search input
+    // Filter categories on search input
     searchBox.on('input', function () {
         const filter = searchBox.val().toLowerCase();
-        renderCategories(cachedData, filter); // Filter and re-render
+        const filteredData = filterCategories(cachedData, filter); // Filter the cached data
+        renderCategories(filteredData);
     });
+
+    // Recursive function to filter categories and their children
+    function filterCategories(categories, filter) {
+        return categories
+            .map(category => {
+                let match = false;
+
+                // Check if the parent matches the filter
+                if (category.category_name && category.category_name.toLowerCase().includes(filter)) {
+                    match = true;
+                }
+
+                // Check if children match the filter
+                const filteredChildren = category.children ? filterCategories(category.children, filter) : [];
+
+                if (filteredChildren.length > 0) {
+                    match = true; // Include parent if children match
+                }
+
+                // Return matched parents and children
+                if (match) {
+                    return {
+                        ...category,
+                        children: filteredChildren,
+                    };
+                }
+
+                return null; // Exclude non-matching categories
+            })
+            .filter(Boolean); // Remove null values
+    }
 
     // Handle category selection
     categoryList.on('click', '.child', function () {
