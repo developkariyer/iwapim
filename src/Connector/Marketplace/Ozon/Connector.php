@@ -6,6 +6,7 @@ use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use Exception;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -32,32 +33,45 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function getApiResponse($method, $url, $query = [], $data = []): array
     {
+        echo "getApiResponse: $method $url ".json_encode($query)." ".json_encode($data)."\n";
         $options = [
             'headers' => [
                 'Client-Id' => $this->marketplace->getOzonClientId(),
                 'Api-Key' => $this->marketplace->getOzonApiKey(),
-                'Content-Type' => 'application/json'
             ],
         ];
+
         if (!empty($query)) {
             $options['query'] = $query;
         }
-        if (!empty($data)) {
+
+        if (!empty($data) && ($method === 'POST' || $method === 'PUT')) {
+            $options['headers']['Content-Type'] = 'application/json';
             $options['json'] = $data;
         }
+
         try {
             $response = $this->httpClient->request($method, $url, $options);
             $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: ".json_encode($response->toArray())."\n";
+
+            if ($statusCode < 200 || $statusCode >= 300) {
+                echo "Error: " . json_encode($response->toArray(false)) . "\n";
+                return [];
             }
-            $response = $response->toArray();
-            return $response['result'] ?? [];
+
+            try {
+                $responseArray = $response->toArray();
+                return $responseArray['result'] ?? [];
+            } catch (DecodingExceptionInterface) {
+                echo "Failed to decode response: " . $response->getContent(false) . "\n";
+                return [];
+            }
         } catch (Exception $e) {
-            echo "Unexpected error: " . $e->getMessage() . "\n" . $e->getCode() . "\n";
+            echo "Unexpected error: " . $e->getMessage() . "\n";
             return [];
         }
     }
+
 
     /**
      * @throws TransportExceptionInterface
@@ -68,6 +82,7 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function getApiMultiPageResponse($method, $url, $query = [], $data = [], $itemsKey = 'items'): array
     {
+        echo "getApiMultiPageResponse: $method $url ".json_encode($query)." ".json_encode($data)."\n";
         $items = [];
         $lastId = null;
         if (empty($query['limit'])) {
