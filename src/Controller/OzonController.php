@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Utils\Utility;
 use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,6 +46,8 @@ class OzonController extends FrontendController
                 ['id' => 6, 'name' => 'Women'],
             ]],
         ];
+
+        $categories = json_decode(Utility::getCustomCache('CATEGORY_TREE.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ozon"), true) ?? $categories;
 
         return new JsonResponse($categories);
     }
