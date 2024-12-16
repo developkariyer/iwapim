@@ -79,8 +79,7 @@ class Listings
             //'offer_id' => $product['offer_id'] ?? '',
             //'sku' => 0,
         ];
-        $apiResponse = $this->connector->getApiResponse('POST', self::API_OZON_PRODUCT_INFO_URL, $query);
-        return $apiResponse['result'] ?? [];
+        return $this->connector->getApiResponse('POST', self::API_OZON_PRODUCT_INFO_URL, $query);
     }
 
     /**

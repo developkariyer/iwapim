@@ -61,7 +61,6 @@ class Connector extends MarketplaceConnectorAbstract
 
             try {
                 $responseArray = $response->toArray();
-                print_r($responseArray);
                 return $responseArray['result'] ?? [];
             } catch (DecodingExceptionInterface) {
                 echo "Failed to decode response: " . $response->getContent(false) . "\n";
@@ -92,15 +91,16 @@ class Connector extends MarketplaceConnectorAbstract
         }
         do {
             $query['last_id'] = $lastId;
-            $result = $this->getApiResponse(
+            $response = $this->getApiResponse(
                 $method,
                 $url,
                 $query
             );
-            if (empty($result[$itemsKey])) {
+            $result = empty($itemsKey) ? $response : $response[$itemsKey];
+            if (empty($result)) {
                 break;
             }
-            $items = array_merge($items, empty($itemsKey) ? $result : $result[$itemsKey]);
+            $items = array_merge($items, $result);
             $lastId = $result['last_id'] ?? null;
             $totalCount = $result['total'] ?? 0;
             echo " $totalCount";
