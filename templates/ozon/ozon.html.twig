@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select2 with Webpack</title>
+    <title>Category Selector</title>
     {{ encore_entry_link_tags('app') }}
 </head>
 <body>
-<div style="width: 300px; margin: 50px auto;">
-    <h1>Select a Category</h1>
-    <select id="category-select" style="width: 100%;"></select>
+<div style="width: 400px; margin: 50px auto;">
+    <input type="text" id="search-box" placeholder="Search categories..." style="width: 100%; padding: 5px; margin-bottom: 10px;" />
+    <ul id="category-list"></ul>
 </div>
 {{ encore_entry_script_tags('app') }}
 </body>

@@ -1,51 +1,52 @@
-import 'select2/dist/css/select2.css';
+import './styles/app.css'; // Include your custom CSS
 import $ from 'jquery';
-import 'select2';
 
 $(document).ready(function () {
-    $('#category-select').select2({
-        placeholder: "Search or select a category...",
-        width: '100%',
-        minimumInputLength: 3, // Wait for at least 3 characters
-        ajax: {
-            url: '/ozon/category-tree',
-            dataType: 'json',
-            processResults: function (data) {
-                function transformCategories(categories) {
-                    return categories.map(category => {
-                        if (category.category_name) {
-                            return {
-                                text: category.category_name, // Parent name
-                                disabled: true, // Unselectable parent
-                                children: category.children ? transformCategories(category.children) : [],
-                            };
-                        }
+    const searchBox = $('#search-box');
+    const categoryList = $('#category-list');
 
-                        if (category.type_name) {
-                            return {
-                                id: category.type_id, // Selectable id
-                                text: category.type_name, // Selectable text
-                            };
-                        }
+    // Fetch categories from backend
+    fetch('/ozon/category-tree')
+        .then(response => response.json())
+        .then(data => {
+            renderCategories(data); // Render categories on load
+        });
 
-                        return null; // Handle edge cases
-                    }).filter(Boolean); // Remove null entries
-                }
+    // Render categories into the list
+    function renderCategories(categories, filter = '') {
+        const renderItems = (items) => {
+            return items
+                .filter(item => item.category_name?.toLowerCase().includes(filter) || item.type_name?.toLowerCase().includes(filter))
+                .map(item => {
+                    if (item.category_name) {
+                        // Render parent category
+                        return `<li class="parent">${item.category_name}</li>` +
+                            (item.children ? renderItems(item.children).join('') : '');
+                    }
+                    if (item.type_name) {
+                        // Render selectable type
+                        return `<li data-id="${item.type_id}" class="child">${item.type_name}</li>`;
+                    }
+                    return '';
+                });
+        };
 
-                const results = transformCategories(data);
+        categoryList.html(renderItems(categories).join(''));
+    }
 
-                return {
-                    results: results
-                };
-            },
-        },
-        templateResult: formatResult,
+    // Filter categories on search
+    searchBox.on('input', function () {
+        const filter = searchBox.val().toLowerCase();
+        fetch('/ozon/category-tree') // Fetch full list again
+            .then(response => response.json())
+            .then(data => {
+                renderCategories(data, filter);
+            });
     });
 
-    function formatResult(data) {
-        if (data.children) {
-            return $('<span><strong>' + data.text + '</strong></span>'); // Bold for unselectable parents
-        }
-        return $('<span>' + data.text + '</span>'); // Normal for selectable items
-    }
+    // Handle category selection
+    categoryList.on('click', '.child', function () {
+        const selectedId = $(this).data('id');
+        alert('Selected category ID: ' + selectedId); // Replace with your logic
+    });
 });
