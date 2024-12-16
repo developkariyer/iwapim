@@ -61,6 +61,7 @@ class Connector extends MarketplaceConnectorAbstract
 
             try {
                 $responseArray = $response->toArray();
+                print_r($responseArray);
                 return $responseArray['result'] ?? [];
             } catch (DecodingExceptionInterface) {
                 echo "Failed to decode response: " . $response->getContent(false) . "\n";
@@ -84,7 +85,6 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function getApiMultiPageResponse($method, $url, $query = [], $itemsKey = 'items'): array
     {
-        echo "\ngetApiMultiPageResponse: $method $url ".json_encode($query)."\n\n";
         $items = [];
         $lastId = null;
         if (empty($query['limit'])) {
