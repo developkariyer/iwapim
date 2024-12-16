@@ -31,9 +31,9 @@ class Connector extends MarketplaceConnectorAbstract
     /**
      * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface
      */
-    public function getApiResponse($method, $url, $query = [], $data = []): array
+    public function getApiResponse($method, $url, $query = []): array
     {
-        echo "getApiResponse: $method $url ".json_encode($query)." ".json_encode($data)."\n";
+        echo "getApiResponse: $method $url ".json_encode($query)."\n";
         $options = [
             'headers' => [
                 'Client-Id' => $this->marketplace->getOzonClientId(),
@@ -42,12 +42,12 @@ class Connector extends MarketplaceConnectorAbstract
         ];
 
         if (!empty($query)) {
-            $options['query'] = $query;
-        }
-
-        if (!empty($data) && ($method === 'POST' || $method === 'PUT')) {
-            $options['headers']['Content-Type'] = 'application/json';
-            $options['json'] = $data;
+            if ($method === 'POST' || $method === 'PUT') {
+                $options['headers']['Content-Type'] = 'application/json';
+                $options['json'] = $query;
+            } else {
+                $options['query'] = $query;
+            }
         }
 
         try {
@@ -80,9 +80,9 @@ class Connector extends MarketplaceConnectorAbstract
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function getApiMultiPageResponse($method, $url, $query = [], $data = [], $itemsKey = 'items'): array
+    public function getApiMultiPageResponse($method, $url, $query = [], $itemsKey = 'items'): array
     {
-        echo "getApiMultiPageResponse: $method $url ".json_encode($query)." ".json_encode($data)."\n";
+        echo "getApiMultiPageResponse: $method $url ".json_encode($query)."\n";
         $items = [];
         $lastId = null;
         if (empty($query['limit'])) {
@@ -93,8 +93,7 @@ class Connector extends MarketplaceConnectorAbstract
             $result = $this->getApiResponse(
                 $method,
                 $url,
-                $query,
-                $data
+                $query
             );
             if (empty($result[$itemsKey])) {
                 break;

@@ -2,7 +2,6 @@
 
 namespace App\Connector\Marketplace\Ozon;
 
-use App\Utils\Utility;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -64,7 +63,7 @@ class Listings
      */
     public function getListingsFromApi($visibility = 'ALL'): array
     {
-        return $this->connector->getApiMultiPageResponse('POST',  self::API_PRODUCT_LIST_URL, [], ['visibility' => $visibility]);
+        return $this->connector->getApiMultiPageResponse('POST',  self::API_PRODUCT_LIST_URL, ['visibility' => $visibility]);
     }
 
     /**
