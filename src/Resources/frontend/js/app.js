@@ -19,81 +19,59 @@ $(document).ready(function () {
 
     // Render categories into the list
     function renderCategories(categories) {
-        categoryList.html(renderItems(categories)); // Render items and populate the list
-    }
-
-    // Recursive function to render items
-    function renderItems(items) {
-        if (!Array.isArray(items)) {
-            return ''; // If items is not an array, return an empty string
-        }
-
-        return items
-            .map(item => {
+        const renderItems = (items) => {
+            return items.map(item => {
                 if (item.category_name) {
-                    // Render parent category (unselectable)
+                    // Parent category (unselectable)
                     return `
-                        <li class="parent">
+                        <li class="parent" data-filtered="true">
                             ${item.category_name}
-                            <ul>${renderItems(item.children || [])}</ul>
+                            <ul>${renderItems(item.children || []).join('')}</ul>
                         </li>
                     `;
                 }
                 if (item.type_name) {
-                    // Render selectable type
+                    // Selectable type
                     return `
-                        <li class="child" data-id="${item.type_id}">
+                        <li class="child" data-filtered="true" data-id="${item.type_id}">
                             ${item.type_name}
                         </li>
                     `;
                 }
-                return ''; // Fallback for unexpected data
-            })
-            .filter(Boolean) // Remove undefined or null values
-            .join(''); // Join valid strings to build the HTML
+                return '';
+            }).join('');
+        };
+
+        categoryList.html(renderItems(categories));
     }
 
     // Filter categories on search input
     searchBox.on('input', function () {
         const filter = searchBox.val().toLowerCase();
-        const filteredData = filterCategories(cachedData, filter); // Filter the cached data
-        renderCategories(filteredData);
+        filterCategories(filter);
     });
 
-    // Recursive function to filter categories and their children
-    function filterCategories(categories, filter) {
-        return categories
-            .map(category => {
-                let match = false;
+    // Update visibility without deleting DOM nodes
+    function filterCategories(filter) {
+        categoryList.find('li').each(function () {
+            const text = $(this).text().toLowerCase();
+            const isVisible = text.includes(filter);
 
-                // Check if the parent matches the filter
-                if (category.category_name && category.category_name.toLowerCase().includes(filter)) {
-                    match = true;
-                }
-
-                // Check if children match the filter
-                const filteredChildren = category.children ? filterCategories(category.children, filter) : [];
-
-                if (filteredChildren.length > 0) {
-                    match = true; // Include parent if children match
-                }
-
-                // Return matched parents and children
-                if (match) {
-                    return {
-                        ...category,
-                        children: filteredChildren,
-                    };
-                }
-
-                return null; // Exclude non-matching categories
-            })
-            .filter(Boolean); // Remove null values
+            if (isVisible) {
+                $(this).show();
+                $(this).attr('data-filtered', 'true');
+            } else {
+                $(this).hide();
+                $(this).attr('data-filtered', 'false');
+            }
+        });
     }
 
-    // Handle category selection using event delegation
+    // Handle category selection
     categoryList.on('click', '.child', function () {
-        const selectedId = $(this).data('id');
-        alert(`Selected category ID: ${selectedId}`); // Replace with your logic
+        if ($(this).attr('data-filtered') === 'true') {
+            const selectedId = $(this).data('id');
+            alert(`Selected category ID: ${selectedId}`);
+        }
     });
 });
