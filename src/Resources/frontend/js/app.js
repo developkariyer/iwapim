@@ -10,18 +10,27 @@ $(document).ready(function () {
             url: '/ozon/category-tree', // Your API endpoint
             dataType: 'json',
             processResults: function (data) {
-                // Transform the data to make category_name unselectable
+                // Recursive function to transform nested categories
                 function transformCategories(categories) {
-                    return categories.map(category => ({
-                        text: category.category_name, // Unselectable parent
-                        children: [
-                            ...(category.children ? transformCategories(category.children) : []),
-                            ...(category.children || []).map(child => ({
-                                id: child.type_id, // Selectable type_id
-                                text: child.type_name // Selectable type_name
-                            }))
-                        ]
-                    }));
+                    return categories.map(category => {
+                        const node = {
+                            text: category.category_name || category.type_name, // Show name
+                            id: category.type_id || null, // Only set `id` for selectable items
+                            children: []
+                        };
+
+                        // If children exist, process them recursively
+                        if (category.children && category.children.length > 0) {
+                            node.children = transformCategories(category.children);
+                        }
+
+                        // If this node has an `id` (type_name), it's selectable
+                        if (!node.id) {
+                            node.disabled = true; // Disable unselectable parents
+                        }
+
+                        return node;
+                    });
                 }
 
                 // Transform the top-level categories
@@ -38,7 +47,7 @@ $(document).ready(function () {
     // Format display to distinguish unselectable parents
     function formatResult(data) {
         if (data.children) {
-            return $('<span><strong>' + data.text + '</strong></span>'); // Bold for parent categories
+            return $('<span><strong>' + data.text + '</strong></span>'); // Bold for unselectable parents
         }
         return $('<span>' + data.text + '</span>'); // Normal for selectable items
     }
