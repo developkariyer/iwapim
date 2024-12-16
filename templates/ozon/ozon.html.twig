@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Category Selector</title>
-    {{ encore_entry_link_tags('app') }}
+    {{ encore_entry_link_tags('app') }} {# This will include app.css #}
 </head>
 <body>
 <div style="width: 400px; margin: 50px auto;">
-    <input type="text" id="search-box" placeholder="Search categories..." style="width: 100%; padding: 5px; margin-bottom: 10px;" />
+    <input type="text" id="search-box" placeholder="Search categories..." style="width: 100%; padding: 5px; margin-bottom: 10px;">
     <ul id="category-list"></ul>
 </div>
-{{ encore_entry_script_tags('app') }}
+{{ encore_entry_script_tags('app') }} {# This will include app.js #}
 </body>
 </html>

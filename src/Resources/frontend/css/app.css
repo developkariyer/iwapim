@@ -1,0 +1,25 @@
+#category-list {
+    border: 1px solid #ccc;
+    max-height: 300px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+}
+
+#category-list li {
+    padding: 5px;
+    cursor: pointer;
+}
+
+#category-list li:hover {
+    background-color: #f0f0f0;
+}
+
+#category-list .parent {
+    font-weight: bold;
+    cursor: default;
+}
+
+#category-list .parent:hover {
+    background-color: transparent;
+}

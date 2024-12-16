@@ -1,4 +1,4 @@
-import './styles/app.css'; // Include your custom CSS
+import '../css/app.css'; // Link the CSS file
 import $ from 'jquery';
 
 $(document).ready(function () {
@@ -8,45 +8,40 @@ $(document).ready(function () {
     // Fetch categories from backend
     fetch('/ozon/category-tree')
         .then(response => response.json())
-        .then(data => {
-            renderCategories(data); // Render categories on load
-        });
+        .then(data => renderCategories(data));
 
-    // Render categories into the list
+    // Recursive function to render the category list
     function renderCategories(categories, filter = '') {
         const renderItems = (items) => {
             return items
-                .filter(item => item.category_name?.toLowerCase().includes(filter) || item.type_name?.toLowerCase().includes(filter))
+                .filter(item =>
+                    item.category_name?.toLowerCase().includes(filter) ||
+                    item.type_name?.toLowerCase().includes(filter)
+                )
                 .map(item => {
                     if (item.category_name) {
-                        // Render parent category
                         return `<li class="parent">${item.category_name}</li>` +
                             (item.children ? renderItems(item.children).join('') : '');
                     }
                     if (item.type_name) {
-                        // Render selectable type
                         return `<li data-id="${item.type_id}" class="child">${item.type_name}</li>`;
                     }
-                    return '';
-                });
+                }).join('');
         };
 
-        categoryList.html(renderItems(categories).join(''));
+        categoryList.html(renderItems(categories));
     }
 
-    // Filter categories on search
+    // Filter logic
     searchBox.on('input', function () {
         const filter = searchBox.val().toLowerCase();
-        fetch('/ozon/category-tree') // Fetch full list again
+        fetch('/ozon/category-tree')
             .then(response => response.json())
-            .then(data => {
-                renderCategories(data, filter);
-            });
+            .then(data => renderCategories(data, filter));
     });
 
-    // Handle category selection
+    // Handle selection
     categoryList.on('click', '.child', function () {
-        const selectedId = $(this).data('id');
-        alert('Selected category ID: ' + selectedId); // Replace with your logic
+        alert(`Selected ID: ${$(this).data('id')}`);
     });
 });
