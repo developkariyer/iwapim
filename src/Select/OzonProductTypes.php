@@ -7,6 +7,7 @@ use Pimcore\Model\DataObject\ClassDefinition\DynamicOptionsProvider\SelectOption
 
 class OzonProductTypes implements SelectOptionsProviderInterface
 {
+
     public function getOptions(array $context, Data $fieldDefinition = null): array
     {
         $ozonCategoryTree = json_decode(file_get_contents(PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/Ozon/CATEGORY_TREE.json'), true);
