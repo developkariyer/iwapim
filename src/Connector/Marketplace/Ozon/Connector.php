@@ -103,7 +103,6 @@ class Connector extends MarketplaceConnectorAbstract
             $items = array_merge($items, $result);
             $lastId = $result['last_id'] ?? null;
             $totalCount = $result['total'] ?? 0;
-            echo " $totalCount";
         } while ($lastId !== null && count($items) < $totalCount);
         return $items;
     }

@@ -34,7 +34,6 @@ class Listings
         $this->connector->listings = [];
         $productBucket = [];
         $products = $this->getListingsFromApi();
-        print_r($products);
         $totalCount = count($products);
         $index = 0;
         foreach ($products as $product) {
@@ -47,7 +46,6 @@ class Listings
             }
             $this->connector->listings[$productId] = $product;
             $this->connector->listings[$productId]['info'] = $this->getProductInfo($product);
-            print_r($this->connector->listings[$productId]['info']);
             //echo " {$this->connector->listings[$productId]['info']['sku']} ";
             $productBucket[] = $productId;
             if (count($productBucket) >= 1000) {
@@ -58,7 +56,7 @@ class Listings
         }
         $this->getProductAttributes($productBucket);
         $this->connector->putListingsToCache();
-        //print_r($this->connector->listings);
+        print_r($this->connector->listings);
     }
 
     /**
@@ -87,7 +85,6 @@ class Listings
      */
     public function getProductAttributes(array $productBucket): void
     {
-        return;
         $query = [
             'filter' => [
                 'product_id' => $productBucket,
