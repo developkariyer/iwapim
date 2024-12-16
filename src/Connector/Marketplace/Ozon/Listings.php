@@ -64,7 +64,12 @@ class Listings
      */
     public function getListingsFromApi($visibility = 'ALL'): array
     {
-        return $this->connector->getApiMultiPageResponse('POST',  self::API_OZON_PRODUCT_LIST_URL, []);
+        $query = [
+            'filter' => [
+                'visibility' => $visibility,
+            ],
+        ];
+        return $this->connector->getApiMultiPageResponse('POST',  self::API_OZON_PRODUCT_LIST_URL, $query);
     }
 
     /**
