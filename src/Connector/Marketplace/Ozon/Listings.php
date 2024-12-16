@@ -58,6 +58,7 @@ class Listings
         }
         $this->getProductAttributes($productBucket);
         $this->connector->putListingsToCache();
+        print_r($this->connector->listings);
     }
 
     /**
