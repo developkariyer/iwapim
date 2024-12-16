@@ -3,108 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ozon Yardımcısı</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqtree/1.6.1/tree.jquery.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqtree/1.6.1/jqtree.css">
+    <title>Category Selector</title>
 
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
 </head>
 <body>
-    <div class="container-fluid">
-        <input type="text" id="search" class="form-control" placeholder="Arama yapın...">
-        <div id="tree1"></div>
-    </div> 
+<div>
+    <h1>Select a Category</h1>
+    <select id="category-select" class="form-control"></select>
+</div>
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
 </body>
-<script>
-    function transformData(data) {
-        if (data && data.result) {
-            data = data.result;
-        }
-        renameCategoryNameToName(data);
-        return data;
-    }
-    
-    function renameCategoryNameToName(data) {
-        if (Array.isArray(data)) {
-            data.forEach(item => renameCategoryNameToName(item));
-        } else if (typeof data === 'object' && data !== null) {
-            if ('category_name' in data) {
-                data.name = data.category_name;
-                delete data.category_name; 
-            }
-            if ('type_name' in data) {
-                data.name = data.type_name;
-                delete data.type_name;
-            }
-            if ('children' in data && Array.isArray(data.children) && data.children.length > 0) {
-                renameCategoryNameToName(data.children);
-            } else {
-                delete data.children;
-            }
-        }
-    }
-
-    $(document).ready(function() {
-        console.log('Document is ready v.3');
-        let treeInstance;
-
-        $.getJSON('/tmp/categories.json')
-            .done(function(data) {
-                const transformedData = transformData(data);
-                treeInstance = $('#tree1').tree({
-                    data: transformedData
-                });
-            })
-            .fail(function(jqxhr, textStatus, error) {
-                console.error("Failed to load JSON: ", textStatus, error);
-                alert("Failed to load data. Please try again later.");
-            });
-
-        $('#search').on('keypress', function(e) {
-            if (e.which === 13) { // Check if Enter is pressed
-                const searchTerm = $(this).val().toLowerCase();
-                if (!treeInstance) {
-                    console.log('Tree instance is not ready yet.');
-                    return;
-                }
-
-                console.log('Collapsing all nodes...');
-                $('#tree1').tree('closeAll');
-
-                const matchingNodes = [];
-                $('#tree1').tree('getTree').iterate(function(node) {
-                    if (node.name.toLowerCase().includes(searchTerm)) {
-                        matchingNodes.push(node);
-                        return false; // Stop iteration
-                    }
-                });
-                console.log('matchingNodes:', matchingNodes);
-
-                // Expand and highlight the matching nodes
-                matchingNodes.forEach(node => {
-                    let currentNode = node;
-                    while (currentNode.parent) {
-                        $('#tree1').tree('openNode', currentNode.parent); // Open parent nodes
-                        currentNode = currentNode.parent;
-                    }
-                    // Add a highlight class to the matching node
-                    const $nodeElement = $('#tree1').find(`[data-id="${node.id}"]`);
-                    $nodeElement.addClass('highlight');
-                });
-            }
-        });
-
-        // Optional: CSS for highlighted nodes
-        $('<style>')
-            .prop('type', 'text/css')
-            .html(`
-                .highlight {
-                    background-color: yellow;
-                }
-            `)
-            .appendTo('head');
-    });
-</script>
-
 </html>
