@@ -44,39 +44,61 @@ class Products
      */
     public function saveCategoryTreeToDb(): void
     {
-        function serializeCategoryTree($parentId, $children): array
-        {
-            $serializedCategoryTree = [];
-            foreach ($children as $child) {
-                $serializedCategoryTree[] = [
-                    'description_category_id' => $child['description_category_id'] ?? "{$parentId}_{$child['type_id']}",
+        $serializedCategoryTree = $this->serializeCategoryTree($this->categoryTree);
+        $db = Db::get();
+        try {
+            $db->executeQuery("TRUNCATE TABLE iwa_ozon_description_category_tree");
+            $db->beginTransaction();
+            foreach ($serializedCategoryTree as $item) {
+                $db->executeQuery(
+                    "INSERT INTO iwa_ozon_description_category_tree (description_category_id, category_name, type_id, type_name, parent_id) VALUES (?, ?, ?, ?, ?)",
+                    [
+                        $item['description_category_id'],
+                        $item['category_name'],
+                        $item['type_id'],
+                        $item['type_name'],
+                        $item['parent_id'],
+                    ]
+                );
+            }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            // Use a logger to log the error
+            echo "Database error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    private function serializeCategoryTree($children): array
+    {
+        $serializedCategoryTree = [];
+        $stack = [[
+            'parentId' => null,
+            'children' => $children,
+        ]];
+        while (!empty($stack)) {
+            $current = array_pop($stack);
+            $currentParentId = $current['parentId'];
+            $currentChildren = $current['children'];
+
+            foreach ($currentChildren as $child) {
+                $category = [
+                    'description_category_id' => $child['description_category_id'] ?? "{$currentParentId}_{$child['type_id']}",
                     'category_name' => $child['category_name'] ?? '',
                     'type_id' => $child['type_id'] ?? '',
                     'type_name' => $child['type_name'] ?? '',
-                    'parent_id' => $parentId,
+                    'parent_id' => $currentParentId,
                 ];
+                $serializedCategoryTree[] = $category;
                 if (!empty($child['children'])) {
-                    $serializedCategoryTree = array_merge($serializedCategoryTree, serializeCategoryTree($child['description_category_id'] ?? $child['type_id'], $child['children']));
+                    $stack[] = [
+                        'parentId' => $category['description_category_id'],
+                        'children' => $child['children'],
+                    ];
                 }
             }
-            echo count($serializedCategoryTree) . " categories\n";
-            return $serializedCategoryTree;
         }
-
-        $serializedCategoryTree = serializeCategoryTree(null, $this->categoryTree);
-
-        $db = Db::get();
-        $db->executeQuery("TRUNCATE TABLE ozon_category_tree");
-        $db->beginTransaction();
-        foreach ($serializedCategoryTree as $item) {
-            $db->executeQuery("INSERT INTO iwa_ozon_description_category_tree (description_category_id, category_name, type_id, type_name, parent_id) VALUES (?, ?, ?, ?, ?)", [
-                $item['description_category_id'],
-                $item['category_name'],
-                $item['type_id'],
-                $item['type_name'],
-                $item['parent_id'],
-            ]);
-        }
-        $db->commit();
+        return $serializedCategoryTree;
     }
+
 }
