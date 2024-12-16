@@ -59,6 +59,7 @@ class Products
                     $serializedCategoryTree = array_merge($serializedCategoryTree, serializeCategoryTree($child['description_category_id'] ?? $child['type_id'], $child['children']));
                 }
             }
+            echo count($serializedCategoryTree) . " categories\n";
             return $serializedCategoryTree;
         }
 
