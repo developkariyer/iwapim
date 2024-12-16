@@ -58,7 +58,7 @@ class Listings
         }
         $this->getProductAttributes($productBucket);
         $this->connector->putListingsToCache();
-        print_r($this->connector->listings);
+        //print_r($this->connector->listings);
     }
 
     /**
@@ -76,8 +76,8 @@ class Listings
     {
         $query = [
             'product_id' => $product['product_id'],
-            'offer_id' => $product['offer_id'] ?? '',
-            'sku' => 0,
+            //'offer_id' => $product['offer_id'] ?? '',
+            //'sku' => 0,
         ];
         $apiResponse = $this->connector->getApiResponse('POST', self::API_OZON_PRODUCT_INFO_URL, $query);
         return $apiResponse['result'] ?? [];
@@ -88,6 +88,7 @@ class Listings
      */
     public function getProductAttributes(array $productBucket): void
     {
+        return;
         $query = [
             'filter' => [
                 'product_id' => $productBucket,
