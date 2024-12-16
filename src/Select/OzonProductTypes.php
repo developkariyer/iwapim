@@ -33,7 +33,7 @@ class OzonProductTypes implements SelectOptionsProviderInterface
                 }
                 if (!empty($child['children'])) {
                     $stack[] = [
-                        'id' => $child['id'],
+                        'id' => $child['description_category_id'],
                         'children' => $child['children'],
                         'parent_text' => $parent_text,
                     ];
