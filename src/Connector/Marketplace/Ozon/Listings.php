@@ -12,9 +12,9 @@ class Listings
 {
     public Connector $connector;
 
-    const string API_PRODUCT_LIST_URL = "https://api-seller.ozon.ru/v2/product/list";
-    const string API_PRODUCT_ATTRIBUTES_URL = "https://api-seller.ozon.ru/v4/product/info/attributes";
-    const string API_PRODUCT_INFO_URL = "https://api-seller.ozon.ru/v2/product/info";
+    const string API_OZON_PRODUCT_LIST_URL = "https://api-seller.ozon.ru/v2/product/list";
+    const string API_OZON_PRODUCT_ATTRIBUTES_URL = "https://api-seller.ozon.ru/v4/product/info/attributes";
+    const string API_OZON_PRODUCT_INFO_URL = "https://api-seller.ozon.ru/v2/product/info";
 
     public function __construct(Connector $connector)
     {
@@ -63,7 +63,7 @@ class Listings
      */
     public function getListingsFromApi($visibility = 'ALL'): array
     {
-        return $this->connector->getApiMultiPageResponse('POST',  self::API_PRODUCT_LIST_URL, []);
+        return $this->connector->getApiMultiPageResponse('POST',  self::API_OZON_PRODUCT_LIST_URL, []);
     }
 
     /**
@@ -72,7 +72,7 @@ class Listings
     public function getProductInfo($product): array
     {
         $productId = $product['product_id'];
-        $apiResponse = $this->connector->getApiResponse('POST', self::API_PRODUCT_INFO_URL, ['product_id' => $productId]);
+        $apiResponse = $this->connector->getApiResponse('POST', self::API_OZON_PRODUCT_INFO_URL, ['product_id' => $productId]);
         return $apiResponse['result'] ?? [];
     }
 
@@ -87,7 +87,7 @@ class Listings
                 'visibility' => 'ALL'
             ],
         ];
-        $productAttributes = $this->connector->getApiMultiPageResponse('POST', self::API_PRODUCT_ATTRIBUTES_URL, $query);
+        $productAttributes = $this->connector->getApiMultiPageResponse('POST', self::API_OZON_PRODUCT_ATTRIBUTES_URL, $query);
         foreach ($productAttributes as $product) {
             if (!isset($this->connector->listings[$product['id']])) {
                 echo "Product {$product['id']} not found in listings.\n";

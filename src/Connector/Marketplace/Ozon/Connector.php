@@ -6,7 +6,6 @@ use App\Connector\Marketplace\MarketplaceConnectorAbstract;
 use Exception;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -33,7 +32,7 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function getApiResponse($method, $url, $query = []): array
     {
-        echo "getApiResponse: $method $url ".json_encode($query)."\n";
+        echo "\ngetApiResponse: $method $url ".json_encode($query)."\n\n";
         $options = [
             'headers' => [
                 'Client-Id' => $this->marketplace->getOzonClientId(),
@@ -56,7 +55,8 @@ class Connector extends MarketplaceConnectorAbstract
 
             if ($statusCode < 200 || $statusCode >= 300) {
                 echo "Error: " . json_encode($response->toArray(false)) . "\n";
-                return [];
+                exit;
+                //return [];
             }
 
             try {
@@ -84,7 +84,7 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function getApiMultiPageResponse($method, $url, $query = [], $itemsKey = 'items'): array
     {
-        echo "getApiMultiPageResponse: $method $url ".json_encode($query)."\n";
+        echo "\ngetApiMultiPageResponse: $method $url ".json_encode($query)."\n\n";
         $items = [];
         $lastId = null;
         if (empty($query['limit'])) {
