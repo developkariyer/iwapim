@@ -91,7 +91,7 @@ $(document).ready(function () {
             .filter(Boolean); // Remove null values
     }
 
-    // Handle category selection
+    // Handle category selection using event delegation
     categoryList.on('click', '.child', function () {
         const selectedId = $(this).data('id');
         alert(`Selected category ID: ${selectedId}`); // Replace with your logic
