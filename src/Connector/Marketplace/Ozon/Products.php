@@ -59,8 +59,8 @@ class Products
                 foreach ($response as $attribute) {
                     $this->attributes[$categoryId]['products'][$productId]['attributes'][$attribute['id']] = $attribute;
                 }
-                echo "\n";
             }
+            echo "\n";
         }
     }
 
