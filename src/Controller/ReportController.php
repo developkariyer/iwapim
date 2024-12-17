@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\GroupProduct;
@@ -34,19 +35,17 @@ class ReportController extends FrontendController
         return $sticker->getFullPath();
     }
 
-    private function prepareProductsData($products, $pricingModels, $showPrice = true, $stickerType = 'iwasku')
+    private function prepareProductsData($products, $pricingModels, $showPrice = true, $stickerType = 'iwasku'): array
     {
         $priceTemplate = Marketplace::getMarketplaceListAsArrayKeys();
         $productTwig = [];
 
-        $index = 0;
         foreach ($products as $product) {
-            $index++;
             if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
                 $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
             }
 
-            $productModels = $this->getProductModels($pricingModels, $product);
+            $productModels = $this->getProductModels($pricingModels);
             $prices = $this->getProductPrices($product, $priceTemplate);
 
             $sticker = self::stickerPath($stickerType, $product);
@@ -78,7 +77,7 @@ class ReportController extends FrontendController
         return $productTwig;
     }
 
-    private function prepareModelsData($pricingModels)
+    private function prepareModelsData($pricingModels): array
     {
         $modelTwig = [];    
         foreach ($pricingModels as $pricingModel) {
@@ -87,7 +86,7 @@ class ReportController extends FrontendController
         return $modelTwig;
     }
 
-    private function getProductModels($pricingModels, $product)
+    private function getProductModels($pricingModels): array
     {
         $productModels = [];
 
@@ -133,7 +132,7 @@ class ReportController extends FrontendController
         return $priceTemplate;
     }
 
-    private function prepareSingleProductData($product, $showPrice = true)
+    private function prepareSingleProductData($product): array
     {
         if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
             $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
@@ -151,21 +150,22 @@ class ReportController extends FrontendController
             'productDimension3' => $product->getInheritedField('productDimension3'),
             'packageWeight' => $product->getInheritedField('packageWeight'),
             'imageUrl' => $imageUrl,
-            'productCost' => $showPrice ? $product->getProductCost() : '',
+            'productCost' => true ? $product->getProductCost() : '',
             'bundleItems' => [], //$product->getBundleItems(),
             'prices' => $prices,
             'sticker' => '',
             'documents' => $product->getInheritedField('technicals'),
         ];
     }
- 
-    
+
+
     /**
      * @Route("/report/connected", name="report_connected")
+     * @throws Exception
      */
     public function connectedAction(): Response
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $sql = "SELECT DISTINCT src_id FROM object_relations_product WHERE fieldname='listingItems' LIMIT 5";
         $products = array_map(function ($row) {
             return Product::getById($row['src_id']);
@@ -255,7 +255,7 @@ class ReportController extends FrontendController
     }
 
     /**
-     * @ Route("/report/sticker/{group_id}/{type?iwasku}", name="report_sticker")
+     * @Route("/report/sticker/{group_id}/{type?iwasku}", name="report_sticker")
      */
     public function stickerAction(Request $request): Response
     {
