@@ -54,7 +54,7 @@ class Products
             echo "    Getting attributes for category {$category['category_name']} ";
             foreach (array_keys($category['products']) as $productId) {
                 echo "{$category['products'][$productId]['type_name']}(";
-                $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$productId}.json");
+                $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$productId}.json", 7*86400);
                 if (empty($response)) {
                     echo "*";
                     $response = $this->connector->getApiResponse('POST', self::API_CATEGORY_ATTRIBUTE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $productId]);
