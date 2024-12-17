@@ -52,12 +52,16 @@ class Products
     {
         echo "  Getting category attributes from API\n";
         foreach ($this->attributes as $categoryId => $category) {
+            echo "    Getting attributes for category {$category['category_name']} ";
             foreach (array_keys($category['products']) as $productId) {
+                echo "{$category['products'][$productId]['type_name']}";
                 $response = $this->connector->getApiResponse('POST', self::API_CATEGORY_ATTRIBUTE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $productId]);
+                echo "(".count($response).") ";
                 foreach ($response as $attribute) {
                     $this->attributes[$categoryId]['products'][$productId]['attributes'][$attribute['id']] = $attribute;
                 }
-           }
+                echo "\n";
+            }
         }
     }
 
