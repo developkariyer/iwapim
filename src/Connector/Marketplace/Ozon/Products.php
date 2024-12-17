@@ -14,6 +14,7 @@ class Products
     public OzonConnector $connector;
 
     const string API_CATEGORY_TREE_URL = "https://api-seller.ozon.ru/v1/description-category/tree";
+    const string API_CATEGORY_ATTRIBUTE_URL = "https://api-seller.ozon.ru/v1/description-category/attribute";
 
     public array $categoryTree = [];
     public array $attributes = [];
@@ -40,8 +41,29 @@ class Products
         print_r($this->attributes);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function getCategoryAttributesFromApi(): void
     {
+        echo "  Getting category attributes from API\n";
+        foreach ($this->attributes as $categoryId => $category) {
+            foreach (array_keys($category['products']) as $productId) {
+                $response = $this->connector->getApiResponse('POST', self::API_CATEGORY_ATTRIBUTE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $productId]);
+                foreach ($response as $attribute) {
+                    $this->attributes[$categoryId]['products'][$productId]['attributes'][$attribute['id']] = $attribute;
+                }
+           }
+        }
+    }
+
+    public function saveAttributes(): void
+    {
+        $this->connector->putToCache('CATEGORY_ATTRIBUTES.json', $this->attributes);
     }
 
     public function buildCategoryTree(): void
