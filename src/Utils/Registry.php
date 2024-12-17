@@ -54,11 +54,32 @@ class Registry
     /**
      * @throws Exception
      */
-    public static function getKey($regkey, $regtype = 'DEFAULT', $useTransaction = false)
+    public static function getJsonKey($regkey, $regtype='DEFAULT', $useTransaction = false): array
+    {
+        $db = $useTransaction ? (self::$transactionDb ?? Db::get()) : Db::get();
+        $sql = "SELECT regjson FROM iwa_registry_json WHERE regkey = ? AND regtype = ?";
+        $json = $db->fetchOne($sql, [$regkey, $regtype]);
+        return json_decode($json, true) ?? [];
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function setJsonKey($regkey, $regjson, $regtype='DEFAULT'): void
+    {
+        $db = self::$transactionDb ?? Db::get();
+        $sql = "INSERT INTO iwa_registry_json (regkey, regjson, regtype) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE regjson = ?";
+        $db->executeStatement($sql, [$regkey, json_encode($regjson), $regtype, json_encode($regjson)]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function getKey($regkey, $regtype = 'DEFAULT', $useTransaction = false): string
     {
         $db = $useTransaction ? (self::$transactionDb ?? Db::get()) : Db::get();
         $sql = "SELECT regvalue FROM iwa_registry WHERE regkey = ? AND regtype = ?";
-        return $db->fetchOne($sql, [$regkey, $regtype]);
+        return $db->fetchOne($sql, [$regkey, $regtype]) ?? '';
     }
 
     /**

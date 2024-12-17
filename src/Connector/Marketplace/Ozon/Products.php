@@ -17,7 +17,7 @@ class Products
 
     const string API_CATEGORY_TREE_URL = "https://api-seller.ozon.ru/v1/description-category/tree";
 
-    public array $categoryTree;
+    public array $categoryTree = [];
 
     public function __construct(OzonConnector $connector)
     {
@@ -26,9 +26,11 @@ class Products
 
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
+     * @throws Exception
      */
     public function getCategoryTreeFromApi(): void
     {
+        echo "  Getting category tree from API\n";
         $this->categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json');
         if (empty($this->categoryTree)) {
             $this->categoryTree = $this->connector->getApiResponse('POST', self::API_CATEGORY_TREE_URL, ['language' => 'EN']);
@@ -36,6 +38,11 @@ class Products
         } else {
             echo "  Using cached category tree\n";
         }
+        $this->saveCategoryTreeToDb();
+    }
+
+    public function getCategoryAttributesFromApi(): void
+    {
     }
 
     /**
@@ -43,43 +50,11 @@ class Products
      */
     public function saveCategoryTreeToDb(): void
     {
-        $this->serializeCategoryTree($this->categoryTree);
-        /*
-        $serializedCategoryTree = $this->serializeCategoryTree($this->categoryTree);
-        $db = Db::get();
-        try {
-            $db->executeQuery("TRUNCATE TABLE iwa_ozon_description_category_tree");
-            $db->beginTransaction();
-            foreach ($serializedCategoryTree as $item) {
-                $db->executeQuery(
-                    "INSERT INTO iwa_ozon_description_category_tree (description_category_id, category_name, type_id, type_name, parent_id) VALUES (?, ?, ?, ?, ?)",
-                    [
-                        $item['description_category_id'],
-                        $item['category_name'],
-                        $item['type_id'],
-                        $item['type_name'],
-                        $item['parent_id'],
-                    ]
-                );
-            }
-            $db->commit();
-        } catch (\Exception $e) {
-            $db->rollBack();
-            // Use a logger to log the error
-            echo "Database error: " . $e->getMessage() . "\n";
-        }
-        */
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function serializeCategoryTree($children): void
-    {
-        //$serializedCategoryTree = [];
+        $categoryTree = [];
+        echo "  Saving category tree to database\n";
         $stack = [[
             'parentId' => null,
-            'children' => $children,
+            'children' => $this->categoryTree ?? [],
         ]];
         Registry::beginTransaction();
         while (!empty($stack)) {
@@ -93,18 +68,16 @@ class Products
                     if (!is_null($currentParentId)) {
                         Registry::setKey($child['description_category_id'], $currentParentId, 'ozonCategoryParent');
                     }
+                    $categoryTree[$child['description_category_id']] = [
+                        'category_name' => $child['category_name'],
+                        'parent' => $currentParentId,
+                        'products' => []
+                    ];
                 } elseif (isset($child['type_id'])) {
                     Registry::setKey($child['type_id'], $child['type_name'], 'ozonProductType');
                     Registry::setKey($child['type_id'], $currentParentId, 'ozonProductTypeParent');
-                } /*
-                $category = [
-                    'description_category_id' => $child['description_category_id'] ?? $currentParentId,
-                    'category_name' => $child['category_name'] ?? '',
-                    'type_id' => $child['type_id'] ?? '',
-                    'type_name' => $child['type_name'] ?? '',
-                    'parent_id' => $currentParentId,
-                ];
-                $serializedCategoryTree[] = $category; */
+                    $categoryTree[$currentParentId]['products'][$child['type_id']] = $child['type_name'];
+                }
                 if (!empty($child['children'])) {
                     $stack[] = [
                         'parentId' => $child['description_category_id'],
@@ -114,7 +87,9 @@ class Products
             }
         }
         Registry::commit();
-        // return $serializedCategoryTree;
+        print_r($categoryTree);
     }
+
+
 
 }
