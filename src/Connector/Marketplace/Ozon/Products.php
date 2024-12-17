@@ -3,9 +3,7 @@
 namespace App\Connector\Marketplace\Ozon;
 
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
-use App\Utils\Utility;
-use Doctrine\DBAL\Exception;
-use Pimcore\Db;
+use App\Utils\Registry;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -40,10 +38,11 @@ class Products
     }
 
     /**
-     * @throws Exception
      */
     public function saveCategoryTreeToDb(): void
     {
+        $this->serializeCategoryTree($this->categoryTree);
+        /*
         $serializedCategoryTree = $this->serializeCategoryTree($this->categoryTree);
         $db = Db::get();
         try {
@@ -67,11 +66,12 @@ class Products
             // Use a logger to log the error
             echo "Database error: " . $e->getMessage() . "\n";
         }
+        */
     }
 
-    private function serializeCategoryTree($children): array
+    private function serializeCategoryTree($children): void
     {
-        $serializedCategoryTree = [];
+        //$serializedCategoryTree = [];
         $stack = [[
             'parentId' => null,
             'children' => $children,
@@ -82,6 +82,15 @@ class Products
             $currentChildren = $current['children'];
 
             foreach ($currentChildren as $child) {
+                if (isset($child['description_category_id'])) {
+                    Registry::setKey($child['description_category_id'], $child['category_name'], 'ozonCategory');
+                    if (!is_null($currentParentId)) {
+                        Registry::setKey($child['description_category_id'], $currentParentId, 'ozonCategoryParent');
+                    }
+                } elseif (isset($child['type_id'])) {
+                    Registry::setKey($child['type_id'], $child['type_name'], 'ozonProductType');
+                    Registry::setKey($child['type_id'], $currentParentId, 'ozonProductTypeParent');
+                } /*
                 $category = [
                     'description_category_id' => $child['description_category_id'] ?? $currentParentId,
                     'category_name' => $child['category_name'] ?? '',
@@ -89,16 +98,16 @@ class Products
                     'type_name' => $child['type_name'] ?? '',
                     'parent_id' => $currentParentId,
                 ];
-                $serializedCategoryTree[] = $category;
+                $serializedCategoryTree[] = $category; */
                 if (!empty($child['children'])) {
                     $stack[] = [
-                        'parentId' => $category['description_category_id'],
+                        'parentId' => $child['description_category_id'],
                         'children' => $child['children'],
                     ];
                 }
             }
         }
-        return $serializedCategoryTree;
+        // return $serializedCategoryTree;
     }
 
 }
