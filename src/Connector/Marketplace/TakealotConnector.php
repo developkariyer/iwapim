@@ -31,8 +31,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -66,7 +65,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        $this->putListingsToCache();
     }
 
     public function createUrlLink($url,$title): string
@@ -224,24 +223,25 @@ class TakealotConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws TransportExceptionInterface
+     * @param VariantProduct $listing
+     * @param int $targetValue
+     * @param null $sku
+     * @param null $country
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
      * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         $offerId = json_decode($listing->jsonRead('apiResponseJson'), true)['offer_id'];
         if (empty($offerId)) {
             echo "Offer ID not found\n";
             return;
         }
-        $response = $this->httpClient->request('PATCH', static::$apiUrl['offers'], [
-            'headers' => [
-                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-            ],
+        $request = [
             'query' => [
                 'identifier' => $offerId
             ],
@@ -251,37 +251,34 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     'quantity' => $targetValue
                 ]
             ]
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        $data = $response->toArray();
-        $date = date('Y-m-d H:i:s');
-        $filename = "{$offerId}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetInventory', $data);
+        ];
+        $this->setInventoryPrice($request,"SETINVENTORY_{$offerId}.json");
     }
 
     /**
+     * @param VariantProduct $listing
+     * @param string $targetPrice
+     * @param null $targetCurrency
+     * @param null $sku
+     * @param null $country
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
      * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
-        if ($targetPrice === null) {
+        if (empty($targetPrice)) {
             echo "Error: Price cannot be null\n";
             return;
         }
-        if ($targetCurrency === null) {
+        if (empty($targetCurrency)) {
             $targetCurrency = $listing->getSaleCurrency();
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if ($finalPrice === null) {
+        if (empty($finalPrice)) {
             echo "Error: Currency conversion failed\n";
             return;
         }
@@ -290,16 +287,32 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             echo "Offer ID not found\n";
             return;
         }
-        $response = $this->httpClient->request('PATCH', static::$apiUrl['offers'], [
-            'headers' => [
-                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-            ],
+        $request = [
             'query' => [
                 'identifier' => $offerId
             ],
             'json' => [
                 'selling_price' => $finalPrice
             ]
+        ];
+        $this->setInventoryPrice($request, "SETPRICE_{$offerId}.json");
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function setInventoryPrice($request, $cacheName): void
+    {
+        $response = $this->httpClient->request('PATCH', static::$apiUrl['offers'], [
+            'headers' => [
+                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+            ],
+            'query' => $request['query'],
+            'json' => $request['json']
         ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
@@ -307,9 +320,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
-        $date = date('Y-m-d H:i:s');
-        $filename = "{$offerId}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $data);
+        $this->putToCache($cacheName, ['request' => $request, 'response' => $data]);
     }
 
 }

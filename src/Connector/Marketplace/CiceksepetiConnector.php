@@ -4,6 +4,8 @@ namespace App\Connector\Marketplace;
 
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use Doctrine\DBAL\Exception;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -36,10 +38,16 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         ]);
     }
 
-    public function download($forceDownload = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function download($forceDownload = false): void
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -74,10 +82,14 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        $this->putListingsToCache();
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -120,7 +132,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         }    
     }
 
-    public function downloadOrders()
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function downloadOrders(): void
     {
         $db = \Pimcore\Db::get();
         $now = date('Y-m-d'); 
@@ -205,28 +225,30 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     }
 
+    /**
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
         if (empty($stockCode)) {
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
-            'body' => json_encode([
-                'items' => [
-                    [
-                        'stockCode' => $stockCode,
-                        'StockQuantity' => $targetValue, 
-                    ]
+        $body = [
+            'items' => [
+                [
+                    'stockCode' => $stockCode,
+                    'StockQuantity' => $targetValue,
                 ]
-            ])
-        ]);
-        print_r($response->getContent());
+            ]
+        ];
+        $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], ['body' => json_encode($body)]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -238,26 +260,29 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
         ];
         echo "Inventory set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$stockCode}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
+        $filename = "SETINVENTORY_{$stockCode}.json";
+        $this->putToCache($filename, ['requeest'=>$body, 'response'=>$combinedData]);
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     * @throws RedirectionExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
-        if ($targetPrice === null) {
-            echo "Error: Price cannot be null\n";
+        if (empty($targetPrice)) {
+            echo "Error: Price cannot be empty\n";
             return;
         }
         if ($targetCurrency === null) {
             $targetCurrency = $listing->getSaleCurrency();
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if ($finalPrice === null) {
+        if (empty($finalPrice)) {
             echo "Error: Currency conversion failed\n";
             return;
         }
@@ -266,18 +291,16 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], [
-            'body' => json_encode([
-                'items' => [
-                    [
-                        'stockCode' => $stockCode,
-                        'salesPrice' => (float)$finalPrice, 
-                    ]
+        $body = [
+            'items' => [
+                [
+                    'stockCode' => $stockCode,
+                    'salesPrice' => (float)$finalPrice,
                 ]
-            ])
-        ]);
+            ]
+        ];
+        $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], ['body' => json_encode($body)]);
         echo $finalPrice . "\n";
-        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -289,10 +312,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
         ];
         echo "Price set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$stockCode}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($combinedData));
-    } 
+        $filename = "SETPRICE_{$stockCode}.json";
+        $this->putToCache($filename, ['requeest'=>$body, 'response'=>$combinedData]);
+    }
 
     /*public function updateProduct(VariantProduct $listing, string $sku)
     {

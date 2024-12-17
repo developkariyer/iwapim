@@ -97,10 +97,10 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
-     * @param $expiration
+     * @param int $expiration
      * @return bool
      */
-    public function getListingsFromCache($expiration = 86000): bool
+    public function getListingsFromCache(int $expiration = 86000): bool
     {
         $this->listings = $this->getFromCache(self::LISTINGS_FILE_NAME, $expiration);
         return !empty($this->listings);
@@ -151,7 +151,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
      */
     public function getTempPath(): string
     {
-        return self::MARKETPLACE_TEMP_PATH.urlencode($this->marketplace->getKey());
+        return self::MARKETPLACE_TEMP_PATH.urlencode($this->getMarketplaceKey());
     }
 
 }

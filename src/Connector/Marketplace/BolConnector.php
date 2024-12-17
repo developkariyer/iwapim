@@ -439,8 +439,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
         $data = $response->toArray();
         echo "Inventory set\n";
-        $date = date('YmdHis');
-        $filename = "SETINVENTORY_{$offerId}_$date.json";
+        $filename = "SETINVENTORY_{$offerId}.json";
         $this->putToCache($filename, ['request'=>$json, 'response'=>$data]);
     }
 
@@ -456,19 +455,15 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
         $this->prepareToken();
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
-        if ($targetPrice === null) {
+        if (empty($targetPrice)) {
             echo "Error: Price cannot be null\n";
             return;
         }
-        if ($targetCurrency === null) {
+        if (empty($targetCurrency)) {
             $targetCurrency = $listing->getSaleCurrency();
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if ($finalPrice === null) {
+        if (empty($finalPrice)) {
             echo "Error: Currency conversion failed\n";
             return;
         }
@@ -477,8 +472,8 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/price', ['json' => ['pricing' => ['bundlePrices' => [['unitPrice' => $finalPrice, 'quantity' => 1]]]]]);
-        print_r($response->getContent());
+        $json = ['pricing' => ['bundlePrices' => [['unitPrice' => $finalPrice, 'quantity' => 1]]]];
+        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/price', ['json' => $json]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 202) {
             echo "Error: $statusCode\n";
@@ -486,9 +481,8 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
         $data = $response->toArray();
         echo "Price set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$offerId}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($data));
-    } 
+        $filename = "SETPRICE_{$offerId}.json";
+        $this->putToCache($filename, ['request'=>$json, 'response'=>$data]);
+    }
 
 }

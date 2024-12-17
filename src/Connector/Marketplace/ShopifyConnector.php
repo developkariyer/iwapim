@@ -3,15 +3,22 @@
 namespace App\Connector\Marketplace;
 
 use Doctrine\DBAL\Exception;
+use Pimcore\Db;
+use Pimcore\Model\DataObject\Data\ExternalImage;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
+use Pimcore\Model\Element\DuplicateFullPathException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
 
-    private $apiUrl = null;
+    private string $apiUrl;
 
     public function __construct($marketplace)
     {
@@ -20,12 +27,18 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (empty($this->apiUrl)) {
             throw new \Exception("API URL is not set for Shopify marketplace {$this->marketplace->getKey()}");
         }
-        if (strpos($this->apiUrl, 'https://') === false) {
+        if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
     }
-    
-    public function getFromShopifyApi($method, $parameter, $query = [], $key = null, $body = null)
+
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function getFromShopifyApi($method, $parameter, $query = [], $key = null, $body = null): ?array
     {
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
@@ -68,10 +81,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $data;
     }
 
-    public function download($forceDownload = false)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function download($forceDownload = false): void
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -80,12 +98,18 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        $this->putListingsToCache();
     }
 
-    public function downloadInventory()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function downloadInventory(): void
     {
-        $inventory = json_decode(Utility::getCustomCache('INVENTORY.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -107,12 +131,19 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'inventory_levels' => $inventoryLevels
             ];
         }
-        Utility::setCustomCache('INVENTORY.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($inventory));
+        $this->putToCache('INVENTORY.json', $inventory);
     }
 
-    public function downloadOrders()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function downloadOrders(): void
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
@@ -137,7 +168,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    protected function getImage($listing, $mainListing) {
+    protected function getImage($listing, $mainListing): ?ExternalImage
+    {
         $lastImage = null;
         $images = $mainListing['images'] ?? [];
         foreach ($images as $img) {
@@ -154,7 +186,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $lastImage;
     }
 
-    public function import($updateFlag, $importFlag)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Exception
+     */
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -215,21 +251,39 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
         $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
         if (empty($inventoryItemId)) {
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->getFromShopifyApi('POST', "inventory_levels/set.json", [], null, ['location_id' => $locationId, 'inventory_item_id' => $inventoryItemId, 'available' => $targetValue]);
+        $request = [
+            'location_id' => $locationId,
+            'inventory_item_id' => $inventoryItemId,
+            'available' => $targetValue
+        ];
+        $response = $this->getFromShopifyApi('POST', "inventory_levels/set.json", [], null, $request);
         echo "Inventory set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$inventoryItemId}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($response));
+        $filename = "SETINVENTORY_{$inventoryItemId}.json";
+        $this->putToCache($filename, ['request'=>$request, 'response'=>$response]);
     }
 
-    public function setSku(VariantProduct $listing, string $sku)
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function setSku(VariantProduct $listing, string $sku): void
     {
         if (empty($sku)) {
             echo "SKU is empty for {$listing->getKey()}\n";
@@ -246,16 +300,27 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", [], null, ['inventory_item' => ['id' => $inventoryItemId, 'sku' => $sku]]);
+        $request = [
+            'inventory_item' => [
+                'id' => $inventoryItemId,
+                'sku' => $sku
+            ]
+        ];
+        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", [], null, $request);
         if (empty($response)) {
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
         }
         echo "SKU set\n";
-        Utility::setCustomCache("{$listing->getUniqueMarketplaceId()}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetSKU', json_encode($response));
+        $this->putToCache("SETSKU_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$request, 'response'=>$response]);
     }
 
+
     /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
      * @throws Exception
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
@@ -277,27 +342,36 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Price is empty for {$listing->getKey()}\n";
             return;
         }
-        if ($targetCurrency === null) {
+        if (empty($targetCurrency)) {
             $marketplace = $listing->getMarketplace();
             if ($marketplace instanceof Marketplace) {
                 $marketplaceCurrency = $marketplace->getCurrency();
-                if ($marketplaceCurrency !== null) {
+                if (empty($marketplaceCurrency)) {
                     if (isset($currencies[$marketplaceCurrency])) {
                         $marketplaceCurrency = $currencies[$marketplaceCurrency];
                     }
                 }
             }
         }
+        if (empty($marketplaceCurrency)) {
+            echo "Marketplace currency could not be found for {$listing->getKey()}\n";
+            return;
+        }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $marketplaceCurrency);
         if (empty($finalPrice)) {
             echo "Failed to convert currency for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->getFromShopifyApi('PUT', "variants/{$variantId}.json", [], null, ['variant' => ['id' => $variantId, 'price' => $finalPrice]]);
+        $request = [
+            'variant' => [
+                'id' => $variantId,
+                'price' => $finalPrice
+            ]
+        ];
+        $response = $this->getFromShopifyApi('PUT', "variants/{$variantId}.json", [], null, $request);
         echo "Price set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$variantId}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetPrice', json_encode($response));
+        $filename = "SETPRICE_{$variantId}.json";
+        $this->putToCache($filename, ['request'=>$request, 'response'=>$response]);
     }
 
 }

@@ -25,8 +25,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -60,13 +59,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($this->listings) . "\n";
             $offset += $limit;
         } while (count($this->listings) < $totalItems);
-
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
         }
         $this->downloadAttributes();
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        $this->putListingsToCache();
     }
 
     /**
@@ -200,7 +198,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        
+        $body = [
+            'hepsiburadaSku' => $hbsku,
+            'merchantSku' => $merchantSku,
+            'availableStock' => $targetValue
+        ];
         $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/stock-uploads", [
             'headers' => [
                 'authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -208,15 +210,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'accept' => 'application/json',
                 'content-type' => 'application/*+json'
             ],
-            'body' => json_encode([ 
-                [
-                    'hepsiburadaSku' => $hbsku,         
-                    'merchantSku' => $merchantSku,      
-                    'availableStock' => $targetValue    
-                ]
-            ])
+            'body' => json_encode($body)
         ]);
-        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -228,9 +223,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             'batchRequestResult' => $this->getBatchRequestResult($data['id'],"stock-uploads"),
         ];
         echo "Inventory set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$hbsku}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($combinedData));
+        $filename = "SETINVENTORY_{$hbsku}.json";
+        $this->putToCache($filename, ['request'=>$body, 'response'=>$combinedData]);
     }
 
     /**
@@ -265,6 +259,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
+        $body = [
+            'hepsiburadaSku' => $hbsku,
+            'merchantSku' => $merchantSku,
+            'price' => (float) $finalPrice
+        ];
         $response = $this->httpClient->request('POST', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/price-uploads", [
             'headers' => [
                 'authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -272,13 +271,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'accept' => 'application/json',
                 'content-type' => 'application/*+json'
             ],
-            'body' => json_encode([
-                [
-                    'hepsiburadaSku' => $hbsku,
-                    'merchantSku' => $merchantSku,
-                    'price' =>(float) $finalPrice
-                ]
-            ])
+            'body' => json_encode($body)
         ]); 
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
@@ -291,10 +284,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             'price' => $data,
             'batchRequestResult' => $this->getBatchRequestResult($data['id'],"price-uploads"),
         ];
-        $date = date('Y-m-d H:i:s');
-        $combinedJson = json_encode($combinedData);
-        $filename = "{$hbsku}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $combinedJson);
+        $filename = "SETPRICE_{$hbsku}.json";
+        $this->putToCache($filename, ['request'=>$body, 'response'=>$combinedData]);
     }
 
     /**
