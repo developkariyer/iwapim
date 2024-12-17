@@ -72,7 +72,6 @@ class Products
     public function buildCategoryTree(): void
     {
         $this->attributes = [];
-        echo "  Saving category tree to database\n";
         $stack = [[
             'parentId' => null,
             'children' => $this->categoryTree ?? [],
