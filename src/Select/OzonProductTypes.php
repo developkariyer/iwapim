@@ -19,6 +19,7 @@ class OzonProductTypes implements SelectOptionsProviderInterface
             ],
         ];
         $options = [];
+        return $options;/*
         while (!empty($stack)) {
             $node = array_pop($stack);
             foreach ($node['children'] as $child) {
@@ -40,7 +41,7 @@ class OzonProductTypes implements SelectOptionsProviderInterface
                 }
             }
         }
-        return $options;
+        return $options;*/
     }
 
     public function hasStaticOptions(array $context, Data $fieldDefinition): bool
