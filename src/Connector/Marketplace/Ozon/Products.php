@@ -29,7 +29,7 @@ class Products
      */
     public function getCategoryTreeFromApi(): void
     {
-        echo "  Getting category tree from API\n";
+        echo "\n  Getting category tree from API\n";
         $this->categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json');
         if (empty($this->categoryTree)) {
             $this->categoryTree = $this->connector->getApiResponse('POST', self::API_CATEGORY_TREE_URL, ['language' => 'EN']);
@@ -38,7 +38,6 @@ class Products
             echo "  Using cached category tree\n";
         }
         $this->buildCategoryTree();
-        print_r($this->attributes);
     }
 
     /**
