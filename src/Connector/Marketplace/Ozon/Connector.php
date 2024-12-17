@@ -118,7 +118,6 @@ class Connector extends MarketplaceConnectorAbstract
 
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
-     * @throws \Doctrine\DBAL\Exception
      */
     public function downloadAttributes(): void
     {
