@@ -71,9 +71,9 @@ class Inventory
     {
         $inventoryApi = $this->connector->amazonSellerConnector->fbaInventoryV1();
         foreach ($this->connector->getMarketplace()->getFbaRegions() ?? [] as $country) {
-            $summary = Utility::getCustomCache("{$country}_inventory.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory");
+            $summary = $this->connector->getFromCache("INVENTORY_{$country}.json");
             if ($summary) {
-                $this->inventory[$country] = json_decode($summary, true);
+                $this->inventory[$country] = $summary;
                 continue;
             }
             $nextToken = null;
@@ -97,11 +97,7 @@ class Inventory
                 }
                 sleep($this->rateLimit);
             } while ($nextToken);
-            Utility::setCustomCache(
-                filename: "{$country}_inventory.json",
-                cachePath: PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/AmazonInventory", 
-                stringToCache: json_encode($summary, JSON_PRETTY_PRINT)
-            );
+            $this->connector->putToCache("INVENTORY_{$country}.json", $summary);
             $this->inventory[$country] = $summary;
         }
     }

@@ -38,7 +38,7 @@ class Listings
         foreach ($items as $item) {
             $asin = $item['asin'] ?? '';
             $this->connector->listings[$asin]['catalog'] = $item;
-            Utility::setCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->connector->getMarketplace()->getKey()), json_encode($item, JSON_PRETTY_PRINT));
+            $this->connector->putToCache("ASIN_{$asin}.json", $item);
             Utility::storeJsonData($this->connector->getMarketplace()->getId(), $asin, $item);
         }
         sleep(1);
@@ -49,8 +49,7 @@ class Listings
      */
     protected function addToAsinBucket($asin, $forceDownload = false): void
     {
-        $item = Utility::getCustomCache("ASIN_{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->connector->getMarketplace()->getKey()));
-        $item = json_decode($item, true);
+        $item = $this->connector->getFromCache("ASIN_{$asin}.json");
         if (empty($item) || $forceDownload) {
             $this->asinBucket[$asin] = 1;
             if (count($this->asinBucket) >= 10) {

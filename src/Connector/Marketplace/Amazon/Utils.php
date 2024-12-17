@@ -28,7 +28,7 @@ class Utils
             $country = $this->connector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", 86400*7);
+        $listing = $this->connector->getFromCache("LISTING_{$country}_{$safeSku}.json", 7*86400);
         if (empty($listing)) {
             $listing = $listingsApi->getListingsItem(
                 sellerId: $this->connector->getMarketplace()->getMerchantId(),
@@ -36,10 +36,8 @@ class Utils
                 marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                 includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
             );
-            Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode($listing->json(), JSON_PRETTY_PRINT));
             $listing = $listing->json();
-        } else {
-            $listing = json_decode($listing, true);
+            $this->connector->putToCache("LISTING_{$country}_{$safeSku}.json", $listing);
         }
         $productType = $listing['summaries'][0]['productType'] ?? '';
         if (empty($productType)) { 
@@ -57,7 +55,7 @@ class Utils
             listingsItemPatchRequest: $listingsItemPatchRequest,
             marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']]
         );
-        Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonPatch/$country", json_encode(['patches' => $patches, 'response' => $patchOperation->json()], JSON_PRETTY_PRINT));
+        $this->connector->putToCache("PATCH_{$country}_{$safeSku}.json", ['patches' => $patches, 'response' => $patchOperation->json()]);
         echo $patchOperation->json()['status']."\n";
     }
 
@@ -70,7 +68,7 @@ class Utils
             $country = $this->connector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        $listing = Utility::getCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country");
+        $listing = $this->connector->getFromCache("LISTING_{$country}_{$safeSku}.json", 7*86400);
         if (empty($listing)) {
             $listingsApi = $this->connector->amazonSellerConnector->listingsItemsV20210801();
             $listing = $listingsApi->getListingsItem(
@@ -80,13 +78,13 @@ class Utils
                 includedData: ['summaries', 'attributes', 'issues', 'offers', 'fulfillmentAvailability', 'procurement']
             );
             $listing = $listing->json();
-            Utility::setCustomCache("$safeSku.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonListing/$country", json_encode($listing, JSON_PRETTY_PRINT));
+            $this->connector->putToCache("LISTING_{$country}_{$safeSku}.json", $listing);
         }
         $productType = $listing['summaries'][0]['productType'] ?? '';
         if (empty($productType)) { return; }
 
         $safeProductType = preg_replace('/[^a-zA-Z0-9._-]/', '_', $productType);
-        $definition = Utility::getCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country");
+        $definition = $this->connector->getFromCache("PRODUCTTYPE_{$country}_{$safeProductType}.json");
         if (empty($definition)) {
             $productTypeDefinitionApi = $this->connector->amazonSellerConnector->productTypeDefinitionsV20200901();
             $definition = $productTypeDefinitionApi->getDefinitionsProductType(
@@ -94,7 +92,8 @@ class Utils
                 marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']],
                 sellerId: $this->connector->getMarketplace()->getMerchantId()
             );
-            Utility::setCustomCache("$safeProductType.json", PIMCORE_PROJECT_ROOT."/tmp/marketplaces/AmazonDefinition/$country", json_encode($definition->json(), JSON_PRETTY_PRINT));
+            $definition = $definition->json();
+            $this->connector->putToCache("PRODUCTTYPE_{$country}_{$safeProductType}.json", $definition);
         }
     }
 

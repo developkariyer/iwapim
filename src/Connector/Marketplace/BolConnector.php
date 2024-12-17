@@ -125,7 +125,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadOfferReport($forceDownload = false): string
     {
         $this->prepareToken();
-        $report = Utility::getCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}");
+        $report =  $this->getFromCacheRaw('OFFERS_EXPORT_REPORT.csv');
         if (!$report || $forceDownload) {
             echo "Requesting offer report from Bol.com\n";
             $entityId = $this->reportStatus($this->requestOfferReport());
@@ -134,7 +134,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get offer report from Bol.com:'.$response->getContent());
             }
             $report = $response->getContent();
-            Utility::setCustomCache('OFFERS_EXPORT_REPORT.csv', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", $report);
+            $this->putToCacheRaw('OFFERS_EXPORT_REPORT.csv', $report);
         } else {
             echo "Using cached report\n";
         }
@@ -185,7 +185,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $this->listings[$ean]['placement'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/placement");
                 $this->listings[$ean]['commission'] = $this->downloadExtra(static::$apiUrl['commissionUrl'], 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
                 $this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/product-ids");
-                Utility::setCustomCache("EAN_{$ean}.json", PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings[$ean]));
+                $this->putToCache("EAN_{$ean}.json", $this->listings[$ean]);
                 echo "OK\n";
             }
         }
@@ -257,15 +257,14 @@ class BolConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {   
-        $this->listings = json_decode(Utility::getCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
         $this->getListings(
             $this->downloadOfferReport($forceDownload)
         );
-        Utility::setCustomCache('BOL_LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/{$this->marketplace->getKey()}", json_encode($this->listings));
+        $this->putListingsToCache();
     }
 
     /**
@@ -422,10 +421,6 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
         $this->prepareToken();
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
         if ($targetValue > 999) {
             echo "Bol.com does not support inventory values greater than 999\n";
             return;
@@ -435,8 +430,8 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
-        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/stock', ['json' => ['amount' => $targetValue, 'managedByRetailer' => true]]);
-        print_r($response->getContent());
+        $json = ['amount' => $targetValue, 'managedByRetailer' => true];
+        $response = $this->httpClient->request("PUT", static::$apiUrl['offers'] . $offerId . '/stock', ['json' => $json]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 202) {
             echo "Error: $statusCode\n";
@@ -444,9 +439,9 @@ class BolConnector extends MarketplaceConnectorAbstract
         }
         $data = $response->toArray();
         echo "Inventory set\n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$offerId}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/SetInventory', json_encode($data));
+        $date = date('YmdHis');
+        $filename = "SETINVENTORY_{$offerId}_$date.json";
+        $this->putToCache($filename, ['request'=>$json, 'response'=>$data]);
     }
 
     /**

@@ -40,10 +40,7 @@ class Reports
         if (!$silent) {
             echo "        Downloading Report $reportType ";
         }
-        $report = Utility::getCustomCache(
-            "{$reportType}_{$country}.csv", 
-            PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}"
-        );
+        $report = $this->connector->getFromCacheRaw(key:"{$reportType}_{$country}.csv");
         if (empty($report) || $forceDownload) {
             echo "Waiting Report ";
             $reportsApi = $this->connector->amazonSellerConnector->reportsV20210630();
@@ -63,11 +60,7 @@ class Reports
             if (str_starts_with($report, "\x1f\x8b")) {
                 $report = gzdecode(data: $report);
             }
-            Utility::setCustomCache(
-                "{$reportType}_{$country}.csv",
-                PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/{$marketplaceKey}",
-                $report
-            );
+            $this->connector->putToCacheRaw("{$reportType}_{$country}.csv", $report);
             echo "OK ";
         } else {
             if (!$silent) {

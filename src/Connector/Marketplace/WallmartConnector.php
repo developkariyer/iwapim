@@ -6,6 +6,10 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class WallmartConnector extends MarketplaceConnectorAbstract
@@ -57,14 +61,16 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function download($forceDownload = false)
+    /**
+     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
+     */
+    public function download($forceDownload = false): void
     {
        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
        }
        echo "Token is valid. Proceeding with download...\n";
-        $this->listings = json_decode(Utility::getCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
-        if (!(empty($this->listings) || $forceDownload)) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -104,7 +110,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        Utility::setCustomCache('LISTINGS.json', PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings));
+        $this->putListingsToCache();
     }
 
     public function getAnItem($sku): void
@@ -272,17 +278,12 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws Exception
+     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface|Exception
      */
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
         if ($targetValue < 0) {
             echo "Error: Quantity cannot be less than 0\n";
-            return;
-        }
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
             return;
         }
         $sku = json_decode($listing->jsonRead('apiResponseJson'), true)['sku'];
@@ -290,13 +291,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Error: Barcode is missing\n";
             return;
         }
-        $response = $this->httpClient->request('GET',  static::$apiUrl['inventory'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
+        $request = [
             'query' => [
                 'sku' => $sku
             ],
@@ -307,6 +302,16 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'amount' => $targetValue
                 ]
             ]
+        ];
+        $response = $this->httpClient->request('GET',  static::$apiUrl['inventory'], [
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
+            ],
+            $request['query'],
+            $request['json']
         ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
@@ -314,27 +319,26 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             return;
         }
         echo "Inventory set to $targetValue\n";
-        $date = date('Y-m-d H:i:s');
+        $date = date('YmdHis');
         $data = $response->toArray();
-        $filename = "{$sku}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetInventory', $data);
+        $filename = "SETINVENTORY_{$sku}_{$date}.json";
+        $this->putToCache($filename, ['request' => $request, 'response' => $data]);
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface|Exception
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
-        if ($targetPrice === null) {
+        if (empty($targetPrice)) {
             echo "Error: Price cannot be null\n";
             return;
         }
-        if ($targetCurrency === null) {
+        if (empty($targetCurrency)) {
             $targetCurrency = $listing->getSaleCurrency();
         }
         $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if ($finalPrice === null) {
+        if (empty($finalPrice)) {
             echo "Error: Currency conversion failed\n";
             return;
         }
@@ -343,6 +347,16 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Error: Barcode is missing\n";
             return;
         }
+        $json = [
+            'sku' => $sku,
+            'pricing' => [
+                'currentPriceType' => 'BASE',
+                'currentPrice' => [
+                    'currency' => $listing->getSaleCurrency(),
+                    'amount' => (float) $finalPrice
+                ]
+            ]
+        ];
         $response = $this->httpClient->request('GET',  static::$apiUrl['price'], [
             'headers' => [
                 'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
@@ -350,16 +364,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'WM_SVC.NAME' => 'Walmart Marketplace',
                 'Accept' => 'application/json'
             ],
-            'json' => [
-                'sku' => $sku,
-                'pricing' => [
-                    'currentPriceType' => 'BASE',
-                    'currentPrice' => [
-                        'currency' => $listing->getSaleCurrency(),
-                        'amount' => (float) $finalPrice
-                    ]
-                ]
-            ]
+            'json' => $json,
         ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
@@ -367,10 +372,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             return;
         }
         echo "Price set to $finalPrice\n";
-        $date = date('Y-m-d H:i:s');
+        $date = date('YmdHis');
         $data = $response->toArray();
-        $filename = "{$sku}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . urlencode($this->marketplace->getKey()) . '/SetPrice', $data);
+        $filename = "SETPRICE_{$sku}_{$date}.json";
+        $this->putToCache($filename, ['request' => $json, 'response' => $data]);
     }
    
 }

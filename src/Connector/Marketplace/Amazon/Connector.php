@@ -69,14 +69,13 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true) ?? [];
-        if (empty($this->listings) || $forceDownload) {
+        if ($forceDownload || !$this->getListingsFromCache($forceDownload)) {
             $this->reportsHelper->downloadAllReports($forceDownload);
             $this->listingsHelper->getListings($forceDownload);
-            Utility::setCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($this->listings, JSON_PRETTY_PRINT));
+            $this->putListingsToCache();
         }
         foreach ($this->listings as $asin=>$listing) {
-            Utility::setCustomCache("{$asin}.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/tmp/".urlencode($this->marketplace->getKey()), json_encode($listing, JSON_PRETTY_PRINT));
+            $this->putToCache("ASIN_{$asin}.json", $listing);
         }
     }
 

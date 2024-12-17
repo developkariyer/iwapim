@@ -10,6 +10,9 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Utils\Utility;
 
+/**
+ *
+ */
 abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInterface
 {
     public Marketplace $marketplace;
@@ -85,17 +88,67 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
     }
 
+    /**
+     * @return void
+     */
     public function putListingsToCache(): void
     {
-        Utility::setCustomCache(self::LISTINGS_FILE_NAME, $this->getTempPath(), json_encode($this->listings, JSON_PRETTY_PRINT));
+        $this->putToCache(self::LISTINGS_FILE_NAME, $this->listings);
     }
 
+    /**
+     * @param $expiration
+     * @return bool
+     */
     public function getListingsFromCache($expiration = 86000): bool
     {
-        $this->listings = json_decode(Utility::getCustomCache(self::LISTINGS_FILE_NAME, $this->getTempPath(), $expiration), true) ?? [];
+        $this->listings = $this->getFromCache(self::LISTINGS_FILE_NAME, $expiration);
         return !empty($this->listings);
     }
 
+    /**
+     * @param string $key
+     * @param array $data
+     * @return void
+     */
+    public function putToCache(string $key, array $data): void
+    {
+        $this->putToCacheRaw($key, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * @param string $key
+     * @param string $data
+     * @return void
+     */
+    public function putToCacheRaw(string $key, string $data): void
+    {
+        Utility::setCustomCache($key, $this->getTempPath(), $data);
+    }
+
+    /**
+     * @param string $key
+     * @param int $expires
+     * @return array
+     */
+    public function getFromCache(string $key, int $expires = 86000): array
+    {
+        return json_decode($this->getFromCacheRaw($key, $expires), true) ?? [];
+    }
+
+    /**
+     * @param string $key
+     * @param int $expires
+     * @return string
+     */
+    public function getFromCacheRaw(string $key, int $expires = 86000): string
+    {
+        return Utility::getCustomCache($key, $this->getTempPath(), $expires) ?? '';
+    }
+
+    /**
+     * @return string
+     */
     public function getTempPath(): string
     {
         return self::MARKETPLACE_TEMP_PATH.urlencode($this->marketplace->getKey());
