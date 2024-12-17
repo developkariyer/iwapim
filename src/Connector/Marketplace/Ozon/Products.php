@@ -83,7 +83,7 @@ class Products
 
             foreach ($currentChildren as $child) {
                 $category = [
-                    'description_category_id' => $child['description_category_id'] ?? "{$currentParentId}_{$child['type_id']}",
+                    'description_category_id' => $child['description_category_id'] ?? $currentParentId,
                     'category_name' => $child['category_name'] ?? '',
                     'type_id' => $child['type_id'] ?? '',
                     'type_name' => $child['type_name'] ?? '',
