@@ -13,7 +13,7 @@ use App\Utils\Utility;
 abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInterface
 {
     public Marketplace $marketplace;
-    public array $listings = [];
+    public ?array $listings = [];
     public HttpClientInterface $httpClient;
     public static string $marketplaceType = '';
 

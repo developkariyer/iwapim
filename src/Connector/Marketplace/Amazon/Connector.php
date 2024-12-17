@@ -2,19 +2,17 @@
 
 namespace App\Connector\Marketplace\Amazon;
 
+use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
+use App\Connector\Marketplace\MarketplaceConnectorAbstract;
+use App\Utils\Utility;
 use Exception;
 use JsonException;
+use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use SellingPartnerApi\Enums\Endpoint;
 use SellingPartnerApi\Seller\SellerConnector;
 use SellingPartnerApi\SellingPartnerApi;
-use SellingPartnerApi\Enums\Endpoint;
-
-use Pimcore\Model\DataObject\Marketplace;
-
-use App\Connector\Marketplace\MarketplaceConnectorAbstract;
-use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Utils\Utility;
 
 class Connector extends MarketplaceConnectorAbstract
 {
@@ -71,7 +69,7 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true);
+        $this->listings = json_Decode(Utility::getCustomCache("LISTINGS.json", PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/".urlencode($this->marketplace->getKey())), true) ?? [];
         if (empty($this->listings) || $forceDownload) {
             $this->reportsHelper->downloadAllReports($forceDownload);
             $this->listingsHelper->getListings($forceDownload);
