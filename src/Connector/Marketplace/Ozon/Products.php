@@ -3,8 +3,6 @@
 namespace App\Connector\Marketplace\Ozon;
 
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
-use App\Utils\Registry;
-use Doctrine\DBAL\Exception;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -27,7 +25,6 @@ class Products
 
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
-     * @throws Exception
      */
     public function getCategoryTreeFromApi(): void
     {
