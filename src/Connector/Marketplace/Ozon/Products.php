@@ -18,6 +18,7 @@ class Products
     const string API_CATEGORY_TREE_URL = "https://api-seller.ozon.ru/v1/description-category/tree";
 
     public array $categoryTree = [];
+    public array $attributes = [];
 
     public function __construct(OzonConnector $connector)
     {
@@ -38,25 +39,22 @@ class Products
         } else {
             echo "  Using cached category tree\n";
         }
-        $this->saveCategoryTreeToDb();
+        $this->buildCategoryTree();
+        print_r($this->attributes);
     }
 
     public function getCategoryAttributesFromApi(): void
     {
     }
 
-    /**
-     * @throws Exception
-     */
-    public function saveCategoryTreeToDb(): void
+    public function buildCategoryTree(): void
     {
-        $categoryTree = [];
+        $this->attributes = [];
         echo "  Saving category tree to database\n";
         $stack = [[
             'parentId' => null,
             'children' => $this->categoryTree ?? [],
         ]];
-        Registry::beginTransaction();
         while (!empty($stack)) {
             $current = array_pop($stack);
             $currentParentId = $current['parentId'];
@@ -64,19 +62,16 @@ class Products
 
             foreach ($currentChildren as $child) {
                 if (isset($child['description_category_id'])) {
-                    Registry::setKey($child['description_category_id'], $child['category_name'], 'ozonCategory');
-                    if (!is_null($currentParentId)) {
-                        Registry::setKey($child['description_category_id'], $currentParentId, 'ozonCategoryParent');
-                    }
-                    $categoryTree[$child['description_category_id']] = [
+                    $this->attributes[$child['description_category_id']] = [
                         'category_name' => $child['category_name'],
                         'parent' => $currentParentId,
                         'products' => []
                     ];
                 } elseif (isset($child['type_id'])) {
-                    Registry::setKey($child['type_id'], $child['type_name'], 'ozonProductType');
-                    Registry::setKey($child['type_id'], $currentParentId, 'ozonProductTypeParent');
-                    $categoryTree[$currentParentId]['products'][$child['type_id']] = $child['type_name'];
+                    $this->attributes[$currentParentId]['products'][$child['type_id']] = [
+                        'type_name' => $child['type_name'],
+                        'attributes' => [],
+                    ];
                 }
                 if (!empty($child['children'])) {
                     $stack[] = [
@@ -86,8 +81,6 @@ class Products
                 }
             }
         }
-        Registry::commit();
-        print_r($categoryTree);
     }
 
 
