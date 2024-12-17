@@ -2,26 +2,82 @@
 
 namespace App\Utils;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
+
 class Registry
 {
-    public static function getKey($regkey, $regtype = 'DEFAULT')
+
+    private static bool $transactionActive = false;
+    private static ?Connection $transactionDb = null;
+
+    /**
+     * @throws Exception
+     */
+    public static function beginTransaction(): void
     {
-        $db = \Pimcore\Db::get();
+        if (self::$transactionActive) {
+            throw new Exception('Transaction already active');
+        }
+        self::$transactionActive = true;
+        self::$transactionDb = Db::get();
+        self::$transactionDb->beginTransaction();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function commit(): void
+    {
+        if (!self::$transactionActive) {
+            throw new Exception('No active transaction');
+        }
+        self::$transactionDb->commit();
+        self::$transactionActive = false;
+        self::$transactionDb = null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function rollback(): void
+    {
+        if (!self::$transactionActive) {
+            throw new Exception('No active transaction');
+        }
+        self::$transactionDb->rollBack();
+        self::$transactionActive = false;
+        self::$transactionDb = null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function getKey($regkey, $regtype = 'DEFAULT', $useTransaction = false)
+    {
+        $db = $useTransaction ? (self::$transactionDb ?? Db::get()) : Db::get();
         $sql = "SELECT regvalue FROM iwa_registry WHERE regkey = ? AND regtype = ?";
         return $db->fetchOne($sql, [$regkey, $regtype]);
     }
 
-    public static function setKey($regkey, $regvalue, $regtype = 'DEFAULT')
+    /**
+     * @throws Exception
+     */
+    public static function setKey($regkey, $regvalue, $regtype = 'DEFAULT'): void
     {
-        $db = \Pimcore\Db::get();
+        $db = self::$transactionDb ?? Db::get();
         $sql = "INSERT INTO iwa_registry (regkey, regvalue, regtype) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE regvalue = ?";
         $db->executeStatement($sql, [$regkey, $regvalue, $regtype, $regvalue]);
     }
 
-    public static function searchValue($regvalue, $regtype = 'DEFAULT')
-    {   // DO NOT USE THIS FUNCTION 
-        $db = \Pimcore\Db::get();
-        $sql = "SELECT regkey FROM iwa_registry WHERE regvalue = ? AND regtype = ? LIMIT 1";
-        return $db->fetchOne($sql, [$regvalue, $regtype]);
+    /**
+     * @throws Exception
+     */
+    public static function searchKeys($regvalue, $regtype = 'DEFAULT'): array
+    {
+        $db = Db::get();
+        $sql = "SELECT regkey FROM iwa_registry WHERE regvalue = ? AND regtype = ?";
+        return $db->fetchFirstColumn($sql, [$regvalue, $regtype]);
     }
 }

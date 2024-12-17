@@ -4,6 +4,7 @@ namespace App\Connector\Marketplace\Ozon;
 
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
 use App\Utils\Registry;
+use Doctrine\DBAL\Exception;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -38,6 +39,7 @@ class Products
     }
 
     /**
+     * @throws Exception
      */
     public function saveCategoryTreeToDb(): void
     {
@@ -69,6 +71,9 @@ class Products
         */
     }
 
+    /**
+     * @throws Exception
+     */
     private function serializeCategoryTree($children): void
     {
         //$serializedCategoryTree = [];
@@ -76,6 +81,7 @@ class Products
             'parentId' => null,
             'children' => $children,
         ]];
+        Registry::beginTransaction();
         while (!empty($stack)) {
             $current = array_pop($stack);
             $currentParentId = $current['parentId'];
@@ -107,6 +113,7 @@ class Products
                 }
             }
         }
+        Registry::commit();
         // return $serializedCategoryTree;
     }
 
