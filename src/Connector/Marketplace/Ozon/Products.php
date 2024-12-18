@@ -168,7 +168,7 @@ class Products
                             $lastId = max($lastId, $value['id']);
                         }
                     } while ($apiResponse['has_next']);
-                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", $apiResponse);
+                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", $response);
                 }
                 $db->executeStatement("DELETE FROM " . self::OZON_VALUE_TABLE . " WHERE description_category_id = ? AND type_id = ? AND attribute_id = ?", [
                     $categoryId,
