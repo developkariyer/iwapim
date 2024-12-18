@@ -53,6 +53,7 @@ class Products
     {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
+        echo "TEST\n";
         echo "  Processing category tree\n";
         $db = Db::get();
         echo "1";
