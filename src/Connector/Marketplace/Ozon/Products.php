@@ -53,9 +53,14 @@ class Products
     public function processCategoryTree($categoryTree): void
     {
         echo "Processing category tree\n";
-        $db = Db::get();
-        $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_TABLE);
-        $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
+        try {
+            $db = Db::get();
+            $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_TABLE);
+            $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            exit;
+        }
         $db->beginTransaction();
         try {
             $stack = [[
@@ -92,8 +97,9 @@ class Products
             $db->commit();
             echo count($categoryTree) . " categories processed\n";
         } catch (Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
             $db->rollBack();
-            throw $e;
+            exit;
         }
     }
 
@@ -103,10 +109,16 @@ class Products
     public function getCategoryAttributesFromApi(): void
     {
         echo "Getting category attributes from API\n";
-        $db = Db::get();
-        $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_ATTRIBUTE_TABLE);
-        $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_TABLE);
-        $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE . " ORDER BY description_category_id, type_id");
+        try {
+            $db = Db::get();
+            $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_ATTRIBUTE_TABLE);
+            $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_TABLE);
+            $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE . " ORDER BY description_category_id, type_id");
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            exit;
+        }
+        echo "Processing " . count($productTypes) . " product types\n";
         $db->beginTransaction();
         $index = 0;
         try {
@@ -144,7 +156,8 @@ class Products
             echo "\n";
         } catch (Exception $e) {
             $db->rollBack();
-            throw $e;
+            echo "Error: " . $e->getMessage() . "\n";
+            exit;
         }
     }
 
@@ -154,10 +167,15 @@ class Products
     public function getAttributeValuesFromApi(): void
     {
         echo "Getting attribute values from API\n";
-        $db = Db::get();
-        $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM ".
-            self::OZON_CATEGORY_ATTRIBUTE_TABLE . " WHERE dictionary_id > 0 GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
-        $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_VALUE_TABLE);
+        try {
+            $db = Db::get();
+            $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM ".
+                self::OZON_CATEGORY_ATTRIBUTE_TABLE . " WHERE dictionary_id > 0 GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
+            $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_VALUE_TABLE);
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            exit;
+        }
         $db->beginTransaction();
         $index = 0;
         try {
