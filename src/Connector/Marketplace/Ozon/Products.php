@@ -65,7 +65,7 @@ class Products
                 $current = array_pop($stack);
                 $currentParentId = $current['parentId'];
                 $currentChildren = $current['children'];
-                echo "\r".($currentParentId ?? 'root')."            ";
+                echo "                      \r".($currentParentId ?? 'root');
                 foreach ($currentChildren as $child) {
                     if (isset($child['description_category_id'])) {
                         $db->executeStatement("INSERT INTO " . self::OZON_CATEGORY_TABLE . " (description_category_id, parent_id, category_name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE parent_id = ?, category_name = ?", [
@@ -106,15 +106,16 @@ class Products
     {
         echo "Getting category attributes from API\n";
         $db = Db::get();
-        $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE);
+        $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE . " ORDER BY description_category_id, type_id");
         $db->beginTransaction();
         try {
             foreach ($productTypes as $productType) {
                 $categoryId = $productType['description_category_id'];
                 $typeId = $productType['type_id'];
-                echo "\r$categoryId.$typeId                 ";
+                echo "                \r$categoryId.$typeId";
                 $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", 7 * 86400);
                 if (empty($response)) {
+                    echo " *";
                     $response = $this->connector->getApiResponse('POST', self::API_CATEGORY_ATTRIBUTE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $typeId]);
                     $this->connector->putToCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", $response);
                 }
@@ -143,41 +144,45 @@ class Products
     {
         echo "Getting attribute values from API\n";
         $db = Db::get();
-        $attributes = $db->fetchAllAssociative("SELECT description_category_id, type_id, attribute_id FROM " . self::OZON_ATTRIBUTE_TABLE);
+        $attributes = $db->fetchAllAssociative("SELECT description_category_id, type_id, attribute_id FROM " . self::OZON_ATTRIBUTE_TABLE . " ORDER BY description_category_id, type_id, attribute_id");
         $db->beginTransaction();
         try {
             foreach ($attributes as $attribute) {
                 $categoryId = $attribute['description_category_id'];
                 $typeId = $attribute['type_id'];
                 $attributeId = $attribute['attribute_id'];
-                echo "\r$categoryId.$typeId.$attributeId               ";
+                echo "                 \r$categoryId.$typeId.$attributeId";
                 $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", 7 * 86400);
                 if (empty($response)) {
                     $lastId = 0;
+                    $response = [];
                     $query = ['description_category_id' => $categoryId, 'language' => 'EN', 'limit' => 5000, 'type_id' => $typeId, 'attribute_id' => $attributeId];
                     do {
+                        echo " *";
                         if ($lastId) {
                             $query['last_id'] = $lastId;
                         }
-                        $response = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, $query, '');
-                        $db->executeStatement("DELETE FROM " . self::OZON_VALUE_TABLE . " WHERE description_category_id = ? AND type_id = ? AND attribute_id = ?", [
-                            $categoryId,
-                            $typeId,
-                            $attributeId,
-                        ]);
-                        foreach ($response['result'] as $value) {
+                        $apiResponse = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, $query, '');
+                        foreach ($apiResponse['result'] as $value) {
+                            $response[] = $value;
                             $lastId = max($lastId, $value['id']);
-                            $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (description_category_id, type_id, attribute_id, value_id, value_json) VALUES (?, ?, ?, ?, ?)", [
-                                $categoryId,
-                                $typeId,
-                                $attributeId,
-                                $value['id'],
-                                json_encode($value),
-                            ]);
                         }
-                    } while ($response['has_next']);
-                    $response = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $typeId, 'attribute_id' => $attributeId]);
-                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", $response);
+                    } while ($apiResponse['has_next']);
+                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", $apiResponse);
+                }
+                $db->executeStatement("DELETE FROM " . self::OZON_VALUE_TABLE . " WHERE description_category_id = ? AND type_id = ? AND attribute_id = ?", [
+                    $categoryId,
+                    $typeId,
+                    $attributeId,
+                ]);
+                foreach ($response as $value) {
+                    $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (description_category_id, type_id, attribute_id, value_id, value_json) VALUES (?, ?, ?, ?, ?)", [
+                        $categoryId,
+                        $typeId,
+                        $attributeId,
+                        $value['id'],
+                        json_encode($value),
+                    ]);
                 }
             }
             $db->commit();
