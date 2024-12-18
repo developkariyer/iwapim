@@ -173,8 +173,29 @@ class Products
         echo "Getting attribute values from API\n";
         try {
             $db = Db::get();
-            $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM ".
-                self::OZON_CATEGORY_ATTRIBUTE_TABLE . " WHERE dictionary_id > 0 GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
+            $attributes = $db->fetchAllAssociative("SELECT
+                    t1.description_category_id,
+                    t1.type_id,
+                    t1.attribute_id,
+                    t1.group_id
+                FROM
+                    " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . " t1
+                JOIN (
+                    SELECT
+                        attribute_id,
+                        group_id,
+                        MIN(CONCAT(description_category_id, ':', type_id)) AS min_pair
+                    FROM
+                        " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . "
+                    WHERE
+                        dictionary_id > 0
+                    GROUP BY
+                        attribute_id, group_id
+                ) t2
+                ON
+                    t1.attribute_id = t2.attribute_id
+                    AND t1.group_id = t2.group_id
+                    AND CONCAT(t1.description_category_id, ':', t1.type_id) = t2.min_pair");
             $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_VALUE_TABLE);
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
