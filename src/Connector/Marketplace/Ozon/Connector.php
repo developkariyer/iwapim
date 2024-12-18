@@ -117,13 +117,13 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
+     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|\Doctrine\DBAL\Exception
      */
     public function downloadAttributes(): void
     {
         $this->productsHelper->getCategoryTreeFromApi();
         $this->productsHelper->getCategoryAttributesFromApi();
-        $this->productsHelper->saveAttributes();
+        $this->productsHelper->getAttributeValuesFromApi();
     }
 
 
