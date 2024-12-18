@@ -131,7 +131,7 @@ class Products
                 }
                 $categoryId = $productType['description_category_id'];
                 $typeId = $productType['type_id'];
-                echo "                \r$categoryId.$typeId ".($index / $totalCount * 100)."%";
+                echo "                \r$categoryId.$typeId ".round($index / $totalCount * 100, 2)."%";
                 $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", 7 * 86400);
                 if (empty($response)) {
                     echo " *";
@@ -215,7 +215,7 @@ class Products
                 $typeId = $attribute['type_id'];
                 $attributeId = $attribute['attribute_id'];
                 $groupId = $attribute['group_id'];
-                echo "                 \r$categoryId.$typeId.$attributeId ".($index / $totalCount * 100)."%";
+                echo "                            \r$categoryId.$typeId.$attributeId ".round($index / $totalCount * 100, 2)."%";
                 $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", 7 * 86400);
                 if (empty($response)) {
                     $lastId = 0;
