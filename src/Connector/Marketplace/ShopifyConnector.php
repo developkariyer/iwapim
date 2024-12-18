@@ -89,7 +89,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -98,7 +98,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
+        $this->downloadAbondonedCheckouts();
+
+
     }
 
     /**
@@ -158,6 +161,33 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $this->marketplace->getId(),
                         $order['id'],
                         json_encode($order)
+                    ]
+                );
+            }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            echo "Error: " . $e->getMessage() . "\n";
+        }
+    }
+
+    public function downloadAbondonedCheckouts(): void
+    {
+        $db = Db::get();
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_abandoned_checkouts WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+        $checkouts = $this->getFromShopifyApi('GET', 'checkouts.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'checkouts');
+        $db->beginTransaction();
+        try {
+            foreach ($checkouts as $checkout) {
+                $db->executeStatement(
+                    "INSERT INTO iwa_marketplace_abandoned_checkouts (marketplace_id, checkout_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+                    [
+                        $this->marketplace->getId(),
+                        $checkout['id'],
+                        json_encode($checkout)
                     ]
                 );
             }
