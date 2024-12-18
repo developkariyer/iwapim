@@ -156,7 +156,8 @@ class Products
     {
         echo "Getting attribute values from API\n";
         $db = Db::get();
-        $attributes = $db->fetchAllAssociative("SELECT description_category_id, type_id, attribute_id FROM " . self::OZON_ATTRIBUTE_TABLE . " ORDER BY description_category_id, type_id, attribute_id");
+        $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM".
+            self::OZON_CATEGORY_ATTRIBUTE_TABLE . "GROUP BY attribute_id, group_id;");
         $db->beginTransaction();
         $index = 0;
         try {
@@ -164,8 +165,9 @@ class Products
                 $categoryId = $attribute['description_category_id'];
                 $typeId = $attribute['type_id'];
                 $attributeId = $attribute['attribute_id'];
+                $groupId = $attribute['group_id'];
                 echo "                 \r$categoryId.$typeId.$attributeId";
-                $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", 7 * 86400);
+                $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", 7 * 86400);
                 if (empty($response)) {
                     $lastId = 0;
                     $response = [];
@@ -181,19 +183,17 @@ class Products
                             $lastId = max($lastId, $value['id']);
                         }
                     } while ($apiResponse['has_next']);
-                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", $response);
+                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", $response);
                 }
-                $db->executeStatement("DELETE FROM " . self::OZON_VALUE_TABLE . " WHERE description_category_id = ? AND type_id = ? AND attribute_id = ?", [
-                    $categoryId,
-                    $typeId,
+                $db->executeStatement("DELETE FROM " . self::OZON_VALUE_TABLE . " WHERE attribute_id = ? AND group_id = ?", [
                     $attributeId,
+                    $groupId,
                 ]);
                 foreach ($response as $value) {
                     $index++;
-                    $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (description_category_id, type_id, attribute_id, value_id, value_json) VALUES (?, ?, ?, ?, ?)", [
-                        $categoryId,
-                        $typeId,
+                    $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (attribute_id, group_id, value_id, value_json) VALUES (?, ?, ?, ?)", [
                         $attributeId,
+                        $groupId,
                         $value['id'],
                         json_encode($value),
                     ]);
