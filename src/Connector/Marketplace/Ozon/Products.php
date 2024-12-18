@@ -52,6 +52,7 @@ class Products
     public function processCategoryTree($categoryTree): void
     {
         echo "  Processing category tree\n";
+        print_r($categoryTree);
         $db = Db::get();
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_TABLE);
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_PRODUCTTYPE_TABLE);
