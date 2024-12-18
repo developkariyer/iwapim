@@ -22,7 +22,6 @@ class Products
     const string OZON_CATEGORY_TABLE = 'iwa_ozon_category';
     const string OZON_PRODUCTTYPE_TABLE = 'iwa_ozon_producttype';
     const string OZON_CATEGORY_ATTRIBUTE_TABLE = 'iwa_ozon_category_attribute';
-    const string OZON_ATTRIBUTE_TABLE = 'iwa_ozon_attribute';
     const string OZON_ATTRIBUTE_VALUE_TABLE = 'iwa_ozon_attribute_value';
 
     public function __construct(OzonConnector $connector)
@@ -112,14 +111,12 @@ class Products
         try {
             $db = Db::get();
             $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_ATTRIBUTE_TABLE);
-            $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_TABLE);
             $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE . " ORDER BY description_category_id, type_id");
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit;
         }
         $totalCount = count($productTypes);
-        $attributeList = [];
         $db->beginTransaction();
         $index = 0;
         try {
@@ -139,21 +136,13 @@ class Products
                     $this->connector->putToCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", $response);
                 }
                 foreach ($response as $attribute) {
-                    $db->executeStatement("INSERT INTO " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, group_id, dictionary_id) VALUES (?, ?, ?, ?, ?)", [
+                    $db->executeStatement("INSERT INTO " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, dictionary_id, attribute_json) VALUES (?, ?, ?, ?, ?)", [
                         $categoryId,
                         $typeId,
                         $attribute['id'],
-                        $attribute['group_id'],
                         $attribute['dictionary_id'],
+                        json_encode($attribute),
                     ]);
-                    if (empty($attributeList["{$attribute['id']}.{$attribute['group_id']}"])) {
-                        $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (attribute_id, group_id, attribute_json) VALUES (?, ?, ?)", [
-                            $attribute['id'],
-                            $attribute['group_id'],
-                            json_encode($attribute),
-                        ]);
-                        $attributeList["{$attribute['id']}.{$attribute['group_id']}"] = true;
-                    }
                 }
             }
             $db->commit();
@@ -177,24 +166,24 @@ class Products
                     t1.description_category_id,
                     t1.type_id,
                     t1.attribute_id,
-                    t1.group_id
+                    t1.dictionary_id
                 FROM
                     " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . " t1
                 JOIN (
                     SELECT
                         attribute_id,
-                        group_id,
+                        dictionary_id,
                         MIN(CONCAT(description_category_id, ':', type_id)) AS min_pair
                     FROM
                         " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . "
                     WHERE
                         dictionary_id > 0
                     GROUP BY
-                        attribute_id, group_id
+                        attribute_id, dictionary_id
                 ) t2
                 ON
                     t1.attribute_id = t2.attribute_id
-                    AND t1.group_id = t2.group_id
+                    AND t1.dictionary_id = t2.dictionary_id
                     AND CONCAT(t1.description_category_id, ':', t1.type_id) = t2.min_pair");
             $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_VALUE_TABLE);
         } catch (Exception $e) {
@@ -214,9 +203,9 @@ class Products
                 $categoryId = $attribute['description_category_id'];
                 $typeId = $attribute['type_id'];
                 $attributeId = $attribute['attribute_id'];
-                $groupId = $attribute['group_id'];
-                echo "                            \r$categoryId.$typeId.$attributeId ".round($index / $totalCount * 100, 2)."%";
-                $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", 7 * 86400);
+                $dictionaryId = $attribute['dictionary_id'];
+                echo "                            \r$categoryId.$typeId.$attributeId.$dictionaryId ".round($index / $totalCount * 100, 2)."%";
+                $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$dictionaryId}.json", 7 * 86400);
                 if (empty($response)) {
                     $lastId = 0;
                     $response = [];
@@ -233,12 +222,12 @@ class Products
                             $lastId = max($lastId, $value['id']);
                         }
                     } while ($apiResponse['has_next'] && $lastId !== $prevLastId);
-                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", $response);
+                    $this->connector->putToCache("ATTRIBUTE_VALUES_{$attributeId}_{$dictionaryId}.json", $response);
                 }
                 foreach ($response as $value) {
-                    $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_VALUE_TABLE . " (attribute_id, group_id, value_id, value_json) VALUES (?, ?, ?, ?)", [
+                    $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_VALUE_TABLE . " (attribute_id, dictionary_id, value_id, value_json) VALUES (?, ?, ?, ?)", [
                         $attributeId,
-                        $groupId,
+                        $dictionaryId,
                         $value['id'],
                         json_encode($value),
                     ]);
