@@ -173,12 +173,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadAbondonedCheckouts(): void
     {
+        echo "Downloading abandoned checkouts\n";
         $db = Db::get();
         $lastUpdatedAt = $db->fetchOne(
             "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_abandoned_checkouts WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
-        echo "Last updated at: $lastUpdatedAt\n";
         $checkouts = $this->getFromShopifyApi('GET', 'checkouts.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'checkouts');
         $db->beginTransaction();
         try {
