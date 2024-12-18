@@ -141,7 +141,7 @@ class Products
                         $attribute['group_id'],
                         $attribute['dictionary_id'],
                     ]);
-                    $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (attribute_id, group_id, attribute_json) VALUES (?, ?, ?)", [
+                    $db->executeStatement("INSERT IGNORE INTO " . self::OZON_ATTRIBUTE_TABLE . " (attribute_id, group_id, attribute_json) VALUES (?, ?, ?)", [
                         $attribute['id'],
                         $attribute['group_id'],
                         json_encode($attribute),
