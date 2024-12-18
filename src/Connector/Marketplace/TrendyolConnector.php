@@ -58,6 +58,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'page' => $page
                 ]
             ]);
+            print_r($response->getInfo());
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
