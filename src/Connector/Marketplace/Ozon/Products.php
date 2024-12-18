@@ -118,15 +118,20 @@ class Products
             echo "Error: " . $e->getMessage() . "\n";
             exit;
         }
-        echo "Processing " . count($productTypes) . " product types\n";
+        $totalCount = count($productTypes);
         $attributeList = [];
         $db->beginTransaction();
         $index = 0;
         try {
             foreach ($productTypes as $productType) {
+                $index++;
+                if ($index % 1000 === 0) {
+                    $db->commit();
+                    $db->beginTransaction();
+                }
                 $categoryId = $productType['description_category_id'];
                 $typeId = $productType['type_id'];
-                echo "                \r$categoryId.$typeId";
+                echo "                \r$categoryId.$typeId ".($index / $totalCount * 100)."%";
                 $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", 7 * 86400);
                 if (empty($response)) {
                     echo " *";
@@ -134,7 +139,6 @@ class Products
                     $this->connector->putToCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", $response);
                 }
                 foreach ($response as $attribute) {
-                    $index++;
                     $db->executeStatement("INSERT INTO " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, group_id, dictionary_id) VALUES (?, ?, ?, ?, ?)", [
                         $categoryId,
                         $typeId,
@@ -149,10 +153,6 @@ class Products
                             json_encode($attribute),
                         ]);
                         $attributeList["{$attribute['id']}.{$attribute['group_id']}"] = true;
-                    }
-                    if ($index % 1000 === 0) {
-                        $db->commit();
-                        $db->beginTransaction();
                     }
                 }
             }
@@ -202,14 +202,20 @@ class Products
             exit;
         }
         $db->beginTransaction();
+        $totalCount = count($attributes);
         $index = 0;
         try {
             foreach ($attributes as $attribute) {
+                $index++;
+                if ($index % 1000 === 0) {
+                    $db->commit();
+                    $db->beginTransaction();
+                }
                 $categoryId = $attribute['description_category_id'];
                 $typeId = $attribute['type_id'];
                 $attributeId = $attribute['attribute_id'];
                 $groupId = $attribute['group_id'];
-                echo "                 \r$categoryId.$typeId.$attributeId";
+                echo "                 \r$categoryId.$typeId.$attributeId ".($index / $totalCount * 100)."%";
                 $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", 7 * 86400);
                 if (empty($response)) {
                     $lastId = 0;
@@ -229,17 +235,12 @@ class Products
                     $this->connector->putToCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", $response);
                 }
                 foreach ($response as $value) {
-                    $index++;
                     $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_VALUE_TABLE . " (attribute_id, group_id, value_id, value_json) VALUES (?, ?, ?, ?)", [
                         $attributeId,
                         $groupId,
                         $value['id'],
                         json_encode($value),
                     ]);
-                    if ($index % 1000 === 0) {
-                        $db->commit();
-                        $db->beginTransaction();
-                    }
                 }
             }
             $db->commit();
