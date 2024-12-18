@@ -53,12 +53,13 @@ class Products
     {
         echo "  Processing category tree\n";
         $db = Db::get();
-        echo "  Truncating tables\n";
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_TABLE);
-        echo "  Truncating tables 2\n";
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_PRODUCTTYPE_TABLE);
-        echo "  Beginning transaction\n";
+        echo "1";
+        $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_TABLE);
+        echo "2";
+        $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
+        echo "3";
         $db->beginTransaction();
+        echo "4";
         try {
             $stack = [[
                 'parentId' => null,
