@@ -52,8 +52,6 @@ class Products
      */
     public function processCategoryTree($categoryTree): void
     {
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
         echo "Processing category tree\n";
         $db = Db::get();
         $db->beginTransaction();
@@ -157,7 +155,8 @@ class Products
         echo "Getting attribute values from API\n";
         $db = Db::get();
         $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM".
-            self::OZON_CATEGORY_ATTRIBUTE_TABLE . "GROUP BY attribute_id, group_id;");
+            self::OZON_CATEGORY_ATTRIBUTE_TABLE . "GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
+        echo count($attributes) . " attributes to process\n";
         $db->beginTransaction();
         $index = 0;
         try {
