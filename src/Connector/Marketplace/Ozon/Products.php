@@ -65,7 +65,7 @@ class Products
                 $current = array_pop($stack);
                 $currentParentId = $current['parentId'];
                 $currentChildren = $current['children'];
-                echo "  $currentParentId";
+                echo "  ".($currentParentId ?? 'root');
                 foreach ($currentChildren as $child) {
                     echo ".";
                     if (isset($child['description_category_id'])) {
