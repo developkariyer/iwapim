@@ -227,11 +227,12 @@ class Products
                             $query['last_id'] = $lastId;
                         }
                         $apiResponse = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, $query, '');
+                        $prevLastId = $lastId;
                         foreach ($apiResponse['result'] as $value) {
-                            $response[] = $value;
+                            $response[$value['id']] = $value;
                             $lastId = max($lastId, $value['id']);
                         }
-                    } while ($apiResponse['has_next']);
+                    } while ($apiResponse['has_next'] && $lastId !== $prevLastId);
                     $this->connector->putToCache("ATTRIBUTE_VALUES_{$attributeId}_{$groupId}.json", $response);
                 }
                 foreach ($response as $value) {
