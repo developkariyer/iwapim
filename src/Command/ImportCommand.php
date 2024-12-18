@@ -217,10 +217,10 @@ class ImportCommand extends AbstractCommand
                     echo "No connector available, skipping...\n";
                     continue;
                 }
-                echo "    Downloading... ";
-                $connector->download($downloadFlag);
-                echo "done.\n";
                 if ($updateFlag || $importFlag) {
+                    echo "    Downloading... ";
+                    $connector->download($downloadFlag);
+                    echo "done.\n";
                     echo "    Importing...";
                     $connector->import($updateFlag, $importFlag);
                     echo "done.\n";
