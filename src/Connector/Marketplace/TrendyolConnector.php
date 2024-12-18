@@ -9,6 +9,7 @@ use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpClient\HttpClient;
 
 use App\Utils\Utility;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -17,7 +18,24 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TrendyolConnector extends MarketplaceConnectorAbstract
 {
+    private static array $apiUrl = [
+        'offers' => 'products?approved=true/',
+        'orders' => 'orders/',
+        'inventory_price' => 'products/price-and-inventory/',
+        'batch_requests' => 'products/batch-requests/'
+    ];
+
     public static string $marketplaceType = 'Trendyol';
+
+    public function __construct($marketplace)
+    {
+        parent::__construct($marketplace);
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/", [
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+            ]
+        ]);
+    }
 
     /**
      * @throws TransportExceptionInterface
@@ -32,14 +50,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products?approved=true";
         $page = 0;
         $this->listings = [];
         do {
-            $response = $this->httpClient->request('GET', $apiUrl, [
-                'headers' => [
-                    'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-                ],
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
                 'query' => [
                     'page' => $page
                 ]
@@ -74,7 +88,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $db = \Pimcore\Db::get();
-        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/orders";
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now)); 
         $lastUpdatedAt = $db->fetchOne(
@@ -96,10 +109,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         do {
             $page = 0;
             do {
-                $response = $this->httpClient->request('GET', $apiUrl, [
-                    'headers' => [
-                        'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-                    ],
+                $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
                     'query' => [
                         'page' => $page,
                         'size' => $size,
@@ -237,7 +247,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Error: Quantity cannot be less than 0\n";
             return;
         }
-        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         if ($barcode === null) {
             echo "Error: Barcode is missing\n";
@@ -251,12 +260,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 ]
             ]
         ];
-        $response = $this->httpClient->request('POST', $apiUrl, [
-            'headers' => [
-                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
-            ],
-            'json' => $request
-        ]);
+        $response = $this->httpClient->request('POST', static::$apiUrl['inventory_price'], ['json' => $request]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -294,7 +298,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Error: Currency conversion failed\n";
             return;
         }
-        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/price-and-inventory";
         $barcode = json_decode($listing->jsonRead('apiResponseJson'), true)['barcode'];
         if ($barcode === null) {
             echo "Error: Barcode is missing\n";
@@ -308,12 +311,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 ]
             ]
         ];
-        $response = $this->httpClient->request('POST', $apiUrl, [
-            'headers' => [
-                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken()
-            ],
-            'json' => $request
-        ]);
+        $response = $this->httpClient->request('POST', static::$apiUrl['inventory_price'], ['json' => $request]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -338,12 +336,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      */
     public function getBatchRequestResult($batchRequestId): array
     {
-        $apiUrl = "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/products/batch-requests/{$batchRequestId}";
-        $response = $this->httpClient->request('GET', $apiUrl, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getTrendyolToken()
-            ]
-        ]);
+        $response = $this->httpClient->request('GET', static::$apiUrl['batch_requests'] . $batchRequestId);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
