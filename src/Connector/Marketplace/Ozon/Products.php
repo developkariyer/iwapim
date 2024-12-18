@@ -156,7 +156,7 @@ class Products
         $db = Db::get();
         echo "Fetch";
         $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM ".
-            self::OZON_CATEGORY_ATTRIBUTE_TABLE . " GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
+            self::OZON_CATEGORY_ATTRIBUTE_TABLE . " WHERE group_id > 0 GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
         echo count($attributes) . " attributes to process\n";
         $db->beginTransaction();
         $index = 0;
