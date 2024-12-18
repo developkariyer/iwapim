@@ -119,6 +119,7 @@ class Products
             exit;
         }
         echo "Processing " . count($productTypes) . " product types\n";
+        $attributeList = [];
         $db->beginTransaction();
         $index = 0;
         try {
@@ -141,11 +142,14 @@ class Products
                         $attribute['group_id'],
                         $attribute['dictionary_id'],
                     ]);
-                    $db->executeStatement("INSERT IGNORE INTO " . self::OZON_ATTRIBUTE_TABLE . " (attribute_id, group_id, attribute_json) VALUES (?, ?, ?)", [
-                        $attribute['id'],
-                        $attribute['group_id'],
-                        json_encode($attribute),
-                    ]);
+                    if (empty($attributeList["{$attribute['id']}.{$attribute['group_id']}"])) {
+                        $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (attribute_id, group_id, attribute_json) VALUES (?, ?, ?)", [
+                            $attribute['id'],
+                            $attribute['group_id'],
+                            json_encode($attribute),
+                        ]);
+                        $attributeList["{$attribute['id']}.{$attribute['group_id']}"] = true;
+                    }
                     if ($index % 1000 === 0) {
                         $db->commit();
                         $db->beginTransaction();
