@@ -196,7 +196,7 @@ class Products
         try {
             foreach ($attributes as $attribute) {
                 $index++;
-                if ($index % 1000 === 0) {
+                if ($index % 10 === 0) {
                     $db->commit();
                     $db->beginTransaction();
                 }
@@ -237,7 +237,8 @@ class Products
             echo "\n";
         } catch (Exception $e) {
             $db->rollBack();
-            throw $e;
+            echo "Error: " . $e->getMessage() . "\n";
+            exit;
         }
     }
 
