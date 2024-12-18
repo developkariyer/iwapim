@@ -35,7 +35,7 @@ class Products
     public function getCategoryTreeFromApi(): void
     {
         echo "\n  Getting category tree from API: ";
-        $categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json');
+        $categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json', 7 * 86400);
         if (empty($this->categoryTree)) {
             echo "asking Ozon\n";
             $categoryTree = $this->connector->getApiResponse('POST', self::API_CATEGORY_TREE_URL, ['language' => 'EN']);
