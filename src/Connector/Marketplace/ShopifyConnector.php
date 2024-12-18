@@ -30,6 +30,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
+        echo "Downloading abandoned checkouts\n";
+        $this->downloadAbondonedCheckouts();
     }
 
     /**
@@ -89,7 +91,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        echo "Downloading abandoned checkouts\n";
 
         /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -101,7 +102,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->putListingsToCache();*/
-        $this->downloadAbondonedCheckouts();
 
 
     }
