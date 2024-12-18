@@ -7,6 +7,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -16,11 +17,21 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class TakealotConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'offers' => "https://seller-api.takealot.com/v2/offers/",
-        'orders' => "https://seller-api.takealot.com/v2/sales"
+        'offers' => "offers/",
+        'orders' => "sales/"
     ];
 
     public static string $marketplaceType = 'Takealot';
+
+    public function __construct($marketplace)
+    {
+        parent::__construct($marketplace);
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://seller-api.takealot.com/v2/', [
+            'headers' => [
+                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
+            ],
+        ]);
+    }
 
     /**
      * @throws TransportExceptionInterface
@@ -40,9 +51,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         $this->listings = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                'headers' => [
-                    'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-                ],
                 'query' => [
                     'page_number' => $page,
                     'page_size' => $size
@@ -178,9 +186,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         $size = 100;
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
-                'headers' => [
-                    'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-                ],
                 'query' => [
                     'page_number' => $page,
                     'page_size' => $size
@@ -308,9 +313,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
     public function setInventoryPrice($request, $cacheName): void
     {
         $response = $this->httpClient->request('PATCH', static::$apiUrl['offers'], [
-            'headers' => [
-                'Authorization' =>' Key ' . $this->marketplace->getTakealotKey()
-            ],
             'query' => $request['query'],
             'json' => $request['json']
         ]);
