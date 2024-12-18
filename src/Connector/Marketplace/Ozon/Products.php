@@ -54,8 +54,8 @@ class Products
     {
         echo "Processing category tree\n";
         $db = Db::get();
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_TABLE);
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_PRODUCTTYPE_TABLE);
+        $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_TABLE);
+        $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
         $db->beginTransaction();
         try {
             $stack = [[
@@ -104,8 +104,8 @@ class Products
     {
         echo "Getting category attributes from API\n";
         $db = Db::get();
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_ATTRIBUTE_TABLE);
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_ATTRIBUTE_TABLE);
+        $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_ATTRIBUTE_TABLE);
+        $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_TABLE);
         $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE . " ORDER BY description_category_id, type_id");
         $db->beginTransaction();
         $index = 0;
@@ -157,7 +157,7 @@ class Products
         $db = Db::get();
         $attributes = $db->fetchAllAssociative("SELECT MIN(description_category_id) AS description_category_id, MIN(type_id) AS type_id, attribute_id, group_id FROM ".
             self::OZON_CATEGORY_ATTRIBUTE_TABLE . " WHERE dictionary_id > 0 GROUP BY attribute_id, group_id ORDER BY description_category_id, type_id, attribute_id");
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_ATTRIBUTE_VALUE_TABLE);
+        $db->executeQuery("DELETE FROM " . self::OZON_ATTRIBUTE_VALUE_TABLE);
         $db->beginTransaction();
         $index = 0;
         try {
