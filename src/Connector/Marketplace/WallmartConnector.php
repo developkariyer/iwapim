@@ -123,14 +123,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function getAnItem($sku): void
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['item'] . $sku, [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ]
-        ]);
+        $response = $this->httpClient->request('GET', static::$apiUrl['item'] . $sku);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -225,12 +218,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         do {
             do {
                 $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
-                    'headers' => [
-                        'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                        'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                        'WM_SVC.NAME' => 'Walmart Marketplace',
-                        'Accept' => 'application/json'
-                    ],
                     'query' => [
                         'limit' => $limit,
                         'offset' => $offset,
@@ -312,12 +299,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $response = $this->httpClient->request('GET',  static::$apiUrl['inventory'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
             $request['query'],
             $request['json']
         ]);
@@ -366,12 +347,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $response = $this->httpClient->request('GET',  static::$apiUrl['price'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
             'json' => $json,
         ]);
         $statusCode = $response->getStatusCode();
