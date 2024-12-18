@@ -51,6 +51,8 @@ class Products
      */
     public function processCategoryTree($categoryTree): void
     {
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
         echo "  Processing category tree\n";
         $db = Db::get();
         echo "1";
