@@ -53,14 +53,8 @@ class Products
     {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        echo "TEST\n";
         echo "  Processing category tree\n";
         $db = Db::get();
-        echo "1";
-        $db->delete(self::OZON_CATEGORY_TABLE, [1 => 1]);
-        echo "2";
-        $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
-        echo "3";
         $db->beginTransaction();
         echo "4";
         try {
@@ -78,16 +72,19 @@ class Products
                 foreach ($currentChildren as $child) {
                     echo ".";
                     if (isset($child['description_category_id'])) {
-                        $db->insert(self::OZON_CATEGORY_TABLE, [
-                            'description_category_id' => $child['description_category_id'],
-                            'parent_id' => $currentParentId,
-                            'category_name' => $child['category_name'],
+                        $db->executeStatement("INSERT INTO " . self::OZON_CATEGORY_TABLE . " (description_category_id, parent_id, category_name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE parent_id = ?, category_name = ?", [
+                            $child['description_category_id'],
+                            $currentParentId,
+                            $child['category_name'],
+                            $currentParentId,
+                            $child['category_name'],
                         ]);
                     } elseif (isset($child['type_id'])) {
-                        $db->insert(self::OZON_PRODUCTTYPE_TABLE, [
-                            'description_category_id' => $currentParentId,
-                            'type_id' => $child['type_id'],
-                            'type_name' => $child['type_name'],
+                        $db->executeStatement("INSERT INTO " . self::OZON_PRODUCTTYPE_TABLE . " (description_category_id, type_id, type_name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE type_name = ?", [
+                            $currentParentId,
+                            $child['type_id'],
+                            $child['type_name'],
+                            $child['type_name'],
                         ]);
                     }
                     if (!empty($child['children'])) {
@@ -113,7 +110,6 @@ class Products
     {
         echo "  Getting category attributes from API\n";
         $db = Db::get();
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_ATTRIBUTE_TABLE);
         $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE);
         $db->beginTransaction();
         try {
@@ -128,11 +124,12 @@ class Products
                 }
                 foreach ($response as $attribute) {
                     echo ".";
-                    $db->insert(self::OZON_ATTRIBUTE_TABLE, [
-                        'description_category_id' => $categoryId,
-                        'type_id' => $typeId,
-                        'attribute_id' => $attribute['id'],
-                        'attribute_json' => json_encode($attribute),
+                    $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, attribute_json) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE attribute_json = ?", [
+                        $categoryId,
+                        $typeId,
+                        $attribute['id'],
+                        json_encode($attribute),
+                        json_encode($attribute),
                     ]);
                 }
                 echo "\n";
@@ -151,7 +148,6 @@ class Products
     {
         echo "  Getting attribute values from API\n";
         $db = Db::get();
-        $db->executeQuery("TRUNCATE TABLE " . self::OZON_VALUE_TABLE);
         $attributes = $db->fetchAllAssociative("SELECT description_category_id, type_id, attribute_id FROM " . self::OZON_ATTRIBUTE_TABLE);
         $db->beginTransaction();
         try {
@@ -169,15 +165,20 @@ class Products
                             $query['last_id'] = $lastId;
                         }
                         $response = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, $query, '');
+                        $db->executeStatement("DELETE FROM " . self::OZON_VALUE_TABLE . " WHERE description_category_id = ? AND type_id = ? AND attribute_id = ?", [
+                            $categoryId,
+                            $typeId,
+                            $attributeId,
+                        ]);
                         foreach ($response['result'] as $value) {
                             echo ".";
                             $lastId = max($lastId, $value['id']);
-                            $db->insert(self::OZON_VALUE_TABLE, [
-                                'description_category_id' => $categoryId,
-                                'type_id' => $typeId,
-                                'attribute_id' => $attributeId,
-                                'value_id' => $value['id'],
-                                'value_json' => json_encode($value),
+                            $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (description_category_id, type_id, attribute_id, value_id, value_json) VALUES (?, ?, ?, ?, ?)", [
+                                $categoryId,
+                                $typeId,
+                                $attributeId,
+                                $value['id'],
+                                json_encode($value),
                             ]);
                         }
                     } while ($response['has_next']);
