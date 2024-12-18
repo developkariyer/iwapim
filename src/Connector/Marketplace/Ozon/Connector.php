@@ -121,8 +121,8 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function downloadAttributes(): void
     {
-        #$this->productsHelper->getCategoryTreeFromApi();
-        #$this->productsHelper->getCategoryAttributesFromApi();
+        $this->productsHelper->getCategoryTreeFromApi();
+        $this->productsHelper->getCategoryAttributesFromApi();
         $this->productsHelper->getAttributeValuesFromApi();
     }
 
