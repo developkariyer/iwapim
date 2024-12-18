@@ -19,9 +19,9 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class TrendyolConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'offers' => 'products?approved=true/',
-        'orders' => 'orders/',
-        'inventory_price' => 'products/price-and-inventory/',
+        'offers' => 'products?approved=true',
+        'orders' => 'orders',
+        'inventory_price' => 'products/price-and-inventory',
         'batch_requests' => 'products/batch-requests/'
     ];
 
@@ -58,7 +58,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'page' => $page
                 ]
             ]);
-            print_r($response->getInfo());
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
