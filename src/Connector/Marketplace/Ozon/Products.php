@@ -53,8 +53,11 @@ class Products
     {
         echo "  Processing category tree\n";
         $db = Db::get();
+        echo "  Truncating tables\n";
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_TABLE);
+        echo "  Truncating tables 2\n";
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_PRODUCTTYPE_TABLE);
+        echo "  Beginning transaction\n";
         $db->beginTransaction();
         try {
             $stack = [[
