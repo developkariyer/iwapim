@@ -62,6 +62,7 @@ class Products
                 'children' => $categoryTree ?? [],
             ]];
             while (!empty($stack)) {
+                echo "TEST\n";
                 $current = array_pop($stack);
                 $currentParentId = $current['parentId'];
                 $currentChildren = $current['children'];
