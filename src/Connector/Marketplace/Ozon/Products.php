@@ -108,6 +108,7 @@ class Products
         $db = Db::get();
         $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE . " ORDER BY description_category_id, type_id");
         $db->beginTransaction();
+        $index = 0;
         try {
             foreach ($productTypes as $productType) {
                 $categoryId = $productType['description_category_id'];
@@ -120,6 +121,7 @@ class Products
                     $this->connector->putToCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", $response);
                 }
                 foreach ($response as $attribute) {
+                    $index++;
                     $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, attribute_json) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE attribute_json = ?", [
                         $categoryId,
                         $typeId,
@@ -127,6 +129,10 @@ class Products
                         json_encode($attribute),
                         json_encode($attribute),
                     ]);
+                    if ($index % 1000 === 0) {
+                        $db->commit();
+                        $db->beginTransaction();
+                    }
                 }
             }
             $db->commit();
@@ -146,6 +152,7 @@ class Products
         $db = Db::get();
         $attributes = $db->fetchAllAssociative("SELECT description_category_id, type_id, attribute_id FROM " . self::OZON_ATTRIBUTE_TABLE . " ORDER BY description_category_id, type_id, attribute_id");
         $db->beginTransaction();
+        $index = 0;
         try {
             foreach ($attributes as $attribute) {
                 $categoryId = $attribute['description_category_id'];
@@ -176,6 +183,7 @@ class Products
                     $attributeId,
                 ]);
                 foreach ($response as $value) {
+                    $index++;
                     $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (description_category_id, type_id, attribute_id, value_id, value_json) VALUES (?, ?, ?, ?, ?)", [
                         $categoryId,
                         $typeId,
@@ -183,6 +191,10 @@ class Products
                         $value['id'],
                         json_encode($value),
                     ]);
+                    if ($index % 1000 === 0) {
+                        $db->commit();
+                        $db->beginTransaction();
+                    }
                 }
             }
             $db->commit();
