@@ -34,13 +34,14 @@ class Products
      */
     public function getCategoryTreeFromApi(): void
     {
-        echo "\n  Getting category tree from API\n";
+        echo "\n  Getting category tree from API: ";
         $categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json');
         if (empty($this->categoryTree)) {
+            echo "asking Ozon\n";
             $categoryTree = $this->connector->getApiResponse('POST', self::API_CATEGORY_TREE_URL, ['language' => 'EN']);
             $this->connector->putToCache('CATEGORY_TREE.json', $categoryTree);
         } else {
-            echo "  Using cached category tree\n";
+            echo "using cached category tree\n";
         }
         $this->processCategoryTree($categoryTree);
     }
@@ -50,6 +51,7 @@ class Products
      */
     public function processCategoryTree($categoryTree): void
     {
+        echo "  Processing category tree\n";
         $db = Db::get();
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_TABLE);
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_PRODUCTTYPE_TABLE);
