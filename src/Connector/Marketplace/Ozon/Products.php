@@ -54,7 +54,7 @@ class Products
         echo "  Processing category tree\n";
         $db = Db::get();
         echo "1";
-        $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_TABLE);
+        $db->delete(self::OZON_CATEGORY_TABLE, [1 => 1]);
         echo "2";
         $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
         echo "3";
