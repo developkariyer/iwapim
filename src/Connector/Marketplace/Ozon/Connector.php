@@ -123,7 +123,7 @@ class Connector extends MarketplaceConnectorAbstract
     {
         $this->productsHelper->getCategoryTreeFromApi();
         $this->productsHelper->getCategoryAttributesFromApi();
-        $this->productsHelper->getAttributeValuesFromApi();
+        //$this->productsHelper->getAttributeValuesFromApi();
     }
 
 

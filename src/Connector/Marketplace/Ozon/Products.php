@@ -21,7 +21,8 @@ class Products
 
     const string OZON_CATEGORY_TABLE = 'iwa_ozon_category';
     const string OZON_PRODUCTTYPE_TABLE = 'iwa_ozon_category_producttype';
-    const string OZON_ATTRIBUTE_TABLE = 'iwa_ozon_category_producttype_attribute';
+    const string OZON_CATEGORY_ATTRIBUTE_TABLE = 'iwa_ozon_category_producttype_attribute';
+    const string OZON_ATTRIBUTE_TABLE = 'iwa_ozon_attribute';
     const string OZON_VALUE_TABLE = 'iwa_ozon_attribute_value';
 
     public function __construct(OzonConnector $connector)
@@ -122,10 +123,15 @@ class Products
                 }
                 foreach ($response as $attribute) {
                     $index++;
-                    $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, attribute_json) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE attribute_json = ?", [
+                    $db->executeStatement("INSERT IGNORE INTO " . self::OZON_CATEGORY_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, group_id) VALUES (?, ?, ?, ?)", [
                         $categoryId,
                         $typeId,
                         $attribute['id'],
+                        $attribute['group_id'],
+                    ]);
+                    $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (attribute_id, group_id, attribute_json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE attribute_json = ?", [
+                        $attribute['id'],
+                        $attribute['group_id'],
                         json_encode($attribute),
                         json_encode($attribute),
                     ]);
