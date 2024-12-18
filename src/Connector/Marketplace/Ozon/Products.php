@@ -215,7 +215,7 @@ class Products
                         if ($lastId) {
                             $query['last_id'] = $lastId;
                         }
-                        $apiResponse = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, $query, '');
+                        $apiResponse = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, $query, null);
                         $prevLastId = $lastId;
                         foreach ($apiResponse['result'] as $value) {
                             $response[$value['id']] = $value;
