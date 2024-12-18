@@ -34,7 +34,7 @@ class Products
      */
     public function getCategoryTreeFromApi(): void
     {
-        echo "\n  Getting category tree from API: ";
+        echo "\nGetting category tree from API: ";
         $categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json', 7 * 86400);
         if (empty($categoryTree)) {
             echo "asking Ozon\n";
@@ -53,7 +53,7 @@ class Products
     {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        echo "  Processing category tree\n";
+        echo "Processing category tree\n";
         $db = Db::get();
         $db->beginTransaction();
         try {
@@ -61,14 +61,12 @@ class Products
                 'parentId' => null,
                 'children' => $categoryTree ?? [],
             ]];
-            echo count($stack) . " ". count($categoryTree) . "\n";
             while (!empty($stack)) {
                 $current = array_pop($stack);
                 $currentParentId = $current['parentId'];
                 $currentChildren = $current['children'];
-                echo "  ".($currentParentId ?? 'root');
+                echo "\r".($currentParentId ?? 'root')."            ";
                 foreach ($currentChildren as $child) {
-                    echo ".";
                     if (isset($child['description_category_id'])) {
                         $db->executeStatement("INSERT INTO " . self::OZON_CATEGORY_TABLE . " (description_category_id, parent_id, category_name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE parent_id = ?, category_name = ?", [
                             $child['description_category_id'],
@@ -92,9 +90,9 @@ class Products
                         ];
                     }
                 }
-                echo "\n";
             }
             $db->commit();
+            echo count($categoryTree) . " categories processed\n";
         } catch (Exception $e) {
             $db->rollBack();
             throw $e;
@@ -106,7 +104,7 @@ class Products
      */
     public function getCategoryAttributesFromApi(): void
     {
-        echo "  Getting category attributes from API\n";
+        echo "Getting category attributes from API\n";
         $db = Db::get();
         $productTypes = $db->fetchAllAssociative("SELECT description_category_id, type_id FROM " . self::OZON_PRODUCTTYPE_TABLE);
         $db->beginTransaction();
@@ -114,14 +112,13 @@ class Products
             foreach ($productTypes as $productType) {
                 $categoryId = $productType['description_category_id'];
                 $typeId = $productType['type_id'];
-                echo "  $categoryId.$typeId";
+                echo "\r$categoryId.$typeId                 ";
                 $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", 7 * 86400);
                 if (empty($response)) {
                     $response = $this->connector->getApiResponse('POST', self::API_CATEGORY_ATTRIBUTE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $typeId]);
                     $this->connector->putToCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", $response);
                 }
                 foreach ($response as $attribute) {
-                    echo ".";
                     $db->executeStatement("INSERT INTO " . self::OZON_ATTRIBUTE_TABLE . " (description_category_id, type_id, attribute_id, attribute_json) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE attribute_json = ?", [
                         $categoryId,
                         $typeId,
@@ -130,9 +127,9 @@ class Products
                         json_encode($attribute),
                     ]);
                 }
-                echo "\n";
             }
             $db->commit();
+            echo "\n";
         } catch (Exception $e) {
             $db->rollBack();
             throw $e;
@@ -144,7 +141,7 @@ class Products
      */
     public function getAttributeValuesFromApi(): void
     {
-        echo "  Getting attribute values from API\n";
+        echo "Getting attribute values from API\n";
         $db = Db::get();
         $attributes = $db->fetchAllAssociative("SELECT description_category_id, type_id, attribute_id FROM " . self::OZON_ATTRIBUTE_TABLE);
         $db->beginTransaction();
@@ -153,7 +150,7 @@ class Products
                 $categoryId = $attribute['description_category_id'];
                 $typeId = $attribute['type_id'];
                 $attributeId = $attribute['attribute_id'];
-                echo "  $categoryId.$typeId.$attributeId";
+                echo "\r$categoryId.$typeId.$attributeId               ";
                 $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", 7 * 86400);
                 if (empty($response)) {
                     $lastId = 0;
@@ -169,7 +166,6 @@ class Products
                             $attributeId,
                         ]);
                         foreach ($response['result'] as $value) {
-                            echo ".";
                             $lastId = max($lastId, $value['id']);
                             $db->executeStatement("INSERT INTO " . self::OZON_VALUE_TABLE . " (description_category_id, type_id, attribute_id, value_id, value_json) VALUES (?, ?, ?, ?, ?)", [
                                 $categoryId,
@@ -183,9 +179,9 @@ class Products
                     $response = $this->connector->getApiResponse('POST', self::API_ATTRIBUTE_VALUE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $typeId, 'attribute_id' => $attributeId]);
                     $this->connector->putToCache("ATTRIBUTE_VALUES_{$categoryId}_{$typeId}_{$attributeId}.json", $response);
                 }
-                echo "\n";
             }
             $db->commit();
+            echo "\n";
         } catch (Exception $e) {
             $db->rollBack();
             throw $e;
