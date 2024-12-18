@@ -52,7 +52,6 @@ class Products
     public function processCategoryTree($categoryTree): void
     {
         echo "  Processing category tree\n";
-        print_r($categoryTree);
         $db = Db::get();
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_CATEGORY_TABLE);
         $db->executeQuery("TRUNCATE TABLE " . self::OZON_PRODUCTTYPE_TABLE);
@@ -62,6 +61,7 @@ class Products
                 'parentId' => null,
                 'children' => $categoryTree ?? [],
             ]];
+            echo count($stack) . " ". count($categoryTree) . "\n";
             while (!empty($stack)) {
                 echo "TEST\n";
                 $current = array_pop($stack);
