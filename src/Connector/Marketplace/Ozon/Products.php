@@ -53,9 +53,13 @@ class Products
     {
         echo "  Processing category tree\n";
         $db = Db::get();
+        echo "1";
         $db->executeQuery("DELETE FROM " . self::OZON_CATEGORY_TABLE);
+        echo "2";
         $db->executeQuery("DELETE FROM " . self::OZON_PRODUCTTYPE_TABLE);
+        echo "3";
         $db->beginTransaction();
+        echo "4";
         try {
             $stack = [[
                 'parentId' => null,
@@ -63,6 +67,7 @@ class Products
             ]];
             echo count($stack) . " ". count($categoryTree) . "\n";
             while (!empty($stack)) {
+                echo "TEST\n";
                 $current = array_pop($stack);
                 $currentParentId = $current['parentId'];
                 $currentChildren = $current['children'];
