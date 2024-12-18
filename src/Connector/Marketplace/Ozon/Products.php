@@ -56,7 +56,6 @@ class Products
         echo "  Processing category tree\n";
         $db = Db::get();
         $db->beginTransaction();
-        echo "4";
         try {
             $stack = [[
                 'parentId' => null,
@@ -64,7 +63,6 @@ class Products
             ]];
             echo count($stack) . " ". count($categoryTree) . "\n";
             while (!empty($stack)) {
-                echo "TEST\n";
                 $current = array_pop($stack);
                 $currentParentId = $current['parentId'];
                 $currentChildren = $current['children'];
