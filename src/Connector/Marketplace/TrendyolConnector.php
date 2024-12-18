@@ -32,7 +32,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         parent::__construct($marketplace);
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/", [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getTrendyolToken(),
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
             ]
         ]);
     }
