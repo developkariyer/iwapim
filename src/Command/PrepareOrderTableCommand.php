@@ -207,7 +207,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_orders_line_items
+        $sql = "UPDATE iwa_marketplace_abondoned_line_items
         SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         $statement = $db->prepare($sql);
