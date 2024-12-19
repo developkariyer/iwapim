@@ -68,11 +68,11 @@ class PrepareOrderTableCommand extends AbstractCommand
             FROM
                 iwa_marketplace_abondoned_line_items
             WHERE 
-                marketplace_type = '$marketplaceType'
+                marketplace_type = 'Shopify'
             ";
         $values = $db->fetchAllAssociative($sql);
         foreach ($values as $row) {
-            $this->prepareOrderTable($row['variant_id'],$marketplaceType);
+            $this->prepareOrderTable($row['variant_id'],'Shopify');
         }
 
 
