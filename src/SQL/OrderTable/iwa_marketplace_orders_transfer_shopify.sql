@@ -1,4 +1,4 @@
-INSERT INTO iwa_marketplace_abondoned_line_items (
+INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
     shipping_country, shipping_province, shipping_city, shipping_company, shipping_country_code, total_price, subtotal_price,
     fulfillments_status, tracking_company, fulfillments_status_control, referring_site, landing_site
@@ -29,7 +29,7 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.referring_site')) AS referring_site,
     COALESCE(LEFT(JSON_UNQUOTE(JSON_EXTRACT(json, '$.landing_site')), 255), NULL) AS landing_site
 FROM
-    iwa_marketplace_abandoned_checkouts
+    iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
         LEFT JOIN JSON_TABLE(json, '$.fulfillments[*]' COLUMNS ( value JSON PATH '$' )) AS fulfillments ON TRUE
         LEFT JOIN JSON_TABLE(json, '$.discount_applications[*]' COLUMNS ( value JSON PATH '$' )) AS discount_application ON TRUE

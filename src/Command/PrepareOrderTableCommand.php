@@ -39,6 +39,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->testAbondoned();
         if($input->getOption('transfer')) {
             $this->transferOrders();
         }
@@ -56,6 +57,25 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->extraColumns();
         }
         return Command::SUCCESS;
+    }
+
+    protected function testAbondoned()
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            SELECT 
+                DISTINCT variant_id
+            FROM
+                iwa_marketplace_abondoned_line_items
+            WHERE 
+                marketplace_type = '$marketplaceType'
+            ";
+        $values = $db->fetchAllAssociative($sql);
+        foreach ($values as $row) {
+            $this->prepareOrderTable($row['variant_id'],$marketplaceType);
+        }
+
+
     }
 
     protected function marketplaceList(): void
