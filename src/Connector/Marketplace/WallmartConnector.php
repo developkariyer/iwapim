@@ -29,6 +29,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public  function  __construct($marketplace)
     {
         parent::__construct($marketplace);
+        $this->prepareToken();
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://marketplace.walmartapis.com/v3/', [
             'headers' => [
                 'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),

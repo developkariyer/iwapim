@@ -168,7 +168,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function downloadAbondonedCheckouts(): void
+    private function downloadAbondonedCheckouts(): void
     {
         echo "Downloading abandoned checkouts\n";
         $db = Db::get();
