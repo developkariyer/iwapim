@@ -39,7 +39,6 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->testAbondoned();
         if($input->getOption('transfer')) {
             $this->transferOrders();
         }
@@ -57,25 +56,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->extraColumns();
         }
         return Command::SUCCESS;
-    }
-
-    protected function testAbondoned()
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT 
-                DISTINCT variant_id
-            FROM
-                iwa_marketplace_abondoned_line_items
-            WHERE 
-                marketplace_type = 'Shopify'
-            ";
-        $values = $db->fetchAllAssociative($sql);
-        foreach ($values as $row) {
-            $this->prepareOrderTable($row['variant_id'],'Shopify');
-        }
-
-
     }
 
     protected function marketplaceList(): void
@@ -227,7 +207,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_abondoned_line_items
+        $sql = "UPDATE iwa_marketplace_orders_line_items
         SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
         WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
         $statement = $db->prepare($sql);
