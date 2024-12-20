@@ -222,7 +222,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         ]);
     }
 
-    protected function findVariantProduct($uniqueMarketplaceId, $field = null)
+    protected function findVariantProduct($uniqueMarketplaceId, $field = null): VariantProduct|Concrete|null
     {
         $variantProduct = null;
         if ($field === null) {
@@ -235,10 +235,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         if ($objectId) {
            return VariantProduct::getById($objectId);
         }
-        return $variantProduct;
+        return null;
     }
 
-    protected function currencyRate()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function currencyRate(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -325,7 +329,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "All processes completed.\n";
     }
 
-    protected function calculatePrice()
+    protected function calculatePrice(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -416,7 +420,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Complated is Cancelled\n";
     }
 
-    protected function setMarketplaceKey()
+    protected function setMarketplaceKey(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -448,7 +452,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function insertClosedAtDiff() 
+    protected function insertClosedAtDiff(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -460,7 +464,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function discountValue() 
+    protected function discountValue(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -475,7 +479,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function isCancelled() 
+    protected function isCancelled(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -501,7 +505,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function parseUrl()
+    protected function parseUrl(): void
     {
         $tldList = [
             'com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk',
@@ -546,7 +550,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function usaCode()
+    protected function usaCode(): void
     {
         $isoCodes = [
             'Alabama' => 'US-AL',
@@ -634,7 +638,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function bolcomTotalPrice()
+    protected function bolcomTotalPrice(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -655,7 +659,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function bolcomFixOrders()
+    protected function bolcomFixOrders(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
@@ -666,7 +670,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt->execute();
     }
 
-    protected function countryCodes()
+    protected function countryCodes(): void
     {
         // ISO 3166-1 alpha-2
         $countries = array
