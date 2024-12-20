@@ -31,7 +31,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
 
-        $this->getFeedback(8028410708210);
+        $this->getFeedback("8028410708210");
 
     }
 
