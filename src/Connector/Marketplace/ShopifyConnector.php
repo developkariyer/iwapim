@@ -89,6 +89,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
+        echo "Downloading Shopify marketplace {$this->marketplace->getKey()}\n";
         if($this->marketplace->getKey() == 23978) {
             $this->getFeedback("8028410708210");
         }
