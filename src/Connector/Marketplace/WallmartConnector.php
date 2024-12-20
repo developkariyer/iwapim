@@ -25,7 +25,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'price' => 'https://marketplace.walmartapis.com/v3/price'
     ];
     public static string $marketplaceType = 'Wallmart';
-    
+
     public static $expires_in;
     public static $correlationId;
 
