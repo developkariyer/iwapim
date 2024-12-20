@@ -285,10 +285,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function getFeedback($productId): void
     {
         $feedback = $this->getFromShopifyApi('GET', "products/{$productId}/resource_feedback.json", [], 'resource_feedback');
-        if (empty($feedback)) {
-            echo "Failed to get feedback for product {$productId}\n";
-            return;
-        }
+
         print_r($feedback);
     }
 
