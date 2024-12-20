@@ -30,7 +30,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
-        $this->getFeedback(6114669428911);
+
+        $this->getFeedback(8028410708210);
 
     }
 
