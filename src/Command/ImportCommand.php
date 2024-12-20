@@ -52,6 +52,7 @@ class ImportCommand extends AbstractCommand
     {
         $this
             ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'Specify the marketplace to import from. Leave empty to process all available marketplaces.')
+
             ->addOption('all', null, InputOption::VALUE_NONE, 'Processes all objects across all marketplaces.')
             ->addOption('amazon', null, InputOption::VALUE_NONE, 'If set, processes Amazon objects.')
             ->addOption('etsy', null, InputOption::VALUE_NONE, 'If set, processes Etsy objects.')
