@@ -25,20 +25,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'price' => 'https://marketplace.walmartapis.com/v3/price'
     ];
     public static string $marketplaceType = 'Wallmart';
-
-    public  function  __construct($marketplace)
-    {
-        parent::__construct($marketplace);
-        $this->prepareToken();
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://marketplace.walmartapis.com/v3/', [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ]
-        ]);
-    }
+    
     public static $expires_in;
     public static $correlationId;
 
