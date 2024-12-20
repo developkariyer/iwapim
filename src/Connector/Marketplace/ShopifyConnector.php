@@ -30,6 +30,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
+        $this->getFeedback(6114669428911);
+
     }
 
     /**
@@ -89,8 +91,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->getFeedback(6114669428911);
-        /*if (!$forceDownload && $this->getListingsFromCache()) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -99,7 +100,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     /**
