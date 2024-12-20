@@ -89,7 +89,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->getFeedback(6114669428911);
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -98,7 +99,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     /**
@@ -277,6 +278,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "OK\n";
             $index++;
         }
+    }
+
+    public function getFeedback($productId): void
+    {
+        $feedback = $this->getFromShopifyApi('GET', "products/{$productId}/resource_feedback.json", [], 'resource_feedback');
+        if (empty($feedback)) {
+            echo "Failed to get feedback for product {$productId}\n";
+            return;
+        }
+        print_r($feedback);
     }
 
     /**
