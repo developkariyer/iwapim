@@ -1,4 +1,5 @@
 {# ozon.html.twig #}
+
 {% extends 'ozon/base.html.twig' %}
 
 {% block title %}Ozon Listeleme Yardımcısı{% endblock %}
@@ -16,8 +17,40 @@
 {% endblock %}
 
 {% block header %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Ozon</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% for task in tasks %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/ozon/task/{{ task.id }}">{{ task.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
 {% endblock %}
 
 {% block content %}
     <h1>Ozon Listeleme Yardımcısı</h1>
+    <form method="post" action="/ozon/newtask">
+        <div class="mb-3">
+            <label for="marketplace" class="form-label">Ozon Pazaryeri</label>
+            <select class="form-select" id="marketplace" name="marketplace">
+                {% for marketplace in marketplaces %}
+                    <option value="{{ marketplace.id }}">{{ marketplace.getKey }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="taskName" class="form-label">Görev İsmi</label>
+            <input type="text" class="form-control" id="taskName" name="taskName" placeholder="Göreve isim verin">
+        </div>
+        <button type="submit" class="btn btn-primary">Yeni Görev</button>
+    </form>
 {% endblock %}
