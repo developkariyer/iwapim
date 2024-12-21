@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category Selector</title>
-    {{ encore_entry_link_tags('app') }} {# This will include app.css #}
-</head>
-<body>
-<div style="width: 400px; margin: 50px auto;">
-    <input type="text" id="search-box" placeholder="Search categories..." style="width: 100%; padding: 5px; margin-bottom: 10px;">
-    <ul id="category-list"></ul>
-</div>
-{{ encore_entry_script_tags('app') }} {# This will include app.js #}
-</body>
-</html>
+{# ozon.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello World Page{% endblock %}
+
+{% block stylesheets %}
+    <!-- link rel="stylesheet" href="/path/to/custom.css" -->
+{% endblock %}
+
+{% block head_scripts %}
+    <!-- script src="/path/to/head-custom.js"></script -->
+{% endblock %}
+
+{% block body_scripts %}
+    <!-- script src="/path/to/body-custom.js"></script -->
+{% endblock %}
+
+{% block content %}
+    <h1>Hello World</h1>
+{% endblock %}
