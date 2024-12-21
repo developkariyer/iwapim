@@ -25,11 +25,16 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    {% for task in tasks %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/ozon/task/{{ task.id }}">{{ task.title }}</a>
-                        </li>
-                    {% endfor %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Listelemeler
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% for task in tasks %}
+                                <li><a class="dropdown-item" href="/ozon/task/{{ task.id }}">{{ task.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
