@@ -34,7 +34,9 @@ class OzonController extends FrontendController
         $mrkListing = new Marketplace\Listing();
         $mrkListing->setCondition("marketplaceType = ?", ['Ozon']);
         $marketplaces = $mrkListing->load();
-        $tasks = ['id' => 1, 'title' => 'Task 1'];
+        $tasks = [
+            ['id' => 1, 'title' => 'Task 1']
+        ];
 
         return $this->render('ozon/ozon.html.twig', [
             'tasks' => $tasks,
