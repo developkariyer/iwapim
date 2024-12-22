@@ -27,11 +27,18 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{  task.key }}
+                            {{ task.key }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for product in products %}
-                                <li><a class="dropdown-item" href="/ozon/task/{{ product.object.id }}">{{ product.object.key }} ({{ product.data.price }})</a></li>
+                            {% for productId, productGroup in products %}
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">{{ productGroup.product }}</a>
+                                    <ul class="dropdown-menu">
+                                        {% for child in productGroup.children %}
+                                            <li><a class="dropdown-item" href="/ozon/task/{{ child.getObject().getId() }}">{{ child.getObject().getKey() }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
                             {% endfor %}
                         </ul>
                     </li>

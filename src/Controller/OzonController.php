@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,11 +31,9 @@ class OzonController extends FrontendController
         $mrkListing = new Marketplace\Listing();
         $mrkListing->setCondition("marketplaceType = ?", ['Ozon']);
         $marketplaces = $mrkListing->load();
-
         $taskListing = new ListingTemplate\Listing();
         $taskListing->setUnpublished(true);
         $tasksObjects = $taskListing->load();
-
         $tasks = [];
         foreach ($tasksObjects as $task) {
             if ($task->getMarketplace()->getMarketplaceType() !== 'Ozon') {
@@ -45,7 +44,6 @@ class OzonController extends FrontendController
                 'title' => $task->getKey(),
             ];
         }
-
         return $this->render('ozon/ozon.html.twig', [
             'tasks' => $tasks,
             'marketplaces' => $marketplaces,
@@ -90,10 +88,26 @@ class OzonController extends FrontendController
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
-        $products = $task->getProducts();
+        $taskProducts = $task->getProducts();
+        $groupedProducts = [];
+        foreach ($taskProducts as $taskProduct) {
+            $product = $taskProduct->getObject();
+            $parentProduct = $product->getParent();
+            if (!$parentProduct instanceof Product) {
+                continue;
+            }
+            if (!isset($groupedProducts[$parentProduct->getId()])) {
+                $groupedProducts[$parentProduct->getId()] = [
+                    'product' => $parentProduct->getKey(),
+                    'children' => [],
+                ];
+            }
+            $groupedProducts[$parentProduct->getId()]['children'][] = $taskProduct;
+        }
+
         return $this->render('ozon/task.html.twig', [
             'task' => $task,
-            'products' => $products,
+            'products' => $groupedProducts,
         ]);
     }
 
