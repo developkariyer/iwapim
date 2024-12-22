@@ -38,6 +38,7 @@ class OzonController extends FrontendController
         $marketplaces = $mrkListing->load();
 
         $taskListing = new ListingTemplate\Listing();
+        $taskListing->setUnpublished(true);
         $tasksObjects = $taskListing->load();
 
         $tasks = [];
