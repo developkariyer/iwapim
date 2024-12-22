@@ -49,5 +49,29 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{ task.key }}</h1>
+    <div class="container mt-4">
+        <h1>{{ task.key }} - Products</h1>
+        <div class="accordion" id="productAccordion">
+            {% for productId, productGroup in products %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading{{ productId }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ productId }}" aria-expanded="true" aria-controls="collapse{{ productId }}">
+                            {{ productGroup.product }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ productId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ productId }}" data-bs-parent="#productAccordion">
+                        <div class="accordion-body">
+                            <ul class="list-group">
+                                {% for child in productGroup.children %}
+                                    <li class="list-group-item">
+                                        <a href="/ozon/task/{{ child.getObject().getId() }}">{{ child.getObject().getKey() }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
