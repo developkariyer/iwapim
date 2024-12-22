@@ -40,26 +40,34 @@
                     </h2>
                     <div id="collapse{{ productId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ productId }}" data-bs-parent="#productAccordion">
                         <div class="accordion-body">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Size</th>
-                                    {% for color, _ in productGroup.children|first %}
-                                        <th>{{ color }}</th>
-                                    {% endfor %}
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for size, colors in productGroup.children %}
-                                    <tr>
-                                        <th>{{ size }}</th>
-                                        {% for color, product in colors %}
-                                            <td>{{ product }}</td>
-                                        {% endfor %}
-                                    </tr>
+                            <div class="accordion" id="sizeAccordion{{ productId }}">
+                                {% for size, colorGroup in productGroup.children %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingSize{{ productId }}{{ size }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSize{{ productId }}{{ size }}" aria-expanded="false" aria-controls="collapseSize{{ productId }}{{ size }}">
+                                                {{ size }}
+                                            </button>
+                                        </h2>
+                                        <div id="collapseSize{{ productId }}{{ size }}" class="accordion-collapse collapse" aria-labelledby="headingSize{{ productId }}{{ size }}" data-bs-parent="#sizeAccordion{{ productId }}">
+                                            <div class="accordion-body">
+                                                {% for color, product in colorGroup %}
+                                                    <label>
+                                                        {{ color }}
+                                                        <select class="form-select" name="productSelect{{ product.getId() }}">
+                                                            <option value="">Select an option</option>
+                                                            {% for listingItem in product.getListingItems() %}
+                                                                <option value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}selected{% endif %}>
+                                                                    {{ listingItem.getMarketplace().getMarketplaceType() }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
                                 {% endfor %}
-                                </tbody>
-                            </table>
+                            </div>
                         </div>
                     </div>
                 </div>

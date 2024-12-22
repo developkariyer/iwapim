@@ -111,7 +111,7 @@ class OzonController extends FrontendController
                     }
                 }
             }
-            $groupedProducts[$parentProduct->getId()]['children'][$product->getVariationSize()][$product->getVariationColor()] = $taskProduct->getData()['listing'];
+            $groupedProducts[$parentProduct->getId()]['children'][$product->getVariationSize()][$product->getVariationColor()] = $taskProduct;
         }
 
         return $this->render('ozon/task.html.twig', [
