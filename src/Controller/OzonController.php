@@ -103,15 +103,15 @@ class OzonController extends FrontendController
                 foreach (explode("\n", $parentProduct->getVariationSizeList()) as $size) {
                     if (!empty($size)) {
                         $groupedProducts[$parentProduct->getId()]['children'][$size] = [];
-                    }
-                }
-                foreach (explode("\n", $parentProduct->getVariationColorList()) as $color) {
-                    if (!empty($color)) {
-                        $groupedProducts[$parentProduct->getId()]['children'][$color] = [];
+                        foreach (explode("\n", $parentProduct->getVariationColorList()) as $color) {
+                            if (!empty($color)) {
+                                $groupedProducts[$parentProduct->getId()]['children'][$size][$color] = -1;
+                            }
+                        }
                     }
                 }
             }
-            $groupedProducts[$parentProduct->getId()]['children'][$product->getVariationSize()][$product->getVariationColor()] = $taskProduct;
+            $groupedProducts[$parentProduct->getId()]['children'][$product->getVariationSize()][$product->getVariationColor()] = $taskProduct->getData()['price'];
         }
 
         return $this->render('ozon/task.html.twig', [
