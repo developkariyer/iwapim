@@ -53,7 +53,7 @@
                                 {% for size, colors in productGroup.children %}
                                     <tr>
                                         <th>{{ size }}</th>
-                                        {% for color, product in colors.items %}
+                                        {% for color, product in colors %}
                                             <td>{{ product }}</td>
                                         {% endfor %}
                                     </tr>
