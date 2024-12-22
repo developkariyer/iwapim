@@ -55,19 +55,20 @@
                                                         <div class="accordion-item">
                                                             <h2 class="accordion-header" id="headingColor{{ productId }}{{ size }}{{ color }}">
                                                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseColor{{ productId }}{{ size }}{{ color }}" aria-expanded="false" aria-controls="collapseColor{{ productId }}{{ size }}{{ color }}">
-                                                                    {{ productGroup.product }} {{ color }}
+                                                                    {{ productGroup.product }} {{ size }} {{ color }}
+                                                                    {{ product.getKey() }} {{ product.getIwasku() }}
                                                                 </button>
                                                             </h2>
                                                             <div id="collapseColor{{ productId }}{{ size }}{{ color }}" class="accordion-collapse collapse" aria-labelledby="headingColor{{ productId }}{{ size }}{{ color }}" data-bs-parent="#colorAccordion{{ productId }}{{ size }}">
                                                                 <div class="accordion-body">
                                                                     <div class="form-check">
-                                                                        <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="noneOption{{ product.getIwasku() }}" value="" {% if selectedListings[product.getIwasku()] is not defined %}checked{% endif %}>
                                                                         <label class="form-check-label" for="noneOption{{ product.getIwasku() }}">
+                                                                            <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="noneOption{{ product.getIwasku() }}" value="" {% if selectedListings[product.getIwasku()] is not defined %}checked{% endif %}>
                                                                             None
                                                                         </label>
                                                                         {% for listingItem in product.getListingItems() %}
-                                                                            <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}" value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}checked{% endif %}>
                                                                             <label class="form-check-label" for="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}">
+                                                                                <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}" value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}checked{% endif %}>
                                                                                 {{ listingItem.getMarketplace().getKey() }}
                                                                             </label>
                                                                         {% endfor %}
