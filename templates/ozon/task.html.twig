@@ -77,7 +77,7 @@
                                                                                         <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}" value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}checked{% endif %}>
                                                                                         <span class="fw-bold">{{ listingItem.getMarketplace().getKey() }}</span>
                                                                                         <br>
-                                                                                        <span class="text-muted">Additional data here</span>
+                                                                                        <span class="text-muted"><a href="{{ listingItem.getUrlLink() }}">{{ listingItem.getTitle() }}</a></span>
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
