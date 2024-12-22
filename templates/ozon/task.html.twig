@@ -44,7 +44,7 @@
                                 <thead>
                                 <tr>
                                     <th>Size</th>
-                                    {% for color, _ in productGroup.children|first.colors %}
+                                    {% for color, _ in productGroup.children|first %}
                                         <th>{{ color }}</th>
                                     {% endfor %}
                                 </tr>
