@@ -20,13 +20,12 @@ class OzonController extends FrontendController
 
     /**
      * @Route("/ozon", name="ozon_menu")
-     * @param Request $request
      * @return Response
      *
      * This controller method loads all marketplaces and tasks for Ozon and renders the page.
      * Also displays the form to create a new Ozon Listing task.
      */
-    public function ozonAction(Request $request): Response
+    public function ozonAction(): Response
     {
         $mrkListing = new Marketplace\Listing();
         $mrkListing->setCondition("marketplaceType = ?", ['Ozon']);
@@ -101,8 +100,18 @@ class OzonController extends FrontendController
                     'product' => $parentProduct->getKey(),
                     'children' => [],
                 ];
+                foreach (explode("\n", $parentProduct->getVariationSizeList()) as $size) {
+                    if (!empty($size)) {
+                        $groupedProducts[$parentProduct->getId()]['children'][$size] = [];
+                    }
+                }
+                foreach (explode("\n", $parentProduct->getVariationColorList()) as $color) {
+                    if (!empty($color)) {
+                        $groupedProducts[$parentProduct->getId()]['children'][$color] = [];
+                    }
+                }
             }
-            $groupedProducts[$parentProduct->getId()]['children'][] = $taskProduct;
+            $groupedProducts[$parentProduct->getId()]['children'][$product->getVariationSize()][$product->getVariationColor()] = $taskProduct;
         }
 
         return $this->render('ozon/task.html.twig', [

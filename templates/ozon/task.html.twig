@@ -40,13 +40,25 @@
                     </h2>
                     <div id="collapse{{ productId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ productId }}" data-bs-parent="#productAccordion">
                         <div class="accordion-body">
-                            <ul class="list-group">
-                                {% for child in productGroup.children %}
-                                    <li class="list-group-item">
-                                        <a href="/ozon/task/{{ child.getObject().getId() }}">{{ child.getObject().getVariationSize() }} {{ child.getObject().getVariationColor() }} ({{ child.getData().price }})</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Size</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for size, colors in productGroup.children %}
+                                        <tr>
+                                            <th>{{ size }}</th>
+                                            {%  for color in colors %}
+                                                <td>{{ color }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
