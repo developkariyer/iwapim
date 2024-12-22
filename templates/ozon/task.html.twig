@@ -57,7 +57,7 @@
                                                             <option value="">Select an option</option>
                                                             {% for listingItem in product.getListingItems() %}
                                                                 <option value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}selected{% endif %}>
-                                                                    {{ listingItem.getMarketplace().getMarketplaceType() }}
+                                                                    {{ listingItem.getMarketplace().getKey() }}
                                                                 </option>
                                                             {% endfor %}
                                                         </select>
