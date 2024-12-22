@@ -121,6 +121,7 @@ class OzonController extends FrontendController
         return $this->render('ozon/task.html.twig', [
             'task' => $task,
             'products' => $groupedProducts,
+            'selectedListings' => $selectedListings,
         ]);
     }
 
