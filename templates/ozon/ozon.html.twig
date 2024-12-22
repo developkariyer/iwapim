@@ -46,16 +46,22 @@
     <form method="post" action="/ozon/newtask">
         <div class="mb-3">
             <label for="marketplace" class="form-label">Ozon Pazaryeri</label>
-            <select class="form-select" id="marketplace" name="marketplace">
+            <select class="form-select" id="marketplace" name="marketplace" required>
+                <option value="" selected disabled>Ozon Pazaryeri Seçiniz</option>
                 {% for marketplace in marketplaces %}
-                    <option>Ozon Pazaryeri Seçiniz</option>
                     <option value="{{ marketplace.id }}">{{ marketplace.getKey }}</option>
                 {% endfor %}
             </select>
+            <div class="invalid-feedback">
+                Lütfen bir pazaryeri seçin.
+            </div>
         </div>
         <div class="mb-3">
             <label for="taskName" class="form-label">Görev İsmi</label>
-            <input type="text" class="form-control" id="taskName" name="taskName" placeholder="Göreve isim verin">
+            <input type="text" class="form-control" id="taskName" name="taskName" placeholder="Göreve isim verin" required>
+            <div class="invalid-feedback">
+                Lütfen bir görev ismi girin.
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Yeni Görev</button>
     </form>
