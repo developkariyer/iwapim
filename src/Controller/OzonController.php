@@ -6,6 +6,7 @@ use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -56,22 +57,6 @@ class OzonController extends FrontendController
         ]);
     }
 
-    /**
-     * @Route("/ozon/task/{id}", name="ozon_task")
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function taskAction(Request $request, int $id): Response
-    {
-        $task = ListingTemplate::getById($id);
-        if (!$task) {
-            return new Response('Task not found');
-        }
-        return $this->render('ozon/task.html.twig', [
-            'task' => $task,
-        ]);
-    }
 
     /**
      * @Route("/ozon/newtask", name="ozon_newtask_action")
@@ -80,18 +65,19 @@ class OzonController extends FrontendController
      * This controller method creates a new ListingTemplate and redirects page to /ozon/task/{id} page
      * @throws Exception
      */
-    public function newTaskAction(Request $request)
+    public function newTaskAction(Request $request): RedirectResponse|JsonResponse
     {
         $task = new ListingTemplate();
         // get key from request POST
         $task->setKey($request->get('taskName', 'İsimsiz'));
+        $task->setParent(Utility::checkSetPath('Listing'));
         $marketplaceId = $request->get('marketplace', 0);
         if (!$marketplaceId) {
             return new JsonResponse(['error' => 'Marketplace not found'], 400);
         }
         $task->setMarketplace(Marketplace::getById($marketplaceId) ?? null);
         $task->save();
-        return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+        return $this->redirectToRoute('ozon_menu'); //, ['id' => $task->getId()]);
     }
 
 }
