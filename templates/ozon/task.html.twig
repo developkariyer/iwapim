@@ -46,7 +46,7 @@
                                         <tr>
                                             <th>{{ size }}</th>
                                             {%  for product in colors %}
-                                                <td>{{ product.getData().getPrice() }}</td>
+                                                <td>{{ product.data.price }}</td>
                                             {% endfor %}
                                         </tr>
                                     {% endfor %}
