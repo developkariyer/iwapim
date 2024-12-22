@@ -41,19 +41,12 @@
                     <div id="collapse{{ productId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ productId }}" data-bs-parent="#productAccordion">
                         <div class="accordion-body">
                             <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Size</th>
-                                        <th scope="col">Price</th>
-                                        <th scope="col">Stock</th>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     {% for size, colors in productGroup.children %}
                                         <tr>
                                             <th>{{ size }}</th>
-                                            {%  for color in colors %}
-                                                <td>{{ color }}</td>
+                                            {%  for product in colors %}
+                                                <td>{{ product.getData().getPrice() }}</td>
                                             {% endfor %}
                                         </tr>
                                     {% endfor %}
