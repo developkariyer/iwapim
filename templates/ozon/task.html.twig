@@ -31,9 +31,9 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             {% for productId, productGroup in products %}
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">{{ productGroup.product }}</a>
-                                    <ul class="dropdown-menu">
+                                <li class="dropdown-item dropdown">
+                                    <a class="dropdown-item" href="#" id="dropdownSubMenu{{ productId }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ productGroup.product }}</a>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownSubMenu{{ productId }}">
                                         {% for child in productGroup.children %}
                                             <li><a class="dropdown-item" href="/ozon/task/{{ child.getObject().getId() }}">{{ child.getObject().getKey() }}</a></li>
                                         {% endfor %}
