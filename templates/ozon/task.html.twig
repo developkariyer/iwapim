@@ -67,10 +67,12 @@
                                                                             None
                                                                         </label>
                                                                         {% for listingItem in product.getListingItems() %}
-                                                                            <label class="form-check-label" for="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}">
-                                                                                <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}" value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}checked{% endif %}>
-                                                                                {{ listingItem.getMarketplace().getKey() }}
-                                                                            </label>
+                                                                            <div>
+                                                                                <label class="form-check-label" for="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}">
+                                                                                    <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}" value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}checked{% endif %}>
+                                                                                    {{ listingItem.getMarketplace().getKey() }}
+                                                                                </label>
+                                                                            </div>
                                                                         {% endfor %}
                                                                     </div>
                                                                 </div>
