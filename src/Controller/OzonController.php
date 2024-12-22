@@ -89,6 +89,7 @@ class OzonController extends FrontendController
         }
         $taskProducts = $task->getProducts();
         $groupedProducts = [];
+        $selectedListings = [];
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
             $parentProduct = $product->getParent();
@@ -110,8 +111,11 @@ class OzonController extends FrontendController
                         }
                     }
                 }
+                foreach ($parentProduct->getChildren() as $child) {
+                    $groupedProducts[$parentProduct->getId()]['children'][$child->getVariationSize()][$child->getVariationColor()] = $child;
+                }
             }
-            $groupedProducts[$parentProduct->getId()]['children'][$product->getVariationSize()][$product->getVariationColor()] = $taskProduct;
+            $selectedListings[$product->getIwasku()] = $taskProduct->getObject()['listing'];
         }
 
         return $this->render('ozon/task.html.twig', [
@@ -119,7 +123,5 @@ class OzonController extends FrontendController
             'products' => $groupedProducts,
         ]);
     }
-
-
 
 }
