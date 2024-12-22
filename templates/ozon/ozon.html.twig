@@ -27,7 +27,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Listelemeler
+                            Görevler
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             {% for task in tasks %}
@@ -48,6 +48,7 @@
             <label for="marketplace" class="form-label">Ozon Pazaryeri</label>
             <select class="form-select" id="marketplace" name="marketplace">
                 {% for marketplace in marketplaces %}
+                    <option>Ozon Pazaryeri Seçiniz</option>
                     <option value="{{ marketplace.id }}">{{ marketplace.getKey }}</option>
                 {% endfor %}
             </select>
