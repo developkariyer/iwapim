@@ -1,8 +1,8 @@
-{# ozon.html.twig #}
+{# task.html.twig #}
 
 {% extends 'ozon/base.html.twig' %}
 
-{% block title %}Ozon Listeleme Yardımcısı{% endblock %}
+{% block title %}Ozon Listeleme Görevi{% endblock %}
 
 {% block stylesheets %}
     <!-- link rel="stylesheet" href="/path/to/custom.css" -->
@@ -27,11 +27,11 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Görevler
+                            {{  task.key }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for task in tasks %}
-                                <li><a class="dropdown-item" href="/ozon/task/{{ task.id }}">{{ task.title }}</a></li>
+                            {% for product in products %}
+                                <li><a class="dropdown-item" href="/ozon/task/{{ product.object.id }}">{{ product.object.key }} ({{ product.data.price }})</a></li>
                             {% endfor %}
                         </ul>
                     </li>

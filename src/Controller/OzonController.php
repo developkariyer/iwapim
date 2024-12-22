@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,19 +21,12 @@ class OzonController extends FrontendController
      * @Route("/ozon", name="ozon_menu")
      * @param Request $request
      * @return Response
+     *
+     * This controller method loads all marketplaces and tasks for Ozon and renders the page.
+     * Also displays the form to create a new Ozon Listing task.
      */
     public function ozonAction(Request $request): Response
     {
-        /*
-        // ozon marketplace id is 268776
-        $ozonMarketplace = Marketplace::getByMarketplaceType('Ozon', ['limit' => 1]);
-        if (!$ozonMarketplace) {
-            return new Response('Ozon marketplace not found');
-        }
-
-        $ozonConnector = new OzonConnector($ozonMarketplace);
-        $categories = $ozonConnector->getCategories();
-        */
         $mrkListing = new Marketplace\Listing();
         $mrkListing->setCondition("marketplaceType = ?", ['Ozon']);
         $marketplaces = $mrkListing->load();
@@ -62,8 +56,10 @@ class OzonController extends FrontendController
     /**
      * @Route("/ozon/newtask", name="ozon_newtask_action")
      * @param Request $request
+     * @return RedirectResponse|JsonResponse
      *
-     * This controller method creates a new ListingTemplate and redirects page to /ozon/task/{id} page
+     * This controller method creates a new task for Ozon Listing and redirects to the task detail page.
+     * @throws DuplicateFullPathException
      * @throws Exception
      */
     public function newTaskAction(Request $request): RedirectResponse|JsonResponse
@@ -78,7 +74,29 @@ class OzonController extends FrontendController
         }
         $task->setMarketplace(Marketplace::getById($marketplaceId) ?? null);
         $task->save();
-        return $this->redirectToRoute('ozon_menu'); //, ['id' => $task->getId()]);
+        return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
     }
+
+    /**
+     * @Route("/ozon/task/{id}", name="ozon_task")
+     * @param Request $request
+     * @return Response
+     *
+     * This controller method displays the detail page for an Ozon Listing task.
+     */
+    public function taskAction(Request $request): Response
+    {
+        $task = ListingTemplate::getById($request->get('id'));
+        if (!$task) {
+            return $this->redirectToRoute('ozon_menu');
+        }
+        $products = $task->getProducts();
+        return $this->render('ozon/task.html.twig', [
+            'task' => $task,
+            'products' => $products,
+        ]);
+    }
+
+
 
 }
