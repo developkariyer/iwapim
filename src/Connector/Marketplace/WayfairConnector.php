@@ -110,7 +110,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         GRAPHQL;
         $variables = [
-            'supplierId' => 194115, 
+            'supplierId' => 218846,
             'paginationOptions' => [
                 'page' => 1,  
                 'pageSize' => 10
