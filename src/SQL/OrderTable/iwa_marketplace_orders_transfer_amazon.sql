@@ -1,6 +1,6 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title,
-    total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
+    shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
 SELECT
     :marketplaceType,
     :marketPlaceId,
@@ -10,11 +10,9 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.OrderItemId')) AS product_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) AS variant_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ItemPrice.Amount')) AS price,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ItemPrice.CurrencyCode')) AS currency,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderTotal.CurrencyCode')) AS currency,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.QuantityOrdered')) AS quantity,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.Title')) AS variant_title,
-    (CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.PromotionDiscount.Amount')) AS DECIMAL(10,2)) +
-     CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.PromotionDiscountTax.Amount')) AS DECIMAL(10,2))) AS total_discount,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.City')) as shipping_city,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.ShippingAddress.CountryCode')) AS shipping_country_code,
     CONCAT(
@@ -44,7 +42,6 @@ ON DUPLICATE KEY UPDATE
      currency = VALUES(currency),
      quantity = VALUES(quantity),
      variant_title = VALUES(variant_title),
-     total_discount = VALUES(total_discount),
      shipping_city = VALUES(shipping_city),
      shipping_country_code = VALUES(shipping_country_code),
      total_price = VALUES(total_price),
