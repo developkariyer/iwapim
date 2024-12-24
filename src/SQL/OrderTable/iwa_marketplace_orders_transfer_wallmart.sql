@@ -10,15 +10,15 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.purchaseOrderId')) AS order_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) AS variant_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.charges.charge[0].chargeAmount.amount')) AS price,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.$.charges.charge[0].chargeAmount.currency')) AS currency,
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.charges.charge[0].chargeAmount.currency')) AS currency,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineQuantity.amount')) AS quantity,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.productName')) AS variant_title,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.state')) AS shipping_province,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.city')) AS shipping_city,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.country')) AS shipping_country_code,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.orderLineStatuses.orderLineStatus[0].status')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.orderLineStatuses.orderLineStatus[0].trackingInfo.carrierName.carrier')) AS tracking_company,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.orderLineStatuses.orderLineStatus[0].cancellationReason')) AS fulfillments_status_control
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].status')) AS fulfillments_status,
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].trackingInfo.carrierName.carrier')) AS tracking_company,
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].cancellationReason')) AS fulfillments_status_control
 FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.orderLines.orderLine[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
