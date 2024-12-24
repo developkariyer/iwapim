@@ -4,7 +4,6 @@ namespace App\Connector\Marketplace\Amazon;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\MarketplaceConnectorAbstract;
-use App\Utils\Utility;
 use Exception;
 use JsonException;
 use Pimcore\Model\DataObject\Marketplace;
@@ -53,7 +52,7 @@ class Connector extends MarketplaceConnectorAbstract
     {
         $endpoint = match ($marketplace->getMainMerchant()) {
             "SG", "AU", "JP", "IN" => Endpoint::FE,
-            "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" => Endpoint::EU,
+            "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" , "IE" => Endpoint::EU,
             default => Endpoint::NA,  //"CA", "US", "MX", "BR"
         };
         return SellingPartnerApi::seller(
@@ -112,11 +111,11 @@ class Connector extends MarketplaceConnectorAbstract
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
     {
-
+        // TODO: Implement setInventory() method.
     }
 
     public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-
+        // TODO: Implement setPrice() method.
     }
 }

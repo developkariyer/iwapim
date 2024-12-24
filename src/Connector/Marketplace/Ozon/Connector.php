@@ -53,18 +53,18 @@ class Connector extends MarketplaceConnectorAbstract
             $statusCode = $response->getStatusCode();
             if ($statusCode < 200 || $statusCode >= 300) {
                 echo "Error: " . json_encode($response->toArray(false)) . "\n";
-                exit; // return [];
+                return [];
             }
             try {
                 $responseArray = $response->toArray();
                 return empty($returnKey) ? $responseArray : ($responseArray[$returnKey] ?? []);
             } catch (DecodingExceptionInterface) {
                 echo "Failed to decode response: " . $response->getContent(false) . "\n";
-                exit; // return [];
+                return [];
             }
         } catch (Exception $e) {
             echo "Unexpected error: " . $e->getMessage() . "\n";
-            exit; // return [];
+            return [];
         }
     }
 
@@ -108,12 +108,12 @@ class Connector extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-        
+        // TODO: Implement downloadInventory() method.
     }
 
     public function downloadOrders()
     {
-
+        // TODO: Implement downloadOrders() method.
     }
 
     /**
@@ -123,27 +123,24 @@ class Connector extends MarketplaceConnectorAbstract
     {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        //$this->productsHelper->getCategoryTreeFromApi();
-        //$this->productsHelper->getCategoryAttributesFromApi();
+        $this->productsHelper->getCategoryTreeFromApi();
+        $this->productsHelper->getCategoryAttributesFromApi();
         $this->productsHelper->getAttributeValuesFromApi();
     }
 
-
     public function import($updateFlag, $importFlag)
     {
-
+        // TODO: Implement import() method.
     }
-
-
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
     {
-
+        // TODO: Implement setInventory() method.
     }
 
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-
+        // TODO: Implement setPrice() method.
     }
 
 }
