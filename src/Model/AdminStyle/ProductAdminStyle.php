@@ -2,7 +2,6 @@
 
 namespace App\Model\AdminStyle;
 
-use App\Website\Tool\ForceInheritance;
 use Pimcore\Model\Element\AdminStyle;
 use Pimcore\Model\Element\ElementInterface;
 use Pimcore\Model\DataObject\Product;
@@ -11,7 +10,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 class ProductAdminStyle extends AdminStyle
 {
     /** @var ElementInterface */
-    protected $element;
+    protected ElementInterface $element;
 
     public function __construct($element)
     {
@@ -20,14 +19,12 @@ class ProductAdminStyle extends AdminStyle
         $this->element = $element;
 
         if ($element instanceof Product) {
-            switch ($element->level()) {
-                case 0:
-                    $this->elementIcon = '/custom/product.svg';
-                    break;
-                case 1:
-                    $this->elementIcon = (count($element->getListingItems())) ? '/custom/deployment.svg' : '/custom/object.svg';
-                    break;
-                default:
+            $this->elementIcon = '/custom/product.svg';
+            if ($element->level() === 1) {
+                $this->elementIcon = '/custom/object.svg';
+                if (count($element->getListingItems()) + count($element->getBundleProducts())) {
+                    $this->elementIcon = '/custom/deployment.svg';
+                }
             }
         }
         if ($element instanceof VariantProduct) {
@@ -53,7 +50,7 @@ class ProductAdminStyle extends AdminStyle
             $config['text'] = "$total/$shopifyVariations listing bağlı<br>";
             $image = $this->element->getInheritedField('image');
             if ($image) {
-                $config["text"] .= "<img src='{$image->getThumbnail()->getPath()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";
+                $config["text"] .= "<img src='{$image->getThumbnail()->getPath()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;' alt='alt'>";
             }
             $album = $this->element->getInheritedField('album');
             foreach ($album as $asset) {
@@ -62,13 +59,13 @@ class ProductAdminStyle extends AdminStyle
                 }
                 $image = $asset->getImage();
                 if ($image) {
-                    $config['text'] .= "<img src='{$image->getThumbnail()->getPath()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";
+                    $config['text'] .= "<img src='{$image->getThumbnail()->getPath()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;' alt='alt'>";
                     break;
                 }
             }
             $imageUrl = $this->element->getInheritedField('imageUrl');
             if ($imageUrl) {
-                $config['text'] .= "<img src='{$imageUrl->getUrl()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";
+                $config['text'] .= "<img src='{$imageUrl->getUrl()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;' alt=\"alt\">";
             }
             return $config;
         }
@@ -76,7 +73,7 @@ class ProductAdminStyle extends AdminStyle
             $config = parent::getElementQtipConfig();
             $config['text'] = '';
             if ($this->element->getImageUrl()) {
-                $config['text'] .= "<br><img src='{$this->element->getImageUrl()->getUrl()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;'>";
+                $config['text'] .= "<br><img src='{$this->element->getImageUrl()->getUrl()}' style='max-width: 100%; height: 100px; background-color: #f0f0f0;' alt=\"alt\">";
             }
             $config['text'] .= "<br>{$this->element->getUniqueMarketplaceId()}<br>{$this->element->getAttributes()}";
             return $config;

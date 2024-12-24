@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\ClassDefinition\CustomLayout;
+use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Serial;
 use Pimcore\Model\DataObject\GroupProduct;
@@ -42,7 +43,7 @@ class DataObjectListener implements EventSubscriberInterface
         ];
     }
 
-    protected function doModifyCustomLayouts(Product $object, GenericEvent $event)
+    protected function doModifyCustomLayouts(Product $object, GenericEvent $event): void
     {
         $level = $object->level();
         $data = $event->getArgument('data');
@@ -62,7 +63,7 @@ class DataObjectListener implements EventSubscriberInterface
         $event->setArgument('data', $data);
     }
 
-    public function onPreSendData(GenericEvent $event)
+    public function onPreSendData(GenericEvent $event): void
     {
         $object = $event->getArgument('object');
         if ($object instanceof Product) {
@@ -70,7 +71,10 @@ class DataObjectListener implements EventSubscriberInterface
         }
     }
 
-    public function onPreDelete(DataObjectEvent $event)
+    /**
+     * @throws \Exception
+     */
+    public function onPreDelete(DataObjectEvent $event): void
     {
         $object = $event->getObject();
         if ($object instanceof Folder) {
@@ -80,9 +84,14 @@ class DataObjectListener implements EventSubscriberInterface
                 throw new \Exception('Ayarlar klasörü ve altındaki ana klasörler silinemez');
             }
         }
+        if ($object instanceof Product) {
+            if ($object->getDependencies()) {
+                throw new \Exception('Bu ürün muhtemelen bir setin parçası. Silinemez!');
+            }
+        }
     }
 
-    public function onResolveElementAdminStyle(\Pimcore\Bundle\AdminBundle\Event\ElementAdminStyleEvent $event)
+    public function onResolveElementAdminStyle(\Pimcore\Bundle\AdminBundle\Event\ElementAdminStyleEvent $event): void
     {
         $object = $event->getElement();
         if (
@@ -99,7 +108,7 @@ class DataObjectListener implements EventSubscriberInterface
      * 
      * @param DataObjectEvent $event
      */
-    public function onPreAdd(DataObjectEvent $event)
+    public function onPreAdd(DataObjectEvent $event): void
     {
         $object = $event->getObject();
         if ($object instanceof Product) {
@@ -115,7 +124,7 @@ class DataObjectListener implements EventSubscriberInterface
      * 
      * $param DataObjectEvent $event
      */
-    public function onPreUpdate(DataObjectEvent $event)
+    public function onPreUpdate(DataObjectEvent $event): void
     {
         $object = $event->getObject();
         if ($object instanceof Product && $object->getParent()->getKey() !== 'WISERSELL ERROR') {
@@ -133,7 +142,7 @@ class DataObjectListener implements EventSubscriberInterface
         }
     }
 
-    public function onPostUpdate(DataObjectEvent $event)
+    public function onPostUpdate(DataObjectEvent $event): void
     {
         $object = $event->getObject();
         if ($object instanceof Product && $object->getParent()->getKey() !== 'WISERSELL ERROR') {
@@ -180,7 +189,7 @@ class DataObjectListener implements EventSubscriberInterface
         return "";
     }
 
-    public function onPostLoad(DataObjectEvent $event)
+    public function onPostLoad(DataObjectEvent $event): void
     {
         $object = $event->getObject();
         $image_url = '';
@@ -215,7 +224,7 @@ class DataObjectListener implements EventSubscriberInterface
         }
     }
 
-    protected static function generateLink($url)
+    protected static function generateLink($url): Link
     {
         $l = new Link();
         $l->setPath($url);
