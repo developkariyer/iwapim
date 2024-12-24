@@ -2,9 +2,12 @@
 
 namespace App\EventListener;
 
+use App\Model\AdminStyle\ProductAdminStyle;
 use App\Model\DataObject\VariantProduct;
-use Pimcore\Model\DataObject;
+use Exception;
+use Pimcore\Bundle\AdminBundle\Event\ElementAdminStyleEvent;
 use Pimcore\Model\DataObject\ClassDefinition\CustomLayout;
+use Pimcore\Model\DataObject\Data\ExternalImage;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Serial;
@@ -17,7 +20,6 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 use Pimcore\Event\Model\DataObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Pimcore\Cache;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
 use Pimcore\Model\DataObject\Service;
@@ -43,7 +45,7 @@ class DataObjectListener implements EventSubscriberInterface
         ];
     }
 
-    protected function doModifyCustomLayouts(Product $object, GenericEvent $event): void
+    public function doModifyCustomLayouts(Product $object, GenericEvent $event): void
     {
         $level = $object->level();
         $data = $event->getArgument('data');
@@ -72,7 +74,7 @@ class DataObjectListener implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function onPreDelete(DataObjectEvent $event): void
     {
@@ -81,24 +83,25 @@ class DataObjectListener implements EventSubscriberInterface
             Product::setGetInheritedValues(false);
             $parent = $object->getParent();
             if ($object->getKey() === 'Ayarlar' || ($parent && $parent->getKey() === 'Ayarlar')) {
-                throw new \Exception('Ayarlar klasörü ve altındaki ana klasörler silinemez');
+                throw new Exception('Ayarlar klasörü ve altındaki ana klasörler silinemez');
             }
         }
         if ($object instanceof Product) {
             if ($object->getDependencies()->getRequiredByTotalCount()) {
-                throw new \Exception('Bu ürün muhtemelen bir setin parçası. Silinemez!'.json_encode($object->getDependencies()->getRequiredBy()));
+                error_log(json_encode($object->getDependencies()->getRequiredBy()));
+                throw new Exception('Bu ürün muhtemelen bir setin parçası. Silinemez');
             }
         }
     }
 
-    public function onResolveElementAdminStyle(\Pimcore\Bundle\AdminBundle\Event\ElementAdminStyleEvent $event): void
+    public function onResolveElementAdminStyle(ElementAdminStyleEvent $event): void
     {
         $object = $event->getElement();
         if (
             $object instanceof Product || 
             $object instanceof VariantProduct
         ) {
-            $event->setAdminStyle(new \App\Model\AdminStyle\ProductAdminStyle($object));
+            $event->setAdminStyle(new ProductAdminStyle($object));
         }
     }
 
@@ -159,7 +162,7 @@ class DataObjectListener implements EventSubscriberInterface
         $listingItems = $object->getListingItems();
         foreach ($listingItems as $listingItem) {
             if (($listingItem instanceof VariantProduct)) {
-                if ($listingItem->getImageUrl() instanceof \Pimcore\Model\DataObject\Data\ExternalImage) {
+                if ($listingItem->getImageUrl() instanceof ExternalImage) {
                     return $listingItem->getImageUrl()->getUrl();
                 }
             }
@@ -198,7 +201,7 @@ class DataObjectListener implements EventSubscriberInterface
 //            if (empty($object->getImageUrl())) {
                 $image_url = self::traverseProducts($object);
                 if (!empty($image_url)) {
-                    $object->setImageUrl(new \Pimcore\Model\DataObject\Data\ExternalImage($image_url));
+                    $object->setImageUrl(new ExternalImage($image_url));
                 } else {
                     $object->setImageUrl(null);
                 }
