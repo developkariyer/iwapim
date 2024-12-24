@@ -86,7 +86,7 @@ class DataObjectListener implements EventSubscriberInterface
         }
         if ($object instanceof Product) {
             if ($object->getDependencies()->getRequiredByTotalCount()) {
-                throw new \Exception('Bu ürün muhtemelen bir setin parçası. Silinemez!');
+                throw new \Exception('Bu ürün muhtemelen bir setin parçası. Silinemez!'.json_encode($object->getDependencies()->getRequiredBy()));
             }
         }
     }
