@@ -37,6 +37,9 @@ class PrepareOrderTableCommand extends AbstractCommand
             ;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if($input->getOption('transfer')) {
@@ -497,8 +500,10 @@ class PrepareOrderTableCommand extends AbstractCommand
                 WHEN marketplace_type = 'Amazon' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'  
                 WHEN marketplace_type = 'Wallmart' AND fulfillments_status_control = 'null' THEN 'cancelled'
                 WHEN marketplace_type = 'Wallmart' AND fulfillments_status_control != 'null' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control = 'null' THEN 'cancelled'
-                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control != 'null' THEN 'not_cancelled'
+                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control = 'null' THEN 'not_cancelled'
+                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control != 'null' THEN 'cancelled'
+                WHEN marketplace_type = 'Takealot' AND fulfillments_status = 'Returned' OR fulfillments_status = 'Cancelled by Customer'  THEN 'cancelled'
+                WHEN marketplace_type = 'Takealot' AND fulfillments_status = 'Returned' OR fulfillments_status = 'Cancelled by Customer' THEN 'not_cancelled'
             END;
         ";
         $stmt = $db->prepare($sql);

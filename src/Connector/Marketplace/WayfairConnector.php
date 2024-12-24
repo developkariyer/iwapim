@@ -88,7 +88,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false): void
     {
-        /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+        /*echo "Downloading Wayfair...\n";
+        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }
         echo "Token is valid. Proceeding with download...\n";
@@ -109,7 +110,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         GRAPHQL;
         $variables = [
-            'supplierId' => 194115, 
+            'supplierId' => 194115,
             'paginationOptions' => [
                 'page' => 1,  
                 'pageSize' => 10

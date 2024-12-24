@@ -5,7 +5,8 @@ INSERT INTO iwa_marketplace_orders_line_items (
 SELECT
     :marketplaceType,
     :marketPlaceId,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderCreateDate')) AS created_at,
+    STR_TO_DATE(CONCAT(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderCreateDate')), ' ', JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderCreateTime'))),'%d/%m/%Y %H:%i:%s'
+    ) AS created_at,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderModifyDate')) AS closed_at,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderId')) AS order_id,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.productId')) AS product_id,
