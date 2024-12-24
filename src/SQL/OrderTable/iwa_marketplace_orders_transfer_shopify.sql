@@ -15,14 +15,14 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.currency')) AS currency,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.name')) AS variant_title,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_discounts')) AS total_discount,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.current_total_discounts')) AS total_discount,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country')) AS shipping_country,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.province')) AS shipping_province,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.city')) AS shipping_city,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.company')) AS shipping_company,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shipping_address.country_code')) AS shipping_country_code,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.total_price')) AS total_price,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.subtotal_price')) AS subtotal_price,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.current_total_price')) AS total_price,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.current_subtotal_price')) AS subtotal_price,
     COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.status')), NULL) AS fulfillments_status,
     COALESCE(JSON_UNQUOTE(JSON_EXTRACT(fulfillments.value, '$.tracking_company')), NULL) AS tracking_company,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelled_at')) AS fulfillments_status_control,
@@ -32,7 +32,6 @@ FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.line_items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
         LEFT JOIN JSON_TABLE(json, '$.fulfillments[*]' COLUMNS ( value JSON PATH '$' )) AS fulfillments ON TRUE
-        LEFT JOIN JSON_TABLE(json, '$.discount_applications[*]' COLUMNS ( value JSON PATH '$' )) AS discount_application ON TRUE
 WHERE
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) IS NOT NULL
     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.variant_id')) != 'null'
