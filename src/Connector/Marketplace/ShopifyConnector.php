@@ -102,7 +102,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             }        
                             totalInventory
                             vendor          
-                            variants
+                            variants(first: 5)
                             {
                                 nodes
                                 {
