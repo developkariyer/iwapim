@@ -34,7 +34,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function getFromShopifyApiGraphql($method, $parameter, $data)
     {
-        $data = [];
         $headersToApi = [
             'data' => $data,
             'headers' => [
