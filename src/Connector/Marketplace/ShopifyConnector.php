@@ -82,6 +82,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             descriptionHtml
                             feedback
                             {
+                                details
+                                {
+                                    feedbackGeneratedAt
+                                    messages
+                                    {
+                                        field
+                                        message
+                                    }
+                                }
                                 summary
                             }          
                             giftCardTemplateSuffix
