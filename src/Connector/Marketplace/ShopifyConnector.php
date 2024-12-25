@@ -13,7 +13,6 @@ use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use Shopify\Clients\Graphql;
 
 class ShopifyConnector extends MarketplaceConnectorAbstract
 {
@@ -31,6 +30,46 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
+    }
+
+    public function getFromShopifyApiGraphql($method, $parameter, $data, $key = null, $body = null)
+    {
+        $data = [];
+        $headersToApi = [
+            'data' => $data,
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ],
+            'json' => $body
+        ];
+        $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json' ,$headersToApi);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()}\n";
+            return null;
+        }
+        print_r($response->getContent());
+    }
+
+    public function  graphqlDownload()
+    {
+        $query = [
+          'query' => "
+              query GetProducts 
+               { 
+                    products(first: 10) 
+                    { 
+                        nodes 
+                        { 
+                            id 
+                            title 
+                        } 
+                    } 
+               }
+          "
+        ];
+        $this->getFromShopifyApiGraphql('POST', 'graphql.json', $query);
     }
 
     /**
@@ -90,7 +129,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->graphqlDownload();
+       /* if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -99,7 +139,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     /**
