@@ -30,6 +30,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
         }
+        $this->graphqlDownload();
     }
 
     public function getFromShopifyApiGraphql($method, $parameter, $data, $key = null, $body = null)
