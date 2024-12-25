@@ -84,7 +84,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             {
                                 details
                                 {
-                                    feedbackGeneratedAt
                                     messages
                                     {
                                         field
