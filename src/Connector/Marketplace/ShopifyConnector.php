@@ -35,7 +35,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function getFromShopifyApiGraphql($method, $parameter, $data)
     {
         $headersToApi = [
-            'data' => $data,
+            'json' => $data,
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json'
