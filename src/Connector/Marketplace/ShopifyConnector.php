@@ -57,12 +57,36 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
           'query' => "
               query GetProducts 
                { 
-                    products(first: 10) 
+                    products(first: 3) 
                     { 
                         nodes 
                         { 
                             id 
-                            title 
+                            sku
+                            grams
+                            price
+                            title
+                            weight
+                            barcode
+                            option1
+                            option2
+                            option3
+                            taxable
+                            image_id
+                            position
+                            created_at
+                            product_id
+                            updated_at
+                            weight_unit
+                            compare_at_price
+                            inventory_policy
+                            inventory_item_id
+                            requires_shipping
+                            inventory_quantity
+                            fulfillment_service
+                            admin_graphql_api_id
+                            inventory_management
+                            old_inventory_quantity                            
                         } 
                     } 
                }
