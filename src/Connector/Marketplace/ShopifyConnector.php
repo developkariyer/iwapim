@@ -107,25 +107,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             }        
                             totalInventory
                             vendor          
-                            variants
-                            {
-                                nodes
-                                {
-                                    barcode
-                                    compareAtPrice
-                                    createdAt
-                                    displayName
-                                    image
-                                    {
-                                        url
-                                    }
-                                    inventoryQuantity
-                                    price
-                                    sku
-                                    title
-                                    
-                                }
-                            }
+                            
                         } 
                     } 
                }
