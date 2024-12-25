@@ -49,7 +49,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()}\n";
             return null;
         }
-        print_r($response->getContent());
+        return $response;
     }
 
     public function  graphqlDownload()
