@@ -44,6 +44,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $url = $this->apiUrl . '/graphql.json';
         echo "Requesting $method $url\n";
         $response = $this->httpClient->request($method, $url, $headersToApi);
+        usleep(200000);
         if ($response->getStatusCode() !== 200) {
             echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()}\n";
             return null;
@@ -53,80 +54,48 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function  graphqlDownload()
     {
-        $query = [
-          'query' => "
-              query GetProducts 
-               { 
-                    products(first: 3) 
-                    { 
-                        nodes 
-                        { 
-                            id 
-                            availablePublicationsCount
-                            {
-                                count
-                                precision
+        $cursor = null;
+        $products = [];
+        do {
+            $query = [
+                'query' => "
+                    query GetProducts(\$numProducts: Int!, \$cursor: String) { 
+                        products(first: \$numProducts, after: \$cursor) { 
+                            pageInfo {
+                                hasNextPage
+                                endCursor
                             }
-                            category 
-                            {
-                                id
-                                fullName
-                                name
-                                parentId
-                            }
-                            title
-                            createdAt
-                            defaultCursor
-                            description
-                            descriptionHtml
-                            feedback
-                            {
-                                details
-                                {
-                                    messages
-                                    {
-                                        field
-                                        message
-                                    }
-                                }
-                                summary
-                            }          
-                            giftCardTemplateSuffix
-                            handle
-                            productType
-                            publishedAt
-                            seo
-                            {
-                                description
+                            nodes { 
+                                id 
                                 title
-                            }        
-                            totalInventory
-                            vendor          
-                            variants(first: 5)
-                            {
-                                nodes
-                                {
-                                    barcode
-                                    compareAtPrice
-                                    createdAt
-                                    displayName
-                                    image
-                                    {
-                                        url
+                                variants(first: 5) {
+                                    nodes {
+                                        title
+                                        price
                                     }
-                                    inventoryQuantity
-                                    price
-                                    sku
-                                    title
-                                    
                                 }
-                            }
+                            } 
                         } 
-                    } 
-               }
-          "
-        ];
-        $this->getFromShopifyApiGraphql('POST', 'graphql.json', $query);
+                    }
+                ",
+                'variables' => [
+                    'numProducts' => 3,
+                    'cursor' => $cursor,
+                ]
+            ];
+
+            $response = getFromShopifyApiGraphql('POST', 'graphql.json', $query);
+            $data = $response['data']['products'];
+            $products = array_merge($products, $data['nodes']);
+            $cursor = $data['pageInfo']['endCursor'];
+            $hasNextPage = $data['pageInfo']['hasNextPage'];
+            echo $cursor . "\n";
+            echo $hasNextPage . "\n";
+            print_r($products);
+        } while ($hasNextPage);
+
+
+
     }
 
     /**
