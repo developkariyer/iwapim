@@ -85,13 +85,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ];
 
             $response = $this->getFromShopifyApiGraphql('POST', 'graphql.json', $query);
-            $data = $response['data']['products'] ?? null;
-            $products = array_merge($products, $data['nodes']);
-            $cursor = $data['pageInfo']['endCursor'];
-            $hasNextPage = $data['pageInfo']['hasNextPage'];
-            echo $cursor . "\n";
-            echo $hasNextPage . "\n";
-            print_r($products);
+            print_r($response);
+            $hasNextPage= null;
+            //$data = $response['data']['products'] ?? null;
+            //$products = array_merge($products, $data['nodes']);
+            //$cursor = $data['pageInfo']['endCursor'];
+            //$hasNextPage = $data['pageInfo']['hasNextPage'];
+            //echo $cursor . "\n";
+            //echo $hasNextPage . "\n";
+            //print_r($products);
         } while ($hasNextPage);
 
 
