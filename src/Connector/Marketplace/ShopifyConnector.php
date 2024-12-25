@@ -10,6 +10,7 @@ use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -32,8 +33,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function getFromShopifyApiGraphql($method, $parameter, $data)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
     {
+        $data = [];
         $headersToApi = [
             'json' => $data,
             'headers' => [
@@ -41,21 +50,20 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ];
-        $url = $this->apiUrl . '/graphql.json';
-        echo "Requesting $method $url\n";
-        $response = $this->httpClient->request($method, $url, $headersToApi);
+        $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
         usleep(200000);
         if ($response->getStatusCode() !== 200) {
-            echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()}\n";
+            echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
             return null;
         }
-        return $response;
+        $newData = json_decode($response->getContent(), true);
+        $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
+        return $data;
     }
 
     public function  graphqlDownload()
     {
         $cursor = null;
-        $products = [];
         do {
             $query = [
                 'query' => "
@@ -68,7 +76,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             nodes { 
                                 id 
                                 title
-                                variants(first: 5) {
+                                variants(first: 200) {
                                     nodes {
                                         title
                                         price
@@ -79,24 +87,21 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     }
                 ",
                 'variables' => [
-                    'numProducts' => 3,
+                    'numProducts' => 50,
                     'cursor' => $cursor,
                 ]
             ];
-
-            $response = $this->getFromShopifyApiGraphql('POST', 'graphql.json', $query);
-            $data2 = $response->toArray();
-            $data = $data2['data']['products'];
-            $products = array_merge($products, $data['nodes']);
+            $response = $this->getFromShopifyApiGraphql('POST', $query);
+            $data = $response['data']['products'];
+            $this->listings = array_merge($this->listings, $data['nodes']);
             $cursor = $data['pageInfo']['endCursor'];
             $hasNextPage = $data['pageInfo']['hasNextPage'];
-            echo $cursor . "\n";
-            echo $hasNextPage . "\n";
-            print_r($products);
         } while ($hasNextPage);
 
-
-
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+        }
     }
 
     /**
@@ -156,18 +161,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        echo  "Downloading listings Graphql\n";
-        $this->graphqlDownload();
-       /* if (!$forceDownload && $this->getListingsFromCache()) {
+       if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
-        if (empty($this->listings)) {
+       $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
+       if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
-        }
-        $this->putListingsToCache();*/
+       }
+       $this->putListingsToCache();
     }
 
     /**
