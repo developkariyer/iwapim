@@ -62,6 +62,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         nodes 
                         { 
                             id 
+                            availablePublicationsCount
+                            {
+                                count
+                                precision
+                            }
+                            
                             category 
                             {
                                 id
@@ -70,6 +76,34 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                                 parentId
                             }
                             title
+                            createdAt
+                            defaultCursor
+                            description
+                            descriptionHtml
+                            feedback
+                            {
+                                details
+                                {
+                                    feedbackGeneratedAt
+                                    link 
+                                    {
+                                        label
+                                        url
+                                    }
+                                }
+                                summary
+                            }          
+                            giftCardTemplateSuffix
+                            handle
+                            productType
+                            publishedAt
+                            seo
+                            {
+                                description
+                                title
+                            }        
+                            totalInventory
+                            vendor          
                         } 
                     } 
                }
