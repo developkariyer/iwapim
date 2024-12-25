@@ -62,9 +62,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         nodes 
                         { 
                             id 
-                            category
+                            category 
+                            {
+                                id
+                                fullName
+                                name
+                                parentId
+                            }
                             title
-                            SEO
                         } 
                     } 
                }
