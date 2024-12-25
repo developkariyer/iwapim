@@ -32,7 +32,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function getFromShopifyApiGraphql($method, $parameter, $data, $key = null, $body = null)
+    public function getFromShopifyApiGraphql($method, $parameter, $data)
     {
         $data = [];
         $headersToApi = [
@@ -40,8 +40,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json'
-            ],
-            'json' => $body
+            ]
         ];
         $url = $this->apiUrl . '/graphql.json';
         echo "Requesting $method $url\n";
