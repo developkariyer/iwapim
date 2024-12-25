@@ -67,17 +67,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                                 count
                                 precision
                             }
-                            
                             category 
                             {
                                 id
                                 fullName
                                 name
                                 parentId
-                            }
-                            combinedListing
-                            {
-                                
                             }
                             title
                             createdAt
@@ -107,7 +102,25 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             }        
                             totalInventory
                             vendor          
-                            
+                            variants
+                            {
+                                nodes
+                                {
+                                    barcode
+                                    compareAtPrice
+                                    createdAt
+                                    displayName
+                                    image
+                                    {
+                                        url
+                                    }
+                                    inventoryQuantity
+                                    price
+                                    sku
+                                    title
+                                    
+                                }
+                            }
                         } 
                     } 
                }
