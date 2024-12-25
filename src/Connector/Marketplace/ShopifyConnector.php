@@ -59,12 +59,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                { 
                     products(first: 3) 
                     { 
-                        nodes 
-                        { 
-                            id 
-                            sku
-                            title                         
-                        } 
+                        edges
+                        {
+                            node 
+                            { 
+                                id 
+                                sku
+                                title                         
+                            }
+                        }
                     } 
                }
           "
