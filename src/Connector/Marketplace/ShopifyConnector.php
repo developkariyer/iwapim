@@ -75,6 +75,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                                 name
                                 parentId
                             }
+                            combinedListing
+                            {
+                                
+                            }
                             title
                             createdAt
                             defaultCursor
@@ -103,6 +107,25 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             }        
                             totalInventory
                             vendor          
+                            variants
+                            {
+                                nodes
+                                {
+                                    barcode
+                                    compareAtPrice
+                                    createdAt
+                                    displayName
+                                    image
+                                    {
+                                        url
+                                    }
+                                    inventoryQuantity
+                                    price
+                                    sku
+                                    title
+                                    
+                                }
+                            }
                         } 
                     } 
                }
