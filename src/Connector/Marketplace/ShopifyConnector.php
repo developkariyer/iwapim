@@ -63,30 +63,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         { 
                             id 
                             sku
-                            grams
-                            price
-                            title
-                            weight
-                            barcode
-                            option1
-                            option2
-                            option3
-                            taxable
-                            image_id
-                            position
-                            created_at
-                            product_id
-                            updated_at
-                            weight_unit
-                            compare_at_price
-                            inventory_policy
-                            inventory_item_id
-                            requires_shipping
-                            inventory_quantity
-                            fulfillment_service
-                            admin_graphql_api_id
-                            inventory_management
-                            old_inventory_quantity                            
+                            title                         
                         } 
                     } 
                }
