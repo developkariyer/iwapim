@@ -44,7 +44,7 @@
                             {% for color, child in colorGroup %}
                                 {% set sanitizedColor = color|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="childCheckbox{{ child.getId() }}" value="{{ child.getId() }}" {% if selectedProducts[child.getId()] is defined and selectedProducts[child.getId()] %}checked{% endif %}>
+                                    <input class="form-check-input" type="checkbox" id="childCheckbox{{ child.getId() }}" value="{{ child.getId() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] %}checked{% endif %}>
                                     <label class="form-check-label" for="childCheckbox{{ child.getId() }}">
                                         {{ child.getKey() }}
                                     </label>
@@ -56,5 +56,5 @@
             {% endfor %}
         </div>
     </div>
-    {{ dump(selectedProducts) }}
+    {{ dump(selectedChildren) }}
 {% endblock %}
