@@ -233,7 +233,7 @@ class Utility
         return new ExternalImage($url);
     }
 
-    public function convertCurrency($amount, $fromCurrency, $toCurrency,$date): string
+    public static function convertCurrency($amount, $fromCurrency, $toCurrency,$date): string
     {
         if ($fromCurrency === $toCurrency) {
             return $amount;
