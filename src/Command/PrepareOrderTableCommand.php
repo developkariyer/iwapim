@@ -64,12 +64,14 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function test()
     {
-        $db = \Pimcore\Db::get();
+        $result  = Utility::convertCurrency("500", "USD", "TRY","2024-09-01");
+        echo $result;
+        /*$db = \Pimcore\Db::get();
         $sql = "
-            SELECT * FROM iwa_marketplace_orders_line_items
-            WHERE product_price_usd IS NULL OR total_price_usd IS NULL;
-        ";
-        $results = $db->fetchAllAssociative($sql);
+            SELECT currency, price, total_price, subtotal_price FROM iwa_marketplace_orders_line_items
+            WHERE (product_price_usd IS NULL OR total_price_usd IS NULL) AND currency IS NOT NULL;";
+        $results = $db->fetchAllAssociative($sql);*/
+
 
 
     }
