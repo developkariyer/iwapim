@@ -64,7 +64,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function test()
     {
-        $result = Utility::convertCurrency("500", "TL", "USD","2024-12-24");
+        $result = Utility::convertCurrency("500", "EUR", "USD","2024-12-24");
         echo $result;
     }
 
