@@ -64,7 +64,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function test()
     {
-        $result = Utility::getCurrencyValueByDate("USD","2024-12-24");
+        $result = Utility::getCurrencyValueByDate("EUR","2024-12-24");
         echo $result;
     }
 
