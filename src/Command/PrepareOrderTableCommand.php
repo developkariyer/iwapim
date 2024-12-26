@@ -794,7 +794,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             'ZM' => 'Zambia',
             'ZW' => 'Zimbabwe',
         );
-        $db = \Pimcore\Db::get();
+        print_r(json_encode($countries));
+        /*$db = \Pimcore\Db::get();
         $sql = "
             SELECT DISTINCT shipping_country_code 
             FROM iwa_marketplace_orders_line_items 
@@ -817,7 +818,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'shipping_country' => $countryName
                 ]);
             }
-        }
+        }*/
     }
 
     protected function amazonSubtotalCalculate(): void{
