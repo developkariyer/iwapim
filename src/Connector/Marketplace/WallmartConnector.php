@@ -158,8 +158,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-
-
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' =>  '',
