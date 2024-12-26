@@ -1,0 +1,102 @@
+{# task.html.twig #}
+
+{% extends 'ozon/base.html.twig' %}
+
+{% block title %}Ozon Listeleme Görevi{% endblock %}
+
+{% block stylesheets %}
+    <!-- link rel="stylesheet" href="/path/to/custom.css" -->
+{% endblock %}
+
+{% block head_scripts %}
+    <!-- script src="/path/to/head-custom.js"></script -->
+{% endblock %}
+
+{% block body_scripts %}
+    <!-- script src="/path/to/body-custom.js"></script -->
+{% endblock %}
+
+{% block header %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/ozon">Ozon Listing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1>{{ task.key }} - Products</h1>
+        <div class="accordion" id="productAccordion">
+            {% for productId, productGroup in products %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading{{ productId }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ productId }}" aria-expanded="true" aria-controls="collapse{{ productId }}">
+                            {{ productGroup.product }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ productId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ productId }}" data-bs-parent="#productAccordion">
+                        <div class="accordion-body">
+                            <div class="accordion" id="sizeAccordion{{ productId }}">
+                                {% for size, colorGroup in productGroup.children %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingSize{{ productId }}{{ size }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSize{{ productId }}{{ size }}" aria-expanded="false" aria-controls="collapseSize{{ productId }}{{ size }}">
+                                                {{ productGroup.product }} {{ size }}
+                                            </button>
+                                        </h2>
+                                        <div id="collapseSize{{ productId }}{{ size }}" class="accordion-collapse collapse" aria-labelledby="headingSize{{ productId }}{{ size }}" data-bs-parent="#sizeAccordion{{ productId }}">
+                                            <div class="accordion-body">
+                                                {% for color, product in colorGroup %}
+                                                    <div class="accordion" id="colorAccordion{{ productId }}{{ size }}">
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="headingColor{{ productId }}{{ size }}{{ color }}">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseColor{{ productId }}{{ size }}{{ color }}" aria-expanded="false" aria-controls="collapseColor{{ productId }}{{ size }}{{ color }}">
+                                                                    {{ productGroup.product }} {{ size }} {{ color }} ({{ product.getIwasku() }})
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapseColor{{ productId }}{{ size }}{{ color }}" class="accordion-collapse collapse" aria-labelledby="headingColor{{ productId }}{{ size }}{{ color }}" data-bs-parent="#colorAccordion{{ productId }}{{ size }}">
+                                                                <div class="accordion-body">
+                                                                    <div class="form-check">
+                                                                        <div class="row">
+                                                                            <div class="col-12">
+                                                                                <label class="form-check-label d-block" for="noneOption{{ product.getIwasku() }}">
+                                                                                    <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="noneOption{{ product.getIwasku() }}" value="" {% if selectedListings[product.getIwasku()] is not defined %}checked{% endif %}>
+                                                                                    None
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        {% for listingItem in product.getListingItems() %}
+                                                                            <div class="row border-bottom py-2">
+                                                                                <div class="col-12">
+                                                                                    <label class="form-check-label d-block" for="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}">
+                                                                                        <input class="form-check-input" type="radio" name="productRadio{{ product.getIwasku() }}" id="listingItem{{ product.getIwasku() }}{{ listingItem.getId() }}" value="{{ listingItem.getId() }}" {% if selectedListings[product.getIwasku()] is defined and selectedListings[product.getIwasku()] == listingItem.getId() %}checked{% endif %}>
+                                                                                        <span class="fw-bold">{{ listingItem.getMarketplace().getKey() }}</span>
+                                                                                        <br>
+                                                                                        <span class="text-muted"><a target="_blank" href="{{ listingItem.getUrlLink().getHref() }}">{{ listingItem.getTitle() }}</a></span>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+

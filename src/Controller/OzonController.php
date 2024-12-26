@@ -88,19 +88,23 @@ class OzonController extends FrontendController
             return $this->redirectToRoute('ozon_menu');
         }
         $taskProducts = $task->getProducts();
-        $groupedProducts = [];
-        $selectedListings = [];
+        $parentProducts = [];
+        //$groupedProducts = [];
+        //$selectedListings = [];
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
             $parentProduct = $product->getParent();
             if (!$parentProduct instanceof Product) {
                 continue;
             }
+            $parentProducts[$parentProduct->getId()] = $parentProduct;
+            /*
             if (!isset($groupedProducts[$parentProduct->getId()])) {
                 $groupedProducts[$parentProduct->getId()] = [
                     'product' => $parentProduct->getKey(),
                     'children' => [],
                 ];
+
                 foreach (explode("\n", $parentProduct->getVariationSizeList()) as $size) {
                     if (!empty($size)) {
                         $groupedProducts[$parentProduct->getId()]['children'][$size] = [];
@@ -116,12 +120,14 @@ class OzonController extends FrontendController
                 }
             }
             $selectedListings[$product->getIwasku()] = $taskProduct->getData()['listing'];
+            */
         }
 
         return $this->render('ozon/task.html.twig', [
             'task' => $task,
-            'products' => $groupedProducts,
-            'selectedListings' => $selectedListings,
+            'parentProducts' => $parentProducts,
+            //'products' => $groupedProducts,
+            //'selectedListings' => $selectedListings,
         ]);
     }
 
