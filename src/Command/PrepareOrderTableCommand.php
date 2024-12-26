@@ -58,6 +58,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->countryCodes();
         return Command::SUCCESS;
     }
 
