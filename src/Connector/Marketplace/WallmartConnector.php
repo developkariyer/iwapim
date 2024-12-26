@@ -158,6 +158,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
+            print_r("Parent: $parent\n");
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
