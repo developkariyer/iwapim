@@ -424,6 +424,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Amazon Subtotal Calculate\n";
         $this->amazonSubtotalCalculate();
         echo "Complated Amazon Subtotal Calculate\n";
+        echo "Wayfair Total Price\n";
+        $this->wayfairTotalPrice();
+        echo "Complated Wayfair Total Price\n";
     }
 
     protected function setMarketplaceKey(): void
@@ -978,4 +981,24 @@ class PrepareOrderTableCommand extends AbstractCommand
         ;
     }
 
+    protected function wayfairTotalPrice(): void
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            UPDATE iwa_marketplace_orders_line_items as t1
+            INNER JOIN (
+                SELECT 
+                    order_id,
+                    SUM(price) as total_price
+                FROM iwa_marketplace_orders_line_items
+                WHERE marketplace_type = 'Wayfair'
+                GROUP BY order_id
+            ) as t2
+            ON t1.order_id = t2.order_id
+            SET t1.total_price = t2.total_price
+            WHERE t1.marketplace_type = 'Wayfair';
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
 }
