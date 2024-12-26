@@ -1,6 +1,6 @@
 INSERT INTO iwa_marketplace_orders_line_items (
-    marketplace_type, marketplace_id, created_at, order_id, product_id, variant_id, price, quantity,
-    shipping_city, shipping_province, province_code, fulfillments_status,tracking_company)
+    marketplace_type, marketplace_id, created_at, order_id, product_id, variant_id, price, currency, quantity,
+    shipping_city, shipping_province, fulfillments_status,tracking_company)
 SELECT
     :marketplaceType,
     :marketPlaceId,
@@ -9,13 +9,10 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.partNumber')) AS product_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.partNumber')) AS variant_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.price')) AS price,
+    'USD' AS currency,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerCity')) as shipping_city,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerState')) AS shipping_province,
-    CONCAT(
-            'US-',
-            JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerState'))
-    ) AS province_code,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderType')) AS fulfillments_status,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.carrierCode')) AS tracking_company
 FROM
