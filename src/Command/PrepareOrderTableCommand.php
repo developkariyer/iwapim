@@ -52,44 +52,13 @@ class PrepareOrderTableCommand extends AbstractCommand
 
         if($input->getOption('updateCoin')) {
             $this->currencyRate();
-            $this->calculatePrice();
+            $this->calculatePriceUsd();
         }
 
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
-        $this->test();
         return Command::SUCCESS;
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function test()
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT id, currency, price, total_price, subtotal_price, DATE(created_at) as created_date  FROM iwa_marketplace_orders_line_items
-            WHERE (product_price_usd IS NULL OR total_price_usd IS NULL) AND currency IS NOT NULL;";
-        $results = $db->fetchAllAssociative($sql);
-        foreach ($results as $row) {
-            $subtotalPrice = $row['subtotal_price'] ?? 0;
-            $productPriceUsd = Utility::convertCurrency($row['price'], $row['currency'], "USD", $row['created_date']) ?? 0;
-            $totalPriceUsd = Utility::convertCurrency($row['total_price'], $row['currency'], "USD", $row['created_date']) ?? 0;
-            $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
-            $updateSql = "
-                UPDATE iwa_marketplace_orders_line_items
-                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
-                WHERE id = {$row['id']};";
-            echo "Updating... $updateSql\n";
-            try {
-                $affectedRows = $db->executeStatement($updateSql);
-                echo "Rows affected: $affectedRows\n";
-                echo "Update successful\n";
-            } catch (Exception $e) {
-                echo "Error occurred: " . $e->getMessage() . "\n";
-            }
-        }
     }
 
     protected function marketplaceList(): void
@@ -303,61 +272,22 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function calculatePrice(): void
+    protected function calculatePriceUsd(): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
-            SELECT * FROM iwa_marketplace_orders_line_items
-            WHERE product_price_usd IS NULL OR total_price_usd IS NULL;
-        ";
+            SELECT id, currency, price, total_price, subtotal_price, DATE(created_at) as created_date  FROM iwa_marketplace_orders_line_items
+            WHERE (product_price_usd IS NULL OR total_price_usd IS NULL) AND currency IS NOT NULL;";
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $row) {
-            $price = $row['price'];
-            $totalPrice = $row['total_price'];
-            $subtotalPrice = $row['subtotal_price'];
-            if ($subtotalPrice === null) {
-                $subtotalPrice = $totalPrice;
-            }
-            $currency = $row['currency'];
-            $currencyRate = $row['currency_rate'];
-            $currentUsd = $row['current_USD'];
-            $productPriceUsd = null;
-            $totalPriceUsd = null;
-            $subtotalPriceUsd = null;
-            if ($currency === 'USD') {
-                $productPriceUsd = $price;
-                $totalPriceUsd = $totalPrice;
-                $subtotalPriceUsd = $subtotalPrice;
-            } else {
-                if ($currency === 'TRY') {
-                    if ($currencyRate != 0) { 
-                        $productPriceUsd = round($price / $currencyRate, 2);
-                        $totalPriceUsd = round($totalPrice / $currencyRate, 2);
-                        $subtotalPriceUsd = round($subtotalPrice / $currencyRate, 2);
-                    } else {
-                        $productPriceUsd = $totalPriceUsd = $subtotalPriceUsd = 0; 
-                    }
-                } else {
-                    if ($currencyRate != 0 && $currentUsd != 0) { 
-                        $productPriceUsd = round($price * $currencyRate / $currentUsd, 2);
-                        $totalPriceUsd = round($totalPrice * $currencyRate / $currentUsd, 2);
-                        $subtotalPriceUsd = round($subtotalPrice * $currencyRate / $currentUsd, 2);
-                    } else {
-                        $productPriceUsd = $totalPriceUsd = $subtotalPriceUsd = 0; 
-                    }
-                }
-            }
-            if ($subtotalPriceUsd == 0) {
-                $subtotalPriceUsd = $totalPriceUsd;
-            }
-            $productPriceUsd = $productPriceUsd ?? 0;
-            $totalPriceUsd = $totalPriceUsd ?? 0;
-            $subtotalPriceUsd = $subtotalPriceUsd ?? 0;
+            $subtotalPrice = $row['subtotal_price'] ?? 0;
+            $productPriceUsd = Utility::convertCurrency($row['price'], $row['currency'], "USD", $row['created_date']) ?? 0;
+            $totalPriceUsd = Utility::convertCurrency($row['total_price'], $row['currency'], "USD", $row['created_date']) ?? 0;
+            $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
-                WHERE id = {$row['id']};
-            ";
+                WHERE id = {$row['id']};";
             echo "Updating... $updateSql\n";
             try {
                 $affectedRows = $db->executeStatement($updateSql);
@@ -367,7 +297,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                 echo "Error occurred: " . $e->getMessage() . "\n";
             }
         }
-        echo "All processes completed.\n";
     }
 
     protected function extraColumns(): void
