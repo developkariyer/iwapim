@@ -62,18 +62,34 @@ class PrepareOrderTableCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function test()
     {
-        $result  = Utility::convertCurrency("500", "ZAR", "USD","2024-09-01");
-        echo $result;
-        /*$db = \Pimcore\Db::get();
+        $db = \Pimcore\Db::get();
         $sql = "
-            SELECT currency, price, total_price, subtotal_price FROM iwa_marketplace_orders_line_items
+            SELECT id, currency, price, total_price, subtotal_price, DATE(created_at) as created_date  FROM iwa_marketplace_orders_line_items
             WHERE (product_price_usd IS NULL OR total_price_usd IS NULL) AND currency IS NOT NULL;";
-        $results = $db->fetchAllAssociative($sql);*/
-
-
-
+        $results = $db->fetchAllAssociative($sql);
+        foreach ($results as $row) {
+            $subtotalPrice = $row['subtotal_price'] ?? 0;
+            $productPriceUsd = Utility::convertCurrency($row['price'], $row['currency'], "USD", $row['created_date']) ?? 0;
+            $totalPriceUsd = Utility::convertCurrency($row['total_price'], $row['currency'], "USD", $row['created_date']) ?? 0;
+            $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
+            $updateSql = "
+                UPDATE iwa_marketplace_orders_line_items
+                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
+                WHERE id = {$row['id']};";
+            echo "Updating... $updateSql\n";
+            try {
+                $affectedRows = $db->executeStatement($updateSql);
+                echo "Rows affected: $affectedRows\n";
+                echo "Update successful\n";
+            } catch (Exception $e) {
+                echo "Error occurred: " . $e->getMessage() . "\n";
+            }
+        }
     }
 
     protected function marketplaceList(): void
