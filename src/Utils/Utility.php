@@ -263,6 +263,9 @@ class Utility
     public static function getCurrencyValueByDate($currency, $date): float
     {
         $db = Db::get();
+        if ($currency === 'TRY') {
+            return 1;
+        }
         $sql = "SELECT value FROM iwa_currency_history WHERE currency = :currency AND DATE(date) <= :today ORDER BY ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC LIMIT 1;";
         return $db->fetchOne($sql, [
             'today' => $date,
