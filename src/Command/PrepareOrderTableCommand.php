@@ -64,7 +64,9 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function test()
     {
-        $db = \Pimcore\Db::get();
+        $result = Utility::getCurrencyValueByDate("TRY", "2024-09-01");
+        echo $result;
+        /*$db = \Pimcore\Db::get();
         $distinctRows = $db->fetchAllAssociative("
             SELECT DISTINCT currency, DATE(created_at) as created_date 
             FROM iwa_marketplace_orders_line_items
@@ -85,7 +87,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             } catch (Exception $e) {
                 echo "Error: " . $e->getMessage();
             }
-        }
+        }*/
 
     }
 
