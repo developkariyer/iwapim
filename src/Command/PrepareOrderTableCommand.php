@@ -660,13 +660,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             INNER JOIN (
                 SELECT 
                     order_id,
-                    SUM(product_price_usd) as total_price_usd
+                    SUM(price) as total_price
                 FROM iwa_marketplace_orders_line_items
                 WHERE marketplace_type = 'Bol.com'
                 GROUP BY order_id
             ) as t2
             ON t1.order_id = t2.order_id
-            SET t1.total_price_usd = t2.total_price_usd
+            SET t1.total_price = t2.total_price
             WHERE t1.marketplace_type = 'Bol.com';
         ";
         $stmt = $db->prepare($sql);
