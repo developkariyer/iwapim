@@ -427,6 +427,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Wayfair Total Price\n";
         $this->wayfairTotalPrice();
         echo "Complated Wayfair Total Price\n";
+        echo "Wallmart Total Price\n";
+        $this->wallmartTotalPrice();
+        echo "Complated Wallmart Total Price\n";
     }
 
     protected function setMarketplaceKey(): void
@@ -1001,4 +1004,26 @@ class PrepareOrderTableCommand extends AbstractCommand
         $stmt = $db->prepare($sql);
         $stmt->execute();
     }
+
+    protected function wallmartTotalPrice(): void
+    {
+        $db = \Pimcore\Db::get();
+        $sql = "
+            UPDATE iwa_marketplace_orders_line_items as t1
+            INNER JOIN (
+                SELECT 
+                    order_id,
+                    SUM(price) as total_price
+                FROM iwa_marketplace_orders_line_items
+                WHERE marketplace_type = 'Wallmart'
+                GROUP BY order_id
+            ) as t2
+            ON t1.order_id = t2.order_id
+            SET t1.total_price = t2.total_price
+            WHERE t1.marketplace_type = 'Wallmart';
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+    }
+
 }
