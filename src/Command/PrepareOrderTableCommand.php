@@ -372,11 +372,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function insertClosedAtDiff(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET completion_day = DATEDIFF(DATE(closed_at), DATE(created_at))
-        WHERE DATE(closed_at) IS NOT NULL;
-        ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'closedAtDiff.sql');
         $stmt = $db->prepare($sql);
         $stmt->executeStatement();
     }
@@ -387,14 +383,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function discountValue(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-        UPDATE iwa_marketplace_orders_line_items
-        SET has_discount = 
-        CASE 
-            WHEN total_discount IS NOT NULL AND total_discount <> 0.00 THEN TRUE
-            ELSE FALSE
-        END;
-        ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'discountValue.sql');
         $stmt = $db->prepare($sql);
         $stmt->executeStatement();
     }
@@ -405,27 +394,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function isCancelled(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items
-            SET is_canceled = CASE
-                WHEN marketplace_type = 'Shopify' AND fulfillments_status_control = 'null' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Shopify' AND fulfillments_status_control != 'null' THEN 'cancelled'
-                WHEN marketplace_type = 'Trendyol' AND fulfillments_status = 'Cancelled' THEN 'cancelled'
-                WHEN marketplace_type = 'Trendyol' AND fulfillments_status != 'Cancelled' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control = 'true' THEN 'cancelled'
-                WHEN marketplace_type = 'Bol.com' AND fulfillments_status_control != 'true' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Etsy' AND fulfillments_status = 'Canceled' THEN 'cancelled'
-                WHEN marketplace_type = 'Etsy' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Amazon' AND fulfillments_status = 'Canceled' THEN 'cancelled'
-                WHEN marketplace_type = 'Amazon' AND fulfillments_status != 'Canceled' THEN 'not_cancelled'  
-                WHEN marketplace_type = 'Wallmart' AND fulfillments_status_control = 'null' THEN 'cancelled'
-                WHEN marketplace_type = 'Wallmart' AND fulfillments_status_control != 'null' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control = 'null' THEN 'not_cancelled'
-                WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control != 'null' THEN 'cancelled'
-                WHEN marketplace_type = 'Takealot' AND fulfillments_status = 'Returned' OR fulfillments_status = 'Cancelled by Customer'  THEN 'cancelled'
-                WHEN marketplace_type = 'Takealot' AND fulfillments_status = 'Returned' OR fulfillments_status = 'Cancelled by Customer' THEN 'not_cancelled'
-            END;
-        ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'isCancelled.sql');
         $stmt = $db->prepare($sql);
         $stmt->executeStatement();
     }
@@ -437,13 +406,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $tldList = ['com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk', 'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg', 'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk', 'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi', 'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz', 'gm', 'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'];
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT DISTINCT referring_site 
-            FROM iwa_marketplace_orders_line_items 
-            WHERE referring_site IS NOT NULL 
-            AND referring_site != '' 
-            AND referring_site != 'null'
-            ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'parseUrlSelect.sql');
         $results = $db->fetchAllAssociative($sql); 
         foreach ($results as $row) {
             $referringSite = $row['referring_site'];
@@ -460,13 +423,12 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $domain = implode('.', $domainParts);
                 $domain = preg_replace('/^www\./', '', $domain);
                 $domain = strtolower($domain);
-                $updateQuery = "
-                    UPDATE iwa_marketplace_orders_line_items 
-                    SET referring_site_domain = ?
-                    WHERE referring_site = ?
-                ";
+                $updateQuery = file_get_contents($this->extraColumnsSqlfilePath . 'parseUrlUpdate.sql');
                 $stmt = $db->prepare($updateQuery);
-                $stmt->executeStatement([$domain,$row['referring_site']]);
+                $stmt->executeStatement([
+                    'referringSiteDomain' => $domain,
+                    'referringSite' => $row['referring_site'],
+                ]);
             }
         }
     }
@@ -485,22 +447,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             throw new Exception("Error parsing JSON file: " . json_last_error_msg());
         }
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT DISTINCT shipping_province 
-            FROM iwa_marketplace_orders_line_items 
-            WHERE shipping_province IS NOT NULL 
-            AND shipping_province != '' 
-            AND shipping_province != 'null';";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'usaCodeSelect.sql');
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $result) {
             $shippingProvince = $result['shipping_province'];
             if (isset($isoCodes[$shippingProvince])) {
                 $provinceCode = $isoCodes[$shippingProvince];
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items 
-                    SET province_code = :province_code 
-                    WHERE shipping_province = :shipping_province
-                ";
+                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'usaCodeUpdate.sql');
                 $db->executeStatement($updateSql, [
                     'province_code' => $provinceCode,
                     'shipping_province' => $shippingProvince
@@ -512,20 +465,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function calculateTotalPrice($marketplaceType): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items AS t1
-            INNER JOIN (
-                SELECT 
-                    order_id,
-                    SUM(price) AS total_price
-                FROM iwa_marketplace_orders_line_items
-                WHERE marketplace_type = :marketplace_type
-                GROUP BY order_id
-            ) AS t2
-            ON t1.order_id = t2.order_id
-            SET t1.total_price = t2.total_price
-            WHERE t1.marketplace_type = :marketplace_type;";
-
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql');
         try {
             $stmt = $db->prepare($sql);
             $stmt->executeStatement(['marketplace_type' => $marketplaceType]);
@@ -540,10 +480,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function bolcomFixOrders(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            DELETE FROM iwa_marketplace_orders_line_items
-            WHERE marketplace_type = 'Bol.com' AND order_id = '0';
-        ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'bolcomFixOrders.sql');
         $stmt = $db->prepare($sql);
         $stmt->executeStatement();
     }
@@ -562,23 +499,13 @@ class PrepareOrderTableCommand extends AbstractCommand
             throw new Exception("Error parsing JSON file: " . json_last_error_msg());
         }
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT DISTINCT shipping_country_code 
-            FROM iwa_marketplace_orders_line_items 
-            WHERE shipping_country_code IS NOT NULL 
-            AND shipping_country_code != '' 
-            AND shipping_country_code != 'null'
-            ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'countryCodesSelect.sql');
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $result) {
             $shippingCountryCode = $result['shipping_country_code'];
             if (isset($countries[$shippingCountryCode])) {
                 $countryName = $countries[$shippingCountryCode];
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items 
-                    SET shipping_country = :shipping_country 
-                    WHERE shipping_country_code = :shipping_country_code
-                ";
+                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'countryCodesUpdate.sql');
                 $db->executeStatement($updateSql, [
                     'shipping_country_code' => $shippingCountryCode,
                     'shipping_country' => $countryName
@@ -592,24 +519,7 @@ class PrepareOrderTableCommand extends AbstractCommand
      */
     protected function amazonSubtotalCalculate(): void{
         $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE 
-            iwa_marketplace_orders_line_items
-            JOIN (
-                SELECT 
-                    order_id,
-                    SUM(price) - SUM(total_discount) AS pnet
-                FROM 
-                    iwa_marketplace_orders_line_items
-                WHERE 
-                    marketplace_type = 'Amazon'
-                GROUP BY 
-                    order_id
-            ) AS calculated_pnet
-            ON 
-                iwa_marketplace_orders_line_items.order_id = calculated_pnet.order_id
-            SET 
-                iwa_marketplace_orders_line_items.subtotal_price = calculated_pnet.pnet;";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'amazonSubtotal.sql');
         $stmt = $db->prepare($sql);
         $stmt->executeStatement();
     }
