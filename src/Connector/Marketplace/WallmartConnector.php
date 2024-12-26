@@ -158,8 +158,23 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
-            print_r("Parent: $parent\n");
-            VariantProduct::addUpdateVariant(
+            $variantData = [
+                'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
+                'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
+                'salePrice' => $listing['price']['amount'] ?? 0,
+                'saleCurrency' => 'USD',
+                'title' => $listing['productName'] ?? '',
+                'attributes' => $this->getAttributes($listing) ?? '',
+                'uniqueMarketplaceId' => $listing['wpid'] ?? '',
+                'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
+                'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
+                'sku' => $listing['sku'] ?? '',
+            ];
+
+            echo "Fields being passed to addUpdateVariant:\n";
+            print_r($variantData);
+
+            /*VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
                     'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
@@ -176,7 +191,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 updateFlag: $updateFlag,
                 marketplace: $this->marketplace,
                 parent: $parent
-            );
+            );*/
             echo "OK\n";
             $index++;
         }    
