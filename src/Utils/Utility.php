@@ -236,7 +236,7 @@ class Utility
     public static function convertCurrency($amount, $fromCurrency, $toCurrency,$date): string
     {
         if ($fromCurrency === $toCurrency) {
-            return $amount;
+            return (string)$amount;
         }
         $fromCurrencyValue = ($fromCurrency === 'TRY') ? 1 : null;
         $toCurrencyValue = ($toCurrency === 'TRY') ? 1 : null;
@@ -256,7 +256,7 @@ class Utility
         }
         if (!$fromCurrencyValue || !$toCurrencyValue) {
             echo "Currency values not found for $fromCurrency or $toCurrency";
-            return 0;
+            return (string)0;
         }
         return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
     }
