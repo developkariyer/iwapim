@@ -344,11 +344,15 @@ class PrepareOrderTableCommand extends AbstractCommand
             $price = $row['price'];
             $totalPrice = $row['total_price'];
             $subtotalPrice = $row['subtotal_price'];
+            if ($subtotalPrice === null) {
+                $subtotalPrice = $totalPrice;
+            }
             $currency = $row['currency'];
             $currencyRate = $row['currency_rate'];
             $currentUsd = $row['current_USD'];
             $productPriceUsd = null;
             $totalPriceUsd = null;
+            $subtotalPriceUsd = null;
             if ($currency === 'USD') {
                 $productPriceUsd = $price;
                 $totalPriceUsd = $totalPrice;
@@ -375,6 +379,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             if ($subtotalPriceUsd == 0) {
                 $subtotalPriceUsd = $totalPriceUsd;
             }
+
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
                 SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
