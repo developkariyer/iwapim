@@ -372,6 +372,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function insertClosedAtDiff(): void
     {
         $db = \Pimcore\Db::get();
@@ -381,9 +384,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         WHERE DATE(closed_at) IS NOT NULL;
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->executeStatement();
     }
 
+    /**
+     * @throws Exception
+     */
     protected function discountValue(): void
     {
         $db = \Pimcore\Db::get();
@@ -396,9 +402,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         END;
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->executeStatement();
     }
 
+    /**
+     * @throws Exception
+     */
     protected function isCancelled(): void
     {
         $db = \Pimcore\Db::get();
@@ -424,19 +433,15 @@ class PrepareOrderTableCommand extends AbstractCommand
             END;
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->executeStatement();
     }
 
+    /**
+     * @throws Exception
+     */
     protected function parseUrl(): void
     {
-        $tldList = [
-            'com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk',
-            'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg',
-            'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk',
-            'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi',
-            'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz', 'gm',
-            'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'
-        ];
+        $tldList = ['com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk', 'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg', 'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk', 'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi', 'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz', 'gm', 'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'];
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT DISTINCT referring_site 
@@ -467,11 +472,14 @@ class PrepareOrderTableCommand extends AbstractCommand
                     WHERE referring_site = ?
                 ";
                 $stmt = $db->prepare($updateQuery);
-                $stmt->execute([$domain,$row['referring_site']]);
+                $stmt->executeStatement([$domain,$row['referring_site']]);
             }
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function usaCode(): void
     {
         $filePath = PIMCORE_PROJECT_ROOT . '/src/JSON/usa_iso_codes.json';
@@ -532,6 +540,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function bolcomFixOrders(): void
     {
         $db = \Pimcore\Db::get();
@@ -540,7 +551,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             WHERE marketplace_type = 'Bol.com' AND order_id = '0';
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->executeStatement();
     }
 
     /**
@@ -582,6 +593,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function amazonSubtotalCalculate(): void{
         $db = \Pimcore\Db::get();
         $sql = "
@@ -601,8 +615,9 @@ class PrepareOrderTableCommand extends AbstractCommand
             ON 
                 iwa_marketplace_orders_line_items.order_id = calculated_pnet.order_id
             SET 
-                iwa_marketplace_orders_line_items.subtotal_price = calculated_pnet.pnet;"
-        ;
+                iwa_marketplace_orders_line_items.subtotal_price = calculated_pnet.pnet;";
+        $stmt = $db->prepare($sql);
+        $stmt->executeStatement();
     }
 
 }
