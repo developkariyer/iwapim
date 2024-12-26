@@ -89,8 +89,6 @@ class OzonController extends FrontendController
         }
         $taskProducts = $task->getProducts();
         $parentProducts = [];
-        //$groupedProducts = [];
-        //$selectedListings = [];
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
             $parentProduct = $product->getParent();
@@ -98,29 +96,6 @@ class OzonController extends FrontendController
                 continue;
             }
             $parentProducts[$parentProduct->getId()] = $parentProduct;
-            /*
-            if (!isset($groupedProducts[$parentProduct->getId()])) {
-                $groupedProducts[$parentProduct->getId()] = [
-                    'product' => $parentProduct->getKey(),
-                    'children' => [],
-                ];
-
-                foreach (explode("\n", $parentProduct->getVariationSizeList()) as $size) {
-                    if (!empty($size)) {
-                        $groupedProducts[$parentProduct->getId()]['children'][$size] = [];
-                        foreach (explode("\n", $parentProduct->getVariationColorList()) as $color) {
-                            if (!empty($color)) {
-                                $groupedProducts[$parentProduct->getId()]['children'][$size][$color] = -1;
-                            }
-                        }
-                    }
-                }
-                foreach ($parentProduct->getChildren() as $child) {
-                    $groupedProducts[$parentProduct->getId()]['children'][$child->getVariationSize()][$child->getVariationColor()] = $child;
-                }
-            }
-            $selectedListings[$product->getIwasku()] = $taskProduct->getData()['listing'];
-            */
         }
 
         return $this->render('ozon/task.html.twig', [
@@ -128,6 +103,55 @@ class OzonController extends FrontendController
             'parentProducts' => $parentProducts,
             //'products' => $groupedProducts,
             //'selectedListings' => $selectedListings,
+        ]);
+    }
+
+    /**
+     * @Route("/ozon/product/{taskId}/{productId}", name="ozon_task_product")
+     * @param Request $request
+     * @return RedirectResponse|Response
+     *
+     * This controller method is used to set variants for a product in an Ozon Listing task.
+     */
+    public function taskProductAction(Request $request): RedirectResponse|Response
+    {
+        $task = ListingTemplate::getById($request->get('taskId'));
+        if (!$task) {
+            return $this->redirectToRoute('ozon_menu');
+        }
+        $parentProduct = Product::getById($request->get('productId'));
+        if (!$parentProduct) {
+            return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+        }
+        $children = [];
+        $selectedChildren = [];
+        foreach (explode("\n", $parentProduct->getVariationSizeList()) as $size) {
+            if (!empty($size)) {
+                $children[$size] = [];
+                foreach (explode("\n", $parentProduct->getVariationColorList()) as $color) {
+                    if (!empty($color)) {
+                        $children[$size][$color] = null;
+                    }
+                }
+            }
+        }
+        foreach ($parentProduct->getChildren() as $child) {
+            $children[$child->getVariationSize()][$child->getVariationColor()] = $child;
+            $selectedChildren[$child->getId()] = 0;
+        }
+        $taskProducts = $task->getProducts();
+        foreach ($taskProducts as $taskProduct) {
+            $product = $taskProduct->getObject();
+            if (!$product instanceof Product) {
+                continue;
+            }
+            $selectedChildren[$product->getId()] = 1;
+        }
+        return $this->render('ozon/products.html.twig', [
+            'task' => $task,
+            'parentProduct' => $parentProduct,
+            'children' => $children,
+            'selectedChildren' => $selectedChildren,
         ]);
     }
 
