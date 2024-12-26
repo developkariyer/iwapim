@@ -474,7 +474,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function usaCode(): void
     {
-        $filePath = PIMCORE_PROJECT_ROOT . '/src/JSON/usa_states.json';
+        $filePath = PIMCORE_PROJECT_ROOT . '/src/JSON/usa_iso_codes.json';
         if (!file_exists($filePath)) {
             throw new Exception("USA states JSON file not found.");
         }
