@@ -26,6 +26,9 @@ use App\Utils\Utility;
 class PrepareOrderTableCommand extends AbstractCommand
 {
     private array $marketplaceListWithIds = [];
+    private $transferSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/Transfer/';
+    private $extraColumnsSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/ExtraColumns/';
+
 
     protected function configure(): void
     {
@@ -77,22 +80,21 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
         $marketplaceIds = $db->fetchAllAssociative($sql);
-        $filePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/';
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
             if (isset($this->marketplaceListWithIds[$id])) {
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_shopify.sql', $id, $marketplaceType),
-                    'Trendyol' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_trendyol.sql', $id,$marketplaceType),
-                    'Bol.com' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_bolcom.sql', $id,$marketplaceType),
-                    'Etsy' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_etsy.sql', $id,$marketplaceType),
-                    'Amazon' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_amazon.sql', $id,$marketplaceType),
-                    'Takealot' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_takealot.sql', $id,$marketplaceType),
-                    'Wallmart' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_wallmart.sql', $id,$marketplaceType),
-                    'Ciceksepeti' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_ciceksepeti.sql', $id,$marketplaceType),
-                    'Wayfair' => $this->transferOrdersExecute($filePath . 'iwa_marketplace_orders_transfer_wayfair.sql', $id,$marketplaceType),
+                    'Shopify' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_shopify.sql', $id, $marketplaceType),
+                    'Trendyol' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_trendyol.sql', $id,$marketplaceType),
+                    'Bol.com' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_bolcom.sql', $id,$marketplaceType),
+                    'Etsy' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_etsy.sql', $id,$marketplaceType),
+                    'Amazon' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_amazon.sql', $id,$marketplaceType),
+                    'Takealot' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_takealot.sql', $id,$marketplaceType),
+                    'Wallmart' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_wallmart.sql', $id,$marketplaceType),
+                    'Ciceksepeti' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_ciceksepeti.sql', $id,$marketplaceType),
+                    'Wayfair' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_wayfair.sql', $id,$marketplaceType),
                     default => null,
                 };
                 echo "Complated: $marketplaceType\n";
@@ -340,28 +342,20 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Complated Wallmart Total Price\n";
     }
 
+    /**
+     * @throws Exception
+     */
     protected function setMarketplaceKey(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT 
-                DISTINCT marketplace_id
-            FROM
-                iwa_marketplace_orders_line_items
-            WHERE 
-                marketplace_id IS NOT NULL
-            ";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyFetch.sql');
         $values = $db->fetchAllAssociative($sql);
         foreach ($values as $row) {
             $id = $row['marketplace_id'];
             $marketplace = Marketplace::getById($id);
             if ($marketplace) {
                 $marketplaceKey = $marketplace->getKey();
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items
-                    SET marketplace_key = :marketplaceKey
-                    WHERE marketplace_id = :marketplaceId
-                ";
+                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'updateMarketPlaceKey.sql');
                 $db->executeStatement($updateSql, [
                     'marketplaceKey' => $marketplaceKey,
                     'marketplaceId' => $id,
