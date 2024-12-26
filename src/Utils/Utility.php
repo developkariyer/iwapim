@@ -255,7 +255,8 @@ class Utility
             ]);
         }
         if (!$fromCurrencyValue || !$toCurrencyValue) {
-            throw new Exception("Currency values not found for $fromCurrency or $toCurrency");
+            echo "Currency values not found for $fromCurrency or $toCurrency";
+            return 0;
         }
         return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
     }
