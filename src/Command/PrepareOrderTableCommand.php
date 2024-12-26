@@ -65,28 +65,12 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function test()
     {
         $db = \Pimcore\Db::get();
-        $distinctRows = $db->fetchAllAssociative("
-            SELECT DISTINCT currency, DATE(created_at) as created_date 
-            FROM iwa_marketplace_orders_line_items
-            WHERE currency is not null  AND currency_rate is null
-        ");
-        foreach ($distinctRows as $row) {
-            try {
-                $currencyRate = Utility::getCurrencyValueByDate($row['currency'], $row['created_date']);
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items 
-                    SET currency_rate = :currency_rate 
-                    WHERE currency = :currency AND DATE(created_at) = :created_date AND currency_rate IS NULL";
-                $db->executeStatement($updateSql, [
-                    'currency_rate' => (float) $currencyRate,
-                    'currency' => $row['currency'],
-                    'created_date' => $row['created_date'],
-                ]);
-                echo "Currency rate updated for currency: {$row['currency']}, date: {$row['created_date']}, rate: {$currencyRate}\n";
-            } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        }
+        $sql = "
+            SELECT * FROM iwa_marketplace_orders_line_items
+            WHERE product_price_usd IS NULL OR total_price_usd IS NULL;
+        ";
+        $results = $db->fetchAllAssociative($sql);
+
 
     }
 
@@ -277,88 +261,28 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function currencyRate(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT 
-                DISTINCT currency,
-                DATE(created_at)
-            FROM
-                iwa_marketplace_orders_line_items
-            WHERE currency_rate IS NULL;
-        ";
-        $results = $db->fetchAllAssociative($sql);
-        echo "Start: Updating currency rates...\n";
-        foreach ($results as $row) {
-            $currency = $row['currency'];
-            $date = $row['DATE(created_at)'];
-            echo "Processing... Currency: $currency, Date: $date\n";
-            if ($currency === 'TRY') {
-                $currency = 'USD';
-            }
-            $rateSql = "
-                SELECT 
-                    value
-                FROM 
-                    iwa_currency_history
-                WHERE 
-                    currency = '$currency'
-                    AND DATE(date) <= '$date'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
-                LIMIT 1;
-            ";
-            $currencyRate  = $db->fetchOne($rateSql);
-            $usdRateSql = "
-                SELECT 
-                    value
-                FROM 
-                    iwa_currency_history
-                WHERE 
-                    currency = 'USD'
-                    AND DATE(date) <= '$date'
-                ORDER BY 
-                    ABS(TIMESTAMPDIFF(DAY, DATE(date), '$date')) ASC
-                LIMIT 1;
-            ";
-            $usdRate = $db->fetchOne($usdRateSql);
-
-            if (!$currencyRate) {
-                echo "Currency rate not found for currency: $currency, date: $date\n";
-                continue;
-            }
-
-            if (!$usdRate) {
-                echo "USD rate not found for date: $date\n";
-                continue;
-            }
-
-            if($row['currency'] === 'TRY') {
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items
-                    SET 
-                        currency_rate = $currencyRate,
-                        current_USD = $usdRate
-                    WHERE DATE(created_at)  = '$date' AND currency = 'TRY';
-                ";
-            }
-            else {
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items
-                    SET 
-                        currency_rate = $currencyRate,
-                        current_USD = $usdRate
-                    WHERE DATE(created_at)  = '$date' AND currency = '$currency';
-                ";
-            }
-            echo "Updating... $updateSql\n";
+        $distinctRows = $db->fetchAllAssociative("
+            SELECT DISTINCT currency, DATE(created_at) as created_date 
+            FROM iwa_marketplace_orders_line_items
+            WHERE currency is not null  AND currency_rate is null
+        ");
+        foreach ($distinctRows as $row) {
             try {
-                $affectedRows = $db->executeStatement($updateSql);
-                echo "Rows affected: $affectedRows\n";
-                echo "Update successful\n";
+                $currencyRate = Utility::getCurrencyValueByDate($row['currency'], $row['created_date']);
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items 
+                    SET currency_rate = :currency_rate 
+                    WHERE currency = :currency AND DATE(created_at) = :created_date AND currency_rate IS NULL";
+                $db->executeStatement($updateSql, [
+                    'currency_rate' => (float) $currencyRate,
+                    'currency' => $row['currency'],
+                    'created_date' => $row['created_date'],
+                ]);
+                echo "Currency rate updated for currency: {$row['currency']}, date: {$row['created_date']}, rate: {$currencyRate}\n";
             } catch (Exception $e) {
-                echo "Error occurred: " . $e->getMessage() . "\n";
+                echo "Error: " . $e->getMessage();
             }
         }
-        echo "All processes completed.\n";
     }
 
     protected function calculatePrice(): void
