@@ -64,8 +64,29 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function test()
     {
-        $result = Utility::getCurrencyValueByDate("USD","2024-12-26");
-        echo $result;
+        $db = \Pimcore\Db::get();
+        $distinctRows = $db->fetchAll("
+            SELECT DISTINCT currency, DATE(created_at) as created_date 
+            FROM iwa_marketplace_orders_line_items
+            WHERE currency is not null  AND currency_rate is null
+        ");
+        foreach ($distinctRows as $row) {
+            try {
+                $currencyRate = self::getCurrencyValueByDate($row['currency'], $row['created_date']);
+                $updateSql = "
+                    UPDATE iwa_marketplace_orders_line_items 
+                    SET currency_rate = :currency_rate 
+                    WHERE currency = :currency AND DATE(created_at) = :created_date AND currency_rate IS NULL";
+                $db->execute($updateSql, [
+                    'currency_rate' => $currencyRate,
+                    'currency' => $row['currency'],
+                    'created_date' => $row['created_date'],
+                ]);
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+
     }
 
     protected function marketplaceList(): void
