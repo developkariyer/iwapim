@@ -2,11 +2,8 @@
 
 namespace App\EventListener;
 
-use App\Model\AdminStyle\ProductAdminStyle;
 use App\Model\DataObject\VariantProduct;
 use Exception;
-use Pimcore\Bundle\AdminBundle\Event\ElementAdminStyleEvent;
-use Pimcore\Model\DataObject\ClassDefinition\CustomLayout;
 use Pimcore\Model\DataObject\Data\ExternalImage;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\DataObject\Product;
@@ -15,14 +12,8 @@ use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\Dependency;
 
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-
 use Pimcore\Event\Model\DataObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
-
-use Pimcore\Model\DataObject\Service;
 
 class DataObjectListener implements EventSubscriberInterface
 {
@@ -40,37 +31,7 @@ class DataObjectListener implements EventSubscriberInterface
             'pimcore.dataobject.preUpdate' => 'onPreUpdate',
             'pimcore.dataobject.postUpdate' => 'onPostUpdate',
             'pimcore.dataobject.postLoad' => 'onPostLoad',
-            'pimcore.admin.resolve.elementAdminStyle' => 'onResolveElementAdminStyle',
-            'pimcore.admin.dataobject.get.preSendData' => 'onPreSendData',
         ];
-    }
-
-    public function doModifyCustomLayouts(Product $object, GenericEvent $event): void
-    {
-        $level = $object->level();
-        $data = $event->getArgument('data');
-        if (empty($data['validLayouts'])) {
-            return;
-        }
-        foreach ($data['validLayouts'] as $key=>$layout) {
-            if (($layout['name'] === 'product' && $level == 0) || ($layout['name'] === 'variant' && $level == 1)) {
-                $data['currentLayoutId'] = $layout['id'];
-                $customLayout = CustomLayout::getById($layout['id']);
-                $data['layout'] = $customLayout->getLayoutDefinitions();
-                Service::enrichLayoutDefinition($data['layout'], $object);
-            } else {
-                unset($data['validLayouts'][$key]);
-            }
-        }
-        $event->setArgument('data', $data);
-    }
-
-    public function onPreSendData(GenericEvent $event): void
-    {
-        $object = $event->getArgument('object');
-        if ($object instanceof Product) {
-            $this->doModifyCustomLayouts($object, $event);
-        }
     }
 
     /**
@@ -94,16 +55,6 @@ class DataObjectListener implements EventSubscriberInterface
         }
     }
 
-    public function onResolveElementAdminStyle(ElementAdminStyleEvent $event): void
-    {
-        $object = $event->getElement();
-        if (
-            $object instanceof Product || 
-            $object instanceof VariantProduct
-        ) {
-            $event->setAdminStyle(new ProductAdminStyle($object));
-        }
-    }
 
     /**
      * Called before initializing a new object
@@ -195,17 +146,14 @@ class DataObjectListener implements EventSubscriberInterface
     public function onPostLoad(DataObjectEvent $event): void
     {
         $object = $event->getObject();
-        $image_url = '';
         if ($object instanceof Product) {
             Product::setGetInheritedValues(false);
-//            if (empty($object->getImageUrl())) {
-                $image_url = self::traverseProducts($object);
-                if (!empty($image_url)) {
-                    $object->setImageUrl(new ExternalImage($image_url));
-                } else {
-                    $object->setImageUrl(null);
-                }
-//            }
+            $image_url = self::traverseProducts($object);
+            if (!empty($image_url)) {
+                $object->setImageUrl(new ExternalImage($image_url));
+            } else {
+                $object->setImageUrl(null);
+            }
             if ($object->level()>0) {
                 $object->setTechnicals(null);
                 $object->setVariationSizeList(null);
