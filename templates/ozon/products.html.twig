@@ -34,27 +34,20 @@
             {% for size, colorGroup in children %}
                 {% set sanitizedSize = size|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingSize{{ sanitizedSize }}">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSize{{ sanitizedSize }}" aria-expanded="false" aria-controls="collapseSize{{ sanitizedSize }}">
-                            {{ size }}
-                        </button>
-                    </h2>
-                    <div id="collapseSize{{ sanitizedSize }}" class="accordion-collapse collapse" aria-labelledby="headingSize{{ sanitizedSize }}" data-bs-parent="#sizeAccordion">
-                        <div class="accordion-body">
-                            {% for color, child in colorGroup %}
-                                {% set sanitizedColor = color|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="childCheckbox{{ child.getId() }}" value="{{ child.getId() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] %}checked{% endif %}>
-                                    <label class="form-check-label" for="childCheckbox{{ child.getId() }}">
-                                        {{ child.getKey() }}
-                                    </label>
-                                </div>
-                            {% endfor %}
-                        </div>
+                    <h2 class="accordion-header" id="headingSize{{ sanitizedSize }}">{{ size }}</h2>
+                    <div class="accordion-body">
+                        {% for color, child in colorGroup %}
+                            {% set sanitizedColor = color|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="childCheckbox{{ child.getId() }}" value="{{ child.getId() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] %}checked{% endif %}>
+                                <label class="form-check-label" for="childCheckbox{{ child.getId() }}">
+                                    {{ child.getKey() }}
+                                </label>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}
         </div>
     </div>
-    {{ dump(selectedChildren) }}
 {% endblock %}
