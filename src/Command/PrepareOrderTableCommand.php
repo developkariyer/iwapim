@@ -26,8 +26,8 @@ use App\Utils\Utility;
 class PrepareOrderTableCommand extends AbstractCommand
 {
     private array $marketplaceListWithIds = [];
-    private $transferSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/Transfer/';
-    private $extraColumnsSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/ExtraColumns/';
+    private string $transferSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/Transfer/';
+    private string $extraColumnsSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/ExtraColumns/';
 
 
     protected function configure(): void
