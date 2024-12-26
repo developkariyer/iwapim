@@ -30,24 +30,14 @@
 {% block content %}
     <div class="container mt-4">
         <h1>{{ task.key }} - Ürünler</h1>
-        <div class="accordion" id="productAccordion">
+        <ul class="list-group">
             {% for productId, product in parentProducts %}
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading{{ productId }}">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ productId }}" aria-expanded="false" aria-controls="collapse{{ productId }}">
-                            {{ product.getKey() }}
-                        </button>
-                    </h2>
-                    <div id="collapse{{ productId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ productId }}" data-bs-parent="#productAccordion">
-                        <div class="accordion-body">
-                            <!-- Add any additional product details here if needed -->
-                            <a href="/ozon/product/{{ task.id }}/{{ productId }}" class="btn btn-primary">
-                                Satıştaki Varyasyonları Düzenle
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <li class="list-group-item">
+                    <a href="/ozon/product/{{ task.id }}/{{ productId }}" class="text-decoration-none">
+                        {{ product.getKey() }}
+                    </a>
+                </li>
             {% endfor %}
-        </div>
+        </ul>
     </div>
 {% endblock %}
