@@ -1,6 +1,6 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
-    shipping_city, shipping_company, shipping_country_code,total_price, subtotal_price fulfillments_status, tracking_company)
+    shipping_city, shipping_company, shipping_country_code,total_price, subtotal_price, fulfillments_status, tracking_company)
 SELECT
     :marketplaceType,
     :marketPlaceId,

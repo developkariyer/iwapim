@@ -1,5 +1,5 @@
 INSERT INTO iwa_marketplace_orders_line_items (
-    marketplace_type, marketplace_id, created_at, closed_at, order_id, variant_id, price, currency, quantity, variant_title,
+    marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title,
     shipping_province, shipping_city, shipping_country_code, fulfillments_status, tracking_company, fulfillments_status_control
 )
 SELECT
@@ -8,6 +8,7 @@ SELECT
     FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDate')) / 1000) AS created_at,
     FROM_UNIXTIME(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.statusDate')) / 1000)AS closed_at,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.purchaseOrderId')) AS order_id,
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) AS product_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.item.sku')) AS variant_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.charges.charge[0].chargeAmount.amount')) AS price,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.charges.charge[0].chargeAmount.currency')) AS currency,
@@ -32,6 +33,7 @@ ON DUPLICATE KEY UPDATE
     marketplace_id = VALUES(marketplace_id),
     created_at = VALUES(created_at),
     closed_at = VALUES(closed_at),
+    product_id = VALUES(product_id),
     variant_id = VALUES(variant_id),
     price = VALUES(price),
     currency = VALUES(currency),

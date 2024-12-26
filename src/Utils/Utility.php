@@ -233,4 +233,45 @@ class Utility
         return new ExternalImage($url);
     }
 
+    public static function convertCurrency($amount, $fromCurrency, $toCurrency,$date): string
+    {
+        if ($fromCurrency === $toCurrency) {
+            return (string)$amount;
+        }
+        $fromCurrencyValue = ($fromCurrency === 'TRY') ? 1 : null;
+        $toCurrencyValue = ($toCurrency === 'TRY') ? 1 : null;
+        $db = Db::get();
+        $sql = "SELECT value FROM iwa_currency_history WHERE currency = :currency AND DATE(date) <= :today ORDER BY ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC LIMIT 1;";
+        if (!isset($fromCurrencyValue)) {
+            $fromCurrencyValue = $db->fetchOne($sql, [
+                'today' => $date,
+                'currency' => $fromCurrency
+            ]);
+        }
+        if (!isset($toCurrencyValue)) {
+            $toCurrencyValue = $db->fetchOne($sql, [
+                'today' => $date,
+                'currency' => $toCurrency
+            ]);
+        }
+        if (!$fromCurrencyValue || !$toCurrencyValue) {
+            echo "Currency values not found for $fromCurrency or $toCurrency";
+            return (string)0;
+        }
+        return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
+    }
+
+    public static function getCurrencyValueByDate($currency, $date): float
+    {
+        $db = Db::get();
+        if ($currency === 'TRY') {
+            return "1.0";
+        }
+        $sql = "SELECT value FROM iwa_currency_history WHERE currency = :currency AND DATE(date) <= :today ORDER BY ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC LIMIT 1;";
+        return $db->fetchOne($sql, [
+            'today' => $date,
+            'currency' => $currency
+        ]);
+    }
+
 }
