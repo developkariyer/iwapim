@@ -238,8 +238,8 @@ class Utility
         if ($fromCurrency === $toCurrency) {
             return $amount;
         }
-        $fromCurrencyValue = ($fromCurrency === 'TL') ? 1 : null;
-        $toCurrencyValue = ($toCurrency === 'TL') ? 1 : null;
+        $fromCurrencyValue = ($fromCurrency === 'TRY') ? 1 : null;
+        $toCurrencyValue = ($toCurrency === 'TRY') ? 1 : null;
         $db = Db::get();
         $sql = "SELECT value FROM iwa_currency_history WHERE currency = :currency AND DATE(date) <= :today ORDER BY ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC LIMIT 1;";
         if (!isset($fromCurrencyValue)) {
@@ -258,6 +258,16 @@ class Utility
             throw new Exception("Currency values not found for $fromCurrency or $toCurrency");
         }
         return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
+    }
+
+    public static function getCurrencyValueByDate($currency, $date): float
+    {
+        $db = Db::get();
+        $sql = "SELECT value FROM iwa_currency_history WHERE currency = :currency AND DATE(date) <= :today ORDER BY ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC LIMIT 1;";
+        return $db->fetchOne($sql, [
+            'today' => $date,
+            'currency' => $currency
+        ]);
     }
 
 }
