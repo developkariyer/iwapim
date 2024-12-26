@@ -151,13 +151,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
-            $parent = Utility::checkSetPath($marketplaceFolder);
-            if (!empty($listing['variantGroupId'])) {
-                $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($listing['variantGroupId']),
-                    $parent
-                );
-            }
             $variantData = [
                 'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
                 'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
@@ -173,6 +166,14 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
             echo "Fields being passed to addUpdateVariant:\n";
             print_r($variantData);
+            $parent = Utility::checkSetPath($marketplaceFolder);
+            if (!empty($listing['variantGroupId'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($listing['variantGroupId']),
+                    $parent
+                );
+            }
+
 
             /*VariantProduct::addUpdateVariant(
                 variant: [
