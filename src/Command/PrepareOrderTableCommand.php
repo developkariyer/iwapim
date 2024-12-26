@@ -82,6 +82,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                     'currency' => $row['currency'],
                     'created_date' => $row['created_date'],
                 ]);
+                echo "Currency rate updated for currency: {$row['currency']}, date: {$row['created_date']}\n";
             } catch (Exception $e) {
                 echo "Error: " . $e->getMessage();
             }
