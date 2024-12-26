@@ -64,7 +64,7 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function test()
     {
-        $result  = Utility::convertCurrency("500", "USD", "TRY","2024-09-01");
+        $result  = Utility::convertCurrency("500", "USD", "USD","2024-09-01");
         echo $result;
         /*$db = \Pimcore\Db::get();
         $sql = "
