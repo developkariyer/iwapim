@@ -151,21 +151,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['productName']} ...";
-            $variantData = [
-                'imageUrl' => Utility::getCachedImage($listing['image_url']) ?? '',
-                'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
-                'salePrice' => $listing['price']['amount'] ?? 0,
-                'saleCurrency' => 'USD',
-                'title' => $listing['productName'] ?? '',
-                'attributes' => $this->getAttributes($listing) ?? '',
-                'uniqueMarketplaceId' => $listing['wpid'] ?? '',
-                'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
-                'sku' => $listing['sku'] ?? '',
-            ];
-
-            echo "Fields being passed to addUpdateVariant:\n";
-            print_r($variantData);
+            print_r($listing);
             $parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['variantGroupId'])) {
                 $parent = Utility::checkSetPath(
