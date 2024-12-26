@@ -10,7 +10,7 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.OrderItemId')) AS product_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ASIN')) AS variant_id,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ItemPrice.Amount')) AS price,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.ItemPrice.CurrencyCode')) AS currency,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderTotal.CurrencyCode')) AS currency,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.QuantityOrdered')) AS quantity,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.Title')) AS variant_title,
     (CAST(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.PromotionDiscount.Amount')) AS DECIMAL(10,2)) +

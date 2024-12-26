@@ -10,6 +10,7 @@ use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -29,6 +30,77 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
         if (!str_contains($this->apiUrl, 'https://')) {
             $this->apiUrl = "https://{$this->apiUrl}/admin/api/2024-07";
+        }
+    }
+
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
+    {
+        $data = [];
+        $headersToApi = [
+            'json' => $data,
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ];
+        $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+        usleep(200000);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
+            return null;
+        }
+        $newData = json_decode($response->getContent(), true);
+        $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
+        return $data;
+    }
+
+    public function  graphqlDownload()
+    {
+        $cursor = null;
+        do {
+            $query = [
+                'query' => "
+                    query GetProducts(\$numProducts: Int!, \$cursor: String) { 
+                        products(first: \$numProducts, after: \$cursor) { 
+                            pageInfo {
+                                hasNextPage
+                                endCursor
+                            }
+                            nodes { 
+                                id 
+                                title
+                                variants(first: 200) {
+                                    nodes {
+                                        title
+                                        price
+                                    }
+                                }
+                            } 
+                        } 
+                    }
+                ",
+                'variables' => [
+                    'numProducts' => 50,
+                    'cursor' => $cursor,
+                ]
+            ];
+            $response = $this->getFromShopifyApiGraphql('POST', $query);
+            $data = $response['data']['products'];
+            $this->listings = array_merge($this->listings, $data['nodes']);
+            $cursor = $data['pageInfo']['endCursor'];
+            $hasNextPage = $data['pageInfo']['hasNextPage'];
+        } while ($hasNextPage);
+
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
         }
     }
 
@@ -89,16 +161,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        if (!$forceDownload && $this->getListingsFromCache()) {
+       if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
-        if (empty($this->listings)) {
+       $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
+       if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
-        }
-        $this->putListingsToCache();
+       }
+       $this->putListingsToCache();
     }
 
     /**
