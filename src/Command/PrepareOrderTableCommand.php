@@ -281,8 +281,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $row) {
             $subtotalPrice = $row['subtotal_price'] ?? 0;
+            $totalPrice = $row['total_price'] ?? 0;
             $productPriceUsd = Utility::convertCurrency($row['price'], $row['currency'], "USD", $row['created_date']) ?? 0;
-            $totalPriceUsd = Utility::convertCurrency($row['total_price'], $row['currency'], "USD", $row['created_date']) ?? 0;
+            $totalPriceUsd = Utility::convertCurrency($totalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $updateSql = "
                 UPDATE iwa_marketplace_orders_line_items
@@ -320,7 +321,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->usaCode();
         echo "Complated USA Code\n";
         echo "Calculating Bolcom Total Price\n";
-        $this->bolcomTotalPrice();
+        $this->calculateTotalPrice("Bol.com");
         echo "Complated Bolcom Total Price\n";
         echo "Fix Bolcom Orders\n";
         $this->bolcomFixOrders();
@@ -332,10 +333,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->amazonSubtotalCalculate();
         echo "Complated Amazon Subtotal Calculate\n";
         echo "Wayfair Total Price\n";
-        $this->wayfairTotalPrice();
+        $this->calculateTotalPrice("Wayfair");
         echo "Complated Wayfair Total Price\n";
         echo "Wallmart Total Price\n";
-        $this->wallmartTotalPrice();
+        $this->calculateTotalPrice("Wallmart");
         echo "Complated Wallmart Total Price\n";
     }
 
@@ -538,10 +539,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             FROM iwa_marketplace_orders_line_items 
             WHERE shipping_province IS NOT NULL 
             AND shipping_province != '' 
-            AND shipping_province != 'null'
-            ";
+            AND shipping_province != 'null';";
         $results = $db->fetchAllAssociative($sql);
-
         foreach ($results as $result) {
             $shippingProvince = $result['shipping_province'];
             if (isset($isoCodes[$shippingProvince])) {
@@ -559,25 +558,29 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function bolcomTotalPrice(): void
+    protected function calculateTotalPrice($marketplaceType): void
     {
         $db = \Pimcore\Db::get();
         $sql = "
-            UPDATE iwa_marketplace_orders_line_items as t1
+            UPDATE iwa_marketplace_orders_line_items AS t1
             INNER JOIN (
                 SELECT 
                     order_id,
-                    SUM(price) as total_price
+                    SUM(price) AS total_price
                 FROM iwa_marketplace_orders_line_items
-                WHERE marketplace_type = 'Bol.com'
+                WHERE marketplace_type = :marketplace_type
                 GROUP BY order_id
-            ) as t2
+            ) AS t2
             ON t1.order_id = t2.order_id
             SET t1.total_price = t2.total_price
-            WHERE t1.marketplace_type = 'Bol.com';
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
+            WHERE t1.marketplace_type = :marketplace_type;";
+
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->executeStatement(['marketplace_type' => $marketplaceType]);
+        } catch (\Exception $e) {
+            echo "Error while updating total price: " . $e->getMessage();
+        }
     }
 
     protected function bolcomFixOrders(): void
@@ -889,48 +892,6 @@ class PrepareOrderTableCommand extends AbstractCommand
             SET 
                 iwa_marketplace_orders_line_items.subtotal_price = calculated_pnet.pnet;"
         ;
-    }
-
-    protected function wayfairTotalPrice(): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items as t1
-            INNER JOIN (
-                SELECT 
-                    order_id,
-                    SUM(price) as total_price
-                FROM iwa_marketplace_orders_line_items
-                WHERE marketplace_type = 'Wayfair'
-                GROUP BY order_id
-            ) as t2
-            ON t1.order_id = t2.order_id
-            SET t1.total_price = t2.total_price
-            WHERE t1.marketplace_type = 'Wayfair';
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-    }
-
-    protected function wallmartTotalPrice(): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = "
-            UPDATE iwa_marketplace_orders_line_items as t1
-            INNER JOIN (
-                SELECT 
-                    order_id,
-                    SUM(price) as total_price
-                FROM iwa_marketplace_orders_line_items
-                WHERE marketplace_type = 'Wallmart'
-                GROUP BY order_id
-            ) as t2
-            ON t1.order_id = t2.order_id
-            SET t1.total_price = t2.total_price
-            WHERE t1.marketplace_type = 'Wallmart';
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
     }
 
 }
