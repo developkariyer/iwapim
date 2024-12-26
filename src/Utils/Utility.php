@@ -233,4 +233,27 @@ class Utility
         return new ExternalImage($url);
     }
 
+    public function convertCurrency($amount, $fromCurrency, $toCurrency,$date): string
+    {
+        if ($fromCurrency === $toCurrency) {
+            return $amount;
+        }
+        $fromCurrencyValue = ($fromCurrency === 'TL') ? 1 : null;
+        $toCurrencyValue = ($toCurrency === 'TL') ? 1 : null;
+        $db = Db::get();
+        $sql = "SELECT value FROM iwa_currency_history WHERE currency = :currency AND DATE(date) <= :today ORDER BY ABS(TIMESTAMPDIFF(DAY, DATE(date), :today)) ASC LIMIT 1;";
+        $fromCurrencyValue = $db->fetchOne($sql, [
+            'today' => $date,
+            'currency' => $fromCurrency
+        ]);
+        $toCurrencyValue = $db->fetchOne($sql, [
+            'today' => $date,
+            'currency' => $toCurrency
+        ]);
+        if (!$fromCurrencyValue || !$toCurrencyValue) {
+            throw new Exception("Currency values not found for $fromCurrency or $toCurrency");
+        }
+        return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
+    }
+
 }

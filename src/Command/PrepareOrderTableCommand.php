@@ -58,7 +58,14 @@ class PrepareOrderTableCommand extends AbstractCommand
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
         }
+        $this->test();
         return Command::SUCCESS;
+    }
+
+    protected function test()
+    {
+        $result = Utility::convertCurrency("500", "TL", "USD","2024-12-24");
+        echo $result;
     }
 
     protected function marketplaceList(): void
