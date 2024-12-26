@@ -72,7 +72,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         ");
         foreach ($distinctRows as $row) {
             try {
-                $currencyRate = self::getCurrencyValueByDate($row['currency'], $row['created_date']);
+                $currencyRate = Utility::getCurrencyValueByDate($row['currency'], $row['created_date']);
                 $updateSql = "
                     UPDATE iwa_marketplace_orders_line_items 
                     SET currency_rate = :currency_rate 
