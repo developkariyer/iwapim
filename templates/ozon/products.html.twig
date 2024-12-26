@@ -29,12 +29,12 @@
 
 {% block content %}
     <div class="container mt-4">
-        <h1>{{ task.key }} - {{ product.key }}</h1>
+        <h1>{{ task.key }} - {{ parentProduct.key }}</h1>
         <div class="accordion" id="sizeAccordion">
             {% for size, colorGroup in children %}
                 {% set sanitizedSize = size|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
                 <div class="accordion-item">
-                    <h4 class="accordion-header" id="headingSize{{ sanitizedSize }}">{{ product.key }} {{ size }}</h4>
+                    <h4 class="accordion-header" id="headingSize{{ sanitizedSize }}">{{ parentProduct.key }} {{ size }}</h4>
                     <div class="accordion-body">
                         {% for color, child in colorGroup %}
                             {% set sanitizedColor = color|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
