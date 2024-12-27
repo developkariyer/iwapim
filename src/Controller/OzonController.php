@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exception\FrontendException;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Exception;
@@ -187,7 +188,7 @@ class OzonController extends FrontendController
             $taskProducts[] = $taskProduct;
         }
         foreach ($selectedChildren as $productId => $listing) {
-            if (!$listing) {
+            if ($listing<0) {
                 continue;
             }
             $product = Product::getById($productId);
@@ -195,13 +196,17 @@ class OzonController extends FrontendController
                 error_log('Product not found: ' . $productId);
                 continue;
             }
-            $listingItem = VariantProduct::getById($listing);
-            if (!$listingItem) {
-                error_log('Listing not found: ' . $listing);
-                continue;
-            }
             $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
-            $objectMetadata->setData(['listing'=>$listingItem->getId()]);
+            if ($listing) {
+                $listingItem = VariantProduct::getById($listing);
+                if (!$listingItem) {
+                    error_log('Listing not found: ' . $listing);
+                    continue;
+                }
+                $objectMetadata->setData(['listing'=>$listingItem->getId()]);
+            } else {
+                $objectMetadata->setData(['listing'=>0]);
+            }
             $taskProducts[] = $objectMetadata;
         }
         $taskProducts = array_unique($taskProducts);
@@ -221,6 +226,7 @@ class OzonController extends FrontendController
     {
         $task = ListingTemplate::getById($request->get('taskId'));
         if (!$task) {
+            $this->addFlash('danger', 'Task not found');
             return $this->redirectToRoute('ozon_menu');
         }
         $iwasku = $request->get('iwasku');

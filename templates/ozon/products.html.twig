@@ -43,7 +43,8 @@
                                 <label class="col-sm-6 col-form-label" for="childSelect{{ child.getId() }}">{{ child.getKey() }}</label>
                                 <div class="col-sm-6">
                                     <select class="form-select" id="childSelect{{ child.getId() }}" name="selectedChildren[{{ child.getId() }}]">
-                                        <option value="0" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == 0 %}selected{% endif %}>Hiçbiri</option>
+                                        <option value="-1" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == -1 %}selected{% endif %}>Listeleme</option>
+                                        <option value="0" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == 0 %}selected{% endif %}>PIM Bilgilerini Kullan</option>
                                         {% for item in child.getListingItems() %}
                                             <option value="{{ item.getId() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == item.getId() %}selected{% endif %}>{{ item.getKey() }}</option>
                                         {% endfor %}
