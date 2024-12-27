@@ -145,7 +145,7 @@ class OzonController extends FrontendController
         }
         foreach ($parentProduct->getChildren() as $child) {
             $children[$child->getVariationSize()][$child->getVariationColor()] = $child;
-            $selectedChildren[$child->getId()] = 0;
+            $selectedChildren[$child->getId()] = -1;
         }
         $taskProducts = $task->getProducts();
         foreach ($taskProducts as $taskProduct) {
