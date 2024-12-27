@@ -1,0 +1,21 @@
+{
+    "query":"
+        query GetProducts($numProducts: Int!, $cursor: String) {
+            products(first: $numProducts, after: $cursor) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+                nodes {
+                    id
+                    title
+                    variants(first: 200) {
+                        nodes {
+                            title
+                            price
+                        }
+                    }
+                }
+            }
+        }"
+}
