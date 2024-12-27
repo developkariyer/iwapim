@@ -179,6 +179,9 @@ class OzonController extends FrontendController
         $selectedChildren = $request->get('selectedChildren', []);
         $taskProducts = [];
         foreach ($selectedChildren as $productId => $listing) {
+            if (!$listing) {
+                continue;
+            }
             $product = Product::getById($productId);
             if (!$product) {
                 error_log('Product not found: ' . $productId);
