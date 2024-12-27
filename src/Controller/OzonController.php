@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -175,8 +177,23 @@ class OzonController extends FrontendController
             return $this->redirectToRoute('ozon_menu');
         }
         $selectedChildren = $request->get('selectedChildren', []);
-
-
+        $taskProducts = [];
+        foreach ($selectedChildren as $productId => $listing) {
+            $product = Product::getById($productId);
+            if (!$product) {
+                error_log('Product not found: ' . $productId);
+                continue;
+            }
+            $listingItem = VariantProduct::getById($listing);
+            if (!$listingItem) {
+                error_log('Listing not found: ' . $listing);
+                continue;
+            }
+            $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
+            $objectMetadata->setData(['listing'=>$listingItem->getId()]);
+            $taskProducts[] = $objectMetadata;
+        }
+        $task->setProducts($taskProducts);
         return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
     }
 
