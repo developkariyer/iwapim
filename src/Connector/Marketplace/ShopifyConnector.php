@@ -94,12 +94,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
             [$this->marketplace->getId()]
         );
+        $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
             'variables' => [
                 'numOrders' => 50,
                 'cursor' => null,
-                'filter' => (string)$lastUpdatedAt
+                'filter' => $filter
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
