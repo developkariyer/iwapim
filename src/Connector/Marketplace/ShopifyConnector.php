@@ -79,10 +79,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'cursor' => null
             ]
         ];
-        print_r($query);
-        /* 
-         $products = $this->getFromShopifyApiGraphql('POST', $query, 'products');
-         print_r($products);*/
+
+       $products = $this->getFromShopifyApiGraphql('POST', $query, 'products');
+       print_r($products);
     }
 
     /**
