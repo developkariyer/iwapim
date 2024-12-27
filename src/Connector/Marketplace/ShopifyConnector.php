@@ -70,7 +70,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $allData;
     }
 
-    public function  graphqlDownload()
+    public function  graphqlDownload() // working
     {
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
@@ -80,8 +80,33 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
        ];
 
-       $products = $this->getFromShopifyApiGraphql('POST', $query, 'products');
-       print_r($products);
+       $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
+       if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+       }
+    }
+
+    public function downloadOrdersGraphql()
+    {
+        $db = Db::get();
+        $lastUpdatedAt = $db->fetchOne(
+            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
+            [$this->marketplace->getId()]
+        );
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
+            'variables' => [
+                'numOrders' => 50,
+                'cursor' => null,
+                'filter' => $lastUpdatedAt
+            ]
+        ];
+        $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
+        print_r($orders);
+
+
+        return 0;
     }
 
     /**
@@ -141,7 +166,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->graphqlDownload();
+        //$this->graphqlDownload();
+        $this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;

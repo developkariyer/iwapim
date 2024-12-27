@@ -1,0 +1,12 @@
+query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
+    orders(first: $numOrders, after: $cursor, query: $filter) {
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        nodes {
+            id
+            updatedAt
+        }
+    }
+}
