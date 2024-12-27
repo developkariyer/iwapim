@@ -19,6 +19,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
 
+    private string $graphqlUrl = PIMCORE_PROJECT_ROOT . '/src/GraphQL/Shopify/';
+
     private string $apiUrl;
 
     public function __construct($marketplace)
@@ -71,28 +73,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function  graphqlDownload()
     {
         $query = [
-            'query' => "
-                    query GetProducts(\$numProducts: Int!, \$cursor: String) { 
-                        products(first: \$numProducts, after: \$cursor) { 
-                            pageInfo {
-                                hasNextPage
-                                endCursor
-                            }
-                            nodes { 
-                                id 
-                                title
-                                variants(first: 200) {
-                                    nodes {
-                                        title
-                                        price
-                                    }
-                                }
-                            } 
-                        } 
-                    }
-                ",
+            'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 50,
+                '$numProducts' => 50,
                 'cursor' => null
             ]
         ];
