@@ -279,7 +279,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->parseUrl();
         echo "Complated Parse URL\n";
         echo "Calculating Closed At Diff\n";
-        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'closedAtDiff.sql');
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'closedAtDiff.sql', []);
         echo "Complated Closed At Diff\n";
         echo "Calculating is Discount\n";
         $this->executeSqlFile($this->extraColumnsSqlfilePath . 'discountValue.sql');
