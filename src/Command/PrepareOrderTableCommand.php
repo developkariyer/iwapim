@@ -442,7 +442,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         try {
             $db = \Pimcore\Db::get();
             $sql = file_get_contents($filePath);
-            return !empty($params) ? $db->fetchAllAssociative($sql, $params) : $db->fetchAllAssociative($sql);
+            return $db->fetchAllAssociative($sql, $params);
         }catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
