@@ -205,6 +205,7 @@ class OzonController extends FrontendController
             $objectMetadata->setData(['listing'=>$listingItem->getId()]);
             $taskProducts[] = $objectMetadata;
         }
+        $taskProducts = array_unique($taskProducts);
         $task->setProducts($taskProducts);
         $task->save();
         return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
