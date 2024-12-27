@@ -87,7 +87,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        }
     }
 
-    public function downloadOrdersGraphql()
+    public function downloadOrdersGraphql() // working
     {
         $db = Db::get();
         $lastUpdatedAt = $db->fetchOne(
@@ -104,8 +104,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        print_r($orders);
-
 
         return 0;
     }
@@ -167,8 +165,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        //$this->graphqlDownload();
-        $this->downloadOrdersGraphql();
+        $this->graphqlDownload();
+        //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
