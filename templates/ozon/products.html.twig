@@ -31,6 +31,7 @@
     <div class="container mt-4">
         <h1>{{ task.key }} - {{ parentProduct.key }}</h1>
         <form method="post" action="/ozon/modify/{{ task.id }}">
+            <input type="hidden" name="productId" value="{{ parentProduct.getId() }}">
             {% for size, colorGroup in children %}
                 {% set sanitizedSize = size|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
                 <div class="size-group">

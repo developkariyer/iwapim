@@ -173,12 +173,20 @@ class OzonController extends FrontendController
      */
     public function modifyTaskAction(Request $request): RedirectResponse
     {
+        $parentProductId = $request->get('productId');
         $task = ListingTemplate::getById($request->get('taskId'));
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
         $selectedChildren = $request->get('selectedChildren', []);
         $taskProducts = [];
+        foreach ($task->getProducts() as $taskProduct) {
+            $product = $taskProduct->getObject();
+            if ($product->getId() == $parentProductId) {
+                continue;
+            }
+            $taskProducts[] = $taskProduct;
+        }
         foreach ($selectedChildren as $productId => $listing) {
             if (!$listing) {
                 continue;
