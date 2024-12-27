@@ -211,10 +211,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function findVariantProduct($uniqueMarketplaceId, $field = null): VariantProduct|Concrete|null
     {
         if ($field === null) {
-            return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
+            return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId, $unpublished = true);
         }
         $jsonPath = '$.' . $field;
-        $this->fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql',['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId,]);
+        $this->fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql',['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);
