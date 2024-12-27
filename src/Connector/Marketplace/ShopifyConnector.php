@@ -99,7 +99,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'variables' => [
                 'numOrders' => 50,
                 'cursor' => null,
-                'filter' => $lastUpdatedAt
+                'filter' => (string)$lastUpdatedAt
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
