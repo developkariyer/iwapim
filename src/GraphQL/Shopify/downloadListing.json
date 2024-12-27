@@ -17,5 +17,10 @@
                     }
                 }
             }
-        }"
+        }
+    ",
+    "variables": {
+        '$numProducts' => 50,
+        'cursor' => null
+    }
 }
