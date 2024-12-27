@@ -44,7 +44,7 @@
                                     <select class="form-select" id="childSelect{{ child.getId() }}" name="selectedChildren[{{ child.getId() }}]">
                                         <option value="0" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == 0 %}selected{% endif %}>Hiçbiri</option>
                                         {% for item in child.getListingItems() %}
-                                            <option value="{{ item.getKey() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == item.getKey() %}selected{% endif %}>{{ item.getKey() }}</option>
+                                            <option value="{{ item.getId() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == item.getId() %}selected{% endif %}>{{ item.getKey() }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
