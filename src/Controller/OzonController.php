@@ -64,7 +64,6 @@ class OzonController extends FrontendController
     public function newTaskAction(Request $request): RedirectResponse|JsonResponse
     {
         $task = new ListingTemplate();
-        // get key from request POST
         $task->setKey($request->get('taskName', 'İsimsiz'));
         $task->setParent(Utility::checkSetPath('Listing'));
         $marketplaceId = $request->get('marketplace', 0);
