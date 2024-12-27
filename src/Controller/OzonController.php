@@ -169,6 +169,7 @@ class OzonController extends FrontendController
      * @return RedirectResponse
      *
      * This controller method is used to save the selected variants for a product in an Ozon Listing task.
+     * @throws Exception
      */
     public function modifyTaskAction(Request $request): RedirectResponse
     {
@@ -197,6 +198,7 @@ class OzonController extends FrontendController
             $taskProducts[] = $objectMetadata;
         }
         $task->setProducts($taskProducts);
+        $task->save();
         return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
     }
 
