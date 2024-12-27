@@ -321,7 +321,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $marketplace = Marketplace::getById($id);
             if ($marketplace) {
                 $marketplaceKey = $marketplace->getKey();
-                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyUpdate.sql', [
+                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'updateMarketPlaceKey.sql', [
                     'marketplaceKey' => $marketplaceKey,
                     'marketplaceId' => $id,
                 ]);
