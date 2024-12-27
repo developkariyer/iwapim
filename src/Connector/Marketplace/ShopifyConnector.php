@@ -72,17 +72,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function  graphqlDownload()
     {
-        $query  = file_get_contents($this->graphqlUrl . 'downloadListing.graphql');
-        print_r($query);
-       /* $query = [
+       $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
                 '$numProducts' => 50,
                 'cursor' => null
             ]
         ];
-        $products = $this->getFromShopifyApiGraphql('POST', $query, 'products');
-        print_r($products);*/
+        print_r($query);
+        /* 
+         $products = $this->getFromShopifyApiGraphql('POST', $query, 'products');
+         print_r($products);*/
     }
 
     /**
