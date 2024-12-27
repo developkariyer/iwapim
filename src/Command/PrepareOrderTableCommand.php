@@ -279,7 +279,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $db = \Pimcore\Db::get();
         $sql = "
             SELECT id, currency, price, total_price, subtotal_price, DATE(created_at) as created_date  FROM iwa_marketplace_orders_line_items
-            WHERE (product_price_usd IS NULL OR total_price_usd IS NULL) AND currency IS NOT NULL;";
+            WHERE (product_price_usd IS NULL OR total_price_usd IS NULL OR total_price_usd = 0) AND currency IS NOT NULL;";
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $row) {
             $subtotalPrice = $row['subtotal_price'] ?? 0;
