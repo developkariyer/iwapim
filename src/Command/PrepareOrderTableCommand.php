@@ -282,9 +282,10 @@ class PrepareOrderTableCommand extends AbstractCommand
             WHERE (product_price_usd IS NULL OR total_price_usd IS NULL OR total_price_usd = 0) AND currency IS NOT NULL;";
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $row) {
+            $price = $row['price'] ?? 0;
             $subtotalPrice = $row['subtotal_price'] ?? 0;
             $totalPrice = $row['total_price'] ?? 0;
-            $productPriceUsd = Utility::convertCurrency($row['price'], $row['currency'], "USD", $row['created_date']) ?? 0;
+            $productPriceUsd = Utility::convertCurrency($price, $row['currency'], "USD", $row['created_date']) ?? 0;
             $totalPriceUsd = Utility::convertCurrency($totalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $updateSql = "
