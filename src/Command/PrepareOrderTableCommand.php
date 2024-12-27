@@ -28,6 +28,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     private array $marketplaceListWithIds = [];
     private string $transferSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/Transfer/';
     private string $extraColumnsSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/ExtraColumns/';
+    private string $variantSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/OrderTable/Variant/';
 
 
     protected function configure(): void
@@ -78,7 +79,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $this->marketplaceList();
         }
         $db = \Pimcore\Db::get();
-        $sql = "SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders";
+        $sql = file_get_contents($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $marketplaceIds = $db->fetchAllAssociative($sql);
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
@@ -137,15 +138,8 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function fetchVariantInfo($marketplaceType): array
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT 
-                DISTINCT variant_id
-            FROM
-                iwa_marketplace_orders_line_items
-            WHERE 
-                marketplace_type = '$marketplaceType'
-            ";
-        $values = $db->fetchAllAssociative($sql); 
+        $sql = file_get_contents($this->variantSqlfilePath . 'selectVariant.sql');
+        $values = $db->fetchAllAssociative($sql, ['marketplaceType' => $marketplaceType]);
         return $values;
     }
 
@@ -212,9 +206,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "UPDATE iwa_marketplace_orders_line_items
-        SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
-        WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
+        $sql = file_get_contents($this->variantSqlfilePath . 'updateVariant.sql');
         $statement = $db->prepare($sql);
         $statement->executeStatement([
             'iwasku' => $iwasku,
@@ -229,13 +221,16 @@ class PrepareOrderTableCommand extends AbstractCommand
 
     protected function findVariantProduct($uniqueMarketplaceId, $field = null): VariantProduct|Concrete|null
     {
-        $variantProduct = null;
         if ($field === null) {
             return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         }
-        $sql = "SELECT object_id FROM iwa_json_store  WHERE field_name = 'apiResponseJson'  AND JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.$field')) = ? LIMIT 1;";
+        $jsonPath = '$.' . $field;
+        $sql = file_get_contents($this->variantSqlfilePath . 'findVariant.sql');
         $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [$uniqueMarketplaceId]);
+        $result = $db->fetchAllAssociative($sql, [
+            'jsonPath' => $jsonPath,
+            'uniqueId' => $uniqueMarketplaceId,
+        ]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);
@@ -250,18 +245,12 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function currencyRate(): void
     {
         $db = \Pimcore\Db::get();
-        $distinctRows = $db->fetchAllAssociative("
-            SELECT DISTINCT currency, DATE(created_at) as created_date 
-            FROM iwa_marketplace_orders_line_items
-            WHERE currency is not null  AND currency_rate is null
-        ");
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'selectCurrency.sql');
+        $distinctRows = $db->fetchAllAssociative($sql);
         foreach ($distinctRows as $row) {
             try {
                 $currencyRate = Utility::getCurrencyValueByDate($row['currency'], $row['created_date']);
-                $updateSql = "
-                    UPDATE iwa_marketplace_orders_line_items 
-                    SET currency_rate = :currency_rate 
-                    WHERE currency = :currency AND DATE(created_at) = :created_date AND currency_rate IS NULL";
+                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'updateCurrency.sql');
                 $db->executeStatement($updateSql, [
                     'currency_rate' => (float) $currencyRate,
                     'currency' => $row['currency'],
@@ -274,12 +263,13 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function calculatePriceUsd(): void
     {
         $db = \Pimcore\Db::get();
-        $sql = "
-            SELECT id, currency, price, total_price, subtotal_price, DATE(created_at) as created_date  FROM iwa_marketplace_orders_line_items
-            WHERE (product_price_usd IS NULL OR total_price_usd IS NULL OR total_price_usd = 0) AND currency IS NOT NULL;";
+        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'selectCalculatePriceUsd.sql');
         $results = $db->fetchAllAssociative($sql);
         foreach ($results as $row) {
             $price = $row['price'] ?? 0;
@@ -288,13 +278,15 @@ class PrepareOrderTableCommand extends AbstractCommand
             $productPriceUsd = Utility::convertCurrency($price, $row['currency'], "USD", $row['created_date']) ?? 0;
             $totalPriceUsd = Utility::convertCurrency($totalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
-            $updateSql = "
-                UPDATE iwa_marketplace_orders_line_items
-                SET product_price_usd = $productPriceUsd, total_price_usd = $totalPriceUsd, subtotal_price_usd = $subtotalPriceUsd
-                WHERE id = {$row['id']};";
+            $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'updateCalculatePriceUsd.sql');
             echo "Updating... $updateSql\n";
             try {
-                $affectedRows = $db->executeStatement($updateSql);
+                $affectedRows = $db->executeStatement($updateSql,[
+                    'productPriceUsd' => $productPriceUsd,
+                    'totalPriceUsd' => $totalPriceUsd,
+                    'subtotalPriceUsd' => $subtotalPriceUsd,
+                    'id' => $row['id'],
+                ]);
                 echo "Rows affected: $affectedRows\n";
                 echo "Update successful\n";
             } catch (Exception $e) {
