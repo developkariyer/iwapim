@@ -73,51 +73,42 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function transferOrders(): void
     {
         if (empty($this->marketplaceListWithIds)) {
             $this->marketplaceList();
         }
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
-        $marketplaceIds = $db->fetchAllAssociative($sql);
+        $marketplaceIds = $this->fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
+        $fileNames = [
+            'Shopify' => 'iwa_marketplace_orders_transfer_shopify.sql',
+            'Trendyol' => 'iwa_marketplace_orders_transfer_trendyol.sql',
+            'Bol.com' => 'iwa_marketplace_orders_transfer_bolcom.sql',
+            'Etsy' => 'iwa_marketplace_orders_transfer_etsy.sql',
+            'Amazon' => 'iwa_marketplace_orders_transfer_amazon.sql',
+            'Takealot' => 'iwa_marketplace_orders_transfer_takealot.sql',
+            'Wallmart' => 'iwa_marketplace_orders_transfer_wallmart.sql',
+            'Ciceksepeti' => 'iwa_marketplace_orders_transfer_ciceksepeti.sql',
+            'Wayfair' => 'iwa_marketplace_orders_transfer_wayfair.sql',
+        ];
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id']; 
             if (isset($this->marketplaceListWithIds[$id])) {
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
-                $result = match ($marketplaceType) {
-                    'Shopify' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_shopify.sql', $id, $marketplaceType),
-                    'Trendyol' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_trendyol.sql', $id,$marketplaceType),
-                    'Bol.com' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_bolcom.sql', $id,$marketplaceType),
-                    'Etsy' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_etsy.sql', $id,$marketplaceType),
-                    'Amazon' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_amazon.sql', $id,$marketplaceType),
-                    'Takealot' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_takealot.sql', $id,$marketplaceType),
-                    'Wallmart' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_wallmart.sql', $id,$marketplaceType),
-                    'Ciceksepeti' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_ciceksepeti.sql', $id,$marketplaceType),
-                    'Wayfair' => $this->transferOrdersExecute($this->transferSqlfilePath . 'iwa_marketplace_orders_transfer_wayfair.sql', $id,$marketplaceType),
-                    default => null,
-                };
+                if (isset($fileNames[$marketplaceType])) {
+                    $this->executeSqlFile($this->transferSqlfilePath . $fileNames[$marketplaceType], ['marketPlaceId' => $id, 'marketplaceType' => $marketplaceType]);
+                }
                 echo "Complated: $marketplaceType\n";
             }
         }
     }
 
-    protected function transferOrdersExecute($sqlPath, $marketPlaceId, $marketPlaceType): void
-    {
-        $sql = file_get_contents($sqlPath);
-        try {
-            $db = \Pimcore\Db::get();
-            $statement = $db->prepare($sql);
-            $statement->executeStatement([
-                'marketPlaceId' => $marketPlaceId,
-                'marketplaceType' => $marketPlaceType,
-            ]);
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
+    /**
+     * @throws Exception
+     */
     protected function processVariantOrderData(): void
     {
         if (empty($this->marketplaceListWithIds)) {
@@ -125,7 +116,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceTypes = array_values(array_unique($this->marketplaceListWithIds));
         foreach ($marketplaceTypes as $marketplaceType) {
-            $values = $this->fetchVariantInfo($marketplaceType);
+            $values = $this->fetchFromSqlFile($this->variantSqlfilePath . 'selectVariant.sql', ['marketplaceType' => $marketplaceType]);
             $index = 0;
             foreach ($values as $row) {
                 $index++;
@@ -135,14 +126,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
-    protected function fetchVariantInfo($marketplaceType): array
-    {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->variantSqlfilePath . 'selectVariant.sql');
-        $values = $db->fetchAllAssociative($sql, ['marketplaceType' => $marketplaceType]);
-        return $values;
-    }
-
+    /**
+     * @throws Exception
+     */
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType): void
     {
         $variantObject = match ($marketplaceType) {
@@ -203,12 +189,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function insertIntoTable($uniqueMarketplaceId, $iwasku, $identifier, $productType, $variantName, $parentName, $marketplaceType): void
     {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->variantSqlfilePath . 'updateVariant.sql');
-        $statement = $db->prepare($sql);
-        $statement->executeStatement([
+        $this->executeSqlFile($this->variantSqlfilePath . 'updateVariant.sql', [
             'iwasku' => $iwasku,
             'identifier' => $identifier,
             'productType' => $productType,
@@ -219,18 +205,16 @@ class PrepareOrderTableCommand extends AbstractCommand
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     protected function findVariantProduct($uniqueMarketplaceId, $field = null): VariantProduct|Concrete|null
     {
         if ($field === null) {
             return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId,$unpublished = true);
         }
         $jsonPath = '$.' . $field;
-        $sql = file_get_contents($this->variantSqlfilePath . 'findVariant.sql');
-        $db = \Pimcore\Db::get();
-        $result = $db->fetchAllAssociative($sql, [
-            'jsonPath' => $jsonPath,
-            'uniqueId' => $uniqueMarketplaceId,
-        ]);
+        $this->fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql',['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId,]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);
@@ -244,14 +228,11 @@ class PrepareOrderTableCommand extends AbstractCommand
      */
     protected function currencyRate(): void
     {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'selectCurrency.sql');
-        $distinctRows = $db->fetchAllAssociative($sql);
+        $distinctRows = $this->fetchFromSqlFile($this->extraColumnsSqlfilePath . 'selectCurrency.sql');
         foreach ($distinctRows as $row) {
             try {
                 $currencyRate = Utility::getCurrencyValueByDate($row['currency'], $row['created_date']);
-                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'updateCurrency.sql');
-                $db->executeStatement($updateSql, [
+                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'updateCurrency.sql', [
                     'currency_rate' => (float) $currencyRate,
                     'currency' => $row['currency'],
                     'created_date' => $row['created_date'],
@@ -268,9 +249,7 @@ class PrepareOrderTableCommand extends AbstractCommand
      */
     protected function calculatePriceUsd(): void
     {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'selectCalculatePriceUsd.sql');
-        $results = $db->fetchAllAssociative($sql);
+        $results = $this->fetchFromSqlFile($this->extraColumnsSqlfilePath . 'selectCalculatePriceUsd.sql');
         foreach ($results as $row) {
             $price = $row['price'] ?? 0;
             $subtotalPrice = $row['subtotal_price'] ?? 0;
@@ -278,23 +257,19 @@ class PrepareOrderTableCommand extends AbstractCommand
             $productPriceUsd = Utility::convertCurrency($price, $row['currency'], "USD", $row['created_date']) ?? 0;
             $totalPriceUsd = Utility::convertCurrency($totalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
             $subtotalPriceUsd = Utility::convertCurrency($subtotalPrice, $row['currency'], "USD", $row['created_date']) ?? 0;
-            $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'updateCalculatePriceUsd.sql');
-            echo "Updating... $updateSql\n";
-            try {
-                $affectedRows = $db->executeStatement($updateSql,[
-                    'productPriceUsd' => $productPriceUsd,
-                    'totalPriceUsd' => $totalPriceUsd,
-                    'subtotalPriceUsd' => $subtotalPriceUsd,
-                    'id' => $row['id'],
-                ]);
-                echo "Rows affected: $affectedRows\n";
-                echo "Update successful\n";
-            } catch (Exception $e) {
-                echo "Error occurred: " . $e->getMessage() . "\n";
-            }
+            $this->executeSqlFile($this->extraColumnsSqlfilePath . 'updateCalculatePriceUsd.sql', [
+                'productPriceUsd' => $productPriceUsd,
+                'totalPriceUsd' => $totalPriceUsd,
+                'subtotalPriceUsd' => $subtotalPriceUsd,
+                'id' => $row['id'],
+            ]);
+            echo "ID: {$row['id']} Price: $price, Subtotal Price: $subtotalPrice, Total Price: $totalPrice\n";
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function extraColumns(): void
     {
         echo "Set Marketplace key\n";
@@ -304,10 +279,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->parseUrl();
         echo "Complated Parse URL\n";
         echo "Calculating Closed At Diff\n";
-        $this->insertClosedAtDiff();
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'closedAtDiff.sql');
         echo "Complated Closed At Diff\n";
         echo "Calculating is Discount\n";
-        $this->discountValue();
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'discountValue.sql');
         echo "Complated is Discount\n";
         echo "Calculating is Country Name\n";
         $this->countryCodes();
@@ -316,22 +291,22 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->usaCode();
         echo "Complated USA Code\n";
         echo "Calculating Bolcom Total Price\n";
-        $this->calculateTotalPrice("Bol.com");
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql', ['marketplaceType' => 'Bol.com']);
         echo "Complated Bolcom Total Price\n";
         echo "Fix Bolcom Orders\n";
-        $this->bolcomFixOrders();
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'bolcomFixOrders.sql');
         echo "Complated Fix Bolcom Orders\n";
         echo "Calculating is Cancelled\n";
-        $this->isCancelled();
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'isCancelled.sql');
         echo "Complated is Cancelled\n";
         echo "Amazon Subtotal Calculate\n";
-        $this->amazonSubtotalCalculate();
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'amazonSubtotal.sql');
         echo "Complated Amazon Subtotal Calculate\n";
         echo "Wayfair Total Price\n";
-        $this->calculateTotalPrice("Wayfair");
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql', ['marketplaceType' => 'Wayfair']);
         echo "Complated Wayfair Total Price\n";
         echo "Wallmart Total Price\n";
-        $this->calculateTotalPrice("Wallmart");
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql', ['marketplaceType' => 'Wallmart']);
         echo "Complated Wallmart Total Price\n";
     }
 
@@ -340,16 +315,13 @@ class PrepareOrderTableCommand extends AbstractCommand
      */
     protected function setMarketplaceKey(): void
     {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyFetch.sql');
-        $values = $db->fetchAllAssociative($sql);
+        $values = $this->fetchFromSqlFile($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyFetch.sql');
         foreach ($values as $row) {
             $id = $row['marketplace_id'];
             $marketplace = Marketplace::getById($id);
             if ($marketplace) {
                 $marketplaceKey = $marketplace->getKey();
-                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'updateMarketPlaceKey.sql');
-                $db->executeStatement($updateSql, [
+                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyUpdate.sql', [
                     'marketplaceKey' => $marketplaceKey,
                     'marketplaceId' => $id,
                 ]);
@@ -362,45 +334,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     /**
      * @throws Exception
      */
-    protected function insertClosedAtDiff(): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'closedAtDiff.sql');
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement();
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function discountValue(): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'discountValue.sql');
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement();
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function isCancelled(): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'isCancelled.sql');
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement();
-    }
-
-    /**
-     * @throws Exception
-     */
     protected function parseUrl(): void
     {
         $tldList = ['com', 'org', 'net', 'gov', 'm', 'io', 'I', 'co', 'uk', 'de', 'lens', 'search', 'pay', 'tv', 'nl', 'au', 'ca', 'lm', 'sg', 'at', 'nz', 'in', 'tt', 'dk', 'es', 'no', 'se', 'ae', 'hk', 'sa', 'us', 'ie', 'be', 'pk', 'ro', 'co', 'il', 'hu', 'fi', 'pa', 't', 'm', 'io', 'cse', 'az', 'new', 'tr', 'web', 'cz', 'gm', 'ua', 'www', 'fr', 'gr', 'ch', 'pt', 'pl', 'rs', 'bg', 'hr','l','it','m','lm','pay'];
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'parseUrlSelect.sql');
-        $results = $db->fetchAllAssociative($sql); 
+        $results = $this->fetchFromSqlFile($this->extraColumnsSqlfilePath . 'parseUrlSelect.sql');
         foreach ($results as $row) {
             $referringSite = $row['referring_site'];
             $parsedUrl = parse_url($referringSite);
@@ -416,9 +353,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $domain = implode('.', $domainParts);
                 $domain = preg_replace('/^www\./', '', $domain);
                 $domain = strtolower($domain);
-                $updateQuery = file_get_contents($this->extraColumnsSqlfilePath . 'parseUrlUpdate.sql');
-                $stmt = $db->prepare($updateQuery);
-                $stmt->executeStatement([
+                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'parseUrlUpdate.sql', [
                     'referringSiteDomain' => $domain,
                     'referringSite' => $row['referring_site'],
                 ]);
@@ -439,43 +374,17 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception("Error parsing JSON file: " . json_last_error_msg());
         }
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'usaCodeSelect.sql');
-        $results = $db->fetchAllAssociative($sql);
+        $results = $this->fetchFromSqlFile($this->extraColumnsSqlfilePath . 'usaCodeSelect.sql');
         foreach ($results as $result) {
             $shippingProvince = $result['shipping_province'];
             if (isset($isoCodes[$shippingProvince])) {
                 $provinceCode = $isoCodes[$shippingProvince];
-                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'usaCodeUpdate.sql');
-                $db->executeStatement($updateSql, [
+                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'usaCodeUpdate.sql', [
                     'province_code' => $provinceCode,
                     'shipping_province' => $shippingProvince
                 ]);
             }
         }
-    }
-
-    protected function calculateTotalPrice($marketplaceType): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql');
-        try {
-            $stmt = $db->prepare($sql);
-            $stmt->executeStatement(['marketplace_type' => $marketplaceType]);
-        } catch (\Exception $e) {
-            echo "Error while updating total price: " . $e->getMessage();
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function bolcomFixOrders(): void
-    {
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'bolcomFixOrders.sql');
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement();
     }
 
     /**
@@ -491,15 +400,12 @@ class PrepareOrderTableCommand extends AbstractCommand
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception("Error parsing JSON file: " . json_last_error_msg());
         }
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'countryCodesSelect.sql');
-        $results = $db->fetchAllAssociative($sql);
+        $results = $this->fetchFromSqlFile($this->extraColumnsSqlfilePath . 'countryCodesSelect.sql');
         foreach ($results as $result) {
             $shippingCountryCode = $result['shipping_country_code'];
             if (isset($countries[$shippingCountryCode])) {
                 $countryName = $countries[$shippingCountryCode];
-                $updateSql = file_get_contents($this->extraColumnsSqlfilePath . 'countryCodesUpdate.sql');
-                $db->executeStatement($updateSql, [
+                $this->executeSqlFile($this->extraColumnsSqlfilePath . 'countryCodesUpdate.sql', [
                     'shipping_country_code' => $shippingCountryCode,
                     'shipping_country' => $countryName
                 ]);
@@ -510,11 +416,37 @@ class PrepareOrderTableCommand extends AbstractCommand
     /**
      * @throws Exception
      */
-    protected function amazonSubtotalCalculate(): void{
-        $db = \Pimcore\Db::get();
-        $sql = file_get_contents($this->extraColumnsSqlfilePath . 'amazonSubtotal.sql');
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement();
+    protected function executeSqlFile(string $filePath, array $params = []): void
+    {
+        if (!file_exists($filePath)) {
+            throw new Exception("SQL file not found.");
+        }
+        try {
+            $db = \Pimcore\Db::get();
+            $sql = file_get_contents($filePath);
+            $stmt = $db->prepare($sql);
+            $stmt->executeStatement(!empty($params) ? $params : null);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function fetchFromSqlFile(string $filePath, array $params = []): array
+    {
+        if (!file_exists($filePath)) {
+            throw new Exception("SQL file not found.");
+        }
+        try {
+            $db = \Pimcore\Db::get();
+            $sql = file_get_contents($filePath);
+            return !empty($params) ? $db->fetchAllAssociative($sql, $params) : $db->fetchAllAssociative($sql);
+        }catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        return [];
     }
 
 }
