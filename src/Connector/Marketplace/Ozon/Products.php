@@ -35,7 +35,7 @@ class Products
     public function getCategoryTreeFromApi(): void
     {
         echo "\nGetting category tree from API: ";
-        $categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json', 7 * 86400);
+        $categoryTree = $this->connector->getFromCache('CATEGORY_TREE.json', 7 * 86400, true);
         if (empty($categoryTree)) {
             echo "asking Ozon\n";
             $categoryTree = $this->connector->getApiResponse('POST', self::API_CATEGORY_TREE_URL, ['language' => 'EN']);
@@ -129,7 +129,7 @@ class Products
                 $categoryId = $productType['description_category_id'];
                 $typeId = $productType['type_id'];
                 echo "                \r$categoryId.$typeId ".round($index / $totalCount * 100, 2)."%";
-                $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", 7 * 86400);
+                $response = $this->connector->getFromCache("CATEGORY_ATTRIBUTES_{$categoryId}_{$typeId}.json", 7 * 86400, true);
                 if (empty($response)) {
                     echo " *";
                     $response = $this->connector->getApiResponse('POST', self::API_CATEGORY_ATTRIBUTE_URL, ['description_category_id' => $categoryId, 'language' => 'EN', 'type_id' => $typeId]);
@@ -205,7 +205,7 @@ class Products
                 $attributeId = $attribute['attribute_id'];
                 $dictionaryId = $attribute['dictionary_id'];
                 echo "                            \r$categoryId.$typeId.$attributeId.$dictionaryId ".round($index / $totalCount * 100, 2)."%";
-                $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$dictionaryId}.json", 7 * 86400);
+                $response = $this->connector->getFromCache("ATTRIBUTE_VALUES_{$attributeId}_{$dictionaryId}.json", 7 * 86400, true);
                 if (empty($response)) {
                     $lastId = 0;
                     $response = [];

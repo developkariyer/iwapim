@@ -98,11 +98,12 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
 
     /**
      * @param int $expiration
+     * @param bool $lazy
      * @return bool
      */
-    public function getListingsFromCache(int $expiration = 86000): bool
+    public function getListingsFromCache(int $expiration = 86000, bool $lazy = false): bool
     {
-        $this->listings = $this->getFromCache(self::LISTINGS_FILE_NAME, $expiration);
+        $this->listings = $this->getFromCache(self::LISTINGS_FILE_NAME, $expiration, $lazy);
         return !empty($this->listings);
     }
 
@@ -129,21 +130,23 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     /**
      * @param string $key
      * @param int $expires
+     * @param bool $lazy
      * @return array
      */
-    public function getFromCache(string $key, int $expires = 86000): array
+    public function getFromCache(string $key, int $expires = 86000, bool $lazy = false): array
     {
-        return json_decode($this->getFromCacheRaw($key, $expires), true) ?? [];
+        return json_decode($this->getFromCacheRaw($key, $expires, $lazy), true) ?? [];
     }
 
     /**
      * @param string $key
      * @param int $expires
+     * @param bool $lazy
      * @return string
      */
-    public function getFromCacheRaw(string $key, int $expires = 86000): string
+    public function getFromCacheRaw(string $key, int $expires = 86000, bool $lazy = false): string
     {
-        return Utility::getCustomCache($key, $this->getTempPath(), $expires) ?? '';
+        return Utility::getCustomCache($key, $this->getTempPath(), $expires, $lazy) ?? '';
     }
 
     /**

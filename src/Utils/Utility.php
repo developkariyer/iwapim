@@ -12,6 +12,7 @@ use Pimcore\Model\Asset\Folder as AssetFolder;
 use Pimcore\Model\Asset\Listing as AssetListing;
 use App\Command\CacheImagesCommand;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 
 class Utility
 {
@@ -140,8 +141,15 @@ class Utility
         return str_replace("  ", " ", $str);
     }
 
-    public static function getSetCustomCache($filename, $cachePath, $stringToCache = null, $expiration = 86400): bool|string
+    /**
+     * @throws RandomException
+     */
+    public static function getSetCustomCache($filename, $cachePath, $stringToCache = null, $expiration = 86400, bool $lazy = false): bool|string
     {
+        if ($lazy) {
+            // Randomize expiration by %50
+            $expiration += random_int(-($expiration / 2), $expiration / 2);
+        }
         $cachePath = rtrim($cachePath, '/');
         if (!is_dir($cachePath)) {
             if (!mkdir($cachePath, 0777, true)) {
@@ -160,9 +168,9 @@ class Utility
         return false;
     }
 
-    public static function getCustomCache($filename, $cachePath, $expiration = 86400): string
+    public static function getCustomCache($filename, $cachePath, $expiration = 86400, bool $lazy = false): string
     {
-        return static::getSetCustomCache($filename, $cachePath, null, $expiration);
+        return static::getSetCustomCache($filename, $cachePath, null, $expiration, $lazy);
     }
 
     public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400): bool

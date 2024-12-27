@@ -108,12 +108,12 @@ class Connector extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-        // TODO: Implement downloadInventory() method.
+        // Implement downloadInventory() method.
     }
 
     public function downloadOrders()
     {
-        // TODO: Implement downloadOrders() method.
+        // Implement downloadOrders() method.
     }
 
     /**
@@ -130,17 +130,17 @@ class Connector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag)
     {
-        // TODO: Implement import() method.
+        // Implement import() method.
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
     {
-        // TODO: Implement setInventory() method.
+        // Implement setInventory() method.
     }
 
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
     {
-        // TODO: Implement setPrice() method.
+        // Implement setPrice() method.
     }
 
 }
