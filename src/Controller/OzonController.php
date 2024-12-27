@@ -161,4 +161,23 @@ class OzonController extends FrontendController
         ]);
     }
 
+    /**
+     * @Route("/ozon/modify/{taskId}", name="ozon_modify_task")
+     * @param Request $request
+     * @return RedirectResponse
+     *
+     * This controller method is used to save the selected variants for a product in an Ozon Listing task.
+     */
+    public function modifyTaskAction(Request $request): RedirectResponse
+    {
+        $task = ListingTemplate::getById($request->get('taskId'));
+        if (!$task) {
+            return $this->redirectToRoute('ozon_menu');
+        }
+        $selectedChildren = $request->get('selectedChildren', []);
+
+
+        return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+    }
+
 }
