@@ -279,7 +279,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         $this->parseUrl();
         echo "Complated Parse URL\n";
         echo "Calculating Closed At Diff\n";
-        //$this->executeSqlFile($this->extraColumnsSqlfilePath . 'closedAtDiff.sql');
+        $this->executeSqlFile($this->extraColumnsSqlfilePath . 'closedAtDiff.sql');
         echo "Complated Closed At Diff\n";
         echo "Calculating is Discount\n";
         $this->executeSqlFile($this->extraColumnsSqlfilePath . 'discountValue.sql');
@@ -425,7 +425,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $db = \Pimcore\Db::get();
             $sql = file_get_contents($filePath);
             $stmt = $db->prepare($sql);
-            $stmt->executeStatement(!empty($params) ? $params : null);
+            $stmt->executeStatement($params);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
