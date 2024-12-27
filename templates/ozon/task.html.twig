@@ -31,11 +31,18 @@
     <div class="container mt-4">
         <h1>{{ task.key }} - Ürünler</h1>
         <ul class="list-group">
-            {% for productId, product in parentProducts %}
+            {% for productId, productGrp in parentProducts %}
                 <li class="list-group-item">
                     <a href="/ozon/product/{{ task.id }}/{{ productId }}" class="text-decoration-none">
-                        {{ product.getKey() }}
+                        {{ productGrp.parentProduct.getKey() }}
                     </a>
+                    <ul class="list-group">
+                        {% for product in productGrp.products %}
+                            <li class="list-group">
+                                {{ product.getKey() }}
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </li>
             {% endfor %}
         </ul>

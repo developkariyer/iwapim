@@ -95,21 +95,20 @@ class OzonController extends FrontendController
             if (!$parentProduct instanceof Product) {
                 continue;
             }
-            if (!isset($parentProducts[$parentProduct->getId()])) {
-                $parentProducts[$parentProduct->getId()] = [
+            $id = $parentProduct->getId();
+            if (!isset($parentProducts[$id])) {
+                $parentProducts[$id] = [
                     'parentProduct' => $parentProduct,
                     'products' => [$product],
                 ];
             } else {
-                $parentProducts[$parentProduct->getId()]['products'][] = $product;
+                $parentProducts[$id]['products'][] = $product;
             }
         }
 
         return $this->render('ozon/task.html.twig', [
             'task' => $task,
             'parentProducts' => $parentProducts,
-            //'products' => $groupedProducts,
-            //'selectedListings' => $selectedListings,
         ]);
     }
 
