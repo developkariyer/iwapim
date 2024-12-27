@@ -18,7 +18,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         field
                         message
                     }
-                    state
                 }
                 summary
             }
