@@ -38,15 +38,16 @@
                     {% for color, child in colorGroup %}
                         {% set sanitizedColor = color|replace({' ': '_', '/': '_', '\\': '_', '-': '_'})|lower %}
                         <div class="color-group">
-                            <h5>{{ color }}</h5>
-                            <div class="form-group mb-2">
-                                <label for="childSelect{{ child.getId() }}">{{ child.getKey() }}</label>
-                                <select class="form-select" id="childSelect{{ child.getId() }}" name="selectedChildren[{{ child.getId() }}]">
-                                    <option value="0" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == 0 %}selected{% endif %}>Hiçbiri</option>
-                                    {% for item in child.getListingItems() %}
-                                        <option value="{{ item.getId() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == item.getId() %}selected{% endif %}>{{ item.getKey() }}</option>
-                                    {% endfor %}
-                                </select>
+                            <div class="form-group row mb-2">
+                                <label class="col-sm-6 col-form-label" for="childSelect{{ child.getId() }}">{{ child.getKey() }}</label>
+                                <div class="col-sm-6">
+                                    <select class="form-select" id="childSelect{{ child.getId() }}" name="selectedChildren[{{ child.getId() }}]">
+                                        <option value="0" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == 0 %}selected{% endif %}>Hiçbiri</option>
+                                        {% for item in child.getListingItems() %}
+                                            <option value="{{ item.getKey() }}" {% if selectedChildren[child.getId()] is defined and selectedChildren[child.getId()] == item.getKey() %}selected{% endif %}>{{ item.getKey() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     {% endfor %}
@@ -56,4 +57,5 @@
         </form>
     </div>
 {% endblock %}
+
 

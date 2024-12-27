@@ -151,7 +151,7 @@ class OzonController extends FrontendController
             if (!$product instanceof Product) {
                 continue;
             }
-            $selectedChildren[$product->getId()] = 1;
+            $selectedChildren[$product->getId()] = $taskProduct->getData()['listing'];
         }
         return $this->render('ozon/products.html.twig', [
             'task' => $task,
