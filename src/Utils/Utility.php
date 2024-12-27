@@ -274,4 +274,40 @@ class Utility
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
+    public static function executeSqlFile(string $filePath, array $params = []): void
+    {
+        if (!file_exists($filePath)) {
+            throw new Exception("SQL file not found.");
+        }
+        try {
+            $db = \Pimcore\Db::get();
+            $sql = file_get_contents($filePath);
+            $stmt = $db->prepare($sql);
+            $stmt->executeStatement($params);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function fetchFromSqlFile(string $filePath, array $params = []): array
+    {
+        if (!file_exists($filePath)) {
+            throw new Exception("SQL file not found.");
+        }
+        try {
+            $db = \Pimcore\Db::get();
+            $sql = file_get_contents($filePath);
+            return $db->fetchAllAssociative($sql, $params);
+        }catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        return [];
+    }
+
 }
