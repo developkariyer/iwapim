@@ -35,38 +35,43 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     /**
      * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
     public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
     {
-        $data = [];
-        $headersToApi = [
-            'json' => $data,
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json'
-            ]
-        ];
-        $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-        usleep(200000);
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
-            return null;
-        }
-        $newData = json_decode($response->getContent(), true);
-        $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
-        return $data;
+        $allData = [];
+        $cursor = null;
+        do {
+            $data['variables']['cursor'] = $cursor;
+            $headersToApi = [
+                'json' => $data,
+                'headers' => [
+                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                    'Content-Type' => 'application/json'
+                ]
+            ];
+            $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+            usleep(200000);
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
+                return null;
+            }
+            $newData = json_decode($response->getContent(), true);
+            $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
+            $allData = array_merge($allData, $currentPageData);
+            $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
+            $cursor = $pageInfo['endCursor'] ?? null;
+            $hasNextPage = $pageInfo['hasNextPage'] ?? false;
+        } while ($hasNextPage);
+        return $allData;
     }
 
     public function  graphqlDownload()
     {
-        $cursor = null;
-        do {
-            $query = [
-                'query' => "
+        $query = [
+            'query' => "
                     query GetProducts(\$numProducts: Int!, \$cursor: String) { 
                         products(first: \$numProducts, after: \$cursor) { 
                             pageInfo {
@@ -86,22 +91,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         } 
                     }
                 ",
-                'variables' => [
-                    'numProducts' => 50,
-                    'cursor' => $cursor,
-                ]
-            ];
-            $response = $this->getFromShopifyApiGraphql('POST', $query);
-            $data = $response['data']['products'];
-            $this->listings = array_merge($this->listings, $data['nodes']);
-            $cursor = $data['pageInfo']['endCursor'];
-            $hasNextPage = $data['pageInfo']['hasNextPage'];
-        } while ($hasNextPage);
-
-        if (empty($this->listings)) {
-            echo "Failed to download listings\n";
-            return;
-        }
+            'variables' => [
+                'numProducts' => 50,
+                'cursor' => null
+            ]
+        ];
+        $products = $this->getFromShopifyApiGraphql('POST', $query, 'products');
+        print_r($products);
     }
 
     /**
@@ -161,7 +157,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-       if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->graphqlDownload();
+       /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -170,7 +167,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();
+       $this->putListingsToCache();*/
     }
 
     /**
