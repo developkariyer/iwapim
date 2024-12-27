@@ -182,7 +182,7 @@ class OzonController extends FrontendController
         $taskProducts = [];
         foreach ($task->getProducts() as $taskProduct) {
             $product = $taskProduct->getObject();
-            if ($product->getId() == $parentProductId) {
+            if ($product->getParent()->getId() == $parentProductId) {
                 continue;
             }
             $taskProducts[] = $taskProduct;
