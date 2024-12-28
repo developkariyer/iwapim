@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Exception\FrontendException;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
@@ -239,6 +239,39 @@ class OzonController extends FrontendController
             return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
         }
         return $this->redirectToRoute('ozon_task_product', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
+    }
+
+    /**
+     * @Route("/ozon/tree", name="ozon_tree")
+     * @return JsonResponse
+     *
+     * This controller iterates on database and outputs item list
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function treeAction(): JsonResponse
+    {
+        $db = Db::get();
+        $items = [];
+        $results = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype WHERE name = "product"');
+        foreach ($results as $result) {
+            $item = [
+                'type_id' => $result['type_id'],
+                'type_name' => $result['type_name'],
+                'description_category_id' => $result['description_category_id'],
+                'category_name' => '',
+            ];
+            $parentId = $result['description_category_id'];
+            while ($parentId) {
+                $row = $db->fetchAssociative('SELECT * FROM iwa_ozon_category WHERE description_category_id = ?', [$parentId]);
+                if (!$row) {
+                    break;
+                }
+                $parentId = $row['parent_id'];
+                $item['category_name'] = "{$row['category_name']}.{$item['category_name']}";
+            }
+            $items[] = $item;
+        }
+        return new JsonResponse($items);
     }
 
 }
