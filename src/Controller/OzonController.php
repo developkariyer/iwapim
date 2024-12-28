@@ -270,7 +270,7 @@ class OzonController extends FrontendController
                 $item['category_name'] = trim("{$row['category_name']} | {$item['category_name']}");
             }
             $items[] = $item;
-            $db->executeQuery("UPDATE iwa_ozon_producttype SET category_full_name = ? WHERE type_id = ? AND descrioption_category_id = ?", [$item['category_name'], $item['type_id'], $item['description_category_id']]);
+            $db->executeQuery("UPDATE iwa_ozon_producttype SET category_full_name = ? WHERE type_id = ? AND description_category_id = ?", [$item['category_name'], $item['type_id'], $item['description_category_id']]);
         }
         return new JsonResponse($items);
     }
