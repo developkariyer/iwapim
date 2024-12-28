@@ -252,7 +252,7 @@ class OzonController extends FrontendController
     {
         $db = Db::get();
         $items = [];
-        $results = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype WHERE name = "product"');
+        $results = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype');
         foreach ($results as $result) {
             $item = [
                 'type_id' => $result['type_id'],
