@@ -256,7 +256,7 @@ class OzonController extends FrontendController
         foreach ($results as $result) {
             $item = [
                 'type_id' => $result['type_id'],
-                'type_name' => $result['type_name'],
+                'type_name' => trim($result['type_name']),
                 'description_category_id' => $result['description_category_id'],
                 'category_name' => '',
             ];
@@ -267,7 +267,7 @@ class OzonController extends FrontendController
                     break;
                 }
                 $parentId = $row['parent_id'];
-                $item['category_name'] = "{$row['category_name']}.{$item['category_name']}";
+                $item['category_name'] = trim("'{$row['category_name']}' > '{$item['category_name']}'");
             }
             $items[] = $item;
         }
