@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\OzonTaskFormType;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Exception;
@@ -27,12 +28,26 @@ class OzonController extends FrontendController
      *
      * This controller method loads all marketplaces and tasks for Ozon and renders the page.
      * Also displays the form to create a new Ozon Listing task.
+     * @throws DuplicateFullPathException
+     * @throws Exception
      */
-    public function ozonAction(): Response
+    public function ozonAction(Request $request): Response
     {
         $mrkListing = new Marketplace\Listing();
         $mrkListing->setCondition("marketplaceType = ?", ['Ozon']);
         $marketplaces = $mrkListing->load();
+        $newTaskForm = $this->createForm(OzonTaskFormType::class, null, ['marketplaces' => $marketplaces]);
+        $newTaskForm->handleRequest($request);
+        if ($newTaskForm->isSubmitted() && $newTaskForm->isValid()) {
+            $data = $newTaskForm->getData();
+            $task = new ListingTemplate();
+            $task->setKey($data['taskName']);
+            $task->setParent(Utility::checkSetPath('Listing'));
+            $task->setMarketplace($data['marketplace']);
+            $task->save();
+            $this->addFlash('success', 'Yeni görev başarıyla oluşturuldu.');
+            return $this->redirectToRoute('ozon_menu');
+        }
         $taskListing = new ListingTemplate\Listing();
         $taskListing->setUnpublished(true);
         $tasksObjects = $taskListing->load();
@@ -41,12 +56,10 @@ class OzonController extends FrontendController
             if ($task->getMarketplace()->getMarketplaceType() !== 'Ozon') {
                 continue;
             }
-            $tasks[] = [
-                'id' => $task->getId(),
-                'title' => $task->getKey(),
-            ];
+            $tasks[] = $task;
         }
         return $this->render('ozon/ozon.html.twig', [
+            'newTaskForm' => $newTaskForm->createView(),
             'tasks' => $tasks,
             'marketplaces' => $marketplaces,
         ]);
