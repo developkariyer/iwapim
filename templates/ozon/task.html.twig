@@ -1,56 +1,28 @@
-{# task.html.twig #}
-
-{% extends 'ozon/base.html.twig' %}
-
-{% block title %}Ozon Listeleme Görevi{% endblock %}
-
-{% block stylesheets %}
-    <!-- link rel="stylesheet" href="/path/to/custom.css" -->
-{% endblock %}
-
-{% block head_scripts %}
-    <!-- script src="/path/to/head-custom.js"></script -->
-{% endblock %}
-
-{% block body_scripts %}
-    <!-- script src="/path/to/body-custom.js"></script -->
-{% endblock %}
-
-{% block header %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/ozon">Ozon Listing</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </nav>
-{% endblock %}
-
-{% block content %}
-    <div class="container mt-4">
-        <h1>{{ task.key }} - Ürünler</h1>
-        <ul class="list-group">
-            {% for productId, productGrp in parentProducts %}
-                <li class="list-group-item">
-                    <a href="/ozon/product/{{ task.id }}/{{ productId }}" class="text-decoration-none">
-                        {{ productGrp.parentProduct.getKey() }}
-                    </a>
-                    <ul class="list-group">
-                        {% for product in productGrp.products %}
-                            <li class="list-group">
-                                - {{ product.getKey() }}
-                            </li>
+<div class="accordion" id="parentProductsAccordion{{ taskId }}">
+    {% for parentProductId, parentData in parentProducts %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingParent{{ parentProductId }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseParent{{ parentProductId }}" aria-expanded="false" aria-controls="collapseParent{{ parentProductId }}">
+                    {{ parentData.parentProduct.getKey() }}
+                </button>
+            </h2>
+            <div id="collapseParent{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}">
+                <div class="accordion-body">
+                    <ul>
+                        {% for product in parentData.products %}
+                            <li>{{ product.getKey() }}</li>
+                        {% else %}
+                            <li>No products found.</li>
                         {% endfor %}
                     </ul>
-                </li>
-            {% endfor %}
-        </ul>
-        <form method="post" action="/ozon/addproduct/{{ task.id }}">
-            <div class="input-group mb-3 mt-3">
-                <input type="text" class="form-control" name="iwasku" placeholder="Eklenecek IWASKU" aria-label="Eklenecek IWASKU">
-                <button class="btn btn-primary" type="submit">Ekle</button>
+                </div>
             </div>
-        </form>
-    </div>
-{% endblock %}
+        </div>
+    {% else %}
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <p class="text-muted">No parent products available.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -31,7 +31,7 @@ class OzonController extends FrontendController
      * @throws DuplicateFullPathException
      * @throws Exception
      */
-    public function ozonAction(Request $request): Response
+    public function ozonMainPage(Request $request): Response
     {
         $mrkListing = new Marketplace\Listing();
         $mrkListing->setCondition("marketplaceType = ?", ['Ozon']);
@@ -65,30 +65,6 @@ class OzonController extends FrontendController
         ]);
     }
 
-
-    /**
-     * @Route("/ozon/newtask", name="ozon_newtask_action")
-     * @param Request $request
-     * @return RedirectResponse|JsonResponse
-     *
-     * This controller method creates a new task for Ozon Listing and redirects to the task detail page.
-     * @throws DuplicateFullPathException
-     * @throws Exception
-     */
-    public function newTaskAction(Request $request): RedirectResponse|JsonResponse
-    {
-        $task = new ListingTemplate();
-        $task->setKey($request->get('taskName', 'İsimsiz'));
-        $task->setParent(Utility::checkSetPath('Listing'));
-        $marketplaceId = $request->get('marketplace', 0);
-        if (!$marketplaceId) {
-            return new JsonResponse(['error' => 'Marketplace not found'], 400);
-        }
-        $task->setMarketplace(Marketplace::getById($marketplaceId) ?? null);
-        $task->save();
-        return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
-    }
-
     /**
      * @Route("/ozon/task/{id}", name="ozon_task")
      * @param Request $request
@@ -96,9 +72,10 @@ class OzonController extends FrontendController
      *
      * This controller method displays the detail page for an Ozon Listing task.
      */
-    public function taskAction(Request $request): Response
+    public function getTaskProducts(Request $request): Response
     {
-        $task = ListingTemplate::getById($request->get('id'));
+        $taskId = $request->get('id');
+        $task = ListingTemplate::getById($taskId);
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
@@ -122,7 +99,7 @@ class OzonController extends FrontendController
         }
 
         return $this->render('ozon/task.html.twig', [
-            'task' => $task,
+            'taskId' => $taskId,
             'parentProducts' => $parentProducts,
         ]);
     }
