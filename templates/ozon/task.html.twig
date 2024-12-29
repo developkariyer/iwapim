@@ -3,19 +3,11 @@
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingParent{{ parentProductId }}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseParent{{ parentProductId }}" aria-expanded="false" aria-controls="collapseParent{{ parentProductId }}">
-                    {{ parentData.parentProduct.getKey() }}
+                    {{ parentData.parentProduct.getKey() }} ({{ parentData.children|length }} varyasyon)
                 </button>
             </h2>
             <div id="collapseParent{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}">
-                <div class="accordion-body">
-                    <ul>
-                        {% for product in parentData.products %}
-                            <li>{{ product.getKey() }}</li>
-                        {% else %}
-                            <li>No products found.</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                <div class="accordion-body" id="childProducts{{ parentProductId }}"></div>
             </div>
         </div>
     {% else %}
