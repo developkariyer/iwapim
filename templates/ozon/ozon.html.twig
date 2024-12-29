@@ -60,7 +60,7 @@
                 // Check if parent products are already loaded
                 if (!parentAccordion.data('loaded')) {
                     // Load parent products via AJAX
-                    $.get(`/ozon/${taskId}`, function (data) {
+                    $.get(`/ozon/task/${taskId}`, function (data) {
                         parentAccordion.html(data);
                         parentAccordion.data('loaded', true); // Mark as loaded
                     });
