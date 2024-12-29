@@ -3,7 +3,7 @@
 {% block title %}Ozon Listing{% endblock %}
 {% block content %}
     <div class="accordion" id="ozonAccordion">
-        <!-- Level 0: ListingTemplate Objects + NewTask Form -->
+        <!-- Level 0: ListingTemplate Objects -->
         {% for task in tasks %}
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingTask{{ task.id }}">
@@ -29,14 +29,27 @@
                 </div>
             </div>
         {% endfor %}
-    </div>
 
-    {{ form_start(newTaskForm, {'attr': {'class': 'mt-3'}}) }}
-    {{ form_row(newTaskForm.marketplace) }}
-    {{ form_row(newTaskForm.taskName) }}
-    {{ form_row(newTaskForm.save) }}
-    {{ form_end(newTaskForm) }}
+        <!-- New Task Form as an Accordion Item -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingNewTask">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNewTask" aria-expanded="false" aria-controls="collapseNewTask">
+                    Add New Task
+                </button>
+            </h2>
+            <div id="collapseNewTask" class="accordion-collapse collapse" aria-labelledby="headingNewTask" data-bs-parent="#ozonAccordion">
+                <div class="accordion-body">
+                    {{ form_start(newTaskForm, {'attr': {'class': 'mt-3'}}) }}
+                    {{ form_row(newTaskForm.marketplace) }}
+                    {{ form_row(newTaskForm.taskName) }}
+                    {{ form_row(newTaskForm.save) }}
+                    {{ form_end(newTaskForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
+
 {% block body_scripts %}
     <script>
         $(document).ready(function () {
