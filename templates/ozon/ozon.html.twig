@@ -11,7 +11,7 @@
                         Ozon Listing: {{ task.key }}
                     </button>
                 </h2>
-                <div id="collapseTask{{ task.id }}" class="accordion-collapse collapse" aria-labelledby="headingTask{{ task.id }}" data-bs-parent="#ozonAccordion">
+                <div id="collapseTask{{ task.id }}" class="accordion-collapse collapse" aria-labelledby="headingTask{{ task.id }}" data-bs-parent="#ozonAccordion" data-type="parent">
                     <div class="accordion-body">
                         <div class="loading-spinner text-center" id="loadingTask{{ task.id }}" style="display: none;">
                             <div class="spinner-border text-primary" role="status">
@@ -54,7 +54,7 @@
 {% block body_scripts %}
     <script>
         $(document).ready(function () {
-            $(document).on('show.bs.collapse', '.accordion-collapse', function () {
+            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
                 const taskId = $(this).attr('id').replace('collapseTask', '');
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
                 const loadingSpinner = $(`#loadingTask${taskId}`);
