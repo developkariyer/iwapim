@@ -97,7 +97,9 @@ class OzonController extends FrontendController
                 $parentProducts[$id]['products'][] = $product;
             }
         }
-
+        uasort($parentProducts, function ($a, $b) {
+            return strcmp($a['parentProduct']->getKey(), $b['parentProduct']->getKey());
+        });
         return $this->render('ozon/task.html.twig', [
             'taskId' => $taskId,
             'parentProducts' => $parentProducts,
