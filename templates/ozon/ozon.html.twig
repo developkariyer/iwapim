@@ -13,11 +13,13 @@
                 </h2>
                 <div id="collapseTask{{ task.id }}" class="accordion-collapse collapse" aria-labelledby="headingTask{{ task.id }}" data-bs-parent="#ozonAccordion">
                     <div class="accordion-body">
-                        <div id="parentProductAccordion{{ task.id }}">
-                            <!-- Parent Products will be loaded dynamically -->
+                        <div class="loading-spinner text-center" id="loadingTask{{ task.id }}" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
                         </div>
+                        <div id="parentProductAccordion{{ task.id }}"></div>
 
-                        <!-- Add Parent Product Form -->
                         <form method="POST" action="/ozon/addproduct/{{ task.id }}" class="mt-3">
                             <div class="input-group mb-3 mt-3">
                                 <input type="text" class="form-control" name="iwasku" placeholder="Eklenecek IWASKU" aria-label="Eklenecek IWASKU">
@@ -52,17 +54,18 @@
 {% block body_scripts %}
     <script>
         $(document).ready(function () {
-            // Load Parent Products dynamically when accordion is expanded
             $(document).on('show.bs.collapse', '.accordion-collapse', function () {
                 const taskId = $(this).attr('id').replace('collapseTask', '');
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
-
-                // Check if parent products are already loaded
+                const loadingSpinner = $(`#loadingTask${taskId}`);
                 if (!parentAccordion.data('loaded')) {
-                    // Load parent products via AJAX
+                    loadingSpinner.show();
+                    parentAccordion .hide();
                     $.get(`/ozon/task/${taskId}`, function (data) {
                         parentAccordion.html(data);
-                        parentAccordion.data('loaded', true); // Mark as loaded
+                        parentAccordion.data('loaded', true);
+                        loadingSpinner.hide();
+                        parentAccordion.show();
                     });
                 }
             });
