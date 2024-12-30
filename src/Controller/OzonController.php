@@ -161,7 +161,17 @@ class OzonController extends FrontendController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             //var_dump($data); exit;
-            $taskProducts = [];
+            $taskProducts = $task->getProducts();
+            $newTaskProducts = [];
+            foreach ($taskProducts as $taskProduct) {
+                $product = $taskProduct->getObject();
+                if (!$product) {
+                    continue;
+                }
+                if ($product->getParent()->getId() != $parentProduct->getId()) {
+                    $newTaskProducts[] = $taskProduct;
+                }
+            }
             foreach ($data['selectedChildren'] as $productId => $listing) {
                 $product = Product::getById($productId);
                 if (!$product) {
@@ -179,10 +189,10 @@ class OzonController extends FrontendController
                 } else {
                     $objectMetadata->setData(['listing'=>0]);
                 }
-                $taskProducts[] = $objectMetadata;
+                $newTaskProducts[] = $objectMetadata;
             }
-            $taskProducts = array_unique($taskProducts);
-            $task->setProducts($taskProducts);
+            $newTaskProducts = array_unique($newTaskProducts);
+            $task->setProducts($newTaskProducts);
             $task->save();
             return $this->redirectToRoute('ozon_menu', ['id' => $task->getId()]);
         }
