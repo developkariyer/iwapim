@@ -1,4 +1,4 @@
-<div class="accordion" id="parentProductsAccordion{{ taskId }}">
+<div class="accordion" id="parentProductsAccordion{{ taskId }}" data-task-id="{{ taskId }}">
     {% for parentProductId, parentData in parentProducts %}
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingParent{{ parentProductId }}">
@@ -8,7 +8,6 @@
             </h2>
             <div id="collapseParent{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child">
                 <div class="accordion-body">
-                    <!-- Spinner for loading -->
                     <div class="loading-spinner text-center" id="loadingChild{{ parentProductId }}" style="display: none;">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>

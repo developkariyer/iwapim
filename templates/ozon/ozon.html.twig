@@ -69,15 +69,15 @@
                     });
                 }
             });
-
             $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
                 const parentProductId = $(this).attr('id').replace('collapseParent', '');
+                const taskId = $(this).closest('.accordion').data('task-id');
                 const childAccordion = $(`#childProducts${parentProductId}`);
                 const loadingSpinner = $(`#loadingChild${parentProductId}`);
                 if (!childAccordion.data('loaded')) {
                     loadingSpinner.show();
                     childAccordion.hide();
-                    $.get(`/ozon/child/${parentProductId}`, function (data) {
+                    $.get(`/ozon/product/${taskId}/${parentProductId}`, function (data) {
                         childAccordion.html(data);
                         childAccordion.data('loaded', true);
                         loadingSpinner.hide();
@@ -86,6 +86,5 @@
                 }
             });
         });
-
     </script>
 {% endblock %}
