@@ -207,8 +207,6 @@ class PrepareOrderTableCommand extends AbstractCommand
         $jsonPath = '$.' . $field;
         echo  "Json Path: $jsonPath\n";
         $result = Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql', ['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
-        echo "Sql Result: ";
-        print_r($result);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);
