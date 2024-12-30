@@ -168,7 +168,7 @@ class OzonController extends FrontendController
                 if (!$product) {
                     continue;
                 }
-                if ($product->getId() != $parentProduct->getId() && $product->getParent()->getId() != $parentProduct->getId()) {
+                if ($product->getParent()->getId() != $parentProduct->getId()) {
                     $newTaskProducts[] = $taskProduct;
                 }
             }
@@ -200,6 +200,7 @@ class OzonController extends FrontendController
             'form' => $form->createView(),
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
+            'task_products' => $taskProducts,
         ]);
     }
 
