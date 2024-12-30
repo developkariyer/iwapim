@@ -209,11 +209,12 @@ class OzonController extends FrontendController
     }
 
     /**
-     * @Route("/ozon/addproduct/{taskId}", name="ozon_add_product")
+     * @Route("/ozonaddproduct/{taskId}", name="ozon_add_product")
      * @param Request $request
      * @return RedirectResponse
      *
      * This controller method is used to add a product to an Ozon Listing task.
+     * @throws Exception
      */
     public function addProductAction(Request $request): RedirectResponse
     {
@@ -225,12 +226,20 @@ class OzonController extends FrontendController
         $iwasku = $request->get('iwasku');
         $product = Product::getByIwasku($iwasku, 1);
         if (!$product) {
+            $this->addFlash('danger', 'Product not found');
             return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
         }
         $parentProduct = $product->getParent();
         if (!$parentProduct instanceof Product) {
+            $this->addFlash('danger', 'Parent product not found');
             return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
         }
+        $taskProducts = $task->getProducts();
+        $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
+        $objectMetadata->setData(['listing'=>0]);
+        $taskProducts[] = $objectMetadata;
+        $task->setProducts($taskProducts);
+        $task->save();
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
     }
 
