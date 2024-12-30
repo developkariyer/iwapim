@@ -108,30 +108,10 @@
             console.log('Initializing Select2 on page load');
             initializeSelect2();
 
-            const observer = new MutationObserver(mutations => {
-                let shouldReinitialize = false;
-                mutations.forEach(mutation => {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1 && node.matches('.select2')) {
-                            shouldReinitialize = true;
-                        }
-                    });
-                });
-                if (shouldReinitialize) {
-                    console.log('Targeted DOM mutation detected, reinitializing Select2');
-                    initializeSelect2();
-                }
-            });
-
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-            });
-
             function initializeSelect2() {
                 $('.select2:not(.select2-initialized)').each(function () {
                     $(this)
-                        .addClass('select2-initialized') // Mark as initialized
+                        .addClass('select2-initialized')
                         .select2({
                             ajax: {
                                 url: function () {
@@ -145,7 +125,6 @@
                                     };
                                 },
                                 processResults: function (data) {
-                                    console.log('Ajax data:', data);
                                     return {
                                         results: data.map(item => ({
                                             id: item.id,
