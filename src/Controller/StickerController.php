@@ -36,7 +36,7 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"GET", "POST"})
+     * @Route("/sticker/add_sticker_group", name="sticker_new_group", methods={"GET", "POST"})
      * @return Response
      */
     public function addStickerGroup(Request $request): Response
