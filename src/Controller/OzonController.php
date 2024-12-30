@@ -69,7 +69,7 @@ class OzonController extends FrontendController
     }
 
     /**
-     * @Route("/ozon/task/{id}", name="ozon_task")
+     * @Route("/ozontask/{id}", name="ozon_task")
      * @param Request $request
      * @return Response
      *
@@ -110,7 +110,7 @@ class OzonController extends FrontendController
     }
 
     /**
-     * @Route("/ozon/product/{taskId}/{productId}", name="ozon_task_product")
+     * @Route("/ozonproduct/{taskId}/{productId}", name="ozon_task_product")
      * @param Request $request
      * @return RedirectResponse|Response
      *

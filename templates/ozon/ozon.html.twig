@@ -61,7 +61,7 @@
                 if (!parentAccordion.data('loaded')) {
                     loadingSpinner.show();
                     parentAccordion .hide();
-                    $.get(`/ozon/task/${taskId}`, function (data) {
+                    $.get(`/ozontask/${taskId}`, function (data) {
                         parentAccordion.html(data);
                         parentAccordion.data('loaded', true);
                         loadingSpinner.hide();
@@ -77,7 +77,7 @@
                 if (!childAccordion.data('loaded')) {
                     loadingSpinner.show();
                     childAccordion.hide();
-                    $.get(`/ozon/product/${taskId}/${parentProductId}`, function (data) {
+                    $.get(`/ozonproduct/${taskId}/${parentProductId}`, function (data) {
                         childAccordion.html(data);
                         childAccordion.data('loaded', true);
                         loadingSpinner.hide();
