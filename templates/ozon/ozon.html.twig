@@ -108,6 +108,11 @@
             console.log('Initializing Select2 on page load');
             initializeSelect2();
 
+            $(document).on('ajaxComplete', function () {
+                console.log('Initializing Select2 after AJAX request');
+                initializeSelect2();
+            });
+
             function initializeSelect2() {
                 $('.select2:not(.select2-initialized)').each(function () {
                     $(this)
@@ -140,8 +145,6 @@
                         });
                 });
             }
-
-
 
         });
     </script>
