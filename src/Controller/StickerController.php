@@ -30,6 +30,6 @@ class StickerController extends FrontendController
     public function stickerMainPage(Request $request): Response
     {
 
-        return $this->render('sticker/base.html.twig');
+        return $this->render('sticker/sticker.html.twig');
     }
 }
