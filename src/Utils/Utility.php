@@ -146,6 +146,9 @@ class Utility
      */
     public static function getSetCustomCache($filename, $cachePath, $stringToCache = null, $expiration = 86400, bool $lazy = false): bool|string
     {
+        if (empty($cachePath)) {
+            $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
+        }
         if ($lazy) {
             // Randomize expiration by %50
             $expiration += random_int(-($expiration / 2), $expiration / 2);
@@ -168,11 +171,17 @@ class Utility
         return false;
     }
 
+    /**
+     * @throws RandomException
+     */
     public static function getCustomCache($filename, $cachePath, $expiration = 86400, bool $lazy = false): string
     {
         return static::getSetCustomCache($filename, $cachePath, null, $expiration, $lazy);
     }
 
+    /**
+     * @throws RandomException
+     */
     public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400): bool
     {
         return static::getSetCustomCache($filename, $cachePath, $stringToCache, $expiration);
@@ -241,7 +250,10 @@ class Utility
         return new ExternalImage($url);
     }
 
-    public static function convertCurrency($amount, $fromCurrency, $toCurrency,$date): string
+    /**
+     * @throws Exception
+     */
+    public static function convertCurrency($amount, $fromCurrency, $toCurrency, $date): string
     {
         if ($fromCurrency === $toCurrency) {
             return (string)$amount;

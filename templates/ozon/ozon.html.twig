@@ -104,6 +104,35 @@
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
                 loadChildAccordionContent(taskId, parentProductId);
             });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                $('.select2').select2({
+                    ajax: {
+                        url: function () {
+                            return $(this).data('ajax-url');
+                        },
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.items.map(item => ({ id: item.id, text: item.text })),
+                            };
+                        },
+                    },
+                    placeholder: function () {
+                        return $(this).data('placeholder');
+                    },
+                    minimumInputLength: function () {
+                        return $(this).data('minimum-input-length') || 1;
+                    },
+                });
+            });
+
         });
     </script>
 {% endblock %}

@@ -55,6 +55,18 @@ class OzonTaskProductFormType extends AbstractType
             }
         }
 
+        $builder->add('productType', ChoiceType::class, [
+            'choices' => [],
+            'label' => 'Ürün Tipi',
+            'attr' => [
+                'class' => 'select2 form-select',
+                'data-ajax-url' => '/ozontree',
+                'data-placeholder' => 'Ürün Tipi Seçiniz...',
+                'data-minimum-input-length' => 3,
+            ],
+            'required' => true,
+        ]);
+
         $builder->add($selectedChildrenGroup);
 
         $builder->add('submit', SubmitType::class, [

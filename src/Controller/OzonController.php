@@ -12,6 +12,7 @@ use Pimcore\Db;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -263,34 +264,24 @@ class OzonController extends FrontendController
      *
      * This controller iterates on database and outputs item list
      * @throws \Doctrine\DBAL\Exception
+     * @throws RandomException
      */
     public function treeAction(): JsonResponse
     {
-        $db = Db::get();
-        $items = [];
-        $results = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype');
-        foreach ($results as $result) {
-            $item = [
-                'type_id' => $result['type_id'],
-                //'type_name' => trim($result['type_name']),
-                'description_category_id' => $result['description_category_id'],
-                'category_name' => trim($result['type_name']),
-            ];
-            $parentId = $result['description_category_id'];
-            while ($parentId) {
-                $row = $db->fetchAssociative('SELECT * FROM iwa_ozon_category WHERE description_category_id = ?', [$parentId]);
-                if (!$row) {
-                    break;
-                }
-                $parentId = $row['parent_id'];
-                $item['category_name'] = trim("{$row['category_name']} | {$item['category_name']}");
-            }
-            $items[] = $item;
-            if (empty($result['category_full_name'])) {
-                $db->executeQuery("UPDATE iwa_ozon_producttype SET category_full_name = ? WHERE type_id = ? AND description_category_id = ?", [$item['category_name'], $item['type_id'], $item['description_category_id']]);
-            }
+        $items = json_decode(Utility::getCustomCache('OzonProductTypesSelect.json', ''), true);
+        if (empty($items)) {
+            $db = Db::get();
+            $results = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype');
+            $items = array_map(function ($result) {
+                return [
+                    'id' => $result['description_category_id'] . '.' . $result['type_id'],
+                    'text' => trim($result['type_name']),
+                ];
+            }, $results);
+            Utility::setCustomCache('OzonProductTypesSelect.json', '', json_encode($items));
         }
         return new JsonResponse($items);
     }
+
 
 }
