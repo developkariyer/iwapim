@@ -70,17 +70,22 @@
                 }
             });
 
-            // Load Child Products dynamically
-            $(document).on('click', '.load-child-products', function () {
-                const taskId = $(this).data('task-id');
-                const parentProductId = $(this).data('parent-product-id');
-                const childAccordion = $(`#childProductAccordion${parentProductId}`);
-
-                // Load child products via AJAX
-                $.get(`/ozon/${taskId}/${parentProductId}`, function (data) {
-                    childAccordion.html(data);
-                });
+            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
+                const parentProductId = $(this).attr('id').replace('collapseParent', '');
+                const childAccordion = $(`#childProducts${parentProductId}`);
+                const loadingSpinner = $(`#loadingChild${parentProductId}`);
+                if (!childAccordion.data('loaded')) {
+                    loadingSpinner.show();
+                    childAccordion.hide();
+                    $.get(`/ozon/child/${parentProductId}`, function (data) {
+                        childAccordion.html(data);
+                        childAccordion.data('loaded', true);
+                        loadingSpinner.hide();
+                        childAccordion.show();
+                    });
+                }
             });
         });
+
     </script>
 {% endblock %}

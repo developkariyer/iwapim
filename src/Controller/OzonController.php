@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\OzonTaskFormType;
+use App\Form\OzonTaskProductFormType;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Exception;
@@ -113,7 +114,7 @@ class OzonController extends FrontendController
      *
      * This controller method is used to set variants for a product in an Ozon Listing task.
      */
-    public function taskProductAction(Request $request): RedirectResponse|Response
+    public function getProductDetails(Request $request): RedirectResponse|Response
     {
         $task = ListingTemplate::getById($request->get('taskId'));
         if (!$task) {
@@ -147,11 +148,25 @@ class OzonController extends FrontendController
             }
             $selectedChildren[$product->getId()] = $taskProduct->getData()['listing'];
         }
-        return $this->render('ozon/products.html.twig', [
-            'task' => $task,
-            'parentProduct' => $parentProduct,
+        $form = $this->createForm(OzonTaskProductFormType::class, null, [
+            'task_id' => $task->getId(),
+            'parent_product_id' => $parentProduct->getId(),
             'children' => $children,
-            'selectedChildren' => $selectedChildren,
+            'selected_children' => $selectedChildren,
+        ]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            // Handle the form submission (e.g., update database)
+            // ...
+
+            return $this->redirectToRoute('ozon_task_product', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
+        }
+        return $this->render('ozon/products.html.twig', [
+            'form' => $form->createView(),
+            'task_id' => $task->getId(),
+            'product_id' => $parentProduct->getId(),
         ]);
     }
 
