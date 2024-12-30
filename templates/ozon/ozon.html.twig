@@ -22,7 +22,7 @@
 
                         <form method="POST" action="/ozonaddproduct/{{ task.id }}" class="mt-3">
                             <div class="input-group mb-3 mt-3">
-                                <input type="text" class="form-control" name="iwasku" placeholder="Eklenecek IWASKU" aria-label="Eklenecek IWASKU">
+                                <input type="text" class="form-control" name="iwasku" placeholder="Eklenecek IWASKU (virgül, boşluk veya tab ile birden çok girilebilir)" aria-label="Eklenecek IWASKU">
                                 <button class="btn btn-primary" type="submit">Ekle</button>
                             </div>
                         </form>
@@ -54,6 +54,14 @@
 {% block body_scripts %}
     <script>
         $(document).ready(function () {
+            const taskId = '{{ taskId|default(null) }}'; // Get the taskId from the server-side variable
+            if (taskId) {
+                const taskAccordion = $(`#collapseTask${taskId}`);
+                if (taskAccordion.length) {
+                    taskAccordion.collapse('show');
+                }
+            }
+
             $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
                 const taskId = $(this).data('task-id');
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
