@@ -18,7 +18,6 @@ class OzonTaskProductFormType extends AbstractType
         $children = $options['children'];
         $selectedChildren = $options['selected_children'];
 
-        // Hidden fields
         $builder
             ->add('taskId', HiddenType::class, [
                 'data' => $taskId,
@@ -27,10 +26,13 @@ class OzonTaskProductFormType extends AbstractType
                 'data' => $parentProductId,
             ]);
 
-        // Dynamically add size and color groups
+        $selectedChildrenGroup = $builder->create('selectedChildren', null, [
+            'compound' => true,
+        ]);
+
         foreach ($children as $colorGroup) {
             foreach ($colorGroup as $child) {
-                $builder->add("selectedChildren[{$child->getId()}]", ChoiceType::class, [
+                $selectedChildrenGroup->add((string)$child->getId(), ChoiceType::class, [
                     'choices' => array_merge(
                         [
                             'Listeleme' => -1,
@@ -51,6 +53,8 @@ class OzonTaskProductFormType extends AbstractType
                 ]);
             }
         }
+
+        $builder->add($selectedChildrenGroup);
 
         $builder->add('submit', SubmitType::class, [
             'label' => 'Güncelle',
