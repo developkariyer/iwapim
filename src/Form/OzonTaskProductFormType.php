@@ -59,7 +59,7 @@ class OzonTaskProductFormType extends AbstractType
             'choices' => [],
             'label' => 'Ürün Tipi',
             'attr' => [
-                'class' => 'select2 form-select',
+                'class' => 'select2 form-select needs-initialization',
                 'data-ajax-url' => '/ozontree',
                 'data-placeholder' => 'Ürün Tipi Seçiniz...',
                 'data-minimum-input-length' => 3,

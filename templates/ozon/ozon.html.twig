@@ -114,9 +114,9 @@
             });
 
             function initializeSelect2() {
-                $('.select2:not(.select2-initialized)').each(function () {
+                $('.needs-initialization').each(function () {
                     $(this)
-                        .addClass('select2-initialized')
+                        .removeClass('needs-initialization')
                         .select2({
                             ajax: {
                                 url: function () {
