@@ -12,6 +12,7 @@ use Pimcore\Db;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -142,10 +143,10 @@ class OzonController extends FrontendController
 
             foreach ($child->getListingItems() as $item) {
                 if (strlen($item->getKey()) > 190) {
-                    throw new \RuntimeException("Label '{$item->getKey()}' exceeds 190 characters.");
+                    throw new RuntimeException("Label '{$item->getKey()}' exceeds 190 characters.");
                 }
                 if (strlen($item->getId()) > 190) {
-                    throw new \RuntimeException("ID '{$item->getId()}' exceeds 190 characters.");
+                    throw new RuntimeException("ID '{$item->getId()}' exceeds 190 characters.");
                 }
             }
         }
