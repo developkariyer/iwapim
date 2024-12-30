@@ -11,14 +11,14 @@
                         Ozon Listing: {{ task.key }}
                     </button>
                 </h2>
-                <div id="collapseTask{{ task.id }}" class="accordion-collapse collapse" aria-labelledby="headingTask{{ task.id }}" data-bs-parent="#ozonAccordion" data-type="parent">
+                <div id="collapseTask{{ task.id }}" class="accordion-collapse collapse" aria-labelledby="headingTask{{ task.id }}" data-bs-parent="#ozonAccordion" data-type="parent" data-task-id="{{ task.id }}">
                     <div class="accordion-body">
                         <div class="loading-spinner text-center" id="loadingTask{{ task.id }}" style="display: none;">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                        <div id="parentProductAccordion{{ task.id }}"></div>
+                        <div id="parentProductAccordion{{ task.id }}" data-task-id="{{ task.id }}"></div>
 
                         <form method="POST" action="/ozon/addproduct/{{ task.id }}" class="mt-3">
                             <div class="input-group mb-3 mt-3">
@@ -55,12 +55,12 @@
     <script>
         $(document).ready(function () {
             $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
-                const taskId = $(this).attr('id').replace('collapseTask', '');
+                const taskId = $(this).data('task-id');
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
                 const loadingSpinner = $(`#loadingTask${taskId}`);
                 if (!parentAccordion.data('loaded')) {
                     loadingSpinner.show();
-                    parentAccordion .hide();
+                    parentAccordion.hide();
                     $.get(`/ozontask/${taskId}`, function (data) {
                         parentAccordion.html(data);
                         parentAccordion.data('loaded', true);
@@ -69,11 +69,12 @@
                     });
                 }
             });
+
             $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
-                const parentProductId = $(this).attr('id').replace('collapseParent', '');
-                const taskId = $(this).closest('.accordion').data('task-id');
-                const childAccordion = $(`#childProducts${parentProductId}`);
-                const loadingSpinner = $(`#loadingChild${parentProductId}`);
+                const parentProductId = $(this).data('parent-product-id');
+                const taskId = $(this).closest('[data-task-id]').data('task-id');
+                const childAccordion = $(`#childProducts${taskId}_${parentProductId}`);
+                const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
                 if (!childAccordion.data('loaded')) {
                     loadingSpinner.show();
                     childAccordion.hide();
