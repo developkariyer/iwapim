@@ -47,7 +47,7 @@ class OzonController extends FrontendController
             $task->setMarketplace($data['marketplace']);
             $task->save();
             $this->addFlash('success', 'Yeni görev başarıyla oluşturuldu.');
-            return $this->redirectToRoute('ozon_menu');
+            return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         $taskListing = new ListingTemplate\Listing();
         $taskListing->setUnpublished(true);
