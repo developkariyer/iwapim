@@ -39,7 +39,7 @@ class OzonTaskProductFormType extends AbstractType
                             'PIM Bilgilerini Kullan' => 0,
                         ],
                         array_combine(
-                            array_map(fn($item) => $item->getKey(), $child->getListingItems()),
+                            array_map(fn($item) => mb_strimwidth($item->getKey(), 0, 190, '...'), $child->getListingItems()),
                             array_map(fn($item) => $item->getId(), $child->getListingItems())
                         )
                     ),
@@ -52,7 +52,8 @@ class OzonTaskProductFormType extends AbstractType
                     'required' => false,
                 ]);
             }
-        }
+
+            }
 
         $builder->add($selectedChildrenGroup);
 
