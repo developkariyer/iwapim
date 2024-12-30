@@ -105,7 +105,7 @@
                 loadChildAccordionContent(taskId, parentProductId);
             });
 
-            document.addEventListener('DOMContentLoaded', () => {
+            function initializeSelect2() {
                 $('.select2').select2({
                     ajax: {
                         url: function () {
@@ -120,7 +120,7 @@
                         },
                         processResults: function (data) {
                             return {
-                                results: data.items.map(item => ({ id: item.id, text: item.text })),
+                                results: data.map(item => ({ id: item.id, text: item.text })),
                             };
                         },
                     },
@@ -131,7 +131,16 @@
                         return $(this).data('minimum-input-length') || 1;
                     },
                 });
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeSelect2();
             });
+
+            $(document).on('ajaxComplete', function () {
+                initializeSelect2();
+            });
+
 
         });
     </script>
