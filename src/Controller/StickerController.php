@@ -22,6 +22,7 @@ use Pimcore\Model\DataObject\Marketplace;
 
 /**
  * @Route("/sticker", name="sticker_main_page")
+ * @return Response
  */
 class StickerController extends FrontendController
 {
