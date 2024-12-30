@@ -35,8 +35,8 @@ class OzonTaskProductFormType extends AbstractType
                 $selectedChildrenGroup->add((string)$child->getId(), ChoiceType::class, [
                     'choices' => array_merge(
                         [
-                            'Listeleme' => -1,
-                            'PIM Bilgilerini Kullan' => 0,
+                            '** Listeleme' => -1,
+                            '* PIM Bilgilerini Kullan' => 0,
                         ],
                         array_combine(
                             array_map(fn($item) => mb_strimwidth($item->getKey(), 0, 190, '...'), $child->getListingItems()),
