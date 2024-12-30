@@ -20,8 +20,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pimcore\Model\DataObject\Marketplace;
 
-
-class StickerController extends  FrontendController
+/**
+ * @Route("/sticker", name="sticker_main_page")
+ */
+class StickerController extends FrontendController
 {
     public function stickerMainPage(Request $request): Response
     {
