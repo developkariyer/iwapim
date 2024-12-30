@@ -115,6 +115,7 @@ class OzonController extends FrontendController
      * @return RedirectResponse|Response
      *
      * This controller method is used to set variants for a product in an Ozon Listing task.
+     * @throws Exception
      */
     public function getProductDetails(Request $request): RedirectResponse|Response
     {
@@ -159,70 +160,37 @@ class OzonController extends FrontendController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            var_dump($data);
-            exit;
-
-            // Handle the form submission (e.g., update database)
-            // ...
-            //return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+            //var_dump($data); exit;
+            $taskProducts = [];
+            foreach ($data['selectedChildren'] as $productId => $listing) {
+                $product = Product::getById($productId);
+                if (!$product) {
+                    continue;
+                }
+                $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
+                if ($listing<0) {
+                    continue;
+                }
+                if ($listing) {
+                    $listingItem = VariantProduct::getById($listing);
+                    if ($listingItem) {
+                        $objectMetadata->setData(['listing'=>$listingItem->getId()]);
+                    }
+                } else {
+                    $objectMetadata->setData(['listing'=>0]);
+                }
+                $taskProducts[] = $objectMetadata;
+            }
+            $taskProducts = array_unique($taskProducts);
+            $task->setProducts($taskProducts);
+            $task->save();
+            return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
         }
         return $this->render('ozon/products.html.twig', [
             'form' => $form->createView(),
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
         ]);
-    }
-
-    /**
-     * @Route("/ozon/modify/{taskId}", name="ozon_modify_task")
-     * @param Request $request
-     * @return RedirectResponse
-     *
-     * This controller method is used to save the selected variants for a product in an Ozon Listing task.
-     * @throws Exception
-     */
-    public function modifyTaskAction(Request $request): RedirectResponse
-    {
-        $parentProductId = $request->get('productId');
-        $task = ListingTemplate::getById($request->get('taskId'));
-        if (!$task) {
-            return $this->redirectToRoute('ozon_menu');
-        }
-        $selectedChildren = $request->get('selectedChildren', []);
-        $taskProducts = [];
-        foreach ($task->getProducts() as $taskProduct) {
-            $product = $taskProduct->getObject();
-            if ($product->getParent()->getId() == $parentProductId) {
-                continue;
-            }
-            $taskProducts[] = $taskProduct;
-        }
-        foreach ($selectedChildren as $productId => $listing) {
-            if ($listing<0) {
-                continue;
-            }
-            $product = Product::getById($productId);
-            if (!$product) {
-                error_log('Product not found: ' . $productId);
-                continue;
-            }
-            $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
-            if ($listing) {
-                $listingItem = VariantProduct::getById($listing);
-                if (!$listingItem) {
-                    error_log('Listing not found: ' . $listing);
-                    continue;
-                }
-                $objectMetadata->setData(['listing'=>$listingItem->getId()]);
-            } else {
-                $objectMetadata->setData(['listing'=>0]);
-            }
-            $taskProducts[] = $objectMetadata;
-        }
-        $taskProducts = array_unique($taskProducts);
-        $task->setProducts($taskProducts);
-        $task->save();
-        return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
     }
 
     /**
@@ -248,11 +216,11 @@ class OzonController extends FrontendController
         if (!$parentProduct instanceof Product) {
             return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
         }
-        return $this->redirectToRoute('ozon_task_product', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
     }
 
     /**
-     * @Route("/ozon/tree", name="ozon_tree")
+     * @Route("/ozontree", name="ozon_tree")
      * @return JsonResponse
      *
      * This controller iterates on database and outputs item list
