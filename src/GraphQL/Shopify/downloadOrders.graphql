@@ -7,6 +7,125 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
         nodes {
             id
             updatedAt
+            cancellation {
+                staffNote
+            }
+            cancelledAt
+            canNotifyCustomer
+            closedAt
+            createdAt
+            currencyCode
+            currentCartDiscountAmountSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentShippingPriceSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentSubtotalLineItemsQuantity
+            currentSubtotalPriceSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentTaxLines {
+                channelLiable
+                priceSet {
+                    presentmentMoney {
+                        amount
+                        currencyCode
+                    }
+                    shopMoney {
+                        amount
+                        currencyCode
+                    }
+                }
+                rate
+                ratePercentage
+                source
+                title
+            }
+            currentTotalDiscountsSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentTotalDutiesSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentTotalPriceSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentTotalTaxSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentTotalWeight
+            discountCode
+            displayFinancialStatus
+            displayFulfillmentStatus
+            fulfillable
+            fulfillmentOrders (first:200) {
+                nodes {
+                    channelId
+                    createdAt
+                    id
+                    lineItems (first:200) {
+                        nodes {
+                            id
+                            totalQuantity
+                            sku
+                            variantTitle
+                            vendor
+                        }
+                    }
+                }
+            }
+
+
         }
     }
 }
