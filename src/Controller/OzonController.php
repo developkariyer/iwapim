@@ -225,7 +225,7 @@ class OzonController extends FrontendController
         }
         $iwasku = $request->get('iwasku');
         // Try to explode $iwasku using possible delimiters comma, space, newline, tab
-        $iwaskuList = preg_split('/[\s,]+/', $iwasku);
+        $iwaskuList = preg_split('/[\s,;|]+/', $iwasku);
         $iwaskuList = array_filter($iwaskuList);
         if (empty($iwaskuList)) {
             $this->addFlash('danger', 'Product not found');
