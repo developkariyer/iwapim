@@ -125,7 +125,7 @@ class OzonController extends FrontendController
         }
         $parentProduct = Product::getById($request->get('productId'));
         if (!$parentProduct) {
-            return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+            return $this->redirectToRoute('ozon_task', ['taskId' => $task->getId()]);
         }
         $children = [];
         $selectedChildren = [];
@@ -198,7 +198,7 @@ class OzonController extends FrontendController
             $newTaskProducts = array_unique($newTaskProducts);
             $task->setProducts($newTaskProducts);
             $task->save();
-            return $this->redirectToRoute('ozon_menu', ['id' => $task->getId()]);
+            return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         return $this->render('ozon/products.html.twig', [
             'form' => $form->createView(),
@@ -229,7 +229,7 @@ class OzonController extends FrontendController
         $iwaskuList = array_filter($iwaskuList);
         if (empty($iwaskuList)) {
             $this->addFlash('danger', 'Product not found');
-            return $this->redirectToRoute('ozon_menu', ['id' => $task->getId()]);
+            return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         $taskProducts = $task->getProducts();
         $dirty = false;
