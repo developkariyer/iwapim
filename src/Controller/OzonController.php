@@ -24,7 +24,7 @@ class OzonController extends FrontendController
 {
 
     /**
-     * @Route("/ozon", name="ozon_menu")
+     * @Route("/ozon/{taskId}/{parentProductId}", name="ozon_menu", defaults={"taskId"=null, "parentProductId"=null})
      * @return Response
      *
      * This controller method loads all marketplaces and tasks for Ozon and renders the page.
@@ -63,6 +63,8 @@ class OzonController extends FrontendController
             'newTaskForm' => $newTaskForm->createView(),
             'tasks' => $tasks,
             'marketplaces' => $marketplaces,
+            'taskId' => $request->get('taskId'),
+            'parentProductId' => $request->get('parentProductId'),
         ]);
     }
 
@@ -160,8 +162,6 @@ class OzonController extends FrontendController
 
             // Handle the form submission (e.g., update database)
             // ...
-
-            return $this->redirectToRoute('ozon_task_product', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
         }
         return $this->render('ozon/products.html.twig', [
             'form' => $form->createView(),

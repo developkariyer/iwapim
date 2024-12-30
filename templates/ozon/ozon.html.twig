@@ -85,6 +85,37 @@
                     });
                 }
             });
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('ozonTaskProductForm');
+                const responseContainer = document.getElementById('form-response');
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    const actionUrl = form.getAttribute('action');
+                    fetch(actionUrl, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(data => {
+                            const formContainer = form.parentElement;
+                            formContainer.innerHTML = data;
+                            const newForm = formContainer.querySelector('form');
+                            if (newForm) {
+                                newForm.addEventListener('submit', form.submit.bind(newForm));
+                            }
+                            responseContainer.innerHTML = `<div class="alert alert-success">Form updated successfully!</div>`;
+                        })
+                        .catch(error => {
+                            responseContainer.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+                        });
+                });
+            });
         });
     </script>
 {% endblock %}
