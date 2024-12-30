@@ -105,17 +105,15 @@
                 loadChildAccordionContent(taskId, parentProductId);
             });
 
-            console.log('Initializing Select2 on page load');
-            initializeSelect2();
+            let debounceTimer;
+            const debounceDelay = 1200; // Delay in milliseconds (adjust as needed)
 
-            // Observe changes in the DOM for dynamically loaded content
-            const observer = new MutationObserver(mutations => {
-                mutations.forEach(mutation => {
-                    if (mutation.addedNodes.length > 0) {
-                        console.log('DOM mutation detected, reinitializing Select2');
-                        initializeSelect2();
-                    }
-                });
+            const observer = new MutationObserver(() => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    console.log('Debounced DOM mutation detected, reinitializing Select2');
+                    initializeSelect2(); // Process only after the mutations stabilize
+                }, debounceDelay);
             });
 
             observer.observe(document.body, {
