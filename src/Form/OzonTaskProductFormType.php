@@ -45,6 +45,10 @@ class OzonTaskProductFormType extends AbstractType
                     ),
                     'label' => $child->getKey(),
                     'data' => $selectedChildren[$child->getId()] ?? -1,
+                    'attr' => [
+                        'class' => 'form-select',
+                        'id' => "childSelect{$child->getId()}",
+                    ],
                     'required' => false,
                 ]);
             }
