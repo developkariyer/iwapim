@@ -166,7 +166,7 @@ class OzonController extends FrontendController
         return $this->render('ozon/products.html.twig', [
             'form' => $form->createView(),
             'task_id' => $task->getId(),
-            'product_id' => $parentProduct->getId(),
+            'parent_product_id' => $parentProduct->getId(),
         ]);
     }
 
