@@ -119,6 +119,7 @@
                             };
                         },
                         processResults: function (data) {
+                            console.log('Ajax data:', data);
                             return {
                                 results: data,
                             };
@@ -134,12 +135,15 @@
             }
 
             document.addEventListener('DOMContentLoaded', () => {
+                console.log('Initializing Select2 on page load');
                 initializeSelect2();
             });
 
             $(document).on('ajaxComplete', function () {
+                console.log('Reinitializing Select2 after AJAX load');
                 initializeSelect2();
             });
+
 
 
         });
