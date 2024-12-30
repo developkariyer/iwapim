@@ -102,6 +102,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 supplierId: \$supplierId,
                 paginationOptions: \$paginationOptions
             ) {
+                supplierId
                 pageInfo {
                     page
                     pageSize

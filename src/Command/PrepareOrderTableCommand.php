@@ -130,9 +130,9 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $variantObject = match ($marketplaceType) {
             'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti' => $this->findVariantProduct($uniqueMarketplaceId),
-            'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'productCode'),
-            'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'\"product-ids\".bolProductId'),
-            'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'sku'),
+            'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'"productCode"'),
+            'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'"product-ids".bolProductId'),
+            'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'"sku"'),
             default => null,
         };
         if(!$variantObject) {
@@ -203,7 +203,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId, $unpublished = true);
         }
         $jsonPath = '$.' . $field;
-        Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql',['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
+        $result = Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql', ['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);

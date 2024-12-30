@@ -41,7 +41,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
+    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array  //working
     {
         $allData = [];
         $cursor = null;
@@ -105,6 +105,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
+        print_r($orders);
 
         return 0;
     }
@@ -358,14 +359,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function getFeedback($productId): void
-    {
-        echo  "Getting feedback for product {$productId}\n";
-        $feedback = $this->getFromShopifyApi('GET', "products/{$productId}/resource_feedback.json", [], 'resource_feedback');
-
-        print_r($feedback);
-    }
-
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
@@ -429,7 +422,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         echo "SKU set\n";
         $this->putToCache("SETSKU_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$request, 'response'=>$response]);
     }
-
 
     /**
      * @throws TransportExceptionInterface
