@@ -32,4 +32,24 @@ class StickerController extends FrontendController
 
         return $this->render('sticker/sticker.html.twig');
     }
+
+    /**
+     * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"GET", "POST"})
+     * @return Response
+     */
+    public function addStickerGroup(Request $request): Response
+    {
+       /* if ($request->isMethod('POST')) {
+            // Formdan gelen veriyi işleme, yeni grup ekleme işlemleri yapılabilir
+            $formData = $request->request->get('form_data'); // Form verisini alabilirsiniz
+
+            // Veritabanına kaydetme işlemleri veya başka işlemler yapabilirsiniz
+
+            // Sonrasında kullanıcıyı bir başarı sayfasına yönlendirebilirsiniz
+            return $this->redirectToRoute('sticker_main_page');
+        }*/
+        return $this->render('sticker/add_sticker_group.html.twig');
+
+    }
+
 }

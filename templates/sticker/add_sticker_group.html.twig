@@ -1,0 +1,21 @@
+{% extends 'sticker/base.html.twig' %}
+{% block title %} Sticker {% endblock %}
+{% block content %}
+
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-12 mt-2">
+            <form method="post" action="{{ path('sticker_new_group') }}">
+                <input type="text" name="form_data" placeholder="Group Name">
+                <button type="submit" class="btn btn-success">Add Group</button>
+            </form>
+        </div>
+        <a href="{{ path('sticker_main_page') }}" class="btn btn-primary w-100">Main Page</a>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
