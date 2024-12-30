@@ -224,23 +224,37 @@ class OzonController extends FrontendController
             return $this->redirectToRoute('ozon_menu');
         }
         $iwasku = $request->get('iwasku');
-        $product = Product::getByIwasku($iwasku, 1);
-        if (!$product) {
+        // Try to explode $iwasku using possible delimiters comma, space, newline, tab
+        $iwaskuList = preg_split('/[\s,]+/', $iwasku);
+        $iwaskuList = array_filter($iwaskuList);
+        if (empty($iwaskuList)) {
             $this->addFlash('danger', 'Product not found');
-            return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
-        }
-        $parentProduct = $product->getParent();
-        if (!$parentProduct instanceof Product) {
-            $this->addFlash('danger', 'Parent product not found');
-            return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+            return $this->redirectToRoute('ozon_menu', ['id' => $task->getId()]);
         }
         $taskProducts = $task->getProducts();
-        $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
-        $objectMetadata->setData(['listing'=>0]);
-        $taskProducts[] = $objectMetadata;
-        $task->setProducts($taskProducts);
-        $task->save();
-        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'productId' => $parentProduct->getId()]);
+        $dirty = false;
+        foreach ($iwaskuList as $iwasku) {
+            $iwasku = trim($iwasku);
+            $product = Product::getByIwasku($iwasku, 1);
+            if (!$product) {
+                continue;
+            }
+            $parentProduct = $product->getParent();
+            if (!$parentProduct instanceof Product) {
+                continue;
+            }
+            $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
+            $objectMetadata->setData(['listing' => 0]);
+            $taskProducts[] = $objectMetadata;
+            $dirty = true;
+        }
+        if ($dirty) {
+            $task->setProducts($taskProducts);
+            $task->save();
+        } else {
+            $this->addFlash('danger', 'Product not found');
+        }
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
     }
 
     /**
