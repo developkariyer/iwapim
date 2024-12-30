@@ -168,8 +168,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownload();
-        //$this->downloadOrdersGraphql();
-       if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->downloadOrdersGraphql();
+       /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -178,7 +178,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();
+       $this->putListingsToCache();*/
     }
 
     /**
