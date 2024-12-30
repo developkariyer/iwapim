@@ -280,7 +280,7 @@ class OzonController extends FrontendController
                 $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype WHERE category_full_name LIKE ? ORDER BY category_full_name', ['%'.$q.'%']);
             $items = array_map(function ($result) {
                 return [
-                    'id' => (int) ($result['description_category_id'] . '000' . $result['type_id']),
+                    'id' => $result['description_category_id'] . '.' . $result['type_id'],
                     'text' => trim($result['category_full_name']),
                 ];
             }, $results);
