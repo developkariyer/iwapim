@@ -139,6 +139,15 @@ class OzonController extends FrontendController
         foreach ($parentProduct->getChildren() as $child) {
             $children[$child->getVariationSize()][$child->getVariationColor()] = $child;
             $selectedChildren[$child->getId()] = -1;
+
+            foreach ($child->getListingItems() as $item) {
+                if (strlen($item->getKey()) > 190) {
+                    throw new \RuntimeException("Label '{$item->getKey()}' exceeds 190 characters.");
+                }
+                if (strlen($item->getId()) > 190) {
+                    throw new \RuntimeException("ID '{$item->getId()}' exceeds 190 characters.");
+                }
+            }
         }
         $taskProducts = $task->getProducts();
         foreach ($taskProducts as $taskProduct) {
