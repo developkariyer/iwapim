@@ -28,6 +28,7 @@ class OzonTaskProductFormType extends AbstractType
 
         $selectedChildrenGroup = $builder->create('selectedChildren', null, [
             'compound' => true,
+            'label' => false,
         ]);
 
         foreach ($children as $colorGroup) {
