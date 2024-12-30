@@ -127,10 +127,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
-        }
-        print_r($response->getContent());
+        
+        print_r($response);
     }
 
     /**
