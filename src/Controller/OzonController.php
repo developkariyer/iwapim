@@ -149,7 +149,11 @@ class OzonController extends FrontendController
             if (!$product instanceof Product) {
                 continue;
             }
-            $selectedChildren[$product->getId()] = $taskProduct->getData()['listing'];
+            $listingData = $taskProduct->getData()['listing'];
+            if (!is_numeric($listingData)) {
+                continue;
+            }
+            $selectedChildren[$product->getId()] = $listingData;
         }
         $form = $this->createForm(OzonTaskProductFormType::class, null, [
             'task_id' => $task->getId(),
@@ -160,15 +164,12 @@ class OzonController extends FrontendController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            //var_dump($data); exit;
             $taskProducts = $task->getProducts();
             $newTaskProducts = [];
             foreach ($taskProducts as $taskProduct) {
                 $product = $taskProduct->getObject();
-                if (!$product) {
-                    continue;
-                }
-                if ($product->getParent() instanceof Product) {
+                $listingData = $taskProduct->getData()['listing'];
+                if (!$product || !is_numeric($listingData)) {
                     continue;
                 }
                 if ($product->getParent()->getId() != $parentProduct->getId()) {
