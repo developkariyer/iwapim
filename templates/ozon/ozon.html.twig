@@ -22,7 +22,7 @@
 
                         <form method="POST" action="/ozonaddproduct/{{ task.id }}" class="mt-3">
                             <div class="input-group mb-3 mt-3">
-                                <input type="text" class="form-control" name="iwasku" placeholder="Eklenecek IWASKU" aria-label="Eklenecek IWASKU">
+                                <input type="text" class="form-control" name="iwasku" placeholder="Eklenecek IWASKU (virgül, boşluk veya tab ile birden çok girilebilir)" aria-label="Eklenecek IWASKU">
                                 <button class="btn btn-primary" type="submit">Ekle</button>
                             </div>
                         </form>
@@ -54,8 +54,9 @@
 {% block body_scripts %}
     <script>
         $(document).ready(function () {
-            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
-                const taskId = $(this).data('task-id');
+            const taskId = '{{ taskId|default(null) }}';
+
+            const loadParentAccordionContent = (taskId) => {
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
                 const loadingSpinner = $(`#loadingTask${taskId}`);
                 if (!parentAccordion.data('loaded')) {
@@ -68,11 +69,22 @@
                         parentAccordion.show();
                     });
                 }
+            };
+
+            if (taskId) {
+                const taskAccordion = $(`#collapseTask${taskId}`);
+                if (taskAccordion.length) {
+                    taskAccordion.collapse('show');
+                    loadParentAccordionContent(taskId); // Load content manually
+                }
+            }
+
+            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
+                const taskId = $(this).data('task-id');
+                loadParentAccordionContent(taskId);
             });
 
-            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
-                const parentProductId = $(this).data('parent-product-id');
-                const taskId = $(this).closest('[data-task-id]').data('task-id');
+            const loadChildAccordionContent = (taskId, parentProductId) => {
                 const childAccordion = $(`#childProducts${taskId}_${parentProductId}`);
                 const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
                 if (!childAccordion.data('loaded')) {
@@ -85,6 +97,12 @@
                         childAccordion.show();
                     });
                 }
+            };
+
+            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
+                const parentProductId = $(this).data('parent-product-id');
+                const taskId = $(this).closest('[data-task-id]').data('task-id');
+                loadChildAccordionContent(taskId, parentProductId);
             });
         });
     </script>
