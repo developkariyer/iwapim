@@ -130,9 +130,9 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $variantObject = match ($marketplaceType) {
             //'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti' => $this->findVariantProduct($uniqueMarketplaceId),
-            'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'"productCode"'),
+            //'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'"productCode"'),
             //'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'"product-ids".bolProductId'),
-            //'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'sku'),
+            'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'sku'),
             default => null,
         };
         if(!$variantObject) {
