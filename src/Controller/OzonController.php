@@ -184,7 +184,7 @@ class OzonController extends FrontendController
             $taskProducts = array_unique($taskProducts);
             $task->setProducts($taskProducts);
             $task->save();
-            return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
+            return $this->redirectToRoute('ozon_menu', ['id' => $task->getId()]);
         }
         return $this->render('ozon/products.html.twig', [
             'form' => $form->createView(),
