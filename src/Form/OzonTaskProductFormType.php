@@ -43,7 +43,7 @@ class OzonTaskProductFormType extends AbstractType
                             array_map(fn($item) => $item->getId(), $child->getListingItems())
                         )
                     ),
-                    'label' => $child->getKey(),
+                    'label' => mb_strimwidth("{$child->getIWasku()} {$child->getKey()}", 0, 190, '...'),
                     'data' => $selectedChildren[$child->getId()] ?? -1,
                     'attr' => [
                         'class' => 'form-select form-select-sm',
