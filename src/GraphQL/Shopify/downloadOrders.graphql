@@ -36,23 +36,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     currencyCode
                 }
             }
-            currentTaxLines {
-                channelLiable
-                priceSet {
-                    presentmentMoney {
-                        amount
-                        currencyCode
-                    }
-                    shopMoney {
-                        amount
-                        currencyCode
-                    }
-                }
-                rate
-                ratePercentage
-                source
-                title
-            }
             currentTotalDiscountsSet {
                 presentmentMoney {
                     amount
