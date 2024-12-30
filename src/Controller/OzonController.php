@@ -143,10 +143,10 @@ class OzonController extends FrontendController
 
             foreach ($child->getListingItems() as $item) {
                 if (strlen($item->getKey()) > 190) {
-                    throw new RuntimeException("Label '{$item->getKey()}' exceeds 190 characters.");
+                    error_log('Key too long: ' . $item->getKey());
                 }
                 if (strlen($item->getId()) > 190) {
-                    throw new RuntimeException("ID '{$item->getId()}' exceeds 190 characters.");
+                    error_log('Id too long: ' . $item->getId());
                 }
             }
         }
