@@ -23,6 +23,8 @@ use Pimcore\Model\DataObject\Marketplace;
 
 class StickerController extends FrontendController
 {
+    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
+
     /**
      * @Route("/sticker/", name="sticker_main_page")
      * @return Response
@@ -39,17 +41,19 @@ class StickerController extends FrontendController
      */
     public function addStickerGroup(Request $request): Response
     {
-       /* if ($request->isMethod('POST')) {
-            // Formdan gelen veriyi işleme, yeni grup ekleme işlemleri yapılabilir
-            $formData = $request->request->get('form_data'); // Form verisini alabilirsiniz
-
-            // Veritabanına kaydetme işlemleri veya başka işlemler yapabilirsiniz
-
-            // Sonrasında kullanıcıyı bir başarı sayfasına yönlendirebilirsiniz
-            return $this->redirectToRoute('sticker_main_page');
-        }*/
+        if ($request->isMethod('POST')) {
+            $formData = $request->request->get('form_data');
+            $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', [
+                'group' => $formData
+            ]);
+            if ($isSuccess) {
+                $this->addFlash('success', 'Group has been successfully added.');
+                return $this->redirectToRoute('sticker_new_group');
+            } else {
+                $this->addFlash('error', 'There was an error adding the group.');
+            }
+        }
         return $this->render('sticker/add_sticker_group.html.twig');
-
     }
 
 }
