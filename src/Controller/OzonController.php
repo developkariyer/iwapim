@@ -88,7 +88,7 @@ class OzonController extends FrontendController
             $product = $taskProduct->getObject();
             $parentProduct = $product->getParent();
             if (!$parentProduct instanceof Product) {
-                continue;
+                $parentProduct = $product;
             }
             $id = $parentProduct->getId();
             if (!isset($parentProducts[$id])) {
