@@ -117,7 +117,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             $index = 0;
             foreach ($values as $row) {
                 $index++;
-                //if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
+                if (!($index % 100)) echo "\rProcessing $index of " . count($values) . "\r";
                 $this->prepareOrderTable($row['variant_id'],$marketplaceType);
             }
         }
@@ -129,10 +129,10 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType): void
     {
         $variantObject = match ($marketplaceType) {
-            //'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti' => $this->findVariantProduct($uniqueMarketplaceId),
-            //'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'"productCode"'),
-            //'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'"product-ids".bolProductId'),
-            'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'sku'),
+            'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti' => $this->findVariantProduct($uniqueMarketplaceId),
+            'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'"productCode"'),
+            'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'"product-ids".bolProductId'),
+            'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'"sku"'),
             default => null,
         };
         if(!$variantObject) {
@@ -199,14 +199,11 @@ class PrepareOrderTableCommand extends AbstractCommand
      */
     protected function findVariantProduct($uniqueMarketplaceId, $field = null): VariantProduct|Concrete|null
     {
-        echo "Unique Marketplace ID: $uniqueMarketplaceId . Field: $field \n";
-
         if ($field === null) {
             return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId, $unpublished = true);
         }
         $jsonPath = '$.' . $field;
-        echo  "Json Path: $jsonPath\n";
-        $result = Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql', ['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
+        Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql', ['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);
