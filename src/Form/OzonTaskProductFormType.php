@@ -44,16 +44,20 @@ class OzonTaskProductFormType extends AbstractType
                         )
                     ),
                     'label' => $child->getKey(),
-                    'data' => $selectedChildren[$child->getId()] ?? -1,
-                    'attr' => [
-                        'class' => 'form-select',
-                        'id' => "childSelect{$child->getId()}",
+                    'row_attr' => [
+                        'class' => 'row align-items-center mb-2', // Add Bootstrap row
                     ],
+                    'attr' => [
+                        'class' => 'form-select col-sm-6', // Add select styling
+                    ],
+                    'label_attr' => [
+                        'class' => 'col-sm-6 col-form-label', // Add label styling
+                    ],
+                    'data' => $selectedChildren[$child->getId()] ?? -1,
                     'required' => false,
                 ]);
             }
-
-            }
+        }
 
         $builder->add($selectedChildrenGroup);
 
