@@ -159,9 +159,12 @@ class OzonController extends FrontendController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+            var_dump($data);
+            exit;
 
             // Handle the form submission (e.g., update database)
             // ...
+            //return $this->redirectToRoute('ozon_task', ['id' => $task->getId()]);
         }
         return $this->render('ozon/products.html.twig', [
             'form' => $form->createView(),
