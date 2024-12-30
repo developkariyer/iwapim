@@ -203,7 +203,9 @@ class PrepareOrderTableCommand extends AbstractCommand
             return VariantProduct::findOneByField('uniqueMarketplaceId', $uniqueMarketplaceId, $unpublished = true);
         }
         $jsonPath = '$.' . $field;
-        Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql', ['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
+
+        $result = Utility::fetchFromSqlFile($this->variantSqlfilePath . 'findVariant.sql', ['jsonPath' => $jsonPath, 'uniqueId' => $uniqueMarketplaceId]);
+        echo "Sql result: " . json_encode($result) . "\n";
         $objectId = $result[0]['object_id'] ?? null;
         if ($objectId) {
            return VariantProduct::getById($objectId);
