@@ -54,16 +54,9 @@
 {% block body_scripts %}
     <script>
         $(document).ready(function () {
-            const taskId = '{{ taskId|default(null) }}'; // Get the taskId from the server-side variable
-            if (taskId) {
-                const taskAccordion = $(`#collapseTask${taskId}`);
-                if (taskAccordion.length) {
-                    taskAccordion.collapse('show');
-                }
-            }
+            const taskId = '{{ taskId|default(null) }}';
 
-            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
-                const taskId = $(this).data('task-id');
+            const loadParentAccordionContent = (taskId) => {
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
                 const loadingSpinner = $(`#loadingTask${taskId}`);
                 if (!parentAccordion.data('loaded')) {
@@ -76,11 +69,22 @@
                         parentAccordion.show();
                     });
                 }
+            };
+
+            if (taskId) {
+                const taskAccordion = $(`#collapseTask${taskId}`);
+                if (taskAccordion.length) {
+                    taskAccordion.collapse('show');
+                    loadParentAccordionContent(taskId); // Load content manually
+                }
+            }
+
+            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="parent"]', function () {
+                const taskId = $(this).data('task-id');
+                loadParentAccordionContent(taskId);
             });
 
-            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
-                const parentProductId = $(this).data('parent-product-id');
-                const taskId = $(this).closest('[data-task-id]').data('task-id');
+            const loadChildAccordionContent = (taskId, parentProductId) => {
                 const childAccordion = $(`#childProducts${taskId}_${parentProductId}`);
                 const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
                 if (!childAccordion.data('loaded')) {
@@ -93,6 +97,12 @@
                         childAccordion.show();
                     });
                 }
+            };
+
+            $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
+                const parentProductId = $(this).data('parent-product-id');
+                const taskId = $(this).closest('[data-task-id]').data('task-id');
+                loadChildAccordionContent(taskId, parentProductId);
             });
         });
     </script>
