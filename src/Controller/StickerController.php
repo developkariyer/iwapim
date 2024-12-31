@@ -75,4 +75,25 @@ class StickerController extends FrontendController
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
+    /**
+     * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
+     * @return Response
+     */
+    public function addSticker(Request $request): Response
+    {
+        /*if ($request->isMethod('POST')) {
+            $formData = $request->request->get('form_data');
+            $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', [
+                'group_name' => $formData
+            ]);
+            if ($isSuccess) {
+                $this->addFlash('success', 'Group has been successfully added.');
+                return $this->redirectToRoute('sticker_new_group');
+            } else {
+                $this->addFlash('error', 'There was an error adding the group.');
+            }
+        }*/
+        return $this->render('sticker/add_sticker.html.twig');
+    }
+
 }

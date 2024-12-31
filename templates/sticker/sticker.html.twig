@@ -33,7 +33,7 @@
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary">New Sticker</button>
+                        <a href="{{ path('sticker_new') }}" class="btn btn-primary">New Sticker</a>
                     </div>
                 </div>
             </div>
@@ -68,7 +68,6 @@
         function loadStickers(groupId) {
             const tableBody = document.getElementById('stickers-table-body');
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
-
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
