@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace;
 use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use Random\RandomException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -29,17 +30,42 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public static $expires_in;
     public static $correlationId;
 
-    function generateCorrelationId() 
+    /**
+     * @throws RandomException
+     */
+    function generateCorrelationId(): string
     {
         $randomHex = bin2hex(random_bytes(4));
         return substr($randomHex, 0, 4) . '-' . substr($randomHex, 4, 4);
     }
 
-    public function prepareToken()
+    public function __construct($marketplace)
     {
+        parent::__construct($marketplace);
         static::$correlationId = $this->generateCorrelationId();
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://marketplace.walmartapis.com/v3/", [
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
+            ]
+        ]);
+    }
+
+    /**
+     * @throws RandomException
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function prepareToken(): void
+    {
+        $httpClientWallmart = HttpClient::create();
         try {
-            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
+            $response = $httpClientWallmart->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Accept' => 'application/json',
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
@@ -65,6 +91,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
+     * @throws RandomException
      */
     public function download($forceDownload = false): void
     {
@@ -81,12 +108,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $this->listings = [];
         do {
             $response = $this->httpClient->request('GET',  static::$apiUrl['offers'], [
-                'headers' => [
-                    'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                    'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                    'WM_SVC.NAME' => 'Walmart Marketplace',
-                    'Accept' => 'application/json'
-                ],
                 'query' => [
                     'limit' => $limit,
                     'offset' => $offset
@@ -138,7 +159,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return rtrim($attributeString, '-');
     }
 
-    public function import($updateFlag, $importFlag)
+    public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -181,7 +202,16 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         }    
     }
 
-    public function downloadOrders()
+    /**
+     * @throws RandomException
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function downloadOrders(): void
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
@@ -212,12 +242,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         do {
             do {
                 $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
-                    'headers' => [
-                        'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                        'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                        'WM_SVC.NAME' => 'Walmart Marketplace',
-                        'Accept' => 'application/json'
-                    ],
                     'query' => [
                         'limit' => $limit,
                         'offset' => $offset,
@@ -299,12 +323,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $response = $this->httpClient->request('GET',  static::$apiUrl['inventory'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
             $request['query'],
             $request['json']
         ]);
@@ -353,13 +371,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $response = $this->httpClient->request('GET',  static::$apiUrl['price'], [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ],
-            'json' => $json,
+            'json' => $json
         ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
