@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Connector\Marketplace\Ozon\Utils;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -56,7 +58,7 @@ class OzonTaskProductFormType extends AbstractType
         }
 
         $builder->add('productType', ChoiceType::class, [
-            'choices' => [],
+            'choice_loader' => new CallbackChoiceLoader(function () {return Utils::getOzonProductTypes();}),
             'label' => 'Ürün Tipi',
             'attr' => [
                 'class' => 'select2 form-select needs-initialization',

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Connector\Marketplace\Ozon\Utils;
 use App\Form\OzonTaskFormType;
 use App\Form\OzonTaskProductFormType;
 use App\Model\DataObject\VariantProduct;
@@ -255,24 +256,7 @@ class OzonController extends FrontendController
     public function treeAction(Request $request): JsonResponse
     {
         $q = $request->get('q');
-        $filename = 'OzonProductTypesSelect'.urlencode($q).'.json';
-        $cachePath = PIMCORE_PROJECT_ROOT . '/tmp/tmp/';
-        $expiration = 7*86400;
-        $items = json_decode(Utility::getCustomCache($filename, $cachePath, $expiration), true);
-        if (empty($items)) {
-            $db = Db::get();
-            $results = empty($q) ?
-                $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype ORDER BY category_full_name') :
-                $db->fetchAllAssociative('SELECT * FROM iwa_ozon_producttype WHERE category_full_name LIKE ? ORDER BY category_full_name', ['%'.$q.'%']);
-            $items = array_map(function ($result) {
-                return [
-                    'id' => $result['description_category_id'] . '.' . $result['type_id'],
-                    'text' => trim($result['category_full_name']),
-                ];
-            }, $results);
-            Utility::setCustomCache($filename, $cachePath, json_encode($items));
-        }
-        return new JsonResponse($items);
+        return new JsonResponse(Utils::getOzonProductTypes($q));
     }
 
 
