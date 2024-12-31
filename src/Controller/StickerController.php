@@ -49,6 +49,7 @@ class StickerController extends FrontendController
             $formData = $request->request->get('form_data');
             try {
                 Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', ['group_name' => $formData]);
+                $this->addFlash('success', 'Grup Başarıyla Eklendi.');
                 return $this->redirectToRoute('sticker_new_group');
             }  catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
                 $this->addFlash('error', 'Bu grup daha öncede eklenmiş.');
