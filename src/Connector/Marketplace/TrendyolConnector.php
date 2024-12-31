@@ -90,10 +90,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         try {
-            $lastUpdatedAt = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql', [
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
             ]);
-            print_r($lastUpdatedAt);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
