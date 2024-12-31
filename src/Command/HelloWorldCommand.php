@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Model\DataObject\VariantProduct;
+use App\Model\DataObject\Product;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,7 +20,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $iwasku = Registry::getKey("B08VKMV227",'asin-to-iwasku');
         if (isset($iwasku)) {
-            $variant = VariantProduct::findOneByField('iwasku',$iwasku);
+            $variant = Product::findOneByField('iwasku',$iwasku);
             if ($variant instanceof VariantProduct) {
                 print_r($variant->getIwasku());
             } else {
