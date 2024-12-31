@@ -59,4 +59,20 @@ class StickerController extends FrontendController
         return $this->render('sticker/add_sticker_group.html.twig');
     }
 
+    /**
+     * @Route("/sticker/get-stickers/{groupId}", name="get_stickers", methods={"GET"})
+     */
+    public function getStickers(int $groupId): JsonResponse
+    {
+        $stickers = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
+            'group_id' => $groupId
+        ]);
+
+        if (!isset($stickers[$groupId])) {
+            return new JsonResponse(['success' => false, 'stickers' => []]);
+        }
+
+        return new JsonResponse(['success' => true, 'stickers' => $stickers[$groupId]]);
+    }
+
 }

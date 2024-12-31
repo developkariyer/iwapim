@@ -16,7 +16,10 @@
                 <div class="col-12">
                     <div class="list-group">
                         {% for group in groups %}
-                            <a href="#" class="list-group-item list-group-item-action">
+                            <a href="#"
+                               class="list-group-item list-group-item-action"
+                               data-group-id="{{ group.id }}"
+                               onclick="loadStickers(event, {{ group.id }})">
                                 {{ group.group_name }}
                             </a>
                         {% else %}
@@ -36,102 +39,19 @@
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-12">
+                <div class="col-12" id="stickers-container">
                     <table class="table">
                         <thead>
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Group</th>
                             <th scope="col">Iwasku</th>
                             <th scope="col">Category</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Image</th>
                             <th scope="col">Sticker</th>
-
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr><tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
+                        <tbody id="stickers-table-body">
                         </tbody>
                     </table>
                 </div>
@@ -143,3 +63,35 @@
 
 
 {% endblock %}
+
+<script>
+    function loadStickers(event, groupId) {
+        event.preventDefault();
+        const tableBody = document.getElementById('stickers-table-body');
+        tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+
+        fetch(`/sticker/get-stickers/${groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const rows = data.stickers.map(sticker => `
+                    <tr>
+                        <th scope="row">${sticker.id}</th>
+                        <td >${sticker.iwasku}</td>
+                        <td>${sticker.category}</td>
+                        <td>${sticker.product_name}</td>
+                        <td><img src="${sticker.image_link}" alt="Image" width="50"></td>
+                        <td>${sticker.sticker_link}</td>
+                    </tr>
+                `).join('');
+                    tableBody.innerHTML = rows;
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7">No stickers available for this group.</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching stickers:', error);
+                tableBody.innerHTML = '<tr><td colspan="7">An error occurred while loading stickers.</td></tr>';
+            });
+    }
+</script>
