@@ -31,8 +31,11 @@ class StickerController extends FrontendController
      */
     public function stickerMainPage(Request $request): Response
     {
+        $groups = Utility::fetchFromSqlFile($this->sqlPath . 'select_all_groups.sql');
 
-        return $this->render('sticker/sticker.html.twig');
+        return $this->render('sticker/sticker.html.twig', [
+            'groups' => $groups
+        ]);
     }
 
     /**
