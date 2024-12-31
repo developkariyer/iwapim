@@ -18,14 +18,13 @@ class HelloWorldCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $iwasku = Registry::getKey("B09K7WSQXW",'asin-to-iwasku');
+        $iwasku = Registry::getKey("B0B51XB71B",'asin-to-iwasku');
         if (isset($iwasku)) {
             $product = Product::findByField('iwasku',$iwasku);
             if ($product instanceof Product) {
                 echo $product->getInheritedField('productCode') . "\n";
                 echo $product->getInheritedField('productCategory') . "\n";
                 echo $product->getInheritedField('imageUrl') . "\n";
-                echo $product->getInheritedField('productCode') . "\n";
                 if ($product->getInheritedField('sticker4x6eu')) {
                     echo $product->getInheritedField('sticker4x6eu'). "\n";
                 }
@@ -34,7 +33,7 @@ class HelloWorldCommand extends AbstractCommand
                     $stickerPath = $sticker->getFullPath();
                     echo $stickerPath. "\n";
                 }
-                
+
             } else {
                 print_r('No product found');
             }
