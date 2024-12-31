@@ -18,7 +18,7 @@
                         {% for group in groups %}
                             <a href="#"
                                class="list-group-item list-group-item-action"
-                               onclick="loadStickers(event, {{ group.id }})">
+                               onclick="loadStickers({{ group.id }})">
                                 {{ group.group_name }}
                             </a>
                         {% else %}
@@ -65,8 +65,7 @@
 
 {% block body_scripts %}
     <script>
-        function loadStickers(event, groupId) {
-            event.preventDefault();
+        function loadStickers(groupId) {
             const tableBody = document.getElementById('stickers-table-body');
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
 
