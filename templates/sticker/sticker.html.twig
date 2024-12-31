@@ -126,9 +126,11 @@
             const groupLinks = document.querySelectorAll('.list-group-item');
             groupLinks.forEach(link => {
                 if (parseInt(link.dataset.groupId) === groupId) {
-                    link.classList.add('primary');
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'true');
                 } else {
                     link.classList.remove('active');
+                    link.removeAttribute('aria-current');
                 }
             });
         }
