@@ -22,18 +22,18 @@ class HelloWorldCommand extends AbstractCommand
         if (isset($iwasku)) {
             $product = Product::findByField('iwasku',$iwasku);
             if ($product instanceof Product) {
-                $baseUrl = \Pimcore::getContainer()->get('router')->getContext()->getBaseUrl();
-                echo $baseUrl . "\n";
                 echo $product->getInheritedField('productCode') . "\n";
                 echo $product->getInheritedField('productCategory') . "\n";
                 echo $product->getInheritedField('imageUrl') . "\n";
                 if ($product->getInheritedField('sticker4x6eu')) {
-                    echo PIMCORE_PROJECT_ROOT . $product->getInheritedField('sticker4x6eu'). "\n";
+                    echo "Sticker exists\n";
+                    echo $product->getInheritedField('sticker4x6eu'). "\n";
                 }
                 else {
+                    echo "Sticker does not exist\n";
                     $sticker = $product->checkSticker4x6eu();
                     $stickerPath = $sticker->getFullPath();
-                    echo PIMCORE_PROJECT_ROOT . $stickerPath. "\n";
+                    echo  $stickerPath. "\n";
                 }
 
             } else {
