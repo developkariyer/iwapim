@@ -66,6 +66,8 @@
 {% block body_scripts %}
     <script>
         function loadStickers(groupId) {
+            selectedGroupId = groupId; 
+            highlightSelectedGroup(groupId);
             const tableBody = document.getElementById('stickers-table-body');
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
             fetch(`/sticker/get-stickers/${groupId}`)
@@ -118,6 +120,16 @@
                     }
                 }
             }
+        }
+        function highlightSelectedGroup(groupId) {
+            const groupLinks = document.querySelectorAll('.list-group-item');
+            groupLinks.forEach(link => {
+                if (parseInt(link.dataset.groupId) === groupId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
         }
     </script>
 {% endblock %}
