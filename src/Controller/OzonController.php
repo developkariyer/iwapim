@@ -179,21 +179,12 @@ class OzonController extends FrontendController
             }
             foreach ($data['selectedChildren'] as $productId => $listing) {
                 $product = Product::getById($productId);
-                if (!$product) {
+                [$groupType, $productType] = explode('.', $data['productType']);
+                if ($listing<0 || !$product || !$groupType || !$productType) {
                     continue;
                 }
                 $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
-                if ($listing<0) {
-                    continue;
-                }
-                if ($listing) {
-                    $listingItem = VariantProduct::getById($listing);
-                    if ($listingItem) {
-                        $objectMetadata->setData(['listing'=>$listingItem->getId()]);
-                    }
-                } else {
-                    $objectMetadata->setData(['listing'=>0]);
-                }
+                $objectMetadata->setData(['listing'=>$listing, 'groupType'=>$groupType, 'productType'=>$productType]);
                 $newTaskProducts[] = $objectMetadata;
             }
             $newTaskProducts = array_unique($newTaskProducts);
@@ -221,15 +212,12 @@ class OzonController extends FrontendController
     {
         $task = ListingTemplate::getById($request->get('taskId'));
         if (!$task) {
-            $this->addFlash('danger', 'Task not found');
             return $this->redirectToRoute('ozon_menu');
         }
         $iwasku = $request->get('iwasku');
-        // Try to explode $iwasku using possible delimiters comma, space, newline, tab
         $iwaskuList = preg_split('/[\s,;|]+/', $iwasku);
         $iwaskuList = array_filter($iwaskuList);
         if (empty($iwaskuList)) {
-            $this->addFlash('danger', 'Product not found');
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         $taskProducts = $task->getProducts();
@@ -252,8 +240,6 @@ class OzonController extends FrontendController
         if ($dirty) {
             $task->setProducts($taskProducts);
             $task->save();
-        } else {
-            $this->addFlash('danger', 'Product not found');
         }
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
     }
