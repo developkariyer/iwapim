@@ -96,7 +96,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
-        echo "Last Updated At: $lastUpdatedAt[0]\n";
+        echo "Last Updated At: $lastUpdatedAt\n";
         if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
