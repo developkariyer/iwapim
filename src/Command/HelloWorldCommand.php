@@ -26,12 +26,12 @@ class HelloWorldCommand extends AbstractCommand
                 echo $product->getInheritedField('productCategory') . "\n";
                 echo $product->getInheritedField('imageUrl') . "\n";
                 if ($product->getInheritedField('sticker4x6eu')) {
-                    echo $product->getInheritedField('sticker4x6eu'). "\n";
+                    echo PIMCORE_PROJECT_ROOT . $product->getInheritedField('sticker4x6eu'). "\n";
                 }
                 else {
                     $sticker = $product->checkSticker4x6eu();
                     $stickerPath = $sticker->getFullPath();
-                    echo $stickerPath. "\n";
+                    echo PIMCORE_PROJECT_ROOT . $stickerPath. "\n";
                 }
 
             } else {
