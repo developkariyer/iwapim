@@ -42,8 +42,8 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Id</th>
                             <th scope="col">Iwasku</th>
+                            <th scope="col">Product Code</th>
                             <th scope="col">Category</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Image</th>
@@ -76,8 +76,8 @@
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>
-                        <th scope="row">${sticker.id}</th>
                         <td >${sticker.iwasku}</td>
+                        <td>${sticker.product_code}</td>
                         <td>${sticker.category}</td>
                         <td>${sticker.product_name}</td>
                         <td><img src="${sticker.image_link}" alt="Image" width="50"></td>
