@@ -18,7 +18,7 @@ class HelloWorldCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $iwasku = Registry::getKey("B0B51XB71B",'asin-to-iwasku');
+        $iwasku = Registry::getKey("B0BBS765HH",'asin-to-iwasku');
         if (isset($iwasku)) {
             $product = Product::findByField('iwasku',$iwasku);
             if ($product instanceof Product) {
