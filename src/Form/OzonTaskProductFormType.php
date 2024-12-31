@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Connector\Marketplace\Ozon\Utils;
+use Doctrine\DBAL\Exception;
+use Random\RandomException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,6 +15,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OzonTaskProductFormType extends AbstractType
 {
+    /**
+     * @throws RandomException
+     * @throws Exception
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $taskId = $options['task_id'];
@@ -58,7 +64,7 @@ class OzonTaskProductFormType extends AbstractType
         }
 
         $builder->add('productType', ChoiceType::class, [
-            'choice_loader' => new CallbackChoiceLoader(function () {return Utils::getOzonProductTypes();}),
+            'choices' => Utils::getOzonProductTypes(),
             'label' => 'Ürün Tipi',
             'attr' => [
                 'class' => 'select2 form-select needs-initialization',
