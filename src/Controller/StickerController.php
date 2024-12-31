@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\OzonTaskFormType;
 use App\Form\OzonTaskProductFormType;
 use App\Model\DataObject\VariantProduct;
+use App\Utils\Registry;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
@@ -67,11 +68,9 @@ class StickerController extends FrontendController
         $stickers = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
             'group_id' => $groupId
         ]);
-
         if (empty($stickers)) {
             return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
         }
-
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
@@ -82,18 +81,57 @@ class StickerController extends FrontendController
     public function addSticker(Request $request): Response
     {
         if ($request->isMethod('POST')) {
-            $formData = $request->request->get('form_data');
+            $asin = $request->request->get('form_data');
+            $groupId = $request->request->get('group_id');
+            $iwasku = Registry::getKey($asin,'asin-to-iwasku');
+            if (isset($iwasku)) {
+                $product = Product::findByField('iwasku',$iwasku);
+                if ($product instanceof Product) {
+                    $productCode =  $product->getInheritedField('productCode');
+                    $category = $product->getInheritedField('productCategory');
+                    $productName  = $product->getInheritedField('Name');
+                    $imageUrl = $product->getInheritedField('imageUrl');
+                    $variationSize = $product->getVariationSize() ?? '';
+                    $variationColor = $product->getVariationColor() ?? '';
+                    $productDimension1 = $product->getInheritedField('productDimension1') ?? '';
+                    $productDimension2 = $product->getInheritedField('productDimension2') ?? '';
+                    $productDimension3 = $product->getInheritedField('productDimension3') ?? '';
+                    $packageWeight = $product->getInheritedField('packageWeight') ?? '';
+                    $attributes = $variationSize . '\n' . $variationColor . '\n' . $productDimension1 . '\n' . $productDimension2 . '\n' . $productDimension3 . '\n' . $packageWeight;
+                    if ($product->getInheritedField('sticker4x6eu')) {
+                        $sticker = $product->getInheritedField('sticker4x6eu');
+                    }
+                    else {
+                        $stickerEu = $product->checkSticker4x6eu();
+                        $stickerPath = $stickerEu->getFullPath();
+                        $sticker = $stickerPath;
+                    }
+                    $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
+                        'group_id' => $groupId,
+                        'iwasku' => $iwasku,
+                        'product_code' => $productCode,
+                        'category' => $category,
+                        'product_name' => $productName,
+                        'attributes' => $attributes,
+                        'image_link' => $imageUrl,
+                        'sticker_link' => $sticker
+                    ]);
+                    if ($isSuccess) {
+                        $this->addFlash('success', 'Sticker has been successfully added.');
+                        return $this->redirectToRoute('sticker_new');
+                    } else {
+                        $this->addFlash('error', 'There was an error adding the sticker.');
+                    }
 
-
-            /*$isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
-                'group_name' => $formData
-            ]);
-            if ($isSuccess) {
-                $this->addFlash('success', 'Group has been successfully added.');
-                return $this->redirectToRoute('sticker_new_group');
-            } else {
-                $this->addFlash('error', 'There was an error adding the group.');
-            }*/
+                } else {
+                    $this->addFlash('error', 'No product found');
+                    return $this->redirectToRoute('sticker_new');
+                }
+            }
+            else {
+                $this->addFlash('error', 'No iwasku found');
+                return $this->redirectToRoute('sticker_new');
+            }
         }
         $groups = Utility::fetchFromSqlFile($this->sqlPath . 'select_all_groups.sql');
         return $this->render('sticker/add_sticker.html.twig', [

@@ -42,12 +42,11 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Iwasku</th>
                             <th scope="col">Product Code</th>
+                            <th scope="col">Iwasku</th>
                             <th scope="col">Category</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Image</th>
-                            <th scope="col">Sticker</th>
                         </tr>
                         </thead>
                         <tbody id="stickers-table-body">
@@ -75,12 +74,16 @@
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>
-                        <td >${sticker.iwasku}</td>
                         <td>${sticker.product_code}</td>
+                        <td >${sticker.iwasku}</td>
                         <td>${sticker.category}</td>
-                        <td>${sticker.product_name}</td>
+                        <td>
+                            <a href="${sticker.sticker_link}" target="_blank">
+                                ${sticker.product_name}
+                            </a>
+                            ${sticker.attributes}
+                        </td>
                         <td><img src="${sticker.image_link}" alt="Image" width="50"></td>
-                        <td>${sticker.sticker_link}</td>
                     </tr>
                 `).join('');
                         tableBody.innerHTML = rows;
