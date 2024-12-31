@@ -26,7 +26,7 @@ class HelloWorldCommand extends AbstractCommand
                 echo $product->getInheritedField('productCategory') . "\n";
                 echo $product->getInheritedField('imageUrl') . "\n";
                 echo $product->getInheritedField('productCode') . "\n";
-                $sticker = Product::checkSticker4x6eu();
+                $sticker = $product->checkSticker4x6eu();
                 $stickerPath = $sticker->getFullPath();
                 echo $stickerPath. "\n";
             } else {
