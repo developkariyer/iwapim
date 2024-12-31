@@ -24,7 +24,7 @@ class HelloWorldCommand extends AbstractCommand
             if ($product instanceof Product) {
                 echo $product->getInheritedField('productCode') . "\n";
                 echo $product->getInheritedField('productCategory') . "\n";
-                echo $product->getInheritedField('image') . "\n";
+                echo $product->getInheritedField('imageUrl') . "\n";
                 echo $product->getInheritedField('productCode') . "\n";
             } else {
                 print_r('No product found');
