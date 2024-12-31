@@ -7,7 +7,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
+use App\Utils\Utility;
+use App\Utils\Registry;
 #[AsCommand(
     name: 'app:hello-world',
     description: 'Outputs Hello, World!'
@@ -16,9 +17,11 @@ class HelloWorldCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $iwasku = Registry::getKey("B08VKMV227",'asin-to-iwasku');
+        $this->writeInfo($iwasku);
+
         // Output "Hello, World!" as green text
-        $this->writeInfo('Hello, World!');
-        
+
         // Return success status code
         return Command::SUCCESS;
     }
