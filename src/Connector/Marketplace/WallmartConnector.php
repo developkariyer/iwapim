@@ -28,7 +28,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Wallmart';
     private static $expires_in;
     private static $correlationId;
-    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Connector/Wallmart/';
+    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Connector/';
 
     /**
      * @throws RandomException
@@ -221,7 +221,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         $lastUpdatedAt = "";
         try {
-            $lastUpdatedAt = Utility::fetchFromSqlFile($this->sqlPath . 'select_last_updateat.sql',['marketplace_id' => $this->marketplace->getId()]);
+            $lastUpdatedAt = Utility::fetchFromSqlFile($this->sqlPath . 'Wallmart/select_last_updateat.sql',['marketplace_id' => $this->marketplace->getId()]);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             return;
@@ -259,20 +259,14 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 try {
                     $data = $response->toArray();
                     $orders = $data['list']['elements']['order'];
-                    $db->beginTransaction();
                     foreach ($orders as $order) {
-                        $db->executeStatement(
-                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                            [
-                                $this->marketplace->getId(),
-                                $order['purchaseOrderId'],
-                                json_encode($order)
-                            ]
-                        );
+                        Utility::executeSqlFile($this->sqlPath . 'insert_marketplace_orders.sql', [
+                            'marketplace_id' => $this->marketplace->getId(),
+                            'order_id' => $order['purchaseOrderId'],
+                            'json' => json_encode($order)
+                        ]);
                     }
-                    $db->commit();
                 } catch (\Exception $e) {
-                    $db->rollBack();
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $offset += $limit;
