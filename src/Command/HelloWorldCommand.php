@@ -18,7 +18,7 @@ class HelloWorldCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $iwasku = Registry::getKey("B08VKMV227",'asin-to-iwasku');
+        $iwasku = Registry::getKey("B09K7WSQXW",'asin-to-iwasku');
         if (isset($iwasku)) {
             $product = Product::findByField('iwasku',$iwasku);
             if ($product instanceof Product) {
@@ -26,6 +26,7 @@ class HelloWorldCommand extends AbstractCommand
                 echo $product->getInheritedField('productCategory') . "\n";
                 echo $product->getInheritedField('imageUrl') . "\n";
                 echo $product->getInheritedField('productCode') . "\n";
+                echo $product->getInheritedField('sticker4x6eu') . "\n";
             } else {
                 print_r('No product found');
             }
