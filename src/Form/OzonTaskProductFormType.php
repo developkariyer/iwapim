@@ -64,6 +64,7 @@ class OzonTaskProductFormType extends AbstractType
 
         $builder->add('productType', ChoiceType::class, [
             'choices' => [],
+            'choice_lazy' => true,
             'label' => 'Ürün Tipi',
             'attr' => [
                 'class' => 'select2 form-select needs-initialization',
