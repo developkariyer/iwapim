@@ -87,6 +87,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
+        echo "TRENDYOLL...\n";
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         $lastUpdatedAt = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql', [
