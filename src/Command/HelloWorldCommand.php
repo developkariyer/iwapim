@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Model\DataObject\Product;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -24,7 +24,7 @@ class HelloWorldCommand extends AbstractCommand
             if ($variant instanceof VariantProduct) {
                 print_r($variant->getIwasku());
             } else {
-                print_r('No variant found');
+                print_r('No product found');
             }
         }
         $this->writeInfo($iwasku);
