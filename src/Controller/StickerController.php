@@ -47,14 +47,13 @@ class StickerController extends FrontendController
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
-            $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', [
-                'group_name' => $formData
-            ]);
-            if ($isSuccess) {
-                $this->addFlash('success', 'Group has been successfully added.');
+            try {
+                Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', ['group_name' => $formData]);
                 return $this->redirectToRoute('sticker_new_group');
-            } else {
-                $this->addFlash('error', 'There was an error adding the group.');
+            }  catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                $this->addFlash('error', 'Bu grup daha öncede eklenmiş.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
             }
         }
         return $this->render('sticker/add_sticker_group.html.twig');
@@ -118,20 +117,20 @@ class StickerController extends FrontendController
                             'image_link' => $imageUrl,
                             'sticker_link' => $sticker,
                         ]);
-                        $this->addFlash('success', 'Sticker has been successfully added.');
+                        $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
                     } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                        $this->addFlash('error', 'The provided IWASKU already exists. Please use a unique IWASKU.');
+                        $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
                     } catch (\Exception $e) {
-                        $this->addFlash('error', 'An unexpected error occurred. Please try again later.');
+                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
                     }
 
                 } else {
-                    $this->addFlash('error', 'No product found');
+                    $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
                     return $this->redirectToRoute('sticker_new');
                 }
             }
             else {
-                $this->addFlash('error', 'No iwasku found');
+                $this->addFlash('error', 'Yanlış Ürün Sorumluya Ulaşın.');
                 return $this->redirectToRoute('sticker_new');
             }
         }
