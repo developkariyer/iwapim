@@ -71,17 +71,9 @@
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
 
             fetch(`/sticker/get-stickers/${groupId}`)
-                .then(response => {
-                    console.log('Response:', response);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Data:', data);
-                })
-                .catch(error => {
-                    console.error('Error fetching stickers:', error);
-                })
-                .then(data => {
+                    console.log('API Response:', data);
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>
