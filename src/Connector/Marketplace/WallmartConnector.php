@@ -221,7 +221,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $lastUpdatedAt = "";
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Wallmart/select_last_updated_at.sql',['marketplace_id' => $this->marketplace->getId()]);
-            $lastUpdatedAt = $result[0]['last_updated_at'];
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             return;
