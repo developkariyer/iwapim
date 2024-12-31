@@ -22,6 +22,8 @@ class HelloWorldCommand extends AbstractCommand
         if (isset($iwasku)) {
             $product = Product::findByField('iwasku',$iwasku);
             if ($product instanceof Product) {
+                $baseUrl = \Pimcore::getContainer()->get('router')->getContext()->getBaseUrl();
+                echo $baseUrl . "\n";
                 echo $product->getInheritedField('productCode') . "\n";
                 echo $product->getInheritedField('productCategory') . "\n";
                 echo $product->getInheritedField('imageUrl') . "\n";
