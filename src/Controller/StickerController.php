@@ -106,21 +106,23 @@ class StickerController extends FrontendController
                         $stickerPath = $stickerEu->getFullPath();
                         $sticker = $stickerPath;
                     }
-                    $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
-                        'group_id' => $groupId,
-                        'iwasku' => $iwasku,
-                        'product_code' => $productCode,
-                        'category' => $category,
-                        'product_name' => $productName,
-                        'attributes' => $attributes,
-                        'image_link' => $imageUrl,
-                        'sticker_link' => $sticker
-                    ]);
-                    if ($isSuccess) {
+
+                    try {
+                        Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
+                            'group_id' => $groupId,
+                            'iwasku' => $iwasku,
+                            'product_code' => $productCode,
+                            'category' => $category,
+                            'product_name' => $productName,
+                            'attributes' => $attributes,
+                            'image_link' => $imageUrl,
+                            'sticker_link' => $sticker,
+                        ]);
                         $this->addFlash('success', 'Sticker has been successfully added.');
-                        return $this->redirectToRoute('sticker_new');
-                    } else {
-                        $this->addFlash('error', 'There was an error adding the sticker.');
+                    } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                        $this->addFlash('error', 'The provided IWASKU already exists. Please use a unique IWASKU.');
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'An unexpected error occurred. Please try again later.');
                     }
 
                 } else {
