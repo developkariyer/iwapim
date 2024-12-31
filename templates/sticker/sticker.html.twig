@@ -63,10 +63,11 @@
 
 {% endblock %}
 
+
 {% block body_scripts %}
     <script>
         function loadStickers(groupId) {
-            selectedGroupId = groupId; 
+            selectedGroupId = groupId;
             highlightSelectedGroup(groupId);
             const tableBody = document.getElementById('stickers-table-body');
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
