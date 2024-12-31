@@ -92,7 +92,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         try {
             $lastUpdatedAt = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
-            ])[0]['last_updated_at'];
+            ]);
+            print_r($lastUpdatedAt);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
