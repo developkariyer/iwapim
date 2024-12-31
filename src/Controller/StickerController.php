@@ -97,7 +97,7 @@ class StickerController extends FrontendController
                     $productDimension2 = $product->getInheritedField('productDimension2') ?? '';
                     $productDimension3 = $product->getInheritedField('productDimension3') ?? '';
                     $packageWeight = $product->getInheritedField('packageWeight') ?? '';
-                    $attributes = $variationSize . '\n' . $variationColor . '\n' . $productDimension1 . '\n' . $productDimension2 . '\n' . $productDimension3 . '\n' . $packageWeight;
+                    $attributes = $variationSize . ' ' . $variationColor . ' ' . $productDimension1 . ' ' . $productDimension2 . ' ' . $productDimension3 . ' ' . $packageWeight;
                     if ($product->getInheritedField('sticker4x6eu')) {
                         $sticker = $product->getInheritedField('sticker4x6eu');
                     }
