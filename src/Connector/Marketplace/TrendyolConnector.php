@@ -89,8 +89,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
-        $lastUpdatedAt = "";
-        echo "File: "  . parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql' . "\n";
         try {
             $lastUpdatedAt = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
@@ -98,7 +96,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
-        echo "Last Updated At: $lastUpdatedAt\n";
+        echo "Last Updated At: $lastUpdatedAt[0]\n";
         if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
