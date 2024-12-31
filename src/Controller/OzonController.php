@@ -162,7 +162,7 @@ class OzonController extends FrontendController
             'selected_children' => $selectedChildren,
         ]);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $data = $form->getData();
             $taskProducts = $task->getProducts();
             $newTaskProducts = [];
@@ -178,9 +178,9 @@ class OzonController extends FrontendController
             }
             foreach ($data['selectedChildren'] as $productId => $listing) {
                 $product = Product::getById($productId);
-                $groupType = $data['productType']['descriptionCategoryId'];
-                $productType = $data['productType']['typeId'];
-                if ($listing<0 || !$product || !$groupType || !$productType) {
+                $groupType = $data['productType']['descriptionCategoryId'] ?? null;
+                $productType = $data['productType']['typeId'] ?? null;
+                if ($listing<0 || !$product) {
                     continue;
                 }
                 $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
