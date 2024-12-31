@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Connector\Marketplace\Ozon\Utils;
+use App\Form\Transformer\ProductTypeTransformer;
 use Doctrine\DBAL\Exception;
 use Random\RandomException;
 use Symfony\Component\Form\AbstractType;
@@ -64,7 +65,7 @@ class OzonTaskProductFormType extends AbstractType
         }
 
         $builder->add('productType', ChoiceType::class, [
-            'choices' => Utils::getOzonProductTypes(),
+            'choices' => [],
             'label' => 'Ürün Tipi',
             'attr' => [
                 'class' => 'select2 form-select needs-initialization',
@@ -74,6 +75,8 @@ class OzonTaskProductFormType extends AbstractType
             ],
             'required' => false,
         ]);
+        $builder->get('productType')->addModelTransformer(new ProductTypeTransformer());
+
 
         $builder->add($selectedChildrenGroup);
 

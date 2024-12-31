@@ -180,7 +180,8 @@ class OzonController extends FrontendController
             }
             foreach ($data['selectedChildren'] as $productId => $listing) {
                 $product = Product::getById($productId);
-                [$groupType, $productType] = explode('.', $data['productType']);
+                $groupType = $data['productType']['descriptionCategoryId'];
+                $productType = $data['productType']['typeId'];
                 if ($listing<0 || !$product || !$groupType || !$productType) {
                     continue;
                 }
