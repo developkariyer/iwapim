@@ -97,6 +97,11 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
+        if (empty($lastUpdatedAt)) {
+            echo "No data found for marketplace_id: " . $this->marketplace->getId() . "\n";
+        } else {
+            echo "Last updated at: " . $lastUpdatedAt[0]['last_updated_at'] . "\n";
+        }
         echo "Last Updated At: $lastUpdatedAt\n";
         if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
