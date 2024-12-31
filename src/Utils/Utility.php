@@ -323,6 +323,7 @@ class Utility
         try {
             $db = \Pimcore\Db::get();
             $sql = file_get_contents($filePath);
+            print_r($sql);
             return $db->fetchAllAssociative($sql, $params);
         }catch (\Exception $e) {
             throw $e;
