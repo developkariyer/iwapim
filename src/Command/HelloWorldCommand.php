@@ -20,7 +20,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $iwasku = Registry::getKey("B08VKMV227",'asin-to-iwasku');
         if (isset($iwasku)) {
-            $variant = Product::findOneByField('iwasku',$iwasku);
+            $variant = Product::findByField('iwasku',$iwasku);
             if ($variant instanceof VariantProduct) {
                 print_r($variant->getIwasku());
             } else {
