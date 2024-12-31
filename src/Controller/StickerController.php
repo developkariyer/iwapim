@@ -118,11 +118,13 @@ class StickerController extends FrontendController
                             'image_link' => $imageUrl,
                             'sticker_link' => $sticker,
                         ]);
+                        $this->addFlash('success', 'Sticker has been successfully added.');
                     } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
                         $this->addFlash('error', 'The provided IWASKU already exists. Please use a unique IWASKU.');
                     } catch (\Exception $e) {
                         $this->addFlash('error', 'An unexpected error occurred. Please try again later.');
                     }
+
                 } else {
                     $this->addFlash('error', 'No product found');
                     return $this->redirectToRoute('sticker_new');
