@@ -28,6 +28,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Wallmart';
     private static $expires_in;
     private static $correlationId;
+    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Connector/Wallmart/';
 
     /**
      * @throws RandomException
@@ -218,12 +219,13 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $db = \Pimcore\Db::get();
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
-        $lastUpdatedAt = $db->fetchOne(" 
-            SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderLines.orderLine[0].statusDate')) / 1000)), '%Y-%m-%d'),DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 180 DAY), '%Y-%m-%d')) AS lastUpdatedAt            
-            FROM iwa_marketplace_orders
-            WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
+        $lastUpdatedAt = "";
+        try {
+            $lastUpdatedAt = Utility::fetchFromSqlFile($this->sqlPath . 'select_last_updateat.sql',['marketplace_id' => $this->marketplace->getId()]);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            return;
+        }
         echo "Last Updated At: $lastUpdatedAt\n";
         if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
