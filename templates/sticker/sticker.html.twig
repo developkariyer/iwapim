@@ -18,7 +18,6 @@
                         {% for group in groups %}
                             <a href="#"
                                class="list-group-item list-group-item-action"
-                               data-group-id="{{ group.id }}"
                                onclick="loadStickers(event, {{ group.id }})">
                                 {{ group.group_name }}
                             </a>
