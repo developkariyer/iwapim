@@ -81,9 +81,11 @@ class StickerController extends FrontendController
      */
     public function addSticker(Request $request): Response
     {
-        /*if ($request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
-            $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', [
+
+
+            /*$isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
                 'group_name' => $formData
             ]);
             if ($isSuccess) {
@@ -91,9 +93,12 @@ class StickerController extends FrontendController
                 return $this->redirectToRoute('sticker_new_group');
             } else {
                 $this->addFlash('error', 'There was an error adding the group.');
-            }
-        }*/
-        return $this->render('sticker/add_sticker.html.twig');
+            }*/
+        }
+        $groups = Utility::fetchFromSqlFile($this->sqlPath . 'select_all_groups.sql');
+        return $this->render('sticker/add_sticker.html.twig', [
+            'groups' => $groups
+        ]);
     }
 
 }
