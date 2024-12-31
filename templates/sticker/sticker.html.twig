@@ -76,6 +76,12 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log('Data:', data);
+                })
+                .catch(error => {
+                    console.error('Error fetching stickers:', error);
+                })
+                .then(data => {
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>
