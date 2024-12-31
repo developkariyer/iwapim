@@ -64,17 +64,18 @@
 
 {% endblock %}
 
-<script>
-    function loadStickers(event, groupId) {
-        event.preventDefault();
-        const tableBody = document.getElementById('stickers-table-body');
-        tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+{% block body_scripts %}
+    <script>
+        function loadStickers(event, groupId) {
+            event.preventDefault();
+            const tableBody = document.getElementById('stickers-table-body');
+            tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
 
-        fetch(`/sticker/get-stickers/${groupId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const rows = data.stickers.map(sticker => `
+            fetch(`/sticker/get-stickers/${groupId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const rows = data.stickers.map(sticker => `
                     <tr>
                         <th scope="row">${sticker.id}</th>
                         <td >${sticker.iwasku}</td>
@@ -84,14 +85,15 @@
                         <td>${sticker.sticker_link}</td>
                     </tr>
                 `).join('');
-                    tableBody.innerHTML = rows;
-                } else {
-                    tableBody.innerHTML = '<tr><td colspan="7">No stickers available for this group.</td></tr>';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching stickers:', error);
-                tableBody.innerHTML = '<tr><td colspan="7">An error occurred while loading stickers.</td></tr>';
-            });
-    }
-</script>
+                        tableBody.innerHTML = rows;
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="7">No stickers available for this group.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching stickers:', error);
+                    tableBody.innerHTML = '<tr><td colspan="7">An error occurred while loading stickers.</td></tr>';
+                });
+        }
+    </script>
+{% endblock %}
