@@ -64,7 +64,7 @@ class OzonTaskProductFormType extends AbstractType
                 'data-placeholder' => 'Ürün Tipi Seçiniz...',
                 'data-minimum-input-length' => 3,
             ],
-            'required' => true,
+            'required' => false,
         ]);
 
         $builder->add($selectedChildrenGroup);
