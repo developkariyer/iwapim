@@ -18,12 +18,12 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 {
     private static $apiUrl = [
         'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token",
-        'offers' => 'https://marketplace.walmartapis.com/v3/items',
-        'item' => 'https://marketplace.walmartapis.com/v3/items/',
-        'associations' => 'https://marketplace.walmartapis.com/v3/items/associations',
-        'orders' => 'https://marketplace.walmartapis.com/v3/orders',
-        'inventory' => 'https://marketplace.walmartapis.com/v3/inventory',
-        'price' => 'https://marketplace.walmartapis.com/v3/price'
+        'offers' => 'items',
+        'item' => 'items/',
+        'associations' => 'items/associations',
+        'orders' => 'orders',
+        'inventory' => 'inventory',
+        'price' => 'price'
     ];
     public static string $marketplaceType = 'Wallmart';
 
