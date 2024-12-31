@@ -25,6 +25,13 @@
     {% endblock %}
 </header>
 <main class="container mt-4">
+    {% for type, messages in app.flashes %}
+        <div class="alert alert-{{ type }}">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endfor %}
     {% block content %}
         <!-- Content will be injected here -->
     {% endblock %}
