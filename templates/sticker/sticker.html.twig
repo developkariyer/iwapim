@@ -71,7 +71,10 @@
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
 
             fetch(`/sticker/get-stickers/${groupId}`)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response:', response);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
