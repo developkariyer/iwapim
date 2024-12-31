@@ -68,11 +68,11 @@ class StickerController extends FrontendController
             'group_id' => $groupId
         ]);
 
-        if (!isset($stickers[$groupId])) {
-            return new JsonResponse(['success' => false, 'stickers' => []]);
+        if (empty($stickers)) {
+            return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
         }
 
-        return new JsonResponse(['success' => true, 'stickers' => $stickers[$groupId]]);
+        return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
 }
