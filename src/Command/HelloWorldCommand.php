@@ -22,7 +22,10 @@ class HelloWorldCommand extends AbstractCommand
         if (isset($iwasku)) {
             $product = Product::findByField('iwasku',$iwasku);
             if ($product instanceof Product) {
-                print_r($product->getInheritedField('productCode'));
+                echo $product->getInheritedField('productCode') . "\n";
+                echo $product->getInheritedField('productCategory') . "\n";
+                echo $product->getInheritedField('image') . "\n";
+                echo $product->getInheritedField('productCode') . "\n";
             } else {
                 print_r('No product found');
             }
