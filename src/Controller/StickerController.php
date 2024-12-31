@@ -44,7 +44,7 @@ class StickerController extends FrontendController
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
             $isSuccess = Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', [
-                'group' => $formData
+                'group_name' => $formData
             ]);
             if ($isSuccess) {
                 $this->addFlash('success', 'Group has been successfully added.');
