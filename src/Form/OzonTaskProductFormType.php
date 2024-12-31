@@ -6,10 +6,10 @@ use App\Form\Transformer\ProductTypeTransformer;
 use Doctrine\DBAL\Exception;
 use Random\RandomException;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -63,7 +63,7 @@ class OzonTaskProductFormType extends AbstractType
             }
         }
 
-        $builder->add('productType', ChoiceType::class, [
+        $builder->add('productType', TextType::class, [
             'choices' => [],
             'label' => 'Ürün Tipi',
             'attr' => [
