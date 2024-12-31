@@ -22,6 +22,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
 
     const string LISTINGS_FILE_NAME = 'LISTINGS.json';
     const string MARKETPLACE_TEMP_PATH = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/";
+    const string SQL_PATH = PIMCORE_PROJECT_ROOT . '/src/SQL/Connector/';
 
     /**
      * @throws \Exception

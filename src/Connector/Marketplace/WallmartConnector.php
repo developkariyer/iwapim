@@ -28,7 +28,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Wallmart';
     private static $expires_in;
     private static $correlationId;
-    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Connector/';
 
     /**
      * @throws RandomException
@@ -221,7 +220,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         $lastUpdatedAt = "";
         try {
-            $lastUpdatedAt = Utility::fetchFromSqlFile($this->sqlPath . 'Wallmart/select_last_updateat.sql',['marketplace_id' => $this->marketplace->getId()]);
+            $lastUpdatedAt = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Wallmart/select_last_updateat.sql',['marketplace_id' => $this->marketplace->getId()]);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             return;
@@ -260,7 +259,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $data = $response->toArray();
                     $orders = $data['list']['elements']['order'];
                     foreach ($orders as $order) {
-                        Utility::executeSqlFile($this->sqlPath . 'insert_marketplace_orders.sql', [
+                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
                             'marketplace_id' => $this->marketplace->getId(),
                             'order_id' => $order['purchaseOrderId'],
                             'json' => json_encode($order)
