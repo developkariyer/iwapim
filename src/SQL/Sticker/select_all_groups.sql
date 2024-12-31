@@ -1,2 +1,2 @@
-SELECT  group_name
+SELECT  *
 FROM    iwa_sticker_groups
