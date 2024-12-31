@@ -26,9 +26,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'price' => 'price'
     ];
     public static string $marketplaceType = 'Wallmart';
-
-    public static $expires_in;
-    public static $correlationId;
+    private static $expires_in;
+    private static $correlationId;
 
     /**
      * @throws RandomException
