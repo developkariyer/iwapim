@@ -183,7 +183,7 @@ class OzonController extends FrontendController
                 if ($listing<0 || !$product) {
                     continue;
                 }
-                $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
+                $objectMetadata = new ObjectMetadata('products', ['listing', 'groupType', 'productType'], $product);
                 $objectMetadata->setData(['listing'=>$listing, 'groupType'=>$groupType, 'productType'=>$productType]);
                 $newTaskProducts[] = $objectMetadata;
             }
