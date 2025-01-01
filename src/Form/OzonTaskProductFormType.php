@@ -24,6 +24,7 @@ class OzonTaskProductFormType extends AbstractType
         $parentProductId = $options['parent_product_id'];
         $children = $options['children'];
         $selectedChildren = $options['selected_children'];
+        $productTypeOption = $options['product_type'];
 
         $builder
             ->add('taskId', HiddenType::class, [
@@ -63,8 +64,10 @@ class OzonTaskProductFormType extends AbstractType
         }
 
         $builder->add('productType', ChoiceType::class, [
-            'choices' => [],
-            //'choice_lazy' => true,
+            'choices' => [
+                $productTypeOption['text'] => $productTypeOption['id'],
+            ],
+            'data' => $productTypeOption['id'],
             'label' => 'Ürün Tipi',
             'attr' => [
                 'class' => 'select2 form-select needs-initialization',

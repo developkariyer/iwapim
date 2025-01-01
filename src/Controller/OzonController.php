@@ -144,22 +144,42 @@ class OzonController extends FrontendController
             $selectedChildren[$child->getId()] = -1;
         }
         $taskProducts = $task->getProducts();
+        $descriptionCategoryId = null;
+        $typeId = null;
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
             if (!$product instanceof Product) {
                 continue;
             }
             $listingData = $taskProduct->getData()['listing'];
+            if (empty($descriptionCategoryId)) {
+                $descriptionCategoryId = $taskProduct->getData()['groupType'];
+            }
+            if (empty($typeId)) {
+                $typeId = $taskProduct->getData()['productType'];
+            }
             if (!is_numeric($listingData)) {
                 continue;
             }
             $selectedChildren[$product->getId()] = $listingData;
+        }
+        if (!empty($descriptionCategoryId) && !empty($typeId)) {
+            $productTypeOption = [
+                'id' => $descriptionCategoryId . '.' . $typeId,
+                'text' => Utils::isOzonProductType($descriptionCategoryId, $typeId),
+            ];
+        } else {
+            $productTypeOption = [
+                'id' => null,
+                'text' => null,
+            ];
         }
         $form = $this->createForm(OzonTaskProductFormType::class, null, [
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
             'children' => $children,
             'selected_children' => $selectedChildren,
+            'product_type' => $productTypeOption,
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {

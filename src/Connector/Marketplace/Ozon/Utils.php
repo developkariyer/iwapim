@@ -45,10 +45,9 @@ class Utils
     /**
      * @throws Exception
      */
-    static public function isOzonProductType(string $descriptionCategoryId, string $typeId): bool
+    static public function isOzonProductType(string $descriptionCategoryId, string $typeId)
     {
         $db = Db::get();
-        $result = $db->fetchOne('SELECT COUNT(*) FROM iwa_ozon_producttype WHERE description_category_id = ? AND type_id = ?', [$descriptionCategoryId, $typeId]);
-        return $result > 0;
+        return $db->fetchOne('SELECT category_full_name FROM iwa_ozon_producttype WHERE description_category_id = ? AND type_id = ?', [$descriptionCategoryId, $typeId]);
     }
 }

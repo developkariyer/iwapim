@@ -15,6 +15,9 @@ class ProductTypeTransformer implements DataTransformerInterface
      */
     public function transform(mixed $value): mixed
     {
+        if (is_array($value) && isset($value['descriptionCategoryId'], $value['typeId'])) {
+            return $value['descriptionCategoryId'] . '.' . $value['typeId'];
+        }
         return $value;
     }
 
