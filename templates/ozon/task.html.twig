@@ -4,8 +4,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingParent{{ taskId }}_{{ parentProductId }}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseParent{{ taskId }}_{{ parentProductId }}" aria-expanded="false" aria-controls="collapseParent{{ taskId }}_{{ parentProductId }}">
-                    {{ parentData.parentProduct.getKey() }} ({{ parentData.products|length }} varyasyon)<br>
-                    {{ parentData.productType }}
+                    {{ parentData.parentProduct.getKey() }} ({{ parentData.products|length }} varyasyon) ({{ parentData.productType }})
                 </button>
             </h2>
             <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
