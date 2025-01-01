@@ -185,6 +185,7 @@ class OzonController extends FrontendController
                 $product = Product::getById($productId);
                 $groupType = $data['productType']['descriptionCategoryId'] ?? 0;
                 $productType = $data['productType']['typeId'] ?? 0;
+                error_log(json_encode($data['productType']));
                 if ($listing<0 || !$product) {
                     continue;
                 }
