@@ -149,20 +149,12 @@ class OzonController extends FrontendController
             $selectedChildren[$child->getId()] = -1;
         }
         $taskProducts = $task->getProducts();
-        $descriptionCategoryId = null;
-        $typeId = null;
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
             if (!$product instanceof Product) {
                 continue;
             }
             $listingData = $taskProduct->getData()['listing'];
-            if (empty($descriptionCategoryId)) {
-                $descriptionCategoryId = $taskProduct->getData()['grouptype'];
-            }
-            if (empty($typeId)) {
-                $typeId = $taskProduct->getData()['producttype'];
-            }
             if (!is_numeric($listingData)) {
                 continue;
             }
