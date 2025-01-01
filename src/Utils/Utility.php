@@ -308,7 +308,7 @@ class Utility
             $stmt = $db->prepare($sql);
             $stmt->executeStatement($params);
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
+            throw $e;
         }
     }
 
@@ -325,7 +325,7 @@ class Utility
             $sql = file_get_contents($filePath);
             return $db->fetchAllAssociative($sql, $params);
         }catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
+            throw $e;
         }
         return [];
     }

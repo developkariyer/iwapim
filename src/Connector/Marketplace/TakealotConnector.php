@@ -199,20 +199,14 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             try {
                 $data = $response->toArray();
                 $orders = $data['sales'];
-                $db->beginTransaction();
                 foreach ($orders as $order) {
-                    $db->executeStatement(
-                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                        [
-                            $this->marketplace->getId(),
-                            $order['order_id'],
-                            json_encode($order)
-                        ]
-                    );
+                    Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                        'marketplace_id' => $this->marketplace->getId(),
+                        'order_id' => $order['order_id'],
+                        'json' => json_encode($order)
+                    ]);
                 }
-                $db->commit();
             } catch (\Exception $e) {
-                $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
             }
             echo "Page: " . $page . " ";

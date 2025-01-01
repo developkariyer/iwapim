@@ -15,13 +15,15 @@
             <div class="row mt-2">
                 <div class="col-12">
                     <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
-                            The current link item
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">A second link item</a>
-                        <a href="#" class="list-group-item list-group-item-action">A third link item</a>
-                        <a href="#" class="list-group-item list-group-item-action">A fourth link item</a>
-                        <a href="#" class="list-group-item list-group-item-action disabled" tabindex="-1" aria-disabled="true">A disabled link item</a>
+                        {% for group in groups %}
+                            <a href="#"
+                               class="list-group-item list-group-item-action"
+                               onclick="loadStickers({{ group.id }})">
+                                {{ group.group_name }}
+                            </a>
+                        {% else %}
+                            <p class="text-muted">No groups available.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -31,107 +33,24 @@
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary">New Sticker</button>
+                        <a href="{{ path('sticker_new') }}" class="btn btn-primary">New Sticker</a>
                     </div>
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-12">
+                <div class="col-12" id="stickers-container">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Group</th>
+                            <th scope="col">Product Code</th>
                             <th scope="col">Iwasku</th>
                             <th scope="col">Category</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Image</th>
-                            <th scope="col">Sticker</th>
-
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr><tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>@fat</td>
-                        </tr>
+                        <tbody id="stickers-table-body">
                         </tbody>
                     </table>
                 </div>
@@ -142,4 +61,78 @@
 
 
 
+{% endblock %}
+
+
+{% block body_scripts %}
+    <script>
+        function loadStickers(groupId) {
+            selectedGroupId = groupId;
+            highlightSelectedGroup(groupId);
+            const tableBody = document.getElementById('stickers-table-body');
+            tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+            fetch(`/sticker/get-stickers/${groupId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API Response:', data);
+                    if (data.success) {
+                        const rows = data.stickers.map(sticker => `
+                    <tr>
+                        <td>${sticker.product_code}</td>
+                        <td >${sticker.iwasku}</td>
+                        <td>${sticker.category}</td>
+                        <td>
+                            <a href="${sticker.sticker_link}" target="_blank">
+                                ${sticker.product_name}
+                            </a>
+                            <br>
+                            ${sticker.product_attributes ? sticker.product_attributes.split(' ').join('<br>') : ''}
+                        </td>
+                        <td><img src="${sticker.image_link}" alt="Image" width="50"></td>
+                    </tr>
+                `).join('');
+                        tableBody.innerHTML = rows;
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="7">No stickers available for this group.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching stickers:', error);
+                    tableBody.innerHTML = '<tr><td colspan="7">An error occurred while loading stickers.</td></tr>';
+                });
+        }
+        function searchTable() {
+            var input, filter, table, tr, td, i, j, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 1; i < tr.length; i++) {
+                tr[i].style.display = "none";
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        function highlightSelectedGroup(groupId) {
+            const groupLinks = document.querySelectorAll('.list-group-item');
+            groupLinks.forEach(link => {
+                if (parseInt(link.dataset.groupId) === groupId) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'true');
+                } else {
+                    link.classList.remove('active');
+                    link.removeAttribute('aria-current');
+                }
+            });
+        }
+    </script>
 {% endblock %}

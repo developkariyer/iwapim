@@ -1,2 +1,2 @@
-INSERT INTO iwa_sticker_groups (group)
-VALUES (:group);
+INSERT INTO iwa_sticker_groups (group_name)
+VALUES (:group_name);
