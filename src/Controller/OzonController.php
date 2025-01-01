@@ -168,17 +168,6 @@ class OzonController extends FrontendController
             }
             $selectedChildren[$product->getId()] = $listingData;
         }
-        if (!empty($descriptionCategoryId) && !empty($typeId)) {
-            $productTypeOption = [
-                'id' => $descriptionCategoryId . '.' . $typeId,
-                'text' => Utils::isOzonProductType($descriptionCategoryId, $typeId),
-            ];
-        } else {
-            $productTypeOption = [
-                'id' => null,
-                'text' => null,
-            ];
-        }
         $form = $this->createForm(OzonTaskProductFormType::class, null, [
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
