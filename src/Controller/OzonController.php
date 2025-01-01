@@ -190,6 +190,7 @@ class OzonController extends FrontendController
                 }
                 $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $product);
                 $objectMetadata->setData(['listing'=>$listing, 'grouptype'=>$groupType, 'producttype'=>$productType]);
+                error_log("{$product->getIwasku()} {$product->getKey()} l:{$listing} g:{$groupType} t:{$productType}");
                 $newTaskProducts[] = $objectMetadata;
             }
             $newTaskProducts = array_unique($newTaskProducts);
