@@ -74,6 +74,7 @@ class OzonController extends FrontendController
      * @return Response
      *
      * This controller method displays the detail page for an Ozon Listing task.
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getTaskProducts(Request $request): Response
     {
@@ -95,9 +96,13 @@ class OzonController extends FrontendController
                 $parentProducts[$id] = [
                     'parentProduct' => $parentProduct,
                     'products' => [$product],
+                    'productType' => Utils::isOzonProductType($taskProduct->getData()['grouptype'], $taskProduct->getData()['producttype']),
                 ];
             } else {
                 $parentProducts[$id]['products'][] = $product;
+                if (empty($parentProducts[$id]['productType']) && !empty($taskProduct->getData()['grouptype']) && !empty($taskProduct->getData()['producttype'])) {
+                    $parentProducts[$id]['productType'] = Utils::isOzonProductType($taskProduct->getData()['grouptype'], $taskProduct->getData()['producttype']);
+                }
             }
         }
         uasort($parentProducts, function ($a, $b) {
@@ -179,7 +184,6 @@ class OzonController extends FrontendController
             'parent_product_id' => $parentProduct->getId(),
             'children' => $children,
             'selected_children' => $selectedChildren,
-            'product_type' => $productTypeOption,
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
