@@ -98,6 +98,7 @@ class OzonTaskProductFormType extends AbstractType
             'parent_product_id' => null,
             'children' => [],
             'selected_children' => [],
+            'product_type' => [],
         ]);
     }
 }
