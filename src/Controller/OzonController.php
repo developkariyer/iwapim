@@ -153,10 +153,10 @@ class OzonController extends FrontendController
             }
             $listingData = $taskProduct->getData()['listing'];
             if (empty($descriptionCategoryId)) {
-                $descriptionCategoryId = $taskProduct->getData()['groupType'];
+                $descriptionCategoryId = $taskProduct->getData()['grouptype'];
             }
             if (empty($typeId)) {
-                $typeId = $taskProduct->getData()['productType'];
+                $typeId = $taskProduct->getData()['producttype'];
             }
             if (!is_numeric($listingData)) {
                 continue;
@@ -203,8 +203,8 @@ class OzonController extends FrontendController
                 if ($listing<0 || !$product) {
                     continue;
                 }
-                $objectMetadata = new ObjectMetadata('products', ['listing', 'groupType', 'productType'], $product);
-                $objectMetadata->setData(['listing'=>$listing, 'groupType'=>$groupType, 'productType'=>$productType]);
+                $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $product);
+                $objectMetadata->setData(['listing'=>$listing, 'grouptype'=>$groupType, 'producttype'=>$productType]);
                 $newTaskProducts[] = $objectMetadata;
             }
             $newTaskProducts = array_unique($newTaskProducts);
