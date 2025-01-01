@@ -96,7 +96,7 @@ class OzonController extends FrontendController
                 $parentProducts[$id] = [
                     'parentProduct' => $parentProduct,
                     'products' => [$product],
-                    'productType' => Utils::isOzonProductType($taskProduct->getData()['grouptype'], $taskProduct->getData()['producttype']),
+                    'productType' => Utils::isOzonProductType($taskProduct->getData()['grouptype'] ?? 0, $taskProduct->getData()['producttype'] ?? 0),
                 ];
             } else {
                 $parentProducts[$id]['products'][] = $product;
