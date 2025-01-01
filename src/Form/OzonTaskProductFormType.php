@@ -55,7 +55,7 @@ class OzonTaskProductFormType extends AbstractType
                     'data' => $selectedChildren[$child->getId()] ?? -1,
                     'attr' => [
                         'class' => 'form-select form-select-sm',
-                        'id' => "childSelect{$child->getId()}",
+                        'id' => "childSelect_{$taskId}_{$parentProductId}_{$child->getId()}",
                     ],
                     'required' => false,
                 ]);
@@ -71,6 +71,7 @@ class OzonTaskProductFormType extends AbstractType
                 'data-ajax-url' => '/ozontree',
                 'data-placeholder' => 'Ürün Tipi Seçiniz...',
                 'data-minimum-input-length' => 3,
+                'id' => 'productType_{$taskId}_{$parentProductId}',
             ],
             'required' => false,
         ]);
