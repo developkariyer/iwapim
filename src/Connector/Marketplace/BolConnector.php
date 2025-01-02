@@ -315,14 +315,15 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $this->prepareToken();
-        $db = Db::get();
         $now = strtotime('now');
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) 
-             FROM iwa_marketplace_orders 
-             WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
+        try {
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Bolcom/select_last_updated_at.sql', [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
         if ($lastUpdatedAt) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
@@ -374,21 +375,15 @@ class BolConnector extends MarketplaceConnectorAbstract
                         }
                     }
                     $order['orderDetail'] = $orderDetail; 
-                    $db->beginTransaction();
                     try {
-                        $db->executeStatement(
-                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                            [
-                                $this->marketplace->getId(),
-                                $order['orderId'],
-                                json_encode($order)
-                            ]
-                        );
+                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                            'marketplace_id' => $this->marketplace->getId(),
+                            'order_id' => $order['orderId'],
+                            'json' => json_encode($order)
+                        ]);
                         echo "Inserting order: " . $order['orderId'] . "\n";
-                        $db->commit();
                     }
                     catch (\Exception $e) {
-                        $db->rollBack();
                         echo "Error: " . $e->getMessage() . "\n";
                     }
                     usleep(50000);
