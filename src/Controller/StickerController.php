@@ -79,11 +79,7 @@ class StickerController extends FrontendController
                 $sticker['image_link'] = (string)$product->getInheritedField('imageUrl') ?? '';
                 $sticker['variation_size'] = $product->getVariationSize() ?? '';
                 $sticker['variation_color'] = $product->getVariationColor() ?? '';
-                $sticker['product_dimension1'] = $product->getInheritedField('productDimension1') ?? '';
-                $sticker['product_dimension2'] = $product->getInheritedField('productDimension2') ?? '';
-                $sticker['product_dimension3'] = $product->getInheritedField('productDimension3') ?? '';
-                $sticker['package_weight'] = $product->getInheritedField('packageWeight') ?? '';
-                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] . ' ' . $sticker['product_dimension1'] . ' ' . $sticker['product_dimension2'] . ' ' . $sticker['product_dimension3'] . ' ' . $sticker['package_weight'];
+                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] ;
                 $stickerEu = $product->getInheritedField('sticker4x6eu');
                 $sticker['sticker_link'] = $stickerEu->getFullPath() ?? '';
             }
