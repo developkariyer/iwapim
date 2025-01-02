@@ -9,18 +9,11 @@
                 <strong>Products:</strong>
                 <ul>
                     {% for product in group.products %}
-                        <li>{{ product }}</li>
+                        <li>{{ product.name }}</li>
                     {% endfor %}
                 </ul>
             </li>
-            <li>
-                <strong>EU Stickers:</strong>
-                <ul>
-                    {% for sticker in group.euStickers %}
-                        <li>{{ sticker }}</li>
-                    {% endfor %}
-                </ul>
-            </li>
+          
         {% endfor %}
     </ul>
 
