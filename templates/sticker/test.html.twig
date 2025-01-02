@@ -2,13 +2,28 @@
 {% block title %} Sticker Test {% endblock %}
 {% block content %}
 
-        <h1>Group Products</h1>
-        <ul>
-            {% for group in groups %}
-                <li>{{ group.products }}</li>
-                <li>{{ group.euStickers }}</li>
-            {% endfor %}
-        </ul>
+    <h1>Group Products</h1>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <strong>Products:</strong>
+                <ul>
+                    {% for product in group.products %}
+                        <li>{{ product }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <strong>EU Stickers:</strong>
+                <ul>
+                    {% for sticker in group.euStickers %}
+                        <li>{{ sticker }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
 
 
 {% endblock %}
