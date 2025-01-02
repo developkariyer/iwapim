@@ -102,49 +102,16 @@ class StickerController extends FrontendController
             $groupId = $request->request->get('group_id');
             $iwasku = Registry::getKey($asin,'asin-to-iwasku');
             if (isset($iwasku)) {
-                $product = Product::findByField('iwasku',$iwasku);
-                if ($product instanceof Product) {
-                    $productCode =  $product->getInheritedField('productCode');
-                    $category = $product->getInheritedField('productCategory');
-                    $productName  = $product->getInheritedField('Name');
-                    $imageUrl = $product->getInheritedField('imageUrl');
-                    $variationSize = $product->getVariationSize() ?? '';
-                    $variationColor = $product->getVariationColor() ?? '';
-                    $productDimension1 = $product->getInheritedField('productDimension1') ?? '';
-                    $productDimension2 = $product->getInheritedField('productDimension2') ?? '';
-                    $productDimension3 = $product->getInheritedField('productDimension3') ?? '';
-                    $packageWeight = $product->getInheritedField('packageWeight') ?? '';
-                    $attributes = $variationSize . ' ' . $variationColor . ' ' . $productDimension1 . ' ' . $productDimension2 . ' ' . $productDimension3 . ' ' . $packageWeight;
-                    if ($product->getInheritedField('sticker4x6eu')) {
-                        $sticker = $product->getInheritedField('sticker4x6eu');
-                    }
-                    else {
-                        $stickerEu = $product->checkSticker4x6eu();
-                        $stickerPath = $stickerEu->getFullPath();
-                        $sticker = $stickerPath;
-                    }
-
-                    try {
-                        Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
-                            'group_id' => $groupId,
-                            'iwasku' => $iwasku,
-                            'product_code' => $productCode,
-                            'category' => $category,
-                            'product_name' => $productName,
-                            'attributes' => $attributes,
-                            'image_link' => $imageUrl,
-                            'sticker_link' => $sticker,
-                        ]);
-                        $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
-                    } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                        $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
-                    } catch (\Exception $e) {
-                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
-                    }
-
-                } else {
-                    $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
-                    return $this->redirectToRoute('sticker_new');
+                try {
+                    Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
+                        'group_id' => $groupId,
+                        'iwasku' => $iwasku
+                    ]);
+                    $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
+                } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                    $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
                 }
             }
             else {
