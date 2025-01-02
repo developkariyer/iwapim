@@ -84,7 +84,7 @@ class StickerController extends FrontendController
                 $sticker['product_dimension3'] = $product->getInheritedField('productDimension3') ?? '';
                 $sticker['package_weight'] = $product->getInheritedField('packageWeight') ?? '';
                 $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] . ' ' . $sticker['product_dimension1'] . ' ' . $sticker['product_dimension2'] . ' ' . $sticker['product_dimension3'] . ' ' . $sticker['package_weight'];
-                $stickers['sticker_link'] = $product->getInheritedField('sticker4x6eu') ?? '';
+                $stickers['sticker_link'] = $product->getInheritedField('sticker4x6eu').getFullPath() ?? '';
             }
         }
 
@@ -102,16 +102,25 @@ class StickerController extends FrontendController
             $groupId = $request->request->get('group_id');
             $iwasku = Registry::getKey($asin,'asin-to-iwasku');
             if (isset($iwasku)) {
-                try {
-                    Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
-                        'group_id' => $groupId,
-                        'iwasku' => $iwasku
-                    ]);
-                    $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
-                } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                    $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                $product = Product::findByField('iwasku',$iwasku);
+                if ($product instanceof Product) {
+                    if (!$product->getInheritedField('sticker4x6eu')) {
+                        $product->checkSticker4x6eu();
+                    }
+                    try {
+                        Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
+                            'group_id' => $groupId,
+                            'iwasku' => $iwasku
+                        ]);
+                        $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
+                    } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                        $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                    }
+                } else {
+                    $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
+                    return $this->redirectToRoute('sticker_new');
                 }
             }
             else {
