@@ -131,4 +131,13 @@ class StickerController extends FrontendController
         ]);
     }
 
+    /**
+     * @Route("/sticker/", name="sticker_main_page")
+     * @return Response
+     */
+    public function test(Request $request): Response
+    {
+        return $this->render('sticker/test.html.twig');
+    }
+
 }
