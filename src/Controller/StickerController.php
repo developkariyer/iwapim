@@ -70,6 +70,24 @@ class StickerController extends FrontendController
         if (empty($stickers)) {
             return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
         }
+        foreach ($stickers as $key => $sticker) {
+            $product = Product::findByField('iwasku', $sticker['iwasku']);
+            if ($product instanceof Product) {
+                $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
+                $sticker['category'] = $product->getInheritedField('productCategory') ?? '';
+                $sticker['product_name'] = $product->getInheritedField('Name') ?? '';
+                $sticker['image_link'] = $product->getInheritedField('imageUrl') ?? '';
+                $sticker['variation_size'] = $product->getVariationSize() ?? '';
+                $sticker['variation_color'] = $product->getVariationColor() ?? '';
+                $sticker['product_dimension1'] = $product->getInheritedField('productDimension1') ?? '';
+                $sticker['product_dimension2'] = $product->getInheritedField('productDimension2') ?? '';
+                $sticker['product_dimension3'] = $product->getInheritedField('productDimension3') ?? '';
+                $sticker['package_weight'] = $product->getInheritedField('packageWeight') ?? '';
+                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] . ' ' . $sticker['product_dimension1'] . ' ' . $sticker['product_dimension2'] . ' ' . $sticker['product_dimension3'] . ' ' . $sticker['package_weight'];
+                $stickers['sticker_link'] = $product->getInheritedField('sticker4x6eu') ?? '';
+            }
+        }
+
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
