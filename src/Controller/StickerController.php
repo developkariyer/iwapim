@@ -138,12 +138,8 @@ class StickerController extends FrontendController
      */
     public function test(Request $request): Response
     {
-        $groups = GroupProduct::getList();
 
-
-        return $this->render('sticker/test.html.twig', [
-            'groups' => $groups
-        ]);
+        return $this->render('sticker/test.html.twig');
     }
 
 }

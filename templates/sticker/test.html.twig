@@ -3,19 +3,7 @@
 {% block content %}
 
     <h1>Group Products</h1>
-    <ul>
-        {% for group in groups %}
-            <li>
-                <strong>Products:</strong>
-                <ul>
-                    {% for product in group.products %}
-                        <li>{{ product.name }}</li>
-                    {% endfor %}
-                </ul>
-            </li>
 
-        {% endfor %}
-    </ul>
 
 
 
