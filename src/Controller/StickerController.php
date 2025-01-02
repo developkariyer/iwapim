@@ -70,7 +70,7 @@ class StickerController extends FrontendController
         if (empty($stickers)) {
             return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
         }
-        foreach ($stickers as $key => $sticker) {
+        foreach ($stickers as $key => &$sticker) {
             $product = Product::findByField('iwasku', $sticker['iwasku']);
             if ($product instanceof Product) {
                 $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
@@ -85,10 +85,10 @@ class StickerController extends FrontendController
                 $sticker['package_weight'] = $product->getInheritedField('packageWeight') ?? '';
                 $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] . ' ' . $sticker['product_dimension1'] . ' ' . $sticker['product_dimension2'] . ' ' . $sticker['product_dimension3'] . ' ' . $sticker['package_weight'];
                 $stickerEu = $product->getInheritedField('sticker4x6eu');
-                $stickers['sticker_link'] = $stickerEu->getFullPath() ?? '';
+                $sticker['sticker_link'] = $stickerEu->getFullPath() ?? '';
             }
         }
-
+        unset($sticker);
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
