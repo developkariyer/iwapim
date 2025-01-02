@@ -65,6 +65,7 @@ class OzonTaskProductFormType extends AbstractType
         $builder->add('productType', ChoiceType::class, [
             'choices' => [],
             'label' => 'Ürün Tipi',
+            'data' => null,
             'attr' => [
                 'class' => 'select2 form-select needs-initialization',
                 'data-ajax-url' => '/ozontree',
