@@ -65,34 +65,31 @@ class StickerController extends FrontendController
      */
     public function getStickers(int $groupId): JsonResponse
     {
-        $result = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
+        $stickers = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
             'group_id' => $groupId
         ]);
-        if (empty($result)) {
+        if (empty($stickers)) {
             return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
         }
-        $stickers = [];
-        foreach ($result as $key => $sticker) {
+        foreach ($stickers as $key => &$sticker) {
             $product = Product::findByField('iwasku', $sticker['iwasku']);
             if ($product instanceof Product) {
-                $newSticker = [
-                    'iwasku' => $sticker['iwasku'],
-                    'product_code' => $product->getInheritedField('productCode') ?? '',
-                    'category' => $product->getInheritedField('productCategory') ?? '',
-                    'product_name' => $product->getInheritedField('Name') ?? '',
-                    'image_link' => $product->getInheritedField('imageUrl') ?? '',
-                    'variation_size' => $product->getVariationSize() ?? '',
-                    'variation_color' => $product->getVariationColor() ?? '',
-                    'product_dimension1' => $product->getInheritedField('productDimension1') ?? '',
-                    'product_dimension2' => $product->getInheritedField('productDimension2') ?? '',
-                    'product_dimension3' => $product->getInheritedField('productDimension3') ?? '',
-                    'package_weight' => $product->getInheritedField('packageWeight') ?? '',
-                    'attributes' => $product->getVariationSize() . ' ' . $product->getVariationColor() . ' ' . $product->getInheritedField('productDimension1') . ' ' . $product->getInheritedField('productDimension2') . ' ' . $product->getInheritedField('productDimension3') . ' ' . $product->getInheritedField('packageWeight'),
-                    'sticker_link' => $product->getInheritedField('sticker4x6eu')->getFullPath() ?? ''
-                ];
-                $stickers[] = $newSticker;
+                $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
+                $sticker['category'] = $product->getInheritedField('productCategory') ?? '';
+                $sticker['product_name'] = $product->getInheritedField('Name') ?? '';
+                $sticker['image_link'] = $product->getInheritedField('image')->getFullPath() ?? '';
+                $sticker['variation_size'] = $product->getVariationSize() ?? '';
+                $sticker['variation_color'] = $product->getVariationColor() ?? '';
+                $sticker['product_dimension1'] = $product->getInheritedField('productDimension1') ?? '';
+                $sticker['product_dimension2'] = $product->getInheritedField('productDimension2') ?? '';
+                $sticker['product_dimension3'] = $product->getInheritedField('productDimension3') ?? '';
+                $sticker['package_weight'] = $product->getInheritedField('packageWeight') ?? '';
+                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] . ' ' . $sticker['product_dimension1'] . ' ' . $sticker['product_dimension2'] . ' ' . $sticker['product_dimension3'] . ' ' . $sticker['package_weight'];
+                $stickerEu = $product->getInheritedField('sticker4x6eu');
+                $sticker['sticker_link'] = $stickerEu->getFullPath() ?? '';
             }
         }
+        unset($sticker);
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
