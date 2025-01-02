@@ -72,9 +72,9 @@ class OzonTaskProductFormType extends AbstractType
                 'data-minimum-input-length' => 3,
                 'id' => 'productType_{$taskId}_{$parentProductId}',
             ],
-            'required' => false,
+            'required' => true,
         ]);
-        $builder->get('productType')->addModelTransformer(new ProductTypeTransformer());
+        //$builder->get('productType')->addModelTransformer(new ProductTypeTransformer());
 
         $builder->add($selectedChildrenGroup);
 
