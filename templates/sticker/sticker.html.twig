@@ -72,7 +72,7 @@
             const tableBody = document.getElementById('stickers-table-body');
             tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
             fetch(`/sticker/get-stickers/${groupId}`)
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
                     Console.log(data);
                     if (data.success) {
