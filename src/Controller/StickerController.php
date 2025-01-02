@@ -79,7 +79,12 @@ class StickerController extends FrontendController
                 $imageUrl = Utility::fetchFromSqlFile($this->sqlPath . 'select_image_url_by_iwasku.sql', [
                     'iwasku' => $sticker['iwasku']
                 ]);
-                $sticker['image_link'] = $imageUrl['imageUrl'] ?? '';
+                if (!empty($imageUrl) && strpos($imageUrl, 'var/') !== false) {
+                    $imageUrlPart = substr($imageUrl, strpos($imageUrl, 'var/') + 4);  // Adding 4 to skip 'var/'
+                } else {
+                    $imageUrlPart = '';
+                }
+                $sticker['image_link'] = $$imageUrlPart ?? '';
                 $sticker['variation_size'] = $product->getVariationSize() ?? '';
                 $sticker['variation_color'] = $product->getVariationColor() ?? '';
                 $sticker['product_dimension1'] = $product->getInheritedField('productDimension1') ?? '';
