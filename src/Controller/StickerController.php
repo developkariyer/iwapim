@@ -7,7 +7,6 @@ use App\Form\OzonTaskProductFormType;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Registry;
 use App\Utils\Utility;
-use Codeception\Command\Console;
 use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
@@ -77,10 +76,10 @@ class StickerController extends FrontendController
                 $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
                 $sticker['category'] = $product->getInheritedField('productCategory') ?? '';
                 $sticker['product_name'] = $product->getInheritedField('Name') ?? '';
-                if (!($imageUrl = $product->getInheritedField('imageUrl'))) {
-                    $imageUrl = ($image = $product->getInheritedField('image')) ? $image->getFullPath() : '';
-                }
-                $sticker['image_link'] = $imageUrl;
+                $imageUrl = Utility::fetchFromSqlFile($this->sqlPath . 'select_image_url_by_iwasku.sql', [
+                    'iwasku' => $sticker['iwasku']
+                ]);
+                $sticker['image_link'] = $imageUrl['imageUrl'] ?? '';
                 $sticker['variation_size'] = $product->getVariationSize() ?? '';
                 $sticker['variation_color'] = $product->getVariationColor() ?? '';
                 $sticker['product_dimension1'] = $product->getInheritedField('productDimension1') ?? '';
