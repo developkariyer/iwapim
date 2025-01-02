@@ -231,6 +231,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
+        echo  "Last updated at: $lastUpdatedAt\n";
         $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'orders');
         try {
             foreach ($orders as $order) {
