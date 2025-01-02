@@ -2,7 +2,17 @@
 {% block title %} Sticker Test {% endblock %}
 {% block content %}
 
-TEST
+    {% block content %}
+        <h1>Group Products</h1>
+        <ul>
+            {% for group in groups %}
+                <li>{{ group.products }}</li>
+                <li>{{ group.euStickers }}</li>
+            {% endfor %}
+        </ul>
+    {% endblock %}
+
+
 {% endblock %}
 
 

@@ -11,6 +11,7 @@ use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
+use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\ListingTemplate;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
@@ -137,7 +138,12 @@ class StickerController extends FrontendController
      */
     public function test(Request $request): Response
     {
-        return $this->render('sticker/test.html.twig');
+        $groups = GroupProduct::getList();
+
+
+        return $this->render('sticker/test.html.twig', [
+            'groups' => $groups
+        ]);
     }
 
 }
