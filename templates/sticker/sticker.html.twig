@@ -87,7 +87,7 @@
                             <br>
                             ${sticker.attributes ? sticker.attributes.split(' ').join('<br>') : ''}
                         </td>
-                        <td><img src="${sticker.image_link}" alt="Image" style="max-height: 80px; max-width: 100%; height: auto; width: auto;"></td>
+                        <td style="text-align: center;"><img src="${sticker.image_link}" alt="Image" style="max-height: 80px; max-width: 100%; height: auto; width: auto;"></td>
                     </tr>
                 `).join('');
                         tableBody.innerHTML = rows;
