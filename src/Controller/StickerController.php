@@ -132,7 +132,7 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/test/", name="test")
+     * @Route("/sticker/test/", name="test")
      * @return Response
      */
     public function test(Request $request): Response
