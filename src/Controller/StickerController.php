@@ -84,7 +84,7 @@ class StickerController extends FrontendController
                 } else {
                     $imageUrlPart = '';
                 }
-                $sticker['image_link'] = $$imageUrlPart ?? '';
+                $sticker['image_link'] = $imageUrlPart ?? '';
                 $sticker['variation_size'] = $product->getVariationSize() ?? '';
                 $sticker['variation_color'] = $product->getVariationColor() ?? '';
                 $sticker['product_dimension1'] = $product->getInheritedField('productDimension1') ?? '';
