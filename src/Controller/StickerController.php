@@ -79,8 +79,8 @@ class StickerController extends FrontendController
                 $imageUrl = Utility::fetchFromSqlFile($this->sqlPath . 'select_image_url_by_iwasku.sql', [
                     'iwasku' => $sticker['iwasku']
                 ]);
-                if (!empty($imageUrl) && strpos($imageUrl, 'var/') !== false) {
-                    $imageUrlPart = substr($imageUrl, strpos($imageUrl, 'var/') + 4);  // Adding 4 to skip 'var/'
+                if (!empty($imageUrl['imageUrl']) && strpos($imageUrl['imageUrl'], 'var/') !== false) {
+                    $imageUrlPart = substr($imageUrl['imageUrl'], strpos($imageUrl['imageUrl'], 'var/') + 4);  // Adding 4 to skip 'var/'
                 } else {
                     $imageUrlPart = '';
                 }
