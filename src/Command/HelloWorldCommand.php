@@ -18,13 +18,8 @@ class HelloWorldCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-        $product = Product::findByField('iwasku', 'IA03100EZ9QH');
-        echo $product->getInheritedField('imageUrl')  . '\n'  ;
-
-
         // Output "Hello, World!" as green text
-       // $this->writeInfo("Hello, World!", $output);
+        $this->writeInfo("Hello, World!", $output);
 
         // Return success status code
         return Command::SUCCESS;
