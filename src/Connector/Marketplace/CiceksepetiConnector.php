@@ -143,16 +143,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $db = \Pimcore\Db::get();
-        $now = date('Y-m-d'); 
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(
-                DATE_FORMAT(MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderModifyDate')), '%d/%m/%Y')), '%Y-%m-%d'),
-                DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m-%d')
-            ) AS lastUpdatedAt
-            FROM iwa_marketplace_orders
-            WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
+        $now = date('Y-m-d');
+        try {
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ciceksepeti/select_last_updated_at.sql', [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
         echo "Last Updated At: $lastUpdatedAt\n";
         if ($lastUpdatedAt) {
             $threeMonthsAgo = date('Y-m-d', strtotime('-3 months'));
@@ -182,20 +181,14 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 try {
                     $data = $response->toArray();
                     $orders = $data['supplierOrderListWithBranch'];
-                    $db->beginTransaction();
                     foreach ($orders as $order) {
-                        $db->executeStatement(
-                            "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                            [
-                                $this->marketplace->getId(),
-                                $order['orderId'],
-                                json_encode($order)
-                            ]
-                        );
+                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                            'marketplace_id' => $this->marketplace->getId(),
+                            'order_id' => $order['orderId'],
+                            'json' => json_encode($order)
+                        ]);
                     }    
-                    $db->commit();
                 } catch (\Exception $e) {
-                    $db->rollBack();
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $page++;

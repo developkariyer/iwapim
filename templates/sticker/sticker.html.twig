@@ -38,9 +38,9 @@
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-12" id="stickers-container">
+                <div class="col-12 table-responsive"  id="stickers-container">
                     <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
-                    <table class="table">
+                    <table class="table table-striped">
                         <thead>
                         <tr>
                             <th scope="col">Product Code</th>
@@ -74,7 +74,6 @@
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('API Response:', data);
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>
@@ -86,9 +85,9 @@
                                 ${sticker.product_name}
                             </a>
                             <br>
-                            ${sticker.product_attributes ? sticker.product_attributes.split(' ').join('<br>') : ''}
+                            ${sticker.attributes ? sticker.attributes.split(' ').join('<br>') : ''}
                         </td>
-                        <td><img src="${sticker.image_link}" alt="Image" width="50"></td>
+                        <td "><img src="${sticker.image_link}" alt="Image" style="max-height: 80px; max-width: 100%; height: auto; width: auto;"></td>
                     </tr>
                 `).join('');
                         tableBody.innerHTML = rows;

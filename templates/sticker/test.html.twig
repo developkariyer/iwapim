@@ -1,0 +1,14 @@
+{% extends 'sticker/base.html.twig' %}
+{% block title %} Sticker Test {% endblock %}
+{% block content %}
+
+    <h1>Group Products</h1>
+
+
+    <script>
+        const result = {{ result|json_encode|raw }};
+        console.log("Result:", result);
+    </script>
+
+{% endblock %}
+

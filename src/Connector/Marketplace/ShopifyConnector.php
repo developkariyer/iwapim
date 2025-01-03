@@ -223,27 +223,25 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        $db = Db::get();
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
+        try {
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
+        echo  "Last updated at: $lastUpdatedAt\n";
         $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'orders');
-        $db->beginTransaction();
         try {
             foreach ($orders as $order) {
-                $db->executeStatement(
-                    "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                    [
-                        $this->marketplace->getId(),
-                        $order['id'],
-                        json_encode($order)
-                    ]
-                );
+                Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                    'marketplace_id' => $this->marketplace->getId(),
+                    'order_id' => $order['id'],
+                    'json' => json_encode($order)
+                ]);
             }
-            $db->commit();
         } catch (\Exception $e) {
-            $db->rollBack();
             echo "Error: " . $e->getMessage() . "\n";
         }
     }
