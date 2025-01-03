@@ -186,6 +186,7 @@ WHERE
             'children' => $children,
             'selected_children' => $selectedChildren,
             'task_products' => $taskProducts,
+            'preselected_product_type' => [],
         ]);
     }
 
