@@ -39,11 +39,11 @@ class HelloWorldCommand extends AbstractCommand
                     // $stickerId = ??????
                     continue;
                 }
-                echo "  Product: ".$details['oo_id']." Sticker: ".$stickerId."\n";
                 $sticker = Asset::getById($stickerId);
                 if ($sticker) {
+                    echo "  Product: ".$details['oo_id']." Sticker: ".$stickerId." ";
                     echo $sticker->getFullPath();
-                    return Command::SUCCESS; // aksi halde çok fazla nesne çekmeye çalışacak
+                    echo "\n";
                 }
             }
         }
