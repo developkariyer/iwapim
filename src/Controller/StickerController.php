@@ -96,12 +96,9 @@ class StickerController extends FrontendController
                 'iwasku' => $details['iwasku'],
                 'name' => $details['name'],
                 'sticker' => $stickerPath ?? '',
-                'product_code' => $details['product_code'] ?? '',
-                'category' => $details['category'] ?? '',
-                'image_link' => $details['imageUrl'] ?? '',
-                'variation_size' => $details['variation_size'] ?? '',
-                'variation_color' => $details['variation_color'] ?? '',
-                'attributes' => $details['variation_size'] . ' ' . $details['variation_color']
+                'product_code' => $details['productCode'] ?? '',
+                'category' => $details['productCategory'] ?? '',
+                'image_link' => $details['imageUrl'] ?? ''
             ];
 
         }
