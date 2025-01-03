@@ -203,14 +203,17 @@ WHERE
         $taskId = $request->get('taskId');
         $parentProductId = $request->get('productId');
         if (!$formTaskId || !$formParentProductId || $formTaskId != $taskId || $formParentProductId != $parentProductId) {
+            error_log("Invalid form data");
             return $this->redirectToRoute('ozon_menu');
         }
         $task = ListingTemplate::getById($taskId);
         if (!$task) {
+            error_log("Invalid task with id $taskId");
             return $this->redirectToRoute('ozon_menu');
         }
         $parentProduct = Product::getById($parentProductId);
         if (!$parentProduct) {
+            error_log("Invalid parent product with id $parentProductId");
             return $this->redirectToRoute('ozon_task', ['taskId' => $task->getId()]);
         }
         $selectedChildren = $request->get('selectedChildren');
@@ -219,6 +222,7 @@ WHERE
         foreach ($selectedChildren as $childId => $listingId) {
             $child = Product::getById($childId);
             if (!$child) {
+                error_log("Invalid child product with id $childId");
                 continue;
             }
             $explodedProductType = explode('.', $productType) ?? [];
