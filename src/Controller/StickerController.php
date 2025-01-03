@@ -139,7 +139,7 @@ class StickerController extends FrontendController
     public function test(Request $request): Response
     {
         $gproduct = new GroupProduct\Listing();
-        $result = $gproduct->load();
+        $result = $gproduct->load()[0];
         $names = [];
         $products = [];
 
@@ -147,19 +147,8 @@ class StickerController extends FrontendController
         /*foreach ($result as $item) {
             $names[] = $item->getFullPath();
         }*/
-
-        foreach ($result as $groupProduct) {
-            $relatedProducts = $groupProduct->getProducts();
-            
-            foreach ($relatedProducts as $product) {
-                if ($product instanceof Product) {
-                    $products[] = [
-                        'name' => $product->getName(),
-                        'sku' => $product->getIwasku()
-                    ];
-                }
-            }
-        }
+        $products = $result->getProducts()->getObjects()->toArray();
+        
 
 
 
