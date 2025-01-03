@@ -28,7 +28,7 @@ class HelloWorldCommand extends AbstractCommand
         $newGroup = new GroupProduct();
         $operationFolder = Utility::checkSetPath('Operasyonlar');
         $newGroup->setParentId($operationFolder->getId());
-        $newGroup->setKey("Test API Group");
+        $newGroup->setKey("Test API Group2");
         $newGroup->setPublished(1);
         try {
             $newGroup->save();
