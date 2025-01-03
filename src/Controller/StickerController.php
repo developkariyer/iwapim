@@ -121,23 +121,22 @@ class StickerController extends FrontendController
         if ($request->isMethod('POST')) {
             $asin = $request->request->get('form_data');
             $groupId = $request->request->get('group_id');
+            $group = GroupProduct::getById($groupId);
             $iwasku = Registry::getKey($asin,'asin-to-iwasku');
             if (isset($iwasku)) {
                 $product = Product::findByField('iwasku',$iwasku);
                 if ($product instanceof Product) {
                     if (!$product->getInheritedField('sticker4x6eu')) {
-                        $product->checkSticker4x6eu();
-                    }
-                    try {
-                        Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
-                            'group_id' => $groupId,
-                            'iwasku' => $iwasku
-                        ]);
-                        $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
-                    } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                        $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
-                    } catch (\Exception $e) {
-                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                        try {
+                            $product->checkSticker4x6eu();
+                            $group->setProducts(array_merge($group->getProducts(), [$product]));
+                            $group->save();
+                            $this->addFlash('success', 'Etiket başarıyla eklendi.');
+                        } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                            $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
+                        } catch (\Exception $e) {
+                            $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                        }
                     }
                 } else {
                     $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
