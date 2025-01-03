@@ -8,6 +8,7 @@ use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +23,7 @@ class HelloWorldCommand extends AbstractCommand
 {
     /**
      * @throws Exception
+     * @throws DuplicateFullPathException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -32,7 +34,7 @@ class HelloWorldCommand extends AbstractCommand
         $newGroup->setPublished(1);
         try {
             $newGroup->save();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
            echo $e->getMessage();
         }
 

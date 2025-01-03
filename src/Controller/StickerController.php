@@ -149,7 +149,15 @@ class StickerController extends FrontendController
                 return $this->redirectToRoute('sticker_new');
             }
         }
-        $groups = Utility::fetchFromSqlFile($this->sqlPath . 'select_all_groups.sql');
+        $gproduct = new GroupProduct\Listing();
+        $result = $gproduct->load();
+        $groups = [];
+        foreach ($result as $item) {
+            $groups[] = [
+                'name' => $item->getKey(),
+                'id' => $item->getId()
+            ];
+        }
         return $this->render('sticker/add_sticker.html.twig', [
             'groups' => $groups
         ]);
