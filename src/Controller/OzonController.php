@@ -194,45 +194,51 @@ WHERE
      * @Route("/ozonmodifyproduct/{taskId}/{productId}", name="ozon_modify_product")
      * @param Request $request
      * @return RedirectResponse
+     * @throws Exception
      */
     public function modifyProductAction(Request $request): RedirectResponse
-    {/*
-        $form->handleRequest($request);
-        if ($form->isSubmitted()) {
-            $data = $form->getData();
-            error_log(json_encode($data));
-            $taskProducts = $task->getProducts();
-            $newTaskProducts = [];
-            foreach ($taskProducts as $taskProduct) {
-                $product = $taskProduct->getObject();
-                $listingData = $taskProduct->getData()['listing'];
-                if (!$product || !is_numeric($listingData)) {
-                    continue;
-                }
-                if ($product->getParent()->getId() != $parentProduct->getId()) {
-                    $newTaskProducts[] = $taskProduct;
-                }
-            }
-            foreach ($data['selectedChildren'] as $productId => $listing) {
-                $product = Product::getById($productId);
-                $groupType = $data['productType']['descriptionCategoryId'] ?? 0;
-                $productType = $data['productType']['typeId'] ?? 0;
-                if ($listing<0 || !$product) {
-                    continue;
-                }
-                $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $product);
-                $objectMetadata->setData(['listing'=>$listing, 'grouptype'=>$groupType, 'producttype'=>$productType]);
-                error_log("{$product->getIwasku()} {$product->getKey()} l:{$listing} g:{$groupType} t:{$productType}");
-                $newTaskProducts[] = $objectMetadata;
-            }
-            $newTaskProducts = array_unique($newTaskProducts);
-            $task->setProducts($newTaskProducts);
-            $task->save();
-            return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
+    {
+        $formTaskId = $request->get('task_id');
+        $formParentProductId = $request->get('parent_product_id');
+        $taskId = $request->get('taskId');
+        $parentProductId = $request->get('productId');
+        if (!$formTaskId || !$formParentProductId || $formTaskId != $taskId || $formParentProductId != $parentProductId) {
+            return $this->redirectToRoute('ozon_menu');
         }
-        */
-        return $this->redirectToRoute('ozon_menu');
-
+        $task = ListingTemplate::getById($taskId);
+        if (!$task) {
+            return $this->redirectToRoute('ozon_menu');
+        }
+        $parentProduct = Product::getById($parentProductId);
+        if (!$parentProduct) {
+            return $this->redirectToRoute('ozon_task', ['taskId' => $task->getId()]);
+        }
+        $selectedChildren = $request->get('selectedChildren');
+        $productType = $request->get('productType');
+        $newTaskProducts = [];
+        foreach ($selectedChildren as $childId => $listingId) {
+            $child = Product::getById($childId);
+            if (!$child) {
+                continue;
+            }
+            $explodedProductType = explode('.', $productType) ?? [];
+            $ozonGroupType = $explodedProductType[0] ?? 0;
+            $ozonProductType = $explodedProductType[1] ?? 0;
+            $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $child);
+            $objectMetadata->setData(['listing' => $listingId, 'grouptype' => $ozonGroupType, 'producttype' => $ozonProductType]);
+            $objectMetadata->setObject($child);
+            $newTaskProducts[] = $objectMetadata;
+        }
+        $taskProducts = $task->getProducts();
+        foreach ($taskProducts as $taskProduct) {
+            $product = $taskProduct->getObject();
+            if ($product->getParent()->getId() != $parentProduct->getId()) {
+                $newTaskProducts[] = $taskProduct;
+            }
+        }
+        $task->setProducts($newTaskProducts);
+        $task->save();
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
     }
 
     /**
