@@ -23,7 +23,7 @@ class HelloWorldCommand extends AbstractCommand
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
         foreach ($result as $item) {
-            $products = $item->getProducts();
+            $products = $item->getEuStickers();
             print_r($products);
         }
 
