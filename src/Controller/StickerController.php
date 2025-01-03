@@ -71,38 +71,25 @@ class StickerController extends FrontendController
 
     /**
      * @Route("/sticker/get-stickers/{groupId}", name="get_stickers", methods={"GET"})
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getStickers(int $groupId): JsonResponse
     {
-        $db = Db::get();
         $stickers = [];
-        $query = "
-            SELECT 
-                osp.iwasku,
-                osp.name AS product_name,
-                osp.productCode,
-                osp.productCategory,
-                osp.imageUrl,
-                osp.variationSize,
-                osp.variationColor,
-                opr.dest_id AS sticker_id
-            FROM object_relations_gproduct org
-            JOIN object_product osp ON osp.oo_id = org.dest_id
-            LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
-            WHERE org.src_id = ?";
-        $products = $db->fetchAllAssociative($query, [$groupId]);
+        $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
+            'group_id' => $groupId
+        ]);
         foreach ($products as $product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
-                $stickerPath = $sticker ? $sticker->getFullPath() : '';
             } else {
                 $productObject = Product::getById($product['dest_id']);
                 if (!$productObject) {
                     continue;
                 }
                 $sticker = $productObject->checkSticker4x6eu();
-                $stickerPath = $sticker ? $sticker->getFullPath() : '';
             }
+            $stickerPath = $sticker ? $sticker->getFullPath() : '';
             $stickers[] = [
                 'iwasku' => $product['iwasku'],
                 'product_name' => $product['product_name'],
