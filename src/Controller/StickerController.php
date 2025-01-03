@@ -138,8 +138,11 @@ class StickerController extends FrontendController
      */
     public function test(Request $request): Response
     {
-
-        return $this->render('sticker/test.html.twig');
+        $gproduct = new GroupProduct();
+        $result = $gproduct->load();
+        return $this->render('sticker/test.html.twig', [
+            'result' => $result
+        ]);
     }
 
 }
