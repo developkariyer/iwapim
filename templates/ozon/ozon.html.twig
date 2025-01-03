@@ -104,7 +104,7 @@
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
                 const button = $(this);
                 loadProductModifyForm(taskId, parentProductId);
-                button.hide();
+                button.parent().hide();
             });
 
             console.log('Initializing Select2 on page load');
