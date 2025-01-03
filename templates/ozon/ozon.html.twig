@@ -104,9 +104,9 @@
             $(document).on('click', 'button[data-action="edit-product"]', function () {
                 const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
-                const button = $(this); // Store reference to the triggering button
+                const button = $(this);
                 if (loadProductModifyForm(taskId, parentProductId)) {
-                    button.hide(); // Hide the button if form loading was successful
+                    button.hide();
                 }
             });
 
