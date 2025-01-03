@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Connector\Marketplace\Ozon\Utils;
 use App\Form\OzonTaskFormType;
-use App\Form\OzonTaskProductFormType;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
@@ -196,7 +195,7 @@ WHERE
      * @return RedirectResponse
      */
     public function modifyProductAction(Request $request): RedirectResponse
-    {
+    {/*
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $data = $form->getData();
@@ -230,6 +229,8 @@ WHERE
             $task->save();
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
+        */
+        return $this->redirectToRoute('ozon_menu');
 
     }
 
