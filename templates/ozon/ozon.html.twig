@@ -100,8 +100,8 @@
             };
 
             $(document).on('click', 'button[data-action="edit-product"]', function () {
-                const parentProductId = $(this).data('parent-product-id');
-                const taskId = $(this).data('task-id');
+                const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
+                const taskId = $(this).closest('[data-task-id]').data('task-id');
                 loadProductModifyForm(taskId, parentProductId);
             });
 
