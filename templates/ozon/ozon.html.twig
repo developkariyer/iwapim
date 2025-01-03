@@ -95,9 +95,11 @@
                         modifyForm.data('loaded', true);
                         loadingSpinner.hide();
                         modifyForm.show();
+                        console.log('Product modify form loaded, returning true');
                         return true;
                     });
                 }
+                console.log('Product modify form already loaded or something is wrong');
                 return false;
             };
 
@@ -106,6 +108,7 @@
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
                 const button = $(this);
                 if (loadProductModifyForm(taskId, parentProductId)) {
+                    console.log('Returned true, hiding button');
                     button.hide();
                 }
             });
