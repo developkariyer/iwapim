@@ -140,8 +140,9 @@ class StickerController extends FrontendController
     {
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
+        $eu = $result[0]->getInheritedField('sticker4x6eu');
         return $this->render('sticker/test.html.twig', [
-            'result' => $result
+            'result' => $eu
         ]);
     }
 
