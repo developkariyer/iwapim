@@ -98,7 +98,8 @@ class StickerController extends FrontendController
                 'sticker' => $stickerPath ?? '',
                 'product_code' => $details['productCode'] ?? '',
                 'category' => $details['productCategory'] ?? '',
-                'image_link' => $details['imageUrl'] ?? ''
+                'image_link' => $details['imageUrl'] ?? '',
+                'attributes' => $details['variationSize'] . ' ' . $details['variationSize']
             ];
 
         }
