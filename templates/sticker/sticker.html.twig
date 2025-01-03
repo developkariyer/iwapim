@@ -62,25 +62,27 @@
             highlightSelectedGroup(groupId);
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
+
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
-                    <div class="card mb-3">
+                    <div class="card mb-2">
                         <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image">
+                            <div class="col-3">
+                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 80px; max-width: 100%; height: auto; width: auto;">
                             </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title">${sticker.product_name}</h5>
-                                    <p class="card-text">
-                                        <strong>Product Code:</strong> ${sticker.product_code} <br>
+                            <div class="col-9">
+                                <div class="card-body p-2">
+                                    < <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none stretched-link m-0" target="_blank">
+                                        ${sticker.product_name}
+                                    </a>
+                                    <p class="card-text text-muted small m-0">
+                                        <strong>Code:</strong> ${sticker.product_code} <br>
                                         <strong>Iwasku:</strong> ${sticker.iwasku} <br>
                                         <strong>Category:</strong> ${sticker.category}
                                     </p>
-                                    <a href="${sticker.sticker_link}" class="btn btn-primary btn-sm" target="_blank">View Details</a>
                                 </div>
                             </div>
                         </div>
@@ -96,6 +98,7 @@
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
         }
+
         function searchTable() {
             var input, filter, table, tr, td, i, j, txtValue;
             input = document.getElementById("searchInput");
