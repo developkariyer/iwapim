@@ -148,7 +148,7 @@ class StickerController extends FrontendController
             $names[] = $item->getFullPath();
         }*/
 
-        foreach ($gproduct as $groupProduct) {
+        foreach ($result as $groupProduct) {
             $relatedProducts = $groupProduct->getProducts()->getItems(0, 10);
             foreach ($relatedProducts as $product) {
                 if ($product instanceof Product) {
