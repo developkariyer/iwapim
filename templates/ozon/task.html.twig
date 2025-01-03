@@ -12,7 +12,7 @@
                     <div class="ms-2">
                         <ul class="list-group">
                         {% for childProduct in parentData.products %}
-                            <li>{{ childProduct.key }}</li>
+                            <li>{{ childProduct.key }} ({{ childProduct.iwasku }})</li>
                         {% endfor %}
                         </ul>
                     </div>
