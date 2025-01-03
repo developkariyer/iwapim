@@ -95,13 +95,13 @@ class StickerController extends FrontendController
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
             $stickers[] = [
-                'iwasku' => $product['iwasku'],
-                'product_name' => $product['product_name'],
+                'iwasku' => $product['iwasku'] ?? '',
+                'product_name' => $product['product_name'] ?? '',
                 'sticker_link' => $stickerPath ?? '',
                 'product_code' => $product['productCode'] ?? '',
                 'category' => $product['productCategory'] ?? '',
                 'image_link' => $product['imageUrl'] ?? '',
-                'attributes' => $product['variationSize'] . ' ' . $product['variationColor']
+                'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
