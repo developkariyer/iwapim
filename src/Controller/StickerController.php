@@ -139,7 +139,7 @@ class StickerController extends FrontendController
     public function test(Request $request): Response
     {
         $gproduct = new GroupProduct();
-        $result = $gproduct->load();
+        $result = $gproduct->getEuStickers();
         return $this->render('sticker/test.html.twig', [
             'result' => $result
         ]);
