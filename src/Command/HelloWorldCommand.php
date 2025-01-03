@@ -24,13 +24,7 @@ class HelloWorldCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $newGroup = new GroupProduct();
-        $newGroup->setKey("Test API Group");
-        try {
-            $newGroup->save();
-        } catch (Exception $e) {
-           echo $e->getMessage();
-        }
+        $newGroup = GroupProduct::create(['key' => 'test api create']);
 
 
         // Output "Hello, World!" as green text
