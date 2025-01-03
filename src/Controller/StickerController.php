@@ -143,7 +143,7 @@ class StickerController extends FrontendController
         $names = [];
 
         foreach ($result as $item) {
-            $names[] = $item->getPath();
+            $names[] = $item->getFullPath();
         }
 
         return $this->render('sticker/test.html.twig', [
