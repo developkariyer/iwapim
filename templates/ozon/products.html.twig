@@ -32,11 +32,7 @@
                     <label for="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}">
                         {{ child.iwasku }} {{ child.key | slice(0, 190) }}{% if child.key|length > 190 %}...{% endif %}
                     </label>
-                    <select
-                            id="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}"
-                            name="selectedChildren[{{ child.id }}]"
-                            class="form-select form-select-sm"
-                    >
+                    <select id="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}" name="selectedChildren[{{ child.id }}]" class="form-select form-select-sm highlight-me">
                         <option value="-1" {% if selected_children[child.id] is defined and selected_children[child.id] == -1 %}selected{% endif %}>** Listeleme</option>
                         <option value="0" {% if selected_children[child.id] is defined and selected_children[child.id] == 0 %}selected{% endif %}>* PIM Bilgilerini Kullan</option>
                         {% for item in child.listingItems %}
