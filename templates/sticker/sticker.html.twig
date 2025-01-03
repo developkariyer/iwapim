@@ -74,6 +74,7 @@
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Stickers:', data);
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>
