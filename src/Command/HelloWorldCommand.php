@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
+use Pimcore\Model\DataObject\Product;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,12 +35,14 @@ class HelloWorldCommand extends AbstractCommand
                 $details = $db->fetchAssociative("SELECT * FROM object_store_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
                 $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6eu'", [$product['dest_id']]);
                 if (!$stickerId) {
-                    // Burada sticker oluşturan kod çağrulmalı ve gelen id alınmalı
-                    usleep(1);
-                    // $stickerId = ??????
-                    continue;
+                    $productObject = Product::getById($product['dest_id']);
+                    if (!$productObject) {
+                        continue;
+                    }
+                    $sticker = $productObject->checkSticker4x6eu();
+                } else {
+                    $sticker = Asset::getById($stickerId);
                 }
-                $sticker = Asset::getById($stickerId);
                 if ($sticker) {
                     echo "  Product: ".$details['oo_id']." Sticker: ".$stickerId." ";
                     echo $sticker->getFullPath();
