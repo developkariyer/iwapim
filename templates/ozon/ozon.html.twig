@@ -149,33 +149,6 @@
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
-                function updateLabelHighlighting(selectElement) {
-                    const selectedValue = selectElement.value;
-                    const labelElement = document.querySelector(`label[for="${selectElement.id}"]`);
-
-                    if (labelElement) {
-                        if (selectedValue !== '-1') {
-                            labelElement.classList.add('highlight-label');
-                        } else {
-                            labelElement.classList.remove('highlight-label');
-                        }
-                    }
-                }
-
-                document.body.addEventListener('change', function (event) {
-                    const target = event.target;
-                    if (target && target.matches('select.highlight-me')) {
-                        updateLabelHighlighting(target);
-                    }
-                });
-
-                const selectElements = document.querySelectorAll('select.highlight-me');
-                selectElements.forEach(select => {
-                    updateLabelHighlighting(select);
-                });
-            });
-
         });
     </script>
 {% endblock %}
