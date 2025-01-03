@@ -5,12 +5,11 @@
     <h1>Group Products</h1>
 
 
-
+    <script>
+        // Backend'den gelen 'result' verisini konsola yazdırma
+        const result = {{ result|json_encode|raw }};
+        console.log("Result:", result);
+    </script>
 
 {% endblock %}
 
-<script>
-    // Backend'den gelen 'result' verisini konsola yazdırma
-    const result = {{ result|json_encode|raw }};
-    console.log("Result:", result);
-</script>
