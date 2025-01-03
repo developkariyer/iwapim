@@ -94,7 +94,7 @@ class StickerController extends FrontendController
             }
             $stickers[] = [
                 'iwasku' => $details['iwasku'],
-                'name' => $details['key'],
+                'product_name' => $details['key'],
                 'sticker' => $stickerPath ?? '',
                 'product_code' => $details['productCode'] ?? '',
                 'category' => $details['productCategory'] ?? '',
