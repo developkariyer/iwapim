@@ -5,29 +5,32 @@
 
 <div class="container mt-2">
     <div class="row">
-        <div class="col-3">
+        <div class="col-12">
             <h1>Groups</h1>
-            <div class="row mt-4">
-                <div class="col-12">
-                    <a href="{{ path('sticker_new_group') }}" class="btn btn-primary w-100">New Group</a>
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-12">
-                    <div class="list-group">
-                        {% for group in groups %}
-                            <a href="#"
-                               class="list-group-item list-group-item-action"
-                               onclick="loadStickers({{ group.id }})">
+            <div class="dropdown mt-4">
+                <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select Group
+                </button>
+                <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                    {% for group in groups %}
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="loadStickers({{ group.id }})">
                                 {{ group.name }}
                             </a>
-                        {% else %}
-                            <p class="text-muted">No groups available.</p>
-                        {% endfor %}
-                    </div>
-                </div>
+                        </li>
+                    {% else %}
+                        <li>
+                            <span class="dropdown-item text-muted">No groups available.</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="mt-3">
+                <a href="{{ path('sticker_new_group') }}" class="btn btn-secondary w-100">New Group</a>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-9">
             <h1>Stickers</h1>
             <div class="row mt-4">
@@ -74,7 +77,6 @@
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Stickers:', data);
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>

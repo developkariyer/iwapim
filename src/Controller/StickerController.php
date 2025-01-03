@@ -69,15 +69,6 @@ class StickerController extends FrontendController
                 return $this->redirectToRoute('sticker_new_group');
             }
             $this->addFlash('success', 'Grup Başarıyla Eklendi.');
-            /*try {
-                Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', ['group_name' => $formData]);
-                $this->addFlash('success', 'Grup Başarıyla Eklendi.');
-                return $this->redirectToRoute('sticker_new_group');
-            }  catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                $this->addFlash('error', 'Bu grup daha öncede eklenmiş.');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
-            }*/
         }
         return $this->render('sticker/add_sticker_group.html.twig');
     }
@@ -158,26 +149,6 @@ class StickerController extends FrontendController
         }
         return $this->render('sticker/add_sticker.html.twig', [
             'groups' => $groups
-        ]);
-    }
-
-    /**
-     * @Route("/sticker/test/", name="test")
-     * @return Response
-     */
-    public function test(Request $request): Response
-    {
-        $gproduct = new GroupProduct\Listing();
-        $result = $gproduct->load();
-        $names = [];
-
-        // all group products
-        foreach ($result as $item) {
-            $names[] = $item->getKey();
-        }
-
-        return $this->render('sticker/test.html.twig', [
-            'result' => $names
         ]);
     }
 
