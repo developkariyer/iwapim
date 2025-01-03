@@ -28,7 +28,7 @@ class HelloWorldCommand extends AbstractCommand
         $stickers = [];
         $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [249889]);
         foreach ($products as $product) {
-            $details = $db->fetchAssociative("SELECT * FROM object_store_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
+            $details = $db->fetchAssociative("SELECT * FROM object_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
             $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6eu'", [$product['dest_id']]);
             if (!$stickerId) {
                 $productObject = Product::getById($product['dest_id']);
