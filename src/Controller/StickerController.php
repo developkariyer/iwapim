@@ -85,7 +85,7 @@ class StickerController extends FrontendController
                 if (!$productObject) {
                     continue;
                 }
-               // $sticker = $productObject->checkSticker4x6eu();
+               $sticker = $productObject->checkSticker4x6eu();
             } else {
                 $sticker = Asset::getById($stickerId);
             }
