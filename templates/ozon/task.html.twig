@@ -4,11 +4,21 @@
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingParent{{ taskId }}_{{ parentProductId }}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseParent{{ taskId }}_{{ parentProductId }}" aria-expanded="false" aria-controls="collapseParent{{ taskId }}_{{ parentProductId }}">
-                    {{ parentData.parentProduct.getKey() }} ({{ parentData.products|length }} varyasyon) ({{ parentData.productType }})
+                    {{ parentData.parentProduct.key }} ({{ parentData.products|length }} varyasyon)
                 </button>
             </h2>
             <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
                 <div class="accordion-body">
+                    <div>
+                        <ul class="list-group">
+                        {% for childProduct in parentData.products %}
+                            <li>- {{ childProduct.key }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3">
+                        Düzenle
+                    </button>
                     <div class="loading-spinner text-center" id="loadingChild{{ taskId }}_{{ parentProductId }}" style="display: none;">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>

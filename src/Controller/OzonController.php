@@ -8,6 +8,7 @@ use App\Form\OzonTaskProductFormType;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
@@ -22,6 +23,24 @@ use Pimcore\Model\DataObject\ListingTemplate;
 
 class OzonController extends FrontendController
 {
+    private string $sqlTaskProducts = "SELECT 
+    orlt.dest_id AS id, 
+    op.parentId,
+    op.variationSize,
+    op.variationColor,
+    op.iwasku,
+    op_parent.key AS parentKey,
+    CONCAT_WS(' ', op_parent.key, op.variationSize, op.variationColor) AS key
+FROM 
+    object_relations_listingTemplate orlt
+JOIN 
+    object_product op ON orlt.dest_id = op.id
+LEFT JOIN 
+    object_product op_parent ON op_parent.id = op.parentId
+WHERE 
+    orlt.src_id = ? 
+    AND orlt.fieldname = 'products'
+    ORDER BY key";
 
     /**
      * @Route("/ozon/{taskId}/{parentProductId}", name="ozon_menu", defaults={"taskId"=null, "parentProductId"=null})
@@ -78,36 +97,38 @@ class OzonController extends FrontendController
      */
     public function getTaskProducts(Request $request): Response
     {
+        $db = Db::get();
         $taskId = $request->get('id');
         $task = ListingTemplate::getById($taskId);
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
-        $taskProducts = $task->getProducts();
         $parentProducts = [];
-        foreach ($taskProducts as $taskProduct) {
-            $product = $taskProduct->getObject();
-            $parentProduct = $product->getParent();
-            if (!$parentProduct instanceof Product) {
-                continue;
-            }
-            $id = $parentProduct->getId();
+        $taskProductIds = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
+        foreach ($taskProductIds as $taskProductId) {
+            $id = $taskProductId['parentId'];
             if (!isset($parentProducts[$id])) {
                 $parentProducts[$id] = [
-                    'parentProduct' => $parentProduct,
-                    'products' => [$product],
-                    'productType' => Utils::isOzonProductType($taskProduct->getData()['grouptype'] ?? 0, $taskProduct->getData()['producttype'] ?? 0),
+                    'parentProduct' => [
+                        'id' => $taskProductId['parentId'],
+                        'key' => $taskProductId['parentKey']
+                    ],
+                    'products' => [
+                        [
+                            'id' => $taskProductId['id'],
+                            'iwasku' => $taskProductId['iwasku'],
+                            'key' => $taskProductId['key'],
+                        ]
+                    ],
                 ];
             } else {
-                $parentProducts[$id]['products'][] = $product;
-                if (empty($parentProducts[$id]['productType']) && !empty($taskProduct->getData()['grouptype']) && !empty($taskProduct->getData()['producttype'])) {
-                    $parentProducts[$id]['productType'] = Utils::isOzonProductType($taskProduct->getData()['grouptype'], $taskProduct->getData()['producttype']);
-                }
+                $parentProducts[$id]['products'][] = [
+                    'id' => $taskProductId['id'],
+                    'iwasku' => $taskProductId['iwasku'],
+                    'key' => $taskProductId['key'],
+                ];
             }
         }
-        uasort($parentProducts, function ($a, $b) {
-            return strcmp($a['parentProduct']->getKey(), $b['parentProduct']->getKey());
-        });
         return $this->render('ozon/task.html.twig', [
             'taskId' => $taskId,
             'parentProducts' => $parentProducts,

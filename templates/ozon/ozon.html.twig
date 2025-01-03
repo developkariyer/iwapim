@@ -83,7 +83,7 @@
                 const taskId = $(this).data('task-id');
                 loadParentAccordionContent(taskId);
             });
-
+/*
             const loadChildAccordionContent = (taskId, parentProductId) => {
                 const childAccordion = $(`#childProducts${taskId}_${parentProductId}`);
                 const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
@@ -104,7 +104,7 @@
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
                 loadChildAccordionContent(taskId, parentProductId);
             });
-
+*/
             console.log('Initializing Select2 on page load');
             initializeSelect2();
 
