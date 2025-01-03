@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
