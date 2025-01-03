@@ -32,12 +32,14 @@ class HelloWorldCommand extends AbstractCommand
             echo " Products: ".count($products)."\n";
             foreach ($products as $product) {
                 $details = $db->fetchAssociative("SELECT * FROM object_store_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
-                echo "  Product: ".$details['oo_id']."\n";
+                echo "  Product: ".$details['oo_id'];
                 $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6'", [$product['dest_id']]);
+                echo " Sticker: ".$stickerId;
                 if (!$stickerId) {
                     // Burada sticker oluşturan kod çağrulmalı ve gelen id alınmalı
                     usleep(1);
                     // $stickerId = ??????
+                    continue;
                 }
                 $sticker = Asset::getById($stickerId);
                 if ($sticker) {
