@@ -51,16 +51,20 @@ class StickerController extends FrontendController
     /**
      * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"GET", "POST"})
      * @return Response
+     * @throws DuplicateFullPathException
      */
     public function addStickerGroup(Request $request): Response
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
             $newGroup = new GroupProduct();
+            $operationFolder = Utility::checkSetPath('Operasyonlar');
+            $newGroup->setParentId($operationFolder->getId());
             $newGroup->setKey($formData);
+            $newGroup->setPublished(1);
             try {
                 $newGroup->save();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
                 return $this->redirectToRoute('sticker_new_group');
             }
