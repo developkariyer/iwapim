@@ -9,10 +9,10 @@
             </h2>
             <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
                 <div class="accordion-body">
-                    <div>
+                    <div class="me-2">
                         <ul class="list-group">
                         {% for childProduct in parentData.products %}
-                            <li>- {{ childProduct.key }}</li>
+                            <li>{{ childProduct.key }}</li>
                         {% endfor %}
                         </ul>
                     </div>
