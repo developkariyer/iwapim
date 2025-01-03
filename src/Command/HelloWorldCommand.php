@@ -37,8 +37,12 @@ class HelloWorldCommand extends AbstractCommand
                     // $stickerId = ??????
                 }
                 $sticker = Asset::getById($stickerId);
-                echo $sticker->getFullPath();
-                return Command::SUCCESS; // aksi halde çok fazla nesne çekmeye çalışacak
+                if ($sticker) {
+                    echo $sticker->getFullPath();
+                    return Command::SUCCESS; // aksi halde çok fazla nesne çekmeye çalışacak
+                } else {
+                    echo "Sticker not found for product id: " . $product['dest_id'];
+                }
             }
         }
 
