@@ -95,10 +95,10 @@
                         modifyForm.data('loaded', true);
                         loadingSpinner.hide();
                         modifyForm.show();
-                        return true; // Indicate successful loading
+                        return true;
                     });
                 }
-                return false; // Indicate that loading was not necessary
+                return false;
             };
 
             $(document).on('click', 'button[data-action="edit-product"]', function () {
