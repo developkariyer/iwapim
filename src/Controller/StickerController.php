@@ -76,34 +76,45 @@ class StickerController extends FrontendController
     {
         $db = Db::get();
         $stickers = [];
-        $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$groupId]);
+        $query = "
+            SELECT 
+                osp.iwasku,
+                osp.name AS product_name,
+                osp.productCode,
+                osp.productCategory,
+                osp.imageUrl,
+                osp.variationSize,
+                osp.variationColor,
+                opr.dest_id AS sticker_id
+            FROM object_relations_gproduct org
+            JOIN object_product osp ON osp.oo_id = org.dest_id
+            LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
+            WHERE org.src_id = ?";
+        $products = $db->fetchAllAssociative($query, [$groupId]);
         foreach ($products as $product) {
-            $details = $db->fetchAssociative("SELECT * FROM object_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
-            $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6eu'", [$product['dest_id']]);
-
-            if (!$stickerId) {
+            if ($product['sticker_id']) {
+                $sticker = Asset::getById($product['sticker_id']);
+                $stickerPath = $sticker ? $sticker->getFullPath() : '';
+            } else {
                 $productObject = Product::getById($product['dest_id']);
                 if (!$productObject) {
                     continue;
                 }
-               $sticker = $productObject->checkSticker4x6eu();
-            } else {
-                $sticker = Asset::getById($stickerId);
-            }
-            if ($sticker) {
-                $stickerPath = $sticker->getFullPath();
+                $sticker = $productObject->checkSticker4x6eu();
+                $stickerPath = $sticker ? $sticker->getFullPath() : '';
             }
             $stickers[] = [
-                'iwasku' => $details['iwasku'],
-                'product_name' => $details['name'],
+                'iwasku' => $product['iwasku'],
+                'product_name' => $product['product_name'],
                 'sticker_link' => $stickerPath ?? '',
-                'product_code' => $details['productCode'] ?? '',
-                'category' => $details['productCategory'] ?? '',
-                'image_link' => $details['imageUrl'] ?? '',
-                'attributes' => $details['variationSize'] . ' ' . $details['variationColor']
+                'product_code' => $product['productCode'] ?? '',
+                'category' => $product['productCategory'] ?? '',
+                'image_link' => $product['imageUrl'] ?? '',
+                'attributes' => $product['variationSize'] . ' ' . $product['variationColor']
             ];
-
         }
+
+
 
 
 
