@@ -141,34 +141,14 @@ class StickerController extends FrontendController
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
         $names = [];
-        $products = [];
 
         // all group products
-        /*foreach ($result as $item) {
-            $names[] = $item->getFullPath();
-        }*/
-
-
         foreach ($result as $item) {
-            $relatedProducts = $item->getProducts();
-
-            foreach ($relatedProducts as $product) {
-                if ($product instanceof \Pimcore\Model\DataObject\Product) {
-                    $products[] = [
-                        'name' => $product->getName(),
-                        'sku' => $product->getIwasku(),
-                    ];
-                }
-            }
+            $names[] = $item->getKey();
         }
 
-
-
-
-
-
         return $this->render('sticker/test.html.twig', [
-            'result' => $products
+            'result' => $names
         ]);
     }
 
