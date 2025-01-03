@@ -10,6 +10,7 @@ use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
+use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\ListingTemplate;
@@ -104,6 +105,30 @@ class StickerController extends FrontendController
             ];
 
         }
+
+
+
+        /*$stickers = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
+            'group_id' => $groupId
+        ]);
+        if (empty($stickers)) {
+            return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
+        }
+        foreach ($stickers as $key => &$sticker) {
+            $product = Product::findByField('iwasku', $sticker['iwasku']);
+            if ($product instanceof Product) {
+                $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
+                $sticker['category'] = $product->getInheritedField('productCategory') ?? '';
+                $sticker['product_name'] = $product->getInheritedField('Name') ?? '';
+                $sticker['image_link'] = (string)$product->getInheritedField('imageUrl') ?? '';
+                $sticker['variation_size'] = $product->getVariationSize() ?? '';
+                $sticker['variation_color'] = $product->getVariationColor() ?? '';
+                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] ;
+                $stickerEu = $product->getInheritedField('sticker4x6eu');
+                $sticker['sticker_link'] = $stickerEu->getFullPath() ?? '';
+            }
+        }
+        unset($sticker);*/
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
