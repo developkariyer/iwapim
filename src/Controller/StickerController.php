@@ -73,27 +73,37 @@ class StickerController extends FrontendController
      */
     public function getStickers(int $groupId): JsonResponse
     {
-        $stickers = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
-            'group_id' => $groupId
-        ]);
-        if (empty($stickers)) {
-            return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
-        }
-        foreach ($stickers as $key => &$sticker) {
-            $product = Product::findByField('iwasku', $sticker['iwasku']);
-            if ($product instanceof Product) {
-                $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
-                $sticker['category'] = $product->getInheritedField('productCategory') ?? '';
-                $sticker['product_name'] = $product->getInheritedField('Name') ?? '';
-                $sticker['image_link'] = (string)$product->getInheritedField('imageUrl') ?? '';
-                $sticker['variation_size'] = $product->getVariationSize() ?? '';
-                $sticker['variation_color'] = $product->getVariationColor() ?? '';
-                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] ;
-                $stickerEu = $product->getInheritedField('sticker4x6eu');
-                $sticker['sticker_link'] = $stickerEu->getFullPath() ?? '';
+        $db = Db::get();
+        $stickers = [];
+        $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$groupId]);
+        foreach ($products as $product) {
+            $details = $db->fetchAssociative("SELECT * FROM object_store_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
+            $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6eu'", [$product['dest_id']]);
+            if (!$stickerId) {
+                $productObject = Product::getById($product['dest_id']);
+                if (!$productObject) {
+                    continue;
+                }
+                $sticker = $productObject->checkSticker4x6eu();
+            } else {
+                $sticker = Asset::getById($stickerId);
             }
+            if ($sticker) {
+                $stickerPath = $sticker->getFullPath();
+            }
+            $stickers[] = [
+                'iwasku' => $details['iwasku'],
+                'name' => $details['name'],
+                'sticker' => $stickerPath ?? '',
+                'product_code' => $details['product_code'] ?? '',
+                'category' => $details['category'] ?? '',
+                'image_link' => $details['imageUrl'] ?? '',
+                'variation_size' => $details['variation_size'] ?? '',
+                'variation_color' => $details['variation_color'] ?? '',
+                'attributes' => $details['variation_size'] . ' ' . $details['variation_color']
+            ];
+
         }
-        unset($sticker);
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
