@@ -24,7 +24,7 @@
                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
                             {% for group in groups %}
                                 <li>
-                                    <a class="dropdown-item text-truncate" href="#" onclick="loadStickers({{ group.id }})">
+                                    <a class="dropdown-item text-truncate" href="#" onclick="selectGroup('{{ group.name }}', {{ group.id }})">
                                         {{ group.name }}
                                     </a>
                                 </li>
@@ -45,9 +45,6 @@
         </div>
     </div>
 </div>
-
-
-
 {% endblock %}
 
 
@@ -124,6 +121,10 @@
                     link.removeAttribute('aria-current');
                 }
             });
+        }
+        function selectGroup(groupName, groupId) {
+            document.getElementById("dropdownMenuButton").innerHTML = groupName;
+            loadStickers(groupId);
         }
     </script>
 {% endblock %}
