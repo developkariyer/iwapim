@@ -1,5 +1,5 @@
 {# products.html.twig #}
-<form method="post" action="/ozonproduct/{{ task_id }}/{{ parent_product_id }}">
+<form method="post" action="/ozonmodifyproduct/{{ task_id }}/{{ parent_product_id }}">
     {# Hidden Fields #}
     <input type="hidden" id="taskId_{{ task_id }}_{{ parent_product_id }}" name="taskId" value="{{ task_id }}">
     <input type="hidden" id="productId_{{ task_id }}_{{ parent_product_id }}" name="productId" value="{{ parent_product_id }}">
