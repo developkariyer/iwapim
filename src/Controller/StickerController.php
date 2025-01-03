@@ -56,7 +56,16 @@ class StickerController extends FrontendController
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
+            $newGroup = new GroupProduct();
+            $newGroup->setKey($formData);
             try {
+                $newGroup->save();
+            } catch (Exception $e) {
+                $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
+                return $this->redirectToRoute('sticker_new_group');
+            }
+            $this->addFlash('success', 'Grup Başarıyla Eklendi.');
+            /*try {
                 Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', ['group_name' => $formData]);
                 $this->addFlash('success', 'Grup Başarıyla Eklendi.');
                 return $this->redirectToRoute('sticker_new_group');
@@ -64,7 +73,7 @@ class StickerController extends FrontendController
                 $this->addFlash('error', 'Bu grup daha öncede eklenmiş.');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
-            }
+            }*/
         }
         return $this->render('sticker/add_sticker_group.html.twig');
     }
