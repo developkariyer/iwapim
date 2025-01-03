@@ -95,14 +95,19 @@
                         modifyForm.data('loaded', true);
                         loadingSpinner.hide();
                         modifyForm.show();
+                        return true; // Indicate successful loading
                     });
                 }
+                return false; // Indicate that loading was not necessary
             };
 
             $(document).on('click', 'button[data-action="edit-product"]', function () {
                 const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
-                loadProductModifyForm(taskId, parentProductId);
+                const button = $(this); // Store reference to the triggering button
+                if (loadProductModifyForm(taskId, parentProductId)) {
+                    button.hide(); // Hide the button if form loading was successful
+                }
             });
 
             console.log('Initializing Select2 on page load');
