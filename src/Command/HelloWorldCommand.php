@@ -34,8 +34,11 @@ class HelloWorldCommand extends AbstractCommand
             foreach ($products as $product) {
                 $details = $db->fetchAssociative("SELECT * FROM object_store_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
                 $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6eu'", [$product['dest_id']]);
-                echo "  Product: ".$details['oo_id']." Sticker: ".$stickerId." ";
-                if (!$stickerId) {
+                //echo "  Product: ".$details['oo_id']." Sticker: ".$stickerId." ";
+                echo "Product: ".$details['oo_id']." " . $details['iwasku']." " . $details['name']."\n";
+
+
+                /*if (!$stickerId) {
                     $productObject = Product::getById($product['dest_id']);
                     if (!$productObject) {
                         echo " product not found\n";
@@ -49,11 +52,9 @@ class HelloWorldCommand extends AbstractCommand
                 if ($sticker) {
                     echo $sticker->getFullPath();
                     echo "\n";
-                }
+                }*/
             }
         }
-
-
         // Output "Hello, World!" as green text
        // $this->writeInfo("Hello, World!", $output);
 
