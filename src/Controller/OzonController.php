@@ -30,7 +30,7 @@ class OzonController extends FrontendController
     op.variationColor,
     op.iwasku,
     op_parent.key AS parentKey,
-    CONCAT_WS(' ', op_parent.key, op.variationSize, op.variationColor) AS key
+    CONCAT_WS(' ', op_parent.key, op.variationSize, op.variationColor) AS `key`
 FROM 
     object_relations_listingTemplate orlt
 JOIN 
