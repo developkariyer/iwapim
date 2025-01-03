@@ -148,7 +148,7 @@ class StickerController extends FrontendController
             $names[] = $item->getFullPath();
         }*/
         $products = $result->getProducts()->getObjects()->toArray();
-        
+
 
 
 
