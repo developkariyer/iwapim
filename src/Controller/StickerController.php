@@ -115,6 +115,7 @@ class StickerController extends FrontendController
     /**
      * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
      * @return Response
+     * @throws Exception
      */
     public function addSticker(Request $request): Response
     {
@@ -127,17 +128,11 @@ class StickerController extends FrontendController
                 $product = Product::findByField('iwasku',$iwasku);
                 if ($product instanceof Product) {
                     if (!$product->getInheritedField('sticker4x6eu')) {
-                        try {
-                            $product->checkSticker4x6eu();
-                            $group->setProducts(array_merge($group->getProducts(), [$product]));
-                            $group->save();
-                            $this->addFlash('success', 'Etiket başarıyla eklendi.');
-                        } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                            $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
-                        } catch (\Exception $e) {
-                            $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
-                        }
+                        $product->checkSticker4x6eu();
                     }
+                    $group->setProducts(array_merge($group->getProducts(), [$product]));
+                    $group->save();
+                    $this->addFlash('success', 'Etiket başarıyla eklendi.');
                 } else {
                     $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
                     return $this->redirectToRoute('sticker_new');
