@@ -203,7 +203,7 @@ WHERE
         $taskId = $request->get('taskId');
         $parentProductId = $request->get('productId');
         if (!$formTaskId || !$formParentProductId || $formTaskId != $taskId || $formParentProductId != $parentProductId) {
-            error_log("Invalid form data");
+            error_log("Invalid form data: $formTaskId, $formParentProductId, $taskId, $parentProductId");
             return $this->redirectToRoute('ozon_menu');
         }
         $task = ListingTemplate::getById($taskId);
