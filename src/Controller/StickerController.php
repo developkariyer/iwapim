@@ -51,16 +51,20 @@ class StickerController extends FrontendController
     /**
      * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"GET", "POST"})
      * @return Response
+     * @throws DuplicateFullPathException
      */
     public function addStickerGroup(Request $request): Response
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
             $newGroup = new GroupProduct();
+            $operationFolder = Utility::checkSetPath('Operasyonlar');
+            $newGroup->setParentId($operationFolder->getId());
             $newGroup->setKey($formData);
+            $newGroup->setPublished(1);
             try {
                 $newGroup->save();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
                 return $this->redirectToRoute('sticker_new_group');
             }
@@ -115,12 +119,14 @@ class StickerController extends FrontendController
     /**
      * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
      * @return Response
+     * @throws Exception
      */
     public function addSticker(Request $request): Response
     {
         if ($request->isMethod('POST')) {
             $asin = $request->request->get('form_data');
             $groupId = $request->request->get('group_id');
+            $group = GroupProduct::getById($groupId);
             $iwasku = Registry::getKey($asin,'asin-to-iwasku');
             if (isset($iwasku)) {
                 $product = Product::findByField('iwasku',$iwasku);
@@ -128,17 +134,9 @@ class StickerController extends FrontendController
                     if (!$product->getInheritedField('sticker4x6eu')) {
                         $product->checkSticker4x6eu();
                     }
-                    try {
-                        Utility::executeSqlFile($this->sqlPath . 'insert_into_sticker.sql', [
-                            'group_id' => $groupId,
-                            'iwasku' => $iwasku
-                        ]);
-                        $this->addFlash('success', 'Etiket Başarıyla Eklendi.');
-                    } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-                        $this->addFlash('error', 'Bu etiket daha öncede eklenmiş.');
-                    } catch (\Exception $e) {
-                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
-                    }
+                    $group->setProducts(array_merge($group->getProducts(), [$product]));
+                    $group->save();
+                    $this->addFlash('success', 'Etiket başarıyla eklendi.');
                 } else {
                     $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
                     return $this->redirectToRoute('sticker_new');
