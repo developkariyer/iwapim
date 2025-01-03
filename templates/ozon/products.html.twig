@@ -5,7 +5,7 @@
     <input type="hidden" id="productId_{{ task_id }}_{{ parent_product_id }}" name="productId" value="{{ parent_product_id }}">
 
     {# Product Type Select (with Select2) #}
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label for="productType_{{ task_id }}_{{ parent_product_id }}">Ürün Tipi:</label>
         <select
                 id="productType_{{ task_id }}_{{ parent_product_id }}"
@@ -25,9 +25,10 @@
 
     {# Selected Children Groups #}
     <div id="selectedChildren_{{ task_id }}_{{ parent_product_id }}">
-        {% for colorGroup in children %}
-            {% for child in colorGroup %}
-                <div class="form-group">
+        {% for sizeName, colorGroups in children %}
+            <h3>{{ sizeName }}</h3>
+            {% for colorName, child in colorGroups %}
+                <div class="form-group" style="padding-left: 20px;">
                     <label for="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}">
                         {{ child.iwasku }} {{ child.key | slice(0, 190) }}{% if child.key|length > 190 %}...{% endif %}
                     </label>
