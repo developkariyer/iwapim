@@ -149,7 +149,7 @@ class StickerController extends FrontendController
         }*/
 
         foreach ($result as $item) {
-            $products[] = $item->getProducts();
+            $products[] = $item->getProducts()->getIwasku();
         }
 
 
