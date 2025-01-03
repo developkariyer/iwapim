@@ -19,7 +19,7 @@
                             <a href="#"
                                class="list-group-item list-group-item-action"
                                onclick="loadStickers({{ group.id }})">
-                                {{ group.group_name }}
+                                {{ group.name }}
                             </a>
                         {% else %}
                             <p class="text-muted">No groups available.</p>
@@ -74,6 +74,7 @@
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Stickers:', data);
                     if (data.success) {
                         const rows = data.stickers.map(sticker => `
                     <tr>

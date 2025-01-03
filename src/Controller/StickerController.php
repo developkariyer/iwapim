@@ -10,6 +10,7 @@ use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
+use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\GroupProduct;
 use Pimcore\Model\DataObject\ListingTemplate;
@@ -33,7 +34,15 @@ class StickerController extends FrontendController
      */
     public function stickerMainPage(Request $request): Response
     {
-        $groups = Utility::fetchFromSqlFile($this->sqlPath . 'select_all_groups.sql');
+        $gproduct = new GroupProduct\Listing();
+        $result = $gproduct->load();
+        $groups = [];
+        foreach ($result as $item) {
+            $groups[] = [
+                'name' => $item->getKey(),
+                'id' => $item->getId()
+            ];
+        }
         return $this->render('sticker/sticker.html.twig', [
             'groups' => $groups
         ]);
@@ -47,7 +56,16 @@ class StickerController extends FrontendController
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
+            $newGroup = new GroupProduct();
+            $newGroup->setKey($formData);
             try {
+                $newGroup->save();
+            } catch (Exception $e) {
+                $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
+                return $this->redirectToRoute('sticker_new_group');
+            }
+            $this->addFlash('success', 'Grup Başarıyla Eklendi.');
+            /*try {
                 Utility::executeSqlFile($this->sqlPath . 'insert_into_group.sql', ['group_name' => $formData]);
                 $this->addFlash('success', 'Grup Başarıyla Eklendi.');
                 return $this->redirectToRoute('sticker_new_group');
@@ -55,37 +73,42 @@ class StickerController extends FrontendController
                 $this->addFlash('error', 'Bu grup daha öncede eklenmiş.');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
-            }
+            }*/
         }
         return $this->render('sticker/add_sticker_group.html.twig');
     }
 
     /**
      * @Route("/sticker/get-stickers/{groupId}", name="get_stickers", methods={"GET"})
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getStickers(int $groupId): JsonResponse
     {
-        $stickers = Utility::fetchFromSqlFile($this->sqlPath . 'select_stickers_by_group_id.sql', [
+        $stickers = [];
+        $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
             'group_id' => $groupId
         ]);
-        if (empty($stickers)) {
-            return new JsonResponse(['success' => false, 'message' => 'No stickers found.']);
-        }
-        foreach ($stickers as $key => &$sticker) {
-            $product = Product::findByField('iwasku', $sticker['iwasku']);
-            if ($product instanceof Product) {
-                $sticker['product_code'] = $product->getInheritedField('productCode') ?? '';
-                $sticker['category'] = $product->getInheritedField('productCategory') ?? '';
-                $sticker['product_name'] = $product->getInheritedField('Name') ?? '';
-                $sticker['image_link'] = (string)$product->getInheritedField('imageUrl') ?? '';
-                $sticker['variation_size'] = $product->getVariationSize() ?? '';
-                $sticker['variation_color'] = $product->getVariationColor() ?? '';
-                $sticker['attributes'] = $sticker['variation_size'] . ' ' . $sticker['variation_color'] ;
-                $stickerEu = $product->getInheritedField('sticker4x6eu');
-                $sticker['sticker_link'] = $stickerEu->getFullPath() ?? '';
+        foreach ($products as $product) {
+            if ($product['sticker_id']) {
+                $sticker = Asset::getById($product['sticker_id']);
+            } else {
+                $productObject = Product::getById($product['dest_id']);
+                if (!$productObject) {
+                    continue;
+                }
+                $sticker = $productObject->checkSticker4x6eu();
             }
+            $stickerPath = $sticker ? $sticker->getFullPath() : '';
+            $stickers[] = [
+                'iwasku' => $product['iwasku'],
+                'product_name' => $product['product_name'],
+                'sticker_link' => $stickerPath ?? '',
+                'product_code' => $product['productCode'] ?? '',
+                'category' => $product['productCategory'] ?? '',
+                'image_link' => $product['imageUrl'] ?? '',
+                'attributes' => $product['variationSize'] . ' ' . $product['variationColor']
+            ];
         }
-        unset($sticker);
         return new JsonResponse(['success' => true, 'stickers' => $stickers]);
     }
 
@@ -141,34 +164,14 @@ class StickerController extends FrontendController
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
         $names = [];
-        $products = [];
 
         // all group products
-        /*foreach ($result as $item) {
-            $names[] = $item->getFullPath();
-        }*/
-
-
         foreach ($result as $item) {
-            $relatedProducts = $item->getProducts();
-
-            foreach ($relatedProducts as $product) {
-                if ($product instanceof \Pimcore\Model\DataObject\Product) {
-                    $products[] = [
-                        'name' => $product->getName(),
-                        'sku' => $product->getIwasku(),
-                    ];
-                }
-            }
+            $names[] = $item->getKey();
         }
 
-
-
-
-
-
         return $this->render('sticker/test.html.twig', [
-            'result' => $products
+            'result' => $names
         ]);
     }
 
