@@ -70,12 +70,9 @@
                         const cards = data.stickers.map(sticker => `
                     <div class="card mb-2">
                         <div class="row g-0">
-                            <div class="col-3">
-                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 80px; max-width: 100%; height: auto; width: auto;">
-                            </div>
                             <div class="col-9">
                                 <div class="card-body p-2">
-                                    < <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none stretched-link m-0" target="_blank">
+                                    <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
                                         ${sticker.product_name}
                                     </a>
                                     <p class="card-text text-muted small m-0">
@@ -85,6 +82,10 @@
                                     </p>
                                 </div>
                             </div>
+                            <div class="col-3">
+                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100%; max-width: 100%; height: auto; width: auto;">
+                            </div>
+
                         </div>
                     </div>
                 `).join('');
