@@ -16,8 +16,9 @@ use Pimcore\Model\DataObject\GroupProduct;
 
 #[AsCommand(
     name: 'app:stickers',
-    description: 'Outputs stickers'
+    description: 'Generate missing stickers'
 )]
+
 class StickersCommand extends AbstractCommand
 {
     protected function configure(): void
@@ -26,7 +27,6 @@ class StickersCommand extends AbstractCommand
             ->addOption('generate',null, InputOption::VALUE_NONE, 'Generate missing stickers')
         ;
     }
-
 
     /**
      * @throws Exception
