@@ -141,13 +141,21 @@ class StickerController extends FrontendController
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
         $names = [];
+        $products = [];
+
+        // all group products
+        /*foreach ($result as $item) {
+            $names[] = $item->getFullPath();
+        }*/
 
         foreach ($result as $item) {
-            $names[] = $item->getClassName();
+            $products[] = $item->getProducts();
         }
 
+
+
         return $this->render('sticker/test.html.twig', [
-            'result' => $names
+            'result' => $products
         ]);
     }
 
