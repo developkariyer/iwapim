@@ -27,9 +27,12 @@ class HelloWorldCommand extends AbstractCommand
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
         foreach ($result as $item) {
+            echo "Group: ".$item->getKey();
             $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$item->getId()]);
+            echo " Products: ".count($products)."\n";
             foreach ($products as $product) {
-                $details = $db->fetchAllAssociative("SELECT * FROM object_store_product WHERE oo_id = ?", [$product['dest_id']]);
+                $details = $db->fetchAssociative("SELECT * FROM object_store_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
+                echo "  Product: ".$details['oo_id']."\n";
                 $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6'", [$product['dest_id']]);
                 if (!$stickerId) {
                     // Burada sticker oluşturan kod çağrulmalı ve gelen id alınmalı
@@ -41,7 +44,7 @@ class HelloWorldCommand extends AbstractCommand
                     echo $sticker->getFullPath();
                     return Command::SUCCESS; // aksi halde çok fazla nesne çekmeye çalışacak
                 } else {
-                    echo "Sticker not found for product id: " . $product['dest_id'];
+                    echo "    Sticker not found for product id: " . $product['dest_id']." in group ".$item->getId()."\n";
                 }
             }
         }
