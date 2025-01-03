@@ -42,20 +42,8 @@
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-12 table-responsive"  id="stickers-container" style="overflow-x: auto;">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">Product Code</th>
-                            <th scope="col">Iwasku</th>
-                            <th scope="col">Category</th>
-                            <th scope="col">Product Name</th>
-                            <th scope="col">Image</th>
-                        </tr>
-                        </thead>
-                        <tbody id="stickers-table-body">
-                        </tbody>
-                    </table>
+                <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
+
                 </div>
             </div>
         </div>
@@ -72,35 +60,40 @@
         function loadStickers(groupId) {
             selectedGroupId = groupId;
             highlightSelectedGroup(groupId);
-            const tableBody = document.getElementById('stickers-table-body');
-            tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+            const container = document.getElementById('stickers-container');
+            container.innerHTML = '<p>Loading...</p>';
             fetch(`/sticker/get-stickers/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const rows = data.stickers.map(sticker => `
-                    <tr>
-                        <td>${sticker.product_code}</td>
-                        <td >${sticker.iwasku}</td>
-                        <td>${sticker.category}</td>
-                        <td>
-                            <a href="${sticker.sticker_link}" target="_blank">
-                                ${sticker.product_name}
-                            </a>
-                            <br>
-                            ${sticker.attributes ? sticker.attributes.split(' ').join('<br>') : ''}
-                        </td>
-                        <td "><img src="${sticker.image_link}" alt="Image" style="max-height: 80px; max-width: 100%; height: auto; width: auto;"></td>
-                    </tr>
+                        const cards = data.stickers.map(sticker => `
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">${sticker.product_name}</h5>
+                                    <p class="card-text">
+                                        <strong>Product Code:</strong> ${sticker.product_code} <br>
+                                        <strong>Iwasku:</strong> ${sticker.iwasku} <br>
+                                        <strong>Category:</strong> ${sticker.category}
+                                    </p>
+                                    <a href="${sticker.sticker_link}" class="btn btn-primary btn-sm" target="_blank">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `).join('');
-                        tableBody.innerHTML = rows;
+                        container.innerHTML = cards;
                     } else {
-                        tableBody.innerHTML = '<tr><td colspan="7">No stickers available for this group.</td></tr>';
+                        container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching stickers:', error);
-                    tableBody.innerHTML = '<tr><td colspan="7">An error occurred while loading stickers.</td></tr>';
+                    container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
         }
         function searchTable() {
