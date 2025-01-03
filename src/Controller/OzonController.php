@@ -122,7 +122,7 @@ class OzonController extends FrontendController
      * This controller method is used to set variants for a product in an Ozon Listing task.
      * @throws Exception
      */
-    public function getProductDetails(Request $request): RedirectResponse|Response
+    public function getProductDetailsForm(Request $request): RedirectResponse|Response
     {
         $task = ListingTemplate::getById($request->get('taskId'));
         if (!$task) {
@@ -160,6 +160,8 @@ class OzonController extends FrontendController
             }
             $selectedChildren[$product->getId()] = $listingData;
         }
+
+
         $form = $this->createForm(OzonTaskProductFormType::class, null, [
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
@@ -200,11 +202,22 @@ class OzonController extends FrontendController
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         return $this->render('ozon/products.html.twig', [
-            'form' => $form->createView(),
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
+            'children' => $children,
+            'selected_children' => $selectedChildren,
             'task_products' => $taskProducts,
         ]);
+    }
+
+    /**
+     * @Route("/ozonmodifyproduct/{taskId}/{productId}", name="ozon_modify_product")
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function modifyProductAction(Request $request): RedirectResponse
+    {
+
     }
 
     /**

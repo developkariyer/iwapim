@@ -11,6 +11,7 @@
 - **Apache Superset Integration**: Provides fancy business information for all phases from production to consumer.
 - **ERP Capabilities**: Handles ERP-level data, providing actionable insights for marketplace management.
 - **Marketplace Listings Management**: Manage and sync listings across multiple marketplaces.
+- **REST/GraphQL API Integrations**: Integrates to global and regional marketplaces.
 - **Cloud Ready**: Ready to be packed and deployed as Docker containers.
 
 ## 📖 Description
