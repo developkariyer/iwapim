@@ -42,18 +42,19 @@ class HelloWorldCommand extends AbstractCommand
             if ($sticker) {
                 $stickerPath = $sticker->getFullPath();
             }
-            $stickers[] = [
+            /*$stickers[] = [
                 'iwasku' => $details['iwasku'],
-                'product_name' => $details['Key'],
+                'product_name' => $details['key'],
                 'sticker_link' => $stickerPath ?? '',
                 'product_code' => $details['productCode'] ?? '',
                 'category' => $details['productCategory'] ?? '',
                 'image_link' => $details['imageUrl'] ?? '',
                 'attributes' => $details['variationSize'] . ' ' . $details['variationColor']
-            ];
+            ];*/
+            print_r($details);
+            break;
 
         }
-        print_r($stickers);
         // Output "Hello, World!" as green text
        // $this->writeInfo("Hello, World!", $output);
 
