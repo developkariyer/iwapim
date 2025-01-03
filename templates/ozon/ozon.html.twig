@@ -83,28 +83,28 @@
                 const taskId = $(this).data('task-id');
                 loadParentAccordionContent(taskId);
             });
-/*
-            const loadChildAccordionContent = (taskId, parentProductId) => {
-                const childAccordion = $(`#childProducts${taskId}_${parentProductId}`);
+
+            const loadProductModifyForm = (taskId, parentProductId) => {
+                const modifyForm = $(`#childProducts${taskId}_${parentProductId}`);
                 const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
-                if (!childAccordion.data('loaded')) {
+                if (!modifyForm.data('loaded')) {
                     loadingSpinner.show();
-                    childAccordion.hide();
+                    modifyForm.hide();
                     $.get(`/ozonproduct/${taskId}/${parentProductId}`, function (data) {
-                        childAccordion.html(data);
-                        childAccordion.data('loaded', true);
+                        modifyForm.html(data);
+                        modifyForm.data('loaded', true);
                         loadingSpinner.hide();
-                        childAccordion.show();
+                        modifyForm.show();
                     });
                 }
             };
 
             $(document).on('show.bs.collapse', '.accordion-collapse[data-type="child"]', function () {
-                const parentProductId = $(this).data('parent-product-id');
+                const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
-                loadChildAccordionContent(taskId, parentProductId);
+                loadProductModifyForm(taskId, parentProductId);
             });
-*/
+
             console.log('Initializing Select2 on page load');
             initializeSelect2();
 
