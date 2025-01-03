@@ -150,9 +150,18 @@ class StickerController extends FrontendController
 
 
         foreach ($result as $item) {
-            $products[] = $item->getProducts();
+            $relatedProducts = $item->getProducts();
+
+            foreach ($relatedProducts as $product) {
+                if ($product instanceof \Pimcore\Model\DataObject\Product) {
+                    $products[] = [
+                        'name' => $product->getName(),
+                        'sku' => $product->getIwasku(),
+                    ];
+                }
+            }
         }
-       
+
 
 
 
