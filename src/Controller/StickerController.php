@@ -149,15 +149,16 @@ class StickerController extends FrontendController
         }*/
 
         foreach ($result as $groupProduct) {
-            $products = $groupProduct->getProducts();
-            /*foreach ($relatedProducts as $product) {
+            $relatedProducts = $groupProduct->getProducts();
+            
+            foreach ($relatedProducts as $product) {
                 if ($product instanceof Product) {
                     $products[] = [
                         'name' => $product->getName(),
                         'sku' => $product->getIwasku()
                     ];
                 }
-            }*/
+            }
         }
 
 
