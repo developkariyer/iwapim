@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Connector\Marketplace\Ozon\Utils;
 use App\Form\OzonTaskFormType;
-use App\Form\OzonTaskProductFormType;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
@@ -181,14 +180,23 @@ WHERE
             }
             $selectedChildren[$product->getId()] = $listingData;
         }
-
-
-        $form = $this->createForm(OzonTaskProductFormType::class, null, [
+        return $this->render('ozon/products.html.twig', [
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
             'children' => $children,
             'selected_children' => $selectedChildren,
+            'task_products' => $taskProducts,
+            'preselected_product_type' => [],
         ]);
+    }
+
+    /**
+     * @Route("/ozonmodifyproduct/{taskId}/{productId}", name="ozon_modify_product")
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function modifyProductAction(Request $request): RedirectResponse
+    {/*
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $data = $form->getData();
@@ -222,22 +230,8 @@ WHERE
             $task->save();
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
-        return $this->render('ozon/products.html.twig', [
-            'task_id' => $task->getId(),
-            'parent_product_id' => $parentProduct->getId(),
-            'children' => $children,
-            'selected_children' => $selectedChildren,
-            'task_products' => $taskProducts,
-        ]);
-    }
-
-    /**
-     * @Route("/ozonmodifyproduct/{taskId}/{productId}", name="ozon_modify_product")
-     * @param Request $request
-     * @return RedirectResponse
-     */
-    public function modifyProductAction(Request $request): RedirectResponse
-    {
+        */
+        return $this->redirectToRoute('ozon_menu');
 
     }
 
