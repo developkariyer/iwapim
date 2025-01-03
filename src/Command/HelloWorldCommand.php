@@ -44,7 +44,7 @@ class HelloWorldCommand extends AbstractCommand
             }
             $stickers[] = [
                 'iwasku' => $details['iwasku'],
-                'product_name' => $details['name'],
+                'product_name' => $details['Key'],
                 'sticker_link' => $stickerPath ?? '',
                 'product_code' => $details['productCode'] ?? '',
                 'category' => $details['productCategory'] ?? '',
