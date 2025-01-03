@@ -17,32 +17,33 @@
     <div class="row">
         <div class="col-12">
             <div class="row mt-2">
-                <div class="col-12 table-responsive"  id="stickers-container">
-                    <div class="row">
-                        <div class="col-6">
-                            <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
-                        </div>
-                        <div class="col-6">
-                            <div class="dropdown mt-4">
-                                <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Select Group
-                                </button>
-                                <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                                    {% for group in groups %}
-                                        <li>
-                                            <a class="dropdown-item" href="#" onclick="loadStickers({{ group.id }})">
-                                                {{ group.name }}
-                                            </a>
-                                        </li>
-                                    {% else %}
-                                        <li>
-                                            <span class="dropdown-item text-muted">No groups available.</span>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
+                <div class="col-6">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
+                </div>
+                <div class="col-6">
+                    <div class="dropdown mt-4">
+                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Group
+                        </button>
+                        <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                            {% for group in groups %}
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="loadStickers({{ group.id }})">
+                                        {{ group.name }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <span class="dropdown-item text-muted">No groups available.</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12 table-responsive"  id="stickers-container">
+
                     <table class="table table-striped">
                         <thead>
                         <tr>
