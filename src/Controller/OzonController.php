@@ -30,7 +30,7 @@ class OzonController extends FrontendController
     op.variationColor,
     op.iwasku,
     op_parent.key AS parentKey,
-    CONCAT_WS(' ', op_parent.key, op.variationSize, op.variationColor) AS `key`
+    CONCAT_WS(' ', op_parent.key, op.variationSize, op.variationColor) AS productKey
 FROM 
     object_relations_listingTemplate orlt
 JOIN 
@@ -40,7 +40,7 @@ LEFT JOIN
 WHERE 
     orlt.src_id = ? 
     AND orlt.fieldname = 'products'
-    ORDER BY key";
+    ORDER BY productKey";
 
     /**
      * @Route("/ozon/{taskId}/{parentProductId}", name="ozon_menu", defaults={"taskId"=null, "parentProductId"=null})
@@ -117,7 +117,7 @@ WHERE
                         [
                             'id' => $taskProductId['id'],
                             'iwasku' => $taskProductId['iwasku'],
-                            'key' => $taskProductId['key'],
+                            'key' => $taskProductId['productKey'],
                         ]
                     ],
                 ];
@@ -125,7 +125,7 @@ WHERE
                 $parentProducts[$id]['products'][] = [
                     'id' => $taskProductId['id'],
                     'iwasku' => $taskProductId['iwasku'],
-                    'key' => $taskProductId['key'],
+                    'key' => $taskProductId['productKey'],
                 ];
             }
         }
