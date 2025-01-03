@@ -24,37 +24,15 @@ class HelloWorldCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $db = Db::get();
-        $stickers = [];
-        $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [249889]);
-        foreach ($products as $product) {
-            $details = $db->fetchAssociative("SELECT * FROM object_product WHERE oo_id = ? LIMIT 1", [$product['dest_id']]);
-            $stickerId = $db->fetchOne("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='sticker4x6eu'", [$product['dest_id']]);
-            if (!$stickerId) {
-                $productObject = Product::getById($product['dest_id']);
-                if (!$productObject) {
-                    continue;
-                }
-                $sticker = $productObject->checkSticker4x6eu();
-            } else {
-                $sticker = Asset::getById($stickerId);
-            }
-            if ($sticker) {
-                $stickerPath = $sticker->getFullPath();
-            }
-            /*$stickers[] = [
-                'iwasku' => $details['iwasku'],
-                'product_name' => $details['key'],
-                'sticker_link' => $stickerPath ?? '',
-                'product_code' => $details['productCode'] ?? '',
-                'category' => $details['productCategory'] ?? '',
-                'image_link' => $details['imageUrl'] ?? '',
-                'attributes' => $details['variationSize'] . ' ' . $details['variationColor']
-            ];*/
-            print_r($details);
-            break;
-
+        $newGroup = new GroupProduct();
+        $newGroup->setKey("Test API Group");
+        try {
+            $newGroup->save();
+        } catch (Exception $e) {
+           echo $e->getMessage();
         }
+
+
         // Output "Hello, World!" as green text
        // $this->writeInfo("Hello, World!", $output);
 
