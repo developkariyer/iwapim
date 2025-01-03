@@ -30,8 +30,7 @@
             {% for colorName, child in colorGroups %}
                 <div class="form-group mb-2">
                     <label for="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}">
-                        <h5>{{ colorName }}</h5>
-                        {{ child.key }} ({{ child.iwasku }})
+                        <strong>{{ colorName }}</strong> | {{ child.key }} ({{ child.iwasku }})
                     </label>
                     <select id="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}" name="selectedChildren[{{ child.id }}]" class="form-select form-select-sm">
                         <option value="-1" {% if selected_children[child.id] is defined and selected_children[child.id] == -1 %}selected{% endif %}>** Listeleme</option>
