@@ -174,6 +174,9 @@ WHERE
         $groupType = $productType = 0;
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
+            if ($product->getParent()->getId() != $parentProduct->getId()) {
+                continue;
+            }
             if (!$product instanceof Product) {
                 continue;
             }
