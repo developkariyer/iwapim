@@ -88,7 +88,7 @@ WHERE
     }
 
     /**
-     * @Route("/ozontask/{id}", name="ozon_task")
+     * @Route("/ozontask/{taskId}/{parentProductId}", name="ozon_task", defaults={"parentProductId"=null})
      * @param Request $request
      * @return Response
      *
@@ -98,7 +98,7 @@ WHERE
     public function getTaskProducts(Request $request): Response
     {
         $db = Db::get();
-        $taskId = $request->get('id');
+        $taskId = $request->get('taskId');
         $task = ListingTemplate::getById($taskId);
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
@@ -132,6 +132,7 @@ WHERE
         return $this->render('ozon/task.html.twig', [
             'taskId' => $taskId,
             'parentProducts' => $parentProducts,
+            'shoParentProductId' => $request->get('parentProductId'),
         ]);
     }
 

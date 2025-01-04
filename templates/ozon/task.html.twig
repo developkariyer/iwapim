@@ -7,7 +7,11 @@
                     {{ parentData.parentProduct.key }} ({{ parentData.products|length }} varyasyon)
                 </button>
             </h2>
-            <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="accordion-collapse collapse" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
+            {% set collapseClass = 'accordion-collapse collapse' %}
+            {% if parentProductId == showParentProductId %}
+                {% set collapseClass = collapseClass ~ ' show' %}
+            {% endif %}
+            <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="{{ collapseClass }}" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
                 <div class="accordion-body">
                     <div class="ms-2">
                         <ul class="list-group">
