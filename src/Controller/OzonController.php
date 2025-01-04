@@ -169,6 +169,7 @@ WHERE
             $selectedChildren[$child->getId()] = -1;
         }
         $taskProducts = $task->getProducts();
+        $groupType = $productType = 0;
         foreach ($taskProducts as $taskProduct) {
             $product = $taskProduct->getObject();
             if (!$product instanceof Product) {
@@ -178,7 +179,17 @@ WHERE
             if (!is_numeric($listingData)) {
                 continue;
             }
+            if (!$groupType && $taskProduct->getData()['grouptype']) {
+                $groupType = $taskProduct->getData()['grouptype'];
+            }
+            if (!$productType && $taskProduct->getData()['producttype']) {
+                $productType = $taskProduct->getData()['producttype'];
+            }
             $selectedChildren[$product->getId()] = $listingData;
+        }
+        $categoryFullName = Utils::isOzonProductType($groupType, $productType);
+        if (!empty($categoryFullName)) {
+            $preselectedProductType = ['id' => $groupType . '.' . $productType, 'text' => $categoryFullName];
         }
         return $this->render('ozon/products.html.twig', [
             'task_id' => $task->getId(),
@@ -186,7 +197,7 @@ WHERE
             'children' => $children,
             'selected_children' => $selectedChildren,
             'task_products' => $taskProducts,
-            'preselected_product_type' => [],
+            'preselected_product_type' => $preselectedProductType ?? null,
         ]);
     }
 
