@@ -302,6 +302,10 @@ WHERE
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         $taskProducts = $task->getProducts();
+        $objectIdList = [];
+        foreach ($taskProducts as $taskProduct) {
+            $objectIdList[] = $taskProduct->getObject()->getId();
+        }
         $dirty = false;
         $parentProduct = null;
         foreach ($iwaskuList as $iwasku) {
@@ -318,6 +322,10 @@ WHERE
                 error_log("Product not found for iwasku $iwasku");
                 continue;
             }
+            if (in_array($product->getId(), $objectIdList)) {
+                error_log("Product already added to task with iwasku $iwasku");
+                continue;
+            }
             $parentProduct = $product->getParent();
             if (!$parentProduct instanceof Product) {
                 error_log("Parent product not found for product with iwasku $iwasku");
@@ -326,6 +334,7 @@ WHERE
             $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
             $objectMetadata->setData(['listing' => 0]);
             $taskProducts[] = $objectMetadata;
+            $objectIdList[] = $product->getId();
             $dirty = true;
         }
         if ($dirty) {
