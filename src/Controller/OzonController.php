@@ -283,6 +283,7 @@ WHERE
         }
         $taskProducts = $task->getProducts();
         $dirty = false;
+        $parentProduct = null;
         foreach ($iwaskuList as $iwasku) {
             $iwasku = trim($iwasku);
             $product = Product::getByIwasku($iwasku, 1);
@@ -302,7 +303,7 @@ WHERE
             $task->setProducts($taskProducts);
             $task->save();
         }
-        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId() ?? 0]);
     }
 
     /**
