@@ -217,7 +217,7 @@ WHERE
         $parentProductId = $request->get('productId');
         if (!$formTaskId || !$formParentProductId || $formTaskId != $taskId || $formParentProductId != $parentProductId) {
             error_log("Invalid form data: $formTaskId, $formParentProductId, $taskId, $parentProductId");
-            return $this->redirectToRoute('ozon_menu');
+            return $this->redirectToRoute('ozon_menu', ['taskId' => $taskId, 'parentProductId' => $parentProductId]);
         }
         $task = ListingTemplate::getById($taskId);
         if (!$task) {
@@ -258,7 +258,7 @@ WHERE
         }
         $task->setProducts($newTaskProducts);
         $task->save();
-        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId()]);
     }
 
     /**
