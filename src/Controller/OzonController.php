@@ -261,9 +261,11 @@ ORDER BY
             }
             $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $child);
             $objectMetadata->setData(['listing' => $listingId, 'grouptype' => $ozonGroupType, 'producttype' => $ozonProductType]);
-            $objectMetadata->setObject($child);
             $newTaskProducts[] = $objectMetadata;
+            unset($child);
+            unset($objectMetadata);
         }
+        gc_collect_cycles();
         $task->setProducts($newTaskProducts);
         $task->save();
         $this->addFlash('success', 'Ürünler güncellendi.');
@@ -320,8 +322,11 @@ ORDER BY
             $objectMetadata->setData(['listing' => 0]);
             $newTaskProducts[] = $objectMetadata;
             $objectIdList[] = $product->getId();
+            unset($product);
+            unset($objectMetadata);
             $dirty = true;
         }
+        gc_collect_cycles();
         if ($dirty) {
             $task->setProducts($newTaskProducts);
             $this->addFlash('success', 'Yeni ürün eklendi.');
