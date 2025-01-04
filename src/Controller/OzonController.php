@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Connector\Marketplace\Ozon\Utils;
 use App\Form\OzonTaskFormType;
+use App\Utils\Registry;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
@@ -306,6 +307,12 @@ WHERE
         foreach ($iwaskuList as $iwasku) {
             $iwasku = trim($iwasku);
             $product = Product::getByIwasku($iwasku, 1);
+            if (!$product) {
+                $iwaskuFromAsin = Registry::getKey('asin-to-iwasku', $iwasku);
+                if ($iwaskuFromAsin) {
+                    $product = Product::getByIwasku($iwaskuFromAsin, 1);
+                }
+            }
             if (!$product) {
                 continue;
             }
