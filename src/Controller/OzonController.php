@@ -308,7 +308,7 @@ WHERE
             $iwasku = trim($iwasku);
             $product = Product::getByIwasku($iwasku, 1);
             if (!$product) {
-                $iwaskuFromAsin = Registry::getKey('asin-to-iwasku', $iwasku);
+                $iwaskuFromAsin = Registry::getKey($iwasku, 'asin-to-iwasku');
                 error_log("Fallback to asin-to-iwasku for $iwasku: found $iwaskuFromAsin");
                 if ($iwaskuFromAsin) {
                     $product = Product::getByIwasku($iwaskuFromAsin, 1);
