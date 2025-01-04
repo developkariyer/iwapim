@@ -18,7 +18,7 @@
         >
             {# Optionally, include a preselected option if needed #}
             {% if preselected_product_type %}
-                <option value="{{ preselected_product_type.id }}" selected>{{ preselected_product_type.name }}</option>
+                <option value="{{ preselected_product_type.id }}" selected>{{ preselected_product_type.text }}</option>
             {% endif %}
         </select>
     </div>
