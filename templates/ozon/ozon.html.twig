@@ -8,7 +8,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingTask{{ task.id }}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTask{{ task.id }}" aria-expanded="false" aria-controls="collapseTask{{ task.id }}">
-                        Ozon Listing: {{ task.key }}
+                        <strong>Listing Task: {{ task.key }}</strong>
                     </button>
                 </h2>
                 <div id="collapseTask{{ task.id }}" class="accordion-collapse collapse" aria-labelledby="headingTask{{ task.id }}" data-bs-parent="#ozonAccordion" data-type="parent" data-task-id="{{ task.id }}">
