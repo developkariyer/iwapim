@@ -303,7 +303,7 @@ WHERE
             $task->setProducts($taskProducts);
             $task->save();
         }
-        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId() ?? 0]);
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => is_object($parentProduct) ? $parentProduct->getId() : 0]);
     }
 
     /**
