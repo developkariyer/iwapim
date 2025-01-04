@@ -189,7 +189,7 @@ WHERE
         }
         $categoryFullName = Utils::isOzonProductType($groupType, $productType);
         if (!empty($categoryFullName)) {
-            $preselectedProductType = ['id' => $groupType . '.' . $productType, 'text' => $categoryFullName];
+            $preselectedProductType = ['id' => $groupType . '.' . $productType, 'name' => $categoryFullName];
         }
         return $this->render('ozon/products.html.twig', [
             'task_id' => $task->getId(),
