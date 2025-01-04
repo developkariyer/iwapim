@@ -103,15 +103,27 @@ WHERE
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
-        $parentProducts = [];
+        $parentProducts = $dbTypes = [];
+        $groupType = $productType = 0;
+        $dbTypesdb = $db->fetchAllAssociative("SELECT dest_id, `column`, `data` FROM object_metadata_listingTemplate WHERE fieldname = 'products' AND `column` IN ('grouptype', 'producttype') AND id = ? ORDER BY dest_id, `column`", [$taskId]);
+        foreach ($dbTypesdb as $dbType) {
+            if (!isset($dbTypes[$dbType['dest_id']])) {
+                $dbTypes[$dbType['dest_id']] = [];
+            }
+            $dbTypes[$dbType['dest_id']][$dbType['column']] = $dbType['data'];
+        }
         $taskProductIds = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
         foreach ($taskProductIds as $taskProductId) {
             $id = $taskProductId['parentId'];
+            $groupType = $dbTypes[$taskProductId['id']]['grouptype'] ?? 0;
+            $productType = $dbTypes[$taskProductId['id']]['producttype'] ?? 0;
+            $categoryFullName = Utils::isOzonProductType($groupType, $productType) ?? '';
             if (!isset($parentProducts[$id])) {
                 $parentProducts[$id] = [
                     'parentProduct' => [
                         'id' => $taskProductId['parentId'],
-                        'key' => $taskProductId['parentKey']
+                        'key' => $taskProductId['parentKey'],
+                        'categoryFullName' => $categoryFullName,
                     ],
                     'products' => [
                         [
@@ -127,6 +139,9 @@ WHERE
                     'iwasku' => $taskProductId['iwasku'],
                     'key' => $taskProductId['productKey'],
                 ];
+                if (empty($parentProducts[$id]['parentProduct']['categoryFullName'])) {
+                    $parentProducts[$id]['parentProduct']['categoryFullName'] = $categoryFullName;
+                }
             }
         }
         return $this->render('ozon/task.html.twig', [
