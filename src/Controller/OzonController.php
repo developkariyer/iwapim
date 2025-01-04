@@ -309,15 +309,18 @@ WHERE
             $product = Product::getByIwasku($iwasku, 1);
             if (!$product) {
                 $iwaskuFromAsin = Registry::getKey('asin-to-iwasku', $iwasku);
+                error_log("Fallback to asin-to-iwasku for $iwasku: found $iwaskuFromAsin");
                 if ($iwaskuFromAsin) {
                     $product = Product::getByIwasku($iwaskuFromAsin, 1);
                 }
             }
             if (!$product) {
+                error_log("Product not found for iwasku $iwasku");
                 continue;
             }
             $parentProduct = $product->getParent();
             if (!$parentProduct instanceof Product) {
+                error_log("Parent product not found for product with iwasku $iwasku");
                 continue;
             }
             $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
