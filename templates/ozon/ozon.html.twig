@@ -56,13 +56,13 @@
         $(document).ready(function () {
             const taskId = '{{ taskId|default(null) }}';
 
-            const loadParentAccordionContent = (taskId) => {
+            const loadParentAccordionContent = (taskId, parentProductId) => {
                 const parentAccordion = $(`#parentProductAccordion${taskId}`);
                 const loadingSpinner = $(`#loadingTask${taskId}`);
                 if (!parentAccordion.data('loaded')) {
                     loadingSpinner.show();
                     parentAccordion.hide();
-                    $.get(`/ozontask/${taskId}`, function (data) {
+                    $.get(`/ozontask/${taskId}/${parentProductId}`, function (data) {
                         parentAccordion.html(data);
                         parentAccordion.data('loaded', true);
                         loadingSpinner.hide();
@@ -75,7 +75,7 @@
                 const taskAccordion = $(`#collapseTask${taskId}`);
                 if (taskAccordion.length) {
                     taskAccordion.collapse('show');
-                    loadParentAccordionContent(taskId); // Load content manually
+                    loadParentAccordionContent(taskId, {{ parentProductId|default(null) }});
                 }
             }
 

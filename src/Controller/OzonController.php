@@ -88,7 +88,7 @@ WHERE
     }
 
     /**
-     * @Route("/ozontask/{taskId}/{parentProductId}", name="ozon_task", defaults={"parentProductId"=null})
+     * @Route("/ozontask/{taskId}/{parentProductId}", name="ozon_task", defaults={"parentProductId"=0})
      * @param Request $request
      * @return Response
      *
@@ -132,7 +132,7 @@ WHERE
         return $this->render('ozon/task.html.twig', [
             'taskId' => $taskId,
             'parentProducts' => $parentProducts,
-            'shoParentProductId' => $request->get('parentProductId'),
+            'showParentProductId' => $request->get('parentProductId'),
         ]);
     }
 
