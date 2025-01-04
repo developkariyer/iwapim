@@ -249,7 +249,7 @@ ORDER BY
         $explodedProductType = explode('.', $productType) ?? [];
         $ozonGroupType = $explodedProductType[0] ?? 0;
         $ozonProductType = $explodedProductType[1] ?? 0;
-        [$newTaskProducts,] = $this->getTaskProductsAsMetadata($task->getId());
+        [$newTaskProducts,] = $this->getTaskProductsAsMetadata($task->getId(), $parentProduct->getId());
         foreach ($selectedChildren as $childId => $listingId) {
             if ($listingId == -1) {
                 continue;
@@ -347,14 +347,21 @@ ORDER BY
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    private function getTaskProductsAsMetadata(int $taskId): array
+    private function getTaskProductsAsMetadata(int $taskId, int $parentProductIdToIgnore = 0): array
     {
         $db = Db::get();
         $taskProducts = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
         $taskProductsMetadata = [];
         $objectIdList = [];
         foreach ($taskProducts as $taskProduct) {
+            if ($taskProduct['parentId'] == $parentProductIdToIgnore) {
+                continue;
+            }
             $object = Product::getById($taskProduct['id']);
+            if (!$object) {
+                error_log("Invalid product with id {$taskProduct['id']}");
+                continue;
+            }
             $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $object);
             $objectMetadata->setData(['listing' => $taskProduct['listingId'] ?? 0, 'grouptype' => $taskProduct['groupType'] ?? 0, 'producttype' => $taskProduct['productType'] ?? 0]);
             $taskProductsMetadata[] = $objectMetadata;
