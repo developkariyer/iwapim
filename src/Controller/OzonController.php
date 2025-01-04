@@ -69,6 +69,7 @@ WHERE
         }
         $taskListing = new ListingTemplate\Listing();
         $taskListing->setUnpublished(true);
+        $taskListing->setOrderKey('key');
         $tasksObjects = $taskListing->load();
         $tasks = [];
         foreach ($tasksObjects as $task) {
