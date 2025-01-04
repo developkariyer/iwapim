@@ -14,12 +14,10 @@
             <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="{{ collapseClass }}" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
                 <div class="accordion-body">
                     <div class="ms-2">
-                        <i>{{ parentData.parentProduct.categoryFullName }}</i>
-                        <ul class="list-group">
+                        <i>{{ parentData.parentProduct.categoryFullName }}</i><br>
                         {% for childProduct in parentData.products %}
-                            <li>{{ childProduct.key }} ({{ childProduct.iwasku }})</li>
+                            - {{ childProduct.key }} ({{ childProduct.iwasku }})<br>
                         {% endfor %}
-                        </ul>
                         <button type="button" class="btn btn-primary mt-3" data-action="edit-product">
                             Düzenle
                         </button>
