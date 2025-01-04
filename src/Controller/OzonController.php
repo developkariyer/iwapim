@@ -23,24 +23,35 @@ use Pimcore\Model\DataObject\ListingTemplate;
 
 class OzonController extends FrontendController
 {
-    private string $sqlTaskProducts = "SELECT 
-    orlt.dest_id AS id, 
-    op.parentId,
-    op.variationSize,
-    op.variationColor,
-    op.iwasku,
-    op_parent.key AS parentKey,
-    CONCAT_WS(' ', op_parent.key, op.variationSize, op.variationColor) AS productKey
-FROM 
-    object_relations_listingTemplate orlt
-JOIN 
-    object_product op ON orlt.dest_id = op.id
-LEFT JOIN 
-    object_product op_parent ON op_parent.id = op.parentId
-WHERE 
-    orlt.src_id = ? 
-    AND orlt.fieldname = 'products'
-    ORDER BY productKey";
+    private string $sqlTaskProducts = "SELECT
+    ob.id,
+    ob.variationSize,
+    ob.variationColor,
+    ob.iwasku,
+    ob.parentId,
+    ob.`key` AS productKey,
+    ob_parent.`key` AS parentKey,
+    MAX(CASE WHEN omlt.`column` = 'listing' THEN omlt.data END) AS listingId,
+    MAX(CASE WHEN omlt.`column` = 'grouptype' THEN omlt.data END) AS groupType,
+    MAX(CASE WHEN omlt.`column` = 'producttype' THEN omlt.data END) AS productType
+FROM
+    object_relations_listingTemplate AS orlt
+JOIN
+    object_product AS ob ON orlt.dest_id = ob.id
+LEFT JOIN
+    object_product AS ob_parent ON ob.parentId = ob_parent.id
+JOIN
+    object_metadata_listingTemplate AS omlt ON orlt.dest_id = omlt.dest_id
+    AND orlt.src_id = omlt.id
+WHERE
+    orlt.fieldname = 'products'
+    AND omlt.fieldname = 'products'
+    AND orlt.src_id = ?
+GROUP BY
+    ob.id, ob.variationSize, ob.variationColor, ob.iwasku, ob.`key`, ob_parent.`key`
+ORDER BY
+    productKey;";
+
 
     /**
      * @Route("/ozon/{taskId}/{parentProductId}", name="ozon_menu", defaults={"taskId"=null, "parentProductId"=null})
@@ -104,41 +115,33 @@ WHERE
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
-        $parentProducts = $dbTypes = [];
-        $groupType = $productType = 0;
-        $dbTypesdb = $db->fetchAllAssociative("SELECT dest_id, `column`, `data` FROM object_metadata_listingTemplate WHERE fieldname = 'products' AND `column` IN ('grouptype', 'producttype') AND id = ? ORDER BY dest_id, `column`", [$taskId]);
-        foreach ($dbTypesdb as $dbType) {
-            if (!isset($dbTypes[$dbType['dest_id']])) {
-                $dbTypes[$dbType['dest_id']] = [];
-            }
-            $dbTypes[$dbType['dest_id']][$dbType['column']] = $dbType['data'];
-        }
-        $taskProductIds = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
-        foreach ($taskProductIds as $taskProductId) {
-            $id = $taskProductId['parentId'];
-            $groupType = $dbTypes[$taskProductId['id']]['grouptype'] ?? 0;
-            $productType = $dbTypes[$taskProductId['id']]['producttype'] ?? 0;
+        $parentProducts = [];
+        $taskProducts = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
+        foreach ($taskProducts as $taskProduct) {
+            $id = $taskProduct['parentId'];
+            $groupType = $taskProduct['groupType'] ?? 0;
+            $productType = $taskProduct['productType'] ?? 0;
             $categoryFullName = Utils::isOzonProductType($groupType, $productType) ?? '';
             if (!isset($parentProducts[$id])) {
                 $parentProducts[$id] = [
                     'parentProduct' => [
-                        'id' => $taskProductId['parentId'],
-                        'key' => $taskProductId['parentKey'],
+                        'id' => $taskProduct['parentId'],
+                        'key' => $taskProduct['parentKey'],
                         'categoryFullName' => $categoryFullName,
                     ],
                     'products' => [
                         [
-                            'id' => $taskProductId['id'],
-                            'iwasku' => $taskProductId['iwasku'],
-                            'key' => $taskProductId['productKey'],
+                            'id' => $taskProduct['id'],
+                            'iwasku' => $taskProduct['iwasku'],
+                            'key' => $taskProduct['productKey'],
                         ]
                     ],
                 ];
             } else {
                 $parentProducts[$id]['products'][] = [
-                    'id' => $taskProductId['id'],
-                    'iwasku' => $taskProductId['iwasku'],
-                    'key' => $taskProductId['productKey'],
+                    'id' => $taskProduct['id'],
+                    'iwasku' => $taskProduct['iwasku'],
+                    'key' => $taskProduct['productKey'],
                 ];
                 if (empty($parentProducts[$id]['parentProduct']['categoryFullName'])) {
                     $parentProducts[$id]['parentProduct']['categoryFullName'] = $categoryFullName;
@@ -162,6 +165,7 @@ WHERE
      */
     public function getProductDetailsForm(Request $request): RedirectResponse|Response
     {
+        $db = Db::get();
         $task = ListingTemplate::getById($request->get('taskId'));
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
@@ -186,27 +190,20 @@ WHERE
             $children[$child->getVariationSize()][$child->getVariationColor()] = $child;
             $selectedChildren[$child->getId()] = -1;
         }
-        $taskProducts = $task->getProducts();
+        $taskProducts = $db->fetchAllAssociative($this->sqlTaskProducts, [$task->getId()]);
         $groupType = $productType = 0;
         foreach ($taskProducts as $taskProduct) {
-            $product = $taskProduct->getObject();
-            if ($product->getParent()->getId() != $parentProduct->getId()) {
+            if ($taskProduct['parentId'] != $parentProduct->getId()) {
                 continue;
             }
-            if (!$product instanceof Product) {
-                continue;
+            $listingId = $taskProduct['listingId'] ?? 0;
+            if (!$groupType && !empty($taskProduct['grouptype'])) {
+                $groupType = $taskProduct['grouptype'];
             }
-            $listingData = $taskProduct->getData()['listing'];
-            if (!is_numeric($listingData)) {
-                continue;
+            if (!$productType && !empty($taskProduct['producttype'])) {
+                $productType = $taskProduct['producttype'];
             }
-            if (!$groupType && !empty($taskProduct->getData()['grouptype'])) {
-                $groupType = $taskProduct->getData()['grouptype'];
-            }
-            if (!$productType && !empty($taskProduct->getData()['producttype'])) {
-                $productType = $taskProduct->getData()['producttype'];
-            }
-            $selectedChildren[$product->getId()] = $listingData;
+            $selectedChildren[$taskProduct['id']] = $listingId;
         }
         $categoryFullName = Utils::isOzonProductType($groupType, $productType);
         if (!empty($categoryFullName)) {
@@ -217,7 +214,6 @@ WHERE
             'parent_product_id' => $parentProduct->getId(),
             'children' => $children,
             'selected_children' => $selectedChildren,
-            'task_products' => $taskProducts,
             'preselected_product_type' => $preselectedProductType ?? null,
         ]);
     }
@@ -250,7 +246,10 @@ WHERE
         }
         $selectedChildren = $request->get('selectedChildren');
         $productType = $request->get('productType');
-        $newTaskProducts = [];
+        $explodedProductType = explode('.', $productType) ?? [];
+        $ozonGroupType = $explodedProductType[0] ?? 0;
+        $ozonProductType = $explodedProductType[1] ?? 0;
+        [$newTaskProducts,] = $this->getTaskProductsAsMetadata($task->getId());
         foreach ($selectedChildren as $childId => $listingId) {
             if ($listingId == -1) {
                 continue;
@@ -260,20 +259,10 @@ WHERE
                 error_log("Invalid child product with id $childId");
                 continue;
             }
-            $explodedProductType = explode('.', $productType) ?? [];
-            $ozonGroupType = $explodedProductType[0] ?? 0;
-            $ozonProductType = $explodedProductType[1] ?? 0;
             $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $child);
             $objectMetadata->setData(['listing' => $listingId, 'grouptype' => $ozonGroupType, 'producttype' => $ozonProductType]);
             $objectMetadata->setObject($child);
             $newTaskProducts[] = $objectMetadata;
-        }
-        $taskProducts = $task->getProducts();
-        foreach ($taskProducts as $taskProduct) {
-            $product = $taskProduct->getObject();
-            if ($product->getParent()->getId() != $parentProduct->getId()) {
-                $newTaskProducts[] = $taskProduct;
-            }
         }
         $task->setProducts($newTaskProducts);
         $task->save();
@@ -301,11 +290,7 @@ WHERE
         if (empty($iwaskuList)) {
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
-        $taskProducts = $task->getProducts();
-        $objectIdList = [];
-        foreach ($taskProducts as $taskProduct) {
-            $objectIdList[] = $taskProduct->getObject()->getId();
-        }
+        [$newTaskProducts, $objectIdList] = $this->getTaskProductsAsMetadata($task->getId());
         $dirty = false;
         $parentProduct = null;
         foreach ($iwaskuList as $iwasku) {
@@ -333,12 +318,12 @@ WHERE
             }
             $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
             $objectMetadata->setData(['listing' => 0]);
-            $taskProducts[] = $objectMetadata;
+            $newTaskProducts[] = $objectMetadata;
             $objectIdList[] = $product->getId();
             $dirty = true;
         }
         if ($dirty) {
-            $task->setProducts($taskProducts);
+            $task->setProducts($newTaskProducts);
             $this->addFlash('success', 'Yeni ürün eklendi.');
             $task->save();
         }
@@ -359,5 +344,23 @@ WHERE
         return new JsonResponse(Utils::getOzonProductTypes($q));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function getTaskProductsAsMetadata(int $taskId): array
+    {
+        $db = Db::get();
+        $taskProducts = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
+        $taskProductsMetadata = [];
+        $objectIdList = [];
+        foreach ($taskProducts as $taskProduct) {
+            $object = Product::getById($taskProduct['id']);
+            $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $object);
+            $objectMetadata->setData(['listing' => $taskProduct['listingId'] ?? 0, 'grouptype' => $taskProduct['groupType'] ?? 0, 'producttype' => $taskProduct['productType'] ?? 0]);
+            $taskProductsMetadata[] = $objectMetadata;
+            $objectIdList[] = $taskProduct['id'];
+        }
+        return [$taskProductsMetadata, $objectIdList];
+    }
 
 }
