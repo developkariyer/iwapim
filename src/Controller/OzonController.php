@@ -199,10 +199,10 @@ WHERE
             if (!is_numeric($listingData)) {
                 continue;
             }
-            if (!$groupType && $taskProduct->getData()['grouptype']) {
+            if (!$groupType && !empty($taskProduct->getData()['grouptype'])) {
                 $groupType = $taskProduct->getData()['grouptype'];
             }
-            if (!$productType && $taskProduct->getData()['producttype']) {
+            if (!$productType && !empty($taskProduct->getData()['producttype'])) {
                 $productType = $taskProduct->getData()['producttype'];
             }
             $selectedChildren[$product->getId()] = $listingData;
