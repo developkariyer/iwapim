@@ -64,7 +64,7 @@ WHERE
             $task->setParent(Utility::checkSetPath('Listing'));
             $task->setMarketplace($data['marketplace']);
             $task->save();
-            $this->addFlash('success', 'Yeni görev başarıyla oluşturuldu.');
+            $this->addFlash('success', 'Yeni görev oluşturuldu.');
             return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
         }
         $taskListing = new ListingTemplate\Listing();
@@ -276,6 +276,7 @@ WHERE
         }
         $task->setProducts($newTaskProducts);
         $task->save();
+        $this->addFlash('success', 'Ürünler güncellendi.');
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId()]);
     }
 
@@ -319,6 +320,7 @@ WHERE
         }
         if ($dirty) {
             $task->setProducts($taskProducts);
+            $this->addFlash('success', 'Yeni ürün eklendi.');
             $task->save();
         }
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => is_object($parentProduct) ? $parentProduct->getId() : 0]);
