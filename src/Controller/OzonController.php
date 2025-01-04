@@ -220,6 +220,9 @@ WHERE
         $productType = $request->get('productType');
         $newTaskProducts = [];
         foreach ($selectedChildren as $childId => $listingId) {
+            if ($listingId == -1) {
+                continue;
+            }
             $child = Product::getById($childId);
             if (!$child) {
                 error_log("Invalid child product with id $childId");
