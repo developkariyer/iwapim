@@ -166,6 +166,11 @@ WHERE
                 }
             }
         }
+        foreach ($parentProducts as $id => $parentProduct) {
+            if (empty($parentProduct['parentProduct']['categoryFullName'])) {
+                $parentProducts[$id]['parentProduct']['key'] .= ' ⚠️';
+            }
+        }
         return $this->render('ozon/task.html.twig', [
             'taskId' => $taskId,
             'parentProducts' => $parentProducts,
