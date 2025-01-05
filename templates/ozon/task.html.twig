@@ -1,4 +1,5 @@
 {# task.html.twig #}
+<a href="/ozoncsv/{{ taskId }}" class="btn btn-primary mt-3">CSV İndir</a>
 <div class="accordion" id="parentProductsAccordion{{ taskId }}" data-task-id="{{ taskId }}">
     {% for parentProductId, parentData in parentProducts %}
         <div class="accordion-item">
