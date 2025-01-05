@@ -404,7 +404,7 @@ WHERE
                 'Option1 Value' => $taskProduct['variationSize'],
                 'Option2 Name' => 'Color',
                 'Option2 Value' => $taskProduct['variationColor'],
-                'ASIN' => '',
+                'ASIN' => Registry::searchKeys($taskProduct['iwasku'], 'asin-to-iwasku', 1),
                 'HSNCode' => '',
                 'ProductImageURL1' => '',
                 'ProductImageURL2' => '',

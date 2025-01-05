@@ -95,10 +95,10 @@ class Registry
     /**
      * @throws Exception
      */
-    public static function searchKeys($regvalue, $regtype = 'DEFAULT'): array
+    public static function searchKeys($regvalue, $regtype = 'DEFAULT', $limit = 0)
     {
         $db = Db::get();
-        $sql = "SELECT regkey FROM iwa_registry WHERE regvalue = ? AND regtype = ?";
-        return $db->fetchFirstColumn($sql, [$regvalue, $regtype]);
+        $sql = "SELECT regkey FROM iwa_registry WHERE regvalue = ? AND regtype = ? LIMIT $limit";
+        return $limit == 1 ? $db->fetchOne($sql, [$regvalue, $regtype]) : $db->fetchFirstColumn($sql, [$regvalue, $regtype]);
     }
 }
