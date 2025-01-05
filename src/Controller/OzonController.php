@@ -10,6 +10,7 @@ use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -395,6 +396,20 @@ WHERE
         $taskProducts = $this->getTaskProductsFromDb($taskId);
         $csv = [];
         foreach ($taskProducts as $taskProduct) {
+            $asin = Registry::searchKeys($taskProduct['iwasku'], 'asin-to-iwasku', 1);
+            $listing = VariantProduct::getByUniqueMarketplaceId($asin, 1);
+            if (!$listing) {
+                error_log("Listing not found for asin $asin");
+                continue;
+            }
+            $listingImages = $listing->getImageGallery();
+            $images = [];
+            foreach ($listingImages as $image) {
+                $images[] = $image->getImage()->getFullPath();
+                if (count($images) >= 3) {
+                    break;
+                }
+            }
             $csv[] = [
                 'CountryofOrigin' => 'Türkiye',
                 'ProductName' => empty($taskProduct['parentNameEnglish']) ? $taskProduct['parentName'] : $taskProduct['parentNameEnglish'],
@@ -404,11 +419,11 @@ WHERE
                 'Option1 Value' => $taskProduct['variationSize'],
                 'Option2 Name' => 'Color',
                 'Option2 Value' => $taskProduct['variationColor'],
-                'ASIN' => Registry::searchKeys($taskProduct['iwasku'], 'asin-to-iwasku', 1),
+                'ASIN' => $asin,
                 'HSNCode' => '',
-                'ProductImageURL1' => '',
-                'ProductImageURL2' => '',
-                'ProductImageURL3' => '',
+                'ProductImageURL1' => $images[0] ?? '',
+                'ProductImageURL2' => $images[1] ?? '',
+                'ProductImageURL3' => $images[2] ?? '',
             ];
         }
         $response = new Response();
