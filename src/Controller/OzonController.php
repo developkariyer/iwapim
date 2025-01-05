@@ -424,9 +424,9 @@ WHERE
                 'Option2 Value' => $taskProduct['variationColor'],
                 'ASIN' => $asin,
                 'HSNCode' => '',
-                'ProductImageURL1' => $images[0] ?? '',
-                'ProductImageURL2' => $images[1] ?? '',
-                'ProductImageURL3' => $images[2] ?? '',
+                'ProductImageURL1' => 'https://iwa.web.tr'. ($images[0] ?? ''),
+                'ProductImageURL2' => 'https://iwa.web.tr'. ($images[1] ?? ''),
+                'ProductImageURL3' => 'https://iwa.web.tr'. ($images[2] ?? ''),
             ];
         }
         $response = new Response();
