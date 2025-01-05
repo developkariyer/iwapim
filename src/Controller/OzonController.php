@@ -37,7 +37,8 @@ class OzonController extends FrontendController
     ob_parent.productCategory AS parentCategory,
     rel.listing_id AS listingId,
     rel.group_type AS groupType,
-    rel.product_type AS productType
+    rel.product_type AS productType,
+    rel.asin AS asin
 FROM
     iwa_ozon_product_relations AS rel
 JOIN
@@ -50,9 +51,9 @@ ORDER BY
     productKey;";
 
     private string $sqlAddProduct = "INSERT INTO
-    iwa_ozon_product_relations (task_id, product_id, listing_id, group_type, product_type)
+    iwa_ozon_product_relations (task_id, product_id, listing_id, group_type, product_type, asin)
 VALUES
-    (?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?);
 ON DUPLICATE KEY UPDATE
     listing_id = VALUES(listing_id),
     group_type = VALUES(group_type),
@@ -268,7 +269,7 @@ WHERE
                 }
                 continue;
             }
-            $this->addTaskProductToDb($taskId, $childId, $listingId, $ozonGroupType, $ozonProductType);
+            $this->addTaskProductToDb($taskId, $childId, $listingId, $ozonGroupType, $ozonProductType, '');
         }
         $this->addFlash('success', 'Ürünler güncellendi.');
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId()]);
@@ -301,6 +302,7 @@ WHERE
         $dirty = false;
         try {
             foreach ($iwaskuList as $iwasku) {
+                $asin = '';
                 $iwasku = trim($iwasku);
                 $product = Product::getByIwasku($iwasku, 1);
                 if (!$product) {
@@ -308,6 +310,7 @@ WHERE
                     error_log("Fallback to asin-to-iwasku for $iwasku: found $iwaskuFromAsin");
                     if ($iwaskuFromAsin) {
                         $product = Product::getByIwasku($iwaskuFromAsin, 1);
+                        $asin = $iwasku;
                     }
                 }
                 if (!$product) {
@@ -319,7 +322,7 @@ WHERE
                     continue;
                 }
                 $dirty = true;
-                $this->addTaskProductToDb($taskId, $product->getId(), 0, 0, 0);
+                $this->addTaskProductToDb($taskId, $product->getId(), 0, 0, 0, $asin);
                 $taskProducts[$product->getId()] = 1;
                 unset($product);
             }
@@ -376,10 +379,10 @@ WHERE
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    private function addTaskProductToDb(int $taskId, int $productId, int $listingId, int $groupType, int $productType): void
+    private function addTaskProductToDb(int $taskId, int $productId, int $listingId, int $groupType, int $productType, string $asin): void
     {
         $db = Db::get();
-        $db->executeStatement($this->sqlAddProduct, [$taskId, $productId, $listingId, $groupType, $productType]);
+        $db->executeStatement($this->sqlAddProduct, [$taskId, $productId, $listingId, $groupType, $productType, $asin]);
     }
 
     /**
