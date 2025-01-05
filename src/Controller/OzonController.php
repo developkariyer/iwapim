@@ -419,7 +419,7 @@ WHERE
         $taskProducts = $this->getTaskProductsFromDb($taskId);
         $csv = [];
         foreach ($taskProducts as $taskProduct) {
-            $asin = Registry::searchKeys($taskProduct['iwasku'], 'asin-to-iwasku', 1);
+            $asin = empty($taskProduct['asin']) ? Registry::searchKeys($taskProduct['iwasku'], 'asin-to-iwasku', 1) : $taskProduct['asin'];
             $listing = VariantProduct::getByUniqueMarketplaceId($asin, 1);
             if (!$listing) {
                 error_log("Listing not found for asin $asin");
