@@ -29,7 +29,10 @@ class OzonController extends FrontendController
     ob.iwasku,
     ob.parentId,
     ob.`key` AS productKey,
+    ob_parent.id AS parentId,
     ob_parent.`key` AS parentKey,
+    ob_parent.`name` AS parentName,
+    ob_parent.productCategory AS parentCategory,
     rel.listing_id AS listingId,
     rel.group_type AS groupType,
     rel.product_type AS productType
@@ -375,5 +378,49 @@ WHERE
     {
         $db = Db::get();
         $db->executeStatement($this->sqlAddProduct, [$taskId, $productId, $listingId, $groupType, $productType]);
+    }
+
+    /**
+     * @Route("/ozoncsv/{taskId}", name="ozon_csv_output")
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function csvOutput(Request $request): Response
+    {
+        $taskId = $request->get('taskId');
+        $task = ListingTemplate::getById($taskId);
+        if (!$task) {
+            return $this->redirectToRoute('ozon_menu');
+        }
+        $taskProducts = $this->getTaskProductsFromDb($taskId);
+        $csv = [];
+        foreach ($taskProducts as $taskProduct) {
+            $csv[] = [
+                'CountryofOrigin' => 'Türkiye',
+                'ProductName' => $taskProduct['parentName'],
+                'MerchantSKU' => $taskProduct['iwasku'],
+                'Type' => $taskProduct['parentCategory'],
+                'Option1 Name' => 'Size',
+                'Option1 Value' => $taskProduct['variationSize'],
+                'Option2 Name' => 'Color',
+                'Option2 Value' => $taskProduct['variationColor'],
+                'ASIN' => '',
+                'HSNCode' => '',
+                'ProductImageURL1' => '',
+                'ProductImageURL2' => '',
+                'ProductImageURL3' => '',
+            ];
+        }
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="product_list.csv"');
+        $output = fopen('php://memory', 'w');
+        fputcsv($output, array_keys($csv[0]));
+        foreach ($csv as $row) {
+            fputcsv($output, $row);
+        }
+        fseek($output, 0);
+        $response->setContent(stream_get_contents($output));
+        fclose($output);
+        return $response;
     }
 }
