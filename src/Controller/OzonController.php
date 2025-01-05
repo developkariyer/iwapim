@@ -9,7 +9,6 @@ use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
-use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Random\RandomException;
@@ -53,16 +52,6 @@ ON DUPLICATE KEY UPDATE
     listing_id = VALUES(listing_id),
     group_type = VALUES(group_type),
     product_type = VALUES(product_type);";
-
-    private string $sqlUpdateProduct = "UPDATE
-    iwa_ozon_product_relations
-SET
-    listing_id = ?,
-    group_type = ?,
-    product_type = ?
-WHERE
-    task_id = ?
-    AND product_id = ?;";
 
     private string $sqlDeleteProduct = "DELETE FROM
     iwa_ozon_product_relations
