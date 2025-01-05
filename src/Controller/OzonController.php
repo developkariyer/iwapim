@@ -312,37 +312,41 @@ WHERE
         $taskProducts = $this->getTaskProductsFromDb($taskId);
         $db->beginTransaction();
         $dirty = false;
+        $message = '';
         try {
             foreach ($iwaskuList as $iwasku) {
                 $asin = '';
                 $iwasku = trim($iwasku);
+                $message .= "Entered value: $iwasku\n";
                 $product = Product::getByIwasku($iwasku, 1);
                 if (!$product) {
                     $iwaskuFromAsin = Registry::getKey($iwasku, 'asin-to-iwasku');
-                    error_log("Fallback to asin-to-iwasku for $iwasku: found $iwaskuFromAsin");
+                    $message .= "  Product not found. Maybe asin entered. Trying to find iwasku from asin: $iwaskuFromAsin\n";
                     if ($iwaskuFromAsin) {
                         $product = Product::getByIwasku($iwaskuFromAsin, 1);
                         $asin = $iwasku;
                     }
                 }
                 if (!$product) {
-                    error_log("Product not found for iwasku $iwasku");
+                    $message .= "  Product not found for iwasku $iwasku\n";
                     continue;
                 }
+                $message .= "  Product found with iwasku $iwasku\n";
                 if (isset($taskProducts[$product->getId()])) {
-                    error_log("Product already added to task with iwasku $iwasku");
+                    $message .= "  Product already added to task with iwasku $iwasku: ".json_encode($taskProducts[$product->getId()])."\n";
                     continue;
                 }
                 $dirty = true;
                 $this->addTaskProductToDb($taskId, $product->getId(), 0, 0, 0, $asin);
-                $taskProducts[$product->getId()] = 1;
+                $message .= "  Product {$product->getId()} added to task $taskId with iwasku $iwasku\n";
+                $taskProducts[$product->getId()] = ['iwasku' => $iwasku];
                 unset($product);
             }
             $db->commit();
             if ($dirty) {
-                $this->addFlash('success', 'Yeni ürünler eklendi.');
+                $this->addFlash('success', $message);
             } else {
-                $this->addFlash('warning', 'Hiçbir yeni ürün eklenemedi.');
+                $this->addFlash('warning', $message);
             }
         } catch (Exception $e) {
             $db->rollBack();
