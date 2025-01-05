@@ -31,27 +31,44 @@ class OzonController extends FrontendController
     ob.parentId,
     ob.`key` AS productKey,
     ob_parent.`key` AS parentKey,
-    MAX(CASE WHEN omlt.`column` = 'listing' THEN omlt.data END) AS listingId,
-    MAX(CASE WHEN omlt.`column` = 'grouptype' THEN omlt.data END) AS groupType,
-    MAX(CASE WHEN omlt.`column` = 'producttype' THEN omlt.data END) AS productType
+    rel.listing_id AS listingId,
+    rel.group_type AS groupType,
+    rel.product_type AS productType
 FROM
-    object_relations_listingTemplate AS orlt
+    iwa_ozon_product_relations AS rel
 JOIN
-    object_product AS ob ON orlt.dest_id = ob.id
+    object_product AS ob ON rel.product_id = ob.id
 LEFT JOIN
     object_product AS ob_parent ON ob.parentId = ob_parent.id
-JOIN
-    object_metadata_listingTemplate AS omlt ON orlt.dest_id = omlt.dest_id
-    AND orlt.src_id = omlt.id
 WHERE
-    orlt.fieldname = 'products'
-    AND omlt.fieldname = 'products'
-    AND orlt.src_id = ?
-GROUP BY
-    ob.id, ob.variationSize, ob.variationColor, ob.iwasku, ob.`key`, ob_parent.`key`
+    rel.task_id = ?
 ORDER BY
     productKey;";
 
+    private string $sqlAddProduct = "INSERT INTO
+    iwa_ozon_product_relations (task_id, product_id, listing_id, group_type, product_type)
+VALUES
+    (?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    listing_id = VALUES(listing_id),
+    group_type = VALUES(group_type),
+    product_type = VALUES(product_type);";
+
+    private string $sqlUpdateProduct = "UPDATE
+    iwa_ozon_product_relations
+SET
+    listing_id = ?,
+    group_type = ?,
+    product_type = ?
+WHERE
+    task_id = ?
+    AND product_id = ?;";
+
+    private string $sqlDeleteProduct = "DELETE FROM
+    iwa_ozon_product_relations
+WHERE
+    task_id = ?
+    AND product_id = ?;";
 
     /**
      * @Route("/ozon/{taskId}/{parentProductId}", name="ozon_menu", defaults={"taskId"=null, "parentProductId"=null})
@@ -249,25 +266,16 @@ ORDER BY
         $explodedProductType = explode('.', $productType) ?? [];
         $ozonGroupType = $explodedProductType[0] ?? 0;
         $ozonProductType = $explodedProductType[1] ?? 0;
-        [$newTaskProducts,] = $this->getTaskProductsAsMetadata($task->getId(), $parentProduct->getId());
+        $taskProducts = $this->getTaskProductsFromDb($taskId);
         foreach ($selectedChildren as $childId => $listingId) {
             if ($listingId == -1) {
+                if (isset($taskProducts[$childId])) {
+                    $this->deleteTaskProductFromDb($taskId, $childId);
+                }
                 continue;
             }
-            $child = Product::getById($childId);
-            if (!$child) {
-                error_log("Invalid child product with id $childId");
-                continue;
-            }
-            $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $child);
-            $objectMetadata->setData(['listing' => $listingId, 'grouptype' => $ozonGroupType, 'producttype' => $ozonProductType]);
-            $newTaskProducts[] = $objectMetadata;
-            unset($child);
-            unset($objectMetadata);
+            $this->addTaskProductToDb($taskId, $childId, $listingId, $ozonGroupType, $ozonProductType);
         }
-        gc_collect_cycles();
-        $task->setProducts($newTaskProducts);
-        $task->save();
         $this->addFlash('success', 'Ürünler güncellendi.');
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId()]);
     }
@@ -282,7 +290,9 @@ ORDER BY
      */
     public function addProductAction(Request $request): RedirectResponse
     {
-        $task = ListingTemplate::getById($request->get('taskId'));
+        $db = Db::get();
+        $taskId = $request->get('taskId');
+        $task = ListingTemplate::getById($taskId);
         if (!$task) {
             return $this->redirectToRoute('ozon_menu');
         }
@@ -290,48 +300,43 @@ ORDER BY
         $iwaskuList = preg_split('/[\s,;|]+/', $iwasku);
         $iwaskuList = array_filter($iwaskuList);
         if (empty($iwaskuList)) {
-            return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
+            return $this->redirectToRoute('ozon_menu', ['taskId' => $taskId]);
         }
-        [$newTaskProducts, $objectIdList] = $this->getTaskProductsAsMetadata($task->getId());
-        $dirty = false;
         $parentProduct = null;
-        foreach ($iwaskuList as $iwasku) {
-            $iwasku = trim($iwasku);
-            $product = Product::getByIwasku($iwasku, 1);
-            if (!$product) {
-                $iwaskuFromAsin = Registry::getKey($iwasku, 'asin-to-iwasku');
-                error_log("Fallback to asin-to-iwasku for $iwasku: found $iwaskuFromAsin");
-                if ($iwaskuFromAsin) {
-                    $product = Product::getByIwasku($iwaskuFromAsin, 1);
+        $taskProducts = $this->getTaskProductsFromDb($taskId);
+        $db->beginTransaction();
+        try {
+            foreach ($iwaskuList as $iwasku) {
+                $iwasku = trim($iwasku);
+                $product = Product::getByIwasku($iwasku, 1);
+                if (!$product) {
+                    $iwaskuFromAsin = Registry::getKey($iwasku, 'asin-to-iwasku');
+                    error_log("Fallback to asin-to-iwasku for $iwasku: found $iwaskuFromAsin");
+                    if ($iwaskuFromAsin) {
+                        $product = Product::getByIwasku($iwaskuFromAsin, 1);
+                    }
                 }
+                if (!$product) {
+                    error_log("Product not found for iwasku $iwasku");
+                    continue;
+                }
+                if (isset($taskProducts[$product->getId()])) {
+                    error_log("Product already added to task with iwasku $iwasku");
+                    continue;
+                }
+                $parentProduct = $product->getParent();
+                if (!$parentProduct instanceof Product) {
+                    error_log("Parent product not found for product with iwasku $iwasku");
+                    continue;
+                }
+                $this->addTaskProductToDb($taskId, $product->getId(), 0, 0, 0);
             }
-            if (!$product) {
-                error_log("Product not found for iwasku $iwasku");
-                continue;
-            }
-            if (in_array($product->getId(), $objectIdList)) {
-                error_log("Product already added to task with iwasku $iwasku");
-                continue;
-            }
-            $parentProduct = $product->getParent();
-            if (!$parentProduct instanceof Product) {
-                error_log("Parent product not found for product with iwasku $iwasku");
-                continue;
-            }
-            $objectMetadata = new ObjectMetadata('products', ['listing'], $product);
-            $objectMetadata->setData(['listing' => 0]);
-            $newTaskProducts[] = $objectMetadata;
-            $objectIdList[] = $product->getId();
-            unset($product);
-            unset($objectMetadata);
-            $dirty = true;
+            $db->commit();
+        } catch (Exception $e) {
+            $db->rollBack();
+            throw $e;
         }
-        gc_collect_cycles();
-        if ($dirty) {
-            $task->setProducts($newTaskProducts);
-            $this->addFlash('success', 'Yeni ürün eklendi.');
-            $task->save();
-        }
+        $this->addFlash('success', 'Yeni ürün eklendi.');
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => is_object($parentProduct) ? $parentProduct->getId() : 0]);
     }
 
@@ -352,27 +357,32 @@ ORDER BY
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    private function getTaskProductsAsMetadata(int $taskId, int $parentProductIdToIgnore = 0): array
+    private function getTaskProductsFromDb(int $taskId): array
     {
         $db = Db::get();
-        $taskProducts = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
-        $taskProductsMetadata = [];
-        $objectIdList = [];
-        foreach ($taskProducts as $taskProduct) {
-            if ($taskProduct['parentId'] == $parentProductIdToIgnore) {
-                continue;
-            }
-            $object = Product::getById($taskProduct['id']);
-            if (!$object) {
-                error_log("Invalid product with id {$taskProduct['id']}");
-                continue;
-            }
-            $objectMetadata = new ObjectMetadata('products', ['listing', 'grouptype', 'producttype'], $object);
-            $objectMetadata->setData(['listing' => $taskProduct['listingId'] ?? 0, 'grouptype' => $taskProduct['groupType'] ?? 0, 'producttype' => $taskProduct['productType'] ?? 0]);
-            $taskProductsMetadata[] = $objectMetadata;
-            $objectIdList[] = $taskProduct['id'];
+        $taskProductsDb = $db->fetchAllAssociative($this->sqlTaskProducts, [$taskId]);
+        $taskProducts = [];
+        foreach ($taskProductsDb as $taskProduct) {
+            $taskProducts[$taskProduct['id']] = $taskProduct;
         }
-        return [$taskProductsMetadata, $objectIdList];
+        return $taskProducts;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function deleteTaskProductFromDb(int $taskId, int $productId): void
+    {
+        $db = Db::get();
+        $db->executeStatement($this->sqlDeleteProduct, [$taskId, $productId]);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function addTaskProductToDb(int $taskId, int $productId, int $listingId, int $groupType, int $productType): void
+    {
+        $db = Db::get();
+        $db->executeStatement($this->sqlAddProduct, [$taskId, $productId, $listingId, $groupType, $productType]);
+    }
 }
