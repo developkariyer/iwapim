@@ -408,7 +408,7 @@ WHERE
             $listingImages = $listing->getImageGallery();
             $images = [];
             foreach ($listingImages as $image) {
-                $images[] = $image->getImage()->getFullPath();
+                $images[] = $image->getImage()->getFrontendFullPath();
                 if (count($images) >= 3) {
                     break;
                 }
