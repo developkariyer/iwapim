@@ -312,7 +312,7 @@ WHERE
         $taskProducts = $this->getTaskProductsFromDb($taskId);
         $db->beginTransaction();
         $dirty = false;
-        $message = '';
+        $message = '<pre>';
         try {
             foreach ($iwaskuList as $iwasku) {
                 $asin = '';
@@ -343,6 +343,7 @@ WHERE
                 unset($product);
             }
             $db->commit();
+            $message .= '</pre>';
             if ($dirty) {
                 $this->addFlash('success', $message);
             } else {
