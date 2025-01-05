@@ -53,11 +53,17 @@ ORDER BY
     private string $sqlAddProduct = "INSERT INTO
     iwa_ozon_product_relations (task_id, product_id, listing_id, group_type, product_type, asin)
 VALUES
-    (?, ?, ?, ?, ?, ?);
-ON DUPLICATE KEY UPDATE
-    listing_id = VALUES(listing_id),
-    group_type = VALUES(group_type),
-    product_type = VALUES(product_type);";
+    (?, ?, ?, ?, ?, ?);";
+
+    private string $sqlModifyProduct = "UPDATE
+    iwa_ozon_product_relations
+SET
+    listing_id = ?,
+    group_type = ?,
+    product_type = ?
+WHERE
+    task_id = ?
+    AND product_id = ?;";
 
     private string $sqlDeleteProduct = "DELETE FROM
     iwa_ozon_product_relations
@@ -266,10 +272,16 @@ WHERE
             if ($listingId == -1) {
                 if (isset($taskProducts[$childId])) {
                     $this->deleteTaskProductFromDb($taskId, $childId);
+                    unset($taskProducts[$childId]);
                 }
                 continue;
             }
-            $this->addTaskProductToDb($taskId, $childId, $listingId, $ozonGroupType, $ozonProductType, '');
+            if (isset($taskProducts[$childId])) {
+                $this->modifyTaskProductInDb($taskId, $childId, $listingId, $ozonGroupType, $ozonProductType);
+            } else {
+                $this->addTaskProductToDb($taskId, $childId, $listingId, $ozonGroupType, $ozonProductType, '');
+                $taskProducts[$childId] = 1;
+            }
         }
         $this->addFlash('success', 'Ürünler güncellendi.');
         return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => $parentProduct->getId()]);
@@ -385,6 +397,14 @@ WHERE
         $db->executeStatement($this->sqlAddProduct, [$taskId, $productId, $listingId, $groupType, $productType, $asin]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function modifyTaskProductInDb(int $taskId, int $productId, int $listingId, int $groupType, int $productType): void
+    {
+        $db = Db::get();
+        $db->executeStatement($this->sqlModifyProduct, [$listingId, $groupType, $productType, $taskId, $productId]);
+    }
     /**
      * @Route("/ozoncsv/{taskId}", name="ozon_csv_output")
      * @throws \Doctrine\DBAL\Exception
