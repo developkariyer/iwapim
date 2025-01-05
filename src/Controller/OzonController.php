@@ -291,9 +291,9 @@ WHERE
         if (empty($iwaskuList)) {
             return $this->redirectToRoute('ozon_menu', ['taskId' => $taskId]);
         }
-        $parentProduct = null;
         $taskProducts = $this->getTaskProductsFromDb($taskId);
         $db->beginTransaction();
+        $dirty = false;
         try {
             foreach ($iwaskuList as $iwasku) {
                 $iwasku = trim($iwasku);
@@ -313,20 +313,22 @@ WHERE
                     error_log("Product already added to task with iwasku $iwasku");
                     continue;
                 }
-                $parentProduct = $product->getParent();
-                if (!$parentProduct instanceof Product) {
-                    error_log("Parent product not found for product with iwasku $iwasku");
-                    continue;
-                }
+                $dirty = true;
                 $this->addTaskProductToDb($taskId, $product->getId(), 0, 0, 0);
+                $taskProducts[$product->getId()] = 1;
+                unset($product);
             }
             $db->commit();
+            if ($dirty) {
+                $this->addFlash('success', 'Yeni ürünler eklendi.');
+            } else {
+                $this->addFlash('warning', 'Hiçbir yeni ürün eklenemedi.');
+            }
         } catch (Exception $e) {
             $db->rollBack();
             throw $e;
         }
-        $this->addFlash('success', 'Yeni ürün eklendi.');
-        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId(), 'parentProductId' => is_object($parentProduct) ? $parentProduct->getId() : 0]);
+        return $this->redirectToRoute('ozon_menu', ['taskId' => $task->getId()]);
     }
 
     /**
