@@ -32,6 +32,7 @@ class OzonController extends FrontendController
     ob_parent.id AS parentId,
     ob_parent.`key` AS parentKey,
     ob_parent.`name` AS parentName,
+    ob_parent.nameEnglish AS parentNameEnglish,
     ob_parent.productCategory AS parentCategory,
     rel.listing_id AS listingId,
     rel.group_type AS groupType,
@@ -396,7 +397,7 @@ WHERE
         foreach ($taskProducts as $taskProduct) {
             $csv[] = [
                 'CountryofOrigin' => 'Türkiye',
-                'ProductName' => $taskProduct['parentName'],
+                'ProductName' => empty($taskProduct['parentNameEnglish']) ? $taskProduct['parentName'] : $taskProduct['parentNameEnglish'],
                 'MerchantSKU' => $taskProduct['iwasku'],
                 'Type' => $taskProduct['parentCategory'],
                 'Option1 Name' => 'Size',
