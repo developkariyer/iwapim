@@ -67,6 +67,7 @@
                 totalPages = total;
                 for (let page = 1; page <= totalPages; page++) {
                     loadStickers(groupId, page, true);
+                    allCards.add(document.querySelectorAll(".card"));
                 }
             });
         }
@@ -151,18 +152,16 @@
         }
 
         function searchTable() {
-            var input, filter, i, txtValue;
+            var input, filter, card, i, txtValue;
             input = document.getElementById("searchInput");
             filter = input.value.toUpperCase();
-
             for (i = 0; i < allCards.length; i++) {
-                const card = allCards[i];
-                const cardElement = document.getElementById(`card-${card.product_code}`);
-                txtValue = card.product_name + ' ' + card.product_code + ' ' + card.iwasku + ' ' + card.category + ' ' + card.attributes;
+                card = allCards[i];
+                txtValue = card.textContent || card.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    cardElement.style.display = "";
+                    card.style.display = "";
                 } else {
-                    cardElement.style.display = "none";
+                    card.style.display = "none";
                 }
             }
         }
