@@ -58,6 +58,18 @@
         let currentPage = 1;
         let totalPages = 1;
         let selectedGroupId = null;
+        let allCards = [];
+
+        function loadAllStickers(groupId) {
+            selectedGroupId = groupId;
+            allCards = [];
+            fetchTotalPages(groupId).then(total => {
+                totalPages = total;
+                for (let page = 1; page <= totalPages; page++) {
+                    loadStickers(groupId, page, true);
+                }
+            });
+        }
         function loadStickers(groupId, page = 1) {
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
@@ -77,7 +89,7 @@
                         <div class="card mb-2">
                             <div class="row g-0">
                                 <div class="col-9">
-                                    <div class="card-body p-2">
+                                    <div class="card-body p-2" id="card-${sticker.product_code}">
                                         <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
                                             ${sticker.product_name}
                                         </a>
@@ -132,18 +144,18 @@
         }
 
         function searchTable() {
-            var input, filter, cards, card, i, txtValue;
+            var input, filter, i, txtValue;
             input = document.getElementById("searchInput");
             filter = input.value.toUpperCase();
-            cards = document.querySelectorAll(".card");
 
-            for (i = 0; i < cards.length; i++) {
-                card = cards[i];
-                txtValue = card.textContent || card.innerText;
+            for (i = 0; i < allCards.length; i++) {
+                const card = allCards[i];
+                const cardElement = document.getElementById(`card-${card.product_code}`);
+                txtValue = card.product_name + ' ' + card.product_code + ' ' + card.iwasku + ' ' + card.category + ' ' + card.attributes;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";
+                    cardElement.style.display = "";
                 } else {
-                    card.style.display = "none";
+                    cardElement.style.display = "none";
                 }
             }
         }
@@ -163,6 +175,7 @@
 
         function selectGroup(groupName, groupId) {
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
+            loadAllStickers(groupId);
             loadStickers(groupId);
         }
     </script>
