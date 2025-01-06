@@ -77,11 +77,14 @@ class StickerController extends FrontendController
      * @Route("/sticker/get-stickers/{groupId}", name="get_stickers", methods={"GET"})
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getStickers(int $groupId): JsonResponse
+    public function getStickers(int $groupId, int $page = 1, int $limit = 10): JsonResponse
     {
         $stickers = [];
+        $offset = ($page - 1) * $limit;
         $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
-            'group_id' => $groupId
+            'group_id' => $groupId,
+            'limit' => $limit,
+            'offset' => $offset
         ]);
         foreach ($products as $product) {
             if ($product['sticker_id']) {
@@ -104,7 +107,19 @@ class StickerController extends FrontendController
                 'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
-        return new JsonResponse(['success' => true, 'stickers' => $stickers]);
+        $totalProducts = Utility::fetchSingleValueFromSqlFile($this->sqlPath . 'countProductsByGroup.sql', [
+            'group_id' => $groupId
+        ]);
+        return new JsonResponse([
+            'success' => true,
+            'stickers' => $stickers,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $limit,
+                'total_items' => $totalProducts,
+                'total_pages' => ceil($totalProducts / $limit)
+            ]
+        ]);
     }
 
     /**

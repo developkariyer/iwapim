@@ -50,40 +50,45 @@
 
 {% block body_scripts %}
     <script>
-        function loadStickers(groupId) {
+        let selectedGroupId = null;
+        let currentPage = 1;
+        let totalPages = null;
+
+        function loadStickers(groupId, page = 1) {
             selectedGroupId = groupId;
+            currentPage = page;
             highlightSelectedGroup(groupId);
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
-
-            fetch(`/sticker/get-stickers/${groupId}`)
+            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
-                    <div class="card mb-2">
-                        <div class="row g-0">
-                            <div class="col-9">
-                                <div class="card-body p-2">
-                                    <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
-                                        ${sticker.product_name}
-                                    </a>
-                                    <p class="card-text text-muted small m-0">
-                                        <strong>Code:</strong> ${sticker.product_code} <br>
-                                        <strong>Iwasku:</strong> ${sticker.iwasku} <br>
-                                        <strong>Category:</strong> ${sticker.category} <br>
-                                        <strong>Attributes:</strong> ${sticker.attributes}
-                                    </p>
+                        <div class="card mb-2">
+                            <div class="row g-0">
+                                <div class="col-9">
+                                    <div class="card-body p-2">
+                                        <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
+                                            ${sticker.product_name}
+                                        </a>
+                                        <p class="card-text text-muted small m-0">
+                                            <strong>Code:</strong> ${sticker.product_code} <br>
+                                            <strong>Iwasku:</strong> ${sticker.iwasku} <br>
+                                            <strong>Category:</strong> ${sticker.category} <br>
+                                            <strong>Attributes:</strong> ${sticker.attributes}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex align-items-center justify-content-center">
+                                    <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
                                 </div>
                             </div>
-                            <div class="col-3 d-flex align-items-center justify-content-center">
-                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
-                            </div>
-
                         </div>
-                    </div>
                 `).join('');
                         container.innerHTML = cards;
+                        totalPages = data.pagination.total_pages;
+                        renderPagination();
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -92,6 +97,29 @@
                     console.error('Error fetching stickers:', error);
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
+        }
+
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination-container');
+            paginationContainer.innerHTML = '';
+            paginationContainer.innerHTML += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>`;
+                for (let page = 1; page <= totalPages; page++) {
+                    paginationContainer.innerHTML += `
+                <li class="page-item ${page === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                </li>;
+            }`;
+            paginationContainer.innerHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>`;
         }
 
         function searchTable() {
