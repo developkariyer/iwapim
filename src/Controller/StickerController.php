@@ -113,7 +113,7 @@ class StickerController extends FrontendController
         //$totalProducts = $totalProducts['total'];
         return new JsonResponse([
             'success' => true,
-            'stickers' => $products,
+            'stickers' => $stickers,
             'pagination' => [
                 'current_page' => $page,
                 'per_page' => $limit
