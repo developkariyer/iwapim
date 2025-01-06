@@ -14,7 +14,7 @@
                     <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
@@ -136,23 +136,6 @@
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
-        }
-
-        function searchTable() {
-            var input = document.getElementById("searchInput");
-            var filter = input.value.toUpperCase();
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
-                const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
-
-                if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";  // Arama koşuluna uyan kartları göster
-                } else {
-                    card.style.display = "none";  // Arama koşuluna uymayan kartları gizle
-                }
-            });
-
         }
 
         function highlightSelectedGroup(groupId) {
