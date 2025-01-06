@@ -60,17 +60,6 @@
         let selectedGroupId = null;
         let allCards = [];
 
-        function loadAllStickers(groupId) {
-            selectedGroupId = groupId;
-            allCards = [];
-            fetchTotalPages(groupId).then(total => {
-                totalPages = total;
-                for (let page = 1; page <= totalPages; page++) {
-                    loadStickers(groupId, page, true);
-                }
-            });
-        }
-
         function fetchTotalPages(groupId) {
             return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
                 .then(response => response.json())
@@ -127,63 +116,6 @@
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
         }
-
-        function filterAndRenderStickers() {
-            const filteredStickers = allCards.filter(sticker =>
-                sticker.product_name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-
-            const startIndex = (currentPage - 1) * 10;
-            const paginatedStickers = filteredStickers.slice(startIndex, startIndex + 10);
-
-            const container = document.getElementById('stickers-container');
-            const cards = paginatedStickers.map(sticker => `
-                <div class="card mb-2">
-                    <div class="row g-0">
-                        <div class="col-9">
-                            <div class="card-body p-2" id="card-${sticker.product_code}">
-                                <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
-                                    ${sticker.product_name}
-                                </a>
-                                <p class="card-text text-muted small m-0">
-                                    <strong>Code:</strong> ${sticker.product_code} <br>
-                                    <strong>Iwasku:</strong> ${sticker.iwasku} <br>
-                                    <strong>Category:</strong> ${sticker.category} <br>
-                                    <strong>Attributes:</strong> ${sticker.attributes}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-3 d-flex align-items-center justify-content-center">
-                            <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            container.innerHTML = cards;
-            renderPagination(filteredStickers.length);
-        }
-
-        // Sayfalamayı render etme
-        function renderPagination(filteredCount) {
-            const paginationContainer = document.getElementById('pagination');
-            paginationContainer.innerHTML = '';
-            totalPages = Math.ceil(filteredCount / 10);
-
-            for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                pageButton.onclick = () => {
-                    currentPage = i;
-                    filterAndRenderStickers();
-                };
-                paginationContainer.appendChild(pageButton);
-            }
-        }
-
-        document.getElementById('search-input').addEventListener('input', (event) => {
-            loadStickers(selectedGroupId, 1, event.target.value);  // Arama işlemi ile sayfayı yenile
-        });
 
         function searchTable() {
             var input = document.getElementById("searchInput");
