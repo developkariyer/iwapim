@@ -152,18 +152,20 @@
         }
 
         function searchTable() {
-            var input, filter, card, i, txtValue;
+            var input, filter, i, txtValue;
             input = document.getElementById("searchInput");
             filter = input.value.toUpperCase();
             for (i = 0; i < allCards.length; i++) {
-                card = allCards[i];
-                txtValue = card.textContent || card.innerText;
+                const card = allCards[i];
+                const cardElement = document.getElementById(`card-${card.product_code}`);
+                txtValue = card.product_name + ' ' + card.product_code + ' ' + card.iwasku + ' ' + card.category + ' ' + card.attributes;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";
+                    cardElement.style.display = "";
                 } else {
-                    card.style.display = "none";
+                    cardElement.style.display = "none";
                 }
             }
+            
         }
 
         function highlightSelectedGroup(groupId) {
