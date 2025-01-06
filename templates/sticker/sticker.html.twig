@@ -151,20 +151,49 @@
             </li>`;
         }
 
+        function renderCards() {
+            const container = document.getElementById('stickers-container');
+            container.innerHTML = '';
+
+            allCards.forEach(card => {
+                const cardHTML = `
+                <div class="card mb-2" id="card-${card.product_code}">
+                    <div class="row g-0">
+                        <div class="col-9">
+                            <div class="card-body p-2">
+                                <a href="${card.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
+                                    ${card.product_name}
+                                </a>
+                                <p class="card-text text-muted small m-0">
+                                    <strong>Code:</strong> ${card.product_code} <br>
+                                    <strong>Iwasku:</strong> ${card.iwasku} <br>
+                                    <strong>Category:</strong> ${card.category} <br>
+                                    <strong>Attributes:</strong> ${card.attributes}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-3 d-flex align-items-center justify-content-center">
+                            <img src="${card.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
+                        </div>
+                    </div>
+                </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
         function searchTable() {
             var input = document.getElementById("searchInput");
             var filter = input.value.toUpperCase();
-            allCards.forEach(card => {
-                const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
-                const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
-
+            allCards.forEach((card, index) => {
+                const productName = card.product_name || '';
+                const productCode = card.product_code || '';
                 if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";
+                    document.getElementById(`card-${card.product_code}`).style.display = "";
                 } else {
-                    card.style.display = "none";
+                    document.getElementById(`card-${card.product_code}`).style.display = "none";
                 }
             });
-
         }
 
         function highlightSelectedGroup(groupId) {
