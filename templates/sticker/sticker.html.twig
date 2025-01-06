@@ -14,7 +14,7 @@
                     <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3">
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
@@ -58,13 +58,6 @@
         let currentPage = 1;
         let totalPages = 1;
         let selectedGroupId = null;
-        let allCards = [];
-
-        function fetchTotalPages(groupId) {
-            return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
-                .then(response => response.json())
-                .then(data => data.pagination.total_pages);
-        }
 
         function loadStickers(groupId, page = 1) {
             highlightSelectedGroup(groupId);
@@ -81,7 +74,6 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        allCards = data.stickers;
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
                             <div class="row g-0">
@@ -106,7 +98,6 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        renderPagination();
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -115,22 +106,6 @@
                     console.error('Error fetching stickers:', error);
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
-        }
-
-        function searchTable() {
-            var input = document.getElementById("searchInput");
-            var filter = input.value.toUpperCase();
-            allCards.forEach(card => {
-                const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
-                const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
-
-                if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-
         }
 
         function highlightSelectedGroup(groupId) {
