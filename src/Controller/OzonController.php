@@ -246,6 +246,26 @@ WHERE
     }
 
     /**
+     * @Route("/ozoncharacteristics/{groupType}/{productType}", name="ozon_characteristics")
+     * @param Request $request
+     * @return Response
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCharacteristics(Request $request): Response
+    {
+        $db = Db::get();
+        $groupType = $request->get('groupType');
+        $productType = $request->get('productType');
+        $categoryFullName = Utils::isOzonProductType($groupType, $productType);
+        if (empty($categoryFullName)) {
+            return new Response();
+        }
+        $characteristics = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_category_attribute WHERE description_category_id = ? AND type_id = ?', [$groupType, $productType]);
+        $characteristicsEncoded = json_encode($characteristics);
+        return new Response($characteristicsEncoded);
+    }
+
+    /**
      * @Route("/ozonmodifyproduct/{taskId}/{productId}", name="ozon_modify_product")
      * @param Request $request
      * @return RedirectResponse

@@ -107,13 +107,13 @@
                 button.parent().hide();
             });
 
-            const loadProductCharacteristics = (taskId, parentProductId) => {
+            const loadProductCharacteristics = (taskId, parentProductId, groupType, productType) => {
                 const characteristicsDiv = $(`#childCharacteristics${taskId}_${parentProductId}`);
                 const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
                 if (!characteristicsDiv.data('loaded')) {
                     loadingSpinner.show();
                     characteristicsDiv.hide();
-                    $.get(`/ozoncharacteristics/${taskId}/${parentProductId}`, function (data) {
+                    $.get(`/ozoncharacteristics/${groupType}/${productType}`, function (data) {
                         characteristicsDiv.html(data);
                         characteristicsDiv.data('loaded', true);
                         loadingSpinner.hide();
@@ -123,10 +123,15 @@
             };
 
             $(document).on('click', 'button[data-action="show-characteristics"]', function() {
-                const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
                 const taskId = $(this).closest('[data-task-id]').data('task-id');
+                const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
+                const groupType = $(this).closest('[data-group-type]').data('group-type');
+                const productType = $(this).closest('[data-product-type]').data('product-type');
+                if (groupType === 0 || productType === 0) {
+                    return;
+                }
                 const button = $(this);
-                loadProductCharacteristics(taskId, parentProductId);
+                loadProductCharacteristics(taskId, parentProductId, groupType, productType);
                 button.parent().hide();
             });
 
