@@ -19,9 +19,11 @@
                         {% for childProduct in parentData.products %}
                             - {{ childProduct.key }} ({{ childProduct.iwasku }})<br>
                         {% endfor %}
-                        <button type="button" class="btn btn-primary mt-3" data-action="show-characteristics">
-                            Özellikler
-                        </button>
+                        {% if parentData.parentProduct.groupType*parentData.parentProduct.productType > 0 %}
+                            <button type="button" class="btn btn-primary mt-3" data-action="show-characteristics">
+                                Özellikler
+                            </button>
+                        {% endif %}
                         <button type="button" class="btn btn-primary mt-3" data-action="edit-product">
                             Düzenle
                         </button>
