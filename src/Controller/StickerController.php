@@ -156,7 +156,12 @@ class StickerController extends FrontendController
                         $product->checkSticker4x6eu();
                     }
                     $group->setProducts(array_merge($group->getProducts(), [$product]));
-                    $group->save();
+                    try {
+                        $group->save();
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                        return $this->redirectToRoute('sticker_new');
+                    }
                     $this->addFlash('success', 'Etiket başarıyla eklendi.');
                 } else {
                     $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
