@@ -154,40 +154,17 @@
         function searchTable() {
             var input = document.getElementById("searchInput");
             var filter = input.value.toUpperCase();
-            const container = document.getElementById('stickers-container');
-            container.innerHTML = '';
-            const filteredCards = allCardsData.filter(card => {
-                const productName = card.product_name || '';
-                const productCode = card.product_code || '';
-                return productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1;
-            });
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
+                const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
 
-            if (filteredCards.length > 0) {
-                const cards = filteredCards.map(sticker => `
-        <div class="card mb-2" id="card-${sticker.product_code}">
-            <div class="row g-0">
-                <div class="col-9">
-                    <div class="card-body p-2">
-                        <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
-                            ${sticker.product_name}
-                        </a>
-                        <p class="card-text text-muted small m-0">
-                            <strong>Code:</strong> ${sticker.product_code} <br>
-                            <strong>Iwasku:</strong> ${sticker.iwasku} <br>
-                            <strong>Category:</strong> ${sticker.category} <br>
-                            <strong>Attributes:</strong> ${sticker.attributes}
-                        </p>
-                    </div>
-                </div>
-                <div class="col-3 d-flex align-items-center justify-content-center">
-                    <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
-                </div>
-            </div>
-            </div>`).join('');
-                container.innerHTML = cards;
-            } else {
-                container.innerHTML = '<p>No stickers found matching your search.</p>';
-            }
+                if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none"; 
+                }
+            });
 
         }
 
