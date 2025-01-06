@@ -58,6 +58,12 @@
         let currentPage = 1;
         let totalPages = 1;
         let selectedGroupId = null;
+        let searchTerm = '';
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            searchTerm = this.value;
+            loadStickers(selectedGroupId, currentPage, searchTerm);
+        });
 
         function fetchTotalPages(groupId) {
             return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
