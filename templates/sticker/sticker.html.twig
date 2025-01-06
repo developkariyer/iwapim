@@ -71,13 +71,14 @@
                 .then(data => data.pagination.total_pages);
         }
 
-        function loadStickers(groupId, page = 1) {
+        function loadStickers(groupId, page = 1,  searchTerm = '') {
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
             currentPage = page;
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
-            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
+            const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch stickers. Status code: ' + response.status);
