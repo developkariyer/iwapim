@@ -58,18 +58,6 @@
         let currentPage = 1;
         let totalPages = 1;
         let selectedGroupId = null;
-        let allCards = [];
-
-        function loadAllStickers(groupId) {
-            selectedGroupId = groupId;
-            allCards = [];
-            fetchTotalPages(groupId).then(total => {
-                totalPages = total;
-                for (let page = 1; page <= totalPages; page++) {
-                    loadStickers(groupId, page, true);
-                }
-            });
-        }
 
         function fetchTotalPages(groupId) {
             return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
@@ -92,7 +80,6 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        allCards = [...allCards, ...data.stickers];
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
                             <div class="row g-0">
