@@ -54,8 +54,9 @@
     <script>
         let currentPage = 1;
         let totalPages = 1;
-
+        let selectedGroupId = null;
         function loadStickers(groupId, page = 1) {
+            selectedGroupId = groupId;
             currentPage = page;
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
@@ -108,19 +109,19 @@
             paginationContainer.innerHTML = '';
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(groupId, ${currentPage - 1})" aria-label="Previous">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>`;
             for (let page = 1; page <= totalPages; page++) {
                 paginationContainer.innerHTML += `
                 <li class="page-item ${page === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadStickers(groupId, ${page})">${page}</a>
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
                 </li>`;
             }
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(groupId, ${currentPage + 1})" aria-label="Next">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
