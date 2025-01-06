@@ -152,18 +152,20 @@
         }
 
         function searchTable() {
-            var input, filter, i, txtValue;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            for (i = 0; i < allCards.length; i++) {
-                const card = allCards[i];
-                txtValue = card.textContent || card.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toUpperCase();
+            const cards = document.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
+                const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
+
+                if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
                     card.style.display = "";
                 } else {
                     card.style.display = "none";
                 }
-            }
+            });
 
         }
 
