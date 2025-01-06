@@ -75,7 +75,7 @@ WHERE
      * @Route("/ozon/{taskId}/{parentProductId}", name="ozon_menu", defaults={"taskId"=null, "parentProductId"=null})
      * @return Response
      *
-     * This controller method loads all marketplaces and tasks for Ozon and renders the page.
+     * Loads all marketplaces and tasks for Ozon and renders the page.
      * Also displays the form to create a new Ozon Listing task.
      * @throws DuplicateFullPathException
      * @throws Exception
