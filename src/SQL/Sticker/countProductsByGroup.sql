@@ -1,5 +1,5 @@
 SELECT
-    COUNT(*)
+    COUNT(*) as total
 FROM object_relations_gproduct org
          JOIN object_product osp ON osp.oo_id = org.dest_id
          LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
