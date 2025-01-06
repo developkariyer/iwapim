@@ -64,8 +64,6 @@
             currentPage = page;
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
-            console.log("groupId: ", groupId);
-            console.log("page: ", page);
             fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
                 .then(response => {
                     if (!response.ok) {
@@ -74,7 +72,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data)
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
@@ -163,6 +160,7 @@
                 }
             });
         }
+
         function selectGroup(groupName, groupId) {
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
             loadStickers(groupId);
