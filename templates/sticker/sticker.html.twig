@@ -24,7 +24,7 @@
                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
                             {% for group in groups %}
                                 <li>
-                                    <a class="dropdown-item text-truncate" href="#" onclick="loadStickers({{ group.id }})">
+                                    <a class="dropdown-item text-truncate" href="#" onclick="selectGroup('{{ group.name }}', {{ group.id }})">
                                         {{ group.name }}
                                     </a>
                                 </li>
@@ -56,6 +56,7 @@
         let totalPages = 1;
         let selectedGroupId = null;
         function loadStickers(groupId, page = 1) {
+            highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
             currentPage = page;
             const container = document.getElementById('stickers-container');
@@ -144,6 +145,21 @@
             }
         }
 
-
+        function highlightSelectedGroup(groupId) {
+            const groupLinks = document.querySelectorAll('.list-group-item');
+            groupLinks.forEach(link => {
+                if (parseInt(link.dataset.groupId) === groupId) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'true');
+                } else {
+                    link.classList.remove('active');
+                    link.removeAttribute('aria-current');
+                }
+            });
+        }
+        function selectGroup(groupName, groupId) {
+            document.getElementById("dropdownMenuButton").innerHTML = groupName;
+            loadStickers(groupId);
+        }
     </script>
 {% endblock %}
