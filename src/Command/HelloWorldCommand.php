@@ -29,7 +29,9 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
-            'group_id' => 208
+            'group_id' => 208,
+            'limit' => (int)10,
+            'offset' => (int)0
         ]);
         print_r($products);
 

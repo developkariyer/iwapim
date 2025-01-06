@@ -81,11 +81,23 @@ class StickerController extends FrontendController
     {
         $stickers = [];
         $offset = ($page - 1) * $limit;
-        $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
-            'group_id' => $groupId,
-            'limit' => $limit,
-            'offset' => $offset
-        ]);
+        $sql = "
+            SELECT
+                osp.iwasku,
+                osp.name AS product_name,
+                osp.productCode,
+                osp.productCategory,
+                osp.imageUrl,
+                osp.variationSize,
+                osp.variationColor,
+                opr.dest_id AS sticker_id
+            FROM object_relations_gproduct org
+                     JOIN object_product osp ON osp.oo_id = org.dest_id
+                     LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
+            WHERE org.src_id = :$groupId
+            LIMIT $limit OFFSET $offset;";
+        $products = Db::get()->fetchAllAssociative($sql);
+
         foreach ($products as $product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
