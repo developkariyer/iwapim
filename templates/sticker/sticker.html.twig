@@ -70,6 +70,13 @@
                 }
             });
         }
+
+        function fetchTotalPages(groupId) {
+            return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
+                .then(response => response.json())
+                .then(data => data.pagination.total_pages);
+        }
+
         function loadStickers(groupId, page = 1) {
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
