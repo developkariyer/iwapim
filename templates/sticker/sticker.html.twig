@@ -14,7 +14,7 @@
                     <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
@@ -58,6 +58,18 @@
         let currentPage = 1;
         let totalPages = 1;
         let selectedGroupId = null;
+        let allCards = [];
+
+        function loadAllStickers(groupId) {
+            selectedGroupId = groupId;
+            allCards = [];
+            fetchTotalPages(groupId).then(total => {
+                totalPages = total;
+                for (let page = 1; page <= totalPages; page++) {
+                    loadStickers(groupId, page, true);
+                }
+            });
+        }
 
         function fetchTotalPages(groupId) {
             return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
@@ -80,6 +92,7 @@
                 })
                 .then(data => {
                     if (data.success) {
+                        allCards = [...allCards, ...data.stickers];
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
                             <div class="row g-0">
@@ -115,20 +128,44 @@
                 });
         }
 
-        function renderPagination(filteredCount) {
-            const paginationContainer = document.getElementById('pagination');
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
-            totalPages = Math.ceil(filteredCount / 10);
-
-            for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                pageButton.onclick = () => {
-                    currentPage = i;
-                    filterAndRenderStickers();
-                };
-                paginationContainer.appendChild(pageButton);
+            paginationContainer.innerHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>`;
+            for (let page = 1; page <= totalPages; page++) {
+                paginationContainer.innerHTML += `
+                <li class="page-item ${page === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                </li>`;
             }
+            paginationContainer.innerHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>`;
+        }
+
+        function searchTable() {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toUpperCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
+                const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
+
+                if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
+                    card.style.display = "";  // Arama koşuluna uyan kartları göster
+                } else {
+                    card.style.display = "none";  // Arama koşuluna uymayan kartları gizle
+                }
+            });
+
         }
 
         function highlightSelectedGroup(groupId) {
