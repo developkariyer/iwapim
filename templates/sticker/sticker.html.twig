@@ -52,14 +52,11 @@
 
 {% block body_scripts %}
     <script>
-        let selectedGroupId = null;
         let currentPage = 1;
         let totalPages = 1;
 
         function loadStickers(groupId, page = 1) {
-            selectedGroupId = groupId;
             currentPage = page;
-            highlightSelectedGroup(groupId);
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
             fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
@@ -87,7 +84,7 @@
                                 </div>
                             </div>
                         </div>
-                `).join('');
+                        `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
                         renderPagination();
@@ -106,19 +103,19 @@
             paginationContainer.innerHTML = '';
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
+                <a class="page-link" href="#" onclick="loadStickers(groupId, ${currentPage - 1})" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>`;
-                for (let page = 1; page <= totalPages; page++) {
-                    paginationContainer.innerHTML += `
-                <li class="page-item ${page === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
-                </li>`;
-                }
+            for (let page = 1; page <= totalPages; page++) {
                 paginationContainer.innerHTML += `
+                <li class="page-item ${page === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadStickers(groupId, ${page})">${page}</a>
+                </li>`;
+            }
+            paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                <a class="page-link" href="#" onclick="loadStickers(groupId, ${currentPage + 1})" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
@@ -140,21 +137,8 @@
                 }
             }
         }
-        function highlightSelectedGroup(groupId) {
-            const groupLinks = document.querySelectorAll('.list-group-item');
-            groupLinks.forEach(link => {
-                if (parseInt(link.dataset.groupId) === groupId) {
-                    link.classList.add('active');
-                    link.setAttribute('aria-current', 'true');
-                } else {
-                    link.classList.remove('active');
-                    link.removeAttribute('aria-current');
-                }
-            });
-        }
+
         function selectGroup(groupName, groupId) {
-            selectedGroupId = groupId;
-            highlightSelectedGroup(groupId);
             loadStickers(groupId, 1);
         }
 
