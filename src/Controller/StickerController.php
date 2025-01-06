@@ -74,15 +74,42 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/get-stickers/{groupId}", name="get_stickers", methods={"GET"})
+     * @Route("/sticker/get-stickers/{groupId}/{page}/{limit}", name="get_stickers", methods={"GET"})
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getStickers(int $groupId): JsonResponse
+    public function getStickers(int $groupId, int $page = 1, int $limit = 10, ?string $searchTerm = null): JsonResponse
     {
         $stickers = [];
-        $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
-            'group_id' => $groupId
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
+        $offset = ($page - 1) * $limit;
+        $searchCondition = '';
+        if ($searchTerm) {
+            $searchTerm = "%" . $searchTerm . "%";
+            $searchCondition = "AND (iwasku LIKE :searchTerm OR product_name LIKE :searchTerm OR productCategory LIKE :searchTerm OR variationSize LIKE :searchTerm OR variationColor LIKE :searchTerm);";
+        }
+        $sql = "
+        SELECT
+            osp.iwasku,
+            osp.name AS product_name,
+            osp.productCode,
+            osp.productCategory,
+            osp.imageUrl,
+            osp.variationSize,
+            osp.variationColor,
+            opr.dest_id AS sticker_id
+            FROM object_relations_gproduct org
+                 JOIN object_product osp ON osp.oo_id = org.dest_id
+                 LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
+            WHERE org.src_id = :groupId
+            $searchCondition
+            LIMIT $limit OFFSET $offset;
+        ";
+        $products = Db::get()->fetchAllAssociative($sql, [
+            'groupId' => $groupId,
+            'searchTerm' => $searchTerm
         ]);
+
         foreach ($products as $product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
@@ -104,8 +131,23 @@ class StickerController extends FrontendController
                 'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
-        return new JsonResponse(['success' => true, 'stickers' => $stickers]);
+        $totalProducts = Utility::fetchFromSqlFile($this->sqlPath . 'countProductsByGroup.sql', [
+            'group_id' => $groupId,
+            'searchTerm' => $searchTerm
+        ]);
+        $totalProducts = $totalProducts[0]['total'];
+        return new JsonResponse([
+            'success' => true,
+            'stickers' => $stickers,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $limit,
+                'total_items' => $totalProducts,
+                'total_pages' => ceil($totalProducts / $limit)
+            ]
+        ]);
     }
+
 
     /**
      * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
@@ -126,7 +168,12 @@ class StickerController extends FrontendController
                         $product->checkSticker4x6eu();
                     }
                     $group->setProducts(array_merge($group->getProducts(), [$product]));
-                    $group->save();
+                    try {
+                        $group->save();
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                        return $this->redirectToRoute('sticker_new');
+                    }
                     $this->addFlash('success', 'Etiket başarıyla eklendi.');
                 } else {
                     $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');

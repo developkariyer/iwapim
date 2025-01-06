@@ -21,23 +21,13 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
+    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
     /**
      * @throws Exception
      * @throws DuplicateFullPathException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $newGroup = new GroupProduct();
-        $operationFolder = Utility::checkSetPath('Operasyonlar');
-        $newGroup->setParentId($operationFolder->getId());
-        $newGroup->setKey("Test API Group2");
-        $newGroup->setPublished(1);
-        try {
-            $newGroup->save();
-        } catch (\Exception $e) {
-           echo $e->getMessage();
-        }
-
 
         // Output "Hello, World!" as green text
        // $this->writeInfo("Hello, World!", $output);

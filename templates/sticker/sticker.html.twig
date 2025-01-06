@@ -14,7 +14,7 @@
                     <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" onkeyup="searchTable()">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
@@ -41,6 +41,11 @@
                 <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
 
                 </div>
+                <nav aria-label="Page navigation">
+                    <ul id="pagination-container" class="pagination justify-content-center">
+
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
@@ -50,40 +55,63 @@
 
 {% block body_scripts %}
     <script>
-        function loadStickers(groupId) {
-            selectedGroupId = groupId;
+        let currentPage = 1;
+        let totalPages = 1;
+        let selectedGroupId = null;
+        let searchTerm = '';
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            searchTerm = this.value;
+            loadStickers(selectedGroupId, currentPage, searchTerm);
+        });
+
+        function fetchTotalPages(groupId) {
+            return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
+                .then(response => response.json())
+                .then(data => data.pagination.total_pages);
+        }
+
+        function loadStickers(groupId, page = 1,  searchTerm = '') {
             highlightSelectedGroup(groupId);
+            selectedGroupId = groupId;
+            currentPage = page;
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
-
-            fetch(`/sticker/get-stickers/${groupId}`)
-                .then(response => response.json())
+            const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch stickers. Status code: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
-                    <div class="card mb-2">
-                        <div class="row g-0">
-                            <div class="col-9">
-                                <div class="card-body p-2">
-                                    <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
-                                        ${sticker.product_name}
-                                    </a>
-                                    <p class="card-text text-muted small m-0">
-                                        <strong>Code:</strong> ${sticker.product_code} <br>
-                                        <strong>Iwasku:</strong> ${sticker.iwasku} <br>
-                                        <strong>Category:</strong> ${sticker.category} <br>
-                                        <strong>Attributes:</strong> ${sticker.attributes}
-                                    </p>
+                        <div class="card mb-2">
+                            <div class="row g-0">
+                                <div class="col-9">
+                                    <div class="card-body p-2" id="card-${sticker.product_code}">
+                                        <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
+                                            ${sticker.product_name}
+                                        </a>
+                                        <p class="card-text text-muted small m-0">
+                                            <strong>Code:</strong> ${sticker.product_code} <br>
+                                            <strong>Iwasku:</strong> ${sticker.iwasku} <br>
+                                            <strong>Category:</strong> ${sticker.category} <br>
+                                            <strong>Attributes:</strong> ${sticker.attributes}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-flex align-items-center justify-content-center">
+                                    <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
                                 </div>
                             </div>
-                            <div class="col-3 d-flex align-items-center justify-content-center">
-                                <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
-                            </div>
-
                         </div>
-                    </div>
-                `).join('');
+                        `).join('');
                         container.innerHTML = cards;
+                        totalPages = data.pagination.total_pages;
+                        renderPagination();
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -94,22 +122,29 @@
                 });
         }
 
-        function searchTable() {
-            var input, filter, cards, card, i, txtValue;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            cards = document.querySelectorAll(".card");
-
-            for (i = 0; i < cards.length; i++) {
-                card = cards[i];
-                txtValue = card.textContent || card.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
-                }
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination-container');
+            paginationContainer.innerHTML = '';
+            paginationContainer.innerHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>`;
+            for (let page = 1; page <= totalPages; page++) {
+                paginationContainer.innerHTML += `
+                <li class="page-item ${page === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                </li>`;
             }
+            paginationContainer.innerHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>`;
         }
+
         function highlightSelectedGroup(groupId) {
             const groupLinks = document.querySelectorAll('.list-group-item');
             groupLinks.forEach(link => {
@@ -122,6 +157,7 @@
                 }
             });
         }
+
         function selectGroup(groupName, groupId) {
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
             loadStickers(groupId);
