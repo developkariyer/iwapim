@@ -74,7 +74,7 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/get-stickers/{groupId}/{page}/{limit}", name="get_stickers", methods={"GET"})
+     * @Route("/sticker/get-stickers/{groupId}?{page}&{limit}", name="get_stickers", methods={"GET"})
      * @throws \Doctrine\DBAL\Exception
      */
     public function getStickers(int $groupId, int $page = 1, int $limit = 10): JsonResponse
