@@ -52,7 +52,7 @@
     <script>
         let selectedGroupId = null;
         let currentPage = 1;
-        let totalPages = null;
+        let totalPages = 1;
 
         function loadStickers(groupId, page = 1) {
             selectedGroupId = groupId;
@@ -156,7 +156,7 @@
             highlightSelectedGroup(groupId);
             loadStickers(groupId, 1);
         }
-        
+
 
     </script>
 {% endblock %}
