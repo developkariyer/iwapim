@@ -122,15 +122,15 @@ class StickerController extends FrontendController
         $totalProducts = Utility::fetchFromSqlFile($this->sqlPath . 'countProductsByGroup.sql', [
             'group_id' => $groupId
         ]);
-        //$totalProducts = $totalProducts['total'];
+        $totalProducts = $totalProducts['total'];
         return new JsonResponse([
             'success' => true,
             'stickers' => $stickers,
             'pagination' => [
                 'current_page' => $page,
-                'per_page' => $limit
-          //      'total_items' => $totalProducts,
-            //    'total_pages' => ceil($totalProducts / $limit)
+                'per_page' => $limit,
+                'total_items' => $totalProducts,
+                'total_pages' => ceil($totalProducts / $limit)
             ]
         ]);
     }
