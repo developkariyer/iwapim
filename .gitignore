@@ -1,6 +1,6 @@
 # Ignore everything
 /*
-
+whoami.pdf
 # Unignore src/ folder and its contents
 !src/
 !src/**
