@@ -110,9 +110,6 @@
         }
 
         function renderPagination() {
-            console.log("Current Page:", currentPage);
-            console.log("Total Pages:", totalPages);
-
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
             paginationContainer.innerHTML += `
@@ -124,7 +121,7 @@
             for (let page = 1; page <= totalPages; page++) {
                 paginationContainer.innerHTML += `
                 <li class="page-item ${page === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage})">${currentPage}</a>
                 </li>`;
             }
             paginationContainer.innerHTML += `
