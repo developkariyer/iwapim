@@ -154,15 +154,14 @@
         function searchTable() {
             var input = document.getElementById("searchInput");
             var filter = input.value.toUpperCase();
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
+            allCards.forEach(card => {
                 const productName = card.querySelector('.card-title').textContent || card.querySelector('.card-title').innerText;
                 const productCode = card.querySelector('.card-text').textContent || card.querySelector('.card-text').innerText;
 
                 if (productName.toUpperCase().indexOf(filter) > -1 || productCode.toUpperCase().indexOf(filter) > -1) {
                     card.style.display = "";
                 } else {
-                    card.style.display = "none"; 
+                    card.style.display = "none";
                 }
             });
 
