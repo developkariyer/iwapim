@@ -60,7 +60,12 @@
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
             fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch stickers. Status code: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
