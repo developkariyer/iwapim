@@ -66,7 +66,7 @@
             container.innerHTML = '<p>Loading...</p>';
             console.log("groupId: ", groupId);
             console.log("page: ", page);
-            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
+            fetch(`/sticker/get-stickers/${groupId}?page=2&limit=10`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch stickers. Status code: ' + response.status);
