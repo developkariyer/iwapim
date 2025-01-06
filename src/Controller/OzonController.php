@@ -260,9 +260,9 @@ WHERE
         if (empty($categoryFullName)) {
             return new Response();
         }
-        $characteristics = $db->fetchAllAssociative('SELECT * FROM iwa_ozon_category_attribute WHERE description_category_id = ? AND type_id = ?', [$groupType, $productType]);
-        $characteristicsEncoded = json_encode($characteristics);
-        return new Response($characteristicsEncoded);
+        $characteristics = $db->fetchFirstColumn('SELECT attribute_json FROM iwa_ozon_category_attribute WHERE description_category_id = ? AND type_id = ?', [$groupType, $productType]);
+        $characteristics = json_encode(array_map('json_decode', $characteristics));
+        return new Response($characteristics);
     }
 
     /**
