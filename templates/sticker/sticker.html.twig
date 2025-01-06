@@ -73,6 +73,7 @@
                 })
                 .then(data => {
                     if (data.success) {
+                        console.log(data);
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
                             <div class="row g-0">
