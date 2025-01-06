@@ -110,6 +110,9 @@
         }
 
         function renderPagination() {
+            console.log("Current Page:", currentPage);
+            console.log("Total Pages:", totalPages);
+
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
             paginationContainer.innerHTML += `
