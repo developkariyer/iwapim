@@ -14,7 +14,7 @@
                     <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
@@ -59,6 +59,12 @@
         let totalPages = 1;
         let selectedGroupId = null;
 
+        function fetchTotalPages(groupId) {
+            return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
+                .then(response => response.json())
+                .then(data => data.pagination.total_pages);
+        }
+
         function loadStickers(groupId, page = 1) {
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
@@ -98,6 +104,7 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
+                        renderPagination();
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -106,6 +113,22 @@
                     console.error('Error fetching stickers:', error);
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
+        }
+
+        function renderPagination(filteredCount) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            totalPages = Math.ceil(filteredCount / 10);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    filterAndRenderStickers();
+                };
+                paginationContainer.appendChild(pageButton);
+            }
         }
 
         function highlightSelectedGroup(groupId) {
@@ -123,6 +146,7 @@
 
         function selectGroup(groupName, groupId) {
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
+            loadAllStickers(groupId);
             loadStickers(groupId);
         }
     </script>
