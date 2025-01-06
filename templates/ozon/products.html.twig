@@ -28,19 +28,25 @@
         {% for sizeName, colorGroups in children %}
             <h4>{{ sizeName }}</h4>
             {% for colorName, child in colorGroups %}
-                <div class="form-group mb-2 d-flex align-items-center">
-                    <label for="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}" class="me-3 mb-0">
-                        <strong>{{ colorName }}</strong> | {{ child.key }} ({{ child.iwasku }})
-                    </label>
-                    <select id="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}" name="selectedChildren[{{ child.id }}]" class="form-select form-select-sm">
-                        <option value="-1" {% if selected_children[child.id] is defined and selected_children[child.id] == -1 %}selected{% endif %}>** Bu varyasyonu kullanma/listeleme</option>
-                        <option value="0" {% if selected_children[child.id] is defined and selected_children[child.id] == 0 %}selected{% endif %}>* PIM Bilgilerini Kullan</option>
-                        {% for item in child.listingItems %}
-                            <option value="{{ item.id }}" {% if selected_children[child.id] is defined and selected_children[child.id] == item.id %}selected{% endif %}>
-                                {{ item.key | split(' ')[0] }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <div class="form-group mb-2 row align-items-center">
+                    <!-- Label Column -->
+                    <div class="col-6">
+                        <label for="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}" class="mb-0">
+                            <strong>{{ colorName }}</strong> {{ child.iwasku }}
+                        </label>
+                    </div>
+                    <!-- Select Column -->
+                    <div class="col-6">
+                        <select id="childSelect_{{ task_id }}_{{ parent_product_id }}_{{ child.id }}" name="selectedChildren[{{ child.id }}]" class="form-select form-select-sm">
+                            <option value="-1" {% if selected_children[child.id] is defined and selected_children[child.id] == -1 %}selected{% endif %}>** Bu varyasyonu kullanma/listeleme</option>
+                            <option value="0" {% if selected_children[child.id] is defined and selected_children[child.id] == 0 %}selected{% endif %}>* PIM Bilgilerini Kullan</option>
+                            {% for item in child.listingItems %}
+                                <option value="{{ item.id }}" {% if selected_children[child.id] is defined and selected_children[child.id] == item.id %}selected{% endif %}>
+                                    {{ item.key | split(' ')[0] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             {% endfor %}
         {% endfor %}
