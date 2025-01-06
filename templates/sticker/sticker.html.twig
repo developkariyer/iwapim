@@ -108,18 +108,19 @@
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>`;
-                for (let page = 1; page <= totalPages; page++) {
-                    paginationContainer.innerHTML += `
-                <li class="page-item ${page === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
-                </li>;
-            }`;
-            paginationContainer.innerHTML += `
-            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>`;
+            for (let page = 1; page <= totalPages; page++) {
+                paginationContainer.innerHTML += `
+                    <li class="page-item ${page === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                    </li>;
+                        }`;
+                paginationContainer.innerHTML += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>`;
+            }
         }
 
         function searchTable() {
@@ -151,8 +152,11 @@
             });
         }
         function selectGroup(groupName, groupId) {
-            document.getElementById("dropdownMenuButton").innerHTML = groupName;
-            loadStickers(groupId);
+            selectedGroupId = groupId;
+            highlightSelectedGroup(groupId);
+            loadStickers(groupId, 1);
         }
+        
+
     </script>
 {% endblock %}
