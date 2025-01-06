@@ -41,6 +41,8 @@
                 <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
 
                 </div>
+                <div id="pagination-container">
+                </div>
             </div>
         </div>
     </div>
@@ -63,7 +65,6 @@
             fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
