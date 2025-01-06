@@ -12,13 +12,16 @@
             {% if parentProductId == showParentProductId %}
                 {% set collapseClass = collapseClass ~ ' show' %}
             {% endif %}
-            <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="{{ collapseClass }}" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}">
+            <div id="collapseParent{{ taskId }}_{{ parentProductId }}" class="{{ collapseClass }}" aria-labelledby="headingParent{{ taskId }}_{{ parentProductId }}" data-bs-parent="#parentProductsAccordion{{ taskId }}" data-type="child" data-task-id="{{ taskId }}" data-parent-product-id="{{ parentProductId }}" data-group-type="{{ parentData.parentProduct.groupType }}" data-product-type="{{ parentData.parentProduct.productType }}">
                 <div class="accordion-body">
                     <div class="ms-2">
                         <i>{{ parentData.parentProduct.categoryFullName }}</i><br>
                         {% for childProduct in parentData.products %}
                             - {{ childProduct.key }} ({{ childProduct.iwasku }})<br>
                         {% endfor %}
+                        <button type="button" class="btn btn-primary mt-3" data-action="show-characteristics">
+                            Özellikler
+                        </button>
                         <button type="button" class="btn btn-primary mt-3" data-action="edit-product">
                             Düzenle
                         </button>
@@ -28,6 +31,7 @@
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
+                    <div id="childCharacteristics{{ taskId }}_{{ parentProductId }}"></div>
                     <div id="childProducts{{ taskId }}_{{ parentProductId }}"></div>
                 </div>
             </div>

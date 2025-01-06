@@ -146,6 +146,8 @@ WHERE
                         'id' => $taskProduct['parentId'],
                         'key' => $taskProduct['parentKey'],
                         'categoryFullName' => $categoryFullName,
+                        'groupType' => $groupType,
+                        'productType' => $productType,
                     ],
                     'products' => [
                         [
@@ -163,6 +165,8 @@ WHERE
                 ];
                 if (empty($parentProducts[$id]['parentProduct']['categoryFullName'])) {
                     $parentProducts[$id]['parentProduct']['categoryFullName'] = $categoryFullName;
+                    $parentProducts[$id]['parentProduct']['groupType'] = $groupType;
+                    $parentProducts[$id]['parentProduct']['productType'] = $productType;
                 }
             }
         }

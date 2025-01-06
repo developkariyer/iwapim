@@ -107,6 +107,29 @@
                 button.parent().hide();
             });
 
+            const loadProductCharacteristics = (taskId, parentProductId) => {
+                const characteristicsDiv = $(`#childCharacteristics${taskId}_${parentProductId}`);
+                const loadingSpinner = $(`#loadingChild${taskId}_${parentProductId}`);
+                if (!characteristicsDiv.data('loaded')) {
+                    loadingSpinner.show();
+                    characteristicsDiv.hide();
+                    $.get(`/ozoncharacteristics/${taskId}/${parentProductId}`, function (data) {
+                        characteristicsDiv.html(data);
+                        characteristicsDiv.data('loaded', true);
+                        loadingSpinner.hide();
+                        characteristicsDiv.show();
+                    });
+                }
+            };
+
+            $(document).on('click', 'button[data-action="show-characteristics"]', function() {
+                const parentProductId = $(this).closest('[data-parent-product-id]').data('parent-product-id');
+                const taskId = $(this).closest('[data-task-id]').data('task-id');
+                const button = $(this);
+                loadProductCharacteristics(taskId, parentProductId);
+                button.parent().hide();
+            });
+
             console.log('Initializing Select2 on page load');
             initializeSelect2();
 
