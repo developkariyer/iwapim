@@ -30,8 +30,8 @@ class HelloWorldCommand extends AbstractCommand
     {
         $products = Utility::fetchFromSqlFile($this->sqlPath . 'selectProductsByGroup.sql', [
             'group_id' => 208,
-            'limit' => 10,
-            'offset' => 0
+            'limit' => '10',
+            'offset' => '0'
         ]);
         print_r($products);
 
