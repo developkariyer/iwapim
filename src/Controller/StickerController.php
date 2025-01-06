@@ -80,6 +80,8 @@ class StickerController extends FrontendController
     public function getStickers(int $groupId, int $page = 1, int $limit = 10): JsonResponse
     {
         $stickers = [];
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
         $offset = ($page - 1) * $limit;
         $sql = "
             SELECT
