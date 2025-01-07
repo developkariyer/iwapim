@@ -66,6 +66,7 @@
 
         function loadStickers(groupId, page = 1,  searchTerm = '') {
             const paginationContainer = document.getElementById('pagination-container');
+            searchInput = document.getElementById('searchInput').value;
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
             currentPage = page;
@@ -111,7 +112,7 @@
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
 
-                        if (searchParam === '') {
+                        if (searchInput === '') {
                             paginationContainer.style.display = 'none';
                         } else {
                             renderPagination();
