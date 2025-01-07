@@ -61,7 +61,11 @@
 
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
-            loadStickers(selectedGroupId, 1, searchTerm);
+            if (searchTerm.trim() === '') {
+                window.location.reload();
+            } else {
+                loadStickers(selectedGroupId, 1, searchTerm); 
+            }
         });
 
         function loadStickers(groupId, page = 1,  searchTerm = '') {
@@ -174,7 +178,6 @@
                     <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
                 </li>`;
             }
-
             paginationContainer.innerHTML = paginationHTML;
         }
 
@@ -192,7 +195,6 @@
         }
 
         function selectGroup(groupName, groupId) {
-            window.location.reload();
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
             document.getElementById('searchInput').value = '';
             loadStickers(groupId, 1, searchTerm);
