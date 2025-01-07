@@ -115,10 +115,8 @@
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
                         if (searchTerm !== '') {
-                            console.log("NOT PAGINATON");
                             paginationContainer.style.display = 'none';
                         } else {
-                            console.log("PAGINATON");
                             renderPagination();
                         }
                     } else {
@@ -133,7 +131,7 @@
 
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
-            paginationContainer.innerHTML = '';
+            //paginationContainer.innerHTML = '';
             let paginationHTML = '';
             paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
