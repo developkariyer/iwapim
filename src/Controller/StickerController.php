@@ -90,7 +90,6 @@ class StickerController extends FrontendController
             $searchCondition = "AND (iwasku LIKE :searchTerm OR name LIKE :searchTerm OR productCategory LIKE :searchTerm OR variationSize LIKE :searchTerm OR variationColor LIKE :searchTerm)";
             $offset = null;
         }
-
         $sql = "
         SELECT
             osp.iwasku,
@@ -140,7 +139,15 @@ class StickerController extends FrontendController
         $totalProducts = Utility::fetchFromSqlFile($this->sqlPath . 'countProductsByGroup.sql', [
             'group_id' => $groupId
         ]);
-        $totalProducts = $totalProducts[0]['total'];
+        $countSql = "
+            SELECT COUNT(*) AS totalCount
+            FROM object_relations_gproduct org
+            JOIN object_product osp ON osp.oo_id = org.dest_id
+            LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
+            WHERE org.src_id = :groupId
+            " . $searchCondition;
+        $countResult = Db::get()->fetchAssociative($countSql, $parameters);
+        $totalProducts = $countResult['totalCount'] ?? 0;
         return new JsonResponse([
             'success' => true,
             'stickers' => $stickers,
