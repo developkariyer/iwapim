@@ -110,7 +110,7 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        if (searchParam === '') {
+                        if (searchParam !== '') {
                             paginationContainer.style.display = 'none';
                         } else {
                             paginationContainer.style.display = 'block';
