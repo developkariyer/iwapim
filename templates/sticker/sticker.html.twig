@@ -148,7 +148,7 @@
                 </a>
             </li>`;
 
-            const maxVisiblePages = 3;
+            const maxVisiblePages = 5;
             const firstVisiblePage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             const lastVisiblePage = Math.min(totalPages, firstVisiblePage + maxVisiblePages - 1);
 
@@ -172,13 +172,6 @@
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>`;
-
-            if (lastVisiblePage < totalPages) {
-                paginationHTML += `
-                <li class="page-item">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
-                </li>`;
-            }
             paginationContainer.innerHTML = paginationHTML;
         }
 
