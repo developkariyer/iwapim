@@ -123,20 +123,19 @@
         }
 
         function renderPagination() {
-            searchInput = document.getElementById('searchInput').value;
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
             let paginationHTML = '';
             paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1, searchInput)" aria-label="First">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1)" aria-label="First">
                     <span aria-hidden="true">&laquo;&laquo;</span>
                 </a>
             </li>`;
 
             paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1}, searchInput)" aria-label="Previous">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>`;
@@ -148,20 +147,20 @@
             for (let page = firstVisiblePage; page <= lastVisiblePage; page++) {
                 paginationHTML += `
                 <li class="page-item ${page === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page}, searchInput)">${page}</a>
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
                 </li>`;
             }
 
             paginationHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1}, searchInput)" aria-label="Next">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
 
             paginationHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages}, searchInput)" aria-label="Last">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages})" aria-label="Last">
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>`;
@@ -169,7 +168,7 @@
             if (lastVisiblePage < totalPages) {
                 paginationHTML += `
                 <li class="page-item">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages, searchInput)">${totalPages}+ </a>
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
                 </li>`;
             }
 
