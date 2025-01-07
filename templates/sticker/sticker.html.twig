@@ -110,7 +110,7 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        renderPagination();
+                        renderPagination(searchParam);
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -122,7 +122,6 @@
         }
 
         function renderPagination() {
-            const searchParam = document.getElementById('searchInput').value;
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
             paginationContainer.innerHTML += `
