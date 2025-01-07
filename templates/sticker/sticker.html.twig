@@ -118,47 +118,55 @@
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
-            paginationContainer.innerHTML += `
+            let paginationHTML = '';
+
+            paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1)" aria-label="First">
                     <span aria-hidden="true">&laquo;&laquo;</span>
                 </a>
             </li>`;
 
-            paginationContainer.innerHTML += `
+            paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>`;
+
             const maxVisiblePages = 3;
             const firstVisiblePage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             const lastVisiblePage = Math.min(totalPages, firstVisiblePage + maxVisiblePages - 1);
 
             for (let page = firstVisiblePage; page <= lastVisiblePage; page++) {
-                paginationContainer.innerHTML += `
+                paginationHTML += `
                 <li class="page-item ${page === currentPage ? 'active' : ''}">
                     <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
                 </li>`;
             }
-            if (lastVisiblePage < totalPages) {
-                paginationContainer.innerHTML += `
-                <li class="page-item">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
-                </li>`;
-            }
-            paginationContainer.innerHTML += `
+
+            paginationHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
-            paginationContainer.innerHTML += `
+
+            paginationHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages})" aria-label="Last">
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>`;
+
+            if (lastVisiblePage < totalPages) {
+                paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
+            </li>`;
+            }
+
+            paginationContainer.innerHTML = paginationHTML;
         }
 
         function highlightSelectedGroup(groupId) {
