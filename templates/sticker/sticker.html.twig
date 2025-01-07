@@ -78,6 +78,9 @@
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
             const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+            const requestUrl = `/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`;
+            console.log('Request URL:', requestUrl);
+
             fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`)
                 .then(response => {
                     if (!response.ok) {
