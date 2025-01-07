@@ -109,7 +109,12 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        renderPagination();
+                        if (searchParam === '') {
+                            paginationContainer.style.display = 'none';
+                        } else {
+                            paginationContainer.style.display = 'block';
+                            renderPagination();
+                        }
 
 
                     } else {
