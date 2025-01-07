@@ -106,7 +106,7 @@ class StickerController extends FrontendController
                  LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
             WHERE org.src_id = :groupId
             " . $searchCondition . "
-            LIMIT $limit OFFSET $offset;";
+            " . ($limit ? "LIMIT $limit OFFSET $offset" : "") . ";";
         $parameters = ['groupId' => (int) $groupId];
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
