@@ -106,7 +106,7 @@ class StickerController extends FrontendController
             " . $searchCondition . "
             LIMIT $limit OFFSET $offset;";
 
-        $parameters = ['groupId' => $_GET['groupId']];
+        $parameters = ['groupId' => (int) $groupId];
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
