@@ -63,9 +63,11 @@
             searchTerm = this.value;
             let charCount = searchTerm.length;
             if (searchTerm.trim() === '' || charCount < 3) {
+                clearTimeout(timeoutId);
                 loadStickers(selectedGroupId, currentPage);
-            }else {
-                setTimeout(function() {
+            } else {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(function() {
                     loadStickers(selectedGroupId, currentPage, searchTerm);
                 }, 250);
             }
