@@ -58,14 +58,12 @@
         let totalPages = 1;
         let selectedGroupId = null;
         let searchTerm = '';
-        let group_id = localStorage.getItem('group_id') ? parseInt(localStorage.getItem('group_id')) : null;
 
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
             if (searchTerm.trim() === '') {
-                window.location.reload();
-                loadStickers(group_id, 1, '');
-            } else {
+                loadStickers(selectedGroupId, currentPage, '');
+            }else {
                 loadStickers(selectedGroupId, 1, searchTerm);
             }
         });
