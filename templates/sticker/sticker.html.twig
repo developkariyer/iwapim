@@ -65,6 +65,7 @@
         });
 
         function loadStickers(groupId, page = 1,  searchTerm = '') {
+            const paginationContainer = document.getElementById('pagination-container');
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
             currentPage = page;
