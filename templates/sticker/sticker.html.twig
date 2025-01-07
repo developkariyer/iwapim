@@ -119,10 +119,9 @@
                                     ${group.map(sticker => `
                                         <div class="mb-2">
                                             <p><strong>Iwasku:</strong> ${sticker.iwasku}</p>
-                                            <div class="d-flex flex-wrap">
-                                                <p class="me-3"><strong>Attributes:</strong> ${sticker.attributes}</p>
-                                                <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">View Sticker</a>
-                                            </div>
+
+                                            <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">${sticker.attributes}</a>
+
                                         </div>
                                     `).join('')}
                                 </div>
