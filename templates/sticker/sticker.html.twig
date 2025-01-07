@@ -106,18 +106,24 @@
                                         <h5 class="card-title">${mainSticker.product_name} (${mainSticker.product_code})</h5>
                                         <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
                                         <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid">
+                                        <button class="btn btn-primary mt-3" data-bs-toggle="collapse" data-bs-target="#details-${identifier}" aria-expanded="false" aria-controls="details-${identifier}">
+                                            View Details
+                                        </button>
                                     </div>
-                                </div>`;
-                            const details = group.map(sticker => `
-                            <div class="card mb-2">
-                                <div class="card-body">
-                                    <p><strong>Iwasku:</strong> ${sticker.iwasku}</p>
-                                    <p><strong>Attributes:</strong> ${sticker.attributes}</p>
-                                    <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">View Sticker</a>
                                 </div>
-                            </div>
-                            `).join('');
-                            return card + details;
+                                <div class="collapse" id="details-${identifier}">
+                                    ${group.map(sticker => `
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <p><strong>Iwasku:</strong> ${sticker.iwasku}</p>
+                                            <p><strong>Attributes:</strong> ${sticker.attributes}</p>
+                                            <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">View Sticker</a>
+                                        </div>
+                                    </div>
+                                    `).join('')}
+                                </div>
+                            `;
+                            return card;
                         }).join('');
                         container.innerHTML = groupedCards;
                         totalPages = data.pagination.total_pages;
