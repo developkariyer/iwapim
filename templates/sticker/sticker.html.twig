@@ -14,7 +14,7 @@
                     <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">Yeni Etiket</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
+                    <input type="text" id="searchInput" placeholder="Ara..." class="form-control mb-3" >
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
@@ -61,10 +61,13 @@
 
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
-            if (searchTerm.trim() === '') {
+            let charCount = searchTerm.length;
+            if (searchTerm.trim() === '' || charCount < 3) {
                 loadStickers(selectedGroupId, currentPage);
             }else {
-                loadStickers(selectedGroupId, currentPage, searchTerm);
+                setTimeout(function() {
+                    loadStickers(selectedGroupId, currentPage, searchTerm);
+                }, 250);
             }
         });
 
