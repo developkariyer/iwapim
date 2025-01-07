@@ -70,10 +70,13 @@
             currentPage = page;
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
-            const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
-            const url = `/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`;
+            const searchParam = searchTerm != '' ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+            let url = `/sticker/get-stickers/${groupId}?page=${page}&limit=10`;
+            if (searchParam) {
+                url += searchParam;
+            }
             console.log("Fetching URL:", url);
-            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`)
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch stickers. Status code: ' + response.status);
