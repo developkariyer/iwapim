@@ -115,16 +115,18 @@
                                         </div>
                                 </div>
                                 <div class="collapse" id="details-${identifier}">
+                                <div>
                                     ${group.map(sticker => `
-                                    <div class="card mb-2">
-                                        <div class="card-body">
+                                        <div class="mb-2">
                                             <p><strong>Iwasku:</strong> ${sticker.iwasku}</p>
-                                            <p><strong>Attributes:</strong> ${sticker.attributes}</p>
-                                            <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">View Sticker</a>
+                                            <div class="d-flex flex-wrap">
+                                                <p class="me-3"><strong>Attributes:</strong> ${sticker.attributes}</p>
+                                                <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">View Sticker</a>
+                                            </div>
                                         </div>
-                                    </div>
                                     `).join('')}
                                 </div>
+                            </div>
                             `;
                             return card;
                         }).join('');
