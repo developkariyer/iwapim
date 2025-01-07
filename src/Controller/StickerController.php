@@ -86,7 +86,7 @@ class StickerController extends FrontendController
         $searchCondition = '';
         if ($searchTerm) {
             $searchTerm = "%" . $searchTerm . "%";
-            $searchCondition = "AND (iwasku LIKE :searchTerm OR product_name LIKE :searchTerm OR productCategory LIKE :searchTerm OR variationSize LIKE :searchTerm OR variationColor LIKE :searchTerm);";
+            $searchCondition = "AND (iwasku LIKE :searchTerm OR product_name LIKE :searchTerm OR productCategory LIKE :searchTerm OR variationSize LIKE :searchTerm OR variationColor LIKE :searchTerm)";
         }
         $sql = "
         SELECT
@@ -103,12 +103,13 @@ class StickerController extends FrontendController
                  LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
             WHERE org.src_id = :groupId
             $searchCondition
-            LIMIT $limit OFFSET $offset;
-        ";
-        $products = Db::get()->fetchAllAssociative($sql, [
-            'groupId' => $groupId,
-            'searchTerm' => $searchTerm
-        ]);
+            LIMIT $limit OFFSET $offset;";
+
+        $parameters = ['groupId' => $groupId];
+        if ($searchTerm) {
+            $parameters['searchTerm'] = $searchTerm;
+        }
+        $products = Db::get()->fetchAllAssociative($sql, $parameters);
 
         foreach ($products as $product) {
             if ($product['sticker_id']) {
