@@ -65,15 +65,16 @@
             searchTerm = this.value;
             let charCount = searchTerm.length;
             if (searchTerm.trim() === '' || charCount < 3) {
+                console.log("Current search term<3:", searchTerm);
                 clearTimeout(timeoutId);
                 loadStickers(selectedGroupId, currentPage);
             } else {
+                console.log("Current search term>3:", searchTerm);
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(function() {
                     loadStickers(selectedGroupId, currentPage, searchTerm);
                 }, 250);
             }
-            console.log("Current search term:", searchTerm);
         });
 
         function loadStickers(groupId, page = 1,  searchTerm = '') {
