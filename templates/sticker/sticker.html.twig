@@ -110,7 +110,7 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        renderPagination();
+                        renderPagination(searchParam);
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -121,19 +121,19 @@
                 });
         }
 
-        function renderPagination() {
+        function renderPagination(searchParam) {
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1)" aria-label="First">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1, searchParam)" aria-label="First">
                     <span aria-hidden="true">&laquo;&laquo;</span>
                 </a>
             </li>`;
 
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1}, searchParam)" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>`;
@@ -144,24 +144,24 @@
             for (let page = firstVisiblePage; page <= lastVisiblePage; page++) {
                 paginationContainer.innerHTML += `
                 <li class="page-item ${page === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page}, searchParam)">${page}</a>
                 </li>`;
             }
             if (lastVisiblePage < totalPages) {
                 paginationContainer.innerHTML += `
                 <li class="page-item">
-                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages, searchParam)">${totalPages}+ </a>
                 </li>`;
             }
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1}, searchParam)" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
             paginationContainer.innerHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages})" aria-label="Last">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages}, searchParam)" aria-label="Last">
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>`;
