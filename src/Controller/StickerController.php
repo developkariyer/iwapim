@@ -113,6 +113,7 @@ class StickerController extends FrontendController
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
+        error_log($sql);
         $products = Db::get()->fetchAllAssociative($sql, $parameters);
 
         foreach ($products as $product) {
