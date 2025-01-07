@@ -113,9 +113,7 @@ class StickerController extends FrontendController
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
-        error_log($sql);
         $products = Db::get()->fetchAllAssociative($sql, $parameters);
-
         foreach ($products as $product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
@@ -144,6 +142,7 @@ class StickerController extends FrontendController
             LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
             WHERE org.src_id = :groupId
             " . $searchCondition;
+        error_log($countSql);
         $countResult = Db::get()->fetchAssociative($countSql, $parameters);
         $totalProducts = $countResult['totalCount'] ?? 0;
         return new JsonResponse([
