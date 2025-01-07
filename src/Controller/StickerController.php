@@ -126,14 +126,13 @@ class StickerController extends FrontendController
                     continue;
                 }
                 $sticker = $productObject->checkSticker4x6eu();
-                $mainProduct = $productObject->getMainProduct();
+                $mainProduct = $productObject->getParent();
                 if (!$mainProduct) {
                     continue;
                 }
                 $product['nameMain'] = $mainProduct->getName();
                 $product['productCodeMain'] = $mainProduct->getProductCode();
                 $product['productCategoryMain'] = $mainProduct->getProductCategory();
-
 
 
 
