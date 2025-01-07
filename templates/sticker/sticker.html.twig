@@ -193,11 +193,13 @@
 
         function selectGroup(groupName, groupId) {
             totalPages = 1;
-            totalPages = 1;
+            currentPage = 1;
             searchTerm = '';
-            currentPage = 1; 
+            selectedGroupId = groupId;
+
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
-            loadStickers(groupId, 1, '');
+            document.getElementById('searchInput').value = '';
+            loadStickers(groupId, 1, searchTerm);
         }
     </script>
 {% endblock %}
