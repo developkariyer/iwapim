@@ -41,7 +41,7 @@
                 <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
 
                 </div>
-                <nav aria-label="Page navigation">
+                <nav class="col-12" aria-label="Page navigation">
                     <ul id="pagination-container" class="pagination justify-content-center">
 
                     </ul>
@@ -78,9 +78,6 @@
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
             const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
-            const requestUrl = `/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`;
-            console.log('Request URL:', requestUrl);
-
             fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`)
                 .then(response => {
                     if (!response.ok) {
@@ -90,7 +87,6 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        console.log(data);
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
                             <div class="row g-0">

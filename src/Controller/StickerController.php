@@ -105,14 +105,10 @@ class StickerController extends FrontendController
             WHERE org.src_id = :groupId
             " . $searchCondition . "
             LIMIT $limit OFFSET $offset;";
-
         $parameters = ['groupId' => (int) $groupId];
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
-        error_log("Received searchTerm: " . $searchTerm);
-        error_log("Generated SQL: " . $sql);
-        error_log("SQL Parameters: " . print_r($parameters, true));
         $products = Db::get()->fetchAllAssociative($sql, $parameters);
 
         foreach ($products as $product) {
