@@ -80,7 +80,6 @@
             if (searchParam) {
                 url += searchParam;
             }
-            console.log("Fetching URL:", url);
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
