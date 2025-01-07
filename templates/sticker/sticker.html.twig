@@ -97,30 +97,29 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        const cards = data.stickers.map(sticker => `
-                        <div class="card mb-2">
-                            <div class="row g-0">
-                                <div class="col-9">
-                                    <div class="card-body p-2" id="card-${sticker.product_code}">
-                                        <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
-                                            ${sticker.product_name}
-                                        </a>
-                                        <p class="card-text text-muted small m-0">
-                                            <strong>Code:</strong> ${sticker.product_code} <br>
-                                            <strong>Iwasku:</strong> ${sticker.iwasku} <br>
-                                            <strong>Category:</strong> ${sticker.category} <br>
-                                            <strong>Identifier:</strong> ${sticker.product_identifier} <br>
-                                            <strong>Attributes:</strong> ${sticker.attributes}
-                                        </p>
+                        const groupedCards = Object.keys(data.stickers).map(identifier => {
+                            const group = data.stickers[identifier];
+                            const mainSticker = group[0];
+                            const card = `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${mainSticker.product_name} (${mainSticker.product_code})</h5>
+                                        <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
+                                        <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid">
                                     </div>
-                                </div>
-                                <div class="col-3 d-flex align-items-center justify-content-center">
-                                    <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
+                                </div>`;
+                            const details = group.map(sticker => `
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <p><strong>Iwasku:</strong> ${sticker.iwasku}</p>
+                                    <p><strong>Attributes:</strong> ${sticker.attributes}</p>
+                                    <a href="${sticker.sticker_link}" class="btn btn-primary" target="_blank">View Sticker</a>
                                 </div>
                             </div>
-                        </div>
-                        `).join('');
-                        container.innerHTML = cards;
+                            `).join('');
+                            return card + details;
+                        }).join('');
+                        container.innerHTML = groupedCards;
                         totalPages = data.pagination.total_pages;
                         if (searchTerm !== '') {
                             paginationContainer.style.visibility = 'hidden';

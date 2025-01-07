@@ -79,7 +79,7 @@ class StickerController extends FrontendController
      */
     public function getStickers(int $groupId, int $page = 1, int $limit = 10, ?string $searchTerm = null): JsonResponse
     {
-        $stickers = [];
+        $groupedStickers = [];
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
         $offset = ($page - 1) * $limit;
@@ -129,18 +129,17 @@ class StickerController extends FrontendController
                 $sticker = $productObject->checkSticker4x6eu();
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
-            $stickers[] = [
-                'iwasku' => $product['iwasku'] ?? '',
+            $groupedStickers[$product['productIdentifier']][] = [
                 'product_name' => $product['product_name'] ?? '',
-                'sticker_link' => $stickerPath ?? '',
                 'product_code' => $product['productCode'] ?? '',
                 'category' => $product['productCategory'] ?? '',
                 'image_link' => $product['imageUrl'] ?? '',
+                'sticker_link' => $stickerPath,
+                'iwasku' => $product['iwasku'] ?? '',
                 'product_identifier' => $product['productIdentifier'] ?? '',
                 'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
-        unset($product);
         $countSql = "
             SELECT COUNT(*) AS totalCount
             FROM object_relations_gproduct org
@@ -152,7 +151,7 @@ class StickerController extends FrontendController
         $totalProducts = $countResult['totalCount'] ?? 0;
         return new JsonResponse([
             'success' => true,
-            'stickers' => $stickers,
+            'stickers' => $groupedStickers,
             'pagination' => [
                 'current_page' => $page,
                 'per_page' => $limit,
