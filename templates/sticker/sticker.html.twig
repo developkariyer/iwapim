@@ -199,10 +199,8 @@
 
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
             document.getElementById('searchInput').value = '';
-            const container = document.getElementById('stickers-container');
-            const paginationContainer = document.getElementById('pagination-container');
-            container.innerHTML = '';
-            paginationContainer.innerHTML = '';
+
+            loadStickers(groupId, 1, searchTerm);
         }
     </script>
 {% endblock %}
