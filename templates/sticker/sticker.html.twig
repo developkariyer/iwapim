@@ -102,15 +102,17 @@
                             const mainSticker = group[0];
                             const card = `
                                 <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h4 class="card-title"> ${identifier} </h4>
+                                    <h4 class="card-title">${identifier}</h4>
                                         <h5 class="card-title">${mainSticker.product_name} (${mainSticker.product_code})</h5>
-                                        <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
-                                        <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid">
-                                        <button class="btn btn-primary mt-3" data-bs-toggle="collapse" data-bs-target="#details-${identifier}" aria-expanded="false" aria-controls="details-${identifier}">
-                                            View Details
-                                        </button>
-                                    </div>
+                                        <div class="d-flex align-items-center">
+                                            <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid w-25 me-3">
+                                            <div>
+                                                <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
+                                                <button class="btn btn-primary mt-3" data-bs-toggle="collapse" data-bs-target="#details-${identifier}" aria-expanded="false" aria-controls="details-${identifier}">
+                                                    View Details
+                                                </button>
+                                            </div>
+                                        </div>
                                 </div>
                                 <div class="collapse" id="details-${identifier}">
                                     ${group.map(sticker => `
