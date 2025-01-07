@@ -109,8 +109,9 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        if (searchTerm === '')
+                        if (searchTerm === '') {
                             renderPagination();
+                        }
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
