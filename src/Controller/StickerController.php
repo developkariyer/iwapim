@@ -130,9 +130,9 @@ class StickerController extends FrontendController
                 if (!$mainProduct) {
                     continue;
                 }
-                $product['nameMain'] = $mainProduct->getName();
-                $product['productCodeMain'] = $mainProduct->getProductCode();
-                $product['productCategoryMain'] = $mainProduct->getProductCategory();
+                $product['nameMain'] = $mainProduct->getInheritedField('name');
+                //$product['productCodeMain'] = $mainProduct->getProductCode();
+                //$product['productCategoryMain'] = $mainProduct->getProductCategory();
 
 
 
