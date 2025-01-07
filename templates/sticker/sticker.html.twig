@@ -71,8 +71,9 @@
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(function() {
                     loadStickers(selectedGroupId, currentPage, searchTerm);
-                }, 250);  
+                }, 250);
             }
+            console.log("Current search term:", searchTerm);
         });
 
         function loadStickers(groupId, page = 1,  searchTerm = '') {
