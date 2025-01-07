@@ -8,10 +8,10 @@
         <div class="col-12">
             <div class="row mt-2">
                 <div class="col-12 col-md-3 mb-2">
-                    <a href="{{ path('sticker_new_group') }}" class="btn btn-success w-100">New Group</a>
+                    <a href="{{ path('sticker_new_group') }}" class="btn btn-success w-100">Yeni Grup</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
+                    <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">Yeni Etiket</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
@@ -19,7 +19,7 @@
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
                         <button class="btn btn-outline-dark dropdown-toggle text-truncate w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            Select Group
+                            Grup Seç
                         </button>
                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
                             {% for group in groups %}
@@ -30,7 +30,7 @@
                                 </li>
                             {% else %}
                                 <li>
-                                    <span class="dropdown-item text-muted">No groups available.</span>
+                                    <span class="dropdown-item text-muted">Grup Yok</span>
                                 </li>
                             {% endfor %}
                         </ul>

@@ -5,20 +5,20 @@
     <div class="container mt-2">
         <div class="row">
             <div class="col-12 mt-5">
-                <h1>Add New Sticker</h1>
+                <h1>Yeni Etiket Oluştur</h1>
                 <form method="post" action="/sticker/add-sticker" class="mt-3">
-                    <input type="text" name="form_data" placeholder="ASIN" class="form-control mb-3">
+                    <input type="text" name="form_data" placeholder="IWASKU" class="form-control mb-3">
                     <select name="group_id" class="form-control mb-3">
-                        <option value="" disabled selected>Select a group</option>
+                        <option value="" disabled selected>Etiket Grubu</option>
                         {% for group in groups %}
                             <option value="{{ group.id }}">{{ group.name }}</option>
                         {% else %}
-                            <option value="" disabled>No groups available</option>
+                            <option value="" disabled>Etiket Grubu Bulunamadı</option>
                         {% endfor %}
                     </select>
                     <div class="d-flex flex-column">
-                        <button type="submit" class="btn btn-success mb-2">Add Sticker</button>
-                        <a href="{{ path('sticker_main_page') }}" class="btn btn-primary">Main Page</a>
+                        <button type="submit" class="btn btn-success mb-2">Etiker Oluştur</button>
+                        <a href="{{ path('sticker_main_page') }}" class="btn btn-primary">Ana Sayfa</a>
                     </div>
                 </form>
             </div>
