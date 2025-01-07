@@ -61,7 +61,7 @@
 
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
-            loadStickers(selectedGroupId, currentPage, searchTerm);
+            loadStickers(selectedGroupId, 1, searchTerm);
         });
 
         function fetchTotalPages(groupId) {

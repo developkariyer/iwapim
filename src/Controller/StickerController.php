@@ -136,9 +136,6 @@ class StickerController extends FrontendController
                 'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
-        $totalProducts = Utility::fetchFromSqlFile($this->sqlPath . 'countProductsByGroup.sql', [
-            'group_id' => $groupId
-        ]);
         $countSql = "
             SELECT COUNT(*) AS totalCount
             FROM object_relations_gproduct org
