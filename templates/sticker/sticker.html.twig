@@ -115,9 +115,9 @@
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
                         if (searchTerm !== '') {
-                            paginationContainer.style.display = 'none';
+                            paginationContainer.style.visibility = 'hidden';
                         } else {
-                            paginationContainer.style.display = 'true';
+                            paginationContainer.style.visibility = 'visible';
                             renderPagination();
                         }
                     } else {
