@@ -59,16 +59,19 @@
         let selectedGroupId = null;
         let searchTerm = '';
 
+        let timeoutId;
+
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
             let charCount = searchTerm.length;
             if (searchTerm.trim() === '' || charCount < 3) {
+                clearTimeout(timeoutId);
                 loadStickers(selectedGroupId, currentPage);
-            }else {
-                console.log("Current search term:", searchTerm);
-                setTimeout(function() {
+            } else {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(function() {
                     loadStickers(selectedGroupId, currentPage, searchTerm);
-                }, 250);
+                }, 250);  
             }
         });
 
