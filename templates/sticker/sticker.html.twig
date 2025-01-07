@@ -114,7 +114,7 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
-                        if (searchTerm !== '') {
+                        if (searchTerm === '') {
                             paginationContainer.style.display = 'none';
                         } else {
                             renderPagination();
