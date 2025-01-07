@@ -62,7 +62,7 @@
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
             if (searchTerm.trim() === '') {
-                loadStickers(selectedGroupId, currentPage, '.');
+                loadStickers(selectedGroupId, currentPage);
             }else {
                 loadStickers(selectedGroupId, currentPage, searchTerm);
             }
