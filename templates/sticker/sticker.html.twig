@@ -192,6 +192,7 @@
         }
 
         function selectGroup(groupName, groupId) {
+            totalPages = 1;
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
             loadStickers(groupId, 1, '');
         }
