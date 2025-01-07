@@ -99,6 +99,7 @@ class StickerController extends FrontendController
             osp.imageUrl,
             osp.variationSize,
             osp.variationColor,
+            osp.productIdentifier,
             opr.dest_id AS sticker_id
             FROM object_relations_gproduct org
                  JOIN object_product osp ON osp.oo_id = org.dest_id
@@ -117,7 +118,7 @@ class StickerController extends FrontendController
             $parameters['searchTerm'] = $searchTerm;
         }
         $products = Db::get()->fetchAllAssociative($sql, $parameters);
-        foreach ($products as &$product) {
+        foreach ($products as $product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
             } else {
@@ -126,21 +127,11 @@ class StickerController extends FrontendController
                     continue;
                 }
                 $sticker = $productObject->checkSticker4x6eu();
-                $mainProduct = $productObject->getParent();
-                if (!$mainProduct) {
-                    continue;
-                }
-                $product['nameMain'] = $mainProduct->getInheritedField('name');
-                //$product['productCodeMain'] = $mainProduct->getProductCode();
-                //$product['productCategoryMain'] = $mainProduct->getProductCategory();
-
-
-
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
             $stickers[] = [
                 'iwasku' => $product['iwasku'] ?? '',
-                'product_name' => $product['nameMain'] ?? '',
+                'product_name' => $product['productIdentifier'] ?? '',
                 'sticker_link' => $stickerPath ?? '',
                 'product_code' => $product['productCode'] ?? '',
                 'category' => $product['productCategory'] ?? '',
