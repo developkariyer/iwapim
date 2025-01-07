@@ -117,7 +117,7 @@ class StickerController extends FrontendController
             $parameters['searchTerm'] = $searchTerm;
         }
         $products = Db::get()->fetchAllAssociative($sql, $parameters);
-        foreach ($products as $product) {
+        foreach ($products as &$product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
             } else {
@@ -126,11 +126,22 @@ class StickerController extends FrontendController
                     continue;
                 }
                 $sticker = $productObject->checkSticker4x6eu();
+                $mainProduct = $productObject->getMainProduct();
+                if (!$mainProduct) {
+                    continue;
+                }
+                $product['nameMain'] = $mainProduct->getName();
+                $product['productCodeMain'] = $mainProduct->getProductCode();
+                $product['productCategoryMain'] = $mainProduct->getProductCategory();
+
+
+
+
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
             $stickers[] = [
                 'iwasku' => $product['iwasku'] ?? '',
-                'product_name' => $product['product_name'] ?? '',
+                'product_name' => $product['nameMain'] ?? '',
                 'sticker_link' => $stickerPath ?? '',
                 'product_code' => $product['productCode'] ?? '',
                 'category' => $product['productCategory'] ?? '',
@@ -138,6 +149,7 @@ class StickerController extends FrontendController
                 'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
+        unset($product);
         $countSql = "
             SELECT COUNT(*) AS totalCount
             FROM object_relations_gproduct org
