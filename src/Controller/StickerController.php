@@ -131,11 +131,12 @@ class StickerController extends FrontendController
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
             $stickers[] = [
                 'iwasku' => $product['iwasku'] ?? '',
-                'product_name' => $product['productIdentifier'] ?? '',
+                'product_name' => $product['product_name'] ?? '',
                 'sticker_link' => $stickerPath ?? '',
                 'product_code' => $product['productCode'] ?? '',
                 'category' => $product['productCategory'] ?? '',
                 'image_link' => $product['imageUrl'] ?? '',
+                'product_identifier' => $product['productIdentifier'] ?? '',
                 'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
             ];
         }
