@@ -131,7 +131,12 @@
 
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
-            //paginationContainer.innerHTML = '';
+            console.log('Rendering pagination');
+            console.log('Current page:', currentPage);
+            console.log('Total pages:', totalPages);
+            console.log('Selected group:', selectedGroupId);
+            console.log('Search term:', searchTerm);
+            paginationContainer.innerHTML = '';
             let paginationHTML = '';
             paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
