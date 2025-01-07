@@ -106,8 +106,11 @@ class StickerController extends FrontendController
             WHERE org.src_id = :groupId
             " . $searchCondition . "
             LIMIT $limit";
+
         if ($offset !== null) {
-            $sql .= " OFFSET $offset";
+            $sql .= " LIMIT $limit OFFSET $offset";
+        } else {
+            $sql .= " LIMIT $limit";
         }
         $parameters = ['groupId' => (int) $groupId];
         if ($searchTerm) {
