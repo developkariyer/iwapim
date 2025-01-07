@@ -84,7 +84,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Stickers:', data);
                     if (data.success) {
                         const cards = data.stickers.map(sticker => `
                         <div class="card mb-2">
