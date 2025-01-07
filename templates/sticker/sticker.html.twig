@@ -109,9 +109,14 @@
                         `).join('');
                         container.innerHTML = cards;
                         totalPages = data.pagination.total_pages;
+
                         if (searchTerm === '') {
+                            paginationContainer.style.display = 'none';
+                        } else {
+                            paginationContainer.style.display = 'block';
                             renderPagination();
                         }
+
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
