@@ -151,7 +151,12 @@
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
-
+            if (lastVisiblePage < totalPages) {
+                paginationHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
+                </li>`;
+            }
             paginationHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages})" aria-label="Last">
@@ -159,12 +164,7 @@
                 </a>
             </li>`;
 
-            if (lastVisiblePage < totalPages) {
-                paginationHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, totalPages)">${totalPages}+ </a>
-            </li>`;
-            }
+
 
             paginationContainer.innerHTML = paginationHTML;
         }
