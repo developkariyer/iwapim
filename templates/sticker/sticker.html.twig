@@ -64,11 +64,12 @@
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
             let charCount = searchTerm.length;
-            if (searchTerm.trim() === '' || charCount < 3) {
+            if (searchTerm.trim() === '' ) {
                 console.log("Current search term<3:", searchTerm);
                 clearTimeout(timeoutId);
                 loadStickers(selectedGroupId, currentPage);
-            } else {
+            }
+            if (charCount > 3) {
                 console.log("Current search term>3:", searchTerm);
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(function() {
