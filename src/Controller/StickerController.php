@@ -104,8 +104,7 @@ class StickerController extends FrontendController
                  JOIN object_product osp ON osp.oo_id = org.dest_id
                  LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
             WHERE org.src_id = :groupId
-            " . $searchCondition . "
-            LIMIT $limit";
+            " . $searchCondition . " ";
 
         if ($offset !== null) {
             $sql .= " LIMIT $limit OFFSET $offset";
