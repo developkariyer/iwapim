@@ -101,16 +101,13 @@
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
                             const card = `
-                            <div class="card mb-3" id="card-${identifier}">
-                                <div class="card-body">
-                                    <h5 class="card-title">${mainSticker.product_name} (${mainSticker.product_code})</h5>
-                                    <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
-                                    <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid">
-                                </div>
-                                <button class="btn btn-info" id="toggle-details-${identifier}">Show Details</button>
-                                <div class="product-details" id="details-${identifier}" style="display: none;">
-                                </div>
-                            </div>`;
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${mainSticker.product_name} (${mainSticker.product_code})</h5>
+                                        <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
+                                        <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid">
+                                    </div>
+                                </div>`;
                             const details = group.map(sticker => `
                             <div class="card mb-2">
                                 <div class="card-body">
@@ -120,8 +117,7 @@
                                 </div>
                             </div>
                             `).join('');
-                            document.getElementById(`details-${identifier}`).innerHTML = details;
-                            return card;
+                            return card + details;
                         }).join('');
                         container.innerHTML = groupedCards;
                         totalPages = data.pagination.total_pages;
@@ -139,20 +135,6 @@
                     console.error('Error fetching stickers:', error);
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
                 });
-            Object.keys(data.stickers).forEach(identifier => {
-                const button = document.getElementById(`toggle-details-${identifier}`);
-                const details = document.getElementById(`details-${identifier}`);
-
-                button.addEventListener('click', () => {
-                    if (details.style.display === 'none') {
-                        details.style.display = 'block';
-                        button.textContent = 'Hide Details';
-                    } else {
-                        details.style.display = 'none';
-                        button.textContent = 'Show Details';
-                    }
-                });
-            });
         }
 
         function renderPagination() {
