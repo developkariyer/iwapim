@@ -123,7 +123,7 @@ class StickerController extends FrontendController
             $sql .= " LIMIT $limit OFFSET $offset";
         }
         else {
-            $sql .= " LIMIT 20";
+            $sql .= " LIMIT 10";
         }
         $parameters = ['groupId' => (int) $groupId];
         if ($searchTerm) {
@@ -175,7 +175,6 @@ class StickerController extends FrontendController
                 }
 
         }
-
         $countSql = "
             SELECT 
                 COUNT(DISTINCT osp.productIdentifier) AS totalCount
