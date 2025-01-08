@@ -212,9 +212,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareToken();
-        }
+        $this->prepareToken();
+
         $db = \Pimcore\Db::get();
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
