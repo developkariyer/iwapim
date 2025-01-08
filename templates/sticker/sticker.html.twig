@@ -151,13 +151,19 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const product = data.product;
-                        const detailsHtml = `
-                        <p><strong>IWASKU:</strong> ${product.iwasku}</p>
-                        <p><strong>Product Code:</strong> ${product.productCode}</p>
-                        <p><strong>Size:</strong> ${product.variationSize}</p>
-                        <p><strong>Color:</strong> ${product.variationColor}</p>
-                    `;
+                        const products = data.products;  // Burada products, bir dizi olmalı
+                        let detailsHtml = '';
+
+                        products.forEach(product => {
+                            detailsHtml += `
+                                <div class="product-details">
+                                    <p><strong>IWASKU:</strong> ${product.iwasku}</p>
+                                    <p><strong>Product Code:</strong> ${product.productCode}</p>
+                                    <p><strong>Size:</strong> ${product.variationSize}</p>
+                                    <p><strong>Color:</strong> ${product.variationColor}</p>
+                                </div>
+                            `;
+                        });
                         detailsContainer.innerHTML = detailsHtml;
                     } else {
                         detailsContainer.innerHTML = 'Failed to load details.';

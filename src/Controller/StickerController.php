@@ -189,12 +189,11 @@ class StickerController extends FrontendController
                 AND opr.fieldname = 'sticker4x6eu'
             WHERE osp.productIdentifier = :productIdentifier;
         ";
-        error_log($sql);
-        $product = Db::get()->fetchAssociative($sql, ['productIdentifier' => $productIdentifier]);
-        if ($product) {
+        $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier]);
+        if ($products) {
             return new JsonResponse([
                 'success' => true,
-                'product' => $product
+                'products' => $products
             ]);
         } else {
             return new JsonResponse([
