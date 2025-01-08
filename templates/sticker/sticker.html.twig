@@ -114,6 +114,11 @@
                                                 </button>
                                             </div>
                                         </div>
+                                        <div class="collapse" id="details-${identifier}">
+                                            <div class="card-body">
+                                                <div id="details-content-${identifier}">Loading details...</div>
+                                            </div>
+                                        </div>
                                 </div>
 
                             </div>
@@ -135,6 +140,31 @@
                 .catch(error => {
                     console.error('Error fetching stickers:', error);
                     container.innerHTML = '<p>An error occurred while loading stickers.</p>';
+                });
+        }
+
+        function loadDetails(identifier) {
+            const detailsContainer = document.getElementById(`details-content-${identifier}`);
+            detailsContainer.innerHTML = 'Loading details...';
+            fetch(`/sticker/get-product-details/${identifier}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const product = data.product;
+                        const detailsHtml = `
+                        <p><strong>IWASKU:</strong> ${product.iwasku}</p>
+                        <p><strong>Product Code:</strong> ${product.productCode}</p>
+                        <p><strong>Size:</strong> ${product.variationSize}</p>
+                        <p><strong>Color:</strong> ${product.variationColor}</p>
+                    `;
+                        detailsContainer.innerHTML = detailsHtml;
+                    } else {
+                        detailsContainer.innerHTML = 'Failed to load details.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading details:', error);
+                    detailsContainer.innerHTML = 'Error loading details.';
                 });
         }
 

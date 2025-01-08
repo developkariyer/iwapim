@@ -163,6 +163,45 @@ class StickerController extends FrontendController
         ]);
     }
 
+    /**
+     * @Route("/sticker/get-product-details/{productIdentifier}", name="get_product_details", methods={"GET"})
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getProductDetails($productIdentifier): JsonResponse
+    {
+        $sql = "
+            SELECT 
+                osp.iwasku,
+                osp.name,
+                osp.productCode,
+                osp.productCategory,
+                osp.imageUrl,
+                osp.variationSize,
+                osp.variationColor,
+                osp.productIdentifier,
+                opr.dest_id AS sticker_id
+            FROM object_relations_gproduct org
+            JOIN object_product osp ON osp.oo_id = org.dest_id
+            LEFT JOIN object_relations_product opr
+                ON opr.src_id = osp.oo_id
+                AND opr.type = 'asset'
+                AND opr.fieldname = 'sticker4x6eu'
+            WHERE osp.productIdentifier = :productIdentifier;
+        ";
+        $product = Db::get()->fetchAssociative($sql, ['productIdentifier' => $productIdentifier]);
+        if ($product) {
+            return new JsonResponse([
+                'success' => true,
+                'product' => $product
+            ]);
+        } else {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Product not found.'
+            ]);
+        }
+    }
+
 /*
  * $productSql = "
                     SELECT
