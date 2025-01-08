@@ -169,6 +169,7 @@ class StickerController extends FrontendController
      */
     public function getProductDetails($productIdentifier): JsonResponse
     {
+        error_log("Fetching details for product identifier: " . $productIdentifier);
         $sql = "
             SELECT 
                 osp.iwasku,
