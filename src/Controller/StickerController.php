@@ -131,7 +131,7 @@ class StickerController extends FrontendController
                 AND opr.type = 'asset' 
                 AND opr.fieldname = 'sticker4x6eu'
             WHERE org.src_id = :groupId
-            " . $searchCondition;
+            " . $searchCondition . "ORDER BY osp.productIdentifier";
         $countResult = Db::get()->fetchAssociative($countSql, $parameters);
         $totalProducts = $countResult['totalCount'] ?? 0;
         return new JsonResponse([
