@@ -116,10 +116,9 @@ class StickerController extends FrontendController
             FROM object_relations_gproduct org
             JOIN object_product osp ON osp.oo_id = org.dest_id
             WHERE org.src_id = :groupId
-            " . $searchCondition . "  .
+            " . $searchCondition . " 
             GROUP BY osp.productIdentifier
         ";
-        error_log($sql);
         if ($offset !== null) {
             $sql .= " LIMIT $limit OFFSET $offset";
         }
