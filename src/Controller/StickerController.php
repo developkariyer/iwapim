@@ -190,6 +190,7 @@ class StickerController extends FrontendController
             WHERE osp.productIdentifier = :productIdentifier;
         ";
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier]);
+        $sticker = null;
         foreach ($products as &$product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
