@@ -159,13 +159,7 @@
                         let detailsHtml = '';
                         products.forEach(product => {
                             detailsHtml += `
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <div class="product-details mb-2">
-                                              ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})<a href="${product.sticker_link}" target="_blank" class="btn btn-link">EU Link</a>
-                                        </div>
-                                    </div>
-                                </div>
+                                  ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})<a href="${product.sticker_link}" target="_blank" class="btn btn-link">EU Link</a>
                             `;
                         });
                         detailsContainer.innerHTML = `
