@@ -161,8 +161,10 @@
                         let detailsHtml = '';
                         products.forEach(product => {
                             detailsHtml += `
-                                <div class="product-details">
-                                    <a href="${product.sticker_link}" target="_blank">- ${product.productCode} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku}) </a>
+                                <div class="product-details mb-2">
+                                    <a href="${product.sticker_link}" target="_blank" class="text-decoration-none d-block">
+                                        <strong>${product.productCode}</strong> ${product.name} (${product.variationSize}, ${product.variationColor}) - ${product.iwasku}
+                                    </a>
                                 </div>
                             `;
                         });
