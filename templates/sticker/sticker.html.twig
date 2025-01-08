@@ -84,7 +84,7 @@
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
             const searchParam = searchTerm !== '' ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
-            let url = `/sticker/get-stickers/${groupId}?page=${page}&limit=5`;
+            let url = `/sticker/get-stickers/${groupId}?page=${page}&limit=10`;
             if (searchParam) {
                 url += searchParam;
             }
@@ -150,15 +150,12 @@
         function loadDetails(identifier, groupId) {
             const detailsContainer = document.getElementById(`details-content-${identifier}`);
             detailsContainer.innerHTML = 'Loading details...';
-            console.log(identifier);
-            console.log("DETAILS");
             fetch(`/sticker/get-product-details/${identifier}/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const products = data.products;
                         let detailsHtml = '';
-
                         products.forEach(product => {
                             detailsHtml += `
                                 <div class="product-details">
@@ -181,12 +178,6 @@
                 });
         }
 
-        document.querySelectorAll('.accordion-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const identifier = this.closest('.card').querySelector('.card-title').innerText;
-                loadDetails(identifier);
-            });
-        });
 
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
