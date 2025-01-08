@@ -190,6 +190,20 @@ class StickerController extends FrontendController
             WHERE osp.productIdentifier = :productIdentifier;
         ";
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier]);
+        foreach ($products as &$product) {
+            if ($product['sticker_id']) {
+                $sticker = Asset::getById($product['sticker_id']);
+            } else {
+                $productObject = Product::getById($product['dest_id']);
+                if (!$productObject) {
+                    continue;
+                }
+                $sticker = $productObject->checkSticker4x6eu();
+            }
+            $stickerPath = $sticker ? $sticker->getFullPath() : '';
+            $product['sticker_link'] = $stickerPath;
+        }
+        unset($product);
         if ($products) {
             return new JsonResponse([
                 'success' => true,
