@@ -119,6 +119,7 @@ class StickerController extends FrontendController
             " . $searchCondition . "  .
             GROUP BY osp.productIdentifier
         ";
+        error_log($sql);
         if ($offset !== null) {
             $sql .= " LIMIT $limit OFFSET $offset";
         }
