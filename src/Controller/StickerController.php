@@ -163,7 +163,7 @@ class StickerController extends FrontendController
                     }
                     $stickerPath = $sticker ? $sticker->getFullPath() : '';
                     $groupedStickers[$product['productIdentifier']][] = [
-                        'product_name' => $product['product_name'] ?? '',
+                        'product_name' => $product['name'] ?? '',
                         'product_code' => $product['productCode'] ?? '',
                         'category' => $product['productCategory'] ?? '',
                         'image_link' => $product['imageUrl'] ?? '',
