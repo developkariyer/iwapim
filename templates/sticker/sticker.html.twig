@@ -113,15 +113,8 @@
                                     </div>
                                     <div class="accordion" id="accordion-${identifier}">
                                         <div class="accordion-item">
-                                            <h2 class="accordion-header" id="heading-${identifier}">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}">
-                                                    View Details
-                                                </button>
-                                            </h2>
-                                            <div id="collapse-${identifier}" class="accordion-collapse collapse" aria-labelledby="heading-${identifier}" data-bs-parent="#accordion-${identifier}">
-                                                <div class="accordion-body">
-                                                    <div id="details-content-${identifier}">Loading details...</div>
-                                                </div>
+                                            <div id="details-content-${identifier}" class="details-container">
+                                                <button class="btn btn-primary" onclick="loadDetails('${identifier}')">View Details</button>
                                             </div>
                                         </div>
                                     </div>
@@ -147,14 +140,7 @@
                 });
         }
 
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', function() {
-                console.log('Card clicked');
-                const identifier = this.querySelector('.card-title').innerText;
-                console.log(identifier);
-                loadDetails(identifier);
-            });
-        });
+
 
         function loadDetails(identifier) {
             const detailsContainer = document.getElementById(`details-content-${identifier}`);
