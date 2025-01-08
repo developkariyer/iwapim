@@ -213,7 +213,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $this->prepareToken();
-
         $db = \Pimcore\Db::get();
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
