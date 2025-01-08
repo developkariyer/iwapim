@@ -169,6 +169,7 @@ class StickerController extends FrontendController
      */
     public function getProductDetails($productIdentifier): JsonResponse
     {
+        $identifier = isset($_GET['identifier']) ? (int) $_GET['identifier'] : 1;
         $sql = "
             SELECT 
                 osp.iwasku,
@@ -188,7 +189,7 @@ class StickerController extends FrontendController
                 AND opr.fieldname = 'sticker4x6eu'
             WHERE osp.productIdentifier = :productIdentifier;
         ";
-        $product = Db::get()->fetchAssociative($sql, ['productIdentifier' => $productIdentifier]);
+        $product = Db::get()->fetchAssociative($sql, ['productIdentifier' => $identifier]);
         if ($product) {
             return new JsonResponse([
                 'success' => true,

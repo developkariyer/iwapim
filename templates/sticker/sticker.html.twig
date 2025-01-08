@@ -157,7 +157,7 @@
         function loadDetails(identifier) {
             const detailsContainer = document.getElementById(`details-content-${identifier}`);
             detailsContainer.innerHTML = 'Loading details...';
-            fetch(`/sticker/get-product-details/${identifier}`)
+            fetch(`/sticker/get-product-details/identifier=${identifier}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
