@@ -143,6 +143,13 @@
                 });
         }
 
+        document.querySelectorAll('.btn-view-details').forEach(button => {
+            button.addEventListener('click', function() {
+                const identifier = this.getAttribute('data-identifier');
+                loadDetails(identifier);
+            });
+        });
+
         function loadDetails(identifier) {
             const detailsContainer = document.getElementById(`details-content-${identifier}`);
             detailsContainer.innerHTML = 'Loading details...';
