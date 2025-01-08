@@ -126,7 +126,7 @@ class StickerController extends FrontendController
             $parameters['searchTerm'] = $searchTerm;
         }
         $mainProducts = Db::get()->fetchAllAssociative($sql, $parameters);
-        error_log(print_r($mainProducts));
+        error_log(json_encode($mainProducts, JSON_PRETTY_PRINT));
         foreach ($mainProducts as $mainProduct) {
                 $productSql = "
                     SELECT
@@ -148,7 +148,7 @@ class StickerController extends FrontendController
                     WHERE osp.productIdentifier = :identifier ;";
                 $productParameters = ['identifier' => $mainProduct['productIdentifier']];
                 $products = Db::get()->fetchAllAssociative($productSql, $productParameters);
-                error_log(print_r($products));
+                error_log(json_encode($products, JSON_PRETTY_PRINT));
 
                 foreach ($products as $product) {
                     if ($product['sticker_id']) {
