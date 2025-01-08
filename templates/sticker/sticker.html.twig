@@ -97,7 +97,9 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        const groupedCards = Object.keys(data.stickers).sort().map(identifier => {
+                        const groupedCards = Object.keys(data.stickers).sort((a, b) => {
+                            return parseInt(a) - parseInt(b);
+                        }).map(identifier => {
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
                             const card = `
