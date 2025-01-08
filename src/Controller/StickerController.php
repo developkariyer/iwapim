@@ -169,7 +169,7 @@ class StickerController extends FrontendController
                         'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
                     ];
                 }
-                sleep(1);
+                sleep(5);
         }
         $countSql = "
             SELECT 
