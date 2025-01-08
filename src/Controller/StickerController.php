@@ -87,7 +87,7 @@ class StickerController extends FrontendController
         $searchTerm = $_GET['searchTerm'] ?? null;
         if ($searchTerm !== null) {
             $searchTerm = "%" . $searchTerm . "%";
-            $searchCondition = "AND (name LIKE :searchTerm OR productCategory LIKE :searchTerm )";
+            $searchCondition = "AND (name LIKE :searchTerm OR productCategory LIKE :searchTerm productIdentifier LIKE :searchTerm)";
             $offset = null;
         }
         $sql = "
