@@ -113,7 +113,7 @@
                                     </div>
                                     <div class="accordion" id="accordion-${identifier}">
                                         <div class="accordion-item">
-                                            <h2 class="accordion-header" id="heading-${identifier}" onclick="loadDetails('${identifier}')">
+                                            <h2 class="accordion-header" id="heading-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
                                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}">
                                                     View Details
                                                 </button>
@@ -147,14 +147,12 @@
                 });
         }
 
-
-
-        function loadDetails(identifier) {
+        function loadDetails(identifier, groupId) {
             const detailsContainer = document.getElementById(`details-content-${identifier}`);
             detailsContainer.innerHTML = 'Loading details...';
             console.log(identifier);
             console.log("DETAILS");
-            fetch(`/sticker/get-product-details/${identifier}`)
+            fetch(`/sticker/get-product-details/${identifier}/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

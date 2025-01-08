@@ -164,12 +164,11 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/get-product-details/{productIdentifier}", name="get_product_details", methods={"GET"})
+     * @Route("/sticker/get-product-details/{productIdentifier}/{groupId}", name="get_product_details", methods={"GET"})
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getProductDetails($productIdentifier): JsonResponse
+    public function getProductDetails($productIdentifier, $groupId): JsonResponse
     {
-        error_log("Fetching details for product identifier: " . $productIdentifier);
         $sql = "
             SELECT 
                 osp.iwasku,
@@ -187,10 +186,9 @@ class StickerController extends FrontendController
                 ON opr.src_id = osp.oo_id
                 AND opr.type = 'asset'
                 AND opr.fieldname = 'sticker4x6eu'
-            WHERE osp.productIdentifier = :productIdentifier;
+            WHERE osp.productIdentifier = :productIdentifier AND org.src_id = :groupId;
         ";
-        $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier]);
-        $sticker = null;
+        $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
         foreach ($products as &$product) {
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
