@@ -125,8 +125,11 @@ class StickerController extends FrontendController
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
-        $mainProducts = Db::get()->fetchAllAssociative($sql, $parameters);
-        error_log(json_encode($mainProducts, JSON_PRETTY_PRINT));
+        try {
+            $mainProducts = Db::get()->fetchAllAssociative($sql, $parameters);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+        }
         foreach ($mainProducts as $mainProduct) {
                 $productSql = "
                     SELECT
@@ -147,9 +150,11 @@ class StickerController extends FrontendController
                         AND opr.fieldname = 'sticker4x6eu'
                     WHERE osp.productIdentifier = :identifier ;";
                 $productParameters = ['identifier' => $mainProduct['productIdentifier']];
-                $products = Db::get()->fetchAllAssociative($productSql, $productParameters);
-                error_log(json_encode($products, JSON_PRETTY_PRINT));
-
+                try {
+                    $products = Db::get()->fetchAllAssociative($productSql, $productParameters);
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                }
                 foreach ($products as $product) {
                     if ($product['sticker_id']) {
                         $sticker = Asset::getById($product['sticker_id']);
