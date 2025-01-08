@@ -146,9 +146,7 @@ class StickerController extends FrontendController
                         AND opr.fieldname = 'sticker4x6eu'
                     WHERE osp.productIdentifier = :identifier ;";
                 $productParameters = ['identifier' => $mainProduct['productIdentifier']];
-
                 $products = Db::get()->fetchAllAssociative($productSql, $productParameters);
-
                 foreach ($products as $product) {
                     if ($product['sticker_id']) {
                         $sticker = Asset::getById($product['sticker_id']);
@@ -171,6 +169,7 @@ class StickerController extends FrontendController
                         'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
                     ];
                 }
+                sleep(1);
         }
         $countSql = "
             SELECT 
