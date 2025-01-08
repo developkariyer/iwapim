@@ -90,7 +90,7 @@ class StickerController extends FrontendController
             $searchCondition = "AND (iwasku LIKE :searchTerm OR name LIKE :searchTerm OR productCategory LIKE :searchTerm OR variationSize LIKE :searchTerm OR variationColor LIKE :searchTerm)";
             $offset = null;
         }
-        $sql = "
+        /*$sql = "
         SELECT
             osp.iwasku,
             osp.name AS product_name,
@@ -105,48 +105,88 @@ class StickerController extends FrontendController
                  JOIN object_product osp ON osp.oo_id = org.dest_id
                  LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
             WHERE org.src_id = :groupId
-            " . $searchCondition . " GROUP BY osp.productIdentifier";
+            " . $searchCondition . " ";*/
 
+        $sql = "
+            SELECT 
+                DISTINCT osp.productIdentifier
+            FROM object_relations_gproduct org
+            JOIN object_product osp ON osp.oo_id = org.dest_id
+            LEFT JOIN object_relations_product opr 
+                ON opr.src_id = osp.oo_id 
+                AND opr.type = 'asset' 
+                AND opr.fieldname = 'sticker4x6eu'
+            WHERE org.src_id = :groupId
+            " . $searchCondition . " 
+        ";
         if ($offset !== null) {
             $sql .= " LIMIT $limit OFFSET $offset";
         }
         else {
-            $sql .= " LIMIT 50";
+            $sql .= " LIMIT 20";
         }
         $parameters = ['groupId' => (int) $groupId];
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
-        $products = Db::get()->fetchAllAssociative($sql, $parameters);
-        foreach ($products as $product) {
-            if ($product['sticker_id']) {
-                $sticker = Asset::getById($product['sticker_id']);
-            } else {
-                $productObject = Product::getById($product['dest_id']);
-                if (!$productObject) {
-                    continue;
+        $mainProducts = Db::get()->fetchAllAssociative($sql, $parameters);
+        foreach ($mainProducts as $mainProduct) {
+                $productSql = "
+                    SELECT
+                        osp.iwasku,
+                        osp.name,
+                        osp.productCode,
+                        osp.productCategory,
+                        osp.imageUrl,
+                        osp.variationSize,
+                        osp.variationColor,
+                        osp.productIdentifier,
+                        opr.dest_id AS sticker_id
+                    FROM object_relations_gproduct org
+                    JOIN object_product osp ON osp.oo_id = org.dest_id
+                    LEFT JOIN object_relations_product opr 
+                        ON opr.src_id = osp.oo_id 
+                        AND opr.type = 'asset' 
+                        AND opr.fieldname = 'sticker4x6eu'
+                    WHERE osp.productIdentifier = :identifier ;";
+                $productParameters = ['identifier' => $mainProduct['productIdentifier']];
+                $products = Db::get()->fetchAllAssociative($productSql, $productParameters);
+                foreach ($products as $product) {
+                    if ($product['sticker_id']) {
+                        $sticker = Asset::getById($product['sticker_id']);
+                    } else {
+                        $productObject = Product::getById($product['dest_id']);
+                        if (!$productObject) {
+                            continue;
+                        }
+                        $sticker = $productObject->checkSticker4x6eu();
+                    }
+                    $stickerPath = $sticker ? $sticker->getFullPath() : '';
+                    $groupedStickers[$product['productIdentifier']][] = [
+                        'product_name' => $product['product_name'] ?? '',
+                        'product_code' => $product['productCode'] ?? '',
+                        'category' => $product['productCategory'] ?? '',
+                        'image_link' => $product['imageUrl'] ?? '',
+                        'sticker_link' => $stickerPath,
+                        'iwasku' => $product['iwasku'] ?? '',
+                        'product_identifier' => $product['productIdentifier'] ?? '',
+                        'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
+                    ];
                 }
-                $sticker = $productObject->checkSticker4x6eu();
-            }
-            $stickerPath = $sticker ? $sticker->getFullPath() : '';
-            $groupedStickers[$product['productIdentifier']][] = [
-                'product_name' => $product['product_name'] ?? '',
-                'product_code' => $product['productCode'] ?? '',
-                'category' => $product['productCategory'] ?? '',
-                'image_link' => $product['imageUrl'] ?? '',
-                'sticker_link' => $stickerPath,
-                'iwasku' => $product['iwasku'] ?? '',
-                'product_identifier' => $product['productIdentifier'] ?? '',
-                'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
-            ];
+
         }
+
         $countSql = "
-            SELECT COUNT(*) AS totalCount
+            SELECT 
+                COUNT(DISTINCT osp.productIdentifier) AS totalCount
             FROM object_relations_gproduct org
             JOIN object_product osp ON osp.oo_id = org.dest_id
-            LEFT JOIN object_relations_product opr ON opr.src_id = osp.oo_id AND opr.type = 'asset' AND opr.fieldname = 'sticker4x6eu'
+            LEFT JOIN object_relations_product opr 
+                ON opr.src_id = osp.oo_id 
+                AND opr.type = 'asset' 
+                AND opr.fieldname = 'sticker4x6eu';
             WHERE org.src_id = :groupId
-            " . $searchCondition . " GROUP BY osp.productIdentifier";
+            " . $searchCondition;
         $countResult = Db::get()->fetchAssociative($countSql, $parameters);
         $totalProducts = $countResult['totalCount'] ?? 0;
         return new JsonResponse([
