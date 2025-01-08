@@ -77,11 +77,11 @@ class StickerController extends FrontendController
      * @Route("/sticker/get-stickers/{groupId}/{page}/{limit}", name="get_stickers", methods={"GET"})
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getStickers(int $groupId, int $page = 1, int $limit = 10, ?string $searchTerm = null): JsonResponse
+    public function getStickers(int $groupId, int $page = 1, int $limit = 5, ?string $searchTerm = null): JsonResponse
     {
         $groupedStickers = [];
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
         $offset = ($page - 1) * $limit;
         $searchCondition = '';
         $searchTerm = $_GET['searchTerm'] ?? null;
