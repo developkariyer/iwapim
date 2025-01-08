@@ -194,14 +194,16 @@ class StickerController extends FrontendController
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
             } else {
-                $productObject = Product::getById($product['dest_id']);
-                if (!$productObject) {
-                    continue;
+                if (isset($product['dest_id'])) {
+                    $productObject = Product::getById($product['dest_id']);
+                    if (!$productObject) {
+                        continue;
+                    }
+                    $sticker = $productObject->checkSticker4x6eu();
                 }
-                $sticker = $productObject->checkSticker4x6eu();
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
-            $product['sticker_link'] = $stickerPath ?? '';
+            $product['sticker_link'] = $stickerPath ;
         }
         unset($product);
         if ($products) {
