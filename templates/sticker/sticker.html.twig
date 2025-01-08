@@ -162,12 +162,7 @@
                         products.forEach(product => {
                             detailsHtml += `
                                 <div class="product-details">
-                                    <p><strong>IWASKU:</strong> ${product.iwasku}</p>
-                                    <p><strong>Product Name:</strong> ${product.name}</p>
-                                    <p><strong>Product Code:</strong> ${product.productCode}</p>
-                                    <p><strong>Size:</strong> ${product.variationSize}</p>
-                                    <p><strong>Color:</strong> ${product.variationColor}</p>
-                                    <a href="${product.sticker_link}" class="btn btn-primary" target="_blank">${product.iwasku}</a>
+                                    <a href="${product.sticker_link}" target="_blank">- ${product.productCode} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku}) </a>
                                 </div>
                             `;
                         });
