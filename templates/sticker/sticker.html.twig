@@ -149,7 +149,9 @@
 
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', function() {
+                console.log('Card clicked');
                 const identifier = this.querySelector('.card-title').innerText;
+                console.log(identifier);
                 loadDetails(identifier);
             });
         });
