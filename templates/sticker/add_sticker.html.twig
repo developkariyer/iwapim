@@ -19,7 +19,6 @@
                             Lütfen IWASKU bilgisini giriniz.
                         </div>
                     </div>
-
                     <div class="mb-3">
                         <select
                                 name="group_id"
@@ -46,7 +45,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
 
+{% block body_scripts %}
     <script>
         function validateForm() {
             const formData = document.getElementById('form_data');
@@ -71,6 +72,4 @@
             return isValid;
         }
     </script>
-
-
 {% endblock %}
