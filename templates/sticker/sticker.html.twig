@@ -143,9 +143,9 @@
                 });
         }
 
-        document.querySelectorAll('.btn-view-details').forEach(button => {
-            button.addEventListener('click', function() {
-                const identifier = this.getAttribute('data-identifier');
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                const identifier = this.querySelector('.card-title').innerText; 
                 loadDetails(identifier);
             });
         });
