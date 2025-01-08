@@ -105,13 +105,17 @@
                                    <div class="accordion" id="accordion-${identifier}">
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading-${identifier}">
-                                                <button class="accordion-button d-flex align-items-center w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
-                                                    <div class="d-flex flex-column flex-grow-1 mt-2 mb-2">
-                                                        <h5 class="card-title mb-0 text-truncate" style="font-size: 1.25rem;">${mainSticker.product_name}</h5>
-                                                        <h4 class="card-title mb-0 text-truncate" style="font-size: 1.1rem;">${identifier}</h4>
-                                                        <p class="card-text mb-0" style="font-size: 1rem;"><strong>Category:</strong> ${mainSticker.category}</p>
+                                                <button class="accordion-button w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
+                                                    <div class="row w-100 d-flex align-items-center">
+                                                        <div class="col-8 d-flex flex-column">
+                                                            <h5 class="card-title mb-0 text-truncate" style="font-size: 1.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${mainSticker.product_name}</h5>
+                                                            <h4 class="card-title mb-0 text-truncate" style="font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${identifier}</h4>
+                                                            <p class="card-text mb-0" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><strong>Category:</strong> ${mainSticker.category}</p>
+                                                        </div>
+                                                        <div class="col-4 text-center">
+                                                            <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid" style="max-width: 80%; height: auto;">
+                                                        </div>
                                                     </div>
-                                                    <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid" style="max-width: 3rem; height: auto;">
                                                 </button>
                                             </h2>
 
@@ -122,6 +126,7 @@
                                             </div>
                                         </div>
                                    </div>
+
 
 
                             `;
