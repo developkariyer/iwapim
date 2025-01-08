@@ -204,50 +204,6 @@ class StickerController extends FrontendController
         }
     }
 
-/*
- * $productSql = "
-                    SELECT
-                        osp.iwasku,
-                        osp.name,
-                        osp.productCode,
-                        osp.productCategory,
-                        osp.imageUrl,
-                        osp.variationSize,
-                        osp.variationColor,
-                        osp.productIdentifier,
-                        opr.dest_id AS sticker_id
-                    FROM object_relations_gproduct org
-                    JOIN object_product osp ON osp.oo_id = org.dest_id
-                    LEFT JOIN object_relations_product opr
-                        ON opr.src_id = osp.oo_id
-                        AND opr.type = 'asset'
-                        AND opr.fieldname = 'sticker4x6eu'
-                    WHERE osp.productIdentifier = :identifier ;";
-                $productParameters = ['identifier' => $mainProduct['productIdentifier']];
-                $products = Db::get()->fetchAllAssociative($productSql, $productParameters);
-                foreach ($products as $product) {
-                    if ($product['sticker_id']) {
-                        $sticker = Asset::getById($product['sticker_id']);
-                    } else {
-                        $productObject = Product::getById($product['dest_id']);
-                        if (!$productObject) {
-                            continue;
-                        }
-                        $sticker = $productObject->checkSticker4x6eu();
-                    }
-                    $stickerPath = $sticker ? $sticker->getFullPath() : '';
-                    $groupedStickers[$product['productIdentifier']][] = [
-                        'product_name' => $product['name'] ?? '',
-                        'product_code' => $product['productCode'] ?? '',
-                        'category' => $product['productCategory'] ?? '',
-                        'image_link' => $product['imageUrl'] ?? '',
-                        'sticker_link' => $stickerPath,
-                        'iwasku' => $product['iwasku'] ?? '',
-                        'product_identifier' => $product['productIdentifier'] ?? '',
-                        'attributes' => trim(($product['variationSize'] ?? '') . ' ' . ($product['variationColor'] ?? '')) ?: ''
-                    ];
-                }
- * */
     /**
      * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
      * @return Response
