@@ -104,24 +104,28 @@
                             const card = `
                                 <div class="card mb-3">
                                     <h4 class="card-title">${identifier}</h4>
-                                        <h5 class="card-title">${mainSticker.product_name} </h5>
-                                        <div class="d-flex align-items-center">
-                                            <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid w-25 me-3">
-                                            <div>
-                                                <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
-                                                <button class="btn btn-primary mt-3" data-bs-toggle="collapse" data-bs-target="#details-${identifier}" aria-expanded="false" aria-controls="details-${identifier}">
+                                    <h5 class="card-title">${mainSticker.product_name}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid w-25 me-3">
+                                        <div>
+                                            <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
+                                        </div>
+                                    </div>
+                                    <div class="accordion" id="accordion-${identifier}">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading-${identifier}">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}">
                                                     View Details
                                                 </button>
+                                            </h2>
+                                            <div id="collapse-${identifier}" class="accordion-collapse collapse" aria-labelledby="heading-${identifier}" data-bs-parent="#accordion-${identifier}">
+                                                <div class="accordion-body">
+                                                    <div id="details-content-${identifier}">Loading details...</div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="collapse" id="details-${identifier}">
-                                            <div class="card-body">
-                                                <div id="details-content-${identifier}">Loading details...</div>
-                                            </div>
-                                        </div>
+                                    </div>
                                 </div>
-
-                            </div>
                             `;
                             return card;
                         }).join('');
@@ -145,7 +149,7 @@
 
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', function() {
-                const identifier = this.querySelector('.card-title').innerText; 
+                const identifier = this.querySelector('.card-title').innerText;
                 loadDetails(identifier);
             });
         });
@@ -174,6 +178,13 @@
                     detailsContainer.innerHTML = 'Error loading details.';
                 });
         }
+
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const identifier = this.closest('.card').querySelector('.card-title').innerText;
+                loadDetails(identifier);
+            });
+        });
 
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
