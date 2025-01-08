@@ -169,24 +169,46 @@
 
                         let detailsHtml = '';
 
-                        Object.keys(groupedProducts).forEach(size => {
+                        Object.keys(groupedProducts).forEach((size, index) => {
+                            const accordionId = `accordion-${identifier}-${index}`;
+                            const collapseId = `collapse-${identifier}-${index}`;
                             detailsHtml += `
-                                <div class="group-title mt-3 mb-2">
-                                    <h5 class="fw-bold">Size: ${size}</h5>
-                                </div>
-                        `;
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="${accordionId}">
+                                <button class="accordion-button ${index === 0 ? '' : 'collapsed'}"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#${collapseId}"
+                                        aria-expanded="${index === 0}"
+                                        aria-controls="${collapseId}">
+                                    Size: ${size}
+                                </button>
+                            </h2>
+                            <div id="${collapseId}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" aria-labelledby="${accordionId}">
+                                <div class="accordion-body">
+                            `;
 
-                        groupedProducts[size].forEach(product => {
-                            detailsHtml += `
-                        <div class="product-details mb-2">
-                            <a href="${product.sticker_link}" target="_blank" class="text-decoration-none d-block">
-                                <strong>${product.productCode}</strong> ${product.name} (${product.variationSize}, ${product.variationColor}) - ${product.iwasku}
-                            </a>
-                        </div>
-                        `;
+                            groupedProducts[size].forEach(product => {
+                                detailsHtml += `
+                            <div class="product-details mb-2">
+                                <a href="${product.sticker_link}" target="_blank" class="text-decoration-none d-block">
+                                    <strong>${product.productCode}</strong> ${product.name} (${product.variationSize}, ${product.variationColor}) - ${product.iwasku}
+                                </a>
+                            </div>
+                                `;
                             });
-                        });
-                        detailsContainer.innerHTML = detailsHtml;
+
+                                detailsHtml += `
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                            });
+                            detailsContainer.innerHTML = `
+                            <div class="accordion" id="accordion-${identifier}">
+                                ${detailsHtml}
+                            </div>
+                        `;
                     } else {
                         detailsContainer.innerHTML = 'Failed to load details.';
                     }
