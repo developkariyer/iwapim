@@ -154,13 +154,16 @@
                 .then(data => {
                     if (data.success) {
                         const products = data.products;
+                        products.sort((a, b) => {
+                            return a.variationSize.localeCompare(b.variationSize, undefined, { numeric: true });
+                        });
                         let detailsHtml = '';
                         products.forEach(product => {
                             detailsHtml += `
                                 <div class="card mb-3">
                                     <div class="card-body">
                                         <div class="product-details mb-2">
-                                              - ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})<a href="${product.sticker_link}" target="_blank" class="btn btn-link">EU Link</a>
+                                              ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})<a href="${product.sticker_link}" target="_blank" class="btn btn-link">EU Link</a>
                                         </div>
                                     </div>
                                 </div>
