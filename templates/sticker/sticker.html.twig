@@ -103,30 +103,29 @@
                             const mainSticker = group[0];
                             const card = `
                                    <div class="accordion" id="accordion-${identifier}">
-                                    <div class="accordion-item mb-3">
-                                        <h2 class="accordion-header" id="heading-${identifier}">
-                                            <button class="accordion-button w-100 d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
-                                                <div class="row w-100 d-flex align-items-center">
-                                                    <div class="col-8 d-flex flex-column">
-                                                        <h5 class="card-title mb-0 text-truncate" style="font-size: 1.25rem;">${mainSticker.product_name}</h5>
-                                                        <h4 class="card-title mb-0 text-truncate" style="font-size: 1.1rem;">${identifier}</h4>
-                                                        <p class="card-text mb-0" style="font-size: 1rem;"><strong>Category:</strong> ${mainSticker.category}</p>
+                                        <div class="accordion-item mb-3">
+                                            <h2 class="accordion-header" id="heading-${identifier}">
+                                                <button class="accordion-button w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
+                                                    <div class="row w-100 d-flex align-items-center">
+                                                        <div class="col-8 d-flex flex-column">
+                                                            <h5 class="card-title mb-0" style="font-size: 1.25rem; word-wrap: break-word;">${mainSticker.product_name}</h5>
+                                                            <h4 class="card-title mb-0" style="font-size: 1.1rem; word-wrap: break-word;">${identifier}</h4>
+                                                            <p class="card-text mb-0" style="font-size: 1rem; word-wrap: break-word;"><strong>Category:</strong> ${mainSticker.category}</p>
+                                                        </div>
+                                                        <div class="col-4 d-flex justify-content-end">
+                                                            <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid" style="max-width: 60px; height: auto;">
+                                                        </div>
                                                     </div>
-                                                    <div class="col-4 d-flex justify-content-end">
-                                                        <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid" style="max-width: 60px; height: auto;">
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </h2>
+                                                </button>
+                                            </h2>
 
-                                        <div id="collapse-${identifier}" class="accordion-collapse collapse" aria-labelledby="heading-${identifier}" data-bs-parent="#accordion-${identifier}">
-                                            <div class="accordion-body">
-                                                <div id="details-content-${identifier}">Loading details...</div>
+                                            <div id="collapse-${identifier}" class="accordion-collapse collapse" aria-labelledby="heading-${identifier}" data-bs-parent="#accordion-${identifier}">
+                                                <div class="accordion-body">
+                                                    <div id="details-content-${identifier}">Loading details...</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
 
 
 
