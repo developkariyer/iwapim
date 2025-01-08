@@ -158,15 +158,33 @@
                 .then(data => {
                     if (data.success) {
                         const products = data.products;
+                        const groupedProducts = products.reduce((groups, product) => {
+                            const size = product.variationSize || 'Unknown Size'; 
+                            if (!groups[size]) {
+                                groups[size] = [];
+                            }
+                            groups[size].push(product);
+                            return groups;
+                        }, {});
+
                         let detailsHtml = '';
-                        products.forEach(product => {
+
+                        Object.keys(groupedProducts).forEach(size => {
                             detailsHtml += `
-                                <div class="product-details mb-2">
-                                    <a href="${product.sticker_link}" target="_blank" class="text-decoration-none d-block">
-                                        <strong>${product.productCode}</strong> ${product.name} (${product.variationSize}, ${product.variationColor}) - ${product.iwasku}
-                                    </a>
+                                <div class="group-title mt-3 mb-2">
+                                    <h5 class="fw-bold">Size: ${size}</h5>
                                 </div>
-                            `;
+                        `;
+
+                        groupedProducts[size].forEach(product => {
+                            detailsHtml += `
+                        <div class="product-details mb-2">
+                            <a href="${product.sticker_link}" target="_blank" class="text-decoration-none d-block">
+                                <strong>${product.productCode}</strong> ${product.name} (${product.variationSize}, ${product.variationColor}) - ${product.iwasku}
+                            </a>
+                        </div>
+                        `;
+                            });
                         });
                         detailsContainer.innerHTML = detailsHtml;
                     } else {
