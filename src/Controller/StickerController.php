@@ -202,6 +202,9 @@ class StickerController extends FrontendController
                     }
                     $sticker = $productObject->checkSticker4x6eu();
                 }
+                else {
+                    $sticker = null;
+                }
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
             $product['sticker_link'] = $stickerPath ;
