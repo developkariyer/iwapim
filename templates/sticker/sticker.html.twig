@@ -110,7 +110,7 @@
                                                         <div class="col-8 d-flex flex-column">
                                                             <h5 class="card-title mb-0" style="font-size: 1.25rem; word-wrap: break-word;">${mainSticker.product_name}</h5>
                                                             <h4 class="card-title mb-0" style="font-size: 1.1rem; word-wrap: break-word;">${identifier}</h4>
-                                                            <p class="card-text mb-0" style="font-size: 1rem; word-wrap: break-word;"><strong>Category:</strong> ${mainSticker.category}</p>
+                                                            <p class="card-text mb-0" style="font-size: 1rem; word-wrap: break-word;">${mainSticker.category}</p>
                                                         </div>
                                                         <div class="col-4 d-flex justify-content-end">
                                                             <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid" style="max-width: 60px; height: auto;">
@@ -124,11 +124,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-
-
-
-
+                                   </div>
                             `;
                             return card;
                         }).join('');
@@ -159,16 +155,14 @@
                     if (data.success) {
                         const products = data.products;
                         const groupedProducts = products.reduce((groups, product) => {
-                            const size = product.variationSize || 'Unknown Size'; 
+                            const size = product.variationSize || 'Unknown Size';
                             if (!groups[size]) {
                                 groups[size] = [];
                             }
                             groups[size].push(product);
                             return groups;
                         }, {});
-
                         let detailsHtml = '';
-
                         Object.keys(groupedProducts).forEach((size, index) => {
                             const accordionId = `accordion-${identifier}-${index}`;
                             const collapseId = `collapse-${identifier}-${index}`;
@@ -187,7 +181,6 @@
                             <div id="${collapseId}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" aria-labelledby="${accordionId}">
                                 <div class="accordion-body">
                             `;
-
                             groupedProducts[size].forEach(product => {
                                 detailsHtml += `
                             <div class="product-details mb-2">
@@ -197,7 +190,6 @@
                             </div>
                                 `;
                             });
-
                                 detailsHtml += `
                                     </div>
                                 </div>
