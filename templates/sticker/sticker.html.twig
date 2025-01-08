@@ -102,16 +102,16 @@
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
                             const card = `
-                                <div class="card mb-3">
-                                    <h4 class="card-title">${identifier}</h4>
-                                    <h5 class="card-title">${mainSticker.product_name}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid w-25 me-3">
-                                        <div>
-                                            <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
-                                        </div>
-                                    </div>
+
                                     <div class="accordion" id="accordion-${identifier}">
+                                            <h4 class="card-title">${identifier}</h4>
+                                            <h5 class="card-title">${mainSticker.product_name}</h5>
+                                            <div class="d-flex align-items-center">
+                                                <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid w-25 me-3">
+                                                <div>
+                                                    <p class="card-text"><strong>Category:</strong> ${mainSticker.category}</p>
+                                                </div>
+                                            </div>
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
                                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}">
@@ -125,7 +125,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                             `;
                             return card;
                         }).join('');
