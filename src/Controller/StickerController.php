@@ -229,7 +229,7 @@ class StickerController extends FrontendController
             if ($productType === 'asin') {
                 $iwasku = Registry::getKey($productId,'asin-to-iwasku');
             }
-            if (isset($iwasku)) {
+            if ($iwasku !== null) {
                 $product = Product::findByField('iwasku',$iwasku);
                 if ($product instanceof Product) {
                     if (!$product->getInheritedField('sticker4x6eu')) {
