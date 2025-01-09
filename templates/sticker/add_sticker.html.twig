@@ -59,6 +59,15 @@
             </div>
         </div>
     </div>
+    <div id="loading-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; text-align: center; line-height: 100vh;">
+        <div>
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+            <p>İşlem gerçekleştiriliyor, lütfen bekleyiniz...</p>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block body_scripts %}
@@ -91,5 +100,10 @@
             const selectedType = groupSelect.options[groupSelect.selectedIndex].text;
             formInput.placeholder = `Lütfen ${selectedType} bilgisini giriniz.`;
         }
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'block';
+        }
+
     </script>
 {% endblock %}
