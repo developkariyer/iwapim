@@ -224,7 +224,7 @@ class StickerController extends FrontendController
                         $product->checkSticker4x6eu();
                     }
                     $existingProducts = $group->getProducts();
-                    if (!in_array($product, $existingProducts, true)) {
+                       if (!in_array($product, $existingProducts, true)) {
                         $group->setProducts(array_merge($existingProducts, [$product]));
                     }
                     try {
