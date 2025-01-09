@@ -227,7 +227,7 @@ class StickerController extends FrontendController
                     try {
                         $group->save();
                     } catch (\Exception $e) {
-                        $this->addFlash('error', 'Etiket eklenirken bir hata oluştu.');
+                        $this->addFlash('error: ', $e . 'Etiket eklenirken bir hata oluştu.');
                         return $this->redirectToRoute('sticker_new');
                     }
                     $this->addFlash('success', 'Etiket başarıyla eklendi.');
