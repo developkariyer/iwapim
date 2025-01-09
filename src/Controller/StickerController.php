@@ -57,8 +57,13 @@ class StickerController extends FrontendController
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
-            $newGroup = new GroupProduct();
             $operationFolder = Utility::checkSetPath('Operasyonlar');
+            $existingGroup = GroupProduct::getByPath($operationFolder->getFullPath() . '/' . $formData);
+            if ($existingGroup) {
+                $this->addFlash('error', 'Bu anahtar ile zaten bir grup mevcut.');
+                return $this->redirectToRoute('sticker_new_group');
+            }
+            $newGroup = new GroupProduct();
             $newGroup->setParentId($operationFolder->getId());
             $newGroup->setKey($formData);
             $newGroup->setPublished(1);
