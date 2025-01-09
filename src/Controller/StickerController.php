@@ -223,7 +223,10 @@ class StickerController extends FrontendController
                     if (!$product->getInheritedField('sticker4x6eu')) {
                         $product->checkSticker4x6eu();
                     }
-                    $group->setProducts(array_merge($group->getProducts(), [$product]));
+                    $existingProducts = $group->getProducts();
+                    if (!in_array($product, $existingProducts, true)) {
+                        $group->setProducts(array_merge($existingProducts, [$product]));
+                    }
                     try {
                         $group->save();
                     } catch (\Exception $e) {
