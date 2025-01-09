@@ -8,6 +8,20 @@
                 <h1>Yeni Etiket Oluştur</h1>
                 <form method="post" action="/sticker/add-sticker" class="mt-3" onsubmit="return validateForm()">
                     <div class="mb-3">
+                        <select
+                                name="group_id"
+                                id="group_id"
+                                class="form-control"
+                                required>
+                            <option value="" disabled selected>Ürün Tipi</option>
+                                <option value="iwasku">IWASKU</option>
+                                <option value="asin">ASIN</option>
+                        </select>
+                        <div class="invalid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <input
                                 type="text"
                                 name="form_data"
