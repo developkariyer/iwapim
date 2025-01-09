@@ -218,10 +218,17 @@ class StickerController extends FrontendController
     public function addSticker(Request $request): Response
     {
         if ($request->isMethod('POST')) {
-            $asin = $request->request->get('form_data');
+            $productType = $request->request->get('product_type');
+            $productId = $request->request->get('form_data');
             $groupId = $request->request->get('group_id');
             $group = GroupProduct::getById($groupId);
-            $iwasku = Registry::getKey($asin,'asin-to-iwasku');
+            $iwasku = null;
+            if ($productType === 'iwasku') {
+                $iwasku = $productId;
+            }
+            if ($productType === 'asin') {
+                $iwasku = Registry::getKey($productId,'asin-to-iwasku');
+            }
             if (isset($iwasku)) {
                 $product = Product::findByField('iwasku',$iwasku);
                 if ($product instanceof Product) {
@@ -240,12 +247,12 @@ class StickerController extends FrontendController
                     }
                     $this->addFlash('success', 'Etiket başarıyla eklendi.');
                 } else {
-                    $this->addFlash('error', 'Bu ASIN\'e ait ürün bulunamadı.');
+                    $this->addFlash('error', 'Bu Ürün Pimcore\'da Bulunamadı.');
                     return $this->redirectToRoute('sticker_new');
                 }
             }
             else {
-                $this->addFlash('error', 'Yanlış Ürün Sorumluya Ulaşın.');
+                $this->addFlash('error', 'Ürün Bulunamadı.');
                 return $this->redirectToRoute('sticker_new');
             }
         }
