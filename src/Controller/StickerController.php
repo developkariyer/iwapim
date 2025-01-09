@@ -239,6 +239,10 @@ class StickerController extends FrontendController
                     if (!in_array($product, $existingProducts, true)) {
                         $group->setProducts(array_merge($existingProducts, [$product]));
                     }
+                    else {
+                        $this->addFlash('error', 'Bu ürün zaten bu grupta bulunmaktadır.');
+                        return $this->redirectToRoute('sticker_new');
+                    }
                     try {
                         $group->save();
                     } catch (\Exception $e) {
