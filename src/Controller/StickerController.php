@@ -252,7 +252,7 @@ class StickerController extends FrontendController
                 }
             }
             else {
-                $this->addFlash('error', 'Ürün Bulunamadı.');
+                $this->addFlash('error', 'BOŞ BIRAKILAMAZ.');
                 return $this->redirectToRoute('sticker_new');
             }
         }
