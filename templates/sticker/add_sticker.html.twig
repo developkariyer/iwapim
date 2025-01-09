@@ -9,16 +9,17 @@
                 <form method="post" action="/sticker/add-sticker" class="mt-3" onsubmit="return validateForm()">
                     <div class="mb-3">
                         <select
-                                name="group_id"
-                                id="group_id"
+                                name="product_type"
+                                id="product_type"
                                 class="form-control"
+                                onchange="updatePlaceholder()"
                                 required>
                             <option value="" disabled selected>Ürün Tipi</option>
-                                <option value="iwasku">IWASKU</option>
-                                <option value="asin">ASIN</option>
+                            <option value="iwasku">IWASKU</option>
+                            <option value="asin">ASIN</option>
                         </select>
                         <div class="invalid-feedback">
-
+                            Lütfen bir ürün tipi seçiniz.
                         </div>
                     </div>
                     <div class="mb-3">
@@ -26,7 +27,7 @@
                                 type="text"
                                 name="form_data"
                                 id="form_data"
-                                placeholder="IWASKU"
+                                placeholder="IWASKU|ASIN"
                                 class="form-control"
                                 required>
                         <div class="invalid-feedback">
@@ -83,6 +84,12 @@
             }
 
             return isValid;
+        }
+        function updatePlaceholder() {
+            const groupSelect = document.getElementById('product_type');
+            const formInput = document.getElementById('form_data');
+            const selectedType = groupSelect.options[groupSelect.selectedIndex].text;
+            formInput.placeholder = `Lütfen ${selectedType} bilgisini giriniz.`;
         }
     </script>
 {% endblock %}
