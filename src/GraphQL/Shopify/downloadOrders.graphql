@@ -46,16 +46,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     currencyCode
                 }
             }
-            currentShippingPriceSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
             currentSubtotalLineItemsQuantity
             currentSubtotalPriceSet {
                 presentmentMoney {
