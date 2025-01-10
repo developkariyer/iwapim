@@ -239,7 +239,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             totalWeight
             unpaid
             updatedAt
-            
         }
     }
 }
