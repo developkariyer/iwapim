@@ -121,7 +121,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             customerAcceptsMarketing
             discountCode
             displayFinancialStatus
-            dutiesIncluded
             edited
             fulfillable
             fullyPaid
