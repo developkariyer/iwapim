@@ -5,17 +5,48 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             endCursor
         }
         nodes {
-            id
-            updatedAt
+            billingAddress {
+                city
+                company
+                country
+                countryCodeV2
+                formattedArea
+                id
+                province
+            }
             cancellation {
                 staffNote
             }
             cancelledAt
-            canNotifyCustomer
+            cancelReason
+            capturable
+            cartDiscountAmountSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            closed
             closedAt
+            confirmationNumber
+            confirmed
             createdAt
             currencyCode
             currentCartDiscountAmountSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            currentShippingPriceSet {
                 presentmentMoney {
                     amount
                     currencyCode
@@ -35,6 +66,23 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     amount
                     currencyCode
                 }
+            }
+            currentTaxLines {
+                channelLiable
+                priceSet {
+                    presentmentMoney {
+                        amount
+                        currencyCode
+                    }
+                    shopMoney {
+                        amount
+                        currencyCode
+                    }
+                }
+                rate
+                ratePercentage
+                source
+                title
             }
             currentTotalDiscountsSet {
                 presentmentMoney {
@@ -77,28 +125,121 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                 }
             }
             currentTotalWeight
+            customAttributes {
+                key
+                value
+            }
+            customerAcceptsMarketing
             discountCode
             displayFinancialStatus
-            displayFulfillmentStatus
+            dutiesIncluded
+            edited
             fulfillable
-            fulfillmentOrders (first:200) {
+            fullyPaid
+            id
+            lineItems(first:50) {
                 nodes {
-                    channelId
-                    createdAt
+                    currentQuantity
                     id
-                    lineItems (first:200) {
-                        nodes {
-                            id
-                            totalQuantity
-                            sku
-                            variantTitle
-                            vendor
-                        }
+                    isGiftCard
+                    name
+                    quantity
+                    refundableQuantity
+                    requiresShipping
+                    restockable
+                    sku
+                    taxable
+                    title
+                    variant {
+                        availableForSale
+                        barcode
+                        compareAtPrice
+                        createdAt
+                        displayName
+                        id
+                        price
+                        sku
+                        title
+                        updatedAt
+
                     }
+                    vendor
                 }
             }
-
-
+            name
+            poNumber
+            presentmentCurrencyCode
+            processedAt
+            refundable
+            registeredSourceUrl
+            requiresShipping
+            restockable
+            shippingAddress {
+                city
+                company
+                country
+                countryCodeV2
+                formattedArea
+                id
+                province
+            }
+            sourceName
+            tags
+            test
+            totalDiscountsSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalPriceSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalReceivedSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalRefundedSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalTaxSet {
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalWeight
+            unpaid
+            updatedAt
+            
         }
     }
 }
