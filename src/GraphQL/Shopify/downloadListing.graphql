@@ -75,49 +75,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                             amount
                             currencyCode
                         }
-                        inventoryLevels(first: 20) {
-                            nodes {
-                                canDeactivate
-                                createdAt
-                                deactivationAlert
-                                id
-                                item{
-                                    countryCodeOfOrigin
-                                    createdAt
-                                    duplicateSkuCount
-                                    id
-                                    harmonizedSystemCode
-                                    inventoryHistoryUrl
-                                    sku
-                                    updatedAt
-                                }
-                                location{
-                                    activatable
-                                    address {
-                                        address1
-                                        address2
-                                        city
-                                        country
-                                        countryCode
-                                        phone
-                                        province
-                                        zip
-                                        provinceCode
-                                    }
-                                    addressVerified
-                                    createdAt
-                                    deactivatedAt
-                                    fulfillsOnlineOrders
-                                    hasActiveInventory
-                                    hasUnfulfilledOrders
-                                    id
-                                    isActive
-                                    name
-                                    updatedAt
-                                }
-                                updatedAt
-                            }
-                        }
                         updatedAt
                     }
                     inventoryQuantity
