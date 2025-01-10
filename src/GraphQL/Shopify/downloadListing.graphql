@@ -64,10 +64,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         id
                         inventoryHistoryUrl
                         harmonizedSystemCode
-                        locationsCount {
-                            count
-                            precision
-                        }
                         legacyResourceId
                         measurement {
                             id
