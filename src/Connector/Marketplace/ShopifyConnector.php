@@ -155,6 +155,84 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $this->setSkuResult = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItemUpdate');
     }
 
+    public function setInventoryGraphql(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void // not tested
+    {
+        if ($targetValue === null or $targetValue <= 0) {
+            return;
+        }
+        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setInventory.graphql'),
+            'variables' => [
+                'name' => 'available',
+                'quantities' => [
+                    'inventoryItemId' => $inventoryItemId,
+                    'locationId' => $locationId,
+                    'quantity' => $targetValue
+                ],
+                'reason' => 'restock'
+            ]
+        ];
+        $this->setInventoryResult = $this->getFromShopifyApiGraphql('POST', $query, 'inventorySetQuantities');
+        echo "Inventory set\n";
+    }
+
+    public function setPriceGraphql(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void // not tested
+    {
+        $currencies = [
+            'CANADIAN DOLLAR' => 'CAD',
+            'TL' => 'TL',
+            'EURO' => 'EUR',
+            'US DOLLAR' => 'USD',
+            'SWEDISH KRONA' => 'SEK',
+            'POUND STERLING' => 'GBP'
+        ];
+        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
+        if (empty($variantId)) {
+            echo "Failed to get variant id for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($targetPrice)) {
+            echo "Price is empty for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($targetCurrency)) {
+            $marketplace = $listing->getMarketplace();
+            if ($marketplace instanceof Marketplace) {
+                $marketplaceCurrency = $marketplace->getCurrency();
+                if (empty($marketplaceCurrency)) {
+                    if (isset($currencies[$marketplaceCurrency])) {
+                        $marketplaceCurrency = $currencies[$marketplaceCurrency];
+                    }
+                }
+            }
+        }
+        if (empty($marketplaceCurrency)) {
+            echo "Marketplace currency could not be found for {$listing->getKey()}\n";
+            return;
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $marketplaceCurrency);
+        if (empty($finalPrice)) {
+            echo "Failed to convert currency for {$listing->getKey()}\n";
+            return;
+        }
+        $variants = []; //privcce set
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setPrice.graphql'),
+            'variables' => [
+                'productId' => null, //product id
+                'variants' => $variants
+            ]
+
+        ];
+        $this->setPriceResult = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
+        echo "complated setting price\n";
+    }
+
     /**
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
@@ -212,12 +290,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        //$this->graphqlDownload();
-        //$this->downloadOrdersGraphql();
        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
-        }
+       }
        $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
        if (empty($this->listings)) {
             echo "Failed to download listings\n";
@@ -291,6 +367,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    // Not Used
     private function downloadAbondonedCheckouts(): void
     {
         echo "Downloading abandoned checkouts\n";
