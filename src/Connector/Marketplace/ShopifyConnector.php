@@ -88,6 +88,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        }
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadOrdersGraphql() // working
     {
         try {
@@ -109,6 +115,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
+        try {
+            foreach ($orders as $order) {
+                Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                    'marketplace_id' => $this->marketplace->getId(),
+                    'order_id' => $order['id'],
+                    'json' => json_encode($order)
+                ]);
+            }
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
         return 0;
     }
 
@@ -170,8 +187,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownload();
-        $this->downloadOrdersGraphql();
-       /*if (!$forceDownload && $this->getListingsFromCache()) {
+        //$this->downloadOrdersGraphql();
+       if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -180,7 +197,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();*/
+       $this->putListingsToCache();
     }
 
     /**
