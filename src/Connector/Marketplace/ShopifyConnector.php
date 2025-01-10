@@ -129,6 +129,32 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return 0;
     }
 
+    public function setSkuGraphql(VariantProduct $listing, string $sku): void // not tested
+    {
+        if (empty($sku)) {
+            echo "SKU is empty for {$listing->getKey()}\n";
+            return;
+        }
+        $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
+        $jsonSku = $apiResponse['sku'] ?? null;
+        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
+        if (!empty($jsonSku) && $jsonSku === $sku) {
+            echo "SKU is already set for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setSku.graphql'),
+            'variables' => [
+                'sku' => $sku,
+            ]
+        ];
+        $this->setSkuResult = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItemUpdate');
+    }
+
     /**
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
