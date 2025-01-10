@@ -38,7 +38,7 @@ query GetProducts($numProducts: Int!, $cursor: String) {
             totalInventory
             tracksInventory
             updatedAt
-            variants(first: 200) {
+            variants(first: 50) {
                 nodes {
                     availableForSale
                     barcode
@@ -75,7 +75,7 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                             amount
                             currencyCode
                         }
-                        inventoryLevels(first: 200) {
+                        inventoryLevels(first: 20) {
                             nodes {
                                 canDeactivate
                                 createdAt
