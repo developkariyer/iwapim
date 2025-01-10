@@ -119,14 +119,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                             }
                         }
                         updatedAt
-                        variant {
-                            availableForSale
-                            barcode
-                            createdAt
-                            displayName
-                            id
-
-                        }
                     }
                     inventoryQuantity
                     legacyResourceId
