@@ -18,25 +18,34 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         field
                         message
                     }
+                    state
                 }
                 summary
             }
             handle
             isGiftCard
+            onlineStorePreviewUrl
+            onlineStoreUrl
             productType
+            publishedAt
             seo {
                 title
                 description
             }
             status
             tags
+            templateSuffix
             title
             totalInventory
+            tracksInventory
             updatedAt
             variants(first: 200) {
                 nodes {
+                    availableForSale
                     barcode
+                    compareAtPrice
                     createdAt
+                    displayName
                     id
                     image {
                         altText
@@ -45,6 +54,10 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         url
                         width
                     }
+                    locationsCount {
+                        count
+                        precision
+                    }
                     inventoryItem {
                         countryCodeOfOrigin
                         createdAt
@@ -52,6 +65,11 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         id
                         inventoryHistoryUrl
                         harmonizedSystemCode
+                        locationsCount {
+                            count
+                            precision
+                        }
+                        legacyResourceId
                         measurement {
                             id
                             weight {
@@ -61,7 +79,68 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         }
                         provinceCodeOfOrigin
                         sku
+                        tracked
+                        trackedEditable
+                        unitCost {
+                            amount
+                            currencyCode
+                        }
+                        inventoryLevels(first: 200) {
+                            nodes {
+                                canDeactivate
+                                createdAt
+                                deactivationAlert
+                                id
+                                item{
+                                    countryCodeOfOrigin
+                                    createdAt
+                                    duplicateSkuCount
+                                    id
+                                    harmonizedSystemCode
+                                    inventoryHistoryUrl
+                                    sku
+                                    updatedAt
+                                }
+                                location{
+                                    activatable
+                                    address {
+                                        address1
+                                        address2
+                                        city
+                                        country
+                                        countryCode
+                                        id
+                                        phone
+                                        province
+                                        zip
+                                        provinceCode
+                                    }
+                                    addressVerified
+                                    createdAt
+                                    deactivatedAt
+                                    fulfillsOnlineOrders
+                                    hasActiveInventory
+                                    hasUnfulfilledOrders
+                                    id
+                                    isActive
+                                    name
+                                    updatedAt
+                                }
+                                updatedAt
+                            }
+                        }
+                        updatedAt
+                        variant {
+                            availableForSale
+                            barcode
+                            createdAt
+                            displayName
+                            id
+
+                        }
                     }
+                    inventoryQuantity
+                    legacyResourceId
                     position
                     price
                     sku
@@ -73,6 +152,7 @@ query GetProducts($numProducts: Int!, $cursor: String) {
             }
             variantsCount {
                 count
+                precision
             }
             vendor
         }
