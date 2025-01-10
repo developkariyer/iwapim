@@ -71,7 +71,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                 }
                 rate
                 ratePercentage
-                source
                 title
             }
             currentTotalDiscountsSet {
@@ -151,7 +150,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                         sku
                         title
                         updatedAt
-
                     }
                     vendor
                 }
