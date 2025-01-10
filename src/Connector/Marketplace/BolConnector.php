@@ -316,6 +316,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
         $this->prepareToken();
         $now = strtotime('now');
+        echo  "Now: " . $now . "\n";
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Bolcom/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
