@@ -56,7 +56,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
             print_r($response->getContent());
-            break;
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
