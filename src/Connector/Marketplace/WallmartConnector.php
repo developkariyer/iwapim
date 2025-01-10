@@ -81,6 +81,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             }
             $data = $response->toArray();
             static::$expires_in = time() + $data['expires_in'];
+            print_r($data);
+            print_r(static::$expires_in);
             $this->marketplace->setWallmartAccessToken($data['access_token']);
             $this->marketplace->save();
         } catch (\Exception $e) {
@@ -213,7 +215,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $this->prepareToken();
-        $db = \Pimcore\Db::get();
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         $lastUpdatedAt = "";
