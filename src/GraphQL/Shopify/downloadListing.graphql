@@ -99,7 +99,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                                         city
                                         country
                                         countryCode
-                                        id
                                         phone
                                         province
                                         zip
