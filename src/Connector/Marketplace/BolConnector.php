@@ -316,7 +316,6 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
         $this->prepareToken();
         $now = strtotime('now');
-        echo  "Now: " . $now . "\n";
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Bolcom/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
@@ -343,7 +342,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                     echo "Failed to download orders: " . $response->getContent() . "\n";
                     return;
                 }
-                print_r($params);
                 $data = $response->toArray();
                 $orders = $data['orders'] ?? [];
                 foreach ($orders as  &$order) {
@@ -395,7 +393,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
-            print_r("Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "Now:" . $now . "\n");
             if ($startDate >= $now) {
                 echo "End of orders\n";
                 break;
