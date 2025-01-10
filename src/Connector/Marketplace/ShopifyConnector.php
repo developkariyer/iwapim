@@ -77,7 +77,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 50,
+                'numProducts' => 50, //Rate limit is OK!
                 'cursor' => null
             ]
        ];
@@ -91,11 +91,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrdersGraphql() // working
     {
-        $db = Db::get();
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
+        try {
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
+        echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
@@ -106,8 +110,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        print_r($orders);
-
         return 0;
     }
 
@@ -168,8 +170,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->graphqlDownload();
-        //$this->downloadOrdersGraphql();
+        //$this->graphqlDownload();
+        $this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
