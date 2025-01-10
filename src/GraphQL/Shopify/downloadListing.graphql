@@ -53,10 +53,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                         url
                         width
                     }
-                    locationsCount {
-                        count
-                        precision
-                    }
                     inventoryItem {
                         countryCodeOfOrigin
                         createdAt
