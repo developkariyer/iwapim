@@ -1,4 +1,4 @@
-mutation ProductVariantsUpdate($productId: ID!) {
+mutation ProductVariantsUpdate($productId: ID!,  $variants: [ProductVariantsBulkInput!]!) {
     productVariantsBulkUpdate(productId: $productId, variants: $variants) {
         product {
             id
