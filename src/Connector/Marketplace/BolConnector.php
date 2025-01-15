@@ -363,7 +363,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
                         continue;
                     }
-
+                    print_r($orderDetailResponse->getContent());
                     $orderDetail = $orderDetailResponse->toArray();          
                     foreach ($orderDetail['orderItems'] as &$orderItem) {
                         $ean = $orderItem['product']['ean'];
@@ -375,7 +375,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                         }
                     }
                     $order['orderDetail'] = $orderDetail;
-                    print_r($order);
                     try {
                         Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
                             'marketplace_id' => $this->marketplace->getId(),
