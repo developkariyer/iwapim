@@ -94,7 +94,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $product['variants'] = $variants;
                 }
             }
-            print_r($product);
+            print_r($currentPageData);
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
