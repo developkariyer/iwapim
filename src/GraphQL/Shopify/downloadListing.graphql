@@ -21,7 +21,7 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 title
                 description
             }
-            variants(first: 2000) {
+            variants(first: 50) {
                 pageInfo {
                     hasNextPage
                     endCursor
