@@ -13,7 +13,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class WayfairConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
+        'oauth' => 'https://sso.auth.wayfair.io/oauth/token',
         'sandbox' => 'https://sandbox.api.wayfair.com/v1/graphql',
         'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql',
         'prod' => 'https://api.wayfair.com/v1/graphql',
