@@ -41,13 +41,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                     taxable
                     barcode
                     sku
-                    unitPriceMeasurement {
-                        measuredType
-                        quantityUnit
-                        quantityValue
-                        referenceUnit
-                        referenceValue
-                    }
                     inventoryItem {
                         id
                     }
