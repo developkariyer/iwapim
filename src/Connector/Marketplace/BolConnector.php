@@ -344,6 +344,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 $data = $response->toArray();
                 $orders = $data['orders'] ?? [];
+                print_r($orders);
                 foreach ($orders as  &$order) {
                     foreach ($order['orderItems'] as  &$orderItem) {
                         $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$orderItem['ean'].'/product-ids');
@@ -363,8 +364,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
                         continue;
                     }
-                    print_r($orderDetailResponse->getContent());
-                    $orderDetail = $orderDetailResponse->toArray();          
+                    $orderDetail = $orderDetailResponse->toArray();
                     foreach ($orderDetail['orderItems'] as &$orderItem) {
                         $ean = $orderItem['product']['ean'];
                         foreach ($order['orderItems'] as $item) {
