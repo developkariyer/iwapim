@@ -21,20 +21,73 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 title
                 description
             }
+            variants(first: 2000) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+                nodes {
+                    id
+                    product {
+                        id
+                    }
+                    title
+                    price
+                    position
+                    inventoryPolicy
+                    compareAtPrice
+                    selectedOptions {
+                        name
+                        value
+                    }
+                    createdAt
+                    updatedAt
+                    taxable
+                    barcode
+                    sku
+                    inventoryItem {
+                        id
+                    }
+                    inventoryQuantity
+                    image {
+                        id
+                        altText
+                        width
+                        height
+                        src
+                    }
+                }
+            }
             variantsCount {
                 count
                 precision
             }
-            options(first:5) {
+            options(first:2) {
                 id
                 name
                 position
                 values
             }
+            media(first:50) {
+                nodes {
+                    id
+                    mediaContentType
+                    preview {
+                        image {
+                            id
+                            altText
+                            width
+                            height
+                            url
+                        }
+                    }
+                }
+            }
             mediaCount {
                 count
                 precision
             }
+
         }
     }
 }
