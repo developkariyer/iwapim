@@ -254,7 +254,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         while ($nextLink) {
             $response = $this->httpClient->request($method, $nextLink, $headersToApi);
-            print_r($response);
+            print_r($response->getContent());
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
