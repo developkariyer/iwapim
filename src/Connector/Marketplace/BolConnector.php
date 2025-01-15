@@ -354,12 +354,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $productDetail = $productDetailResponse->toArray();
                         $bolProductId = $productDetail['bolProductId'] ?? '';
                         $orderItem['bolProductId'] = $bolProductId;
-                        print_r($orderItem);
                         usleep(1500000);
                     }
-
                     $orderId = $order['orderId'];
                     $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
+                    print_r($orderDetailResponse);
                     if ($orderDetailResponse->getStatusCode() !== 200) {
                         echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
                         continue;
