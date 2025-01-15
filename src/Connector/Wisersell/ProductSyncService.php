@@ -174,7 +174,7 @@ class ProductSyncService
                 continue;
             }
             $errorProducts[] = $wisersellProduct;
-            $wisersellProduct['name'] = "OLMAYAN URUN!";
+            $wisersellProduct['name'] = "OLMAYAN URUN! BENI SILIN LUTFEN!!!";
             $bucket[] = $wisersellProduct;
             if (count($bucket) >= 100) {
                 $response = $this->connector->request(Connector::$apiUrl['product'], 'PUT', '', $bucket);
