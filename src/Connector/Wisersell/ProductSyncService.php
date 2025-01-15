@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\Product;
 use App\Utils\Utility;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -24,11 +25,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|RandomException
      */
     public function loadWisersellProducts($force = false): int
     {
@@ -65,12 +62,7 @@ class ProductSyncService
 
     /**
      * @return array
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|RandomException
      */
     public function status(): array
     {
@@ -85,12 +77,7 @@ class ProductSyncService
     /**
      * @param bool $force
      * @return int
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|RandomException
      */
     public function load(bool $force = false): int
     {
@@ -99,29 +86,9 @@ class ProductSyncService
     }
 
     /**
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function dump(): void
-    {
-        $this->load();
-        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.wisersell.txt', print_r($this->wisersellProducts, true));
-        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.pim.txt', print_r($this->pimProducts, true));        
-    }
-
-    /**
      * @param $code
      * @return mixed|null
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|RandomException
      */
     public function findWisersellProductWithCode($code): mixed
     {
@@ -135,14 +102,18 @@ class ProductSyncService
     }
 
     /**
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|RandomException
+     */
+    public function dump(): void
+    {
+        $this->load();
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.wisersell.txt', print_r($this->wisersellProducts, true));
+        file_put_contents(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.pim.txt', print_r($this->pimProducts, true));
+    }
+
+    /**
      * @param $products
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function addPimProductsToWisersell($products): void
     {
@@ -174,12 +145,7 @@ class ProductSyncService
 
     /**
      * @param $wisersellProducts
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function addWisersellProductsToPim($wisersellProducts): void
     {
@@ -229,13 +195,7 @@ class ProductSyncService
 
     /**
      * @param $wisersellProduct
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function updatePimProduct($wisersellProduct): void
     {
@@ -251,13 +211,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws Exception
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function updateWisersellProduct($product, $error = false): void
     {
@@ -284,13 +238,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws Exception
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function postProductDataToWisersell($productData)
     {
@@ -322,11 +270,7 @@ class ProductSyncService
     /**
      * @param $product
      * @return array
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface
      */
     public function prepareProductData($product): array
     {
@@ -339,12 +283,14 @@ class ProductSyncService
                 if (!($obj instanceof Product)) {
                     continue;
                 }
-                if (empty($obj->getWisersellId()) || empty($subProduct->getAmount())) {
+                if (empty($obj->getWisersellId())) {
                     continue;
                 }
+                $amount = $subProduct->getAmount() ?? 1;
+                if (!$amount) $amount = 1;
                 $subProductData[] = [
                     "subprodId" => $obj->getWisersellId(),
-                    "qty" => $subProduct->getAmount(),
+                    "qty" => $amount,
                 ];
             }
         }
@@ -365,11 +311,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface
      */
     public function search($searchData): array
     {
@@ -396,13 +338,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function updatePimWisersellIds(): void
     {
@@ -474,13 +410,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws Exception
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function sync($forceUpdate = false): void
     {
@@ -573,13 +503,7 @@ class ProductSyncService
     }
 
     /**
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws Exception
-     * @throws RedirectionExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws ClientExceptionInterface|DecodingExceptionInterface|Exception|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|\Exception
      */
     public function fixWisersellNames(): void
     {
