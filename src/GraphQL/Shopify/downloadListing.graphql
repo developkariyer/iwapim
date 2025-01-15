@@ -1,4 +1,4 @@
-query GetProducts($numProducts: Int!, $cursor: String) {
+query GetProducts($numProducts: Int!, $cursor: String, $numVariants: Int, $variantCursor: String) {
     products(first: $numProducts, after: $cursor) {
         pageInfo {
             hasNextPage
@@ -6,75 +6,88 @@ query GetProducts($numProducts: Int!, $cursor: String) {
         }
         nodes {
             id
-            category {
-                name
-            }
-            createdAt
-            description
+            title
             descriptionHtml
-            feedback {
-                details {
-                    messages {
-                        field
-                        message
-                    }
-                }
-                summary
-            }
-            handle
-            isGiftCard
+            vendor
             productType
+            createdAt
+            handle
+            updatedAt
+            publishedAt
+            templateSuffix
+            tags
+            status
             seo {
                 title
                 description
             }
-            status
-            tags
-            title
-            totalInventory
-            updatedAt
-            variants(first: 200) {
+            variants(first: $numVariants, after: $variantCursor) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
                 nodes {
-                    barcode
-                    createdAt
                     id
-                    image {
-                        altText
-                        height
+                    product {
                         id
-                        url
-                        width
                     }
-                    inventoryItem {
-                        countryCodeOfOrigin
-                        createdAt
-                        duplicateSkuCount
-                        id
-                        inventoryHistoryUrl
-                        harmonizedSystemCode
-                        measurement {
-                            id
-                            weight {
-                                unit
-                                value
-                            }
-                        }
-                        provinceCodeOfOrigin
-                        sku
-                    }
-                    position
-                    price
-                    sku
-                    taxable
-                    taxCode
                     title
+                    price
+                    position
+                    inventoryPolicy
+                    compareAtPrice
+                    selectedOptions {
+                        name
+                        value
+                    }
+                    createdAt
                     updatedAt
+                    taxable
+                    barcode
+                    sku
+                    inventoryItem {
+                        id
+                    }
+                    inventoryQuantity
+                    image {
+                        id
+                        altText
+                        width
+                        height
+                        src
+                    }
                 }
             }
             variantsCount {
                 count
+                precision
             }
-            vendor
+            options(first:2) {
+                id
+                name
+                position
+                values
+            }
+            media(first:1) {
+                nodes {
+                    id
+                    mediaContentType
+                    preview {
+                        image {
+                            id
+                            altText
+                            width
+                            height
+                            url
+                        }
+                    }
+                }
+            }
+            mediaCount {
+                count
+                precision
+            }
+
         }
     }
 }

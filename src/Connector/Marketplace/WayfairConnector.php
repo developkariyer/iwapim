@@ -52,7 +52,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
                 'headers' => [
-                    'content-type' => 'application/json'
+                    'content-type' => 'application/json',
+                    'cache-control' => 'no-cache'
                 ],
                 'json' => [
                     'grant_type' => 'client_credentials',
@@ -88,11 +89,12 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false): void
     {
-        /*echo "Downloading Wayfair...\n";
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
+        echo "Downloading Wayfair...\n";
+        /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
-        }
-        echo "Token is valid. Proceeding with download...\n";
+        }*/
+        //$this->prepareTokenProd();
+       /* echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
             \$supplierId: Int!,
@@ -127,9 +129,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
-        }
+        print_r($response->getStatusCode());
         print_r($response->getContent());*/
     }
 

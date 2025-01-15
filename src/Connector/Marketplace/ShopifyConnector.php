@@ -55,7 +55,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            print_r($response->getContent());
+            //print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
@@ -71,16 +71,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $allData;
     }
 
-    public function  graphqlDownload() // working
+    public function graphqlDownload() // working
     {
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 50,
-                'cursor' => null
+                'numProducts' => 1,
+                'cursor' => null,
+                'numVariants' => 2,
+                'variantCursor' => null
             ]
        ];
-
        $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
        if (empty($this->listings)) {
             echo "Failed to download listings\n";
@@ -88,13 +89,23 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        }
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadOrdersGraphql() // working
     {
-        $db = Db::get();
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_orders WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
+        try {
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
+        echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
@@ -105,9 +116,122 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        print_r($orders);
-
+        try {
+            foreach ($orders as $order) {
+                Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                    'marketplace_id' => $this->marketplace->getId(),
+                    'order_id' => $order['id'],
+                    'json' => json_encode($order)
+                ]);
+            }
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
         return 0;
+    }
+
+    public function setSkuGraphql(VariantProduct $listing, string $sku): void // not tested
+    {
+        if (empty($sku)) {
+            echo "SKU is empty for {$listing->getKey()}\n";
+            return;
+        }
+        $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
+        $jsonSku = $apiResponse['sku'] ?? null;
+        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
+        if (!empty($jsonSku) && $jsonSku === $sku) {
+            echo "SKU is already set for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setSku.graphql'),
+            'variables' => [
+                'sku' => $sku,
+            ]
+        ];
+        $this->setSkuResult = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItemUpdate');
+    }
+
+    public function setInventoryGraphql(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void // not tested
+    {
+        if ($targetValue === null or $targetValue <= 0) {
+            return;
+        }
+        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setInventory.graphql'),
+            'variables' => [
+                'name' => 'available',
+                'quantities' => [
+                    'inventoryItemId' => $inventoryItemId,
+                    'locationId' => $locationId,
+                    'quantity' => $targetValue
+                ],
+                'reason' => 'restock'
+            ]
+        ];
+        $this->setInventoryResult = $this->getFromShopifyApiGraphql('POST', $query, 'inventorySetQuantities');
+        echo "Inventory set\n";
+    }
+
+    public function setPriceGraphql(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void // not tested
+    {
+        $currencies = [
+            'CANADIAN DOLLAR' => 'CAD',
+            'TL' => 'TL',
+            'EURO' => 'EUR',
+            'US DOLLAR' => 'USD',
+            'SWEDISH KRONA' => 'SEK',
+            'POUND STERLING' => 'GBP'
+        ];
+        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
+        if (empty($variantId)) {
+            echo "Failed to get variant id for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($targetPrice)) {
+            echo "Price is empty for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($targetCurrency)) {
+            $marketplace = $listing->getMarketplace();
+            if ($marketplace instanceof Marketplace) {
+                $marketplaceCurrency = $marketplace->getCurrency();
+                if (empty($marketplaceCurrency)) {
+                    if (isset($currencies[$marketplaceCurrency])) {
+                        $marketplaceCurrency = $currencies[$marketplaceCurrency];
+                    }
+                }
+            }
+        }
+        if (empty($marketplaceCurrency)) {
+            echo "Marketplace currency could not be found for {$listing->getKey()}\n";
+            return;
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $marketplaceCurrency);
+        if (empty($finalPrice)) {
+            echo "Failed to convert currency for {$listing->getKey()}\n";
+            return;
+        }
+        $variants = []; //privcce set
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setPrice.graphql'),
+            'variables' => [
+                'productId' => null, //product id
+                'variants' => $variants
+            ]
+
+        ];
+        $this->setPriceResult = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
+        echo "complated setting price\n";
     }
 
     /**
@@ -168,11 +292,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownload();
-        //$this->downloadOrdersGraphql();
        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
-        }
+       }
        $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
        if (empty($this->listings)) {
             echo "Failed to download listings\n";
@@ -246,6 +369,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    // Not Used
     private function downloadAbondonedCheckouts(): void
     {
         echo "Downloading abandoned checkouts\n";

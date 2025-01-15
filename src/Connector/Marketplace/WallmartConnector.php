@@ -214,8 +214,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
+            sleep(1);
         }
-        $db = \Pimcore\Db::get();
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         $lastUpdatedAt = "";

@@ -8,18 +8,18 @@
         <div class="col-12">
             <div class="row mt-2">
                 <div class="col-12 col-md-3 mb-2">
-                    <a href="{{ path('sticker_new_group') }}" class="btn btn-success w-100">New Group</a>
+                    <a href="{{ path('sticker_new_group') }}" class="btn btn-success w-100">Yeni Grup</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">New Sticker</a>
+                    <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">Yeni Etiket</a>
                 </div>
                 <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3" >
+                    <input type="text" id="searchInput" placeholder="Ara..." class="form-control mb-3" >
                 </div>
                 <div class="col-12 col-md-3 mb-2">
                     <div class="dropdown">
                         <button class="btn btn-outline-dark dropdown-toggle text-truncate w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            Select Group
+                            Grup Seç
                         </button>
                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
                             {% for group in groups %}
@@ -30,7 +30,7 @@
                                 </li>
                             {% else %}
                                 <li>
-                                    <span class="dropdown-item text-muted">No groups available.</span>
+                                    <span class="dropdown-item text-muted">Grup Yok</span>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -41,9 +41,8 @@
                 <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
 
                 </div>
-                <nav aria-label="Page navigation">
+                <nav class="col-12" aria-label="Page navigation">
                     <ul id="pagination-container" class="pagination justify-content-center">
-
                     </ul>
                 </nav>
             </div>
@@ -59,26 +58,36 @@
         let totalPages = 1;
         let selectedGroupId = null;
         let searchTerm = '';
+        let timeoutId;
 
         document.getElementById('searchInput').addEventListener('input', function() {
             searchTerm = this.value;
-            loadStickers(selectedGroupId, currentPage, searchTerm);
+            let charCount = searchTerm.length;
+            if (searchTerm.trim() === '' ) {
+                clearTimeout(timeoutId);
+                loadStickers(selectedGroupId, currentPage);
+            }
+            if (charCount > 2) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(function() {
+                    loadStickers(selectedGroupId, currentPage, searchTerm);
+                }, 250);
+            }
         });
 
-        function fetchTotalPages(groupId) {
-            return fetch(`/sticker/get-stickers/${groupId}?page=1&limit=10`)
-                .then(response => response.json())
-                .then(data => data.pagination.total_pages);
-        }
-
         function loadStickers(groupId, page = 1,  searchTerm = '') {
+            const paginationContainer = document.getElementById('pagination-container');
             highlightSelectedGroup(groupId);
             selectedGroupId = groupId;
             currentPage = page;
             const container = document.getElementById('stickers-container');
             container.innerHTML = '<p>Loading...</p>';
-            const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
-            fetch(`/sticker/get-stickers/${groupId}?page=${page}&limit=10${searchParam}`)
+            const searchParam = searchTerm !== '' ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+            let url = `/sticker/get-stickers/${groupId}?page=${page}&limit=10`;
+            if (searchParam) {
+                url += searchParam;
+            }
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch stickers. Status code: ' + response.status);
@@ -87,31 +96,44 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        const cards = data.stickers.map(sticker => `
-                        <div class="card mb-2">
-                            <div class="row g-0">
-                                <div class="col-9">
-                                    <div class="card-body p-2" id="card-${sticker.product_code}">
-                                        <a href="${sticker.sticker_link}" class="card-title text-primary text-decoration-none m-0" target="_blank">
-                                            ${sticker.product_name}
-                                        </a>
-                                        <p class="card-text text-muted small m-0">
-                                            <strong>Code:</strong> ${sticker.product_code} <br>
-                                            <strong>Iwasku:</strong> ${sticker.iwasku} <br>
-                                            <strong>Category:</strong> ${sticker.category} <br>
-                                            <strong>Attributes:</strong> ${sticker.attributes}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-3 d-flex align-items-center justify-content-center">
-                                    <img src="${sticker.image_link}" class="img-fluid rounded-start" alt="Image" style="max-height: 100px; max-width: 100%; height: auto; width: auto;">
-                                </div>
-                            </div>
-                        </div>
-                        `).join('');
-                        container.innerHTML = cards;
+                        const groupedCards = Object.keys(data.stickers).map(identifier => {
+                            const group = data.stickers[identifier];
+                            const mainSticker = group[0];
+                            const card = `
+                                   <div class="accordion" id="accordion-${identifier}">
+                                        <div class="accordion-item mb-3">
+                                            <h2 class="accordion-header" id="heading-${identifier}">
+                                                <button class="accordion-button w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${identifier}" aria-expanded="true" aria-controls="collapse-${identifier}" onclick="loadDetails('${identifier}','${groupId}')">
+                                                    <div class="row w-100 d-flex align-items-center">
+                                                        <div class="col-8 d-flex flex-column">
+                                                            <h5 class="card-title mb-0" style="font-size: 1.25rem; word-wrap: break-word;">${mainSticker.product_name}</h5>
+                                                            <h4 class="card-title mb-0" style="font-size: 1.1rem; word-wrap: break-word;">${identifier}</h4>
+                                                            <p class="card-text mb-0" style="font-size: 1rem; word-wrap: break-word;">${mainSticker.category}</p>
+                                                        </div>
+                                                        <div class="col-4 d-flex justify-content-end">
+                                                            <img src="${mainSticker.image_link}" alt="${mainSticker.product_name}" class="img-fluid" style="max-width: 60px; height: auto;">
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            </h2>
+                                            <div id="collapse-${identifier}" class="accordion-collapse collapse" aria-labelledby="heading-${identifier}" data-bs-parent="#accordion-${identifier}">
+                                                <div class="accordion-body">
+                                                    <div id="details-content-${identifier}">Loading details...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                   </div>
+                            `;
+                            return card;
+                        }).join('');
+                        container.innerHTML = groupedCards;
                         totalPages = data.pagination.total_pages;
-                        renderPagination();
+                        if (searchTerm !== '') {
+                            paginationContainer.style.visibility = 'hidden';
+                        } else {
+                            paginationContainer.style.visibility = 'visible';
+                            renderPagination();
+                        }
                     } else {
                         container.innerHTML = '<p>No stickers available for this group.</p>';
                     }
@@ -122,27 +144,82 @@
                 });
         }
 
+        function loadDetails(identifier, groupId) {
+            const detailsContainer = document.getElementById(`details-content-${identifier}`);
+            detailsContainer.innerHTML = 'Loading details...';
+            fetch(`/sticker/get-product-details/${identifier}/${groupId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const products = data.products;
+                        products.sort((a, b) => {
+                            return a.variationSize.localeCompare(b.variationSize, undefined, { numeric: true });
+                        });
+                        let detailsHtml = '';
+                        products.forEach(product => {
+                            detailsHtml += `
+                                  ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})<a href="${product.sticker_link}" target="_blank" class="btn btn-link">EU Link</a> <br/>
+                            `;
+                        });
+                        detailsContainer.innerHTML = `
+                            <div class="accordion" id="accordion-${identifier}">
+                                ${detailsHtml}
+                            </div>
+                        `;
+                    } else {
+                        detailsContainer.innerHTML = 'Failed to load details.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading details:', error);
+                    detailsContainer.innerHTML = 'Error loading details.';
+                });
+        }
+
+
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
-            paginationContainer.innerHTML += `
+            let paginationHTML = '';
+            paginationHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1)" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>`;
+
+            paginationHTML += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>`;
-            for (let page = 1; page <= totalPages; page++) {
-                paginationContainer.innerHTML += `
+
+            const maxVisiblePages = 5;
+            const firstVisiblePage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            const lastVisiblePage = Math.min(totalPages, firstVisiblePage + maxVisiblePages - 1);
+
+            for (let page = firstVisiblePage; page <= lastVisiblePage; page++) {
+                paginationHTML += `
                 <li class="page-item ${page === currentPage ? 'active' : ''}">
                     <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
                 </li>`;
             }
-            paginationContainer.innerHTML += `
+
+            paginationHTML += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>`;
+
+            paginationHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages})" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>`;
+            paginationContainer.innerHTML = paginationHTML;
         }
 
         function highlightSelectedGroup(groupId) {
@@ -159,8 +236,22 @@
         }
 
         function selectGroup(groupName, groupId) {
+            localStorage.setItem('group_id', groupId);
             document.getElementById("dropdownMenuButton").innerHTML = groupName;
-            loadStickers(groupId);
+            document.getElementById('searchInput').value = '';
+            loadStickers(groupId, 1, searchTerm);
         }
     </script>
+    <style>
+        .accordion-button:not(.collapsed) {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+        .accordion-button {
+            background-color: #f8f9fa;
+            color: #000;
+            border: 1px solid #ccc;
+        }
+    </style>
 {% endblock %}

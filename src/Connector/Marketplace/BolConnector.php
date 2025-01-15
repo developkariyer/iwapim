@@ -346,7 +346,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $orders = $data['orders'] ?? [];
                 foreach ($orders as  &$order) {
                     foreach ($order['orderItems'] as  &$orderItem) {
-                        $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].'/'.$orderItem['ean'].'/product-ids');
+                        $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'] . $orderItem['ean'] . '/product-ids');
                         if ($productDetailResponse->getStatusCode() !== 200) {
                             echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
                             continue;
@@ -356,15 +356,13 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $orderItem['bolProductId'] = $bolProductId;
                         usleep(1500000);
                     }
-
                     $orderId = $order['orderId'];
-                    $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'].'/'.$orderId);
+                    $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'] . $orderId);
                     if ($orderDetailResponse->getStatusCode() !== 200) {
                         echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
                         continue;
                     }
-
-                    $orderDetail = $orderDetailResponse->toArray();          
+                    $orderDetail = $orderDetailResponse->toArray();
                     foreach ($orderDetail['orderItems'] as &$orderItem) {
                         $ean = $orderItem['product']['ean'];
                         foreach ($order['orderItems'] as $item) {
@@ -374,7 +372,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                             }
                         }
                     }
-                    $order['orderDetail'] = $orderDetail; 
+                    $order['orderDetail'] = $orderDetail;
                     try {
                         Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
                             'marketplace_id' => $this->marketplace->getId(),
@@ -387,13 +385,14 @@ class BolConnector extends MarketplaceConnectorAbstract
                         echo "Error: " . $e->getMessage() . "\n";
                     }
                     usleep(50000);
-                } 
+                }
                 $page++;
                 usleep(3000000);
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
             if ($startDate >= $now) {
+                echo "End of orders\n";
                 break;
             }
             $this->prepareToken();

@@ -5,24 +5,105 @@
     <div class="container mt-2">
         <div class="row">
             <div class="col-12 mt-5">
-                <h1>Add New Sticker</h1>
-                <form method="post" action="/sticker/add-sticker" class="mt-3">
-                    <input type="text" name="form_data" placeholder="ASIN" class="form-control mb-3">
-                    <select name="group_id" class="form-control mb-3">
-                        <option value="" disabled selected>Select a group</option>
-                        {% for group in groups %}
-                            <option value="{{ group.id }}">{{ group.name }}</option>
-                        {% else %}
-                            <option value="" disabled>No groups available</option>
-                        {% endfor %}
-                    </select>
+                <h1>Yeni Etiket Oluştur</h1>
+                <form method="post" action="/sticker/add-sticker" class="mt-3" onsubmit="return validateForm()">
+                    <div class="mb-3">
+                        <select
+                                name="product_type"
+                                id="product_type"
+                                class="form-control"
+                                onchange="updatePlaceholder()"
+                                required>
+                            <option value="" disabled selected>Ürün Tipi</option>
+                            <option value="iwasku">IWASKU</option>
+                            <option value="asin">ASIN</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Lütfen bir ürün tipi seçiniz.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <input
+                                type="text"
+                                name="form_data"
+                                id="form_data"
+                                placeholder="IWASKU|ASIN"
+                                class="form-control"
+                                required>
+                        <div class="invalid-feedback">
+                            Lütfen IWASKU bilgisini giriniz.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <select
+                                name="group_id"
+                                id="group_id"
+                                class="form-control"
+                                required>
+                            <option value="" disabled selected>Etiket Grubu</option>
+                            {% for group in groups %}
+                                <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% else %}
+                                <option value="" disabled>Etiket Grubu Bulunamadı</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Lütfen bir etiket grubu seçiniz.
+                        </div>
+                    </div>
                     <div class="d-flex flex-column">
-                        <button type="submit" class="btn btn-success mb-2">Add Sticker</button>
-                        <a href="{{ path('sticker_main_page') }}" class="btn btn-primary">Main Page</a>
+                        <button type="submit" class="btn btn-success mb-2">Etiket Oluştur</button>
+                        <a href="{{ path('sticker_main_page') }}" class="btn btn-primary">Ana Sayfa</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <div id="loading-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; text-align: center; line-height: 100vh;">
+        <div>
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+            <p>İşlem gerçekleştiriliyor, lütfen bekleyiniz...</p>
+        </div>
+    </div>
 
+{% endblock %}
+
+{% block body_scripts %}
+    <script>
+        function validateForm() {
+            const formData = document.getElementById('form_data');
+            const groupId = document.getElementById('group_id');
+
+            let isValid = true;
+
+            if (!formData.value.trim()) {
+                formData.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                formData.classList.remove('is-invalid');
+            }
+
+            if (!groupId.value) {
+                groupId.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                groupId.classList.remove('is-invalid');
+            }
+            showLoadingScreen();
+            return isValid;
+        }
+        function updatePlaceholder() {
+            const groupSelect = document.getElementById('product_type');
+            const formInput = document.getElementById('form_data');
+            const selectedType = groupSelect.options[groupSelect.selectedIndex].text;
+            formInput.placeholder = `Lütfen ${selectedType} bilgisini giriniz.`;
+        }
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'block';
+        }
+
+    </script>
 {% endblock %}
