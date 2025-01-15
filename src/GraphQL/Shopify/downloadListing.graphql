@@ -54,7 +54,7 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 count
                 precision
             }
-            options(first:2) {
+            options(first:5) {
                 id
                 name
                 position
