@@ -47,6 +47,10 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                     inventoryQuantity
                     image {
                         id
+                        altText
+                        width
+                        height
+                        src
                     }
                 }
             }
