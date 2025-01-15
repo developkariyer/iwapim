@@ -45,10 +45,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $allData = [];
         $cursor = null;
-        $variantCursor = null;
         do {
             $data['variables']['cursor'] = $cursor;
-            $data['variables']['variantCursor'] = $variantCursor;
             $headersToApi = [
                 'json' => $data,
                 'headers' => [
@@ -64,8 +62,30 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
-            print_r($newData);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
+            if ($key === 'products') {
+                foreach ($currentPageData as &$product) {
+                    $variantCursor = null;
+                    $variants = [];
+                    do {
+                        $variantPageInfo = $product['variants']['pageInfo'] ?? null;
+                        $variantCursor = $variantPageInfo['endCursor'] ?? null;
+                        $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? false;
+                        $variants = array_merge($variants, $product['variants']['nodes'] ?? []);
+                        if ($variantHasNextPage) {
+                            $data['variables']['variantCursor'] = $variantCursor;
+                            $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+                            if ($variantResponse->getStatusCode() !== 200) {
+                                echo "Failed to $method $this->apiUrl/graphql.json: {$variantResponse->getContent()} \n";
+                                return null;
+                            }
+                            $variantData = json_decode($variantResponse->getContent(), true);
+                            $product['variants'] = $variantData['data']['product']['variants'];
+                        }
+                    } while ($variantHasNextPage);
+                    $product['variants'] = $variants;
+                }
+            }
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
