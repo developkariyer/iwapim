@@ -92,7 +92,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }*/
-        $this->prepareTokenProd();
+        //$this->prepareTokenProd();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
@@ -120,6 +120,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
             'headers' => [
+                'grant_type' => 'client_credentials',
+                'client_id' => $this->marketplace->getWayfairClientIdProd(),
+                'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
                 'Content-Type' => 'application/json'
             ],
             'json' => [
