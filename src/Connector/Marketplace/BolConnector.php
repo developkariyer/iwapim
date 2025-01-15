@@ -344,10 +344,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 $data = $response->toArray();
                 $orders = $data['orders'] ?? [];
-                /*foreach ($orders as  &$order) {
+                foreach ($orders as  &$order) {
                     foreach ($order['orderItems'] as  &$orderItem) {
-                        $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'].$orderItem['ean'].'/product-ids');
-                        print_r($productDetailResponse);
+                        $productDetailResponse = $this->httpClient->request("GET", static::$apiUrl['productsUrl'] . $orderItem['ean'] . '/product-ids');
+                        print_r($productDetailResponse->getStatusCode());
+                        print_r($productDetailResponse->getContent());
                         if ($productDetailResponse->getStatusCode() !== 200) {
                             echo "Failed to download product detail: " . $productDetailResponse->getContent() . "\n";
                             continue;
@@ -387,7 +388,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                         echo "Error: " . $e->getMessage() . "\n";
                     }
                     usleep(50000);
-                } */
+                }
                 $page++;
                 usleep(3000000);
             } while(count($orders) == 50);
