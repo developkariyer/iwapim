@@ -374,7 +374,8 @@ class BolConnector extends MarketplaceConnectorAbstract
                             }
                         }
                     }
-                    $order['orderDetail'] = $orderDetail; 
+                    $order['orderDetail'] = $orderDetail;
+                    print_r($order);
                     try {
                         Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
                             'marketplace_id' => $this->marketplace->getId(),
