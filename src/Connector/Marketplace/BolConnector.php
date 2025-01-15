@@ -358,7 +358,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                     }
                     $orderId = $order['orderId'];
                     $orderDetailResponse = $this->httpClient->request("GET", static::$apiUrl['orders'] . $orderId);
-                    print_r($orderDetailResponse->getContent());
                     if ($orderDetailResponse->getStatusCode() !== 200) {
                         echo "Failed to download order detail: " . $orderDetailResponse->getContent() . "\n";
                         continue;
@@ -392,9 +391,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
-            echo "Start date: " . $startDate . "\n";
-            echo "End date: " . $endDate . "\n";
-            echo "Now: " . $now . "\n";
             if ($startDate >= $now) {
                 echo "End of orders\n";
                 break;
