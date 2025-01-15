@@ -71,17 +71,24 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantPageInfo = $product['variants']['pageInfo'] ?? null;
                         $variantCursor = $variantPageInfo['endCursor'] ?? null;
                         $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? false;
-                        $variants = array_merge($variants, $product['variants']['nodes'] ?? []);
+                        $variants = array_merge($variants, $variantData['data']['product']['variants']['nodes'] ?? []);
                         if ($variantHasNextPage) {
-                            $data['variables']['variantCursor'] = $variantCursor;
-                            $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+                            $variantData = [
+                                'query' => $data['query'],
+                                'variables' => [
+                                    'variantCursor' => $variantCursor
+                                ],
+                            ];
+                            $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
+                                'json' => $variantData,
+                                'headers' => $headersToApi['headers']
+                            ]);
                             if ($variantResponse->getStatusCode() !== 200) {
-                                echo "Failed to $method $this->apiUrl/graphql.json: {$variantResponse->getContent()} \n";
+                                echo "Failed to fetch variants: {$variantResponse->getContent()} \n";
                                 return null;
                             }
                             $variantData = json_decode($variantResponse->getContent(), true);
-                            print_r($variantData);
-                            //$product['variants'] = $variantData['data']['product']['variants'];
+                            $variants = array_merge($variants, $variantData['data']['product']['variants']['nodes'] ?? []);
                         }
                     } while ($variantHasNextPage);
                     $product['variants'] = $variants;
