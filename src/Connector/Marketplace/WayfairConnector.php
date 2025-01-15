@@ -130,7 +130,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'variables' => $variables
             ]
         ]);
-        print_r($response->getContent());
+        print_r($response);
     }
 
     /**
