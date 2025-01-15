@@ -81,8 +81,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             }
             $data = $response->toArray();
             static::$expires_in = time() + $data['expires_in'];
-            print_r($data);
-            print_r(static::$expires_in);
             $this->marketplace->setWallmartAccessToken($data['access_token']);
             $this->marketplace->save();
         } catch (\Exception $e) {
