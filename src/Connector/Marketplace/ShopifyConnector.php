@@ -45,8 +45,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $allData = [];
         $cursor = null;
+        $variantCursor = null;
         do {
             $data['variables']['cursor'] = $cursor;
+            $data['variables']['variantCursor'] = $variantCursor;
             $headersToApi = [
                 'json' => $data,
                 'headers' => [
@@ -55,13 +57,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            print_r($response->getContent());
+            //print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
+            print_r($newData);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
@@ -76,8 +79,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 1, //Rate limit is OK!
-                'cursor' => null
+                'numProducts' => 1,
+                'cursor' => null,
+                'numVariants' => 2,
+                'variantCursor' => null
             ]
        ];
        $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');

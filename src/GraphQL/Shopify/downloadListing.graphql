@@ -1,4 +1,4 @@
-query GetProducts($numProducts: Int!, $cursor: String) {
+query GetProducts($numProducts: Int!, $cursor: String, $numVariants: Int, $variantCursor: String) {
     products(first: $numProducts, after: $cursor) {
         pageInfo {
             hasNextPage
@@ -21,7 +21,7 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 title
                 description
             }
-            variants(first: 50) {
+            variants(first: $numVariants, after: $variantCursor) {
                 pageInfo {
                     hasNextPage
                     endCursor
