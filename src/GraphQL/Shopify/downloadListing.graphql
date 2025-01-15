@@ -68,7 +68,7 @@ query GetProducts($numProducts: Int!, $cursor: String, $numVariants: Int, $varia
                 position
                 values
             }
-            media(first:50) {
+            media(first:1) {
                 nodes {
                     id
                     mediaContentType
