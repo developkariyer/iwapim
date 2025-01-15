@@ -393,6 +393,9 @@ class BolConnector extends MarketplaceConnectorAbstract
             } while(count($orders) == 50);
             $startDate = $endDate;
             $endDate = min(strtotime('+1 day', $startDate), $now);
+            echo "Start date: " . $startDate . "\n";
+            echo "End date: " . $endDate . "\n";
+            echo "Now: " . $now . "\n";
             if ($startDate >= $now) {
                 echo "End of orders\n";
                 break;
