@@ -21,39 +21,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 title
                 description
             }
-            variants(first: 50) {
-                nodes {
-                    id
-                    product {
-                        id
-                    }
-                    title
-                    price
-                    position
-                    inventoryPolicy
-                    compareAtPrice
-                    selectedOptions {
-                        name
-                        value
-                    }
-                    createdAt
-                    updatedAt
-                    taxable
-                    barcode
-                    sku
-                    inventoryItem {
-                        id
-                    }
-                    inventoryQuantity
-                    image {
-                        id
-                        altText
-                        width
-                        height
-                        src
-                    }
-                }
-            }
             variantsCount {
                 count
                 precision
@@ -64,14 +31,9 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 position
                 values
             }
-            images(first:20){
-                nodes {
-                    id
-                    altText
-                    width
-                    height
-                    src
-                }
+            mediaCount {
+                count
+                precision
             }
         }
     }

@@ -1,0 +1,33 @@
+variants(first: 50) {
+    nodes {
+        id
+        product {
+            id
+        }
+        title
+        price
+        position
+        inventoryPolicy
+        compareAtPrice
+        selectedOptions {
+            name
+            value
+        }
+        createdAt
+        updatedAt
+        taxable
+        barcode
+        sku
+        inventoryItem {
+            id
+        }
+        inventoryQuantity
+        image {
+            id
+            altText
+            width
+            height
+            src
+        }
+    }
+}
