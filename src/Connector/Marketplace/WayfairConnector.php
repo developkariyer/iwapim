@@ -15,7 +15,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
         'sandbox' => 'https://sandbox.api.wayfair.com/v1/graphql',
-        'catalog' => 'https://api.wayfair.com/v1/supplier-catalog-api/graphql',
+        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql',
         'prod' => 'https://api.wayfair.com/v1/graphql',
     ];
     public static string $marketplaceType = 'Wayfair';
@@ -120,7 +120,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
                 'Content-Type' => 'application/json'
             ],
             'json' => [
