@@ -76,7 +76,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 50, //Rate limit is OK!
+                'numProducts' => 1, //Rate limit is OK!
                 'cursor' => null
             ]
        ];

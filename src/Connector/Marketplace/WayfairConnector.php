@@ -89,19 +89,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function download($forceDownload = false): void
     {
-        $response = $this->httpClient->request('POST', "https://sso.auth.wayfair.com/oauth/token",[
-            'headers' => [
-                'content-type' => 'application/json',
-                'cache-control' => 'no-cache'
-            ],
-            'json' => [
-                'grant_type' => 'client_credentials',
-                'client_id' => $this->marketplace->getWayfairClientIdProd(),
-                'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                'audience' => 'https://api.wayfair.com/'
-            ]
-        ]);
-        print_r($response->getContent());
         echo "Downloading Wayfair...\n";
         /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
