@@ -97,6 +97,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
        }
+        $this->prepareToken();
        echo "Token is valid. Proceeding with download...\n";
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
