@@ -334,7 +334,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $endDate = min(strtotime('+1 day', $startDate), $now);
         do {
             $page = 1;
-            echo "Page $page for date  " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . date('Y-m-d', $now) . "\n";
+            echo "Page $page for date  " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
             do {
                 $params = ['status' => 'ALL', 'page' => $page, 'fulfilment-method' => 'ALL','latest-change-date'=>date('Y-m-d', $startDate)];
                 $response = $this->httpClient->request("GET", static::$apiUrl['orders'], ['query' => $params]);
