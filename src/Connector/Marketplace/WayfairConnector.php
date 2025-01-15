@@ -13,9 +13,9 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class WayfairConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'oauth' => 'https://sso.auth.wayfair.io/oauth/token',
+        'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
         'sandbox' => 'https://sandbox.api.wayfair.com/v1/graphql',
-        'catalog' => 'https://api.wayfair.io/v1/supplier-catalog-api/graphql',
+        'catalog' => 'https://api.wayfair.com/v1/supplier-catalog-api/graphql',
         'prod' => 'https://api.wayfair.com/v1/graphql',
     ];
     public static string $marketplaceType = 'Wayfair';
@@ -58,7 +58,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->marketplace->getWayfairClientIdProd(),
                     'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                    'audience' => 'https://api.wayfair.io/'
+                    'audience' => 'https://api.wayfair.com/'
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
