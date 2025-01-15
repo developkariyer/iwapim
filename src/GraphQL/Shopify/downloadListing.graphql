@@ -23,52 +23,38 @@ query GetProducts($numProducts: Int!, $cursor: String) {
             }
             variants(first: 50) {
                 nodes {
-                    availableForSale
-                    barcode
-                    compareAtPrice
-                    createdAt
-                    displayName
                     id
-                    image {
-                        altText
-                        height
+                    product {
                         id
-                        url
-                        width
+                    }
+                    title
+                    price
+                    position
+                    inventoryPolicy
+                    compareAtPrice
+                    selectedOptions {
+                        name
+                        value
+                    }
+                    createdAt
+                    updatedAt
+                    taxable
+                    barcode
+                    sku
+                    unitPriceMeasurement {
+                        measuredType
+                        quantityUnit
+                        quantityValue
+                        referenceUnit
+                        referenceValue
                     }
                     inventoryItem {
-                        countryCodeOfOrigin
-                        createdAt
-                        duplicateSkuCount
                         id
-                        inventoryHistoryUrl
-                        harmonizedSystemCode
-                        legacyResourceId
-                        measurement {
-                            id
-                            weight {
-                                unit
-                                value
-                            }
-                        }
-                        provinceCodeOfOrigin
-                        sku
-                        tracked
-                        unitCost {
-                            amount
-                            currencyCode
-                        }
-                        updatedAt
                     }
                     inventoryQuantity
-                    legacyResourceId
-                    position
-                    price
-                    sku
-                    taxable
-                    taxCode
-                    title
-                    updatedAt
+                    image {
+                        id
+                    }
                 }
             }
             variantsCount {
