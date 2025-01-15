@@ -71,18 +71,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantPageInfo = $product['variants']['pageInfo'] ?? null;
                         $variantCursor = $variantPageInfo['endCursor'] ?? null;
                         $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? false;
-                        $variants = array_merge($variants, $variantData['data']['product']['variants']['nodes'] ?? []);
+                        $variants = array_merge($variants, $product['variants']['nodes'] ?? []);
                         if ($variantHasNextPage) {
-                            $variantData = [
-                                'query' => $data['query'],
-                                'variables' => [
-                                    'variantCursor' => $variantCursor
-                                ],
-                            ];
+                            $data['variables']['variantCursor'] = $variantCursor;
                             $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
-                                'json' => $variantData,
+                                'json' => $data,
                                 'headers' => $headersToApi['headers']
                             ]);
+                            print_r($variantResponse->getContent());
                             if ($variantResponse->getStatusCode() !== 200) {
                                 echo "Failed to fetch variants: {$variantResponse->getContent()} \n";
                                 return null;
@@ -93,6 +89,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     } while ($variantHasNextPage);
                     $product['variants'] = $variants;
                 }
+                $data['variables']['variantCursor'] = null;
             }
             print_r($currentPageData);
             break;
