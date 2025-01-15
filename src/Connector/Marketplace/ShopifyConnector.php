@@ -63,36 +63,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             $newData = json_decode($response->getContent(), true);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
-            if ($key === 'products') {
-                foreach ($currentPageData as &$product) {
-                    $variantCursor = null;
-                    $variants = [];
-                    do {
-                        $variantPageInfo = $product['variants']['pageInfo'] ?? null;
-                        $variantCursor = $variantPageInfo['endCursor'] ?? null;
-                        $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? false;
-                        $variants = array_merge($variants, $product['variants']['nodes'] ?? []);
-                        if ($variantHasNextPage) {
-                            $data['variables']['variantCursor'] = $variantCursor;
-                            $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
-                                'json' => $data,
-                                'headers' => $headersToApi['headers']
-                            ]);
-                            print_r($variantResponse->getContent());
-                            if ($variantResponse->getStatusCode() !== 200) {
-                                echo "Failed to fetch variants: {$variantResponse->getContent()} \n";
-                                return null;
-                            }
-                            $variantData = json_decode($variantResponse->getContent(), true);
-                            $variants = array_merge($variants, $variantData['data']['product']['variants']['nodes'] ?? []);
-                        }
-                    } while ($variantHasNextPage);
-                    $product['variants'] = $variants;
-                }
-                $data['variables']['variantCursor'] = null;
-            }
-            print_r($currentPageData);
-            break;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
