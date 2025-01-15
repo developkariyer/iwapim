@@ -80,7 +80,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                                 return null;
                             }
                             $variantData = json_decode($variantResponse->getContent(), true);
-                            $product['variants'] = $variantData['data']['product']['variants'];
+                            print_r($variantData);
+                            //$product['variants'] = $variantData['data']['product']['variants'];
                         }
                     } while ($variantHasNextPage);
                     $product['variants'] = $variants;
