@@ -52,7 +52,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
                 'headers' => [
-                    'content-type' => 'application/json'
+                    'content-type' => 'application/json',
+                    'cache-control' => 'no-cache'
                 ],
                 'json' => [
                     'grant_type' => 'client_credentials',
@@ -90,13 +91,14 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     {
         $response = $this->httpClient->request('POST', "https://sso.auth.wayfair.com/oauth/token",[
             'headers' => [
-                'content-type' => 'application/json'
+                'content-type' => 'application/json',
+                'cache-control' => 'no-cache'
             ],
             'json' => [
                 'grant_type' => 'client_credentials',
                 'client_id' => $this->marketplace->getWayfairClientIdProd(),
                 'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                'audience' => 'https://sandbox.api.wayfair.com/'
+                'audience' => 'https://api.wayfair.com/'
             ]
         ]);
         print_r($response->getContent());
