@@ -6,38 +6,21 @@ query GetProducts($numProducts: Int!, $cursor: String) {
         }
         nodes {
             id
-            category {
-                name
-            }
-            createdAt
-            description
+            title
             descriptionHtml
-            feedback {
-                details {
-                    messages {
-                        field
-                        message
-                    }
-                }
-                summary
-            }
-            handle
-            isGiftCard
-            onlineStorePreviewUrl
-            onlineStoreUrl
+            vendor
             productType
+            createdAt
+            handle
+            updatedAt
             publishedAt
+            templateSuffix
+            tags
+            status
             seo {
                 title
                 description
             }
-            status
-            tags
-            templateSuffix
-            title
-            totalInventory
-            tracksInventory
-            updatedAt
             variants(first: 50) {
                 nodes {
                     availableForSale
@@ -92,7 +75,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 count
                 precision
             }
-            vendor
         }
     }
 }
