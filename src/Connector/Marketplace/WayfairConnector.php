@@ -96,7 +96,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'grant_type' => 'client_credentials',
                 'client_id' => $this->marketplace->getWayfairClientIdProd(),
                 'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                'audience' => 'https://api.wayfair.io/'
+                'audience' => 'https://sandbox.api.wayfair.com/'
             ]
         ]);
         print_r($response->getContent());
