@@ -254,7 +254,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         while ($nextLink) {
             $response = $this->httpClient->request($method, $nextLink, $headersToApi);
-            print_r($response->getContent());
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
@@ -291,8 +290,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        //$this->graphqlDownload();
-        $this->getFromShopifyApi('GET', 'products.json', ['limit' => 1], 'products');
+        $this->graphqlDownload();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;

@@ -60,6 +60,15 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 position
                 values
             }
+            images(first:20){
+                nodes {
+                    id
+                    altText
+                    width
+                    height
+                    src
+                }
+            }
         }
     }
 }
