@@ -74,9 +74,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'variantCursor' => null
                         ]
                     ];
+                    $headersToApi = [
+                        'json' => $query,
+                        'headers' => [
+                            'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                            'Content-Type' => 'application/json'
+                        ]
+                    ];
                     $variantCursor  = null;
                     do {
                         $query['variables']['variantCursor'] = $variantCursor;
+                        $headersToApi['json'] = $query;
                         $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
                             'json' => $query,
                             'headers' => $headersToApi['headers']
@@ -119,9 +127,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
                 'numProducts' => 3,
-                'cursor' => null,
-                'numVariants' => 2,
-                'variantCursor' => null
+                'cursor' => null
             ]
        ];
        $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
