@@ -73,7 +73,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     while($variantHasNextPage) {
                         echo "While ";
                         $data['variables']['variantCursor'] = $variantCursor;
-                        print_r($data);
+                        print_r($data['variables']);
                         $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
                             'json' => $data,
                             'headers' => $headersToApi['headers']
