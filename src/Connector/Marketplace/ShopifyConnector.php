@@ -55,14 +55,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            //print_r($response->getContent());
+            print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
-            if ($key === 'products') {
+            /*if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
                 $productCount = 0;
                 print_r($products);
@@ -91,8 +91,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     };
                     $productCount++;
                     echo "product count: $productCount\n";
-                }*/
-            }
+                }
+            }*/
             //unset($products);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
