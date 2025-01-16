@@ -301,7 +301,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();*
+       $this->putListingsToCache();*/
     }
 
     /**
