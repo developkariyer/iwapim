@@ -90,6 +90,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'json' => $query,
                             'headers' => $variantHeadersToApi['headers']
                         ]);
+                        print_r($variantResponse->getContent());
                         usleep(200000);
                         if ($variantResponse->getStatusCode() !== 200) {
                             echo "Failed to $method $this->apiUrl/graphql.json: {$variantResponse->getContent()} \n";
