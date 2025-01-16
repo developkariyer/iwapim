@@ -74,7 +74,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'variantCursor' => null
                         ]
                     ];
-                    $headersToApi = [
+                    $variantHeadersToApi = [
                         'json' => $query,
                         'headers' => [
                             'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
@@ -84,10 +84,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $variantCursor  = null;
                     do {
                         $query['variables']['variantCursor'] = $variantCursor;
-                        $headersToApi['json'] = $query;
+                        $variantHeadersToApi['json'] = $query;
                         $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
                             'json' => $query,
-                            'headers' => $headersToApi['headers']
+                            'headers' => $variantHeadersToApi['headers']
                         ]);
                         usleep(200000);
                         if ($variantResponse->getStatusCode() !== 200) {
