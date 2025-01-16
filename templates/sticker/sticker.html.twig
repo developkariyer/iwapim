@@ -204,6 +204,7 @@
             localStorage.setItem('group_id', groupId);
             document.getElementById("groupTitle").innerHTML = groupName;
             document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').disabled = false;
             loadStickers(groupId, 1, searchTerm);
         }
     </script>
