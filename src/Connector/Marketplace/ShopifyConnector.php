@@ -55,62 +55,19 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            //print_r($response->getContent());
+            print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
-            if ($key === 'products') {
-                $products = $newData['data'][$key]['nodes'] ?? [];
-                foreach ($products as $product) {
-                    $productNode = $product['node'];
-                    $variantCursor = null;
-                    $hasMoreVariants = true;
-                    while ($hasMoreVariants) {
-                        $data['variables']['variantCursor'] = $variantCursor;
-                        
-                        $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
-                            'json' => $data,
-                            'headers' => $headersToApi['headers']
-                        ]);
-                        
-                        $variantData = json_decode($variantResponse->getContent(), true);
-                        $variants = $variantData['data'][$key]['nodes'][0]['node']['variants']['nodes'] ?? [];
-                        
-                        if (!empty($variants)) {
-                            $productNode['variants']['nodes'] = array_merge(
-                                $productNode['variants']['nodes'] ?? [],
-                                $variants
-                            );
-                            
-                            $variantPageInfo = $variantData['data'][$key]['nodes'][0]['node']['variants']['pageInfo'];
-                            $hasMoreVariants = $variantPageInfo['hasNextPage'];
-                            $variantCursor = end($variants)['cursor'];
-                        } else {
-                            $hasMoreVariants = false;
-                        }
-                        
-                        usleep(200000);
-                    }
-                    
-                    $allData[] = $productNode;
-                }
-                
-                $pageInfo = $newData['data'][$key]['pageInfo'];
-                $productCursor = end($products)['cursor'];
-                $hasNextPage = $pageInfo['hasNextPage'];
-                
-            } else {
-                $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
-                $allData = array_merge($allData, $currentPageData);
-                $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
-                $productCursor = $pageInfo['endCursor'] ?? null;
-                $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            }
+            $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
+            $allData = array_merge($allData, $currentPageData);
+            $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
+            $productCursor = $pageInfo['endCursor'] ?? null;
+            $hasNextPage = $pageInfo['hasNextPage'] ?? false;
         } while ($hasNextPage);
-        print_r($allData);
         return $allData;
     }
 
@@ -344,7 +301,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();*/
+       $this->putListingsToCache();*
     }
 
     /**
