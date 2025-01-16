@@ -55,7 +55,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            print_r($response->getContent());
+            //print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
@@ -65,8 +65,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
                 $productCount = 0;
-                print_r($products);
-               /* foreach ($products as $product) {
+               foreach ($products as $product) {
                     $variantCursor = $product['variants']['pageInfo']['endCursor'];
                     $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
                     echo "variant cursor: $variantCursor\n";
@@ -88,10 +87,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantPageInfo = $variantData['data'][$key]['nodes'][$productCount]['variants']['pageInfo'];
                         $variantHasNextPage = $variantPageInfo['hasNextPage'];
                         $variantCursor = $variantPageInfo['endCursor'];
-                    };
+                    };*/
                     $productCount++;
                     echo "product count: $productCount\n";
-                }*/
+                }
             }
             //unset($products);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
