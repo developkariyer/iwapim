@@ -66,16 +66,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $products = $newData['data']['products']['nodes'];
                 foreach ($products as &$product) {
                     $productId = $product['id'];
-                    //$variants = $this->graphqlPaginatedDownloadProduct($productId,$this->graphqlUrl . 'downloadVariant.graphql','variants','variantCursor',3);
-                    $variants = $this->graphqlVariantDownload($productId, 3);
+                    $variants = $this->graphqlPaginatedDownloadProduct($productId, 'downloadVariant.graphql','variants','variantCursor',3);
                     if (!empty($variants)) {
                         $product['variants']['nodes'] = array_merge(
                             $product['variants']['nodes'] ?? [],
                             $variants
                         );
                     }
-                    //$medias = $this->graphqlPaginatedDownloadProduct($productId,$this->graphqlUrl . 'downloadMedia.graphql','media','mediaCursor', 3);
-                    $medias = $this->graphqlMediaDownload($productId, 3);
+                    $medias = $this->graphqlPaginatedDownloadProduct($productId,'downloadMedia.graphql','media','mediaCursor', 3);
                     if (!empty($medias)) {
                         $product['media']['nodes'] = array_merge(
                             $product['media']['nodes'] ?? [],
@@ -98,85 +96,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $allData;
     }
 
-    public function graphqlMediaDownload($productId, $numMedia=2)
-    {
-        $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadMedia.graphql'),
-            'variables' => [
-                'ownerId' => $productId,
-                'numMedia' => $numMedia,
-                'mediaCursor' => null
-            ]
-        ];
-        $mediaHeadersToApi = [
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json'
-            ]
-        ];
-        $mediasCollected = [];
-        $mediaCursor = null;
-        do {
-            $query['variables']['mediaCursor'] = $mediaCursor;
-            $mediaResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
-                'json' => $query,
-                'headers' => $mediaHeadersToApi['headers']
-            ]);
-            usleep(200000);
-            if ($mediaResponse->getStatusCode() !== 200) {
-                echo "Failed to fetch variants for product $productId: {$mediaResponse->getContent()} \n";
-                break;
-            }
-            $mediaData = json_decode($mediaResponse->getContent(), true);
-            $medias = $mediaData['data']['product']['media']['nodes'] ?? [];
-            $mediasCollected = array_merge($mediasCollected, $medias);
-            $mediaPageInfo = $mediaData['data']['product']['media']['pageInfo'];
-            $mediaCursor = $mediaPageInfo['endCursor'] ?? null;
-            $mediaHasNextPage = $mediaPageInfo['hasNextPage'] ?? null;
-        } while ($mediaHasNextPage);
-        return $mediasCollected;
-    }
-
-    public function graphqlVariantDownload($productId, $numVariant=2)
-    {
-        $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadVariant.graphql'),
-            'variables' => [
-                'ownerId' => $productId,
-                'numVariants' => $numVariant,
-                'variantCursor' => null
-            ]
-        ];
-        $variantHeadersToApi = [
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json'
-            ]
-        ];
-        $variantsCollected = [];
-        $variantCursor = null;
-        do {
-            $query['variables']['variantCursor'] = $variantCursor;
-            $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
-                'json' => $query,
-                'headers' => $variantHeadersToApi['headers']
-            ]);
-            usleep(200000);
-            if ($variantResponse->getStatusCode() !== 200) {
-                echo "Failed to fetch variants for product $productId: {$variantResponse->getContent()} \n";
-                break;
-            }
-            $variantData = json_decode($variantResponse->getContent(), true);
-            $variants = $variantData['data']['product']['variants']['nodes'] ?? [];
-            $variantsCollected = array_merge($variantsCollected, $variants);
-            $variantPageInfo = $variantData['data']['product']['variants']['pageInfo'];
-            $variantCursor = $variantPageInfo['endCursor'] ?? null;
-            $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? null;
-        } while ($variantHasNextPage);
-        return $variantsCollected;
-    }
-
-    public function graphqlPaginatedDownloadProduct($productId, $queryFile, $nodeKey, $cursorKey, $numItems = 2)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function graphqlPaginatedDownloadProduct($productId, $queryFile, $nodeKey, $cursorKey, $numItems = 2): array
     {
         $query = [
             'query' => file_get_contents($this->graphqlUrl . $queryFile),
@@ -253,7 +179,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
             'variables' => [
-                'numOrders' => 50,
+                'numOrders' => 5,
                 'cursor' => null,
                 'filter' => $filter
             ]
@@ -434,8 +360,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->graphqlDownload();
-       /*if (!$forceDownload && $this->getListingsFromCache()) {
+        //$this->graphqlDownload();
+       //$this->downloadOrdersGraphql();
+       if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -444,7 +371,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();*/
+       $this->putListingsToCache();
     }
 
     /**

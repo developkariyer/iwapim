@@ -5,227 +5,190 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             endCursor
         }
         nodes {
-            billingAddress {
-                city
-                company
-                country
-                countryCodeV2
-                formattedArea
-                id
-                province
-            }
-            cancellation {
-                staffNote
-            }
-            cancelledAt
-            cancelReason
-            capturable
-            cartDiscountAmountSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            closed
-            closedAt
-            confirmationNumber
-            confirmed
-            createdAt
+            id
+            name
+            note
+            tags
+            test
             currencyCode
-            currentCartDiscountAmountSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            currentSubtotalLineItemsQuantity
-            currentSubtotalPriceSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            currentTaxLines {
-                channelLiable
+            closedAt
+            confirmed
+            poNumber
+            taxLines {
+                rate
+                price
+                title
                 priceSet {
-                    presentmentMoney {
-                        amount
-                        currencyCode
-                    }
                     shopMoney {
                         amount
                         currencyCode
                     }
-                }
-                rate
-                ratePercentage
-                title
-            }
-            currentTotalDiscountsSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            currentTotalDutiesSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            currentTotalPriceSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            currentTotalTaxSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            currentTotalWeight
-            customAttributes {
-                key
-                value
-            }
-            customerAcceptsMarketing
-            discountCode
-            displayFinancialStatus
-            edited
-            fulfillable
-            fullyPaid
-            id
-            lineItems(first:50) {
-                nodes {
-                    currentQuantity
-                    id
-                    isGiftCard
-                    name
-                    quantity
-                    refundableQuantity
-                    requiresShipping
-                    restockable
-                    sku
-                    taxable
-                    title
-                    variant {
-                        availableForSale
-                        barcode
-                        compareAtPrice
-                        createdAt
-                        displayName
-                        id
-                        price
-                        sku
-                        title
-                        updatedAt
+                    presentmentMoney {
+                        amount
+                        currencyCode
                     }
-                    vendor
                 }
-            }
-            name
-            poNumber
-            presentmentCurrencyCode
-            processedAt
-            refundable
-            registeredSourceUrl
-            requiresShipping
-            restockable
-            shippingAddress {
-                city
-                company
-                country
-                countryCodeV2
-                formattedArea
-                id
-                province
-            }
-            sourceName
-            tags
-            test
-            totalDiscountsSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            totalPriceSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            totalReceivedSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
-            }
-            totalRefundedSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
-                shopMoney {
-                    amount
-                    currencyCode
-                }
+                channelLiable
             }
             totalTaxSet {
-                presentmentMoney {
-                    amount
-                    currencyCode
-                }
                 shopMoney {
                     amount
                     currencyCode
                 }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
             }
-            totalWeight
-            unpaid
+            createdAt
+            lineItems (first:5) {
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+                nodes {
+                    id
+                    sku
+                    name
+                    title
+                    duties {
+                        id
+                        countryCodeOfOrigin
+                        harmonizedSystemCode
+                        price {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                    }
+                    vendor
+                    taxable
+                    quantity
+                    isGiftCard
+                    product {
+                        id
+                    }
+                    variant {
+                        id
+                        title
+                        price
+                    }
+                    totalDiscountSet {
+                        shopMoney {
+                            amount
+                            currencyCode
+                        }
+                        presentmentMoney {
+                            amount
+                            currencyCode
+                        }
+                    }
+                    requiresShipping
+                }
+            }
+            registeredSourceUrl
+            taxExempt
             updatedAt
+            sourceName
+            totalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            cancelledAt
+            landingPageUrl
+            processedAt
+            totalWeight
+            cancelReason
+            discountCodes
+            referrerUrl
+            subtotalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            taxesIncluded
+            currentTotalTaxSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            displayFulfillmentStatus
+            subtotalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalTipReceivedSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            confirmationNumber
+            currentTotalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalDiscountsSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            presentmentCurrencyCode
+            currentTotalTaxSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+
+
+
         }
     }
 }

@@ -31,21 +31,6 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 position
                 values
             }
-            media(first:1) {
-                nodes {
-                    id
-                    mediaContentType
-                    preview {
-                        image {
-                            id
-                            altText
-                            width
-                            height
-                            url
-                        }
-                    }
-                }
-            }
             mediaCount {
                 count
                 precision

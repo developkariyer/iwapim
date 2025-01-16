@@ -1,6 +1,6 @@
-query ProductMetafield($ownerId: ID!, $numVariants: Int, $variantCursor: String) {
+query ProductMetafield($ownerId: ID!, $numItems: Int, $variantCursor: String) {
     product(id: $ownerId) {
-        variants(first: $numVariants, after: $variantCursor) {
+        variants(first: $numItems, after: $variantCursor) {
             pageInfo {
                 hasNextPage
                 endCursor
