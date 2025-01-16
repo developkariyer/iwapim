@@ -1,52 +1,17 @@
 {% extends 'sticker/sticker_base.html.twig' %}
 {% block content %}
 <div class="container mt-2">
-    <div class="row">
-        <div class="col-12">
-            <div class="row mt-2">
-                <div class="col-12 col-md-3 mb-2">
-                    <a href="{{ path('sticker_new_group') }}" class="btn btn-success w-100">Yeni Grup</a>
-                </div>
-                <div class="col-12 col-md-3 mb-2">
-                    <a href="{{ path('sticker_new') }}" class="btn btn-success w-100">Yeni Etiket</a>
-                </div>
-                <div class="col-12 col-md-3 mb-2">
-                    <input type="text" id="searchInput" placeholder="Ara..." class="form-control mb-3" >
-                </div>
-                <div class="col-12 col-md-3 mb-2">
-                    <!--div class="dropdown">
-                        <button class="btn btn-outline-dark dropdown-toggle text-truncate w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            Grup Seç
-                        </button>
-                        <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                            {% for group in groups %}
-                                <li>
-                                    <a class="dropdown-item text-truncate" href="#" onclick="selectGroup('{{ group.name }}', {{ group.id }})">
-                                        {{ group.name }}
-                                    </a>
-                                </li>
-                            {% else %}
-                                <li>
-                                    <span class="dropdown-item text-muted">Grup Yok</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div-->
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-12"><h5 id="groupTitle"></h5></div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
+    <div class="row mt-2">
+        <div class="col-12"><h5 id="groupTitle"></h5></div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
 
-                </div>
-                <nav class="col-12" aria-label="Page navigation">
-                    <ul id="pagination-container" class="pagination justify-content-center">
-                    </ul>
-                </nav>
-            </div>
         </div>
+        <nav class="col-12" aria-label="Page navigation">
+            <ul id="pagination-container" class="pagination justify-content-center">
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}
