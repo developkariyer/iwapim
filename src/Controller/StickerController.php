@@ -45,7 +45,7 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"GET", "POST"})
+     * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"POST"})
      * @param Request $request
      * @return Response
      * @throws DuplicateFullPathException
@@ -56,21 +56,21 @@ class StickerController extends FrontendController
             $formData = $request->request->get('form_data');
             if (!preg_match('/^[a-zA-Z0-9_ ]+$/', $formData)) {
                 $this->addFlash('error', 'Grup adı sadece harf, rakam, boşluk ve alt çizgi içerebilir.');
-                return $this->redirectToRoute('sticker_new_group');
+                return $this->redirectToRoute('sticker_main_page');
             }
             if (mb_strlen($formData) > 190) {
                 $this->addFlash('error', 'Grup adı 190 karakterden uzun olamaz.');
-                return $this->redirectToRoute('sticker_new_group');
+                return $this->redirectToRoute('sticker_main_page');
             }
             $operationFolder = Utility::checkSetPath('Operasyonlar');
             if (!$operationFolder) {
                 $this->addFlash('error', 'Operasyonlar klasörü bulunamadı.');
-                return $this->redirectToRoute('sticker_new_group');
+                return $this->redirectToRoute('sticker_main_page');
             }
             $existingGroup = GroupProduct::getByPath($operationFolder->getFullPath() . '/' . $formData);
             if ($existingGroup) {
                 $this->addFlash('error', 'Bu grup zaten mevcut.');
-                return $this->redirectToRoute('sticker_new_group');
+                return $this->redirectToRoute('sticker_main_page');
             }
             $newGroup = new GroupProduct();
             $newGroup->setParent($operationFolder);
@@ -80,13 +80,11 @@ class StickerController extends FrontendController
                 $newGroup->save();
             } catch (Exception $e) {
                 $this->addFlash('error', 'Grup eklenirken bir hata oluştu:'.' '.$e);
-                return $this->redirectToRoute('sticker_new_group');
+                return $this->redirectToRoute('sticker_main_page');
             }
             $this->addFlash('success', 'Grup Başarıyla Eklendi.');
         }
-        return $this->render('sticker/add_sticker_group.html.twig', [
-            'groups' => $this->getGroupList()
-        ]);
+        return $this->redirectToRoute('sticker_main_page');
     }
 
     /**
