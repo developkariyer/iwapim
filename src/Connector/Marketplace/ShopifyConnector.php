@@ -84,7 +84,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $variantCursor  = null;
                     do {
                         $query['variables']['variantCursor'] = $variantCursor;
-                        print_r($query['variables']);
                         $variantHeadersToApi['json'] = $query;
                         $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
                             'json' => $query,
@@ -96,8 +95,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         }
                         $variantData = json_decode($variantResponse->getContent(), true);
                         $variants = $variantData['data']['product']['variants']['nodes'] ?? [];
-                        print_r($variants);
-
                         if (!empty($variants)) {
                             $product['variants']['nodes'] = array_merge(
                                 $product['variants']['nodes'] ?? [],
