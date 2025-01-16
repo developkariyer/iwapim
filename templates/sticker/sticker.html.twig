@@ -234,7 +234,7 @@
 
         function selectGroup(groupName, groupId) {
             localStorage.setItem('group_id', groupId);
-            document.getElementById("dropdownMenuButton").innerHTML = groupName;
+            //document.getElementById("dropdownMenuButton").innerHTML = groupName;
             document.getElementById('searchInput').value = '';
             loadStickers(groupId, 1, searchTerm);
         }
