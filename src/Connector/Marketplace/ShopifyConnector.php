@@ -65,7 +65,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
                 $productCount = 0;
-               foreach ($products as $product) {
+               foreach ($products as &$product) {
                     $variantCursor = $product['variants']['pageInfo']['endCursor'];
                     $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
                     echo "variant cursor: $variantCursor\n";
@@ -77,12 +77,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'json' => $data,
                             'headers' => $headersToApi['headers']
                         ]);
+                        usleep(200000);
                         $variantData = json_decode($variantResponse->getContent(), true);
                         $variants = $variantData['data'][$key]['nodes'][$productCount]['variants']['nodes'] ?? [];
-                        print_r($variants);
                         if (!empty($variants)) {
                             $product['variants']['nodes'] = array_merge(
-                                $productNode['variants']['nodes'] ?? [],
+                                $product['variants']['nodes'] ?? [],
                                 $variants
                             );
                         }
@@ -92,9 +92,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     };
                     $productCount++;
                     echo "product count: $productCount\n";
-                }
+               }
             }
             //unset($products);
+            print_r(json_encode($newData));
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
