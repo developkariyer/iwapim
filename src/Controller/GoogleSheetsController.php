@@ -23,8 +23,9 @@ class GoogleSheetsController extends FrontendController
 FROM 
     iwa_amazon_daily_sales_summary
 GROUP BY 
-    iwasku;
-";
+    iwasku
+ORDER BY
+    iwasku;";
 
     /**
      * @Route("/sheets/main", name="sheets")
