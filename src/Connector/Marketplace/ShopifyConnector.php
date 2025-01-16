@@ -78,7 +78,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'json' => $query,
                         'headers' => $headersToApi['headers']
                     ]);
-                    print_r($variantResponse);
+                    print_r(json_encode($variantResponse->getContent()));
 
 
                     /*$variantCursor = $product['variants']['pageInfo']['endCursor'];
