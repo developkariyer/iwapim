@@ -88,7 +88,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantCursor = $variantPageInfo['endCursor'];
                     };
                     $productCount++;
-                    echo "product count: $productCount\n";
                 }
                 unset($product);
                 $newData['data']['products']['nodes'] = $products;
@@ -100,7 +99,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             break;
         } while ($hasNextPage);
-        print_r($allData);
+        print_r(\Safe\json_encode($allData));
         return $allData;
     }
 
