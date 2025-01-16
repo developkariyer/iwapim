@@ -14,7 +14,27 @@
     {% block head_scripts %}{% endblock %}
 </head>
 <body>
-<header>{% block header %}{% endblock %}</header>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">IWAPIM Frontend</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Uygulamalar
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{{ path('ozon_menu') }}">Ozon Listing</a></li>
+                    <li><a class="dropdown-item" href="{{ path('sticker_main_page') }}">Etiket</a></li>
+                </ul>
+            </li>
+            {% block header %}
+            {% endblock %}
+        </div>
+    </nav>
+</header>
 <main class="container mt-4">
     {% for type, messages in app.flashes %}
         {% for message in messages %}
