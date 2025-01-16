@@ -79,7 +79,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'headers' => $headersToApi['headers']
                     ]);
 
-                    $variantData = json_decode($response->getContent(), true);
+                    $variantData = json_decode($variantResponse->getContent(), true);
                     print_r(json_encode($variantData));
 
 
