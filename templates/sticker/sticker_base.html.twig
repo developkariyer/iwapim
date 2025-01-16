@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %} Sticker {% endblock %}
+{% block navbaritems %}
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Etiket
+        </a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ path('sticker_new_group') }}">Yeni Grup</a></li>
+            <li><a class="dropdown-item" href="{{ path('sticker_new') }}">Yeni Etiket</a></li>
+        </ul>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Gruplar
+        </a>
+        <ul class="dropdown-menu">
+            {% for group in groups %}
+            <li><a class="dropdown-item" href="#" onclick="selectGroup('{{ group.name }}', {{ group.id }})">{{ group.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endblock %}
+{% block header %}
+    <div class="d-flex" role="search">
+        <!--suppress HtmlFormInputWithoutLabel -->
+        <input type="text" id="searchInput" placeholder="Ara..." class="form-control mb-3" >
+    </div>
+{% endblock %}
