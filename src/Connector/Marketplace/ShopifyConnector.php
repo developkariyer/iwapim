@@ -64,9 +64,24 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $newData = json_decode($response->getContent(), true);
             if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
-                print_r(json_encode($products));
                 foreach ($products as &$product) {
-                    $variantCursor = $product['variants']['pageInfo']['endCursor'];
+                    $productId = $product['id'];
+                    $query = [
+                        'query' => file_get_contents($this->graphqlUrl . 'downloadVariant.graphql'),
+                        'variables' => [
+                            '$ownerId' => $productId,
+                            'numVariants' => 3,
+                            'variantCursor' => null
+                        ]
+                    ];
+                    $variantResponse = $this->httpClient->request($query, $this->apiUrl . '/graphql.json', [
+                        'json' => [],
+                        'headers' => $headersToApi['headers']
+                    ]);
+                    print_r($variantResponse);
+
+
+                    /*$variantCursor = $product['variants']['pageInfo']['endCursor'];
                     $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
                     while($variantHasNextPage) {
                         $data['variables']['variantCursor'] = $variantCursor;
@@ -86,7 +101,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantPageInfo = $variantData['data'][$key]['nodes'][0]['variants']['pageInfo'];
                         $variantHasNextPage = $variantPageInfo['hasNextPage'];
                         $variantCursor = $variantPageInfo['endCursor'];
-                    };
+                    };*/
                 }
                 unset($product);
                 $newData['data']['products']['nodes'] = $products;
