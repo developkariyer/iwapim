@@ -149,10 +149,10 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        const groupedCards = Object.keys(data.stickers).map(identifier => {
+                        container.innerHTML = Object.keys(data.stickers).map(identifier => {
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
-                            const card = `
+                            return `
                                    <div class="accordion" id="accordion-${identifier}">
                                         <div class="accordion-item mb-3">
                                             <h2 class="accordion-header" id="heading-${identifier}">
@@ -176,9 +176,7 @@
                                         </div>
                                    </div>
                             `;
-                            return card;
                         }).join('');
-                        container.innerHTML = groupedCards;
                         totalPages = data.pagination.total_pages;
                         if (searchTerm !== '') {
                             paginationContainer.style.visibility = 'hidden';
@@ -298,16 +296,5 @@
             loadStickers(groupId, 1, searchTerm);
         }
     </script>
-    <style>
-        .accordion-button:not(.collapsed) {
-            background-color: #f8f9fa;
-            color: #000;
-        }
 
-        .accordion-button {
-            background-color: #f8f9fa;
-            color: #000;
-            border: 1px solid #ccc;
-        }
-    </style>
 {% endblock %}
