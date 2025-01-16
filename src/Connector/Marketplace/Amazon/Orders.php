@@ -75,7 +75,8 @@ class Orders
                 $orders = array_merge($orders, $responseJson['payload']['Orders'] ?? []);
                 $nextToken = $responseJson['payload']['NextToken'] ?? null;        
                 echo ($responseJson['payload']['Orders'][0]['LastUpdateDate'] ?? "."). "\n";
-            } catch (\Exception) {
+            } catch (\Exception $e) {
+                echo "Error: " . $e->getMessage() . "\n";
                 $this->orderRateLimit = 60;
                 echo "Order rate limit set to 60 seconds\n";
             }

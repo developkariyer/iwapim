@@ -1,0 +1,25 @@
+query ProductMetafield($ownerId: ID!, $numMedia: Int, $mediaCursor: String) {
+    product(id: $ownerId) {
+        media (first: $numMedia, after: $mediaCursor) {
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+            nodes {
+                id
+                alt
+                mediaContentType
+                status
+                preview {
+                    image {
+                        id
+                        altText
+                        width
+                        height
+                        url
+                    }
+                }
+            }
+        }
+    }
+}

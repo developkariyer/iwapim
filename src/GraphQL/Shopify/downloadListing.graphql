@@ -1,4 +1,4 @@
-query GetProducts($numProducts: Int!, $cursor: String, $numVariants: Int, $variantCursor: String) {
+query GetProducts($numProducts: Int!, $cursor: String) {
     products(first: $numProducts, after: $cursor) {
         pageInfo {
             hasNextPage
@@ -20,43 +20,6 @@ query GetProducts($numProducts: Int!, $cursor: String, $numVariants: Int, $varia
             seo {
                 title
                 description
-            }
-            variants(first: $numVariants, after: $variantCursor) {
-                pageInfo {
-                    hasNextPage
-                    endCursor
-                }
-                nodes {
-                    id
-                    product {
-                        id
-                    }
-                    title
-                    price
-                    position
-                    inventoryPolicy
-                    compareAtPrice
-                    selectedOptions {
-                        name
-                        value
-                    }
-                    createdAt
-                    updatedAt
-                    taxable
-                    barcode
-                    sku
-                    inventoryItem {
-                        id
-                    }
-                    inventoryQuantity
-                    image {
-                        id
-                        altText
-                        width
-                        height
-                        src
-                    }
-                }
             }
             variantsCount {
                 count
