@@ -93,6 +93,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $productCount++;
                     echo "product count: $productCount\n";
                }
+                $newData['data']['products']['nodes'] = $products;
             }
             //unset($products);
             print_r(json_encode($newData));
