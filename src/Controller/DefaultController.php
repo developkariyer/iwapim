@@ -47,7 +47,7 @@ class DefaultController extends FrontendController
         $amazonListingCount = $amazonListing->count();
 */
         return $this->render(
-            'iwapim/index.html.twig'
+            'base.html.twig'
         );
     }
 
