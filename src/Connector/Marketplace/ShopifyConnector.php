@@ -68,7 +68,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 foreach ($products as &$product) {
                     $variantCursor = $product['variants']['pageInfo']['endCursor'];
                     $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
-                    while($variantHasNextPage) {
+                    echo "variant cursor: $variantCursor\n";
+                    echo "product cursor: $variantHasNextPage\n";
+                    /*while($variantHasNextPage) {
                         $data['variables']['variantCursor'] = $variantCursor;
                         $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
                             'json' => $data,
@@ -85,18 +87,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantPageInfo = $variantData['data'][$key]['nodes'][$productCount]['variants']['pageInfo'];
                         $variantHasNextPage = $variantPageInfo['hasNextPage'];
                         $variantCursor = $variantPageInfo['endCursor'];
-                    };
+                    };*/
                     $productCount++;
                 }
             }
-            unset($products);
+            //unset($products);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
         } while ($hasNextPage);
-        print_r($allData);
         return $allData;
     }
 
