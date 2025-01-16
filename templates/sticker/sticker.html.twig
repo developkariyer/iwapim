@@ -35,6 +35,9 @@
                 </div>
             </div>
             <div class="row mt-2">
+                <div class="col-12"><h5 id="groupTitle"></h5></div>
+            </div>
+            <div class="row mt-2">
                 <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
 
                 </div>
@@ -234,7 +237,7 @@
 
         function selectGroup(groupName, groupId) {
             localStorage.setItem('group_id', groupId);
-            //document.getElementById("dropdownMenuButton").innerHTML = groupName;
+            document.getElementById("groupTitle").innerHTML = groupName;
             document.getElementById('searchInput').value = '';
             loadStickers(groupId, 1, searchTerm);
         }
