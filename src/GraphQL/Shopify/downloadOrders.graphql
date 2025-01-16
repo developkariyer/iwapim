@@ -51,7 +51,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     sku
                     name
                     title
-                    price
                 }
             }
 
