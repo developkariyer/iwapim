@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class GoogleSheetsController extends FrontendController
 {
     static string $iwaskuSql = "SELECT DISTINCT iwasku FROM iwa_amazon_daily_sales_summary ORDER BY iwasku";
-    static string $asin2iwaskuSql = "SELECT DISTINCT regkey, regvalue FROM iwa_registry WHERE regtype='asin-to-iwasku' ORDER BY asin";
+    static string $asin2iwaskuSql = "SELECT DISTINCT regkey, regvalue FROM iwa_registry WHERE regtype='asin-to-iwasku' ORDER BY regkey";
 
     /**
      * @Route("/sheets/main", name="sheets")
