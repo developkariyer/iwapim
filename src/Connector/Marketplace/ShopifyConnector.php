@@ -96,7 +96,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $allData;
     }
 
-    public function graphqlPaginatedDownloadProduct($productId, $queryFile, $nodeKey, $cursorKey, $numItems = 2)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function graphqlPaginatedDownloadProduct($productId, $queryFile, $nodeKey, $cursorKey, $numItems = 2): array
     {
         $query = [
             'query' => file_get_contents($this->graphqlUrl . $queryFile),
@@ -173,7 +179,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
             'variables' => [
-                'numOrders' => 50,
+                'numOrders' => 5,
                 'cursor' => null,
                 'filter' => $filter
             ]
@@ -354,7 +360,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->graphqlDownload();
+        //$this->graphqlDownload();
+       $this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
