@@ -1,6 +1,16 @@
 {# ozon.html.twig #}
-{% extends 'ozon/base.html.twig' %}
+{% extends 'base.html.twig' %}
 {% block title %}Ozon Listing{% endblock %}
+{% block header %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/ozon">Ozon Listing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+{% endblock %}
 {% block content %}
     <div class="accordion" id="ozonAccordion">
         <!-- Level 0: ListingTemplate Objects -->
