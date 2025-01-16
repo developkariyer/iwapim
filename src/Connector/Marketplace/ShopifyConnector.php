@@ -73,9 +73,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             $variants
                         );
                     }
+                    $medias = $this->graphqlMediaDownload($productId, 2);
+                    if (!empty($medias)) {
+                        $product['media']['nodes'] = array_merge(
+                            $product['media']['nodes'] ?? [],
+                            $medias
+                        );
+                    }
                 }
                 unset($product);
                 $newData['data']['products']['nodes'] = $products;
+                $newData['data']['products']['media'] = $medias;
             }
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
@@ -86,6 +94,45 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         } while ($hasNextPage);
         print_r(json_encode($allData));
         return $allData;
+    }
+
+    public function graphqlMediaDownload($productId, $numMedia=2)
+    {
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadMedia.graphql'),
+            'variables' => [
+                'ownerId' => $productId,
+                'numMedia' => $numMedia,
+                'mediaCursor' => null
+            ]
+        ];
+        $mediaHeadersToApi = [
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ];
+        $mediasCollected = [];
+        $mediaCursor = null;
+        do {
+            $query['variables']['mediaCursor'] = $mediaCursor;
+            $mediaResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+                'json' => $query,
+                'headers' => $mediaHeadersToApi['headers']
+            ]);
+            usleep(200000);
+            if ($mediaResponse->getStatusCode() !== 200) {
+                echo "Failed to fetch variants for product $productId: {$mediaResponse->getContent()} \n";
+                break;
+            }
+            $mediaData = json_decode($mediaResponse->getContent(), true);
+            $medias = $mediaData['data']['product']['media']['nodes'] ?? [];
+            $mediasCollected = array_merge($mediasCollected, $medias);
+            $mediaPageInfo = $mediaData['data']['product']['media']['pageInfo'];
+            $mediaCursor = $mediaPageInfo['endCursor'] ?? null;
+            $mediaHasNextPage = $mediaPageInfo['hasNextPage'] ?? null;
+        } while ($mediaHasNextPage);
+        return $mediasCollected;
     }
 
     public function graphqlVariantDownload($productId, $numVariant=2)
