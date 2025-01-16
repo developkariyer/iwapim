@@ -19,12 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StickerController extends FrontendController
 {
-
-    /**
-     * @Route("/sticker", name="sticker_main_page")
-     * @return Response
-     */
-    public function stickerMainPage(): Response
+    protected function getGroupList(): array
     {
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
@@ -35,8 +30,17 @@ class StickerController extends FrontendController
                 'id' => $item->getId()
             ];
         }
+        return $groups;
+    }
+
+    /**
+     * @Route("/sticker", name="sticker_main_page")
+     * @return Response
+     */
+    public function stickerMainPage(): Response
+    {
         return $this->render('sticker/sticker.html.twig', [
-            'groups' => $groups
+            'groups' => $this->getGroupList()
         ]);
     }
 
@@ -80,7 +84,9 @@ class StickerController extends FrontendController
             }
             $this->addFlash('success', 'Grup Başarıyla Eklendi.');
         }
-        return $this->render('sticker/add_sticker_group.html.twig');
+        return $this->render('sticker/add_sticker_group.html.twig', [
+            'groups' => $this->getGroupList()
+        ]);
     }
 
     /**
