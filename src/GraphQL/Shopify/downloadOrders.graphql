@@ -51,11 +51,142 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     sku
                     name
                     title
+                    duties {
+                        id
+                        countryCodeOfOrigin
+                        harmonizedSystemCode
+                        price {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                    }
+                    vendor
+                    taxable
+                    quantity
+                    isGiftCard
+                    product {
+                        id
+                    }
                     variant {
+                        id
+                        title
                         price
                     }
+                    totalDiscountSet {
+                        shopMoney {
+                            amount
+                            currencyCode
+                        }
+                        presentmentMoney {
+                            amount
+                            currencyCode
+                        }
+                    }
+                    requiresShipping
                 }
             }
+            registeredSourceUrl
+            taxExempt
+            updatedAt
+            sourceName
+            totalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            cancelledAt
+            landingPageUrl
+            processedAt
+            totalWeight
+            cancelReason
+            discountCodes
+            referrerUrl
+            subtotalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            taxesIncluded
+            currentTotalTaxSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            displayFulfillmentStatus
+            subtotalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalTipReceivedSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            confirmationNumber
+            currentTotalPriceSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            totalDiscountsSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+            presentmentCurrencyCode
+            currentTotalTaxSet {
+                shopMoney {
+                    amount
+                    currencyCode
+                }
+                presentmentMoney {
+                    amount
+                    currencyCode
+                }
+            }
+
 
 
         }
