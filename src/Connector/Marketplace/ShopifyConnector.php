@@ -69,7 +69,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $query = [
                         'query' => file_get_contents($this->graphqlUrl . 'downloadVariant.graphql'),
                         'variables' => [
-                            '$ownerId' => $productId,
+                            'ownerId' => $productId,
                             'numVariants' => 3,
                             'variantCursor' => null
                         ]
