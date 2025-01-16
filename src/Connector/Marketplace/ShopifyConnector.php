@@ -94,9 +94,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         if ($variantResponse->getStatusCode() !== 200) {
                             echo "Failed to $method $this->apiUrl/graphql.json: {$variantResponse->getContent()} \n";
                         }
-                        $variantData = json_decode($response->getContent(), true);
-                        print_r($variantData);
+                        $variantData = json_decode($variantResponse->getContent(), true);
                         $variants = $variantData['data']['product']['variants']['nodes'] ?? [];
+                        print_r($variants);
+
                         if (!empty($variants)) {
                             $product['variants']['nodes'] = array_merge(
                                 $product['variants']['nodes'] ?? [],
