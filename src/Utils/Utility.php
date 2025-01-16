@@ -276,7 +276,7 @@ class Utility
         }
         if (!$fromCurrencyValue || !$toCurrencyValue) {
             echo "Currency values not found for $fromCurrency or $toCurrency";
-            return (string)0;
+            return "0";
         }
         return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
     }
