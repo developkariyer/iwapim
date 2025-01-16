@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use Doctrine\DBAL\Exception;
+use Pimcore\Db;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product;
@@ -15,16 +16,22 @@ use Pimcore\Model\Asset;
 class CatalogController extends FrontendController
 {
 
-    protected function getProductTypeOptions()
+    /**
+     * @throws Exception
+     */
+    public static function getProductTypeOptions(): array
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $sql = "SELECT DISTINCT segment FROM iwa_catalog WHERE segment IS NOT NULL ORDER BY segment";
         return $db->fetchFirstColumn($sql);
     }
-    
-    protected function getProducts($query, $category, $page = 0, $pageSize = 20, $countOnly = false)
+
+    /**
+     * @throws Exception
+     */
+    public static function getProducts($query, $category, $page = 0, $pageSize = 20, $countOnly = false)
     {
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $params = [];
         $limit = (int) $pageSize;
         $offset = (int) $page * $pageSize;
@@ -47,7 +54,7 @@ class CatalogController extends FrontendController
         }
     }
         
-    public function getThumbnail($imageUrl, $size = 'album')
+    public static function getThumbnail($imageUrl, $size = 'album')
     {
         $imagePath = str_replace('https://mesa.iwa.web.tr/var/assets', '', $imageUrl);
         $image = Asset::getByPath($imagePath);
@@ -59,6 +66,7 @@ class CatalogController extends FrontendController
 
     /**
      * @Route("/catalog/{query?all}/{category?all}/{page?0}/{pagesize?20}", name="catalog")
+     * @throws Exception
      */
     public function catalogAction(Request $request): Response
     {
@@ -80,7 +88,7 @@ class CatalogController extends FrontendController
         $products = [];
         foreach ($catalog as $product) {
             $imageUrl = $this->getThumbnail($product['imageUrl'] ?? '', 'katalog');
-            $variationSizeList = $variationColorList = $iwaskuList = $listings = $album = [];
+            $variationSizeList = $variationColorList = $iwaskuList = $album = [];
             $children = json_decode($product['children'], true);
             foreach ($children as $child) {
                 $variationSizeList[] = $child['variationSize'];
@@ -96,7 +104,7 @@ class CatalogController extends FrontendController
                     }
                     $url = unserialize($listing['urlLink'] ?? '');
                     if ($url instanceof Link && strlen($listing['imageUrl'])>0) {
-                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."'></a>";
+                        $album[] = "<a href='{$url->getPath()}' target='_blank' data-bs-toggle='tooltip' title='{$listing['marketplaceType']} | {$tooltip}'><img src='".$this->getThumbnail($listing['imageUrl'] ?? '')."' alt=''></a>";
                     }
                 }
             }
@@ -114,7 +122,7 @@ class CatalogController extends FrontendController
                 }
             }
             if (strlen($imageUrl) == 0) {
-                $imageUrl = $placeholder;
+                $imageUrl = $placeholder ?? '';
             }
             $products[] = [
                 'id' => $product['id'],

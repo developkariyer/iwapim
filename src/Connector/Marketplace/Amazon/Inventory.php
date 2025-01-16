@@ -3,7 +3,6 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Utils\Utility;
 use App\Utils\Registry;
 use Doctrine\DBAL\Exception;
 use Pimcore\Db;

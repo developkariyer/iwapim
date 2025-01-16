@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +13,7 @@ class AuthController extends AbstractController
 
     /**
      * @Route("/slack/login", name="slack_login")
+     * @throws RandomException
      */
     public function slackLogin(): Response
     {

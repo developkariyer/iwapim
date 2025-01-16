@@ -2,37 +2,29 @@
 
 namespace App\Controller;
 
-use App\Form\OzonTaskFormType;
-use App\Form\OzonTaskProductFormType;
-use App\Model\DataObject\VariantProduct;
 use App\Utils\Registry;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
-use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use Pimcore\Model\DataObject\GroupProduct;
-use Pimcore\Model\DataObject\ListingTemplate;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pimcore\Model\DataObject\Marketplace;
 
 
 class StickerController extends FrontendController
 {
-    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
 
     /**
-     * @Route("/sticker/", name="sticker_main_page")
+     * @Route("/sticker", name="sticker_main_page")
      * @return Response
      */
-    public function stickerMainPage(Request $request): Response
+    public function stickerMainPage(): Response
     {
         $gproduct = new GroupProduct\Listing();
         $result = $gproduct->load();
@@ -50,6 +42,7 @@ class StickerController extends FrontendController
 
     /**
      * @Route("/sticker/add-sticker-group", name="sticker_new_group", methods={"GET", "POST"})
+     * @param Request $request
      * @return Response
      * @throws DuplicateFullPathException
      */
@@ -57,20 +50,32 @@ class StickerController extends FrontendController
     {
         if ($request->isMethod('POST')) {
             $formData = $request->request->get('form_data');
+            if (!preg_match('/^[a-zA-Z0-9_ ]+$/', $formData)) {
+                $this->addFlash('error', 'Grup adı sadece harf, rakam, boşluk ve alt çizgi içerebilir.');
+                return $this->redirectToRoute('sticker_new_group');
+            }
+            if (mb_strlen($formData) > 190) {
+                $this->addFlash('error', 'Grup adı 190 karakterden uzun olamaz.');
+                return $this->redirectToRoute('sticker_new_group');
+            }
             $operationFolder = Utility::checkSetPath('Operasyonlar');
+            if (!$operationFolder) {
+                $this->addFlash('error', 'Operasyonlar klasörü bulunamadı.');
+                return $this->redirectToRoute('sticker_new_group');
+            }
             $existingGroup = GroupProduct::getByPath($operationFolder->getFullPath() . '/' . $formData);
             if ($existingGroup) {
                 $this->addFlash('error', 'Bu grup zaten mevcut.');
                 return $this->redirectToRoute('sticker_new_group');
             }
             $newGroup = new GroupProduct();
-            $newGroup->setParentId($operationFolder->getId());
+            $newGroup->setParent($operationFolder);
             $newGroup->setKey($formData);
-            $newGroup->setPublished(1);
+            $newGroup->setPublished(true);
             try {
                 $newGroup->save();
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Grup eklenirken bir hata oluştu.');
+            } catch (Exception $e) {
+                $this->addFlash('error', 'Grup eklenirken bir hata oluştu:'.' '.$e);
                 return $this->redirectToRoute('sticker_new_group');
             }
             $this->addFlash('success', 'Grup Başarıyla Eklendi.');
@@ -79,10 +84,10 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/get-stickers/{groupId}/{page}/{limit}", name="get_stickers", methods={"GET"})
+     * @Route("/sticker/get-stickers/{groupId}", name="get_stickers", methods={"GET"})
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getStickers(int $groupId, int $page = 1, int $limit = 5, ?string $searchTerm = null): JsonResponse
+    public function getStickers(int $groupId): JsonResponse
     {
         $groupedStickers = [];
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -95,8 +100,7 @@ class StickerController extends FrontendController
             $searchCondition = "AND (name LIKE :searchTerm OR productCategory LIKE :searchTerm OR productIdentifier LIKE :searchTerm)";
             $offset = null;
         }
-        $sql = "
-            SELECT 
+        $sql = "SELECT 
                 osp.productIdentifier,
                 MIN(osp.name) as name,
                 MIN(osp.productCategory) as category,
@@ -114,7 +118,7 @@ class StickerController extends FrontendController
         else {
             $sql .= " LIMIT 10";
         }
-        $parameters = ['groupId' => (int) $groupId];
+        $parameters = ['groupId' => $groupId];
         if ($searchTerm) {
             $parameters['searchTerm'] = $searchTerm;
         }
@@ -127,8 +131,7 @@ class StickerController extends FrontendController
                     'product_identifier' => $mainProduct['productIdentifier'] ?? ''
                 ];
         }
-        $countSql = "
-            SELECT 
+        $countSql = "SELECT 
                 COUNT(DISTINCT osp.productIdentifier) AS totalCount
             FROM object_relations_gproduct org
             JOIN object_product osp ON osp.oo_id = org.dest_id
@@ -194,7 +197,7 @@ class StickerController extends FrontendController
                 }
             }
             $stickerPath = $sticker ? $sticker->getFullPath() : '';
-            $product['sticker_link'] = $stickerPath ;
+            $product['sticker_link'] = $stickerPath;
         }
         unset($product);
         if ($products) {
@@ -212,8 +215,9 @@ class StickerController extends FrontendController
 
     /**
      * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
+     * @param Request $request
      * @return Response
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function addSticker(Request $request): Response
     {
@@ -245,7 +249,7 @@ class StickerController extends FrontendController
                     }
                     try {
                         $group->save();
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         $this->addFlash('error: ', $e . 'Etiket eklenirken bir hata oluştu.');
                         return $this->redirectToRoute('sticker_new');
                     }

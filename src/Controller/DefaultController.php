@@ -2,15 +2,13 @@
 
 namespace App\Controller;
 
+use Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Pimcore\Controller\FrontendController;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pimcore\Model\DataObject\Product\Listing as ProductListing;
-use Pimcore\Model\DataObject\ShopifyListing\Listing as ShopifyListingListing;
-use Pimcore\Model\DataObject\ShopifyVariant\Listing as ShopifyVariantListing;
-use Pimcore\Model\DataObject\AmazonVariant\Listing as AmazonVariantListing;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use GuzzleHttp\Client;
 
 
@@ -20,7 +18,7 @@ class DefaultController extends FrontendController
     /**
      * @Route("/", name="default_homepage")
      */
-    public function defaultAction(Request $request): Response
+    public function defaultAction(): Response
     {
 /*        $productListing = new ProductListing();
         $productListing->setCondition('variationColor is NOT NULL');
@@ -49,14 +47,13 @@ class DefaultController extends FrontendController
         $amazonListingCount = $amazonListing->count();
 */
         return $this->render(
-            'iwapim/index.html.twig', 
-            [
-            ]
+            'iwapim/index.html.twig'
         );
     }
 
     /**
      * @Route("/login", name="default_login")
+     * @throws RandomException|GuzzleException
      */
     public function loginAction(Request $request): Response
     {
@@ -97,7 +94,7 @@ class DefaultController extends FrontendController
                     } else {
                         error_log('Failed to get ID token from Slack.');
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     error_log("Error during Slack authentication: " . $e->getMessage());
                     return new Response('Error during Slack authentication: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
@@ -129,7 +126,7 @@ class DefaultController extends FrontendController
     /**
      * @Route("/logout", name="default_logout")
      */
-    public function logoutAction(Request $request): Response
+    public function logoutAction(): Response
     {
         setcookie("id_token", "", time() - 3600, "/", ".iwa.web.tr", true, true);
         return $this->redirectToRoute('default_login');

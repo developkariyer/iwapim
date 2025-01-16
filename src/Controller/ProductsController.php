@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Doctrine\DBAL\Exception;
 use Pimcore\Db;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\AbstractObject;
@@ -26,7 +27,7 @@ class ProductsController extends FrontendController
         }
         return $this->render('iwapim/products.html.twig', [
             //'products' => $this->listProducts(level:1),
-            'logged_in' => $request->cookies->get('id_token') ? true : false,
+            'logged_in' => (bool)$request->cookies->get('id_token'),
         ]);
     }
 
@@ -54,6 +55,7 @@ class ProductsController extends FrontendController
 
     /**
      * @Route("/products/sizes", name="products_sizes_menu")
+     * @throws Exception
      */
     public function sizesMenuAction(Request $request): Response
     {
@@ -66,12 +68,13 @@ class ProductsController extends FrontendController
         $categories = array_column($result, 'category');
         return $this->render('iwapim/product_sizes_menu.html.twig', [
             'categories' => $categories,
-            'logged_in' => $request->cookies->get('id_token') ? true : false,
+            'logged_in' => (bool)$request->cookies->get('id_token'),
         ]);
     }
 
     /**
      * @Route("/products/sizes/{category}", name="products_sizes")
+     * @throws \Exception
      */
     public function sizeAction(Request $request): Response
     {
@@ -148,8 +151,8 @@ class ProductsController extends FrontendController
         ];
         return $this->render('iwapim/product_sizes.html.twig', [
             'category' => $category,
-            'products' => $this->listProducts(level: 3, search: $conditions, otherConditions: $conditions),
-            'logged_in' => $request->cookies->get('id_token') ? true : false,
+            'products' => $this->listProducts(level: 3, otherConditions: $conditions),
+            'logged_in' => (bool)$request->cookies->get('id_token'),
         ]);
     }
 
@@ -172,7 +175,7 @@ class ProductsController extends FrontendController
                         'text' => 'Product not found',
                     ],
                 ],
-                'logged_in' => $request->cookies->get('id_token') ? true : false,
+                'logged_in' => (bool)$request->cookies->get('id_token'),
             ]);
         }
         [$sizes, $colors] = $product->listVariations();
@@ -184,7 +187,7 @@ class ProductsController extends FrontendController
                 'colors' => $colors,
             ],
             'productobject' => $product,
-            'logged_in' => $request->cookies->get('id_token') ? true : false,
+            'logged_in' => (bool)$request->cookies->get('id_token'),
         ]);
     }
 
@@ -196,9 +199,7 @@ class ProductsController extends FrontendController
         error_log("Product from serial number");
         $serialNumber = Utility::customBase64Decode($request->get('serial_number'));
         $serial = Serial::getBySerialNumber($serialNumber);
-        if ($serial) {
-            $product = $serial->current()->getProduct();
-        }
+        $product = $serial?->current()->getProduct();
         if (!$serial->current() instanceof Serial || !$product instanceof Product) {
             error_log("Product not found for serial number $serialNumber");
             return $this->render('iwapim/products.html.twig', [
@@ -219,9 +220,10 @@ class ProductsController extends FrontendController
      * Get a list of products for router functions
      * @param int|null $level 0: all, 1: only first level, 2: only second level, 4: only third level, 3: only first and second level, 5: only first and third level, 6: only second and third level, 7: same as 0
      * @param string $search search term to filter products, minimum 3 characters, multiple terms separated by space, case-insensitive, search is done on product key
-     * @return array 
+     * @param array $otherConditions
+     * @return array
      */
-    private function listProducts(int $level = null, string $search = '', $otherConditions = []): array
+    private function listProducts(int $level = null, string $search = '', array $otherConditions = []): array
     {
         $level ??= 7;
         $products = new Listing();

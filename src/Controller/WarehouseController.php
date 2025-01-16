@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Utils\Utility;
+use DateMalformedStringException;
 use DateTime;
 use Doctrine\DBAL\Exception;
 use Pimcore\Controller\FrontendController;
@@ -64,7 +65,7 @@ class WarehouseController extends FrontendController
     /**
      * @Route("/warehouse/json/{iwasku}/{sales_channel}", name="sales_data")
      * @throws Exception
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     public function salesDataAction(Request $request): JsonResponse
     {
