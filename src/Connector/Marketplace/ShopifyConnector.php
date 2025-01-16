@@ -66,7 +66,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $products = $newData['data']['products']['nodes'];
                 foreach ($products as &$product) {
                     $productId = $product['id'];
-                    $variants = $this->graphqlPaginatedDownloadProduct($productId,$this->graphqlUrl . 'downloadVariant.graphql','variants','variantCursor',3);
+                    $variants = $this->graphqlPaginatedDownloadProduct($productId, 'downloadVariant.graphql','variants','variantCursor',3);
                     //$variants = $this->graphqlVariantDownload($productId, 3);
                     if (!empty($variants)) {
                         $product['variants']['nodes'] = array_merge(
@@ -74,7 +74,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             $variants
                         );
                     }
-                    //$medias = $this->graphqlPaginatedDownloadProduct($productId,$this->graphqlUrl . 'downloadMedia.graphql','media','mediaCursor', 3);
+                    $medias = $this->graphqlPaginatedDownloadProduct($productId,'downloadMedia.graphql','media','mediaCursor', 3);
                     //$medias = $this->graphqlMediaDownload($productId, 3);
                     if (!empty($medias)) {
                         $product['media']['nodes'] = array_merge(
