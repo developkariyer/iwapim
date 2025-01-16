@@ -77,7 +77,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'json' => $data,
                             'headers' => $headersToApi['headers']
                         ]);
-                        usleep(200000);
+                        //usleep(200000);
                         $variantData = json_decode($variantResponse->getContent(), true);
                         $variants = $variantData['data'][$key]['nodes'][$productCount]['variants']['nodes'] ?? [];
                         if (!empty($variants)) {
