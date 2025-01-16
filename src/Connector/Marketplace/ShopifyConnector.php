@@ -45,17 +45,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $allData = [];
         $cursor = null;
+        $headersToApi = [
+            'json' => $data,
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ];
         do {
             $data['variables']['cursor'] = $cursor;
-            $headersToApi = [
-                'json' => $data,
-                'headers' => [
-                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                    'Content-Type' => 'application/json'
-                ]
-            ];
+            $headersToApi['json'] = $data;
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            //print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
@@ -65,19 +65,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
                 $productCount = 0;
-               foreach ($products as &$product) {
+                foreach ($products as &$product) {
                     $variantCursor = $product['variants']['pageInfo']['endCursor'];
                     $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
-                    echo "variant cursor: $variantCursor\n";
-                    echo "product cursor: $variantHasNextPage\n";
                     while($variantHasNextPage) {
-                        echo "While ";
                         $data['variables']['variantCursor'] = $variantCursor;
                         $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
                             'json' => $data,
                             'headers' => $headersToApi['headers']
                         ]);
-                        //usleep(200000);
+                        usleep(200000);
                         $variantData = json_decode($variantResponse->getContent(), true);
                         $variants = $variantData['data'][$key]['nodes'][$productCount]['variants']['nodes'] ?? [];
                         if (!empty($variants)) {
@@ -92,12 +89,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     };
                     $productCount++;
                     echo "product count: $productCount\n";
-               }
+                }
                 unset($product);
                 $newData['data']['products']['nodes'] = $products;
             }
-            //unset($products);
-            print_r(json_encode($newData));
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
@@ -105,6 +100,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             break;
         } while ($hasNextPage);
+        print_r($allData);
         return $allData;
     }
 
