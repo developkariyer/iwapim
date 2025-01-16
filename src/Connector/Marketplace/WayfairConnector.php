@@ -93,8 +93,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }*/
-        //$this->prepareTokenProd();
-       /* echo "Token is valid. Proceeding with download...\n";
+        $this->prepareTokenProd();
+        echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
             \$supplierId: Int!,
@@ -130,7 +130,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getStatusCode());
-        print_r($response->getContent());*/
+        print_r($response->getContent());
     }
 
     /**
