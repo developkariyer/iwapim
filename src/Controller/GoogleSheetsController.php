@@ -6,7 +6,6 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class GoogleSheetsController extends FrontendController
@@ -16,7 +15,6 @@ class GoogleSheetsController extends FrontendController
 
     /**
      * @Route("/sheets/main", name="sheets")
-     * @returns JsonResponse
      * @throws Exception
      */
     public function sheetsAction(): JsonResponse
@@ -32,7 +30,6 @@ class GoogleSheetsController extends FrontendController
 
     /**
      * @Route("/sheets/asin2iwasku", name="sheets_asin2iwasku")
-     * @returns JsonResponse
      * @throws Exception
      */
     public function asin2iwaskuAction(): JsonResponse
