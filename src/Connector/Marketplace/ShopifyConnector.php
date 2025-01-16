@@ -74,8 +74,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'variantCursor' => null
                         ]
                     ];
-                    $variantResponse = $this->httpClient->request($query, $this->apiUrl . '/graphql.json', [
-                        'json' => [],
+                    $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+                        'json' => $query,
                         'headers' => $headersToApi['headers']
                     ]);
                     print_r($variantResponse);
