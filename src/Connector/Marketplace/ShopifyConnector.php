@@ -75,6 +75,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         ]);
                         usleep(200000);
                         $variantData = json_decode($variantResponse->getContent(), true);
+                        print_r(json_encode($variantData));
+
                         $variants = $variantData['data'][$key]['nodes'][0]['variants']['nodes'] ?? [];
                         if (!empty($variants)) {
                             $product['variants']['nodes'] = array_merge(
@@ -97,7 +99,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             break;
         } while ($hasNextPage);
-        print_r(json_encode($allData));
+        //print_r(json_encode($allData));
         return $allData;
     }
 
