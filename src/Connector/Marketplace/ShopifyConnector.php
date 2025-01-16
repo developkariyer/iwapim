@@ -64,9 +64,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $newData = json_decode($response->getContent(), true);
             if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
-                $productCount = 0;
                 foreach ($products as &$product) {
-                    $variantCursor = $product['variants']['pageInfo']['endCursor'];
+                    print_r(json_encode($product));
+                    /*$variantCursor = $product['variants']['pageInfo']['endCursor'];
                     $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
                     while($variantHasNextPage) {
                         $data['variables']['variantCursor'] = $variantCursor;
@@ -76,18 +76,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         ]);
                         usleep(200000);
                         $variantData = json_decode($variantResponse->getContent(), true);
-                        $variants = $variantData['data'][$key]['nodes'][$productCount]['variants']['nodes'] ?? [];
+                        $variants = $variantData['data'][$key]['nodes'][0]['variants']['nodes'] ?? [];
                         if (!empty($variants)) {
                             $product['variants']['nodes'] = array_merge(
                                 $product['variants']['nodes'] ?? [],
                                 $variants
                             );
                         }
-                        $variantPageInfo = $variantData['data'][$key]['nodes'][$productCount]['variants']['pageInfo'];
+                        $variantPageInfo = $variantData['data'][$key]['nodes'][0]['variants']['pageInfo'];
                         $variantHasNextPage = $variantPageInfo['hasNextPage'];
                         $variantCursor = $variantPageInfo['endCursor'];
-                    };
-                    $productCount++;
+                    };*/
                 }
                 unset($product);
                 $newData['data']['products']['nodes'] = $products;
@@ -99,7 +98,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             break;
         } while ($hasNextPage);
-        print_r(json_encode($allData));
+        //print_r(json_encode($allData));
         return $allData;
     }
 
