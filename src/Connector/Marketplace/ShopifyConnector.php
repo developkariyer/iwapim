@@ -89,6 +89,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         $variantCursor = $variantPageInfo['endCursor'];
                     };*/
                     $productCount++;
+                    echo "product count: $productCount\n";
                 }
             }
             //unset($products);
