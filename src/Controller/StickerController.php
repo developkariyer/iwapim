@@ -52,38 +52,36 @@ class StickerController extends FrontendController
      */
     public function addStickerGroup(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            $formData = $request->request->get('form_data');
-            if (!preg_match('/^[a-zA-Z0-9_ ]+$/', $formData)) {
-                $this->addFlash('error', 'Grup adı sadece harf, rakam, boşluk ve alt çizgi içerebilir.');
-                return $this->redirectToRoute('sticker_main_page');
-            }
-            if (mb_strlen($formData) > 190) {
-                $this->addFlash('error', 'Grup adı 190 karakterden uzun olamaz.');
-                return $this->redirectToRoute('sticker_main_page');
-            }
-            $operationFolder = Utility::checkSetPath('Operasyonlar');
-            if (!$operationFolder) {
-                $this->addFlash('error', 'Operasyonlar klasörü bulunamadı.');
-                return $this->redirectToRoute('sticker_main_page');
-            }
-            $existingGroup = GroupProduct::getByPath($operationFolder->getFullPath() . '/' . $formData);
-            if ($existingGroup) {
-                $this->addFlash('error', 'Bu grup zaten mevcut.');
-                return $this->redirectToRoute('sticker_main_page');
-            }
-            $newGroup = new GroupProduct();
-            $newGroup->setParent($operationFolder);
-            $newGroup->setKey($formData);
-            $newGroup->setPublished(true);
-            try {
-                $newGroup->save();
-            } catch (Exception $e) {
-                $this->addFlash('error', 'Grup eklenirken bir hata oluştu:'.' '.$e);
-                return $this->redirectToRoute('sticker_main_page');
-            }
-            $this->addFlash('success', 'Grup Başarıyla Eklendi.');
+        $formData = $request->request->get('form_data');
+        if (!preg_match('/^[a-zA-Z0-9_ ]+$/', $formData)) {
+            $this->addFlash('error', 'Grup adı sadece harf, rakam, boşluk ve alt çizgi içerebilir.');
+            return $this->redirectToRoute('sticker_main_page');
         }
+        if (mb_strlen($formData) > 190) {
+            $this->addFlash('error', 'Grup adı 190 karakterden uzun olamaz.');
+            return $this->redirectToRoute('sticker_main_page');
+        }
+        $operationFolder = Utility::checkSetPath('Operasyonlar');
+        if (!$operationFolder) {
+            $this->addFlash('error', 'Operasyonlar klasörü bulunamadı.');
+            return $this->redirectToRoute('sticker_main_page');
+        }
+        $existingGroup = GroupProduct::getByPath($operationFolder->getFullPath() . '/' . $formData);
+        if ($existingGroup) {
+            $this->addFlash('error', 'Bu grup zaten mevcut.');
+            return $this->redirectToRoute('sticker_main_page');
+        }
+        $newGroup = new GroupProduct();
+        $newGroup->setParent($operationFolder);
+        $newGroup->setKey($formData);
+        $newGroup->setPublished(true);
+        try {
+            $newGroup->save();
+        } catch (Exception $e) {
+            $this->addFlash('error', 'Grup eklenirken bir hata oluştu:'.' '.$e);
+            return $this->redirectToRoute('sticker_main_page');
+        }
+        $this->addFlash('success', 'Grup Başarıyla Eklendi.');
         return $this->redirectToRoute('sticker_main_page');
     }
 
@@ -218,68 +216,48 @@ class StickerController extends FrontendController
     }
 
     /**
-     * @Route("/sticker/add-sticker", name="sticker_new", methods={"GET", "POST"})
+     * @Route("/sticker/add-sticker", name="sticker_new", methods={"POST"})
      * @param Request $request
      * @return Response
      * @throws \Doctrine\DBAL\Exception
      */
     public function addSticker(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            $productType = $request->request->get('product_type');
-            $productId = $request->request->get('form_data');
-            $groupId = $request->request->get('group_id');
-            $group = GroupProduct::getById($groupId);
-            $iwasku = null;
-            if ($productType === 'iwasku') {
-                $iwasku = $productId;
+        $productId = $request->request->get('form_data');
+        $groupId = $request->request->get('group_id');
+        $group = GroupProduct::getById($groupId);
+        $iwasku = Registry::getKey($productId,'asin-to-iwasku');
+        if (empty($iwasku)) {
+            $iwasku = $productId;
+        }
+        if (empty($iwasku)) {
+            $this->addFlash('error', 'HATALI VEYA BOŞ ÜRÜN KODU.');
+            return $this->redirectToRoute('sticker_main_page');
+        }
+        $product = Product::findByField('iwasku',$iwasku);
+        if ($product instanceof Product) {
+            if (!$product->getInheritedField('sticker4x6eu')) {
+                $product->checkSticker4x6eu();
             }
-            if ($productType === 'asin') {
-                $iwasku = Registry::getKey($productId,'asin-to-iwasku');
-            }
-            if ($iwasku !== null) {
-                $product = Product::findByField('iwasku',$iwasku);
-                if ($product instanceof Product) {
-                    if (!$product->getInheritedField('sticker4x6eu')) {
-                        $product->checkSticker4x6eu();
-                    }
-                    $existingProducts = $group->getProducts();
-                    if (!in_array($product, $existingProducts, true)) {
-                        $group->setProducts(array_merge($existingProducts, [$product]));
-                    }
-                    else {
-                        $this->addFlash('error', 'Bu ürün zaten bu grupta bulunmaktadır.');
-                        return $this->redirectToRoute('sticker_new');
-                    }
-                    try {
-                        $group->save();
-                    } catch (Exception $e) {
-                        $this->addFlash('error: ', $e . 'Etiket eklenirken bir hata oluştu.');
-                        return $this->redirectToRoute('sticker_new');
-                    }
-                    $this->addFlash('success', 'Etiket başarıyla eklendi.');
-                } else {
-                    $this->addFlash('error', 'Bu Ürün Pimcore\'da Bulunamadı.');
-                    return $this->redirectToRoute('sticker_new');
-                }
+            $existingProducts = $group->getProducts();
+            if (!in_array($product, $existingProducts, true)) {
+                $group->setProducts(array_merge($existingProducts, [$product]));
             }
             else {
-                $this->addFlash('error', 'BOŞ BIRAKILAMAZ.');
-                return $this->redirectToRoute('sticker_new');
+                $this->addFlash('error', 'Bu ürün zaten bu grupta bulunmaktadır.');
+                return $this->redirectToRoute('sticker_main_page');
             }
+            try {
+                $group->save();
+            } catch (Exception $e) {
+                $this->addFlash('error: ', $e . ' Etiket eklenirken bir hata oluştu.');
+                return $this->redirectToRoute('sticker_main_page');
+            }
+            $this->addFlash('success', 'Etiket başarıyla eklendi.');
+        } else {
+            $this->addFlash('error', 'Bu Ürün Pimcore\'da Bulunamadı.');
         }
-        $gproduct = new GroupProduct\Listing();
-        $result = $gproduct->load();
-        $groups = [];
-        foreach ($result as $item) {
-            $groups[] = [
-                'name' => $item->getKey(),
-                'id' => $item->getId()
-            ];
-        }
-        return $this->render('sticker/add_sticker.html.twig', [
-            'groups' => $groups
-        ]);
+        return $this->redirectToRoute('sticker_main_page');
     }
 
 }
