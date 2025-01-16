@@ -66,45 +66,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $products = $newData['data']['products']['nodes'];
                 foreach ($products as &$product) {
                     $productId = $product['id'];
-                    $query = [
-                        'query' => file_get_contents($this->graphqlUrl . 'downloadVariant.graphql'),
-                        'variables' => [
-                            'ownerId' => $productId,
-                            'numVariants' => 3,
-                            'variantCursor' => null
-                        ]
-                    ];
-                    $variantHeadersToApi = [
-                        'json' => $query,
-                        'headers' => [
-                            'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                            'Content-Type' => 'application/json'
-                        ]
-                    ];
-                    $variantCursor  = null;
-                    do {
-                        $query['variables']['variantCursor'] = $variantCursor;
-                        $variantHeadersToApi['json'] = $query;
-                        $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
-                            'json' => $query,
-                            'headers' => $variantHeadersToApi['headers']
-                        ]);
-                        usleep(200000);
-                        if ($variantResponse->getStatusCode() !== 200) {
-                            echo "Failed to $method $this->apiUrl/graphql.json: {$variantResponse->getContent()} \n";
-                        }
-                        $variantData = json_decode($variantResponse->getContent(), true);
-                        $variants = $variantData['data']['product']['variants']['nodes'] ?? [];
-                        if (!empty($variants)) {
-                            $product['variants']['nodes'] = array_merge(
-                                $product['variants']['nodes'] ?? [],
-                                $variants
-                            );
-                        }
-                        $variantPageInfo = $variantData['data']['product']['variants']['pageInfo'];
-                        $variantCursor = $variantPageInfo['endCursor'] ?? null;
-                        $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? null;
-                    } while($variantHasNextPage);
+                    $variants = $this->graphqlVariantDownload($productId, 4);
+                    if (!empty($variants)) {
+                        $product['variants']['nodes'] = array_merge(
+                            $product['variants']['nodes'] ?? [],
+                            $variants
+                        );
+                    }
                 }
                 unset($product);
                 $newData['data']['products']['nodes'] = $products;
@@ -118,6 +86,45 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         } while ($hasNextPage);
         print_r(json_encode($allData));
         return $allData;
+    }
+
+    public function graphqlVariantDownload($productId, $numVariant=2)
+    {
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadVariant.graphql'),
+            'variables' => [
+                'ownerId' => $productId,
+                'numVariants' => $numVariant,
+                'variantCursor' => null
+            ]
+        ];
+        $variantHeadersToApi = [
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ];
+        $variantsCollected = [];
+        $variantCursor = null;
+        do {
+            $query['variables']['variantCursor'] = $variantCursor;
+            $variantResponse = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+                'json' => $query,
+                'headers' => $variantHeadersToApi['headers']
+            ]);
+            usleep(200000);
+            if ($variantResponse->getStatusCode() !== 200) {
+                echo "Failed to fetch variants for product $productId: {$variantResponse->getContent()} \n";
+                break;
+            }
+            $variantData = json_decode($variantResponse->getContent(), true);
+            $variants = $variantData['data']['product']['variants']['nodes'] ?? [];
+            $variantsCollected = array_merge($variantsCollected, $variants);
+            $variantPageInfo = $variantData['data']['product']['variants']['pageInfo'];
+            $variantCursor = $variantPageInfo['endCursor'] ?? null;
+            $variantHasNextPage = $variantPageInfo['hasNextPage'] ?? null;
+        } while ($variantHasNextPage);
+        return $variantsCollected;
     }
 
     public function graphqlDownload() // working
