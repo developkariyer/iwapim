@@ -81,13 +81,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'json' => $query,
                             'headers' => $headersToApi['headers']
                         ]);
-                        usleep(200000);
+                        print_r($variantResponse->getContent());
+                        /*usleep(200000);
                         if ($variantResponse->getStatusCode() !== 200) {
                             echo "Failed to $method $this->apiUrl/graphql.json: {$variantResponse->getContent()} \n";
                         }
                         $variantData = json_decode($response->getContent(), true);
                         $variants = $variantData['data']['product']['variants']['nodes'] ?? [];
-                        print_r($variants);
+                        print_r($variants);*/
                         /*if (!empty($variants)) {
                             $product['variants']['nodes'] = array_merge(
                                 $product['variants']['nodes'] ?? [],
