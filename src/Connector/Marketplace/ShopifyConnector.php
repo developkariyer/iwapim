@@ -62,7 +62,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
-            /*if ($key === 'products') {
+            if ($key === 'products') {
                 $products = $newData['data']['products']['nodes'];
                 $productCount = 0;
                 print_r($products);
@@ -91,8 +91,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     };
                     $productCount++;
                     echo "product count: $productCount\n";
-                }
-            }*/
+                }*/
+            }
             //unset($products);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
