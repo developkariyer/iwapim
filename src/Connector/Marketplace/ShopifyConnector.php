@@ -55,19 +55,48 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            print_r($response->getContent());
+            //print_r($response->getContent());
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
+            if ($key === 'products') {
+                $products = $newData['data']['products']['nodes'];
+                $productCount = 0;
+                foreach ($products as &$product) {
+                    $variantCursor = $product['variants']['pageInfo']['endCursor'];
+                    $variantHasNextPage = $product['variants']['pageInfo']['hasNextPage'];
+                    while($variantHasNextPage) {
+                        $data['variables']['variantCursor'] = $variantCursor;
+                        $variantResponse = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', [
+                            'json' => $data,
+                            'headers' => $headersToApi['headers']
+                        ]);
+                        $variantData = json_decode($variantResponse->getContent(), true);
+                        $variants = $variantData['data'][$key]['nodes'][$productCount]['variants']['nodes'] ?? [];
+                        if (!empty($variants)) {
+                            $product['variants']['nodes'] = array_merge(
+                                $productNode['variants']['nodes'] ?? [],
+                                $variants
+                            );
+                        }
+                        $variantPageInfo = $variantData['data'][$key]['nodes'][$productCount]['variants']['pageInfo'];
+                        $variantHasNextPage = $variantPageInfo['hasNextPage'];
+                        $variantCursor = $variantPageInfo['endCursor'];
+                    };
+                    $productCount++;
+                }
+            }
+            unset($products);
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
-            $productCursor = $pageInfo['endCursor'] ?? null;
+            $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
         } while ($hasNextPage);
+        print_r($allData);
         return $allData;
     }
 
