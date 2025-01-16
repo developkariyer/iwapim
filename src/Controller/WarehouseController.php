@@ -171,4 +171,5 @@ class WarehouseController extends FrontendController
 
         return $this->json($response);
     }
+
 }
