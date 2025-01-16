@@ -93,6 +93,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     $productCount++;
                     echo "product count: $productCount\n";
                }
+                unset($product);
                 $newData['data']['products']['nodes'] = $products;
             }
             //unset($products);
@@ -112,7 +113,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 1,
+                'numProducts' => 3,
                 'cursor' => null,
                 'numVariants' => 2,
                 'variantCursor' => null
