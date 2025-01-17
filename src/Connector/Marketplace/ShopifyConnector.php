@@ -179,8 +179,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'json' => $query,
             'headers' => $headersToApi['headers']
         ]);
-        print_r(json_encode($response->getContent()));
-
+        $data = json_decode($response->getContent(), true);
+        print_r(json_encode($data));
     }
 
     public function graphqlDownload() // working
