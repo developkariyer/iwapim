@@ -127,7 +127,7 @@ class GoogleSheetsController extends FrontendController
         if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'all'])) {
             $channel = 'all';
         }
-        $saleData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600), true);
+        $saleData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
         if (empty($saleData)) {
             $saleData = $db->fetchAllAssociative(self::$channelStats, [$channel]);
             Utility::setCustomCache($filename, $cachePath, json_encode($saleData));
