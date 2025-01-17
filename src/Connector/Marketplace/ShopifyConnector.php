@@ -117,13 +117,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function graphqlPaginatedDownloadProduct($productId, $queryFile, $nodeKey, $cursorKey, $numItems = 2): array
+    public function graphqlNestedPaginateDownload($idKey, $id, $queryFile, $fieldKey, $nodeKey, $numItems = 2): array
     {
         $query = [
             'query' => file_get_contents($this->graphqlUrl . $queryFile),
             'variables' => [
-                'ownerId' => $productId,
-                $cursorKey => null,
+                $idKey => $id,
+                'cursor' => null,
                 'numItems' => $numItems
             ]
         ];
@@ -136,21 +136,20 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $collectedItems = [];
         $cursor = null;
         do {
-            $query['variables'][$cursorKey] = $cursor;
+            $query['variables']['cursor'] = $cursor;
             $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
                 'json' => $query,
                 'headers' => $headersToApi['headers']
             ]);
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
-                echo "Failed to fetch $nodeKey for product $productId: {$response->getContent()} \n";
+                echo "Failed to fetch $nodeKey for product $id: {$response->getContent()} \n";
                 break;
             }
             $data = json_decode($response->getContent(), true);
-            $items = $data['data']['product'][$nodeKey]['nodes'] ?? [];
+            $items = $data['data'][$fieldKey][$nodeKey]['nodes'] ?? [];
             $collectedItems = array_merge($collectedItems, $items);
-
-            $pageInfo = $data['data']['product'][$nodeKey]['pageInfo'];
+            $pageInfo = $data['data'][$fieldKey][$nodeKey]['pageInfo'];
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
         } while ($hasNextPage);
