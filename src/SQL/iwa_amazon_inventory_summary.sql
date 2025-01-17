@@ -55,7 +55,7 @@ SELECT iwasku,
 FROM iwa_inventory
 WHERE inventory_type = 'AMAZON_FBA'
   AND item_condition = 'NewItem'
-  AND total_quantity > 0
+  --- AND total_quantity > 0
 GROUP BY iwasku, asin, warehouse;
 
 -- Step 2: Drop the existing table and rename the temporary table
