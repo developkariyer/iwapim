@@ -54,14 +54,19 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ]
             ];
-            $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-            usleep(200000);
-            if ($response->getStatusCode() !== 200) {
+            while (true) {
+                $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+                $newData = json_decode($response->getContent(), true);
+                if ($response->getStatusCode() === 200) {
+                    break;
+                }
+                if ($response->getStatusCode() === 429) {
+                    $this->processRateLimit($newData['extensions']);
+                    continue;
+                }
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
-            $newData = json_decode($response->getContent(), true);
-            print_r(json_encode($newData));
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
@@ -73,6 +78,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             break;
         } while ($hasNextPage);
         return $allData;
+    }
+
+    public function processRateLimit($extensions)
+    {
+        $actualQueryCost = $extensions['cost']['actualQueryCost'];
+        $currentlyAvailable = $extensions['cost']['throttleStatus']['currentlyAvailable'];
+        $restoreRate = $extensions['cost']['throttleStatus']['restoreRate'];
+        if ($actualQueryCost > $currentlyAvailable) {
+            $requiredTimeToWait = ceil(($actualQueryCost - $currentlyAvailable) / $restoreRate);
+            sleep($requiredTimeToWait);
+        }
     }
 
     /**
@@ -153,13 +169,20 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $cursor = null;
         do {
             $query['variables']['cursor'] = $cursor;
-            $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
-                'json' => $query,
-                'headers' => $headersToApi['headers']
-            ]);
-            usleep(200000);
-            if ($response->getStatusCode() !== 200) {
-                echo "Failed to fetch $nodeKey for product $id: {$response->getContent()} \n";
+            while (true) {
+                $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+                    'json' => $query,
+                    'headers' => $headersToApi['headers']
+                ]);
+                $newData = json_decode($response->getContent(), true);
+                if ($response->getStatusCode() === 200) {
+                    break;
+                }
+                if ($response->getStatusCode() === 429) {
+                    $this->processRateLimit($newData['extensions']);
+                    continue;
+                }
+                echo "Failed to $query $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 break;
             }
             $data = json_decode($response->getContent(), true);
