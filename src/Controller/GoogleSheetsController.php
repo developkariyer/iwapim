@@ -138,7 +138,7 @@ class GoogleSheetsController extends FrontendController
         $channel = $request->get('channel');
         $filename = 'channelStats_' . $channel;
         $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
-        if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'Amazon.com.au', 'all'])) {
+        if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.co.uk', 'Amazon.com.au', 'all'])) {
             return new JsonResponse(['error' => 'Invalid channel'], 400);
         }
         $saleData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
