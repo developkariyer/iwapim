@@ -7,7 +7,7 @@ query inventoryItems($numItems: Int!, $cursor: String) {
         nodes {
             id
             createdAt
-            inventoryLevels (first: 5) {
+            inventoryLevels (first: 50) {
                 nodes {
                     id
                     location {

@@ -69,9 +69,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            break;
         } while ($hasNextPage);
-        print_r(json_encode($allData));
         return $allData;
     }
 
@@ -102,11 +100,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     protected function processProduct(array &$product): void
     {
         $productId = $product['id'];
-        $variants = $this->graphqlNestedPaginateDownload('ownerId', $productId, 'downloadVariant.graphql', 'product', 'variants', 3);
+        $variants = $this->graphqlNestedPaginateDownload('ownerId', $productId, 'downloadVariant.graphql', 'product', 'variants', 50);
         if (!empty($variants)) {
             $product['variants']['nodes'] = array_merge($product['variants']['nodes'] ?? [], $variants);
         }
-        $medias = $this->graphqlNestedPaginateDownload('ownerId', $productId, 'downloadMedia.graphql', 'product', 'media', 3);
+        $medias = $this->graphqlNestedPaginateDownload('ownerId', $productId, 'downloadMedia.graphql', 'product', 'media', 50);
         if (!empty($medias)) {
             $product['media']['nodes'] = array_merge($product['media']['nodes'] ?? [], $medias);
         }
@@ -183,7 +181,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 3,
+                'numProducts' => 50,
                 'cursor' => null
             ]
        ];
@@ -192,6 +190,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
+        $this->putListingsToCache();
     }
 
     /**
@@ -240,7 +239,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadInventory.graphql'),
             'variables' => [
-                'numItems' => 50,
+                'numItems' => 5,
                 'cursor' => null
             ]
         ];
@@ -412,8 +411,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->graphqlDownloadInventory();
-        //$this->graphqlDownload();
+        //$this->graphqlDownloadInventory();
+        $this->graphqlDownload();
         //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
