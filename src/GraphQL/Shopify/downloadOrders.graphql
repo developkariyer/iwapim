@@ -41,56 +41,7 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                 }
             }
             createdAt
-            lineItems (first:5) {
-                pageInfo {
-                    endCursor
-                    hasNextPage
-                }
-                nodes {
-                    id
-                    sku
-                    name
-                    title
-                    duties {
-                        id
-                        countryCodeOfOrigin
-                        harmonizedSystemCode
-                        price {
-                            shopMoney {
-                                amount
-                                currencyCode
-                            }
-                            presentmentMoney {
-                                amount
-                                currencyCode
-                            }
-                        }
-                    }
-                    vendor
-                    taxable
-                    quantity
-                    isGiftCard
-                    product {
-                        id
-                    }
-                    variant {
-                        id
-                        title
-                        price
-                    }
-                    totalDiscountSet {
-                        shopMoney {
-                            amount
-                            currencyCode
-                        }
-                        presentmentMoney {
-                            amount
-                            currencyCode
-                        }
-                    }
-                    requiresShipping
-                }
-            }
+
             registeredSourceUrl
             taxExempt
             updatedAt

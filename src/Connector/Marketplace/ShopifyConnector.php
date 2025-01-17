@@ -85,6 +85,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $newData['data']['products']['nodes'] = $products;
                 $newData['data']['products']['media'] = $medias;
             }
+            if ($key === 'orders') {
+                $orders = $newData['data']['orders']['nodes'];
+                foreach ($orders as &$order) {
+                    $orderId = $order['id'];
+                    $lineItems = $this->graphqlOrderLinesItems($orderId);
+                    break;
+                }
+            }
+
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
@@ -140,6 +149,38 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
         } while ($hasNextPage);
         return $collectedItems;
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function graphqlOrderLinesItems($orderId)
+    {
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadOrdersLineItems.graphql'),
+            'variables' => [
+                'id' => $orderId,
+                'cursor' => null,
+                'numItems' => 1
+            ]
+        ];
+        $headersToApi = [
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ];
+        $collectedItems = [];
+        $cursor = null;
+        $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+            'json' => $query,
+            'headers' => $headersToApi['headers']
+        ]);
+        print_r(json_encode($response->getContent()));
+
     }
 
     public function graphqlDownload() // working
