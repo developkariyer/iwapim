@@ -85,6 +85,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $newData['data']['products']['nodes'] = $products;
                 $newData['data']['products']['media'] = $medias;
             }
+            if ($key === 'orders') {
+                $orders = $newData['data']['orders']['nodes'];
+                foreach ($orders as &$order) {
+                    $orderId = $order['id'];
+                    $lineItems = $this->graphqlOrderLinesItems($orderId);
+                    break;
+                }
+            }
+
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
@@ -92,7 +101,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             break;
         } while ($hasNextPage);
-        print_r(json_encode($allData));
+        //print_r(json_encode($allData));
         return $allData;
     }
 
@@ -140,6 +149,38 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
         } while ($hasNextPage);
         return $collectedItems;
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function graphqlOrderLinesItems($orderId)
+    {
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadOrdersLineItems.graphql'),
+            'variables' => [
+                'id' => $orderId,
+                'cursor' => null,
+                'numItems' => 1
+            ]
+        ];
+        $headersToApi = [
+            'headers' => [
+                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                'Content-Type' => 'application/json'
+            ]
+        ];
+        $collectedItems = [];
+        $cursor = null;
+        $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+            'json' => $query,
+            'headers' => $headersToApi['headers']
+        ]);
+        $data = json_decode($response->getContent(), true);
+        print_r(json_encode($data));
     }
 
     public function graphqlDownload() // working
@@ -361,8 +402,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownload();
-       //$this->downloadOrdersGraphql();
-       if (!$forceDownload && $this->getListingsFromCache()) {
+       $this->downloadOrdersGraphql();
+       /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -371,7 +412,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();
+       $this->putListingsToCache();*/
     }
 
     /**
