@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -114,15 +116,21 @@ class GoogleSheetsController extends FrontendController
     /**
      * @Route("/sheets/amazonsales/{channel}", name="sheets_amazonsales")
      * @throws Exception
+     * @throws RandomException
      */
     public function amazonSalesAction(Request $request): JsonResponse
     {
         $db = Db::get();
         $channel = $request->get('channel');
+        $filename = 'channelStats_' . $channel;
         if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'all'])) {
             $channel = 'all';
         }
-        $saleData = $db->fetchAllAssociative(self::$channelStats, [$channel]);
+        $saleData = json_decode(Utility::getCustomCache(filename: $filename, expiration: 3600), true);
+        if (empty($saleData)) {
+            $saleData = $db->fetchAllAssociative(self::$channelStats, [$channel]);
+            Utility::setCustomCache($filename, json_encode($saleData));
+        }
         return $this->json($saleData);
     }
 

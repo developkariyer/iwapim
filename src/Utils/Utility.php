@@ -174,7 +174,7 @@ class Utility
     /**
      * @throws RandomException
      */
-    public static function getCustomCache($filename, $cachePath, $expiration = 86400, bool $lazy = false): string
+    public static function getCustomCache($filename, $cachePath = PIMCORE_PROJECT_ROOT . "/tmp", $expiration = 86400, bool $lazy = false): string
     {
         return static::getSetCustomCache($filename, $cachePath, null, $expiration, $lazy);
     }
@@ -182,7 +182,7 @@ class Utility
     /**
      * @throws RandomException
      */
-    public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400): bool
+    public static function setCustomCache($filename, $cachePath = PIMCORE_PROJECT_ROOT . "/tmp", string $stringToCache = '', $expiration = 86400): bool
     {
         return static::getSetCustomCache($filename, $cachePath, $stringToCache, $expiration);
     }
@@ -281,6 +281,9 @@ class Utility
         return bcmul((string)$amount, (string)($fromCurrencyValue/$toCurrencyValue), 2);
     }
 
+    /**
+     * @throws Exception
+     */
     public static function getCurrencyValueByDate($currency, $date): float
     {
         $db = Db::get();
@@ -302,14 +305,10 @@ class Utility
         if (!file_exists($filePath)) {
             throw new Exception("SQL file not found.");
         }
-        try {
-            $db = \Pimcore\Db::get();
-            $sql = file_get_contents($filePath);
-            $stmt = $db->prepare($sql);
-            $stmt->executeStatement($params);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        $db = Db::get();
+        $sql = file_get_contents($filePath);
+        $stmt = $db->prepare($sql);
+        $stmt->executeStatement($params);
     }
 
     /**
@@ -320,14 +319,9 @@ class Utility
         if (!file_exists($filePath)) {
             throw new Exception("SQL file not found.");
         }
-        try {
-            $db = \Pimcore\Db::get();
-            $sql = file_get_contents($filePath);
-            return $db->fetchAllAssociative($sql, $params);
-        }catch (\Exception $e) {
-            throw $e;
-        }
-        return [];
+        $db = Db::get();
+        $sql = file_get_contents($filePath);
+        return $db->fetchAllAssociative($sql, $params);
     }
 
 }
