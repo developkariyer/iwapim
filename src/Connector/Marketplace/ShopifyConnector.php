@@ -84,11 +84,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     protected function processShopifyDataByKey(string $key, array $nodes): array
     {
         foreach ($nodes as &$node) {
-            if ($key === 'products') {
-                $this->processProduct($node);
-            } elseif ($key === 'orders') {
-                $this->processOrder($node);
-            }
+            match ($key) {
+                'products' => $this->processProduct($node),
+                'orders' => $this->processOrder($node),
+                default => null,
+            };
         }
         return $nodes;
     }
@@ -397,7 +397,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownload();
-        $this->downloadOrdersGraphql();
+        //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
