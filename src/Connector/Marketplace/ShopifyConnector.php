@@ -67,6 +67,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
+            $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
+            $requestedQueryCost = $newData['extensions']['cost']['requestedQueryCost'];
+            $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
+            $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
+            $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
+            echo "Page Info:\n";
+            echo "Items Count: $itemsCount\n";
+            echo "Requested Query Cost: $requestedQueryCost\n";
+            echo "Actual Query Cost: $actualQueryCost\n";
+            echo "Currently Available: $currentlyAvailable\n";
+            echo "Restore Rate: $restoreRate\n";
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
