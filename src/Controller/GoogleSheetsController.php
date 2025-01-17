@@ -126,7 +126,7 @@ class GoogleSheetsController extends FrontendController
         $channel = $request->get('channel');
         $filename = 'channelStats_' . $channel;
         $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
-        if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'all'])) {
+        if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'Amazon.com.au', 'all'])) {
             $channel = 'all';
         }
         $saleData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
@@ -148,7 +148,7 @@ class GoogleSheetsController extends FrontendController
         $warehouse = $request->get('warehouse');
         $filename = 'channelFba_' . $warehouse;
         $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
-        if (!in_array($warehouse, ['CA', 'EU', 'UK', 'US'])) {
+        if (!in_array($warehouse, ['CA', 'EU', 'UK', 'US', 'AU'])) {
             $warehouse = 'US';
         }
         $fbaData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
