@@ -6,26 +6,73 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class GoogleSheetsController extends FrontendController
 {
     static string $iwaskuSql = "SELECT DISTINCT iwasku FROM iwa_amazon_daily_sales_summary ORDER BY iwasku";
     static string $asin2iwaskuSql = "SELECT DISTINCT regkey AS asin, regvalue AS iwasku FROM iwa_registry WHERE regtype='asin-to-iwasku' ORDER BY asin";
-    static string $asinPreSql = "SELECT 
-    iwasku,
-    MAX(CASE WHEN sales_channel = 'Amazon.com' THEN asin END) AS us_asin,
-    MAX(CASE WHEN sales_channel = 'Amazon.eu' THEN asin END) AS eu_asin,
-    MAX(CASE WHEN sales_channel = 'Amazon.co.uk' THEN asin END) AS uk_asin,
-    MAX(CASE WHEN sales_channel = 'Amazon.ca' THEN asin END) AS ca_asin,
-    MAX(CASE WHEN sales_channel = 'Amazon.au' THEN asin END) AS au_asin,
-    MAX(CASE WHEN sales_channel = 'Amazon.co.jp' THEN asin END) AS jp_asin
-FROM 
-    iwa_amazon_daily_sales_summary
-GROUP BY 
-    iwasku
-ORDER BY
-    iwasku;";
+    static string $asinPreSql =    "SELECT 
+                                        iwasku,
+                                        MAX(CASE WHEN sales_channel = 'Amazon.com' THEN asin END) AS us_asin,
+                                        MAX(CASE WHEN sales_channel = 'Amazon.co.uk' THEN asin END) AS eu_asin,
+                                        MAX(CASE WHEN sales_channel = 'Amazon.co.uk' THEN asin END) AS uk_asin,
+                                        MAX(CASE WHEN sales_channel = 'Amazon.ca' THEN asin END) AS ca_asin,
+                                        MAX(CASE WHEN sales_channel = 'Amazon.au' THEN asin END) AS au_asin,
+                                        MAX(CASE WHEN sales_channel = 'Amazon.co.jp' THEN asin END) AS jp_asin
+                                    FROM 
+                                        iwa_amazon_daily_sales_summary
+                                    GROUP BY 
+                                        iwasku
+                                    ORDER BY
+                                        iwasku;";
+    static string $channelStats =  "WITH date_ranges AS (
+                                        SELECT 
+                                            CURRENT_DATE AS today,
+                                            DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY) AS last7_start,
+                                            DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY) AS last30_start,
+                                            DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY) AS last90_start,
+                                            DATE_SUB(CURRENT_DATE, INTERVAL 180 DAY) AS last180_start,
+                                            DATE_SUB(CURRENT_DATE, INTERVAL 366 DAY) AS last366_start,
+                                            DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR) AS preYear_today,
+                                            DATE_SUB(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 7 DAY) AS preYearLast7_start,
+                                            DATE_SUB(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 30 DAY) AS preYearLast30_start,
+                                            DATE_SUB(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 90 DAY) AS preYearLast90_start,
+                                            DATE_SUB(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 180 DAY) AS preYearLast180_start,
+                                            DATE_SUB(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 365 DAY) AS preYearLast365_start,
+                                            DATE_ADD(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 1 DAY) AS preYearNext7_start,
+                                            DATE_ADD(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 7 DAY) AS preYearNext7_end,
+                                            DATE_ADD(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 30 DAY) AS preYearNext30_end,
+                                            DATE_ADD(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 90 DAY) AS preYearNext90_end,
+                                            DATE_ADD(DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR), INTERVAL 180 DAY) AS preYearNext180_end
+                                    )
+                                    SELECT 
+                                        iwasku,
+                                        asin,
+                                        SUM(CASE WHEN sale_date BETWEEN today AND DATE_ADD(today, INTERVAL 0 DAY) THEN total_quantity ELSE 0 END) AS last7,
+                                        SUM(CASE WHEN sale_date BETWEEN last30_start AND today THEN total_quantity ELSE 0 END) AS last30,
+                                        SUM(CASE WHEN sale_date BETWEEN last90_start AND today THEN total_quantity ELSE 0 END) AS last90,
+                                        SUM(CASE WHEN sale_date BETWEEN last180_start AND today THEN total_quantity ELSE 0 END) AS last180,
+                                        SUM(CASE WHEN sale_date BETWEEN last366_start AND today THEN total_quantity ELSE 0 END) AS last366,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearLast7_start AND preYear_today THEN total_quantity ELSE 0 END) AS preYearLast7,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearLast30_start AND preYear_today THEN total_quantity ELSE 0 END) AS preYearLast30,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearLast90_start AND preYear_today THEN total_quantity ELSE 0 END) AS preYearLast90,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearLast180_start AND preYear_today THEN total_quantity ELSE 0 END) AS preYearLast180,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearLast365_start AND preYear_today THEN total_quantity ELSE 0 END) AS preYearLast365,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearNext7_start AND preYearNext7_end THEN total_quantity ELSE 0 END) AS preYearNext7,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearNext7_start AND preYearNext30_end THEN total_quantity ELSE 0 END) AS preYearNext30,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearNext7_start AND preYearNext90_end THEN total_quantity ELSE 0 END) AS preYearNext90,
+                                        SUM(CASE WHEN sale_date BETWEEN preYearNext7_start AND preYearNext180_end THEN total_quantity ELSE 0 END) AS preYearNext180
+                                    FROM 
+                                        iwa_amazon_daily_sales_summary
+                                    CROSS JOIN 
+                                        date_ranges
+                                    WHERE 
+                                        data_source = 1
+                                        AND sales_channel = ?
+                                    GROUP BY 
+                                        iwasku, asin;";
 
     /**
      * @Route("/sheets/main", name="sheets")
@@ -61,6 +108,21 @@ ORDER BY
     {
         $db = Db::get();
         $saleData = $db->fetchAllAssociative(self::$asinPreSql);
+        return $this->json($saleData);
+    }
+
+    /**
+     * @Route("/sheets/amazonsales/{channel}", name="sheets_amazonsales")
+     * @throws Exception
+     */
+    public function amazonSalesAction(Request $request): JsonResponse
+    {
+        $db = Db::get();
+        $channel = $request->get('channel');
+        if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'all'])) {
+            $channel = 'all';
+        }
+        $saleData = $db->fetchAllAssociative(self::$channelStats, [$channel]);
         return $this->json($saleData);
     }
 
