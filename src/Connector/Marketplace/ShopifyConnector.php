@@ -105,7 +105,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            break;
+            
         } while ($hasNextPage);
         print_r(json_encode($allData));
         return $allData;
@@ -184,7 +184,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function downloadOrdersGraphql() // working
+    public function downloadOrdersGraphql()
     {
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
