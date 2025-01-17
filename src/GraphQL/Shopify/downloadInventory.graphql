@@ -28,8 +28,6 @@ query inventoryItems($numItems: Int!, $cursor: String) {
                 }
             }
             sku
-
-
         }
     }
 }
