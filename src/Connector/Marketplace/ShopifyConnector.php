@@ -90,10 +90,16 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 foreach ($orders as &$order) {
                     $orderId = $order['id'];
                     $lineItems = $this->graphqlOrderLinesItems($orderId);
-                    break;
+                    if (!empty($lineItems)) {
+                        $order['lineItems']['nodes'] = array_merge(
+                            $order['lineItems']['nodes'] ?? [],
+                                $lineItems
+                        );
+                    }
                 }
+                unset($order);
+                $newData['data']['orders']['nodes'] = $orders;
             }
-
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
@@ -101,7 +107,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             break;
         } while ($hasNextPage);
-        //print_r(json_encode($allData));
+        print_r(json_encode($allData));
         return $allData;
     }
 
@@ -175,12 +181,25 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         $collectedItems = [];
         $cursor = null;
-        $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
-            'json' => $query,
-            'headers' => $headersToApi['headers']
-        ]);
-        $data = json_decode($response->getContent(), true);
-        print_r(json_encode($data));
+        do {
+            $query['variables']['cursor'] = $cursor;
+            $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
+                'json' => $query,
+                'headers' => $headersToApi['headers']
+            ]);
+            usleep(200000);
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to fetch $orderId: {$response->getContent()} \n";
+                break;
+            }
+            $data = json_decode($response->getContent(), true);
+            $items = $data['data']['order']['lineItems']['nodes'] ?? [];
+            $collectedItems = array_merge($collectedItems, $items);
+            $pageInfo = $data['data']['order']['lineItems']['pageInfo'];
+            $cursor = $pageInfo['endCursor'] ?? null;
+            $hasNextPage = $pageInfo['hasNextPage'] ?? null;
+        } while($hasNextPage);
+        return $collectedItems;
     }
 
     public function graphqlDownload() // working
@@ -516,7 +535,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         foreach ($images as $img) {
             if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
                 return Utility::getCachedImage($img['src']);
-            } 
+            }
             if (empty($lastImage)) {
                 $lastImage = Utility::getCachedImage($img['src']);
             }
@@ -552,7 +571,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $parent = Utility::checkSetPath(
                     Utility::sanitizeVariable($mainListing['title']),
                     $parent
-                );    
+                );
             }
             if (($mainListing['status'] ?? 'active') !== 'active') {
                 $parent = Utility::checkSetPath(
@@ -673,7 +692,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'SWEDISH KRONA' => 'SEK',
             'POUND STERLING' => 'GBP'
         ];
-        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
+        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
         if (empty($variantId)) {
             echo "Failed to get variant id for {$listing->getKey()}\n";
             return;

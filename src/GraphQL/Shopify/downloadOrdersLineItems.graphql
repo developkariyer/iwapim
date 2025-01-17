@@ -37,16 +37,6 @@ query SuggestedRefund($id: ID!, $numItems: Int, $cursor: String) {
                     title
                     price
                 }
-                totalDiscountSet {
-                    shopMoney {
-                        amount
-                        currencyCode
-                    }
-                    presentmentMoney {
-                        amount
-                        currencyCode
-                    }
-                }
                 requiresShipping
             }
         }
