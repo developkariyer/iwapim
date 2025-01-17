@@ -235,6 +235,22 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return 0;
     }
 
+    public function graphqlDownloadInventory()
+    {
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadInventory.graphql'),
+            'variables' => [
+                'numItems' => 3,
+                'cursor' => null
+            ]
+        ];
+        $inventories = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
+        if (empty($inventories)) {
+            echo "Failed to download listings\n";
+            return;
+        }
+    }
+
     public function setSkuGraphql(VariantProduct $listing, string $sku): void // not tested
     {
         if (empty($sku)) {
@@ -396,6 +412,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
+        $this->graphqlDownloadInventory();
         //$this->graphqlDownload();
         //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {

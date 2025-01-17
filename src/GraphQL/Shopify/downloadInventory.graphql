@@ -1,0 +1,35 @@
+query inventoryItems($numItems: Int!, $cursor: String) {
+    inventoryItems(first: $numItems, after: $cursor) {
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        nodes {
+            id
+            createdAt
+            inventoryLevels (first: 5) {
+                nodes {
+                    id
+                    location {
+                        id
+                        address {
+                            address1
+                            city
+                            country
+                        }
+                    }
+                    item {
+                        id
+                    }
+                    quantities (names: ["available"]){
+                        name
+                        quantity
+                    }
+                }
+            }
+            sku
+
+
+        }
+    }
+}
