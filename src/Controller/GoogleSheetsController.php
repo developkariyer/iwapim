@@ -145,7 +145,7 @@ class GoogleSheetsController extends FrontendController
     public function amazonFbaAction(Request $request): JsonResponse
     {
         $db = Db::get();
-        $warehouse = $request->get('channel');
+        $warehouse = $request->get('warehouse');
         $filename = 'channelFba_' . $warehouse;
         $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
         if (!in_array($warehouse, ['CA', 'EU', 'UK', 'US'])) {
