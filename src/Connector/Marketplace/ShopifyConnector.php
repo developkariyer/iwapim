@@ -202,12 +202,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
             $itemsCount = count($items);
-
             $requestedQueryCost = $newData['extensions']['cost']['requestedQueryCost'];
             $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
             $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
             $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-
             echo "nestedPaginate - Page Info:\n";
             echo "Items Count: $itemsCount\n";
             echo "Requested Query Cost: $requestedQueryCost\n";
