@@ -66,14 +66,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $products = $newData['data']['products']['nodes'];
                 foreach ($products as &$product) {
                     $productId = $product['id'];
-                    $variants = $this->graphqlPaginatedDownloadProduct($productId, 'downloadVariant.graphql','variants','variantCursor',3);
+                    $variants = $this->graphqlNestedPaginateDownload('ownerId' ,$productId, 'downloadVariant.graphql', 'product', 'variants',3);
                     if (!empty($variants)) {
                         $product['variants']['nodes'] = array_merge(
                             $product['variants']['nodes'] ?? [],
                             $variants
                         );
                     }
-                    $medias = $this->graphqlPaginatedDownloadProduct($productId,'downloadMedia.graphql','media','mediaCursor', 3);
+                    $medias = $this->graphqlNestedPaginateDownload('ownerId', $productId,'downloadMedia.graphql', 'product', 'media', 3);
                     if (!empty($medias)) {
                         $product['media']['nodes'] = array_merge(
                             $product['media']['nodes'] ?? [],
@@ -89,7 +89,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $orders = $newData['data']['orders']['nodes'];
                 foreach ($orders as &$order) {
                     $orderId = $order['id'];
-                    $lineItems = $this->graphqlOrderLinesItems($orderId);
+                    $lineItems = $this->graphqlNestedPaginateDownload('id', $orderId, 'downloadOrdersLineItems.graphql', 'order', 'lineItems', 1);
                     if (!empty($lineItems)) {
                         $order['lineItems']['nodes'] = array_merge(
                             $order['lineItems']['nodes'] ?? [],
@@ -153,51 +153,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
         } while ($hasNextPage);
-        return $collectedItems;
-    }
-
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
-     */
-    public function graphqlOrderLinesItems($orderId)
-    {
-        $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadOrdersLineItems.graphql'),
-            'variables' => [
-                'id' => $orderId,
-                'cursor' => null,
-                'numItems' => 1
-            ]
-        ];
-        $headersToApi = [
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json'
-            ]
-        ];
-        $collectedItems = [];
-        $cursor = null;
-        do {
-            $query['variables']['cursor'] = $cursor;
-            $response = $this->httpClient->request("POST", $this->apiUrl . '/graphql.json', [
-                'json' => $query,
-                'headers' => $headersToApi['headers']
-            ]);
-            usleep(200000);
-            if ($response->getStatusCode() !== 200) {
-                echo "Failed to fetch $orderId: {$response->getContent()} \n";
-                break;
-            }
-            $data = json_decode($response->getContent(), true);
-            $items = $data['data']['order']['lineItems']['nodes'] ?? [];
-            $collectedItems = array_merge($collectedItems, $items);
-            $pageInfo = $data['data']['order']['lineItems']['pageInfo'];
-            $cursor = $pageInfo['endCursor'] ?? null;
-            $hasNextPage = $pageInfo['hasNextPage'] ?? null;
-        } while($hasNextPage);
         return $collectedItems;
     }
 
