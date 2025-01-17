@@ -29,7 +29,7 @@ class GoogleSheetsController extends FrontendController
                                         iwasku
                                     ORDER BY
                                         iwasku;";
-    static string $channelStats =  "WITH date_ranges AS (
+    static string $salesStatsSql = "WITH date_ranges AS (
                                         SELECT 
                                             CURRENT_DATE AS today,
                                             DATE_SUB(CURRENT_DATE, INTERVAL 6 DAY) AS last7_start,
@@ -75,6 +75,8 @@ class GoogleSheetsController extends FrontendController
                                         AND sales_channel = ?
                                     GROUP BY 
                                         iwasku, asin;";
+    static string $fbaStatsSql = "SELECT * FROM iwa_amazon_inventory_summary WHERE warehouse = ?";
+
 
     /**
      * @Route("/sheets/main", name="sheets")
@@ -129,10 +131,31 @@ class GoogleSheetsController extends FrontendController
         }
         $saleData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
         if (empty($saleData)) {
-            $saleData = $db->fetchAllAssociative(self::$channelStats, [$channel]);
+            $saleData = $db->fetchAllAssociative(self::$salesStatsSql, [$channel]);
             Utility::setCustomCache($filename, $cachePath, json_encode($saleData));
         }
         return $this->json($saleData);
     }
 
+    /**
+     * @Route("/sheets/amazonfba/{warehouse}", name="sheets_amazonfba")
+     * @throws Exception
+     * @throws RandomException
+     */
+    public function amazonFbaAction(Request $request): JsonResponse
+    {
+        $db = Db::get();
+        $warehouse = $request->get('channel');
+        $filename = 'channelFba_' . $warehouse;
+        $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
+        if (!in_array($warehouse, ['CA', 'EU', 'UK', 'US'])) {
+            $warehouse = 'US';
+        }
+        $fbaData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
+        if (empty($fbaData)) {
+            $fbaData = $db->fetchAllAssociative(self::$fbaStatsSql, [$warehouse]);
+            Utility::setCustomCache($filename, $cachePath, json_encode($fbaData));
+        }
+        return $this->json($fbaData);
+    }
 }
