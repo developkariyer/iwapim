@@ -45,16 +45,15 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $allData = [];
         $cursor = null;
-        $headersToApi = [
-            'json' => $data,
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json'
-            ]
-        ];
         do {
             $data['variables']['cursor'] = $cursor;
-            $headersToApi['json'] = $data;
+            $headersToApi = [
+                'json' => $data,
+                'headers' => [
+                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                    'Content-Type' => 'application/json'
+                ]
+            ];
             $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
             usleep(200000);
             if ($response->getStatusCode() !== 200) {
@@ -62,53 +61,70 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
-            if ($key === 'products') {
-                $products = $newData['data']['products']['nodes'];
-                foreach ($products as &$product) {
-                    $productId = $product['id'];
-                    $variants = $this->graphqlNestedPaginateDownload('ownerId' ,$productId, 'downloadVariant.graphql', 'product', 'variants',3);
-                    if (!empty($variants)) {
-                        $product['variants']['nodes'] = array_merge(
-                            $product['variants']['nodes'] ?? [],
-                            $variants
-                        );
-                    }
-                    $medias = $this->graphqlNestedPaginateDownload('ownerId', $productId,'downloadMedia.graphql', 'product', 'media', 3);
-                    if (!empty($medias)) {
-                        $product['media']['nodes'] = array_merge(
-                            $product['media']['nodes'] ?? [],
-                            $medias
-                        );
-                    }
-                }
-                unset($product);
-                $newData['data']['products']['nodes'] = $products;
-                $newData['data']['products']['media'] = $medias;
-            }
-            if ($key === 'orders') {
-                $orders = $newData['data']['orders']['nodes'];
-                foreach ($orders as &$order) {
-                    $orderId = $order['id'];
-                    $lineItems = $this->graphqlNestedPaginateDownload('id', $orderId, 'downloadOrdersLineItems.graphql', 'order', 'lineItems', 1);
-                    if (!empty($lineItems)) {
-                        $order['lineItems']['nodes'] = array_merge(
-                            $order['lineItems']['nodes'] ?? [],
-                                $lineItems
-                        );
-                    }
-                }
-                unset($order);
-                $newData['data']['orders']['nodes'] = $orders;
+            if ($key) {
+                $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
             $currentPageData = $key ? ($newData['data'][$key]['nodes'] ?? []) : $newData;
             $allData = array_merge($allData, $currentPageData);
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-
+            break;
         } while ($hasNextPage);
         print_r(json_encode($allData));
         return $allData;
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    protected function processShopifyDataByKey(string $key, array $nodes): array
+    {
+        foreach ($nodes as &$node) {
+            if ($key === 'products') {
+                $this->processProduct($node);
+            } elseif ($key === 'orders') {
+                $this->processOrder($node);
+            }
+        }
+        return $nodes;
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    protected function processProduct(array &$product): void
+    {
+        $productId = $product['id'];
+        $variants = $this->graphqlNestedPaginateDownload('ownerId', $productId, 'downloadVariant.graphql', 'product', 'variants', 3);
+        if (!empty($variants)) {
+            $product['variants']['nodes'] = array_merge($product['variants']['nodes'] ?? [], $variants);
+        }
+        $medias = $this->graphqlNestedPaginateDownload('ownerId', $productId, 'downloadMedia.graphql', 'product', 'media', 3);
+        if (!empty($medias)) {
+            $product['media']['nodes'] = array_merge($product['media']['nodes'] ?? [], $medias);
+        }
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    protected function processOrder(array &$order): void
+    {
+        $orderId = $order['id'];
+        $lineItems = $this->graphqlNestedPaginateDownload('id', $orderId, 'downloadOrdersLineItems.graphql', 'order', 'lineItems', 1);
+        if (!empty($lineItems)) {
+            $order['lineItems']['nodes'] = array_merge($order['lineItems']['nodes'] ?? [], $lineItems);
+        }
     }
 
     /**
