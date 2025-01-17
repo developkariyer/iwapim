@@ -86,7 +86,9 @@ class GoogleSheetsController extends FrontendController
                                         JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"Count in Raf\"')) AS count_in_raf,
                                         JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"Count in Ship\"')) AS count_in_ship
                                     FROM iwa_inventory
-                                    WHERE warehouse = 'NJ'";
+                                    WHERE
+                                        warehouse = 'NJ'
+                                        AND iwasku NOT IN ('', 'NULL')";
 
     /**
      * @Route("/sheets/main", name="sheets")
