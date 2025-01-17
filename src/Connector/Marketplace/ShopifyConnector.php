@@ -61,6 +61,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 return null;
             }
             $newData = json_decode($response->getContent(), true);
+            print_r(json_encode($newData));
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
@@ -191,7 +192,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-        $this->putListingsToCache();
+        //$this->putListingsToCache();
     }
 
     /**
