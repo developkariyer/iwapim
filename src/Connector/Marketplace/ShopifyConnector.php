@@ -41,7 +41,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array  //working
+    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
     {
         $allData = [];
         $cursor = null;
@@ -75,7 +75,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            break;
         } while ($hasNextPage);
         return $allData;
     }
@@ -201,12 +200,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function graphqlDownload(): void // working
+    public function graphqlDownload(): void
     {
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
-                'numProducts' => 3,
+                'numProducts' => 50,
                 'cursor' => null
             ]
        ];
@@ -215,7 +214,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-        //$this->putListingsToCache();
+        $this->putListingsToCache();
     }
 
     /**
