@@ -75,8 +75,18 @@ class GoogleSheetsController extends FrontendController
                                         AND sales_channel = ?
                                     GROUP BY 
                                         iwasku, asin;";
-    static string $fbaStatsSql = "SELECT * FROM iwa_amazon_inventory_summary WHERE warehouse = ?";
-
+    static string $fbaStatsSql =   "SELECT * FROM iwa_amazon_inventory_summary WHERE warehouse = ?";
+    static string $whStatsSql =    "SELECT
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.ASIN')) AS asin,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.Name')) AS name,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.FNSKU')) AS fnsku,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.IWASKU')) AS iwasku,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.Category')) AS category,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"Total Count\"')) AS total_count,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"Count in Raf\"')) AS count_in_raf,
+                                        JSON_UNQUOTE(JSON_EXTRACT(json_data, '$.\"Count in Ship\"')) AS count_in_ship
+                                    FROM iwa_inventory
+                                    WHERE warehouse = 'NJ'";
 
     /**
      * @Route("/sheets/main", name="sheets")
@@ -148,12 +158,16 @@ class GoogleSheetsController extends FrontendController
         $warehouse = $request->get('warehouse');
         $filename = 'channelFba_' . $warehouse;
         $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
-        if (!in_array($warehouse, ['CA', 'EU', 'UK', 'US', 'AU'])) {
+        if (!in_array($warehouse, ['CA', 'EU', 'UK', 'US', 'AU', 'NJ'])) {
             return new JsonResponse(['error' => 'Invalid warehouse'], 400);
         }
         $fbaData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600, true), true);
         if (empty($fbaData)) {
-            $fbaData = $db->fetchAllAssociative(self::$fbaStatsSql, [$warehouse]);
+            if ($warehouse === 'NJ') {
+                $fbaData = $db->fetchAllAssociative(self::$whStatsSql);
+            } else {
+                $fbaData = $db->fetchAllAssociative(self::$fbaStatsSql, [$warehouse]);
+            }
             Utility::setCustomCache($filename, $cachePath, json_encode($fbaData));
         }
         return $this->json($fbaData);
