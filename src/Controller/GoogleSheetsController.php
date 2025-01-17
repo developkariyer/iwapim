@@ -123,13 +123,14 @@ class GoogleSheetsController extends FrontendController
         $db = Db::get();
         $channel = $request->get('channel');
         $filename = 'channelStats_' . $channel;
+        $cachePath = PIMCORE_PROJECT_ROOT . "/tmp";
         if (!in_array($channel, ['Amazon.com', 'Amazon.co.uk', 'Amazon.ca', 'Amazon.eu', 'Amazon.au', 'Amazon.co.jp', 'Amazon.co.uk', 'all'])) {
             $channel = 'all';
         }
-        $saleData = json_decode(Utility::getCustomCache(filename: $filename, expiration: 3600), true);
+        $saleData = json_decode(Utility::getCustomCache($filename, $cachePath, 3600), true);
         if (empty($saleData)) {
             $saleData = $db->fetchAllAssociative(self::$channelStats, [$channel]);
-            Utility::setCustomCache($filename, json_encode($saleData));
+            Utility::setCustomCache($filename, $cachePath, json_encode($saleData));
         }
         return $this->json($saleData);
     }

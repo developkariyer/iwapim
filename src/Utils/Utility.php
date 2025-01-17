@@ -174,7 +174,7 @@ class Utility
     /**
      * @throws RandomException
      */
-    public static function getCustomCache($filename, $cachePath = PIMCORE_PROJECT_ROOT . "/tmp", $expiration = 86400, bool $lazy = false): string
+    public static function getCustomCache($filename, $cachePath, $expiration = 86400, bool $lazy = false): string
     {
         return static::getSetCustomCache($filename, $cachePath, null, $expiration, $lazy);
     }
@@ -182,7 +182,7 @@ class Utility
     /**
      * @throws RandomException
      */
-    public static function setCustomCache($filename, $cachePath = PIMCORE_PROJECT_ROOT . "/tmp", string $stringToCache = '', $expiration = 86400): bool
+    public static function setCustomCache($filename, $cachePath, $stringToCache, $expiration = 86400): bool
     {
         return static::getSetCustomCache($filename, $cachePath, $stringToCache, $expiration);
     }
