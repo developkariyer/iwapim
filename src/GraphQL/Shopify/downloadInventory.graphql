@@ -18,16 +18,12 @@ query inventoryItems($numItems: Int!, $cursor: String) {
                             country
                         }
                     }
-                    item {
-                        id
-                    }
-                    quantities (names: ["available"]){
+                    quantities (names: ["available","incoming","committed","reserved","damaged","safety_stock","quality_control"]){
                         name
                         quantity
                     }
                 }
             }
-            sku
         }
     }
 }
