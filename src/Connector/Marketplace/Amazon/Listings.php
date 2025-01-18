@@ -3,7 +3,9 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
+use App\Utils\Registry;
 use App\Utils\Utility;
+use Doctrine\DBAL\Exception;
 use JsonException;
 
 class Listings
@@ -17,8 +19,20 @@ class Listings
         $this->connector = $connector;
     }
 
+    private function retrieveEan($json): string
+    {
+        $identifiers = $json['identifiers'][0]['identifiers'] ?? [];
+        foreach ($identifiers as $identifier) {
+            if ($identifier['identifierType'] === 'EAN') {
+                return $identifier['identifier'] ?? '';
+            }
+        }
+        return '';
+    }
+
     /**
      * @throws JsonException
+     * @throws Exception
      */
     protected function downloadAsinsInBucket(): void
     {
@@ -40,12 +54,16 @@ class Listings
             $this->connector->listings[$asin]['catalog'] = $item;
             $this->connector->putToCache("ASIN_{$asin}.json", $item);
             Utility::storeJsonData($this->connector->getMarketplace()->getId(), $asin, $item);
+            $ean = $this->retrieveEan($item);
+            if (!empty($ean)) {
+                Registry::setKey($asin, $ean, 'asin-to-ean');
+            }
         }
         sleep(1);
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|Exception
      */
     protected function addToAsinBucket($asin, $forceDownload = false): void
     {
@@ -58,6 +76,10 @@ class Listings
         } else {
             $this->connector->listings[$asin]['catalog'] = $item;
             Utility::storeJsonData($this->connector->getMarketplace()->getId(), $asin, $item);
+            $ean = $this->retrieveEan($item);
+            if (!empty($ean)) {
+                Registry::setKey($asin, $ean, 'asin-to-ean');
+            }
         }
     }
 

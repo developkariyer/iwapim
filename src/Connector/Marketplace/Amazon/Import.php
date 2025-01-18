@@ -91,7 +91,7 @@ class Import
     {
         $total = count($this->connector->listings);
         $index = 0;
-        foreach ($this->connector->listings as $asin=> $listing) {
+        foreach ($this->connector->listings as $asin=>$listing) {
             $index++;
             echo "($index/$total) Processing $asin ...";
             if (empty($asin)) {
