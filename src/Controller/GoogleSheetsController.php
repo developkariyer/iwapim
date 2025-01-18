@@ -174,4 +174,15 @@ class GoogleSheetsController extends FrontendController
         }
         return $this->json($fbaData);
     }
+
+    /**
+     * @Route("/sheets/catalog", name="sheets_catalog")
+     * @throws Exception
+     */
+    public function catalogAction(): JsonResponse
+    {
+        $db = Db::get();
+        $catalogData = $db->fetchAllAssociative("SELECT iwasku, `key`, productCategory FROM object_product WHERE iwasku NOT IN ('', 'NULL')");
+        return $this->json($catalogData);
+    }
 }
