@@ -50,6 +50,7 @@ class Listings
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->connector->getMarketplace()->getMerchantId(),
         );
+        echo "ALOOO";
         print_r($response);
         $this->asinBucket = [];
         $items = $response->json()['items'] ?? [];
