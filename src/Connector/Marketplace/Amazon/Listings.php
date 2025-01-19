@@ -52,6 +52,7 @@ class Listings
         );
         $this->asinBucket = [];
         $items = $response->json()['items'] ?? [];
+        print_r($items);
         foreach ($items as $item) {
             $asin = $item['asin'] ?? '';
             $this->connector->listings[$asin]['catalog'] = $item;
@@ -74,6 +75,7 @@ class Listings
         if (empty($item) || $forceDownload) {
             $this->asinBucket[$asin] = 1;
             if (count($this->asinBucket) >= 10) {
+                echo "Downloading ".count($this->asinBucket)." ASINs in bucket.\n";
                 $this->downloadAsinsInBucket();
             }        
         } else {
