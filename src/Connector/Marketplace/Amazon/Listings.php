@@ -21,15 +21,16 @@ class Listings
         $this->connector = $connector;
     }
 
-    private function retrieveEan($json): string
+    private function retrieveEan(array $json): ?string
     {
-        $identifiers = $json['identifiers'][0]['identifiers'] ?? [];
-        foreach ($identifiers as $identifier) {
-            if ($identifier['identifierType'] === 'EAN') {
-                return $identifier['identifier'] ?? '';
+        foreach ($json['identifiers'] ?? [] as $marketplace) {
+            foreach ($marketplace['identifiers'] ?? [] as $identifier) {
+                if ($identifier['identifierType'] === 'EAN') {
+                    return $identifier['identifier'] ?? null;
+                }
             }
         }
-        return '';
+        return null;
     }
 
     /**
