@@ -42,7 +42,9 @@ class Listings
             echo "AM143 - No ASINs to download.\n";
             return;
         }
+        echo "AM144 - Downloading ".count($this->asinBucket)." ASINs in bucket.\n".print_r($this->connector->amazonSellerConnector, true)."\n";
         $catalogApi = $this->connector->amazonSellerConnector->catalogItemsV20220401();
+        echo "AM145: ".print_r($catalogApi, true)."\n";
         $response = $catalogApi->searchCatalogItems(
             marketplaceIds: [AmazonConstants::amazonMerchant[$this->connector->mainCountry]['id']],
             identifiers: array_keys($this->asinBucket),
@@ -50,7 +52,6 @@ class Listings
             includedData: ['attributes', 'classifications', 'dimensions', 'identifiers', 'images', 'productTypes', 'relationships', 'salesRanks', 'summaries'],
             sellerId: $this->connector->getMarketplace()->getMerchantId(),
         );
-        echo "ALOOO";
         print_r($response);
         $this->asinBucket = [];
         $items = $response->json()['items'] ?? [];
