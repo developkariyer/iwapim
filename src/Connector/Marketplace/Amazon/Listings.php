@@ -58,6 +58,7 @@ class Listings
         } catch (Throwable $e) {
             echo "API call failed: " . $e->getMessage() . "\n";
             echo $e->getTraceAsString();
+            sleep(1);
             return;
         }
         print_r($response);
