@@ -8,6 +8,7 @@ use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use JsonException;
 use Random\RandomException;
+use Throwable;
 
 class Listings
 {
@@ -54,7 +55,7 @@ class Listings
             );
             echo "API call succeeded.\n";
             var_dump($response);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             echo "API call failed: " . $e->getMessage() . "\n";
             echo $e->getTraceAsString();
             return;
