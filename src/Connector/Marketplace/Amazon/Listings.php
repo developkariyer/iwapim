@@ -54,14 +54,12 @@ class Listings
                 sellerId: $this->connector->getMarketplace()->getMerchantId(),
             );
             echo "API call succeeded.\n";
-            var_dump($response);
         } catch (Throwable $e) {
             echo "API call failed: " . $e->getMessage() . "\n";
             echo $e->getTraceAsString();
             sleep(1);
             return;
         }
-        print_r($response);
         $this->asinBucket = [];
         $items = $response->json()['items'] ?? [];
         foreach ($items as $item) {
