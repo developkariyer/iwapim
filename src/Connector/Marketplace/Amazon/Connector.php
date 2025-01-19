@@ -4,11 +4,13 @@ namespace App\Connector\Marketplace\Amazon;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Connector\Marketplace\MarketplaceConnectorAbstract;
+use DateMalformedStringException;
 use Exception;
 use JsonException;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 use SellingPartnerApi\Enums\Endpoint;
 use SellingPartnerApi\Seller\SellerConnector;
 use SellingPartnerApi\SellingPartnerApi;
@@ -64,7 +66,7 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws JsonException|\Doctrine\DBAL\Exception
+     * @throws JsonException|\Doctrine\DBAL\Exception|RandomException
      */
     public function download($forceDownload = false): void
     {
@@ -94,7 +96,7 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Exception|DateMalformedStringException
      */
     public function downloadOrders(): void
     {

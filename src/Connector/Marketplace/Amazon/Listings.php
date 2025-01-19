@@ -7,6 +7,7 @@ use App\Utils\Registry;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use JsonException;
+use Random\RandomException;
 
 class Listings
 {
@@ -33,10 +34,12 @@ class Listings
     /**
      * @throws JsonException
      * @throws Exception
+     * @throws RandomException
      */
     protected function downloadAsinsInBucket(): void
     {
         if (empty($this->asinBucket)) {
+            echo "AM143 - No ASINs to download.\n";
             return;
         }
         $catalogApi = $this->connector->amazonSellerConnector->catalogItemsV20220401();
@@ -63,7 +66,7 @@ class Listings
     }
 
     /**
-     * @throws JsonException|Exception
+     * @throws JsonException|Exception|RandomException
      */
     protected function addToAsinBucket($asin, $forceDownload = false): void
     {
@@ -126,7 +129,7 @@ class Listings
     }
 
     /**
-     * @throws JsonException|Exception
+     * @throws JsonException|Exception|RandomException
      */
     public function getListings($forceDownload = false): void
     {
