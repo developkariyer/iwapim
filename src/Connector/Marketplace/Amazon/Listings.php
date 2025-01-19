@@ -133,11 +133,12 @@ class Listings
      */
     public function getListings($forceDownload = false): void
     {
+        echo "getListings called with forceDownload: $forceDownload. Main country is {$this->connector->mainCountry}\n";
         $this->processListingReport($this->connector->mainCountry, $this->connector->reportsHelper->amazonReports['GET_MERCHANT_LISTINGS_ALL_DATA']);
+        echo "Main country report processed. Other countries to process are: ".json_encode($this->connector->countryCodes)."\n";
         foreach ($this->connector->countryCodes as $country) {
             $this->processListingReport($country, $this->connector->reportsHelper->amazonCountryReports['GET_MERCHANT_LISTINGS_ALL_DATA'][$country]);
         }
-
         $totalCount = count($this->connector->listings);
         $index = 0;
         foreach ($this->connector->listings as $asin=> $listing) {
