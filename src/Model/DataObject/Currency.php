@@ -21,7 +21,7 @@ class Currency extends Concrete
     * @param string $currencyCode The currency code to search for.
     * @return Currency|null The currency object or null if not found.
     */
-    protected static function getCurrency($currencyCode)
+    protected static function getCurrency(string $currencyCode)
     {
         switch ($currencyCode) {
             case 'CAD':
@@ -61,7 +61,7 @@ class Currency extends Concrete
     * @param string $toCurrency The currency code to convert to. Defaults to 'TL'.
     * @return string The converted amount or "0.00" if conversion fails.
     */
-    public static function convertCurrency($fromCurrency, $amount, $toCurrency = 'TL')
+    public static function convertCurrency(string $fromCurrency, string $amount, string $toCurrency = 'TL'): string
     {
         if ($fromCurrency === $toCurrency) {
             return $amount;

@@ -8,6 +8,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
 use App\Utils\Utility;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -32,7 +33,7 @@ class ListingSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function loadWisersell($force = false): int
     {

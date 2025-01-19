@@ -3,7 +3,7 @@
 namespace App\Utils;
 
 use chillerlan\QRCode\Output\QRGdImagePNG;
-use chillerlan\QRCode\{QRCode, QROptions};
+use chillerlan\QRCode\{Output\QRCodeOutputException, QRCode, QROptions};
 use chillerlan\QRCode\Common\EccLevel;
 use chillerlan\QRCode\Data\QRMatrix;
 

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Data\Link;
+use Random\RandomException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Utils\Utility;
@@ -91,6 +92,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
 
     /**
      * @return void
+     * @throws RandomException
      */
     public function putListingsToCache(): void
     {
@@ -101,6 +103,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
      * @param int $expiration
      * @param bool $lazy
      * @return bool
+     * @throws RandomException
      */
     public function getListingsFromCache(int $expiration = 86000, bool $lazy = false): bool
     {
@@ -112,6 +115,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
      * @param string $key
      * @param array $data
      * @return void
+     * @throws RandomException
      */
     public function putToCache(string $key, array $data): void
     {
@@ -122,6 +126,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
      * @param string $key
      * @param string $data
      * @return void
+     * @throws RandomException
      */
     public function putToCacheRaw(string $key, string $data): void
     {
@@ -133,6 +138,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
      * @param int $expires
      * @param bool $lazy
      * @return array
+     * @throws RandomException
      */
     public function getFromCache(string $key, int $expires = 86000, bool $lazy = false): array
     {
@@ -144,6 +150,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
      * @param int $expires
      * @param bool $lazy
      * @return string
+     * @throws RandomException
      */
     public function getFromCacheRaw(string $key, int $expires = 86000, bool $lazy = false): string
     {

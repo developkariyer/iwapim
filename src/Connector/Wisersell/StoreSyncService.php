@@ -4,6 +4,7 @@ namespace App\Connector\Wisersell;
 
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -54,7 +55,7 @@ class StoreSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function loadWisersellStores($force = false): int
     {
@@ -82,7 +83,7 @@ class StoreSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function load($force = false): int
     {
@@ -95,7 +96,7 @@ class StoreSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function status(): array
     {
@@ -112,7 +113,7 @@ class StoreSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function dump(): void
     {
@@ -126,7 +127,7 @@ class StoreSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function sync(): void
     {
@@ -160,7 +161,7 @@ class StoreSyncService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function getAmazonStoreIds(): array
     {

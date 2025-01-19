@@ -83,7 +83,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
-     * @throws Exception
      */
     public function downloadOrders(): void
     {

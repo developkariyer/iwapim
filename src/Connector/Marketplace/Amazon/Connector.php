@@ -64,7 +64,7 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|\Doctrine\DBAL\Exception
      */
     public function download($forceDownload = false): void
     {

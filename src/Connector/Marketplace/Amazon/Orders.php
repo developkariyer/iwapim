@@ -2,6 +2,7 @@
 
 namespace App\Connector\Marketplace\Amazon;
 
+use DateMalformedStringException;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Exception;
@@ -55,7 +56,7 @@ class Orders
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|DateMalformedStringException
      */
     public function getOrders(): void
     {
@@ -126,7 +127,7 @@ class Orders
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|DateMalformedStringException
      */
     public function downloadOrders(): void
     {

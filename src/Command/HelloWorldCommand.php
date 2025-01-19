@@ -23,8 +23,6 @@ class HelloWorldCommand extends AbstractCommand
 {
     private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
     /**
-     * @throws Exception
-     * @throws DuplicateFullPathException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

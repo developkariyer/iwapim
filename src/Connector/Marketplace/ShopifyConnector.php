@@ -451,7 +451,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
-     * @throws Exception
      */
     public function downloadOrders(): void
     {

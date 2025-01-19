@@ -20,7 +20,7 @@ class CostModel extends Concrete
     * @param Product $product The product for which the cost is calculated.
     * @return string The total cost as a string formatted to two decimal places.
     */
-    public function getCost($product): string
+    public function getCost(Product $product): string
     {
         $totalCost = '0.00';
 

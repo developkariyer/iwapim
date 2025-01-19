@@ -2,6 +2,7 @@
 
 namespace App\Connector\Wisersell;
 
+use Random\RandomException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use App\Utils\Utility;
@@ -96,7 +97,7 @@ class Connector
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     protected function getAccessToken()
     {

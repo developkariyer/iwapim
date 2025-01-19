@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace;
 use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Random\RandomException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -16,7 +17,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class WallmartConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token",
         'offers' => 'items',
         'item' => 'items/',
@@ -26,8 +27,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'price' => 'price'
     ];
     public static string $marketplaceType = 'Wallmart';
-    private static $expires_in;
-    private static $correlationId;
+    private static int $expires_in;
+    private static int $correlationId;
 
     /**
      * @throws RandomException
@@ -53,7 +54,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws RandomException
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
@@ -135,19 +135,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $this->putListingsToCache();
     }
 
-    public function getAnItem($sku): void
-    {
-        $response = $this->httpClient->request('GET', static::$apiUrl['item'] . $sku);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        $data = $response->toArray();
-        print_r($data);
-    }
-
-    protected function getAttributes($listing)
+    protected function getAttributes($listing): string
     {
         $attributeString = "";
         if (!empty($listing['variantGroupInfo']['groupingAttributes'])) {
@@ -158,6 +146,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return rtrim($attributeString, '-');
     }
 
+    /**
+     * @throws DuplicateFullPathException
+     * @throws \Exception
+     */
     public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
@@ -188,7 +180,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'attributes' => $this->getAttributes($listing) ?? '',
                     'uniqueMarketplaceId' => $listing['wpid'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['publishedStatus'] === 'PUBLISHED' ? true : false,
+                    'published' => $listing['publishedStatus'] === 'PUBLISHED',
                     'sku' => $listing['sku'] ?? '',
                 ],
                 importFlag: $importFlag,
@@ -202,13 +194,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws RandomException
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
-     * @throws Exception
      */
     public function downloadOrders(): void
     {
@@ -292,7 +282,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface|Exception
+     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface|Exception|RandomException
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
@@ -334,7 +324,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface|Exception
+     * @throws RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|TransportExceptionInterface|ServerExceptionInterface|Exception|RandomException
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {

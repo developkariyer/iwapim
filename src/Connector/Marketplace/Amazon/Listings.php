@@ -126,7 +126,7 @@ class Listings
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|Exception
      */
     public function getListings($forceDownload = false): void
     {

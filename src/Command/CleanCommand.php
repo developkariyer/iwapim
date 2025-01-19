@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
+use Exception;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -52,7 +54,7 @@ class CleanCommand extends AbstractCommand
             try {
                 Product::setGetInheritedValues(false);
                 self::fixProductCodes();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 echo $e->getMessage();
             }
         }
@@ -284,6 +286,9 @@ class CleanCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private static function fixProductCodes()
     {
         $listingObject = new Product\Listing();
@@ -313,7 +318,11 @@ class CleanCommand extends AbstractCommand
         }
     }
 
-    private static function splitProductFolders($parent)
+    /**
+     * @throws DuplicateFullPathException
+     * @throws Exception
+     */
+    private static function splitProductFolders($parent): void
     {
         foreach ($parent->getChildren() as $category) {
             if ($category instanceof ObjectFolder) {
@@ -339,7 +348,7 @@ class CleanCommand extends AbstractCommand
         }
     }
 
-    private static function traverseObjectFolders($objectFolder)
+    private static function traverseObjectFolders($objectFolder): void
     {
         if ($objectFolder instanceof ObjectFolder) {
             echo "\rRunning in folder: " . $objectFolder->getFullPath() . " ";

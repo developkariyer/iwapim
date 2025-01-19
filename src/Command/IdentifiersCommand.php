@@ -8,11 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Pimcore\Model\DataObject\AmazonVariant;
-use Pimcore\Model\DataObject\AmazonVariant\Listing as AmazonVariantListing;
-use Pimcore\Model\DataObject\EtsyVariant\Listing as EtsyVariantListing;
-use Pimcore\Model\DataObject\ShopifyVariant\Listing as ShopifyVariantListing;
-
 
 #[AsCommand(
     name: 'app:identifiers',
@@ -21,7 +16,7 @@ use Pimcore\Model\DataObject\ShopifyVariant\Listing as ShopifyVariantListing;
 class IdentifiersCommand extends AbstractCommand
 {
     
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('marketplace', InputOption::VALUE_OPTIONAL, 'The marketplace to import from.')
@@ -161,7 +156,7 @@ class IdentifiersCommand extends AbstractCommand
         }
     }
 
-    protected static function getAmazonIdentifiers(AmazonVariant $amazonListing): Array
+    protected static function getAmazonIdentifiers(AmazonVariant $amazonListing): array
     {
         $identifiers = [
             'asin' => [],

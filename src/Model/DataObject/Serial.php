@@ -28,7 +28,7 @@ class Serial extends Concrete
     *
     * @return int Unique serial number.
     */
-    public function generateUniqueSerialNumber()
+    public function generateUniqueSerialNumber(): int
     {
         do  {
             $candidateNumber = mt_rand(1, 1000000000);
@@ -44,7 +44,7 @@ class Serial extends Concrete
     * 
     * @return Concrete|null Found data object or null.
     */
-    public static function findByField($field, $value)
+    public static function findByField(string $field, mixed $value): ?Concrete
     {
         $list = new Listing();
         $list->setCondition("`$field` = ?", [$value]);
@@ -58,7 +58,7 @@ class Serial extends Concrete
     *
     * @return void
     */
-    public function checkLabel()
+    public function checkLabel(): void
     {
         if (!$this->isPublished()) {
             return;
@@ -73,7 +73,7 @@ class Serial extends Concrete
             $qrlink = $this->getQrcode();
             $qrfile = "{$product->getProductCode()}_{$this->getSerialNumber()}.pdf";
             $label = self::checkAsset($qrfile);
-            if (!$label instanceof Asset) {
+            if (!$label) {
                 $label = PdfGenerator::generate2x5($qrcode, $qrlink, $product, $qrfile);
             }
             $this->setLabel($label);
@@ -87,7 +87,7 @@ class Serial extends Concrete
     * 
     * @return Asset The found asset 
     */
-    protected static function checkAsset($filename)
+    protected static function checkAsset(string $filename): Asset
     {
         $list = new AssetListing();
         $list->setCondition('filename = ?', [$filename]);

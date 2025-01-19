@@ -18,10 +18,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class ImportAssetsCommand extends AbstractCommand
 {
+    /**
+     * @throws DuplicateFullPathException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sourceDir = 'public/var/assets';
-        $this->importAssets($sourceDir, '/');
+        $this->importAssets($sourceDir);
 
         $this->writeInfo('Assets import completed successfully.');
         return Command::SUCCESS;
@@ -30,7 +33,7 @@ class ImportAssetsCommand extends AbstractCommand
     /**
      * @throws DuplicateFullPathException
      */
-    private function importAssets(string $sourceDir, string $targetDir): void
+    private function importAssets(string $sourceDir): void
     {
         $iterator = new \RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($sourceDir, FilesystemIterator::SKIP_DOTS),
@@ -45,7 +48,7 @@ class ImportAssetsCommand extends AbstractCommand
                 continue;
             }
 
-            $targetPath = $targetDir . $relativePath;
+            $targetPath = '/' . $relativePath;
             $targetPath = str_replace('\\', '/', $targetPath); // Normalize the path for different OS
 
             if ($file->isDir()) {

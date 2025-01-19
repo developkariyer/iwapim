@@ -309,7 +309,6 @@ class BolConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
-     * @throws Exception
      * @throws TransportExceptionInterface
      */
     public function downloadOrders(): void
