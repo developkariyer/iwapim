@@ -52,7 +52,7 @@ LEFT JOIN
             if (!$marketplace) {
                 return new JsonResponse(['error' => 'Marketplace not found'], 404);
             }
-            $variantProducts = $db->fetchAllAssociative(self::marketplaceListingsSql." AND ovrp.dest_id=?", [$marketplaceId]);
+            $variantProducts = $db->fetchAllAssociative(self::marketplaceListingsSql." AND orvp.dest_id=?", [$marketplaceId]);
         }
 
         if (empty($variantProducts)) {
