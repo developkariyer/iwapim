@@ -136,7 +136,7 @@ LEFT JOIN
             if (isset($result[$productId])) {
                 $result[$productId] .= ",$productListingEan";
             } else {
-                $result[$productId] = $productListingEan;
+                $result[$productId] = "eans:$productListingEan";
             }
         }
         $response = [];
