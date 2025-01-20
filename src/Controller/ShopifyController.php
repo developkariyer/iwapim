@@ -7,8 +7,6 @@ use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\Marketplace;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ShopifyController extends FrontendController
@@ -41,7 +39,7 @@ LEFT JOIN
      * @Route("/marketplace/shopify/{marketplaceId}", name="shopify_marketplace", defaults={"marketplaceId"=null})
      * @throws Exception
      */
-    public function shopifyAction(Request $request, $marketplaceId): JsonResponse
+    public function shopifyAction($marketplaceId): JsonResponse
     {
         $db = Db::get();
 
@@ -66,7 +64,7 @@ LEFT JOIN
      * @Route("/marketplace/listing2product", name="listing2product")
      * @throws Exception
      */
-    public function listing2productAction(Request $request): JsonResponse
+    public function listing2productAction(): JsonResponse
     {
         $db = Db::get();
 
@@ -100,7 +98,7 @@ LEFT JOIN
      * @Route("/marketplace/listing2ean", name="listing2ean")
      * @throws Exception
      */
-    public function listing2eanAction(Request $request): JsonResponse
+    public function listing2eanAction(): JsonResponse
     {
         $db = Db::get();
 
@@ -113,5 +111,36 @@ LEFT JOIN
         return new JsonResponse($listingEan, 200);
     }
 
+
+    /**
+     * @Route("/marketplace/product2listing2ean", name="product2listing2ean")
+     * @throws Exception
+     */
+    public function product2listing2eanAction(): JsonResponse
+    {
+        $db = Db::get();
+
+        $productListings = $db->fetchAllAssociative("SELECT src_id AS productId, dest_id AS listingId FROM object_relations_product WHERE fieldname = 'listingItems'");
+
+        if (empty($productListings)) {
+            return new JsonResponse(['error' => 'No product listing EAN found'], 404);
+        }
+
+        $result = [];
+        foreach ($productListings as $productListing) {
+            $productListingEan = $db->fetchOne("SELECT regvalue from iwa_registry WHERE regtype='listing-to-ean' AND regkey=?", [$productListing['listingId']]);
+            if (empty($productListingEan)) {
+                continue;
+            }
+            $productId = $productListing['productId'];
+            if (isset($result[$productId])) {
+                $result[$productId] .= ",$productListingEan";
+            } else {
+                $result[$productId] = $productListingEan;
+            }
+        }
+
+        return new JsonResponse($result, 200);
+    }
 }
 
