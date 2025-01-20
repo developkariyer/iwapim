@@ -139,8 +139,12 @@ LEFT JOIN
                 $result[$productId] = $productListingEan;
             }
         }
+        $response = [];
+        foreach ($result as $key => $value) {
+            $response[] = ['id' => $key, 'eans' => $value];
+        }
 
-        return new JsonResponse($result, 200);
+        return new JsonResponse($response, 200);
     }
 }
 
