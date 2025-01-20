@@ -32,19 +32,19 @@ class ExtractEansCommand extends AbstractCommand
 
         foreach ($listingList as $listing) {
             $index++;
-            $counter[$listing['marketplaceType']] = ($counter[$listing['marketplaceType']] ?? 0) + 1;
-            echo "$index/$totalCount - ";
-            foreach ($counter as $key => $value) {
-                echo "$key:$value ";
-            }
-            echo "          \r";
+            echo "$index/$totalCount - "; foreach ($counter as $key => $value) echo "$key:$value ";
+
             $ean = match($listing['marketplaceType']) {
                 'Shopify' => $this->eanFromShopify($listing),
                 default => ''
             };
+
             if (!empty($ean)) {
+                $counter[$listing['marketplaceType']] = ($counter[$listing['marketplaceType']] ?? 0) + 1;
+                echo $ean;
                 Registry::setKey($listing['id'], $ean, 'listing-to-ean');
             }
+            echo "          \r";
         }
         echo "\n";
 
