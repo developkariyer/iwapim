@@ -41,14 +41,13 @@ class ShopifyController extends FrontendController
     osv.quantity,
     osv.lastUpdate,
     osv.`key`
-    orvp.dest_id 
 FROM
     object_varyantproduct osv
 JOIN
     object_relations_varyantproduct orvp
     ON osv.oo_id = orvp.src_id
-    AND orvp.fieldname = 'marketplace'");
-    //AND orvp.dest_id = ?;", [$marketplaceId]);
+    AND orvp.fieldname = 'marketplace'
+    AND orvp.dest_id = ?;", [$marketplaceId]);
 
         if (empty($variantProducts)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
