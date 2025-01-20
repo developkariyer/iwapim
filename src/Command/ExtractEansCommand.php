@@ -33,7 +33,7 @@ class ExtractEansCommand extends AbstractCommand
         foreach ($listingList as $listing) {
             $index++;
             $counter[$listing['marketplaceType']] = ($counter[$listing['marketplaceType']] ?? 0) + 1;
-            echo round(100*$index/$totalCount, 2) . "% - ";
+            echo "$index/$totalCount - ";
             foreach ($counter as $key => $value) {
                 echo "$key:$value ";
             }
