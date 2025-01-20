@@ -168,7 +168,7 @@ LEFT JOIN
             if (empty($iwasku)) {
                 continue;
             }
-            $result[] = ['iwasku' => $iwasku, 'ean' => $item['eantesvik']];
+            $result[] = ['iwasku' => $iwasku, 'ean_tesvik' => $item['eantesvik']];
         }
 
         return new JsonResponse($result, 200);
