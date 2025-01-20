@@ -85,7 +85,7 @@ JOIN
     {
         $db = Db::get();
 
-        $productEanGtin = $db->fetchAllAssociative("SELECT oo_id AS id, eanGtin FROM object_query_product WHERE eanGtin IS NOT NULL AND eanGtin != '';");
+        $productEanGtin = $db->fetchAllAssociative("SELECT oo_id AS id, iwasku, eanGtin FROM object_query_product WHERE eanGtin IS NOT NULL AND eanGtin != '';");
 
         if (empty($productEanGtin)) {
             return new JsonResponse(['error' => 'No product EAN/GTIN found'], 404);
