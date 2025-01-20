@@ -224,11 +224,11 @@ WHERE
                 continue;
             }
             $listingId = $taskProduct['listingId'] ?? 0;
-            if (!$groupType && !empty($taskProduct['grouptype'])) {
-                $groupType = $taskProduct['grouptype'];
+            if (!$groupType && !empty($taskProduct['groupType'])) {
+                $groupType = $taskProduct['groupType'];
             }
-            if (!$productType && !empty($taskProduct['producttype'])) {
-                $productType = $taskProduct['producttype'];
+            if (!$productType && !empty($taskProduct['productType'])) {
+                $productType = $taskProduct['productType'];
             }
             $selectedChildren[$taskProduct['id']] = $listingId;
         }
