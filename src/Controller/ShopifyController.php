@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Utils\Registry;
 use Doctrine\DBAL\Exception;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Db;
@@ -145,6 +146,32 @@ LEFT JOIN
         }
 
         return new JsonResponse($response, 200);
+    }
+
+    /**
+     * @Route("/marketplace/asin2eantesvik", name="asin2eantesvik")
+     * @throws Exception
+     */
+    public function asin2eantesvikAction(): JsonResponse
+    {
+        $db = Db::get();
+
+        $asinEanTesvik = $db->fetchAllAssociative("SELECT regkey as asin, regvalue as eantesvik from iwa_registry WHERE regtype='asin-to-ean-tesvik'");
+
+        if (empty($asinEanTesvik)) {
+            return new JsonResponse(['error' => 'No ASIN to EAN Tesvik found'], 404);
+        }
+
+        $result = [];
+        foreach ($asinEanTesvik as $item) {
+            $iwasku = Registry::getKey($item['asin'], 'asin-to-iwasku');
+            if (empty($iwasku)) {
+                continue;
+            }
+            $result[] = ['iwasku' => $iwasku, 'ean' => $item['eantesvik']];
+        }
+
+        return new JsonResponse($result, 200);
     }
 }
 
