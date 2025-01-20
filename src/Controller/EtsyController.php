@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MarketplaceController extends FrontendController
+class EtsyController extends FrontendController
 {
 
     /**
