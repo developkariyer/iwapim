@@ -36,6 +36,7 @@ class ExtractEansCommand extends AbstractCommand
 
             $ean = match($listing['marketplaceType']) {
                 'Shopify' => $this->eanFromShopify($listing),
+                'Amazon' => $this->eanFromAmazon($listing),
                 default => ''
             };
 
@@ -64,6 +65,37 @@ class ExtractEansCommand extends AbstractCommand
         return $json['barcode'] ?? '';
     }
 
+    /**
+     * @throws Exception
+     */
+    private function eanFromAmazon($listing)
+    {
+        $asin = $listing['uniqueMarketplaceId'];
+        $jsons = $this->readAsinJson($asin);
+        foreach ($jsons as $jsonraw) {
+            $json = json_decode($jsonraw, true);
+            if (empty($json)) {
+                continue;
+            }
+            foreach ($json['identifiers'] ?? [] as $marketplace) {
+                foreach ($marketplace['identifiers'] ?? [] as $identifier) {
+                    if ($identifier['identifierType'] === 'EAN') {
+                        return $identifier['identifier'] ?? '';
+                    }
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function readAsinJson($asin): array
+    {
+        $db = Db::get();
+        return $db->fetchFirstColumn("SELECT json_data FROM iwa_json_store WHERE field_name = ?", [$asin]);
+    }
 
     /**
      * @throws Exception
