@@ -264,7 +264,7 @@ WHERE
             return new Response();
         }
         $characteristics = $db->fetchFirstColumn('SELECT attribute_json FROM iwa_ozon_category_attribute WHERE description_category_id = ? AND type_id = ?', [$groupType, $productType]);
-        $characteristics = json_encode(array_map('json_decode', $characteristics));
+        $characteristics = json_encode(array_map('json_decode', $characteristics), JSON_PRETTY_PRINT);
         return new Response("<pre>".$characteristics."</pre>");
     }
 
