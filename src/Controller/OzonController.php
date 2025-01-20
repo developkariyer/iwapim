@@ -263,9 +263,19 @@ WHERE
         if (empty($categoryFullName)) {
             return new Response();
         }
-        $characteristics = $db->fetchFirstColumn('SELECT attribute_json FROM iwa_ozon_category_attribute WHERE description_category_id = ? AND type_id = ?', [$groupType, $productType]);
-        $characteristics = json_encode(array_map('json_decode', $characteristics), JSON_PRETTY_PRINT);
-        return new Response("<pre>".$characteristics."</pre>");
+        $characteristics = $db->fetchAllAssociative('SELECT attribute_id, dictionary_id, attribute_json FROM iwa_ozon_category_attribute WHERE description_category_id = ? AND type_id = ?', [$groupType, $productType]);
+        $response = "";
+        foreach ($characteristics as $characteristic) {
+            $chars = json_decode($characteristic['attribute_json'], true);
+            $response .= json_encode($chars, JSON_PRETTY_PRINT)."\n";
+            if ($characteristic['dictionary_id'] == 0) {
+                continue;
+            }
+            $dictValues = $db->fetchFirstColumn('SELECT JSON_EXTRACT(value_json, "$.value") AS value, value_id FROM iwa_ozon_attribute_value WHERE attribute_id = ? AND dictionary_id = ? ORDER BY value_id', [$characteristic['attribute_id'], $characteristic['dictionary_id']]);
+            $response .= json_encode($dictValues, JSON_PRETTY_PRINT)."\n";
+        }
+
+        return new Response("<pre>".$response."</pre>");
     }
 
     /**
