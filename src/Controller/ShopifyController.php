@@ -98,6 +98,7 @@ LEFT JOIN
 
     /**
      * @Route("/marketplace/listing2ean", name="listing2ean")
+     * @throws Exception
      */
     public function listing2eanAction(Request $request): JsonResponse
     {
