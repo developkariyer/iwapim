@@ -49,14 +49,29 @@ JOIN
     AND orvp.fieldname = 'marketplace'
     AND orvp.dest_id = ?;", [$marketplaceId]);
 
-
-
         if (empty($variantProducts)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
         }
 
         return new JsonResponse($variantProducts, 200);
 
+    }
+
+    /**
+     * @Route("/marketplace/listing2product", name="listing2product")
+     * @throws Exception
+     */
+    public function listing2productAction(Request $request): JsonResponse
+    {
+        $db = Db::get();
+
+        $listingItems = $db->fetchAllAssociative("SELECT dest_id AS id, src_id AS productId FROM object_relations_product WHERE fieldname = 'listingItems'");
+
+        if (empty($listingItems)) {
+            return new JsonResponse(['error' => 'No listing items found'], 404);
+        }
+
+        return new JsonResponse($listingItems, 200);
     }
 
 }
