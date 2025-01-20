@@ -81,11 +81,11 @@ JOIN
      * @Route("/marketplace/product2eangtin", name="product2eangtin")
      * @throws Exception
      */
-    public function product2eangtinAction(Request $request): JsonResponse
+    public function product2eangtinAction(): JsonResponse
     {
         $db = Db::get();
 
-        $productEanGtin = $db->fetchAllAssociative("SELECT oo_id AS id, eanGtin FROM object_query_product WHERE eanGtin NOT IN ('', '0', NULL)");
+        $productEanGtin = $db->fetchAllAssociative("SELECT oo_id AS id, eanGtin FROM object_query_product WHERE eanGtin IS NOT NULL AND eanGtin != '';");
 
         if (empty($productEanGtin)) {
             return new JsonResponse(['error' => 'No product EAN/GTIN found'], 404);
