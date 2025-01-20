@@ -13,20 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ShopifyController extends FrontendController
 {
-    /**
-     * @Route("/marketplace/shopify/{marketplaceId}", name="shopify_marketplace")
-     * @throws Exception
-     */
-    public function shopifyAction(Request $request, $marketplaceId): JsonResponse
-    {
-        $marketplace = Marketplace::getById($marketplaceId);
-        if (!$marketplace) {
-            return new JsonResponse(['error' => 'Marketplace not found'], 404);
-        }
-
-        $db = Db::get();
-
-        $variantProducts = $db->fetchAllAssociative("SELECT
+    const string marketplaceListingsSql = "SELECT
     osv.id,
     osv.imageUrl,
     TRIM(BOTH '\"' FROM SUBSTRING(
@@ -47,7 +34,23 @@ JOIN
     object_relations_varyantproduct orvp
     ON osv.oo_id = orvp.src_id
     AND orvp.fieldname = 'marketplace'
-    AND orvp.dest_id = ?;", [$marketplaceId]);
+    AND orvp.dest_id = ?;";
+
+
+    /**
+     * @Route("/marketplace/shopify/{marketplaceId}", name="shopify_marketplace")
+     * @throws Exception
+     */
+    public function shopifyAction(Request $request, $marketplaceId): JsonResponse
+    {
+        $marketplace = Marketplace::getById($marketplaceId);
+        if (!$marketplace) {
+            return new JsonResponse(['error' => 'Marketplace not found'], 404);
+        }
+
+        $db = Db::get();
+
+        $variantProducts = $db->fetchAllAssociative(self::marketplaceListingsSql, [$marketplaceId]);
 
         if (empty($variantProducts)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
@@ -74,33 +77,21 @@ JOIN
         return new JsonResponse($listingItems, 200);
     }
 
+    /**
+     * @Route("/marketplace/product2eangtin", name="product2eangtin")
+     * @throws Exception
+     */
+    public function product2eangtinAction(Request $request): JsonResponse
+    {
+        $db = Db::get();
+
+        $productEanGtin = $db->fetchAllAssociative("SELECT oo_id AS id, eanGtin FROM object_query_product WHERE eanGtin NOT IN ('', '0', NULL)");
+
+        if (empty($productEanGtin)) {
+            return new JsonResponse(['error' => 'No product EAN/GTIN found'], 404);
+        }
+
+        return new JsonResponse($productEanGtin, 200);
+    }
 }
 
-
-/*
-        $variantProductIds = $db->fetchAllAssociative("SELECT
-    osv.oo_id,
-    osv.imageUrl,
- TRIM(BOTH '\"' FROM SUBSTRING(
-        urlLink,
-        LOCATE('https://', urlLink),
-        LOCATE('\"', urlLink, LOCATE('https://', urlLink)) - LOCATE('https://', urlLink)
-    )) AS extractedUrl,
-    op.iwasku,
-    op.productCategory,
-    op.key
-FROM
-    object_store_varyantproduct osv
-JOIN
-    object_relations_varyantproduct orvp
-    ON osv.oo_id = orvp.src_id
-    AND orvp.fieldname = 'marketplace'
-    AND orvp.dest_id = ?
-LEFT JOIN
-    object_relations_product orp
-    ON orvp.src_id = orp.dest_id
-    AND orp.fieldname = 'listingItems'
-LEFT JOIN
-    object_product op
-    ON orp.src_id = op.oo_id;", [$marketplaceId]);
-*/
