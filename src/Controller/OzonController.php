@@ -232,10 +232,13 @@ WHERE
             }
             $selectedChildren[$taskProduct['id']] = $listingId;
         }
+        error_log("Group type: $groupType, Product type: $productType");
         $categoryFullName = Utils::isOzonProductType($groupType, $productType);
+        error_log("Category full name: $categoryFullName");
         if (!empty($categoryFullName)) {
             $preselectedProductType = ['id' => $groupType . '.' . $productType, 'text' => $categoryFullName];
         }
+        error_log("Preselected product type: ".json_encode($preselectedProductType ?? null));
         return $this->render('ozon/products.html.twig', [
             'task_id' => $task->getId(),
             'parent_product_id' => $parentProduct->getId(),
