@@ -37,6 +37,7 @@ class ExtractEansCommand extends AbstractCommand
             $ean = match($listing['marketplaceType']) {
                 'Shopify' => $this->eanFromShopify($listing),
                 'Amazon' => $this->eanFromAmazon($listing),
+                'Bol.com' => $this->eanFromBolcom($listing),
                 default => ''
             };
 
@@ -121,5 +122,17 @@ class ExtractEansCommand extends AbstractCommand
     {
         $db = Db::get();
         return $db->fetchOne("SELECT json_data FROM iwa_json_store WHERE object_id = ? AND field_name = ?", [$id, $fieldName]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function eanFromBolcom(array $listing)
+    {
+        $json = json_decode($this->readApiJson($listing['id']), true);
+        if (empty($json)) {
+            return '';
+        }
+        return $json['ean'] ?? '';
     }
 }
