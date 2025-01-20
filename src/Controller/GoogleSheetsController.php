@@ -182,7 +182,7 @@ class GoogleSheetsController extends FrontendController
     public function catalogAction(): JsonResponse
     {
         $db = Db::get();
-        $catalogData = $db->fetchAllAssociative("SELECT iwasku, id, `key`, productCategory, '1' AS asin FROM object_product WHERE iwasku NOT IN ('', 'NULL')");
+        $catalogData = $db->fetchAllAssociative("SELECT iwasku, id, `key`, variationSize, variationColor, productIdentifier, packageDimension1, packageDimension2, packageDimension3, packageWeight, productCategory, '1' AS asin FROM object_product WHERE iwasku IS NOT NULL AND iwasku != ''");
         return $this->json($catalogData);
     }
 }
