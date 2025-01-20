@@ -31,7 +31,11 @@ class ShopifyController extends FrontendController
         $variantProductIds = $db->fetchAllAssociative("SELECT 
     osv.oo_id,
     osv.imageUrl,
-    osv.urlLink,
+ TRIM(BOTH '\"' FROM SUBSTRING(
+        urlLink,
+        LOCATE('https://', urlLink),
+        LOCATE('\"', urlLink, LOCATE('https://', urlLink)) - LOCATE('https://', urlLink) 
+    )) AS extractedUrl,
     op.iwasku,
     op.productCategory,
     op.key
