@@ -96,5 +96,21 @@ LEFT JOIN
         return new JsonResponse($productEanGtin, 200);
     }
 
+    /**
+     * @Route("/marketplace/listing2ean", name="listing2ean")
+     */
+    public function listing2eanAction(Request $request): JsonResponse
+    {
+        $db = Db::get();
+
+        $listingEan = $db->fetchAllAssociative("SELECT regkey as id, regvalue as ean from iwa_registry WHERE regtype='listing-to-ean'");
+
+        if (empty($listingEan)) {
+            return new JsonResponse(['error' => 'No listing EAN found'], 404);
+        }
+
+        return new JsonResponse($listingEan, 200);
+    }
+
 }
 
