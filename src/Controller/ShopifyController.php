@@ -16,48 +16,50 @@ class ShopifyController extends FrontendController
     const string marketplaceListingsSql = "SELECT
     osv.id,
     osv.imageUrl,
-    TRIM(BOTH '\"' FROM SUBSTRING(
-        urlLink,
-        LOCATE('https://', urlLink),
-        LOCATE('\"', urlLink, LOCATE('https://', urlLink)) - LOCATE('https://', urlLink)
-    )) AS extractedUrl,
     osv.title,
     osv.uniqueMarketplaceId,
     osv.salePrice,
     osv.saleCurrency,
     osv.quantity,
     osv.lastUpdate,
-    osv.`key`
+    osv.`key`,
+    orvp.dest_id AS marketplaceId,
+    oqm.marketplaceType,
+    oqm.marketplaceUrl
 FROM
     object_varyantproduct osv
 JOIN
     object_relations_varyantproduct orvp
     ON osv.oo_id = orvp.src_id
     AND orvp.fieldname = 'marketplace'
-    AND orvp.dest_id = ?;";
+LEFT JOIN
+    object_query_marketplace oqm
+    ON oqm.oo_id = orvp.dest_id";
 
 
     /**
-     * @Route("/marketplace/shopify/{marketplaceId}", name="shopify_marketplace")
+     * @Route("/marketplace/shopify/{marketplaceId}", name="shopify_marketplace", defaults={"marketplaceId"=null})
      * @throws Exception
      */
     public function shopifyAction(Request $request, $marketplaceId): JsonResponse
     {
-        $marketplace = Marketplace::getById($marketplaceId);
-        if (!$marketplace) {
-            return new JsonResponse(['error' => 'Marketplace not found'], 404);
-        }
-
         $db = Db::get();
 
-        $variantProducts = $db->fetchAllAssociative(self::marketplaceListingsSql, [$marketplaceId]);
+        if (is_null($marketplaceId)) {
+            $variantProducts = $db->fetchAllAssociative(self::marketplaceListingsSql);
+        } else {
+            $marketplace = Marketplace::getById($marketplaceId);
+            if (!$marketplace) {
+                return new JsonResponse(['error' => 'Marketplace not found'], 404);
+            }
+            $variantProducts = $db->fetchAllAssociative(self::marketplaceListingsSql." AND ovrp.dest_id=?", [$marketplaceId]);
+        }
 
         if (empty($variantProducts)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
         }
 
         return new JsonResponse($variantProducts, 200);
-
     }
 
     /**
@@ -93,5 +95,7 @@ JOIN
 
         return new JsonResponse($productEanGtin, 200);
     }
+
+
 }
 
