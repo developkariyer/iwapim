@@ -25,7 +25,7 @@ class ShopifyController extends FrontendController
         }
 
         $db = Db::get();
-        $variantProductIds = $db->fetchFirstColumn('SELECT src_id FROM object_relations_varyantproduct WHERE src_id = ?', [$marketplaceId]);
+        $variantProductIds = $db->fetchFirstColumn('SELECT src_id FROM object_relations_varyantproduct WHERE dest_id = ?', [$marketplaceId]);
         if (empty($variantProductIds)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
         }
