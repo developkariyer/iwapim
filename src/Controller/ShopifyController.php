@@ -29,7 +29,9 @@ class ShopifyController extends FrontendController
     op.iwasku,
     op.oo_id,
     op.productCategory,
-    op.key
+    op.key,
+    osv.imageUrl,
+    osv.urlLink
 FROM 
     object_relations_varyantproduct orvp
 JOIN 
@@ -38,11 +40,13 @@ JOIN
 JOIN 
     object_product op
     ON orp.src_id = op.oo_id
+JOIN 
+    object_store_varyantproduct osv
+    ON orvp.src_id = osv.oo_id -- Linking object_store_varyantproduct with object_relations_varyantproduct
 WHERE 
     orvp.fieldname = 'marketplace'
     AND orp.fieldname = 'listingItems'
-    AND orvp.dest_id = ?; -- Replace '?' with the external input
-", [$marketplaceId]);
+    AND orvp.dest_id = ?;", [$marketplaceId]);
         if (empty($variantProductIds)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
         }
