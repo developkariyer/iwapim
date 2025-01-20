@@ -96,6 +96,5 @@ LEFT JOIN
         return new JsonResponse($productEanGtin, 200);
     }
 
-
 }
 
