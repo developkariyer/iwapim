@@ -26,8 +26,18 @@ class ExtractEansCommand extends AbstractCommand
         $db = Db::get();
         $listingList = $db->fetchAllAssociative(ShopifyController::marketplaceListingsSql);
 
+        $counter = [];
+        $totalCount = count($listingList);
+        $index = 0;
+
         foreach ($listingList as $listing) {
-            echo $listing['id'] . PHP_EOL;
+            $index++;
+            $counter[$listing['marketplaceType']] = ($counter[$listing['marketplaceType']] ?? 0) + 1;
+            echo round(100*$index/$totalCount, 2) . "% - ";
+            foreach ($counter as $key => $value) {
+                echo "$key:$value ";
+            }
+            echo "          \r";
             $ean = match($listing['marketplaceType']) {
                 'Shopify' => $this->eanFromShopify($listing),
                 default => ''
@@ -36,6 +46,7 @@ class ExtractEansCommand extends AbstractCommand
                 Registry::setKey($listing['id'], $ean, 'listing-to-ean');
             }
         }
+        echo "\n";
 
         // Return success status code
         return Command::SUCCESS;
