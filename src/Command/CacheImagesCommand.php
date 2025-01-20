@@ -4,7 +4,7 @@ namespace App\Command;
 
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
-use Pimcore\Model\DataObject\Folder;
+use Pimcore\Model\Asset\Folder;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
