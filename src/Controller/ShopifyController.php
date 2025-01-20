@@ -41,7 +41,7 @@ class ShopifyController extends FrontendController
     osv.quantity,
     osv.lastUpdate,
     osv.`key`
-    orvp.dest_id AS marketplaceId
+    orvp.dest_id 
 FROM
     object_varyantproduct osv
 JOIN
