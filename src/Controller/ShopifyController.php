@@ -25,7 +25,24 @@ class ShopifyController extends FrontendController
         }
 
         $db = Db::get();
-        $variantProductIds = $db->fetchFirstColumn('SELECT src_id FROM object_relations_varyantproduct WHERE dest_id = ?', [$marketplaceId]);
+        $variantProductIds = $db->fetchAllAssociative("SELECT 
+    op.iwasku,
+    op.oo_id,
+    op.productCategory,
+    op.key
+FROM 
+    object_relations_varyantproduct orvp
+JOIN 
+    object_relations_product orp
+    ON orvp.src_id = orp.dest_id
+JOIN 
+    object_product op
+    ON orp.src_id = op.oo_id
+WHERE 
+    orvp.fieldname = 'marketplace'
+    AND orp.fieldname = 'listingItems'
+    AND orvp.dest_id = ?; -- Replace '?' with the external input
+", [$marketplaceId]);
         if (empty($variantProductIds)) {
             return new JsonResponse(['error' => 'No variant products found'], 404);
         }
