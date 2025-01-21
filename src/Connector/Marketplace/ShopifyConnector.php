@@ -623,7 +623,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function import($updateFlag, $importFlag): void
     {
         $this->graphqlImport();
-        /*if (empty($this->listings)) {
+        if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -679,7 +679,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }*/
+        }
     }
 
     /**
