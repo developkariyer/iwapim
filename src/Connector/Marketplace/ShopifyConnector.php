@@ -603,10 +603,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                echo "variantid : {$listing['id']}\n";
-                /*VariantProduct::addUpdateVariant(
+                VariantProduct::addUpdateVariant(
                     variant: [
-                        'imageUrl' => $this->getImage($listing, $mainListing),
+                        'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
                         'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
                         'salePrice' => $listing['price'] ?? '',
                         'saleCurrency' => $this->marketplace->getCurrency(),
@@ -623,12 +622,27 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     updateFlag: $updateFlag,
                     marketplace: $this->marketplace,
                     parent: $parent
-                );*/
+                );
                 echo "v";
             }
             echo "OK\n";
             $index++;
         }
+    }
+
+    protected function graphqlGetImage($listing, $mainListing): ?ExternalImage
+    {
+        $lastImage = null;
+        $images = $mainListing['media']['nodes'] ?? [];
+        foreach ($images as $img) {
+            if (!is_numeric(basename($listing['image']['id'])) || basename($img['id']) === basename($listing['image']['id'])) {
+                return Utility::getCachedImage($img['preview']['image']['url']);
+            }
+            if (empty($lastImage)) {
+                $lastImage = Utility::getCachedImage($img['preview']['image']['url']);
+            }
+        }
+        return $lastImage;
     }
 
     protected function getImage($listing, $mainListing): ?ExternalImage
