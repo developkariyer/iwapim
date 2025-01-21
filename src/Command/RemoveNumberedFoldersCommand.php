@@ -53,6 +53,7 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
                     $product->save();
                     echo $product->getFullPath() . "\n";
                     $wrongPath++;
+                    sleep(1);
                 }
             }
         }
