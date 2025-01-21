@@ -605,7 +605,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 VariantProduct::addUpdateVariant(
                     variant: [
-                        'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
+                        //'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
                         'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
                         'salePrice' => $listing['price'] ?? '',
                         'saleCurrency' => $this->marketplace->getCurrency(),
