@@ -650,7 +650,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
         }
-        echo "SKU set\n";
+        echo "$sku SKU set\n";
         $this->putToCache("SETSKU_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$request, 'response'=>$response]);
     }
 
