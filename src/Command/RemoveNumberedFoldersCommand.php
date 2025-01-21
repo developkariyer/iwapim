@@ -45,12 +45,14 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
                 $parent = $product->getParent();
                 $grandParent = $parent->getParent();
                 if ($grandParent === $urunler) {
+                    echo $product->getFullPath() . "\n";
                     $correctPath++;
                 } else {
                     $wrongPath++;
                 }
             }
         }
+        echo "\n";
 
         return Command::SUCCESS;
     }
