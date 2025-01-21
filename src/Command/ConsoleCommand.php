@@ -60,6 +60,7 @@ class ConsoleCommand extends AbstractCommand
             108419 => new ShopifyConnector(Marketplace::getById(108419)),*/
         ];
 
+        $carbonYesterday = Carbon::now()->subDays(1);
         $variantObject = new VariantProduct\Listing();
         $pageSize = 5;
         $offset = 0;
@@ -77,6 +78,9 @@ class ConsoleCommand extends AbstractCommand
                 $index++;
                 echo "\rProcessing $index {$listing->getId()} ";
                 if ($listing->getMarketplace()->getMarketplaceType() !== 'Shopify') {
+                    continue;
+                }
+                if ($listing->getLastUpdate() < $carbonYesterday) {
                     continue;
                 }
                 $marketplaceId = $listing->getMarketplace()->getId();
