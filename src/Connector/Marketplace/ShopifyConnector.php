@@ -569,6 +569,23 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    public function graphqlImport($updateFlag, $importFlag): void
+    {
+        if (empty($this->listings)) {
+            echo "Nothing to import\n";
+        }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $mainListing) {
+            print_r($mainListing);
+            break;
+        }
+    }
+
     protected function getImage($listing, $mainListing): ?ExternalImage
     {
         $lastImage = null;
