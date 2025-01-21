@@ -581,7 +581,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $mainListing) {
-            print_r($mainListing);
+            echo "($index/$total) Processing Listing {$mainListing['id']}:{$mainListing['title']} ...";
+            echo "Product Type: {$mainListing['productType']}\n";
+            echo "Title: {$mainListing['title']}\n";
+            echo "Status: {$mainListing['status']}\n";
+
+
             //id
             //title
             //product_type
