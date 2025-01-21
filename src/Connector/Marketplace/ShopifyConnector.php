@@ -569,7 +569,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function graphqlImport(): void
+    public function graphqlImport($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -582,35 +582,51 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $mainListing) {
             echo "($index/$total) Processing Listing {$mainListing['id']}:{$mainListing['title']} ...\n";
-            echo "Product Type: {$mainListing['productType']}\n";
-            echo "Title: {$mainListing['title']}\n";
-            echo "Status: {$mainListing['status']}\n";
-            foreach ($mainListing['variants']['nodes'] as $listing) {
-                echo 'urlLink: ' . $this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '') . "\n";
-                echo 'salePrice: ' . ($listing['price'] ?? '') . "\n";
-                echo 'saleCurrency: ' . $this->marketplace->getCurrency() . "\n";
-                echo 'attributes: ' . ($listing['title'] ?? '') . "\n";
-                echo 'title: ' . (($mainListing['title'] ?? '') . ($listing['title'] ?? '')) . "\n";
-                echo 'quantity: ' . ($listing['inventoryQuantity'] ?? 0) . "\n";
-                echo 'uniqueMarketplaceId: ' . (basename($listing['id']) ?? '') . "\n";
-                echo 'published: ' . ((($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE') ? 'true' : 'false') . "\n";
-                echo 'sku: ' . ($listing['sku'] ?? '') . "\n";
+            $parent = Utility::checkSetPath(
+                Utility::sanitizeVariable($mainListing['productType'] ?? 'Tasnif-Edilmemiş'),
+                $marketplaceFolder
+            );
+            if (!empty($mainListing['title'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($mainListing['title']),
+                    $parent
+                );
             }
-
-
-            //id
-            //title
-            //product_type
-            //status
-            //variants
-            //handle
-            //inventory_quantity
-            //sku
-
-
-
-
-            break;
+            if (($mainListing['status'] ?? 'ACTIVE') !== 'ACTIVE') {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable('_Pasif'),
+                    $marketplaceFolder
+                );
+            }
+            $parentResponseJson = $mainListing;
+            if (isset($parentResponseJson['variants']['nodes'])) {
+                unset($parentResponseJson['variants']['nodes']);
+            }
+            foreach ($mainListing['variants']['nodes'] as $listing) {
+                VariantProduct::addUpdateVariant(
+                    variant: [
+                        'imageUrl' => $this->getImage($listing, $mainListing),
+                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
+                        'salePrice' => $listing['price'] ?? '',
+                        'saleCurrency' => $this->marketplace->getCurrency(),
+                        'attributes' => $listing['title'] ?? '',
+                        'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                        'quantity' => $listing['inventoryQuantity'] ?? 0,
+                        'uniqueMarketplaceId' => basename($listing['id']) ?? '',
+                        'apiResponseJson' => json_encode($listing),
+                        'parentResponseJson' => json_encode($parentResponseJson),
+                        'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                        'sku' => $listing['sku'] ?? '',
+                    ],
+                    importFlag: $importFlag,
+                    updateFlag: $updateFlag,
+                    marketplace: $this->marketplace,
+                    parent: $parent
+                );
+                echo "v";
+            }
+            echo "OK\n";
+            $index++;
         }
     }
 
@@ -638,7 +654,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        $this->graphqlImport();
+        $this->graphqlImport($updateFlag, $importFlag);
         /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
