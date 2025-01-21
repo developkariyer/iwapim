@@ -10,7 +10,6 @@ use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -90,7 +89,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         return $allData;
     }
 
-    public function processRateLimit($extensions)
+    public function processRateLimit($extensions): void
     {
         $actualQueryCost = $extensions['cost']['actualQueryCost'];
         $currentlyAvailable = $extensions['cost']['throttleStatus']['currentlyAvailable'];
