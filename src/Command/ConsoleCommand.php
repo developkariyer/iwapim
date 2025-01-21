@@ -50,13 +50,13 @@ class ConsoleCommand extends AbstractCommand
     {   // $this->setShopifySku();
 
         $shopifyConnectors = [
-            23978 => new ShopifyConnector(Marketplace::getById(23978)),
+            23978 => new ShopifyConnector(Marketplace::getById(23978)),/*
             84124 => new ShopifyConnector(Marketplace::getById(84124)),
             108415 => new ShopifyConnector(Marketplace::getById(108415)),
             108416 => new ShopifyConnector(Marketplace::getById(108416)),
             108417 => new ShopifyConnector(Marketplace::getById(108417)),
             108418 => new ShopifyConnector(Marketplace::getById(108418)),
-            108419 => new ShopifyConnector(Marketplace::getById(108419)),
+            108419 => new ShopifyConnector(Marketplace::getById(108419)),*/
         ];
 
         $variantObject = new VariantProduct\Listing();
