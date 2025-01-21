@@ -592,7 +592,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 echo 'attributes: ' . ($listing['title'] ?? '') . "\n";
                 echo 'title: ' . (($mainListing['title'] ?? '') . ($listing['title'] ?? '')) . "\n";
                 echo 'quantity: ' . ($listing['inventoryQuantity'] ?? 0) . "\n";
-                echo 'uniqueMarketplaceId: ' . ($listing['id'] ?? '') . "\n";
+                echo 'uniqueMarketplaceId: ' . (basename($listing['id']) ?? '') . "\n";
                 echo 'published: ' . ((($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE') ? 'true' : 'false') . "\n";
                 echo 'sku: ' . ($listing['sku'] ?? '') . "\n";
             }
