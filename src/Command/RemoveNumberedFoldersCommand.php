@@ -17,7 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class RemoveNumberedFoldersCommand extends AbstractCommand
 {
-    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
     /**
      * @throws DuplicateFullPathException
      */
