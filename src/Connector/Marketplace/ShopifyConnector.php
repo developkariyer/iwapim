@@ -603,27 +603,31 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                VariantProduct::addUpdateVariant(
-                    variant: [
-                        //'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
-                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
-                        'salePrice' => $listing['price'] ?? '',
-                        'saleCurrency' => $this->marketplace->getCurrency(),
-                        'attributes' => $listing['title'] ?? '',
-                        'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                        'quantity' => $listing['inventoryQuantity'] ?? 0,
-                        'uniqueMarketplaceId' => basename($listing['id']) ?? '',
-                        'apiResponseJson' => json_encode($listing),
-                        'parentResponseJson' => json_encode($parentResponseJson),
-                        'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                        'sku' => $listing['sku'] ?? '',
-                    ],
-                    importFlag: $importFlag,
-                    updateFlag: $updateFlag,
-                    marketplace: $this->marketplace,
-                    parent: $parent
-                );
-                echo "v";
+                try {
+                    VariantProduct::addUpdateVariant(
+                        variant: [
+                            'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
+                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
+                            'salePrice' => $listing['price'] ?? '',
+                            'saleCurrency' => $this->marketplace->getCurrency(),
+                            'attributes' => $listing['title'] ?? '',
+                            'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                            'quantity' => $listing['inventoryQuantity'] ?? 0,
+                            'uniqueMarketplaceId' => basename($listing['id']) ?? '',
+                            'apiResponseJson' => json_encode($listing),
+                            'parentResponseJson' => json_encode($parentResponseJson),
+                            'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                            'sku' => $listing['sku'] ?? '',
+                        ],
+                        importFlag: $importFlag,
+                        updateFlag: $updateFlag,
+                        marketplace: $this->marketplace,
+                        parent: $parent
+                    );
+                    echo "v";
+                } catch (\Exception $e) {
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
             }
             echo "OK\n";
             $index++;
