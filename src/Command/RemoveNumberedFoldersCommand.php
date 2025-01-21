@@ -19,6 +19,7 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
 {
     /**
      * @throws DuplicateFullPathException
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -47,6 +48,9 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
                 if ($grandParent === $urunler) {
                     $correctPath++;
                 } else {
+                    echo $product->getFullPath() . " => ";
+                    $product->setParent($grandParent);
+                    $product->save();
                     echo $product->getFullPath() . "\n";
                     $wrongPath++;
                 }
