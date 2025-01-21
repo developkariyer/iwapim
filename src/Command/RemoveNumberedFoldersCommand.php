@@ -24,22 +24,31 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
     {
         $urunler = Utility::checkSetPath('Ürünler');
         $productListingObject = new Product\Listing();
-        $products = $productListingObject->load();
         $index = 0;
-        $total = count($products);
         $correctPath = $wrongPath = 0;
-        foreach ($products as $product) {
-            $index++;
-            echo "Processing $index/$total Correct: $correctPath Wrong: $wrongPath                 \r";
-            if ($product->level()==1) {
-                continue;
+        $pageSize = 5;
+        $offset = 0;
+        $productListingObject->setLimit($pageSize);
+        while(true) {
+            $productListingObject->setOffset($offset);
+            $offset+= $pageSize;
+            $products = $productListingObject->load();
+            if (empty($products)) {
+                break;
             }
-            $parent = $product->getParent();
-            $grandParent = $parent->getParent();
-            if ($grandParent === $urunler) {
-                $correctPath++;
-            } else {
-                $wrongPath++;
+            foreach ($products as $product) {
+                $index++;
+                echo "Processing $index Correct: $correctPath Wrong: $wrongPath                 \r";
+                if ($product->level()==1) {
+                    continue;
+                }
+                $parent = $product->getParent();
+                $grandParent = $parent->getParent();
+                if ($grandParent === $urunler) {
+                    $correctPath++;
+                } else {
+                    $wrongPath++;
+                }
             }
         }
 
