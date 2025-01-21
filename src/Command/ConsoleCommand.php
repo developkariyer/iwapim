@@ -101,7 +101,7 @@ class ConsoleCommand extends AbstractCommand
                 }
                 $connector = $shopifyConnectors[$marketplaceId] ?? null;
                 if (empty($connector)) {
-                    echo "No Connector\n";
+                    //echo "No Connector\n";
                     continue;
                 }
                 $connector->setSku($listing, $iwasku);
