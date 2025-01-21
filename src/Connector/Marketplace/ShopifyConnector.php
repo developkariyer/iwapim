@@ -585,6 +585,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Product Type: {$mainListing['productType']}\n";
             echo "Title: {$mainListing['title']}\n";
             echo "Status: {$mainListing['status']}\n";
+            foreach ($mainListing['variants']['nodes'] as $listing) {
+                echo 'urlLink: ' . $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')) . "\n";
+                echo 'salePrice: ' . ($listing['price'] ?? '') . "\n";
+                echo 'saleCurrency: ' . $this->marketplace->getCurrency() . "\n";
+                echo 'attributes: ' . ($listing['title'] ?? '') . "\n";
+                echo 'title: ' . (($mainListing['title'] ?? '') . ($listing['title'] ?? '')) . "\n";
+                echo 'quantity: ' . ($listing['inventoryQuantity'] ?? 0) . "\n";
+                echo 'uniqueMarketplaceId: ' . ($listing['id'] ?? '') . "\n";
+                echo 'published: ' . ((($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE') ? 'true' : 'false') . "\n";
+                echo 'sku: ' . ($listing['sku'] ?? '') . "\n";
+            }
 
 
             //id
