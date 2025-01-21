@@ -26,16 +26,20 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
         $productListingObject = new Product\Listing();
         $products = $productListingObject->load();
         $index = 0;
+        $total = count($products);
+        $correctPath = $wrongPath = 0;
         foreach ($products as $product) {
             $index++;
-            echo $index . ' / ' . count($products) ."      \r";
+            echo "Processing $index/$total Correct: $correctPath Wrong: $wrongPath                 \r";
             if ($product->level()==1) {
                 continue;
             }
             $parent = $product->getParent();
             $grandParent = $parent->getParent();
             if ($grandParent === $urunler) {
-                echo $product->getFullPath() . PHP_EOL;
+                $correctPath++;
+            } else {
+                $wrongPath++;
             }
         }
 
