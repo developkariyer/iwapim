@@ -9,6 +9,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -619,7 +620,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
-     * @throws Exception
+     * @throws Exception|RandomException
      */
     public function setSku(VariantProduct $listing, string $sku): void
     {
@@ -631,7 +632,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $jsonSku = $apiResponse['sku'] ?? null;
         $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
         if (!empty($jsonSku) && $jsonSku === $sku) {
-            echo "SKU is already set for {$listing->getKey()}\n";
+            echo "SKU is already set for {$listing->getKey()}: $jsonSku\n";
             return;
         }
         if (empty($inventoryItemId)) {
@@ -658,7 +659,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
-     * @throws Exception
+     * @throws Exception|RandomException
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {

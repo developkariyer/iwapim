@@ -3,7 +3,9 @@
 namespace App\Command;
 
 use App\Connector\Marketplace\ShopifyConnector;
+use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
+use Random\RandomException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +17,10 @@ use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\GroupProduct;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 
 #[AsCommand(
@@ -31,7 +37,16 @@ class ConsoleCommand extends AbstractCommand
         return $jwt['exp'] - time();
     }
 
-    public function setShopifySku()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws RandomException
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function setShopifySku(): void
     {   // $this->setShopifySku();
 
         $shopifyConnectors = [
