@@ -39,7 +39,7 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
             }
             foreach ($products as $product) {
                 $index++;
-                echo "Processing $index Correct: $correctPath Wrong: $wrongPath                 \r";
+                echo "Processing $index Correct: $correctPath Wrong: $wrongPath\n";
                 if ($product->level()==1) {
                     continue;
                 }
@@ -53,7 +53,6 @@ class RemoveNumberedFoldersCommand extends AbstractCommand
                     $product->save();
                     echo $product->getFullPath() . "\n";
                     $wrongPath++;
-                    sleep(1);
                 }
             }
         }
