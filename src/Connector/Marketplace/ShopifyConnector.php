@@ -569,7 +569,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function graphqlImport($updateFlag, $importFlag): void
+    public function graphqlImport(): void
     {
         if (empty($this->listings)) {
             echo "Nothing to import\n";
@@ -582,6 +582,18 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $mainListing) {
             print_r($mainListing);
+            //id
+            //title
+            //product_type
+            //status
+            //variants
+            //handle
+            //inventory_quantity
+            //sku
+
+
+
+
             break;
         }
     }
@@ -610,7 +622,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        if (empty($this->listings)) {
+        $this->graphqlImport();
+        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -666,7 +679,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }
+        }*/
     }
 
     /**
