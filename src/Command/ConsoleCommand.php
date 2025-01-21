@@ -79,9 +79,6 @@ class ConsoleCommand extends AbstractCommand
                     continue;
                 }
                 $marketplaceId = $listing->getMarketplace()->getId();
-                if ($marketplaceId != 84124) {
-                    continue;
-                }
                 $mainProduct = $listing->getMainProduct();
                 if (empty($mainProduct)) {
                     echo "No Main Product\n";
