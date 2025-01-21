@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Connector\Marketplace\ShopifyConnector;
+use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Random\RandomException;
@@ -136,7 +137,7 @@ class ConsoleCommand extends AbstractCommand
             '178640'=>'8684089414853',
             '178639'=>'8684089414846',
             '178638'=>'8684089414839',
-            '268099'=>'8684089414839',
+            //'268099'=>'8684089414839',
             '239469'=>'8684089414822',
             '239468'=>'8684089414815',
             '235050'=>'8684089414808',
@@ -814,11 +815,12 @@ class ConsoleCommand extends AbstractCommand
             '173919'=>'8684089402522',
         ];
         $connector = new ShopifyConnector(Marketplace::getById(23978));
+        $carbon7daysAgo = Carbon::now()->subDays(7);
         foreach ($eans as $id => $ean) {
             echo "$id $ean\n";
             $variantProduct = VariantProduct::getById($id);
-            if (!$variantProduct) {
-                echo "VariantProduct $id not found\n";
+            if (!$variantProduct || $variantProduct->getLastUpdate() < $carbon7daysAgo) {
+                echo "VariantProduct $id not found or too old\n";
                 continue;
             }
             $connector->setBarcode($variantProduct, $ean);
