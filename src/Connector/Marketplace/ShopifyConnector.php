@@ -627,11 +627,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
-                    echo "ERRROR VARİANT: \n";
+                    echo "ERRROR VARIANT: \n";
+                    echo "Listing ID: {$listing['id']}\n";
+                    echo "Main Listing ID: {$mainListing['id']}\n";
                     echo "Handle: {$mainListing['handle']}\n";
                     echo "Price: {$listing['price']}\n";
                     echo "SKU: {$listing['sku']}\n";
                     echo "Title: {$listing['title']}\n";
+                    echo "Main Title: {$mainListing['title']}\n";
                     echo "Quantity: {$listing['inventoryQuantity']}\n";
                     echo "UniqueMarketplaceId: {$listing['id']}\n";
                     echo "Status: {$mainListing['status']}\n";
