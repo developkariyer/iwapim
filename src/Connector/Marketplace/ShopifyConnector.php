@@ -638,7 +638,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Title: {$listing['title']}\n";
                     echo "Main Title: {$mainListing['title']}\n";
                     echo "Quantity: {$listing['inventoryQuantity']}\n";
-                    echo "UniqueMarketplaceId: {$listing['id']}\n";
+                    echo "UniqueMarketplaceId: " . basename($listing['id'] ?? '') . "\n";
                     echo "Status: {$mainListing['status']}\n";
                 }
             }
