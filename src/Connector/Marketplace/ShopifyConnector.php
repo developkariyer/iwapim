@@ -603,19 +603,24 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                $a = [
-                    'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.$uniqueMarketplaceId),
-                    'salePrice' => $listing['price'] ?? '',
-                    'saleCurrency' => $this->marketplace->getCurrency(),
-                    'attributes' => $listing['title'] ?? '',
-                    'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                    'quantity' => $listing['inventoryQuantity'] ?? 0,
-                    'uniqueMarketplaceId' => $uniqueMarketplaceId,
-                    'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                    'sku' => $listing['sku'] ?? '',
-                ];
-                echo "Variant Data:\n";
-                print_r($a);
+                try {
+                    $a = [
+                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.$uniqueMarketplaceId),
+                        'salePrice' => $listing['price'] ?? '',
+                        'saleCurrency' => $this->marketplace->getCurrency(),
+                        'attributes' => $listing['title'] ?? '',
+                        'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                        'quantity' => $listing['inventoryQuantity'] ?? 0,
+                        'uniqueMarketplaceId' => $uniqueMarketplaceId,
+                        'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                        'sku' => $listing['sku'] ?? '',
+                    ];
+                    echo "Variant Data:\n";
+                    print_r($a);
+                } catch (\Exception $e) {
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
+
 
                 try {
                     VariantProduct::addUpdateVariant(
