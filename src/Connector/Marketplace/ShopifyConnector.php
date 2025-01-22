@@ -606,8 +606,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 try {
                     VariantProduct::addUpdateVariant(
                         variant: [
-//                            'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
-                            'imageUrl' => '',
+                            'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
                             'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
                             'salePrice' => $listing['price'] ?? '',
                             'saleCurrency' => $this->marketplace->getCurrency(),
@@ -629,6 +628,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "ERRROR VARIANT: \n";
+                    echo "Parent: {$parent->getId()}\n";
                     echo "Listing ID: {$listing['id']}\n";
                     echo "Main Listing ID: {$mainListing['id']}\n";
                     echo "Handle: {$mainListing['handle']}\n";
