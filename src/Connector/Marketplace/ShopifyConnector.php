@@ -605,13 +605,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 try {
                     $a = [
-                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.$uniqueMarketplaceId),
+                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
                         'salePrice' => $listing['price'] ?? '',
                         'saleCurrency' => $this->marketplace->getCurrency(),
                         'attributes' => $listing['title'] ?? '',
                         'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
                         'quantity' => $listing['inventoryQuantity'] ?? 0,
-                        'uniqueMarketplaceId' => $uniqueMarketplaceId,
+                        'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
                     ];
