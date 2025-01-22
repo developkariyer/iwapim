@@ -603,22 +603,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                $a = [
-                    'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
-                    'salePrice' => $listing['price'] ?? '',
-                    'saleCurrency' => $this->marketplace->getCurrency(),
-                    'attributes' => $listing['title'] ?? '',
-                    'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                    'quantity' => $listing['inventoryQuantity'] ?? 0,
-                    'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
-                    'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                    'sku' => $listing['sku'] ?? ''
-                ];
                 try {
                     VariantProduct::addUpdateVariant(
                         variant: [
                             //'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
-                            //'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
+                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
                             'salePrice' => $listing['price'] ?? '',
                             'saleCurrency' => $this->marketplace->getCurrency(),
                             'attributes' => $listing['title'] ?? '',
@@ -638,7 +627,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
-                    print_r($a);
+                    echo "ERRROR VARİANT: \n";
+                    echo "Handle: {$mainListing['handle']}\n";
+                    echo "Price: {$listing['price']}\n";
+                    echo "SKU: {$listing['sku']}\n";
+                    echo "Title: {$listing['title']}\n";
+                    echo "Quantity: {$listing['inventoryQuantity']}\n";
+                    echo "UniqueMarketplaceId: {$listing['id']}\n";
+                    echo "Status: {$mainListing['status']}\n";
                 }
             }
             echo "OK\n";
