@@ -603,7 +603,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                $variant = [
+                $a = [
                     'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.$uniqueMarketplaceId),
                     'salePrice' => $listing['price'] ?? '',
                     'saleCurrency' => $this->marketplace->getCurrency(),
@@ -615,7 +615,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     'sku' => $listing['sku'] ?? '',
                 ];
                 echo "Variant Data:\n";
-                print_r($variant);
+                print_r($a);
 
                 try {
                     VariantProduct::addUpdateVariant(
