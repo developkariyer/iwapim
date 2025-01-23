@@ -146,7 +146,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     protected function processOrder(array &$order): void
     {
         $orderId = $order['id'];
-        $lineItems = $this->graphqlNestedPaginateDownload('id', $orderId, 'downloadOrdersLineItems.graphql', 'order', 'lineItems', 1);
+        $lineItems = $this->graphqlNestedPaginateDownload('id', $orderId, 'downloadOrdersLineItems.graphql', 'order', 'lineItems', 50);
         if (!empty($lineItems)) {
             $order['lineItems']['nodes'] = array_merge($order['lineItems']['nodes'] ?? [], $lineItems);
         }
