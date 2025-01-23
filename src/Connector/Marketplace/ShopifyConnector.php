@@ -302,12 +302,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         print_r($query['variables']);
         $inventories = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
-        print_r($inventories);
         if (empty($inventories)) {
             echo "Failed to download listings\n";
             return;
         }
-        $this->putToCache('INVENTORY.json', $inventory);
+        $this->putToCache('INVENTORY.json', $inventories);
     }
 
     public function setSkuGraphql(VariantProduct $listing, string $sku): void // not tested
