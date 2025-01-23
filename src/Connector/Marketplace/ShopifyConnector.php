@@ -286,18 +286,24 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function graphqlDownloadInventory()
     {
+        $inventory = $this->getFromCache('INVENTORY.json');
+        if (!empty($inventory)) {
+            echo "Using cached inventory\n";
+            return;
+        }
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadInventory.graphql'),
             'variables' => [
-                'numItems' => 5,
+                'numItems' => 50,
                 'cursor' => null
             ]
         ];
-        $inventories = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
+        $inventory = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
         if (empty($inventories)) {
             echo "Failed to download listings\n";
             return;
         }
+        $this->putToCache('INVENTORY.json', $inventory);
     }
 
     public function setSkuGraphql(VariantProduct $listing, string $sku): void // not tested
@@ -461,8 +467,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        //$this->graphqlDownloadInventory();
-        $this->graphqlDownload();
+        $this->graphqlDownloadInventory();
+        //$this->graphqlDownload();
         //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
