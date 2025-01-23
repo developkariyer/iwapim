@@ -725,7 +725,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'apiResponseJson' =>'',
                             'parentResponseJson' => '',
                             'published' => '',
-                            'sku' => $listing['sku'] ?? '',
+                            'sku' => '',
                         ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
