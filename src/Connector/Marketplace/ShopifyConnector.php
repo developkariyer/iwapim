@@ -724,7 +724,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'uniqueMarketplaceId' =>  '',
                             'apiResponseJson' => '',
                             'parentResponseJson' => '',
-                            'published' => ($mainListing['status'] ?? 'active') === 'active',
+                            'published' => 1,
                             'sku' => $listing['sku'] ?? '',
                         ],
                         importFlag: $importFlag,
