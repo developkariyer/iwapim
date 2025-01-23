@@ -85,6 +85,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
+            print_r($pageInfo);
         } while ($hasNextPage);
         return $allData;
     }
