@@ -66,6 +66,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
                 return null;
             }
+            print_r($newData);
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
             $requestedQueryCost = $newData['extensions']['cost']['requestedQueryCost'];
             $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
