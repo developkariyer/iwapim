@@ -719,13 +719,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'salePrice' =>  '',
                             'saleCurrency' => '',
                             'attributes' =>  '',
-                            'title' => '',
+                            'title' =>  ($mainListing['title'] ?? '').($listing['title'] ?? ''),
                             'quantity' =>  0,
                             'uniqueMarketplaceId' =>  '',
                             'apiResponseJson' =>'',
                             'parentResponseJson' => '',
                             'published' => 1,
-                            'sku' => $listing['sku']
+                            'sku' => ''
                         ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
