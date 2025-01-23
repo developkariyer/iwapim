@@ -712,6 +712,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             foreach ($mainListing['variants'] as $listing) {
                 try {
+                    echo "Sku: {$listing['sku']}\n";
                     VariantProduct::addUpdateVariant(
                         variant: [
                             'imageUrl' => $this->getImage($listing, $mainListing),
@@ -733,7 +734,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         parent: $parent
                     );
                 } catch (\Exception $e) {
-                    echo "Sku parse: " . explode('_', $listing['sku'])[0] . "\n";
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 echo "v";

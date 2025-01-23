@@ -86,6 +86,9 @@ class VariantProduct extends Concrete
             if (!empty($variant['ean'])) {
                 $product = Product::getByEanGtin($variant['ean'], 1);
             }
+            if (!isset($product) || !$product instanceof Product) {
+                echo "Product object not found\n";
+            }
             if (isset($product) && $product instanceof Product) {
                 $product->addVariant($object);
                 $product->save();
