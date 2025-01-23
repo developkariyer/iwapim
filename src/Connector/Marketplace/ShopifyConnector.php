@@ -714,18 +714,18 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 try {
                     VariantProduct::addUpdateVariant(
                         variant: [
-                            'imageUrl' => $this->getImage($listing, $mainListing),
-                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
-                            'salePrice' => $listing['price'] ?? '',
-                            'saleCurrency' => $this->marketplace->getCurrency(),
-                            'attributes' => $listing['title'] ?? '',
-                            'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                            'quantity' => $listing['inventory_quantity'] ?? 0,
-                            'uniqueMarketplaceId' => $listing['id'] ?? '',
-                            'apiResponseJson' => json_encode($listing),
-                            'parentResponseJson' => json_encode($parentResponseJson),
-                            'published' => ($mainListing['status'] ?? 'active') === 'active',
-                            'sku' => $listing['sku'] ?? '',
+                            'imageUrl' => '',
+                            'urlLink' => '',
+                            'salePrice' => '',
+                            'saleCurrency' =>'',
+                            'attributes' =>  '',
+                            'title' => '',
+                            'quantity' => 0,
+                            'uniqueMarketplaceId' =>  '',
+                            'apiResponseJson' => '',
+                            'parentResponseJson' => '',
+                            'published' => '',
+                            'sku' =>  '',
                         ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
@@ -735,7 +735,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                 }
-
                 echo "v";
             }
             echo "OK\n";
