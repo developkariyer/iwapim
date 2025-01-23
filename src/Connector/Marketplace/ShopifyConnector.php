@@ -298,7 +298,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'cursor' => null
             ]
         ];
-        print_r($query);
+        print_r($query['variables']);
         $inventory = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
         if (empty($inventories)) {
             echo "Failed to download listings\n";
