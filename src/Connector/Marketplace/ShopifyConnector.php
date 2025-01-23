@@ -461,9 +461,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownloadInventory();
-        $this->graphqlDownload();
+        //$this->graphqlDownload();
         //$this->downloadOrdersGraphql();
-       /*if (!$forceDownload && $this->getListingsFromCache()) {
+       if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -472,7 +472,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();*/
+       $this->putListingsToCache();
     }
 
     /**
@@ -678,8 +678,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        $this->graphqlImport($updateFlag, $importFlag);
-        /*if (empty($this->listings)) {
+        //$this->graphqlImport($updateFlag, $importFlag);
+        if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -735,7 +735,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }*/
+        }
     }
 
     /**
