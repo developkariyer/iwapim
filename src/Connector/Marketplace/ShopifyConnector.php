@@ -71,12 +71,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
             $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
             $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-            echo "Page Info:\n";
+            /*echo "Page Info:\n";
             echo "Items Count: $itemsCount\n";
             echo "Requested Query Cost: $requestedQueryCost\n";
             echo "Actual Query Cost: $actualQueryCost\n";
             echo "Currently Available: $currentlyAvailable\n";
-            echo "Restore Rate: $restoreRate\n";
+            echo "Restore Rate: $restoreRate\n";*/
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
