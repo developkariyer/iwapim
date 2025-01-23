@@ -725,7 +725,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'apiResponseJson' =>'',
                             'parentResponseJson' => '',
                             'published' => 1,
-                            'sku' => '',
+                            'sku' => $listing['sku'] ?? '',
                         ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
@@ -734,6 +734,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     );
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
+                    echo "Sku: {$listing['sku']}\n";
                 }
                 echo "v";
             }
