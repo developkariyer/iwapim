@@ -268,6 +268,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'filter' => $filter
             ]
         ];
+        print_r($query);
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
         try {
             foreach ($orders as $order) {
