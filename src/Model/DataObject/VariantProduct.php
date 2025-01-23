@@ -86,7 +86,7 @@ class VariantProduct extends Concrete
                     if ($product) {
                         echo "Product found: " . $product->getId() . "\n";
                     } else {
-                        echo "Product not found for SKU: {$variant['sku']}\n"; 
+                        echo "Product not found for SKU: {$variant['sku']}\n";
                     }
                 }
             }
