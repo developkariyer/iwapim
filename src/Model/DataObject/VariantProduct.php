@@ -79,15 +79,8 @@ class VariantProduct extends Concrete
         if ($result && empty($object->getMainProduct())) {
             if (!empty($variant['sku'])) {
                 $variant['sku'] = explode('_', $variant['sku'])[0];
-                echo "Searching for SKU: {$variant['sku']}\n";
-
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
-                    if ($product) {
-                        echo "Product found: " . $product->getId() . "\n";
-                    } else {
-                        echo "Product not found for SKU: {$variant['sku']}\n";
-                    }
                 }
             }
             if (!empty($variant['ean'])) {
