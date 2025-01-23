@@ -617,8 +617,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
                             'apiResponseJson' => json_encode($listing),
                             'parentResponseJson' => json_encode($parentResponseJson),
-                            //'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                            'published' => 1,
+                            'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                             'sku' => $listing['sku'] ?? '',
                         ],
                         importFlag: $importFlag,
@@ -687,8 +686,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        $this->graphqlImport($updateFlag, $importFlag);
-        /*if (empty($this->listings)) {
+        //$this->graphqlImport($updateFlag, $importFlag);
+        if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -744,7 +743,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }*/
+        }
     }
 
     /**
