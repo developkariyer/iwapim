@@ -86,7 +86,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
             print_r($pageInfo);
-            
         } while ($hasNextPage);
         return $allData;
     }
@@ -302,7 +301,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         print_r($query['variables']);
-        $inventory = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
+        $inventories = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
+        print_r($inventories);
         if (empty($inventories)) {
             echo "Failed to download listings\n";
             return;
