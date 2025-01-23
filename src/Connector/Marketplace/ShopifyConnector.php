@@ -607,22 +607,22 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 try {
+                    $variant =  [
+                        'imageUrl' => '',
+                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
+                        'salePrice' => $listing['price'] ?? '',
+                        'saleCurrency' => $this->marketplace->getCurrency(),
+                        'attributes' => $listing['title'] ?? '',
+                        'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                        'quantity' => $listing['inventoryQuantity'] ?? 0,
+                        'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
+                        'apiResponseJson' => json_encode($listing),
+                        'parentResponseJson' => json_encode($parentResponseJson),
+                        'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                        'sku' => $listing['sku'] ?? '',
+                    ];
                     VariantProduct::addUpdateVariant(
-                        variant: [
-//                            'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
-                            'imageUrl' => '',
-                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
-                            'salePrice' => $listing['price'] ?? '',
-                            'saleCurrency' => $this->marketplace->getCurrency(),
-                            'attributes' => $listing['title'] ?? '',
-                            'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                            'quantity' => $listing['inventoryQuantity'] ?? 0,
-                            'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
-                            'apiResponseJson' => json_encode($listing),
-                            'parentResponseJson' => json_encode($parentResponseJson),
-                            'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                            'sku' => $listing['sku'] ?? '',
-                        ],
+                        variant: $variant,
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
                         marketplace: $this->marketplace,
@@ -632,17 +632,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "ERRROR VARIANT: \n";
-                    echo "UrlLink: " . $this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '') . "\n";
-                    echo "Sale Price: {$listing['price']}\n";
-                    echo "Sale Currency: " . $this->marketplace->getCurrency() . "\n";
-                    echo "Attributes: {$listing['title']}\n";
-                    echo "Title: " . ($mainListing['title'] ?? '').($listing['title'] ?? '') . "\n";
-                    echo "Quantity: {$listing['inventoryQuantity']}\n";
-                    echo "Unique Marketplace: " . basename($listing['id'] ?? '') . "\n";
-                    echo "API Response: " . json_encode($listing) . "\n";
-                    echo "Parent Response: " . json_encode($parentResponseJson) . "\n";
-                    echo "Published: " . ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE' . "\n";
-                    echo "SKU: " . ($listing['sku'] ?? '') . "\n";
+                    echo "Variant Data: " . json_encode($variant) . "\n";
+                    echo "Parent Data: " . json_encode($parent) . "\n";
                 }
             }
             echo "OK\n";
