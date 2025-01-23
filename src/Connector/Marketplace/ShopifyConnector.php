@@ -205,12 +205,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
             $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
             $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-            echo "nestedPaginate - Page Info:\n";
+            /*echo "nestedPaginate - Page Info:\n";
             echo "Items Count: $itemsCount\n";
             echo "Requested Query Cost: $requestedQueryCost\n";
             echo "Actual Query Cost: $actualQueryCost\n";
             echo "Currently Available: $currentlyAvailable\n";
-            echo "Restore Rate: $restoreRate\n";
+            echo "Restore Rate: $restoreRate\n";*/
         } while ($hasNextPage);
         return $collectedItems;
     }
