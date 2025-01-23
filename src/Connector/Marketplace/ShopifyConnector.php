@@ -569,6 +569,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    /**
+     * @throws DuplicateFullPathException
+     */
     public function graphqlImport($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
@@ -629,17 +632,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "ERRROR VARIANT: \n";
-                    echo "Parent: {$parent->getId()}\n";
-                    echo "Listing ID: {$listing['id']}\n";
-                    echo "Main Listing ID: {$mainListing['id']}\n";
-                    echo "Handle: {$mainListing['handle']}\n";
-                    echo "Price: {$listing['price']}\n";
-                    echo "SKU: {$listing['sku']}\n";
-                    echo "Title: {$listing['title']}\n";
-                    echo "Main Title: {$mainListing['title']}\n";
-                    echo "Quantity: {$listing['inventoryQuantity']}\n";
-                    echo "UniqueMarketplaceId: " . basename($listing['id'] ?? '') . "\n";
-                    echo "Status: {$mainListing['status']}\n";
+                    print_r(json_decode($listing, true));
                 }
             }
             echo "OK\n";
@@ -686,8 +679,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        //$this->graphqlImport($updateFlag, $importFlag);
-        if (empty($this->listings)) {
+        $this->graphqlImport($updateFlag, $importFlag);
+        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -743,7 +736,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }
+        }*/
     }
 
     /**
