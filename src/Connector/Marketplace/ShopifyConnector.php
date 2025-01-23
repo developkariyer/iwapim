@@ -632,8 +632,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "ERRROR VARIANT: \n";
-                    echo "Variant Data: " . json_encode($variant) . "\n";
-                    echo "Parent Data: " . print_r($parent) . "\n";
                 }
             }
             echo "OK\n";
