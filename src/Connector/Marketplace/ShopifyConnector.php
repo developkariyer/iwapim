@@ -111,7 +111,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         foreach ($nodes as &$node) {
             match ($key) {
                 'products' => $this->processProduct($node),
-                'orders' => $this->processOrder($node),
+               // 'orders' => $this->processOrder($node),
                 default => null,
             };
         }

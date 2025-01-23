@@ -41,7 +41,46 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                 }
             }
             createdAt
-
+            lineItems (first:50) {
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+                nodes {
+                    id
+                    sku
+                    name
+                    title
+                    duties {
+                        id
+                        countryCodeOfOrigin
+                        harmonizedSystemCode
+                        price {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                    }
+                    vendor
+                    taxable
+                    quantity
+                    isGiftCard
+                    product {
+                        id
+                    }
+                    variant {
+                        id
+                        title
+                        price
+                    }
+                    requiresShipping
+                }
+            }
             registeredSourceUrl
             taxExempt
             updatedAt
