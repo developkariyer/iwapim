@@ -733,6 +733,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         parent: $parent
                     );
                 } catch (\Exception $e) {
+                    echo "Sku parse: " . explode('_', $listing['sku'])[0] . "\n";
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 echo "v";
