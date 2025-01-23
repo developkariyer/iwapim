@@ -85,7 +85,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            print_r($pageInfo);
         } while ($hasNextPage);
         return $allData;
     }
@@ -206,7 +205,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
             $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
             $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-            print_r($query['variables']);
 
             /*echo "nestedPaginate - Page Info:\n";
             echo "Items Count: $itemsCount\n";
@@ -271,7 +269,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'filter' => $filter
             ]
         ];
-        print_r($query['variables']);
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
         try {
             foreach ($orders as $order) {
