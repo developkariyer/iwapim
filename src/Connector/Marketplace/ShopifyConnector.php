@@ -603,21 +603,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                echo "*****************************************************************************\n";
-                echo "Parent: {$parent->getId()}\n";
-                echo "Listing ID: {$listing['id']}\n";
-                echo "Main Listing ID: {$mainListing['id']}\n";
-                echo "Handle: {$mainListing['handle']}\n";
-                echo "Price: {$listing['price']}\n";
-                echo "SKU: {$listing['sku']}\n";
-                echo "Title: {$listing['title']}\n";
-                echo "Main Title: {$mainListing['title']}\n";
-                echo "Quantity: {$listing['inventoryQuantity']}\n";
-                echo "UniqueMarketplaceId: " . basename($listing['id'] ?? '') . "\n";
-                echo "Status: {$mainListing['status']}\n";
-                echo "*****************************************************************************\n";
-                
-                /*try {
+                try {
                     VariantProduct::addUpdateVariant(
                         variant: [
 //                            'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
@@ -654,7 +640,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Quantity: {$listing['inventoryQuantity']}\n";
                     echo "UniqueMarketplaceId: " . basename($listing['id'] ?? '') . "\n";
                     echo "Status: {$mainListing['status']}\n";
-                }*/
+                }
             }
             echo "OK\n";
             $index++;
