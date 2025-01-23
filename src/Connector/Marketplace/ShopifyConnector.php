@@ -632,7 +632,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "ERRROR VARIANT: \n";
-                    print_r(json_encode($listing, true));
+                    print_r(json_encode($mainListing, true));
                 }
             }
             echo "OK\n";
