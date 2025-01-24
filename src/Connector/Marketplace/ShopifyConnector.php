@@ -224,7 +224,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function download($forceDownload = false): void
+    public function graphqlDownload(): void
     {
         echo "GraphQL download\n";
         if ($this->getListingsFromCache()) {
@@ -238,6 +238,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'cursor' => null
             ]
        ];
+        echo "GraphQL query\n";
        echo $query;
        $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
        if (empty($this->listings)) {
@@ -470,10 +471,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    //public function download($forceDownload = false): void
-    //{
+    public function download($forceDownload = false): void
+    {
         //$this->graphqlDownloadInventory();
-        //$this->graphqlDownload();
+        $this->graphqlDownload();
         //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -485,7 +486,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             return;
        }
        $this->putListingsToCache();*/
-    //}
+    }
 
     /**
      * @throws TransportExceptionInterface
