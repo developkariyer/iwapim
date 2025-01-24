@@ -77,12 +77,12 @@ class VariantProduct extends Concrete
         }
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
         if ($result && empty($object->getMainProduct())) {
-            if (!empty($variant['sku'])) {
+            /*if (!empty($variant['sku'])) {
                 $variant['sku'] = explode('_', $variant['sku'])[0];
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
                 }
-            }
+            }*/
             if (!empty($variant['ean'])) {
                 $product = Product::getByEanGtin($variant['ean'], 1);
             }
