@@ -643,6 +643,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
+                    echo "Sku: " . $listing['sku'] ?? '';
                     echo "ERRROR VARIANT: \n";
                 }
             }
@@ -651,7 +652,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    protected function graphqlGetImage($listing, $mainListing): ?ExternalImage
+    protected function graphqlGetImage($listing, $mainListing): ?ExternalImage // Not Working
     {
         $lastImage = null;
         $images = $mainListing['media']['nodes'] ?? [];
