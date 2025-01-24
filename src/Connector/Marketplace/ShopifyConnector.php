@@ -643,7 +643,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
-                    echo "Sku: " . $listing['sku'] ?? '';
+                    echo "Sku: " . $listing['sku'] ?? '' . "\n";
+
                     echo "ERRROR VARIANT: \n";
                 }
             }
