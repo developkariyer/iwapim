@@ -42,6 +42,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
     {
+        echo "Getting from Shopify GraphQL\n";
         $allData = [];
         $cursor = null;
         do {
@@ -71,12 +72,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
             $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
             $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-            /*echo "Page Info:\n";
+            echo "Page Info:\n";
             echo "Items Count: $itemsCount\n";
             echo "Requested Query Cost: $requestedQueryCost\n";
             echo "Actual Query Cost: $actualQueryCost\n";
             echo "Currently Available: $currentlyAvailable\n";
-            echo "Restore Rate: $restoreRate\n";*/
+            echo "Restore Rate: $restoreRate\n";
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
@@ -472,9 +473,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownloadInventory();
-      //  $this->graphqlDownload();
+        $this->graphqlDownload();
         //$this->downloadOrdersGraphql();
-       if (!$forceDownload && $this->getListingsFromCache()) {
+       /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -483,7 +484,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();
+       $this->putListingsToCache();*/
     }
 
     /**
