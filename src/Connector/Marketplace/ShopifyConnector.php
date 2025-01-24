@@ -227,10 +227,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function graphqlDownload(): void
     {
         echo "GraphQL download\n";
-        if ($this->getListingsFromCache()) {
+        /*if ($this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
-        }
+        }*/
        $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
