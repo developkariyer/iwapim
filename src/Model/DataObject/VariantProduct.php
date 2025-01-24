@@ -85,8 +85,6 @@ class VariantProduct extends Concrete
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
                     echo "Created Product \n";
-                    echo "Product ID: " . $product->getId() . "\n";
-                    
                 }
             }
             if (!empty($variant['ean'])) {
