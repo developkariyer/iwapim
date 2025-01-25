@@ -32,6 +32,12 @@ class ConsoleCommand extends AbstractCommand
 {
     private NotificationService $notificationService;
 
+    function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+        parent::__construct(self::$defaultName);
+    }
+
     protected static function getJwtRemainingTime($jwt): int
     {
         $jwt = explode('.', $jwt);
@@ -39,11 +45,6 @@ class ConsoleCommand extends AbstractCommand
         return $jwt['exp'] - time();
     }
 
-    function __construct(NotificationService $notificationService)
-    {
-        $this->notificationService = $notificationService;
-        parent::__construct(self::$defaultName);
-    }
 
     /**
      * @throws Exception

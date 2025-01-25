@@ -19,6 +19,7 @@ use App\EventListener\DataObjectListener;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\Notification\Service\NotificationService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,12 +41,14 @@ class ImportCommand extends AbstractCommand
 {
     private EventDispatcherInterface $eventDispatcher;
     private DataObjectListener $dataObjectListener;
+    private NotificationService $notificationService;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, DataObjectListener $dataObjectListener)
+    public function __construct(EventDispatcherInterface $eventDispatcher, DataObjectListener $dataObjectListener, NotificationService $notificationService)
     {
         parent::__construct();
         $this->eventDispatcher = $eventDispatcher;
         $this->dataObjectListener = $dataObjectListener;
+        $this->notificationService = $notificationService;
     }
 
     protected function configure(): void
@@ -113,6 +116,7 @@ class ImportCommand extends AbstractCommand
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -139,6 +143,8 @@ class ImportCommand extends AbstractCommand
         $allFlag = $input->getOption('all');
 
         $this->removeListeners();
+
+        $notificationMessage = "Import completed for following:\n";
 
         try {
             if ($input->getOption('iwabot')) {
@@ -197,7 +203,8 @@ class ImportCommand extends AbstractCommand
                         }
                     }
                 }
-                
+
+                $notificationMessage .= "{$marketplaceType} Marketplace {$marketplace->getKey()} ";
                 echo "Processing {$marketplaceType} Marketplace {$marketplace->getKey()} ...\n";
                 $connector = match ($marketplaceType) {
                     'Amazon' => new AmazonConnector($marketplace),
@@ -222,30 +229,38 @@ class ImportCommand extends AbstractCommand
                     echo "    Downloading... ";
                     $connector->download($downloadFlag);
                     echo "done.\n";
+                    $notificationMessage .= "- Listings downloaded\n";
                 }
                 if ($updateFlag || $importFlag) {
                     echo "    Importing...";
                     $connector->import($updateFlag, $importFlag);
                     echo "done.\n";
+                    $notificationMessage .= "- Listings imported ";
                 }
                 if ($ordersFlag) {
                     echo "    Getting orders... ";
                     $connector->downloadOrders();
+                    $notificationMessage .= "- Ordes downloaded";
                 }
                 if ($inventoryFlag) {
                     echo "    Getting inventory... ";
                     $connector->downloadInventory();
+                    $notificationMessage .= "- Inventory downloaded";
                 }
                 if ($attributesFlag) {
                     echo "    Getting attributes... ";
                     $connector->downloadAttributes();
                 }
                 echo "done.\n";
+                $notificationMessage .= "\n";
             }
-        } catch (Exception|\Exception) {
-        } finally {
+            $this->notificationService->sendToUser(2, 1, 'Import completed!', $notificationMessage);
             $this->addListeners();
+            return Command::SUCCESS;
+        } catch (Exception|\Exception) {
+            $this->notificationService->sendToUser(2, 1, 'Import failed!', "An error occurred while importing listings. Here is where it stopped:\n$notificationMessage");
+            $this->addListeners();
+            return Command::FAILURE;
         }
-        return Command::SUCCESS;
     }
 }
