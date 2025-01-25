@@ -858,10 +858,10 @@ class ConsoleCommand extends AbstractCommand
         echo "\nFinished\n";
     }
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(?string $name = null, NotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
-        parent::__construct();
+        parent::__construct($name);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
