@@ -6,6 +6,7 @@ use App\Connector\Marketplace\ShopifyConnector;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\Notification\Service\NotificationService;
 use Random\RandomException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,11 +32,21 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class ConsoleCommand extends AbstractCommand
 {
 
+    private $notificationService;
+
     protected static function getJwtRemainingTime($jwt): int
     {
         $jwt = explode('.', $jwt);
         $jwt = json_decode(base64_decode($jwt[1]), true);
         return $jwt['exp'] - time();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function sendTestNotification(): void
+    {   // $this->sendTestNotification();
+        $this->notificationService->sendToUser(2, 1, 'Test Notification', 'This is a test notification');
     }
 
     /**
@@ -845,6 +856,12 @@ class ConsoleCommand extends AbstractCommand
             }
         }
         echo "\nFinished\n";
+    }
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
