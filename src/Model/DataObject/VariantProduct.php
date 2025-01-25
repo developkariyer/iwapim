@@ -19,7 +19,7 @@ use Throwable;
 class VariantProduct extends Concrete
 {
     /**
-     * Finds objects by a specific field.
+     * Finds objects by a specific field. To be deleted, since PimCore has built-in findByField method.
      *
      * @param string $field The field name to query by.
      * @param mixed $value The value to query for.
@@ -78,7 +78,7 @@ class VariantProduct extends Concrete
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
         if ($result && empty($object->getMainProduct())) {
             if (!empty($variant['sku'])) {
-                $variant['sku'] = explode('_', $variant['sku'])[0];
+                $variant['sku'] = substr($variant['sku'], 0, 12);
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
                 }
