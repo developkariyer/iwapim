@@ -149,6 +149,7 @@ class ImportCommand extends AbstractCommand
         try {
             if ($input->getOption('iwabot')) {
                 IwabotConnector::downloadReport();
+                $notificationMessage .= "IWA USA Warehouse inventory downloaded\n";
             }
 
             $marketplaces = Marketplace::getMarketplaceList();
