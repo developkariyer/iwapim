@@ -12,12 +12,11 @@ class EtsyConnector extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Etsy';
 
-    public function download($forceDownload = false): int
+    public function download(bool $forceDownload = false): void
     {
         $filename = 'tmp/'.urlencode($this->marketplace->getShopId()).'.json';
         $jsonData = (file_exists($filename)) ? json_decode(file_get_contents($filename), true) : [];
         $this->listings = $jsonData['listings'] ?? [];
-        return count($this->listings);
     }
 
     /**
@@ -56,7 +55,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         echo "Finished.\n";
     }
 
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
     }
 
@@ -158,11 +157,11 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
     }
 }

@@ -98,20 +98,20 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @param bool $forceDownload
+     * @param false $forceDownload
      * @throws ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
         $this->listingsHelper->getListings($forceDownload);
     }
 
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
         // Implement downloadInventory() method.
     }
 
-    public function downloadOrders()
+    public function downloadOrders(): void
     {
         // Implement downloadOrders() method.
     }
@@ -128,17 +128,17 @@ class Connector extends MarketplaceConnectorAbstract
         $this->productsHelper->getAttributeValuesFromApi();
     }
 
-    public function import($updateFlag, $importFlag)
+    public function import($updateFlag, $importFlag): void
     {
         // Implement import() method.
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
         // Implement setInventory() method.
     }
 
-    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
         // Implement setPrice() method.
     }

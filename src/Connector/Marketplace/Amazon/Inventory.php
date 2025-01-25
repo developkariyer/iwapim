@@ -6,6 +6,7 @@ use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use App\Utils\Registry;
 use Doctrine\DBAL\Exception;
 use Pimcore\Db;
+use Random\RandomException;
 
 class Inventory
 {
@@ -20,6 +21,7 @@ class Inventory
 
     /**
      * @throws Exception
+     * @throws RandomException
      */
     public function downloadInventory(): void
     {
@@ -66,6 +68,9 @@ class Inventory
         echo "\n";
     }
 
+    /**
+     * @throws RandomException
+     */
     public function getInventory(): void
     {
         $inventoryApi = $this->connector->amazonSellerConnector->fbaInventoryV1();

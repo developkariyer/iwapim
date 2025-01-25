@@ -6,6 +6,7 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -44,8 +45,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -141,7 +143,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        $db = \Pimcore\Db::get();
         $now = date('Y-m-d');
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ciceksepeti/select_last_updated_at.sql', [
@@ -212,7 +213,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         }while($startDate < $now);
     }
     
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
 
     }
@@ -224,8 +225,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      * @throws Exception
      * @throws RedirectionExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws RandomException
      */
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
         $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
         if (empty($stockCode)) {
@@ -263,6 +265,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      * @throws Exception
      * @throws RedirectionExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws RandomException
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {

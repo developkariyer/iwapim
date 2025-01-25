@@ -6,6 +6,7 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -21,9 +22,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -187,7 +188,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws \Doctrine\DBAL\Exception
      * @throws RedirectionExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws TransportExceptionInterface|RandomException
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
@@ -234,6 +235,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws \Doctrine\DBAL\Exception
+     * @throws RandomException
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
@@ -313,13 +315,13 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return $response->toArray();
     }
 
-    public function downloadOrders()
+    public function downloadOrders(): void
     {
         
         
     }
     
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
 
     }

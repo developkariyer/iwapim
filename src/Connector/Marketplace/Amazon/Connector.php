@@ -19,18 +19,46 @@ class Connector extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Amazon';
 
+    /**
+     * @var Reports $reportsHelper Helper class for Amazon reports
+     */
     public Reports $reportsHelper;
+    /**
+     * @var Listings $listingsHelper Helper class for Amazon listings
+     */
     public Listings $listingsHelper;
+    /**
+     * @var Import $importHelper Helper class for Amazon importing
+     */
     public Import $importHelper;
+    /**
+     * @var Orders $ordersHelper Helper class for Amazon order management
+     */
     public Orders $ordersHelper;
+    /**
+     * @var Utils $utilsHelper Helper class for Amazon related miscellaneous methods
+     */
     public Utils $utilsHelper;
+    /**
+     * @var Inventory $inventoryHelper Helper class for Amazon inventory management
+     */
     public Inventory $inventoryHelper;
 
+    /**
+     * @var SellerConnector|null $amazonSellerConnector The regional seller connector for Amazon
+     */
     public ?SellerConnector $amazonSellerConnector = null;
+    /**
+     * @var array|string[] $countryCodes The authorized country codes for the marketplace
+     */
     public array $countryCodes = [];
+    /**
+     * @var string|null $mainCountry The main country code for the marketplace
+     */
     public ?string $mainCountry = null;
 
     /**
+     * {@inheritDoc}
      * @throws Exception
      */
     public function __construct(Marketplace $marketplace)
@@ -50,13 +78,21 @@ class Connector extends MarketplaceConnectorAbstract
         $this->inventoryHelper = new Inventory($this);
     }
 
+    /**
+     * Initializes the regional seller connector for Amazon
+     * @throws Exception
+     */
     private function initSellerConnector($marketplace): SellerConnector
     {
         $endpoint = match ($marketplace->getMainMerchant()) {
             "SG", "AU", "JP", "IN" => Endpoint::FE,
             "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" , "IE" => Endpoint::EU,
-            default => Endpoint::NA,  //"CA", "US", "MX", "BR"
+            "CA", "US", "MX", "BR" => Endpoint::NA,
+            default => null
         };
+        if ($endpoint === null) {
+            throw new Exception("Country code is not valid");
+        }
         return SellingPartnerApi::seller(
             clientId: $marketplace->getClientId(),
             clientSecret: $marketplace->getClientSecret(),
@@ -66,9 +102,10 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
+     * {@inheritDoc}
      * @throws JsonException|\Doctrine\DBAL\Exception|RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
         if ($forceDownload || !$this->getListingsFromCache($forceDownload)) {
             $this->reportsHelper->downloadAllReports($forceDownload);
@@ -81,8 +118,8 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws DuplicateFullPathException
-     * @throws \Doctrine\DBAL\Exception
+     * {@inheritDoc}
+     * @throws DuplicateFullPathException|\Doctrine\DBAL\Exception
      */
     public function import($updateFlag, $importFlag): void
     {
@@ -96,6 +133,7 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
+     * {@inheritDoc}
      * @throws \Doctrine\DBAL\Exception|DateMalformedStringException
      */
     public function downloadOrders(): void
@@ -104,6 +142,7 @@ class Connector extends MarketplaceConnectorAbstract
     }
 
     /**
+     * {@inheritDoc}
      * @throws \Doctrine\DBAL\Exception
      */
     public function downloadInventory(): void
@@ -111,12 +150,18 @@ class Connector extends MarketplaceConnectorAbstract
         $this->inventoryHelper->downloadInventory();
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    /**
+     * {@inheritDoc}
+     */
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
-        // TODO: Implement setInventory() method.
+        // TODO: Implement setInventory() method. Needs to be implemented in harmony with PIM Inventory management.
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    /**
+     * {@inheritDoc}
+     */
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
         // TODO: Implement setPrice() method.
     }

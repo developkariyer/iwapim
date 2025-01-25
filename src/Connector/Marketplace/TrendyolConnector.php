@@ -3,10 +3,9 @@
 namespace App\Connector\Marketplace;
 
 use Doctrine\DBAL\Exception;
-use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
-use Symfony\Component\HttpClient\HttpClient;
+use Random\RandomException;
 
 use App\Utils\Utility;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -42,9 +41,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -73,7 +72,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $this->putListingsToCache();
     }
 
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
     }
 
@@ -174,7 +173,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         if (!isset($listing['archived'])) {
             return false;
         }
-        return (bool) !$listing['archived'];
+        return !$listing['archived'];
     }
 
     /**
@@ -229,6 +228,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws Exception
+     * @throws RandomException
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void // 15 dakika boyunca aynı isteği tekrarlı olarak atamazsınız!
     {
@@ -275,7 +275,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
-     * @throws Exception
+     * @throws Exception|RandomException
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {

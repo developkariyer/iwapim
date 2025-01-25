@@ -12,7 +12,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Utils\Utility;
 
 /**
+ * Class Marketplace
+ * This class is the base class for all marketplace connectors. It provides basic common functionality for all marketplace connectors.
  *
+ * @package App\Connector\Marketplace
+ * @property Marketplace $marketplace
+ * @property array|null $listings
+ * @property HttpClientInterface $httpClient
+ * @property string $marketplaceType
+ * @property string LISTINGS_FILE_NAME
+ * @property string MARKETPLACE_TEMP_PATH
+ * @property string SQL_PATH
  */
 abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInterface
 {
@@ -26,6 +36,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     const string SQL_PATH = PIMCORE_PROJECT_ROOT . '/src/SQL/Connector/';
 
     /**
+     * MarketplaceConnectorAbstract constructor. Requires a Pimcore Marketplace object.
      * @throws \Exception
      */
     public function __construct(Marketplace $marketplace)
@@ -39,9 +50,15 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         $this->httpClient = HttpClient::create();
     }
 
-    public function getUrlLink($url): ?Link
+    /**
+     * Used to convert url strings received from marketplace APIs to Link objects.
+     * If the url is empty or not a valid url, it doesn't throw exception but only returns null.
+     * @param string $url The url string to convert.
+     * @return Link|null
+     */
+    public function getUrlLink(string $url): ?Link
     {
-        if (empty($url)) {
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
             return null;
         }
         $l = new Link();
@@ -49,11 +66,19 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
         return $l;
     }
 
+    /**
+     * Returns the Pimcore Marketplace object attached during initialization.
+     * @return Marketplace
+     */
     public function getMarketplace(): Marketplace
     {
         return $this->marketplace;
     }
 
+    /**
+     * Returns the key of the marketplace object attached during initialization.
+     * @return string|null
+     */
     public function getMarketplaceKey(): ?string
     {
         return $this->marketplace->getKey();
@@ -91,6 +116,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
+     * Writes listings to cache file to avoid hammering API endpoints.
      * @return void
      * @throws RandomException
      */
@@ -100,8 +126,9 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
-     * @param int $expiration
-     * @param bool $lazy
+     * Load listings from cache file to listings property
+     * @param int $expiration The expiration time in seconds for the cache file.
+     * @param bool $lazy If true, it will randomly change expiration time +-[0-50]% to avoid hammering API endpoints at the same time.
      * @return bool
      * @throws RandomException
      */
@@ -112,6 +139,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
+     * Writes any data to cache file using a key.
      * @param string $key
      * @param array $data
      * @return void
@@ -123,6 +151,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
+     * Puts raw string data to cache subsystem using a key.
      * @param string $key
      * @param string $data
      * @return void
@@ -134,6 +163,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
+     * Reads data as json array from cache subsystem  using a key.
      * @param string $key
      * @param int $expires
      * @param bool $lazy
@@ -146,6 +176,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
+     * Reads data as raw string from cache subsystem using a key.
      * @param string $key
      * @param int $expires
      * @param bool $lazy
@@ -158,6 +189,7 @@ abstract class MarketplaceConnectorAbstract implements MarketplaceConnectorInter
     }
 
     /**
+     * Returns the temporary path for the marketplace cache files.
      * @return string
      */
     public function getTempPath(): string

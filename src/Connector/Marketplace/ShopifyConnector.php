@@ -2,6 +2,7 @@
 
 namespace App\Connector\Marketplace;
 
+use AllowDynamicProperties;
 use Doctrine\DBAL\Exception;
 use Pimcore\Db;
 use Pimcore\Model\DataObject\Data\ExternalImage;
@@ -16,7 +17,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class ShopifyConnector extends MarketplaceConnectorAbstract
+#[AllowDynamicProperties] class ShopifyConnector extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
 
@@ -47,7 +48,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $allData = [];
         $cursor = null;
         $headersToApi = [
-            'json' => $data,
             'headers' => [
                 'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
                 'Content-Type' => 'application/json'
@@ -90,7 +90,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $orders = $newData['data']['orders']['nodes'];
                 foreach ($orders as &$order) {
                     $orderId = $order['id'];
-                    $lineItems = $this->graphqlOrderLinesItems($orderId);
+                    $this->graphqlOrderLinesItems($orderId);
                     break;
                 }
             }
@@ -398,9 +398,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";

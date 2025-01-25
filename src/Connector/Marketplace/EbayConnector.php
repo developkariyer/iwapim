@@ -2,20 +2,29 @@
 
 namespace App\Connector\Marketplace;
 
+use Exception;
 use Pimcore\Model\DataObject\VariantProduct;
-use App\Utils\Utility;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class EbayConnector extends MarketplaceConnectorAbstract
 {
-    private static $apiUrl = [
+    private static array $apiUrl = [
         'loginTokenUrl' => "https://auth.ebay.com/oauth2/authorize"
     ];
 
     public static string $marketplaceType = 'Ebay';
 
-    protected function getConsentRequest()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    protected function getConsentRequest(): void
     {
         $response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
@@ -26,24 +35,27 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed Ebay login');
+            throw new Exception('Failed Ebay login');
         }
         print_r($response->getContent());
     }
-    
-    
-    public function download($forceDownload = false)
+
+
+    /**
+     * @throws Exception|TransportExceptionInterface
+     */
+    public function download(bool $forceDownload = false): void
     {
      //   $this->prepareToken();
         $this->getConsentRequest();
     }
 
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
 
     }
 
-    public function downloadOrders()
+    public function downloadOrders(): void
     {
     }
     
@@ -52,17 +64,17 @@ class EbayConnector extends MarketplaceConnectorAbstract
         
     }
 
-    public function import($updateFlag, $importFlag)
+    public function import($updateFlag, $importFlag): void
     {
         
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
 
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
 
     }

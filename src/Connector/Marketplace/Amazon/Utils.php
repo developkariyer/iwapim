@@ -3,11 +3,11 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use JsonException;
+use Random\RandomException;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\PatchOperation;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Utils\Utility;
 
 class Utils
 {
@@ -19,7 +19,7 @@ class Utils
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|RandomException
      */
     public function patchCustom($sku, $country, $patches): void // $attribute, $operation, $value = null
     {
@@ -60,7 +60,7 @@ class Utils
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|RandomException
      */
     public function getInfo($sku, $country = null): void
     {
@@ -98,7 +98,7 @@ class Utils
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|RandomException
      */
     public function patchGPSR($sku, $country = null): void
     {
@@ -142,7 +142,7 @@ class Utils
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|RandomException
      */
     public function patchDeleteGPSR($sku, $country = null): void
     {

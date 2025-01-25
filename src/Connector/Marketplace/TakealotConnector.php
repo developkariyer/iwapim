@@ -6,7 +6,7 @@ use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
-use Symfony\Component\HttpClient\HttpClient;
+use Random\RandomException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -38,9 +38,9 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -159,7 +159,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     'attributes' => $listing['title'] ?? '',
                     'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['status'] === 'Buyable' ? true : false,
+                    'published' => $listing['status'] === 'Buyable',
                     'sku' => $listing['sku'] ?? '',
                 ],
                 importFlag: $importFlag,
@@ -181,7 +181,6 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void // Does not contain a modifydate field
     {
-        $db = \Pimcore\Db::get();
         $page = 1;
         $size = 100;
         do {
@@ -216,7 +215,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         } while ($data['page_summary'] === $size);
     }
     
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
 
     }
@@ -232,6 +231,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws RandomException
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
@@ -266,6 +266,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws RandomException
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
@@ -302,7 +303,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function setInventoryPrice($request, $cacheName): void
     {

@@ -2,6 +2,7 @@
 
 namespace App\Connector\Marketplace\Ozon;
 
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -22,7 +23,7 @@ class Listings
     }
 
     /**
-     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
+     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|RandomException
      */
     public function getListings($forceDownload = false): void
     {

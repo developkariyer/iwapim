@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace\Ozon;
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
 use Doctrine\DBAL\Exception;
 use Pimcore\Db;
+use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -30,7 +31,7 @@ class Products
     }
 
     /**
-     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|Exception
+     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface|Exception|RandomException
      */
     public function getCategoryTreeFromApi(): void
     {

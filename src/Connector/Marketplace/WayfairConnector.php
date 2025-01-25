@@ -2,9 +2,9 @@
 
 namespace App\Connector\Marketplace;
 
+use Exception;
+use Pimcore\Db;
 use Pimcore\Model\DataObject\VariantProduct;
-use App\Utils\Utility;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -22,6 +22,13 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Wayfair';
     public static $expires_in;
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
     public function prepareTokenSandbox(): void
     {
         try {
@@ -37,17 +44,24 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to get token: ' . $response->getContent(false));
+                throw new Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
             static::$expires_in = time() + $data['expires_in'];
             $this->marketplace->setWayfairAccessToken($data['access_token']);
             $this->marketplace->save();
-        } catch(\Exception $e) {
+        } catch(Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
     public function prepareTokenProd(): void
     {
         try {
@@ -64,13 +78,13 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to get token: ' . $response->getContent(false));
+                throw new Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
             static::$expires_in = time() + $data['expires_in'];
             $this->marketplace->setWayfairAccessTokenProd($data['access_token']);
             $this->marketplace->save();
-        } catch(\Exception $e) {
+        } catch(Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
     }
@@ -88,7 +102,14 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $this->getListingSandbox();
     }*/
 
-    public function download($forceDownload = false): void
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function download(bool $forceDownload = false): void
     {
         echo "Downloading Wayfair...\n";
         /*if (!isset(static::$expires_in) || time() >= static::$expires_in) {
@@ -139,14 +160,14 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
-     * @throws \Exception|DecodingExceptionInterface
+     * @throws Exception|DecodingExceptionInterface
      */
     public function downloadOrders(): void
     {
         if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareTokenProd();
         }
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $fromDate = "2024-05-01T00:00:00Z";
         $limit = 200;
         do {
@@ -196,7 +217,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'json' => ['query' => $query]
             ]);
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+                throw new Exception('Failed to get orders: ' . $response->getContent(false));
             }
             try {
                 $data = $response->toArray();
@@ -215,7 +236,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     );
                 }
                 $db->commit();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
             }
@@ -224,7 +245,15 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             $fromDate = $lastDate;
         }while($ordersCount === $limit);
     }
-    public function testEndpoint()
+
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function testEndpoint(): void
     {
         $response = $this->httpClient->request('GET', 'https://sandbox.api.wayfair.com/v1/demo/clock',[
             'headers' => [
@@ -233,11 +262,18 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to test endpoint: ' . $response->getContent(false));
+            throw new Exception('Failed to test endpoint: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
     public function getListingSandbox()
     {
         $query = <<<GRAPHQL
@@ -284,11 +320,18 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
     public function saveInventorySandbox()
     {
         $query = <<<GRAPHQL
@@ -491,11 +534,18 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
     public function sendShipmentSandbox()
     {
         $query =  $query = <<<GRAPHQL
@@ -569,12 +619,19 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
 
-    public function acceptDropshipOrdersSandbox()
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function acceptDropshipOrdersSandbox(): void
     {
         $query = <<<GRAPHQL
         mutation acceptOrder(\$poNumber: String!, \$shipSpeed: ShipSpeed!, \$lineItems: [AcceptedLineItemInput!]!) {
@@ -618,12 +675,19 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
 
-    public function getDropshipOrdersSandbox()
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    public function getDropshipOrdersSandbox(): void
     {
         $query = <<<GRAPHQL
         query getDropshipPurchaseOrders {
@@ -672,28 +736,28 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         ]);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+            throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
         print_r($response->getContent());
     }
     
 
-    public function import($updateFlag, $importFlag)
+    public function import($updateFlag, $importFlag): void
     {
        
     }
     
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
 
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
     {
 
     }
 
-    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setPrice(VariantProduct $listing,string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
 
     }

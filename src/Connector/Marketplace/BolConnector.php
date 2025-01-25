@@ -3,9 +3,9 @@
 namespace App\Connector\Marketplace;
 
 use Doctrine\DBAL\Exception;
-use Pimcore\Db;
 use Pimcore\Model\DataObject\Folder;
 use Pimcore\Model\Element\DuplicateFullPathException;
+use Random\RandomException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
@@ -161,9 +161,11 @@ class BolConnector extends MarketplaceConnectorAbstract
     }
 
     /**
+     * @param $report
      * @throws ClientExceptionInterface
-     * @throws ServerExceptionInterface
+     * @throws RandomException
      * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
     protected function getListings($report): void
@@ -250,12 +252,9 @@ class BolConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|ClientExceptionInterface|RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {   
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
@@ -268,8 +267,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws DuplicateFullPathException
-     * @throws \Exception
+     * @throws DuplicateFullPathException|\Exception
      */
     public function import($updateFlag, $importFlag): void
     {
@@ -323,7 +321,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
-        if ($lastUpdatedAt) {
+        if (isset($lastUpdatedAt)) {
             $lastUpdatedAtTimestamp = strtotime($lastUpdatedAt);
             $threeMonthsAgo = strtotime('-3 months', $now);
             $startDate = max($lastUpdatedAtTimestamp, $threeMonthsAgo); 
@@ -399,17 +397,23 @@ class BolConnector extends MarketplaceConnectorAbstract
         unset($order); 
     }
 
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
     }
 
     /**
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
+     * @param VariantProduct $listing
+     * @param int $targetValue
+     * @param null $sku
+     * @param null $country
+     * @param null $locationId
      * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
+     * @throws DecodingExceptionInterface
      * @throws Exception
+     * @throws RandomException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {

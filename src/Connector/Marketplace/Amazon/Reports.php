@@ -3,10 +3,10 @@
 namespace App\Connector\Marketplace\Amazon;
 
 use JsonException;
+use Random\RandomException;
 use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 
 use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
-use App\Utils\Utility;
 
 class Reports 
 {
@@ -32,11 +32,10 @@ class Reports
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|RandomException
      */
     public function downloadAmazonReport($reportType, $forceDownload, $country, $silent = false): bool|string
     {
-        $marketplaceKey = urlencode( $this->connector->getMarketplace()->getKey());
         if (!$silent) {
             echo "        Downloading Report $reportType ";
         }
@@ -77,7 +76,7 @@ class Reports
     }
 
     /**
-     * @throws JsonException
+     * @throws JsonException|RandomException
      */
     public function downloadAllReports($forceDownload, $silent = false): void
     {

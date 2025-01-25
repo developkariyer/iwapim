@@ -92,7 +92,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
      * @throws RandomException
      */
-    public function download($forceDownload = false): void
+    public function download(bool $forceDownload = false): void
     {
        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
             $this->prepareToken();
@@ -208,7 +208,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         }
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
-        $lastUpdatedAt = "";
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Wallmart/select_last_updated_at.sql',['marketplace_id' => $this->marketplace->getId()]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
@@ -260,9 +259,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $offset += $limit;
-                $total = $data['list']['meta']['totalCount'];
+                $total = $data['list']['meta']['totalCount'] ?? 0;
                 echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
-                echo "Offset: " . $offset . " " . count($orders) . " ";
+                echo "Offset: " . $offset . " " . count($orders ?? []) . " ";
                 echo "Total: " . $total . "\n";
                 echo ".";
             } while($total == $limit);
@@ -276,7 +275,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         echo "Orders downloaded\n";
     }
     
-    public function downloadInventory()
+    public function downloadInventory(): void
     {
 
     }
