@@ -144,7 +144,7 @@ class ImportCommand extends AbstractCommand
 
         $this->removeListeners();
 
-        $notificationMessage = "Import completed for following:\n";
+        $notificationMessage = "Import report for ".date("Y-i-d H:m").":\n";
 
         try {
             if ($input->getOption('iwabot')) {
