@@ -32,8 +32,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class ConsoleCommand extends AbstractCommand
 {
 
-    private $notificationService;
-
     protected static function getJwtRemainingTime($jwt): int
     {
         $jwt = explode('.', $jwt);
@@ -41,12 +39,19 @@ class ConsoleCommand extends AbstractCommand
         return $jwt['exp'] - time();
     }
 
+    function __construct(?string $name = null)
+    {
+        parent::__construct($name);
+    }
+
     /**
      * @throws Exception
      */
     public function sendTestNotification(): void
     {   // $this->sendTestNotification();
-        $this->notificationService->sendToUser(2, 1, 'Test Notification', 'This is a test notification');
+        // get symfony's notifaction service. But not with new NotificationService() because it will not work
+        $notificationService = NotificationService::class;
+        $notificationService->sendToUser(2, 1, 'Test Notification', 'This is a test notification');
     }
 
     /**
@@ -856,12 +861,6 @@ class ConsoleCommand extends AbstractCommand
             }
         }
         echo "\nFinished\n";
-    }
-
-    public function __construct(?string $name = null, NotificationService $notificationService)
-    {
-        $this->notificationService = $notificationService;
-        parent::__construct($name);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
