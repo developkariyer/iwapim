@@ -39,10 +39,10 @@ class ConsoleCommand extends AbstractCommand
         return $jwt['exp'] - time();
     }
 
-    function __construct(?string $name = null, NotificationService $notificationService)
+    function __construct(NotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
-        parent::__construct($name);
+        parent::__construct(self::$defaultName);
     }
 
     /**
