@@ -31,6 +31,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 )]
 class ConsoleCommand extends AbstractCommand
 {
+    private NotificationService $notificationService;
 
     protected static function getJwtRemainingTime($jwt): int
     {
@@ -39,8 +40,9 @@ class ConsoleCommand extends AbstractCommand
         return $jwt['exp'] - time();
     }
 
-    function __construct(?string $name = null)
+    function __construct(?string $name = null, NotificationService $notificationService)
     {
+        $this->notificationService = $notificationService;
         parent::__construct($name);
     }
 
@@ -50,8 +52,7 @@ class ConsoleCommand extends AbstractCommand
     public function sendTestNotification(): void
     {   // $this->sendTestNotification();
         // get symfony's notifaction service. But not with new NotificationService() because it will not work
-        $notificationService = NotificationService::class;
-        $notificationService->sendToUser(2, 1, 'Test Notification', 'This is a test notification');
+        $this->notificationService->sendToUser(2, 1, 'Test Notification', 'This is a test notification');
     }
 
     /**
