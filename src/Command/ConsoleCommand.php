@@ -18,7 +18,6 @@ use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\GroupProduct;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
-use App\Connector\Marketplace\Amazon\Constants as AmazonConstants;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
