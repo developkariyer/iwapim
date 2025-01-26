@@ -205,7 +205,7 @@ class ImportCommand extends AbstractCommand
                     }
                 }
 
-                $notificationMessage .= "{$marketplaceType} Marketplace {$marketplace->getKey()} ";
+                $notificationMessage .= "{$marketplaceType}-{$marketplace->getKey()} ";
                 echo "Processing {$marketplaceType} Marketplace {$marketplace->getKey()} ...\n";
                 $connector = match ($marketplaceType) {
                     'Amazon' => new AmazonConnector($marketplace),
