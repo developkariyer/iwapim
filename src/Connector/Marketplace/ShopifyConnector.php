@@ -591,7 +591,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
         $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
-            Utility::checkSetPath('Pazaryerleri')
+            Utility::checkSetPath('Pazaryerleri/Test')
         );
         $total = count($this->listings);
         $index = 0;
