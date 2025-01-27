@@ -557,12 +557,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function graphqlImport($updateFlag, $importFlag): void
     {
-        $this->getListingsFromCache();
-        if (empty($this->listings)) {
-            echo "Nothing to import\n";
-        }
-        $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable( "Test2/" . $this->marketplace->getKey(), 190),
+       $this->listings = file_get_contents(PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/' . $this->getMarketplaceKey() .  'LISTINGS.json');
+       print_r($this->listings);
+        /*$marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable( "Test3/" . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
@@ -621,7 +619,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }
+        }*/
     }
 
     protected function graphqlGetImage($listing, $mainListing): ?ExternalImage // Not Working
