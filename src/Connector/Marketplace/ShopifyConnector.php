@@ -557,8 +557,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function graphqlImport($updateFlag, $importFlag): void
     {
-       $this->listings = file_get_contents(PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/' . $this->getMarketplaceKey() .  'LISTINGS.json');
-       print_r($this->listings);
+        $this->listings =[];
         /*$marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable( "Test3/" . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
