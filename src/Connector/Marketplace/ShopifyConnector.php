@@ -557,6 +557,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function graphqlImport($updateFlag, $importFlag): void
     {
+        $this->listings = [];
+        $this->listings =  $this->getListingsFromCache();
         if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
