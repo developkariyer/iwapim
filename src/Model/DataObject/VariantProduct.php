@@ -78,10 +78,7 @@ class VariantProduct extends Concrete
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
         if ($result && empty($object->getMainProduct())) {
             if (!empty($variant['sku'])) {
-                echo "UPDATE VARIANT \n";
-                echo "SKU: " . $variant['sku'] . "\n";
                 $variant['sku'] = substr($variant['sku'], 0, 12);
-                echo "Explode SKU: " . $variant['sku'] . "\n";
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
                     echo "Created Product \n";
