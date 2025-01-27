@@ -80,7 +80,7 @@ class VariantProduct extends Concrete
             if (!empty($variant['sku'])) {
                 echo "UPDATE VARIANT \n";
                 echo "SKU: " . $variant['sku'] . "\n";
-                $variant['sku'] = explode('_', $variant['sku'])[0];
+                $variant['sku'] = substr($variant['sku'], 0, 12);
                 echo "Explode SKU: " . $variant['sku'] . "\n";
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
