@@ -145,6 +145,7 @@ class ImportCommand extends AbstractCommand
         $this->removeListeners();
 
         $notificationMessage = "Import report for ".date("Y-m-d H:i:s").":\n";
+        $notificationSendFlag = false;
 
         try {
             if ($input->getOption('iwabot')) {
@@ -237,6 +238,7 @@ class ImportCommand extends AbstractCommand
                     $connector->import($updateFlag, $importFlag);
                     echo "done.\n";
                     $notificationMessage .= "- Listings imported ";
+                    $notificationSendFlag = true;
                 }
                 if ($ordersFlag) {
                     echo "    Getting orders... ";
@@ -255,7 +257,9 @@ class ImportCommand extends AbstractCommand
                 echo "done.\n";
                 $notificationMessage .= "\n";
             }
-            $this->notificationService->sendToUser(2, 1, 'Import completed!', $notificationMessage);
+            if ($notificationSendFlag) {
+                $this->notificationService->sendToUser(2, 1, 'Import completed!', $notificationMessage);
+            }
             $this->addListeners();
             return Command::SUCCESS;
         } catch (Exception|\Exception) {
