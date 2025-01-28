@@ -77,7 +77,7 @@ class VariantProduct extends Concrete
             $object = new \Pimcore\Model\DataObject\VariantProduct();
         }*/
         $object = new \Pimcore\Model\DataObject\VariantProduct();
-        $result = $object->"updateVariant"($variant, $updateFlag, $marketplace, $parent);
+        $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
        /* if ($result && empty($object->getMainProduct())) {
             if (!empty($variant['sku'])) {
                 $variant['sku'] = substr($variant['sku'], 0, 12);
