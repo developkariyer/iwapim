@@ -237,7 +237,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function downloadOrders()
+    public function downloadOrders(): void
     {
         $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
             'marketplace_id' => $this->marketplace->getId()
@@ -254,16 +254,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        try {
-            foreach ($orders as $order) {
-                Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
-                    'marketplace_id' => $this->marketplace->getId(),
-                    'order_id' => $order['id'],
-                    'json' => json_encode($order)
-                ]);
-            }
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+        foreach ($orders as $order) {
+            Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                'marketplace_id' => $this->marketplace->getId(),
+                'order_id' => $order['id'],
+                'json' => json_encode($order)
+            ]);
         }
     }
 
