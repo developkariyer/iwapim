@@ -616,9 +616,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
+                print_r("Listing: " . json_encode($listing));
                 break;
             }
             echo "OK\n";
+            print_r("Main Listing: " . json_encode($mainListing));
             break;
             $index++;
         }
