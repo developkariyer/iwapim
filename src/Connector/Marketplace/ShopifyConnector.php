@@ -558,8 +558,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function graphqlImport($updateFlag, $importFlag): void
     {
         $this->listings = $this->getFromCache("LISTINGS.json");
-        print_r(json_encode($this->listings));
-        /*$marketplaceFolder = Utility::checkSetPath(
+        $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable( "Test3/" . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
@@ -619,7 +618,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }*/
+        }
     }
 
     protected function graphqlGetImage($listing, $mainListing): ?ExternalImage // Not Working
