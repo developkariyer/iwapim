@@ -106,7 +106,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|RandomException
      */
     public function downloadInventory(): void
     {
@@ -353,12 +353,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function setBarcode(VariantProduct $listing, string $barcode): void
     {
         if (empty($barcode)) {
-            echo "Barcode is empty for {$listing->getKey()}\n";
+            echo "Barcode is empty for {$listing->getKey()}";
             return;
         }
         $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
         if (empty($variantId)) {
-            echo "Failed to get variant id for {$listing->getKey()}\n";
+            echo "Failed to get variant id for {$listing->getKey()}";
             return;
         }
         $request = [
@@ -369,10 +369,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         $response = $this->getFromShopifyApi('PUT', "variants/{$variantId}.json", [], null, $request);
         if (empty($response)) {
-            echo "Failed to set barcode for {$listing->getKey()}\n";
+            echo "Failed to set barcode for {$listing->getKey()}";
             return;
         }
-        echo "Barcode set to $barcode\n";
+        echo "Barcode set to $barcode";
         $this->putToCache("SETBARCODE_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$request, 'response'=>$response]);
     }
 

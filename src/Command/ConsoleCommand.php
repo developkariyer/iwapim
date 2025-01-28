@@ -166,7 +166,7 @@ class ConsoleCommand extends AbstractCommand
                     if (empty($marketplace) || $marketplace->getMarketplaceType() !== 'Shopify') {
                         continue;
                     }
-                    echo "{$marketplace->getKey()} ";
+                    echo "\n  {$marketplace->getKey()} ";
                     $connector = new ShopifyConnector($marketplace);
                     $connector->setBarcode($variantProduct, $ean);
                 }
