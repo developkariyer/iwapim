@@ -590,7 +590,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 try {
                     $variant =  [
-                        'imageUrl' => '',
+                        'imageUrl' => $this->graphqlGetImage($listing, $mainListing),
                         'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
                         'salePrice' => $listing['price'] ?? '',
                         'saleCurrency' => $this->marketplace->getCurrency(),
@@ -616,11 +616,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
-                print_r("Listing: " . json_encode($listing));
+                print_r(json_encode($variant));
                 break;
             }
             echo "OK\n";
-            print_r("Main Listing: " . json_encode($mainListing));
             break;
             $index++;
         }
