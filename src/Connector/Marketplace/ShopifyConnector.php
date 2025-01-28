@@ -560,7 +560,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $this->listings = [];
         $this->listings = $this->getFromCache("LISTINGS.json");
         $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable( "Test4/" . $this->marketplace->getKey(), 190),
+            Utility::sanitizeVariable( "Test5/" . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
@@ -603,14 +603,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
                     ];
-                    print_r("Variant: " . json_encode($variant) . "\n");
-                    /*VariantProduct::addUpdateVariant(
+                    VariantProduct::addUpdateVariant(
                         variant: $variant,
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
                         marketplace: $this->marketplace,
                         parent: $parent
-                    );*/
+                    );
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
