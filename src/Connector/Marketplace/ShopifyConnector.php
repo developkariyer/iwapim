@@ -616,7 +616,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
-                print_r(json_encode($variant));
+                //print_r(json_encode($variant));
                 break;
             }
             echo "OK\n";
@@ -630,12 +630,13 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $lastImage = null;
         $images = $mainListing['media']['nodes'] ?? [];
         foreach ($images as $img) {
-            if (!is_numeric(basename($listing['image']['id'])) || basename($img['id']) === basename($listing['image']['id'])) {
+            print_r($img['preview']['image']['url'] .  "\n");        
+            /*if (!is_numeric(basename($listing['image']['id'])) || basename($img['id']) === basename($listing['image']['id'])) {
                 return Utility::getCachedImage($img['preview']['image']['url']);
             }
             if (empty($lastImage)) {
                 $lastImage = Utility::getCachedImage($img['preview']['image']['url']);
-            }
+            }*/
         }
         return $lastImage;
     }
