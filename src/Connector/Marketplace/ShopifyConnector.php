@@ -603,8 +603,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
                     ];
-                    print_r("Listing: " . json_encode($listing) . "\n");
-                    print_r("Parent: " . json_encode($parentResponseJson) . "\n");
+                    print_r("Variant: " . json_encode($variant) . "\n");
                     /*VariantProduct::addUpdateVariant(
                         variant: $variant,
                         importFlag: $importFlag,
