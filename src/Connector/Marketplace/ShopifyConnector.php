@@ -621,6 +621,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 break;
             }
             echo "OK\n";
+            break;
             $index++;
         }
     }
