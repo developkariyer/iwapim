@@ -14,6 +14,13 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             closedAt
             confirmed
             poNumber
+            shippingAddress {
+                city
+                company
+                country
+                countryCodeV2
+                province
+            }
             taxLines {
                 rate
                 price

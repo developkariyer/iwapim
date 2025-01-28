@@ -235,6 +235,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws Exception
      */
     public function downloadOrders()
     {
@@ -477,7 +478,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
-                print_r(json_encode($variant));
             }
             echo "OK\n";
             $index++;
