@@ -80,7 +80,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceIds = Utility::fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $fileNames = [
-            'Shopify' => 'iwa_marketplace_orders_transfer_shopify_graphql.sql',
+            'Shopify' => 'iwa_marketplace_orders_transfer_shopify.sql',
             'Trendyol' => 'iwa_marketplace_orders_transfer_trendyol.sql',
             'Bol.com' => 'iwa_marketplace_orders_transfer_bolcom.sql',
             'Etsy' => 'iwa_marketplace_orders_transfer_etsy.sql',
