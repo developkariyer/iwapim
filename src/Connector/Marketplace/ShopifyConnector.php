@@ -451,9 +451,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        //$this->graphqlDownloadInventory();
+        $this->graphqlDownloadInventory();
         //$this->graphqlDownload();
-        $this->downloadOrdersGraphql();
+        //$this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
