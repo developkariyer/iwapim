@@ -557,7 +557,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function graphqlImport($updateFlag, $importFlag): void
     {
-        $this->listings =[];
+        $this->listings = $this->getFromCache("LISTINGS.json");
+        print_r(json_encode($this->listings));
         /*$marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable( "Test3/" . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
