@@ -197,7 +197,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
             $totalNestedItems += count($items);
-            print_r("Total Nested Items Count: $totalNestedItems\n");
+            print_r("Total $fieldKey Count: $totalNestedItems\n");
         } while ($hasNextPage);
         return $collectedItems;
     }
