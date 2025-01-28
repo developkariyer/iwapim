@@ -45,6 +45,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         echo "Getting from Shopify GraphQL\n";
         $allData = [];
         $cursor = null;
+        $totalCount = 0;
         do {
             $data['variables']['cursor'] = $cursor;
             $headersToApi = [
@@ -65,19 +66,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     continue;
                 }
                 echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
-                return null;
+                break;
             }
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
-            $requestedQueryCost = $newData['extensions']['cost']['requestedQueryCost'];
-            $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
-            $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
-            $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-            echo "Page Info:\n";
-            echo "Items Count: $itemsCount\n";
-            echo "Requested Query Cost: $requestedQueryCost\n";
-            echo "Actual Query Cost: $actualQueryCost\n";
-            echo "Currently Available: $currentlyAvailable\n";
-            echo "Restore Rate: $restoreRate\n";
+            $totalCount += $itemsCount;
+            echo "Count: $totalCount\n";
+            // Nested Pagination
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
             }
@@ -86,7 +80,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            print_r($pageInfo);
         } while ($hasNextPage);
         return $allData;
     }
@@ -178,6 +171,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         $collectedItems = [];
         $cursor = null;
+        $totalNestedItems = 0;
         do {
             $query['variables']['cursor'] = $cursor;
             while (true) {
@@ -202,18 +196,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $pageInfo = $data['data'][$fieldKey][$nodeKey]['pageInfo'];
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
-            $itemsCount = count($items);
-            $requestedQueryCost = $newData['extensions']['cost']['requestedQueryCost'];
-            $actualQueryCost = $newData['extensions']['cost']['actualQueryCost'];
-            $currentlyAvailable = $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
-            $restoreRate = $newData['extensions']['cost']['throttleStatus']['restoreRate'];
-
-            /*echo "nestedPaginate - Page Info:\n";
-            echo "Items Count: $itemsCount\n";
-            echo "Requested Query Cost: $requestedQueryCost\n";
-            echo "Actual Query Cost: $actualQueryCost\n";
-            echo "Currently Available: $currentlyAvailable\n";
-            echo "Restore Rate: $restoreRate\n";*/
+            $totalNestedItems += count($items);
+            print_r("Total Nested Items Count: $totalNestedItems\n");
         } while ($hasNextPage);
         return $collectedItems;
     }
@@ -238,7 +222,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'cursor' => null
             ]
        ];
-        echo "GraphQL query\n";
        $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
        if (empty($this->listings)) {
             echo "Failed to download listings\n";
@@ -616,7 +599,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
-                //print_r(json_encode($variant));
+                print_r(json_encode($variant));
                 break;
             }
             echo "OK\n";
@@ -630,15 +613,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $lastImage = null;
         $images = $mainListing['media']['nodes'] ?? [];
         foreach ($images as $img) {
-            print_r("id: " . basename($img['id']));
-            print_r("listingimgid: " . basename($listing['image']['id']));
-            print_r("URL: " . $img['preview']['image']['url'] .  "\n");
-            /*if (!is_numeric(basename($listing['image']['id'])) || basename($img['id']) === basename($listing['image']['id'])) {
+            if (!is_numeric(basename($listing['image']['id'])) || basename($img['id']) === basename($listing['image']['id'])) {
                 return Utility::getCachedImage($img['preview']['image']['url']);
             }
             if (empty($lastImage)) {
                 $lastImage = Utility::getCachedImage($img['preview']['image']['url']);
-            }*/
+            }
         }
         return $lastImage;
     }
