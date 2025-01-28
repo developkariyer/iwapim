@@ -137,6 +137,7 @@ class ConsoleCommand extends AbstractCommand
     {   //  $this->setShopifyBarcode();
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
+        $listingObject->filterByEanGtin('868%', 'LIKE');
         $pageSize = 5;
         $offset = 0;
         $listingObject->setLimit($pageSize);
