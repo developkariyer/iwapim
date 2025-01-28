@@ -559,7 +559,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = $this->getFromCache("LISTINGS.json");
         $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable( "Test3/" . $this->marketplace->getKey(), 190),
+            Utility::sanitizeVariable( "Test4/" . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);

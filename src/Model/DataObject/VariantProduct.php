@@ -76,7 +76,7 @@ class VariantProduct extends Concrete
             $object = new \Pimcore\Model\DataObject\VariantProduct();
         }
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
-        if ($result && empty($object->getMainProduct())) {
+       /* if ($result && empty($object->getMainProduct())) {
             if (!empty($variant['sku'])) {
                 $variant['sku'] = substr($variant['sku'], 0, 12);
                 if (!empty($variant['sku'])) {
@@ -90,7 +90,7 @@ class VariantProduct extends Concrete
                 $product->addVariant($object);
                 $product->save();
             }
-        }
+        }*/
         return $object;
     }
 
