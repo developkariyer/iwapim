@@ -167,6 +167,10 @@ class ConsoleCommand extends AbstractCommand
                         continue;
                     }
                     echo "\n  {$marketplace->getKey()} ";
+                    if ($marketplace->getKey() === 'ShopifyShukranEn') {
+                        echo "Skipping";
+                        continue;
+                    }
                     $connector = new ShopifyConnector($marketplace);
                     $connector->setBarcode($variantProduct, $ean);
                 }
