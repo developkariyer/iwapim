@@ -64,9 +64,8 @@ class VariantProduct extends Concrete
      */
     public static function addUpdateVariant($variant, $importFlag, $updateFlag, $marketplace, $parent)
     {
-        /*$object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
+        $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
             'uniqueMarketplaceId',
-
             $variant['uniqueMarketplaceId'] ?? '',
             unpublished: true
         );
@@ -75,10 +74,9 @@ class VariantProduct extends Concrete
                 return true;
             }
             $object = new \Pimcore\Model\DataObject\VariantProduct();
-        }*/
-        $object = new \Pimcore\Model\DataObject\VariantProduct();
+        }
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
-       /* if ($result && empty($object->getMainProduct())) {
+        if ($result && empty($object->getMainProduct())) {
             if (!empty($variant['sku'])) {
                 $variant['sku'] = substr($variant['sku'], 0, 12);
                 if (!empty($variant['sku'])) {
@@ -92,7 +90,7 @@ class VariantProduct extends Concrete
                 $product->addVariant($object);
                 $product->save();
             }
-        }*/
+        }
         return $object;
     }
 
