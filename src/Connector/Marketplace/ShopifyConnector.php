@@ -106,7 +106,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         foreach ($nodes as &$node) {
             match ($key) {
                 'products' => $this->processProduct($node),
-               // 'orders' => $this->processOrder($node),
+                'orders' => $this->processOrder($node),
                 default => null,
             };
         }
@@ -153,7 +153,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function graphqlNestedPaginateDownload($idKey, $id, $queryFile, $fieldKey, $nodeKey, $numItems = 2): array
+    public function graphqlNestedPaginateDownload($idKey, $id, $queryFile, $fieldKey, $nodeKey, $numItems = 50): array
     {
         $query = [
             'query' => file_get_contents($this->graphqlUrl . $queryFile),
@@ -238,14 +238,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrdersGraphql()
     {
-        try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
-                'marketplace_id' => $this->marketplace->getId()
-            ]);
-            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
-        }
+        $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+            'marketplace_id' => $this->marketplace->getId()
+        ]);
+        $lastUpdatedAt = $result[0]['lastUpdatedAt'];
         echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
@@ -456,8 +452,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function download($forceDownload = false): void
     {
         //$this->graphqlDownloadInventory();
-        $this->graphqlDownload();
-        //$this->downloadOrdersGraphql();
+        //$this->graphqlDownload();
+        $this->downloadOrdersGraphql();
        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -543,7 +539,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $this->listings = [];
         $this->listings = $this->getFromCache("LISTINGS.json");
         $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable( "Test5/" . $this->marketplace->getKey(), 190),
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
@@ -600,10 +596,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "ERRROR VARIANT: \n";
                 }
                 print_r(json_encode($variant));
-                break;
             }
             echo "OK\n";
-            break;
             $index++;
         }
     }
