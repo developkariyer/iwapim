@@ -603,19 +603,22 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
                     ];
-                    VariantProduct::addUpdateVariant(
+                    print_r("Listing: " . json_encode($listing) . "\n");
+                    print_r("Parent: " . json_encode($parentResponseJson) . "\n");
+                    /*VariantProduct::addUpdateVariant(
                         variant: $variant,
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
                         marketplace: $this->marketplace,
                         parent: $parent
-                    );
+                    );*/
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
+                break;
             }
             echo "OK\n";
             $index++;
