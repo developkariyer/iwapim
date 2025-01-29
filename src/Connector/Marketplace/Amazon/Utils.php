@@ -193,21 +193,14 @@ class Utils
             $country = $this->connector->mainCountry;
         }
 
-        $marketplaceId = AmazonConstants::amazonMerchant[$country]['id'];
-
         $patches = [
             new PatchOperation(
-                op: "add",
-                path: "/identifiers",
+                op: "replace",
+                path: "/attributes/externally_assigned_product_identifier",
                 value: [
                     [
-                        "marketplaceId" => $marketplaceId,
-                        "identifiers" => [
-                            [
-                                "identifierType" => "EAN",
-                                "identifier" => $ean,
-                            ],
-                        ]
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                        "value" => $ean
                     ]
                 ]
             )
