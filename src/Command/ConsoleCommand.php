@@ -280,7 +280,6 @@ class ConsoleCommand extends AbstractCommand
                                 echo "Error: " . $e->getMessage() . "\n";
                             }
                         }
-                        echo "\n";
                     }
                 }
             }
