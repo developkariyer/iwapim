@@ -138,6 +138,7 @@ class ConsoleCommand extends AbstractCommand
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->filterByEanGtin('868%', 'LIKE');
+        $listingObject->setOrderKey('iwasku');
         $pageSize = 5;
         $offset = 0;
         $listingObject->setLimit($pageSize);
@@ -154,9 +155,6 @@ class ConsoleCommand extends AbstractCommand
             foreach ($products as $product) {
                 $index++;
                 echo "\rProcessing $index {$product->getId()} ";
-                if ($product->getId() < 165209) {
-                    continue;
-                }
                 $ean = $product->getEanGtin();
                 if (empty($ean)) {
                     continue;
@@ -178,13 +176,23 @@ class ConsoleCommand extends AbstractCommand
                     if (!isset($connectors[$marketplace->getId()])) {
                         $connectors[$marketplace->getId()] = new ShopifyConnector($marketplace);
                     }
-                    try {
-                        $connectors[$marketplace->getId()]->setBarcode($variantProduct, $ean);
-                    } catch (\Exception $e) {
-                        echo "Error: ".$e->getMessage();
-                        // I want to retry this operation
-                    } finally {
-                        sleep(1);
+                    $maxRetries = 5;
+                    $attempt = 0;
+                    $success = false;
+
+                    while ($attempt < $maxRetries && !$success) {
+                        try {
+                            $connectors[$marketplace->getId()]->setBarcode($variantProduct, $ean);
+                            $success = true;
+                        } catch (\Exception $e) {
+                            $attempt++;
+                            echo "Error: ".$e->getMessage()." (Attempt $attempt of $maxRetries)";
+                            if ($attempt >= $maxRetries) {
+                                echo " - Giving up.";
+                                break;
+                            }
+                            sleep(1);
+                        }
                     }
                 }
                 echo "\n";
