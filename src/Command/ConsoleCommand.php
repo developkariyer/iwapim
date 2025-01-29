@@ -143,6 +143,7 @@ class ConsoleCommand extends AbstractCommand
         $listingObject->setLimit($pageSize);
         $index = $offset;
         $carbon3daysAgo = Carbon::now()->subDays(3);
+        $connectors = [];
         while (true) {
             $listingObject->setOffset($offset);
             $products = $listingObject->load();
@@ -153,7 +154,7 @@ class ConsoleCommand extends AbstractCommand
             foreach ($products as $product) {
                 $index++;
                 echo "\rProcessing $index {$product->getId()} ";
-                if ($product->getId() < 164483) {
+                if ($product->getId() < 165209) {
                     continue;
                 }
                 $ean = $product->getEanGtin();
@@ -174,8 +175,10 @@ class ConsoleCommand extends AbstractCommand
                         echo "Skipping";
                         continue;
                     }
-                    $connector = new ShopifyConnector($marketplace);
-                    $connector->setBarcode($variantProduct, $ean);
+                    if (!isset($connectors[$marketplace->getId()])) {
+                        $connectors[$marketplace->getId()] = new ShopifyConnector($marketplace);
+                    }
+                    $connectors[$marketplace->getId()]->setBarcode($variantProduct, $ean);
                     sleep(1);
                 }
                 echo "\n";
