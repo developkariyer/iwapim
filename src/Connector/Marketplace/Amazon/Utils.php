@@ -197,12 +197,12 @@ class Utils
             new PatchOperation(
                 op: "replace",
                 path: "/attributes/externally_assigned_product_identifier",
-                value: [
+                value: $ean /*[
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
                         "value" => $ean
                     ]
-                ]
+                ]*/
             )
         ];
         $this->patchCustom($sku, $country, $patches);
