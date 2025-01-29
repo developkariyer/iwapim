@@ -153,6 +153,9 @@ class ConsoleCommand extends AbstractCommand
             foreach ($products as $product) {
                 $index++;
                 echo "\rProcessing $index {$product->getId()} ";
+                if ($product->getId() < 164483) {
+                    continue;
+                }
                 $ean = $product->getEanGtin();
                 if (empty($ean)) {
                     continue;
@@ -173,6 +176,7 @@ class ConsoleCommand extends AbstractCommand
                     }
                     $connector = new ShopifyConnector($marketplace);
                     $connector->setBarcode($variantProduct, $ean);
+                    usleep(500000);
                 }
                 echo "\n";
             }
