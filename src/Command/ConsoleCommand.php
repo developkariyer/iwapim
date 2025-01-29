@@ -139,7 +139,7 @@ class ConsoleCommand extends AbstractCommand
         $listingObject->setUnpublished(false);
         $listingObject->filterByEanGtin('868%', 'LIKE');
         $listingObject->setOrderKey('iwasku');
-        $pageSize = 5;
+        $pageSize = 15;
         $offset = 0;
         $listingObject->setLimit($pageSize);
         $index = $offset;
