@@ -154,7 +154,7 @@ class ConsoleCommand extends AbstractCommand
             $offset += $pageSize;
             foreach ($products as $product) {
                 $index++;
-                echo "\rProcessing $index {$product->getId()} ";
+                echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
                 $ean = $product->getEanGtin();
                 if (empty($ean)) {
                     continue;
