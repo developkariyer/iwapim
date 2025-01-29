@@ -261,13 +261,15 @@ class ConsoleCommand extends AbstractCommand
                     $marketplace = $variantProduct->getMarketplace();
                     if ($marketplace->getMarketplaceType() === 'Amazon') {
                         $amazonListings = $variantProduct->getAmazonMarketplace();
+                        $newline = "\n";
                         foreach ($amazonListings as $amazonListing) {
                             $sku = $amazonListing->getSku();
                             $country = $amazonListing->getMarketplaceId();
                             if (empty($sku)) {
                                 continue;
                             }
-                            echo "\n  Amazon: {$marketplace->getKey()} $sku $country ";
+                            echo "$newline  Amazon: {$marketplace->getKey()} $sku $country ";
+                            $newline = "";
                             $amazonConnector = match ($country) {
                                 'AU' => $amazonConnectors['AU'],
                                 'US','MX' => $amazonConnectors['US'],
