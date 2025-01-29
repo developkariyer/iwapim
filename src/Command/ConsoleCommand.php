@@ -5,13 +5,14 @@ namespace App\Command;
 use App\Connector\Marketplace\ShopifyConnector;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
+use JsonException;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Db;
 use Pimcore\Model\Notification\Service\NotificationService;
 use Random\RandomException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Marketplace;
@@ -22,6 +23,7 @@ use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Throwable;
 
 
 #[AsCommand(
@@ -76,7 +78,7 @@ class ConsoleCommand extends AbstractCommand
             108419 => new ShopifyConnector(Marketplace::getById(108419)),
         ];
 
-        $carbonYesterday = Carbon::now()->subDays(1);
+        $carbonYesterday = Carbon::now()->subDays(2);
         $variantObject = new VariantProduct\Listing();
         $pageSize = 5;
         $offset = 0;
@@ -212,7 +214,73 @@ class ConsoleCommand extends AbstractCommand
         }*/
     }
 
-    public function connectAmazonUs()
+
+    /**
+     * @throws RandomException
+     * @throws JsonException
+     * @throws \Exception
+     */
+    public function setAmazonBarcode(): void
+    {   //  $this->setAmazonBarcode();
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->filterByEanGtin('868%', 'LIKE');
+        $listingObject->setOrderKey('iwasku');
+        $pageSize = 15;
+        $offset = 0;
+        $listingObject->setLimit($pageSize);
+        $index = $offset;
+        $carbon3daysAgo = Carbon::now()->subDays(3);
+        $connectors = [];
+        while (true) {
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                $index++;
+                echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
+/*                $ean = $product->getEanGtin();
+                if (empty($ean)) {
+                    continue;
+                }
+                echo "EAN: $ean ";*/
+                foreach ($product->getListingItems() as $variantProduct) {
+                    if ($variantProduct->getLastUpdate() < $carbon3daysAgo) {
+                        continue;
+                    }
+                    $marketplace = $variantProduct->getMarketplace();
+                    if ($marketplace->getMarketplaceType() === 'Amazon') {
+                        $amazonConnector = new AmazonConnector($marketplace);
+                        $amazonListings = $variantProduct->getAmazonMarketplace();
+                        foreach ($amazonListings as $amazonListing) {
+                            $sku = $amazonListing->getSku();
+                            $country = $amazonListing->getMarketplaceId();
+                            if (empty($sku)) {
+                                continue;
+                            }
+                            echo "\n  Amazon: {$marketplace->getKey()} $sku $country ";
+                            try {
+                                $amazonConnector->utilsHelper->patchDeleteUPC_EAN($sku, $country);
+                            } catch (\Exception $e) {
+                                echo "Error: " . $e->getMessage() . "\n";
+                                return;
+                            }
+                        }
+                        echo "\n";
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @throws \Exception
+     */
+    public function connectAmazonUs(): void
     {   // $this->connectAmazonUs();
         $grp = GroupProduct::getById(267975);
         $grpArray = [];
@@ -245,9 +313,13 @@ class ConsoleCommand extends AbstractCommand
         $grp->save();
     }
 
-    public function deleteFr()
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function deleteFr(): void
     {   // $this->deleteFr();
-        $db = \Pimcore\Db::get();
+        $db = Db::get();
         $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
         $amazonEuMarkets = ['IT', 'FR']; //['DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'SE', 'PL'];
         $euMarketsPlaceholder = implode("','", $amazonEuMarkets);
@@ -279,7 +351,10 @@ class ConsoleCommand extends AbstractCommand
         echo "\nFinished\n";
     }
 
-    public function addMatteToVariantColors()
+    /**
+     * @throws \Exception
+     */
+    public function addMatteToVariantColors(): void
     {   // $this->addMatteToVariantColors();
         $pageSize = 5;
         $offset = 0;
@@ -318,7 +393,10 @@ class ConsoleCommand extends AbstractCommand
         }
     }
 
-    public function getAmazonInfo()
+    /**
+     * @throws \Exception
+     */
+    public function getAmazonInfo(): void
     {   // $this->getAmazonInfo();
         
         $amazonConnector = [
@@ -398,7 +476,7 @@ class ConsoleCommand extends AbstractCommand
                 }
                 echo "\n";
                 $context = get_defined_vars();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $outputCaptured = ob_get_clean();
                 if (!empty($outputCaptured)) {
                     $io->writeln($outputCaptured);

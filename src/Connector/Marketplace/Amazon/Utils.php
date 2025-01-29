@@ -183,5 +183,40 @@ class Utils
         $this->patchCustom($sku, $country, $patches);
     }
 
+    /**
+     * @throws RandomException
+     * @throws JsonException
+     */
+    public function patchDeleteUPC_EAN($sku, $country = null): void
+    {
+        if (empty($country)) {
+            $country = $this->connector->mainCountry;
+        }
+
+        $marketplaceId = AmazonConstants::amazonMerchant[$country]['id'];
+
+        $patches = [
+            new PatchOperation(
+                op: "delete",
+                path: "/identifiers",
+                value: [
+                    [
+                        "marketplaceId" => $marketplaceId,
+                        "identifiers" => [
+                            [
+                                "identifierType" => "EAN"
+                            ],
+                            [
+                                "identifierType" => "GTIN"
+                            ]
+                        ]
+                    ]
+                ]
+            )
+        ];
+        $this->patchCustom($sku, $country, $patches);
+    }
+
+
 
 }
