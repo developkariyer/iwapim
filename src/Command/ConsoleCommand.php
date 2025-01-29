@@ -176,7 +176,7 @@ class ConsoleCommand extends AbstractCommand
                     }
                     $connector = new ShopifyConnector($marketplace);
                     $connector->setBarcode($variantProduct, $ean);
-                    usleep(500000);
+                    sleep(1);
                 }
                 echo "\n";
             }
