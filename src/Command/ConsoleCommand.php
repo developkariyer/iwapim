@@ -222,6 +222,13 @@ class ConsoleCommand extends AbstractCommand
      */
     public function setAmazonBarcode(): void
     {   //  $this->setAmazonBarcode();
+        $amazonConnectors = [
+            'AU' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonAU')),
+            'UK' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUK')),
+            'US' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUS')),
+            'CA' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonCA')),
+        ];
+
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $listingObject->filterByEanGtin('868%', 'LIKE');
@@ -253,7 +260,6 @@ class ConsoleCommand extends AbstractCommand
                     }
                     $marketplace = $variantProduct->getMarketplace();
                     if ($marketplace->getMarketplaceType() === 'Amazon') {
-                        $amazonConnector = new AmazonConnector($marketplace);
                         $amazonListings = $variantProduct->getAmazonMarketplace();
                         foreach ($amazonListings as $amazonListing) {
                             $sku = $amazonListing->getSku();
@@ -262,6 +268,12 @@ class ConsoleCommand extends AbstractCommand
                                 continue;
                             }
                             echo "\n  Amazon: {$marketplace->getKey()} $sku $country ";
+                            $amazonConnector = match ($country) {
+                                'AU' => $amazonConnectors['AU'],
+                                'US','MX' => $amazonConnectors['US'],
+                                'CA' => $amazonConnectors['CA'],
+                                default => $amazonConnectors['UK'],
+                            };
                             try {
                                 $amazonConnector->utilsHelper->patchDeleteUPC_EAN($sku, $country);
                             } catch (\Exception $e) {
