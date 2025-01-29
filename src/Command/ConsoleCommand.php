@@ -266,7 +266,6 @@ class ConsoleCommand extends AbstractCommand
                                 $amazonConnector->utilsHelper->patchDeleteUPC_EAN($sku, $country);
                             } catch (\Exception $e) {
                                 echo "Error: " . $e->getMessage() . "\n";
-                                return;
                             }
                         }
                         echo "\n";
