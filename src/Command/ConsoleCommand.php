@@ -249,11 +249,11 @@ class ConsoleCommand extends AbstractCommand
             foreach ($products as $product) {
                 $index++;
                 echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
-/*                $ean = $product->getEanGtin();
+                $ean = $product->getEanGtin();
                 if (empty($ean)) {
                     continue;
                 }
-                echo "EAN: $ean ";*/
+                echo "EAN: $ean ";
                 foreach ($product->getListingItems() as $variantProduct) {
                     if ($variantProduct->getLastUpdate() < $carbon3daysAgo) {
                         continue;
@@ -275,7 +275,7 @@ class ConsoleCommand extends AbstractCommand
                                 default => $amazonConnectors['UK'],
                             };
                             try {
-                                $amazonConnector->utilsHelper->patchDeleteUPC_EAN($sku, $country);
+                                $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
                             } catch (\Exception $e) {
                                 echo "Error: " . $e->getMessage() . "\n";
                             }
