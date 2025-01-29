@@ -187,7 +187,7 @@ class Utils
      * @throws RandomException
      * @throws JsonException
      */
-    public function patchDeleteUPC_EAN($sku, $country = null): void
+    public function patchSetEan($sku, $ean, $country = null): void
     {
         if (empty($country)) {
             $country = $this->connector->mainCountry;
@@ -197,18 +197,16 @@ class Utils
 
         $patches = [
             new PatchOperation(
-                op: "delete",
+                op: "replace",
                 path: "/identifiers",
                 value: [
                     [
                         "marketplaceId" => $marketplaceId,
                         "identifiers" => [
                             [
-                                "identifierType" => "EAN"
+                                "identifierType" => "EAN",
+                                "identifier" => $ean,
                             ],
-                            [
-                                "identifierType" => "GTIN"
-                            ]
                         ]
                     ]
                 ]
