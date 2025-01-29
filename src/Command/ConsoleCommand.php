@@ -274,10 +274,22 @@ class ConsoleCommand extends AbstractCommand
                                 'CA' => $amazonConnectors['CA'],
                                 default => $amazonConnectors['UK'],
                             };
-                            try {
-                                $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
-                            } catch (\Exception $e) {
-                                echo "Error: " . $e->getMessage() . "\n";
+                            $maxRetries = 5;
+                            $attempt = 0;
+                            $success = false;
+                            while ($attempt < $maxRetries && !$success) {
+                                try {
+                                    $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
+                                    $success = true;
+                                } catch (\Exception $e) {
+                                    $attempt++;
+                                    echo "Attempt $attempt failed: " . $e->getMessage() . "\n";
+                                    if ($attempt >= $maxRetries) {
+                                        echo "Max retry limit reached. Skipping.\n";
+                                        break;
+                                    }
+                                    sleep(min(pow(2, $attempt), 15));
+                                }
                             }
                         }
                     }
