@@ -178,8 +178,14 @@ class ConsoleCommand extends AbstractCommand
                     if (!isset($connectors[$marketplace->getId()])) {
                         $connectors[$marketplace->getId()] = new ShopifyConnector($marketplace);
                     }
-                    $connectors[$marketplace->getId()]->setBarcode($variantProduct, $ean);
-                    sleep(1);
+                    try {
+                        $connectors[$marketplace->getId()]->setBarcode($variantProduct, $ean);
+                    } catch (\Exception $e) {
+                        echo "Error: ".$e->getMessage();
+                        // I want to retry this operation
+                    } finally {
+                        sleep(1);
+                    }
                 }
                 echo "\n";
             }
