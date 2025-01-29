@@ -197,7 +197,7 @@ class Utils
 
         $patches = [
             new PatchOperation(
-                op: "replace",
+                op: "add",
                 path: "/identifiers",
                 value: [
                     [
