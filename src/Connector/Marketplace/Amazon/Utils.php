@@ -197,7 +197,7 @@ class Utils
             new PatchOperation(
                 op: "replace",
                 path: "/attributes/externally_assigned_product_identifier",
-                value: $ean /*[
+                value: [$ean] /*[
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
                         "value" => $ean
