@@ -265,6 +265,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'parentResponseJson' => json_encode($parentResponseJson),
                         'published' => ($mainListing['status'] ?? 'active') === 'active',
                         'sku' => $listing['sku'] ?? '',
+                        'ean' => $listing['barcode'] ?? '',
                     ],
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,

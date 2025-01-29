@@ -222,5 +222,9 @@ class Import
         $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
         $amazonCollection->setMarketplace($marketplace);
         $amazonCollection->setSku($listing['seller-sku'] ?? '');
+        $ean = trim($listing['product-id'] ?? '');
+        if (str_starts_with($ean, '868408')) {
+            $amazonCollection->setEan($ean);
+        }
     }
 }

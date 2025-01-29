@@ -268,14 +268,14 @@ class ConsoleCommand extends AbstractCommand
                             if (empty($sku)) {
                                 continue;
                             }
-                            echo "$newline  Amazon: {$marketplace->getKey()} $sku $country ";
-                            $newline = "";
                             $amazonConnector = match ($country) {
                                 'AU' => $amazonConnectors['AU'],
                                 'US','MX' => $amazonConnectors['US'],
                                 'CA' => $amazonConnectors['CA'],
                                 default => $amazonConnectors['UK'],
                             };
+                            echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
+                            $newline = "";
                             $maxRetries = 5;
                             $attempt = 0;
                             $success = false;
