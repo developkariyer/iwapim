@@ -987,6 +987,59 @@ class ConsoleCommand extends AbstractCommand
 
     }
 
+    public function commandGetEanFromAmazon(): void
+    {
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->filterByEanGtin('868%', 'NOT LIKE');
+        $listingObject->setOrderKey('iwasku');
+        $pageSize = 13;
+        $offset = 0;
+        $listingObject->setLimit($pageSize);
+        $index = $offset;
+        $carbon3daysAgo = Carbon::now()->subDays(3);
+        $connectors = [];
+        while (true) {
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                $index++;
+                echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
+                foreach ($product->getListingItems() as $variantProduct) {
+                    if ($variantProduct->getLastUpdate() < $carbon3daysAgo) {
+                        continue;
+                    }
+                    $marketplace = $variantProduct->getMarketplace();
+                    if (empty($marketplace) || $marketplace->getMarketplaceType() !== 'Amazon') {
+                        continue;
+                    }
+                    foreach ($variantProduct->getAmazonMarketplace() as $amazonMarketplace) {
+                        if ($amazonMarketplace->getLastUpdate() < $carbon3daysAgo) {
+                            continue;
+                        }
+                        $ean = $amazonMarketplace->getEan();
+                        if (empty($ean)) {
+                            continue;
+                        }
+                        echo "EAN: $ean ";
+                        try {
+                            $product->setEanGtin($ean);
+                            $product->save();
+                            break;
+                        } catch (\Exception $e) {
+                            echo "Error: ".$e->getMessage();
+                        }
+                    }
+                }
+                echo "\n";
+            }
+        }
+
+    }
 
     /**
      * @throws Exception
@@ -1141,18 +1194,6 @@ class ConsoleCommand extends AbstractCommand
                 echo "\n";
             }
         }
-
-
-/*
-        foreach ($eans as $id => $ean) {
-            echo "$id $ean\n";
-            $variantProduct = VariantProduct::getById($id);
-            if (!$variantProduct || $variantProduct->getLastUpdate() < $carbon7daysAgo) {
-                echo "VariantProduct $id not found or too old\n";
-                continue;
-            }
-            $connector->setBarcode($variantProduct, $ean);
-        }*/
     }
 
 
