@@ -11,6 +11,7 @@ use Pimcore\Db;
 use Pimcore\Model\Notification\Service\NotificationService;
 use Random\RandomException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,7 +51,7 @@ class ConsoleCommand extends AbstractCommand
                 $methodNames .= "\n  - $method";
             }
         }
-        $this->addArgument('command', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
+        $this->addArgument('runCommand', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
     }
 
     protected static function getJwtRemainingTime($jwt): int
@@ -493,7 +494,7 @@ class ConsoleCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $argCommand = $input->getArgument('command');
+        $argCommand = $input->getArgument('runCommand');
         if (!empty($argCommand)) {
             foreach ($argCommand as $command) {
                 $cmd = str_replace(['(', ')'], '', $command);
@@ -503,7 +504,7 @@ class ConsoleCommand extends AbstractCommand
                     echo "Command $cmd not found\n";
                 }
             }
-            return 0;
+            return Command::SUCCESS;
         }
 
         $io = new SymfonyStyle($input, $output);
