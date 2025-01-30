@@ -47,10 +47,10 @@ class ConsoleCommand extends AbstractCommand
         $methodNames = "";
         foreach ($methods as $method) {
             if (str_starts_with($method, 'command')) {
-                $methodNames .= "$method\n";
+                $methodNames .= "\n  - $method";
             }
         }
-        $this->addArgument('command', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: \n$methodNames");
+        $this->addArgument('command', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
     }
 
     protected static function getJwtRemainingTime($jwt): int
