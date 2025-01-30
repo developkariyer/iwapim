@@ -496,6 +496,9 @@ class ConsoleCommand extends AbstractCommand
     {
         $argCommand = $input->getArgument('runCommand');
         if (!empty($argCommand)) {
+            if (!is_array($argCommand)) {
+                $argCommand = [$argCommand];
+            }
             foreach ($argCommand as $command) {
                 $cmd = str_replace(['(', ')'], '', $command);
                 if (method_exists($this, $cmd)) {
