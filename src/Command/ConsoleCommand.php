@@ -496,13 +496,14 @@ class ConsoleCommand extends AbstractCommand
         $argCommand = $input->getArgument('command');
         if (!empty($argCommand)) {
             foreach ($argCommand as $command) {
-                $command = str_replace(['(', ')'], '', $command);
-                if (method_exists($this, $command)) {
-                    $this->$command();
+                $cmd = str_replace(['(', ')'], '', $command);
+                if (method_exists($this, $cmd)) {
+                    $this->$cmd();
                 } else {
-                    echo "Command $command not found\n";
+                    echo "Command $cmd not found\n";
                 }
             }
+            return 0;
         }
 
         $io = new SymfonyStyle($input, $output);
