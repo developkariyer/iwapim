@@ -11,6 +11,7 @@ use Pimcore\Db;
 use Pimcore\Model\Notification\Service\NotificationService;
 use Random\RandomException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -40,6 +41,18 @@ class ConsoleCommand extends AbstractCommand
         parent::__construct(self::$defaultName);
     }
 
+    protected function configure(): void
+    {
+        $methods = get_class_methods($this);
+        $methodNames = "";
+        foreach ($methods as $method) {
+            if (str_starts_with($method, 'command')) {
+                $methodNames .= "$method\n";
+            }
+        }
+        $this->addArgument('command', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: \n$methodNames");
+    }
+
     protected static function getJwtRemainingTime($jwt): int
     {
         $jwt = explode('.', $jwt);
@@ -50,7 +63,7 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws Exception
      */
-    public function sendTestNotification(): void
+    public function commandSendTestNotification(): void
     {   // $this->sendTestNotification();
         // get symfony's notifaction service. But not with new NotificationService() because it will not work
         $this->notificationService->sendToUser(2, 1, 'Test Notification', 'This is a test notification');
@@ -65,7 +78,7 @@ class ConsoleCommand extends AbstractCommand
      * @throws Exception
      * @throws \Exception
      */
-    public function setShopifySku(): void
+    public function commandSetShopifySku(): void
     {   // $this->setShopifySku();
 
         $shopifyConnectors = [
@@ -135,7 +148,7 @@ class ConsoleCommand extends AbstractCommand
      * @throws \Exception
      * @throws TransportExceptionInterface
      */
-    public function setShopifyBarcode(): void
+    public function commandSetShopifyBarcode(): void
     {   //  $this->setShopifyBarcode();
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
@@ -220,7 +233,7 @@ class ConsoleCommand extends AbstractCommand
      * @throws JsonException
      * @throws \Exception
      */
-    public function setAmazonBarcode(): void
+    public function commandSetAmazonBarcode(): void
     {   //  $this->setAmazonBarcode();
         $amazonConnectors = [
             'AU' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonAU')),
@@ -304,7 +317,7 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws \Exception
      */
-    public function connectAmazonUs(): void
+    public function commandConnectAmazonUs(): void
     {   // $this->connectAmazonUs();
         $grp = GroupProduct::getById(267975);
         $grpArray = [];
@@ -341,7 +354,7 @@ class ConsoleCommand extends AbstractCommand
      * @throws Exception
      * @throws \Exception
      */
-    public function deleteFr(): void
+    public function commandDeleteFrGpsr(): void
     {   // $this->deleteFr();
         $db = Db::get();
         $amazonConnector = new AmazonConnector(Marketplace::getById(200568)); // UK Amazon
@@ -378,7 +391,7 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws \Exception
      */
-    public function addMatteToVariantColors(): void
+    public function commandAddMatteToVariantColors(): void
     {   // $this->addMatteToVariantColors();
         $pageSize = 5;
         $offset = 0;
@@ -420,7 +433,7 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws \Exception
      */
-    public function getAmazonInfo(): void
+    public function commandGetAmazonInfo(): void
     {   // $this->getAmazonInfo();
         
         $amazonConnector = [
@@ -480,8 +493,17 @@ class ConsoleCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$amazon = new AmazonConnector(Marketplace::getById(149795)); // US: 149795  UK: 200568
-        //$amazon->patchCustom(sku: "CA_41_Burgundy_XL", country: "US", attribute: "item_type_keyword", operation: "delete", value: "");
+        $argCommand = $input->getArgument('command');
+        if (!empty($argCommand)) {
+            foreach ($argCommand as $command) {
+                $command = str_replace(['(', ')'], '', $command);
+                if (method_exists($this, $command)) {
+                    $this->$command();
+                } else {
+                    echo "Command $command not found\n";
+                }
+            }
+        }
 
         $io = new SymfonyStyle($input, $output);
         $io->title('IWAPIM Interactive Shell');
