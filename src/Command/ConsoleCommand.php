@@ -1155,12 +1155,12 @@ class ConsoleCommand extends AbstractCommand
                 $index++;
                 echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
                 $ean = $product->getEanGtin();
-                if (empty($ean)) {
-                    continue;
-                }
                 echo "EAN: $ean ";
                 foreach ($product->getListingItems() as $variantProduct) {
                     if ($variantProduct->getLastUpdate() < $carbon3daysAgo) {
+                        continue;
+                    }
+                    if ($ean === $variantProduct->getEan()) {
                         continue;
                     }
                     $marketplace = $variantProduct->getMarketplace();
