@@ -550,6 +550,73 @@ class ConsoleCommand extends AbstractCommand
 
     }
 
+    public function commandAmazonRequireEan(): void
+    {
+        $carbonYesterday = Carbon::now()->subDays(2);
+        $variantObject = new VariantProduct\Listing();
+        $pageSize = 16;
+        $offset = 0;
+        $variantObject->setLimit($pageSize);
+        $variantObject->setUnpublished(false);
+        $index = $offset;
+        while (true) {
+            $variantObject->setOffset($offset);
+            $results = $variantObject->load();
+            if (empty($results)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($results as $listing) {
+                $index++;
+                echo "\rProcessing $index {$listing->getId()} ";
+                if ($listing->getMarketplace()->getMarketplaceType() !== 'Amazon') {
+                    continue;
+                }
+                if ($listing->getLastUpdate() < $carbonYesterday) {
+                    continue;
+                }
+                $mainProduct = $listing->getMainProduct();
+                if (empty($mainProduct)) {
+                    continue;
+                }
+                $mainProduct = reset($mainProduct);
+                if ($mainProduct->getEanGtin() || $mainProduct->getRequireEan()) {
+                    continue;
+                }
+                $hasEan = false;
+                $foundEan = '';
+                foreach ($listing->getAmazonMarketplace() as $amazonMarketplace) {
+                    if ($amazonMarketplace->getLastUpdate() < $carbonYesterday) {
+                        continue;
+                    }
+                    $ean = $amazonMarketplace->getEan();
+                    if (str_starts_with($ean, '868')) {
+                        $hasEan = true;
+                        $foundEan = $ean;
+                    }
+                }
+                if ($hasEan && $foundEan) {
+                    echo "Setting EAN: $foundEan\n";
+                    try {
+                        $mainProduct->setEanGtin($foundEan);
+                        $mainProduct->save();
+                    } catch (\Exception $e) {
+                        echo "Error: ".$e->getMessage()."\n";
+                    }
+                }
+                if (!$hasEan) {
+                    echo "Setting EAN Required\n";
+                    $mainProduct->setRequireEan(true);
+                    $mainProduct->save();
+                }
+            }
+        }
+        echo "\nFinished\n";
+
+    }
+
+
+
     /**
      * @throws Exception
      */
