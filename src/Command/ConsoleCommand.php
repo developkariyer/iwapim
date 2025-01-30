@@ -1032,13 +1032,13 @@ class ConsoleCommand extends AbstractCommand
                             $product->setEanGtin($ean);
                             $product->setRequireEan(false);
                             $product->save();
+                            echo "OK\n";
                             break;
                         } catch (\Exception $e) {
-                            echo "Error: ".$e->getMessage();
+                            echo "Error: ".$e->getMessage()."\n";
                         }
                     }
                 }
-                echo "\n";
             }
         }
 
