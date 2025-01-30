@@ -991,7 +991,6 @@ class ConsoleCommand extends AbstractCommand
     {
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->filterByEanGtin('868%', 'NOT LIKE');
         $listingObject->setOrderKey('iwasku');
         $pageSize = 13;
         $offset = 0;
@@ -1009,6 +1008,9 @@ class ConsoleCommand extends AbstractCommand
             foreach ($products as $product) {
                 $index++;
                 echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
+                if ($product->getEanGtin()) {
+                    continue;
+                }
                 foreach ($product->getListingItems() as $variantProduct) {
                     if ($variantProduct->getLastUpdate() < $carbon3daysAgo) {
                         continue;
@@ -1022,12 +1024,13 @@ class ConsoleCommand extends AbstractCommand
                             continue;
                         }
                         $ean = $amazonMarketplace->getEan();
-                        if (empty($ean)) {
+                        if (empty($ean) || !str_starts_with($ean, '868')) {
                             continue;
                         }
                         echo "EAN: $ean ";
                         try {
                             $product->setEanGtin($ean);
+                            $product->setRequireEan(false);
                             $product->save();
                             break;
                         } catch (\Exception $e) {
