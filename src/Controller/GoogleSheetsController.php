@@ -185,4 +185,15 @@ class GoogleSheetsController extends FrontendController
         $catalogData = $db->fetchAllAssociative("SELECT iwasku, id, `key`, variationSize, variationColor, productIdentifier, packageDimension1, packageDimension2, packageDimension3, packageWeight, productCategory, name, '1' AS asin FROM object_product WHERE iwasku IS NOT NULL AND iwasku != ''");
         return $this->json($catalogData);
     }
+
+    /**
+     * @Route("/sheets/eancatalog", name="sheets_eancatalog")
+     * @throws Exception
+     */
+    public function eanCatalogAction(): JsonResponse
+    {
+        $db = Db::get();
+        $eanData = $db->fetchAllAssociative("SELECT iwasku, eanGtin, id, `key`, variationSize, variationColor, productIdentifier, productCategory, name FROM object_product WHERE iwasku IS NOT NULL AND iwasku != ''");
+        return $this->json($eanData);
+    }
 }
