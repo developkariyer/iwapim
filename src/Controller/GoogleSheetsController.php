@@ -193,7 +193,7 @@ class GoogleSheetsController extends FrontendController
     public function eanCatalogAction(): JsonResponse
     {
         $db = Db::get();
-        $eanData = $db->fetchAllAssociative("SELECT iwasku, eanGtin, id, `key`, variationSize, variationColor, productIdentifier, productCategory, name FROM object_product WHERE iwasku IS NOT NULL AND iwasku != ''");
+        $eanData = $db->fetchAllAssociative("SELECT iwasku, eanGtin, requireEan, id, `key`, variationSize, variationColor, productIdentifier, productCategory, name FROM object_product WHERE iwasku IS NOT NULL AND iwasku != ''");
         return $this->json($eanData);
     }
 }
