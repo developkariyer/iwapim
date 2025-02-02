@@ -68,7 +68,7 @@ class ConsoleCommand extends AbstractCommand
     {
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->filterByEanGtin('868408', 'LIKE');
+        $listingObject->filterByEanGtin('%868408%', 'LIKE');
         $pageSize = 14;
         $offset = 0;
         $listingObject->setLimit($pageSize);
