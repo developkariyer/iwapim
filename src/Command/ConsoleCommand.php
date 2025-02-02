@@ -61,6 +61,40 @@ class ConsoleCommand extends AbstractCommand
         return $jwt['exp'] - time();
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function commandTrimProductEans(): void
+    {
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->filterByEanGtin('868408', 'LIKE');
+        $pageSize = 14;
+        $offset = 0;
+        $listingObject->setLimit($pageSize);
+        $index = $offset;
+        while (true) {
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                $index++;
+                echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
+                $ean = $product->getEanGtin();
+                if ($ean === trim($ean)) {
+                    continue;
+                }
+                $product->setEanGtin(trim($ean));
+                $product->save();
+                echo "Trimmed\n";
+            }
+        }
+    }
+
+
     public function commandSetEanRequires(): void
     {
         $variantProductIdList = "184150
