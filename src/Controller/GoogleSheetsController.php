@@ -208,6 +208,7 @@ class GoogleSheetsController extends FrontendController
   ovp.id,
   ovp.key,
   ovp.ean,
+  ovp.uniqueMarketplaceId,
   orp.src_id AS product_id
 FROM object_varyantproduct AS ovp
 LEFT JOIN object_relations_product AS orp 
