@@ -77,23 +77,17 @@ class VariantProduct extends Concrete
         }
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
         if ($result && empty($object->getMainProduct())) {
-            echo "\n    - Main product not found for {$object->getId()}. SKU is {$variant['sku']}\n";
             if (!empty($variant['sku'])) {
-                echo "    - Searching by SKU: {$variant['sku']} => ".substr($variant['sku'], 0, 12)."\n";
                 $variant['sku'] = substr($variant['sku'], 0, 12);
                 if (!empty($variant['sku'])) {
                     $product = Product::getByIwasku($variant['sku'], 1);
-                    if ($product instanceof Product) {
-                        echo "    - Found product: {$product->getId()}\n";
-                    } else {
-                        echo "    - Product not found.\n";
-                    }
                 }
             }
             if (empty($product) && !empty($variant['ean'])) {
                 $product = Product::getByEanGtin($variant['ean'], 1);
             }
             if (isset($product) && $product instanceof Product) {
+                echo "C";
                 $product->addVariant($object);
                 $product->save();
             }
