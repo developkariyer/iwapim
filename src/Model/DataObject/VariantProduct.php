@@ -91,7 +91,7 @@ class VariantProduct extends Concrete
                     }
                 }
             }
-            if (!empty($variant['ean'])) {
+            if (empty($product) && !empty($variant['ean'])) {
                 $product = Product::getByEanGtin($variant['ean'], 1);
             }
             if (isset($product) && $product instanceof Product) {
