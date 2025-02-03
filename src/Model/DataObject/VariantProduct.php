@@ -77,7 +77,7 @@ class VariantProduct extends Concrete
         }
         $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
         if ($result && empty($object->getMainProduct())) {
-            echo "\n    - Main product not found for {$object->getId()}\n";
+            echo "\n    - Main product not found for {$object->getId()}. SKU is {$variant['sku']}\n";
             if (!empty($variant['sku'])) {
                 echo "    - Searching by SKU: {$variant['sku']} => ".substr($variant['sku'], 0, 12)."\n";
                 $variant['sku'] = substr($variant['sku'], 0, 12);
