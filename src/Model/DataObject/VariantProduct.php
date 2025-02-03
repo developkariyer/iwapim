@@ -85,6 +85,7 @@ class VariantProduct extends Concrete
                     $product = Product::getByIwasku($variant['sku'], 1);
                     if ($product instanceof Product) {
                         echo "    - Found product: {$product->getId()}\n";
+                        sleep(3);
                     } else {
                         echo "    - Product not found.\n";
                     }
