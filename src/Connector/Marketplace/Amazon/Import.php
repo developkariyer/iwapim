@@ -108,6 +108,21 @@ class Import
                 continue;
             }
             $mainListing = reset($mainListings);
+            $ean = trim($mainListing['product-id'] ?? '');
+            foreach ($listing as $countryListings) {
+                foreach ($countryListings as $countryListing) {
+                    if (str_starts_with($ean, '868408')) {
+                        break 2;
+                    } else {
+                        $ean = trim($countryListing['product-id'] ?? '');
+                    }
+                }
+            }
+            if (str_starts_with($ean, '868408')) {
+                $ean = trim($ean);
+            } else {
+                $ean = '';
+            }
             $variantProduct = VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => null,
@@ -119,6 +134,7 @@ class Import
                     'uniqueMarketplaceId' => $asin,
                     'apiResponseJson' => json_encode($listing),
                     'published' => true,
+                    'ean' => $ean,
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,

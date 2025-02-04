@@ -321,7 +321,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $jsonSku = $apiResponse['sku'] ?? null;
         $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
         if (!empty($jsonSku) && $jsonSku === $sku) {
-            echo "SKU is already set for {$listing->getKey()}: $jsonSku\n";
+            //echo "SKU is already set for {$listing->getKey()}: $jsonSku\n";
             return;
         }
         if (empty($inventoryItemId)) {
