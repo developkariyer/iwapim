@@ -64,7 +64,6 @@ class VariantProduct extends Concrete
      */
     public static function addUpdateVariant($variant, $importFlag, $updateFlag, $marketplace, $parent)
     {
-        print_r($variant['apiResponseJson']);
         try {
             $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
                 'uniqueMarketplaceId',
@@ -78,6 +77,7 @@ class VariantProduct extends Concrete
                 $object = new \Pimcore\Model\DataObject\VariantProduct();
             }
             $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+            print_r(json_encode($result));
             if ($result && empty($object->getMainProduct())) {
                 if (!empty($variant['sku'])) {
                     $variant['sku'] = substr($variant['sku'], 0, 12);
