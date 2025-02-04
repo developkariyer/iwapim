@@ -416,7 +416,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = [];
         $this->listings = $this->getFromCache("LISTINGS.json");
-        $marketplaceFolder = Utility::checkSetPath(
+        print_r($this->listings);
+       /* $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable('Test6' . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
@@ -477,7 +478,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             echo "OK\n";
             $index++;
-        }
+        }*/
     }
 
     protected function getImage($listing, $mainListing): ?ExternalImage
