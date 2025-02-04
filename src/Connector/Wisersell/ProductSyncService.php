@@ -306,6 +306,9 @@ class ProductSyncService
                 "Size" => $product->getVariationSize(),
                 "Color" => $product->getVariationColor()
             ],
+            "arrsku" => [
+                $product->getIwasku(),
+            ],
             "subproducts" => $subProductData
         ];
     }
@@ -475,6 +478,10 @@ class ProductSyncService
                 }
                 if ($wisersellProduct['height'] != $pimProduct->getInheritedField('packageDimension3')) {
                     echo "Height Mismatch: {$wisersellProduct['height']} != {$pimProduct->getInheritedField('packageDimension3')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                    $updateWisersellProduct = true;
+                }
+                if (!is_array($wisersellProduct['arrsku']) || !in_array($pimProduct->getIwasku(), $wisersellProduct['arrsku'])) {
+                    echo "SKU Mismatch: ".json_encode($wisersellProduct['arrsku'])." != ".$pimProduct->getIwasku().", {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
                 /* End check */
