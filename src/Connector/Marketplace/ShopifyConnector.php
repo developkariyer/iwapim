@@ -461,7 +461,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'sku' => $listing['sku'] ?? '',
                         'ean' => $listing['barcode'] ?? ''
                     ];
-                    print_r($variant);
+                    print_r(json_encode($variant));
                     break;
                     VariantProduct::addUpdateVariant(
                         variant: $variant,
