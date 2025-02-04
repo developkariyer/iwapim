@@ -450,7 +450,6 @@ class ProductSyncService
                 }
             }
             if (isset($wisersellProduct['id'])) {
-                /* Check if WS requires an update comparing downloaded WS data and PIM */
                 $updateWisersellProduct = false;
                 if ($wisersellProduct['name'] !== $pimProduct->getKey()) {
                     echo "{$wisersellProduct['name']} !== {$pimProduct->getKey()}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
@@ -484,7 +483,6 @@ class ProductSyncService
                     echo "SKU Mismatch: ".json_encode($wisersellProduct['arrsku'])." != ".$pimProduct->getIwasku().", {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
-                /* End check */
                 if ($forceUpdate || $updateWisersellProduct) {
                     $this->updateWisersellProduct($pimProduct);
                     echo "Updated Wisersell " . $wisersellProduct['id'] . " to match PIM " . $pimProduct->getIwasku() . " (" . $pimProduct->getId() . ")\n";
