@@ -446,25 +446,23 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                print_r(json_encode($listing, JSON_PRETTY_PRINT));
-                /*try {
-                    $variant =  [
-                        'imageUrl' => $this->getImage($listing, $mainListing),
-                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
-                        'salePrice' => $listing['price'] ?? '',
-                        'saleCurrency' => $this->marketplace->getCurrency(),
-                        'attributes' => $listing['title'] ?? '',
-                        'title' => 'GRAPHQL'.($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                        'quantity' => $listing['inventoryQuantity'] ?? 0,
-                        'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
-                        'apiResponseJson' => json_encode($listing),
-                        'parentResponseJson' => json_encode($parentResponseJson),
-                        'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                        'sku' => $listing['sku'] ?? '',
-                        'ean' => $listing['barcode'] ?? ''
-                    ];
+                 try{
                     VariantProduct::addUpdateVariant(
-                        variant: $variant,
+                        variant: [
+                            'imageUrl' => $this->getImage($listing, $mainListing),
+                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
+                            'salePrice' => $listing['price'] ?? '',
+                            'saleCurrency' => $this->marketplace->getCurrency(),
+                            'attributes' => $listing['title'] ?? '',
+                            'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                            'quantity' => $listing['inventory_quantity'] ?? 0,
+                            'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
+                            'apiResponseJson' => json_encode($listing),
+                            'parentResponseJson' => json_encode($parentResponseJson),
+                            'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                            'sku' => $listing['sku'] ?? '',
+                            'ean' => $listing['barcode'] ?? '',
+                        ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
                         marketplace: $this->marketplace,
@@ -475,7 +473,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
-                }*/
+                }
                 break;
             }
             echo "OK\n";
