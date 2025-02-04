@@ -416,8 +416,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = [];
         $this->listings = $this->getFromCache("LISTINGS.json");
-        print_r($this->listings);
-       /* $marketplaceFolder = Utility::checkSetPath(
+
+        $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable('Test6' . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
@@ -475,10 +475,12 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
+                break;
             }
             echo "OK\n";
             $index++;
-        }*/
+            break;
+        }
     }
 
     protected function getImage($listing, $mainListing): ?ExternalImage
