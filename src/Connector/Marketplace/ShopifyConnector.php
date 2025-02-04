@@ -459,7 +459,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'parentResponseJson' => json_encode($parentResponseJson),
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
+                        'ean' => $listing['barcode'] ?? ''
                     ];
+                    print_r($variant);
+                    break;
                     VariantProduct::addUpdateVariant(
                         variant: $variant,
                         importFlag: $importFlag,
@@ -474,6 +477,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "ERRROR VARIANT: \n";
                 }
             }
+            break;
             echo "OK\n";
             $index++;
         }
