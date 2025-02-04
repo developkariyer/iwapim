@@ -164,6 +164,7 @@ class VariantProduct extends Concrete
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
+            print_r("EERRRROOOORRRR HEEEERRRRREEEEEE");
             return false;
         }
         echo "{$this->getId()} ";
