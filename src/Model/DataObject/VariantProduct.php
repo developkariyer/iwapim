@@ -64,35 +64,40 @@ class VariantProduct extends Concrete
      */
     public static function addUpdateVariant($variant, $importFlag, $updateFlag, $marketplace, $parent)
     {
-        $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
-            'uniqueMarketplaceId',
-            $variant['uniqueMarketplaceId'] ?? '',
-            unpublished: true
-        );
-        if (!$object) {
-            if (!$importFlag) {
-                return true;
+        try {
+            $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
+                'uniqueMarketplaceId',
+                $variant['uniqueMarketplaceId'] ?? '',
+                unpublished: true
+            );
+            if (!$object) {
+                if (!$importFlag) {
+                    return true;
+                }
+                $object = new \Pimcore\Model\DataObject\VariantProduct();
             }
-            $object = new \Pimcore\Model\DataObject\VariantProduct();
-        }
-        $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
-        if ($result && empty($object->getMainProduct())) {
-            if (!empty($variant['sku'])) {
-                $variant['sku'] = substr($variant['sku'], 0, 12);
+            $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+            if ($result && empty($object->getMainProduct())) {
                 if (!empty($variant['sku'])) {
-                    $product = Product::getByIwasku($variant['sku'], 1);
+                    $variant['sku'] = substr($variant['sku'], 0, 12);
+                    if (!empty($variant['sku'])) {
+                        $product = Product::getByIwasku($variant['sku'], 1);
+                    }
+                }
+                if (empty($product) && !empty($variant['ean'])) {
+                    $product = Product::getByEanGtin($variant['ean'], 1);
+                }
+                if (isset($product) && $product instanceof Product) {
+                    echo "C";
+                    $product->addVariant($object);
+                    $product->save();
                 }
             }
-            if (empty($product) && !empty($variant['ean'])) {
-                $product = Product::getByEanGtin($variant['ean'], 1);
-            }
-            if (isset($product) && $product instanceof Product) {
-                echo "C";
-                $product->addVariant($object);
-                $product->save();
-            }
+            return $object;
+        } catch (\Exception $e) {
+            echo "Error: {$e->getMessage()}\n";
+            return false;
         }
-        return $object;
     }
 
     /**
