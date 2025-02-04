@@ -83,10 +83,11 @@ class VariantProduct extends Concrete
                     $product = Product::getByIwasku($variant['sku'], 1);
                 }
             }
-            if (!empty($variant['ean'])) {
+            if (empty($product) && !empty($variant['ean'])) {
                 $product = Product::getByEanGtin($variant['ean'], 1);
             }
             if (isset($product) && $product instanceof Product) {
+                echo "C";
                 $product->addVariant($object);
                 $product->save();
             }
