@@ -27,6 +27,7 @@ IWAPIM aims to simplify workflows for e-commerce managers by offering real-time 
   - Slack API
   - OpenAI API
   - Pimcore API
+  - Wisersell API
 - **Containerization**: Docker-ready for deployment in cloud environments
 
 ## 🤝 Contributing
@@ -45,6 +46,7 @@ IWAPIM uses the following tools and technologies:
 - **Apache Superset**: A modern, enterprise-ready business intelligence platform licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 - **Slack API**: Enables seamless integration with Slack for real-time communication. Usage governed by the [Slack API Terms of Service](https://api.slack.com/terms).
 - **OpenAI API**: Powers the AI-driven responses in Slack. Usage governed by the [OpenAI API Terms of Use](https://openai.com/terms/).
+- **Wisersell API**: Wisersell is a sales management system. IWAPIM easily integrates with Wisersell and acts as a product/listing catalog for Wisersell.
 
 ### Supporting Infrastructure
 - **MySQL**: Used as the primary database. Licensed under the [GPL License](https://www.gnu.org/licenses/gpl-3.0.html).
