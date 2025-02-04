@@ -456,8 +456,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'title' => 'GRAPHQL'.($mainListing['title'] ?? '').($listing['title'] ?? ''),
                         'quantity' => $listing['inventoryQuantity'] ?? 0,
                         'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
-                        'apiResponseJson' => json_encode($listing, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
-                        'parentResponseJson' => json_encode($parentResponseJson, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                        'apiResponseJson' => json_encode(array_filter($listing), JSON_UNESCAPED_UNICODE),
+                        'parentResponseJson' => json_encode(array_filter($parentResponseJson), JSON_UNESCAPED_UNICODE),
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
                         'ean' => $listing['barcode'] ?? ''
