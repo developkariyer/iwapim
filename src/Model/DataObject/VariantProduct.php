@@ -19,7 +19,7 @@ use Throwable;
 class VariantProduct extends Concrete
 {
     /**
-     * Finds objects by a specific field.
+     * Finds objects by a specific field. To be deleted, since PimCore has built-in findByField method.
      *
      * @param string $field The field name to query by.
      * @param mixed $value The value to query for.
@@ -64,35 +64,40 @@ class VariantProduct extends Concrete
      */
     public static function addUpdateVariant($variant, $importFlag, $updateFlag, $marketplace, $parent)
     {
-        $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
-            'uniqueMarketplaceId',
-            $variant['uniqueMarketplaceId'] ?? '',
-            unpublished: true
-        );
-        if (!$object) {
-            if (!$importFlag) {
-                return true;
+        try {
+            $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
+                'uniqueMarketplaceId',
+                $variant['uniqueMarketplaceId'] ?? '',
+                unpublished: true
+            );
+            if (!$object) {
+                if (!$importFlag) {
+                    return true;
+                }
+                $object = new \Pimcore\Model\DataObject\VariantProduct();
             }
-            $object = new \Pimcore\Model\DataObject\VariantProduct();
-        }
-        $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
-        if ($result && empty($object->getMainProduct())) {
-            if (!empty($variant['sku'])) {
-                $variant['sku'] = substr($variant['sku'], 0, 12);
+            $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+            if ($result && empty($object->getMainProduct())) {
                 if (!empty($variant['sku'])) {
-                    $product = Product::getByIwasku($variant['sku'], 1);
+                    $variant['sku'] = substr($variant['sku'], 0, 12);
+                    if (!empty($variant['sku'])) {
+                        $product = Product::getByIwasku($variant['sku'], 1);
+                    }
+                }
+                if (empty($product) && !empty($variant['ean'])) {
+                    $product = Product::getByEanGtin($variant['ean'], 1);
+                }
+                if (isset($product) && $product instanceof Product) {
+                    echo "C";
+                    $product->addVariant($object);
+                    $product->save();
                 }
             }
-            if (empty($product) && !empty($variant['ean'])) {
-                $product = Product::getByEanGtin($variant['ean'], 1);
-            }
-            if (isset($product) && $product instanceof Product) {
-                echo "C";
-                $product->addVariant($object);
-                $product->save();
-            }
+            return $object;
+        } catch (\Exception $e) {
+            echo "Error: {$e->getMessage()}\n";
+            exit;
         }
-        return $object;
     }
 
     /**
@@ -126,9 +131,9 @@ class VariantProduct extends Concrete
         if (!$parent) {
             throw new \Exception('Parent is required for adding/updating VariantProduct');
         }
-        $key_base = ($marketplace instanceof \Pimcore\Model\DataObject\Marketplace) 
-                    ? "{$marketplace->getKey()} {$variant['title']} " 
-                    : "Amazon {$variant['title']} ";
+        $key_base = ($marketplace instanceof \Pimcore\Model\DataObject\Marketplace)
+            ? "{$marketplace->getKey()} {$variant['title']} "
+            : "Amazon {$variant['title']} ";
         $key_base.= Utility::sanitizeVariable($variant['attributes'] ?? '');
         $key_base = Utility::sanitizeVariable($key_base,250);
         $key = '';
@@ -144,6 +149,7 @@ class VariantProduct extends Concrete
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
+        $this->setEan($variant['ean'] ?? '');
         $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
@@ -166,7 +172,7 @@ class VariantProduct extends Concrete
         if (isset($variant['parentResponseJson'])) {
             $this->jsonWrite('parentResponseJson', $variant['parentResponseJson']);
         }
-        return $result;    
+        return $result;
     }
 
     /**
