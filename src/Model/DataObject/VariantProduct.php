@@ -64,7 +64,7 @@ class VariantProduct extends Concrete
      */
     public static function addUpdateVariant($variant, $importFlag, $updateFlag, $marketplace, $parent)
     {
-        print_r(json_encode($variant['apiResponseJson']));
+        print_r(json_encode($variant['parentResponseJson']));
         try {
             $object = \Pimcore\Model\DataObject\VariantProduct::findOneByField(
                 'uniqueMarketplaceId',
