@@ -461,8 +461,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'sku' => $listing['sku'] ?? '',
                         'ean' => $listing['barcode'] ?? ''
                     ];
-                    print_r(json_encode($variant));
-                    break;
                     VariantProduct::addUpdateVariant(
                         variant: $variant,
                         importFlag: $importFlag,
@@ -477,7 +475,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "ERRROR VARIANT: \n";
                 }
             }
-            break;
             echo "OK\n";
             $index++;
         }
