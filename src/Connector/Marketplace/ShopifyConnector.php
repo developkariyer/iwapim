@@ -446,7 +446,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                try {
+                print_r(json_encode($listing, JSON_PRETTY_PRINT));
+                /*try {
                     $variant =  [
                         'imageUrl' => $this->getImage($listing, $mainListing),
                         'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.(basename($listing['id']) ?? '')),
@@ -456,8 +457,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         'title' => 'GRAPHQL'.($mainListing['title'] ?? '').($listing['title'] ?? ''),
                         'quantity' => $listing['inventoryQuantity'] ?? 0,
                         'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
-                        'apiResponseJson' => json_encode(array_filter($listing), JSON_UNESCAPED_UNICODE),
-                        'parentResponseJson' => json_encode(array_filter($parentResponseJson), JSON_UNESCAPED_UNICODE),
+                        'apiResponseJson' => json_encode($listing),
+                        'parentResponseJson' => json_encode($parentResponseJson),
                         'published' => ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                         'sku' => $listing['sku'] ?? '',
                         'ean' => $listing['barcode'] ?? ''
@@ -474,7 +475,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
-                }
+                }*/
                 break;
             }
             echo "OK\n";
