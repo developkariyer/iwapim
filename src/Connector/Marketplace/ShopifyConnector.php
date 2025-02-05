@@ -416,7 +416,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     {
         $this->listings = [];
         //$this->listings = $this->getFromCache("LISTINGS.json");
-        $this->listings = file_get_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . $this->marketplace->getKey() . "LISTINGS.json");
+        $this->listings = file_get_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . $this->marketplace->getKey() . "/LISTINGS.json");
 
         $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable('Test7' . $this->marketplace->getKey(), 190),
