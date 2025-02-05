@@ -192,39 +192,31 @@ class StickerController extends FrontendController
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
         foreach ($products as &$product) {
             if (isset($product['sticker_id_eu'])) {
-                error_log("✅ sticker_id_eu bulundu: " . $product['sticker_id_eu']);
                 $stickerEu = Asset::getById($product['sticker_id_eu']);
             } else {
                 if (isset($product['dest_id'])) {
                     $productObject = Product::getById($product['dest_id']);
                     if ($productObject) {
                         $stickerEu = $productObject->checkSticker4x6eu();
-                        error_log("⚠️ sticker_id_eu bulunamadı, dest_id üzerinden alındı.");
                     } else {
                         $stickerEu = null;
-                        error_log("❌ sticker_id_eu ve dest_id'den de sticker alınamadı.");
                     }
                 } else {
                     $stickerEu = null;
-                    error_log("❌ sticker_id_eu de yok, dest_id de yok.");
                 }
             }
             if (isset($product['sticker_id'])) {
                 $sticker = Asset::getById($product['sticker_id']);
-                error_log("✅ sticker_id bulundu: " . $product['sticker_id']);
             } else {
                 if (isset($product['dest_id'])) {
                     $productObject = Product::getById($product['dest_id']);
                     if ($productObject) {
                         $sticker = $productObject->checkSticker4x6iwasku();
-                        error_log("⚠️ sticker_id bulunamadı, dest_id üzerinden alındı.");
                     } else {
                         $sticker = null;
-                        error_log("❌ sticker_id ve dest_id'den de sticker alınamadı.");
                     }
                 } else {
                     $sticker = null;
-                    error_log("❌ sticker_id de yok, dest_id de yok.");
                 }
             }
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
