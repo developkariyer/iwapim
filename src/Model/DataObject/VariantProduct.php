@@ -162,12 +162,17 @@ class VariantProduct extends Concrete
         $publishedStatus = $variant['published'] ?? false;
         $this->setParent($publishedStatus ?  $parent : $passiveFolder);
         $this->setLastUpdate(Carbon::now());
-        dump($this);
-        try {
+4        try {
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             print_r("EERRRROOOORRRR HEEEERRRRREEEEEE");
+            echo "\n================= ERROR DETECTED =================\n";
+            echo "Error Message: {$e->getMessage()}\n";
+            echo "File: {$e->getFile()} - Line: {$e->getLine()}\n";
+            echo "Trace:\n" . $e->getTraceAsString() . "\n";
+            echo "=================================================\n";
+            exit;
             return false;
         }
         echo "{$this->getId()} ";
