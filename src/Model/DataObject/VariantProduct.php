@@ -141,27 +141,26 @@ class VariantProduct extends Concrete
         while (VariantProduct::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
             $key = $key ? $key+1 : 1;
         }
-
+        $this->setKey(trim("$key_base$key"));
+        if (!empty($variant['imageUrl'])) {
+            $this->setImageUrl($variant['imageUrl']);
+        }
+        $this->setUrlLink($variant['urlLink'] ?? null);
+        $this->setSalePrice($variant['salePrice'] ?? '');
+        $this->setSaleCurrency($variant['saleCurrency'] ?? '');
+        $this->setTitle($variant['title'] ?? '');
+        $this->setAttributes($variant['attributes'] ?? '');
+        //$this->setEan($variant['ean'] ?? '');
+        $this->setQuantity($variant['quantity'] ?? 0);
+        $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
+        $this->setMarketplace($marketplace);
+        $this->setMarketplaceType($marketplace->getMarketplaceType()); // might seem redundant but it's for caching purposes
+        $this->setPublished($variant['published'] ?? false);
+        $passiveFolder = Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri")));
+        $publishedStatus = $variant['published'] ?? false;
+        $this->setParent($publishedStatus ?  $parent : $passiveFolder);
+        $this->setLastUpdate(Carbon::now());
         try {
-            $this->setKey(trim("$key_base$key"));
-            if (!empty($variant['imageUrl'])) {
-                $this->setImageUrl($variant['imageUrl']);
-            }
-            $this->setUrlLink($variant['urlLink'] ?? null);
-            $this->setSalePrice($variant['salePrice'] ?? '');
-            $this->setSaleCurrency($variant['saleCurrency'] ?? '');
-            $this->setTitle($variant['title'] ?? '');
-            $this->setAttributes($variant['attributes'] ?? '');
-            //$this->setEan($variant['ean'] ?? '');
-            $this->setQuantity($variant['quantity'] ?? 0);
-            $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
-            $this->setMarketplace($marketplace);
-            $this->setMarketplaceType($marketplace->getMarketplaceType()); // might seem redundant but it's for caching purposes
-            $this->setPublished($variant['published'] ?? false);
-            $passiveFolder = Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri")));
-            $publishedStatus = $variant['published'] ?? false;
-            $this->setParent($publishedStatus ?  $parent : $passiveFolder);
-            $this->setLastUpdate(Carbon::now());
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
