@@ -167,11 +167,6 @@ class VariantProduct extends Concrete
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
             print_r("EERRRROOOORRRR HEEEERRRRREEEEEE");
-            echo "\n================= ERROR DETECTED =================\n";
-            echo "Error Message: {$e->getMessage()}\n";
-            echo "File: {$e->getFile()} - Line: {$e->getLine()}\n";
-            echo "Trace:\n" . $e->getTraceAsString() . "\n";
-            echo "=================================================\n";
             return false;
         }
         echo "{$this->getId()} ";
