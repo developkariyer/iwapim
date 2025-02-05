@@ -76,10 +76,9 @@ class VariantProduct extends Concrete
                 }
                 $object = new \Pimcore\Model\DataObject\VariantProduct();
             }
-            $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+            $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
             echo "added variant\n";
-            //print_r(json_encode($result));
-            /*if ($result && empty($object->getMainProduct())) {
+            if ($result && empty($object->getMainProduct())) {
                 echo "Result and main empty \n";
                 if (!empty($variant['sku'])) {
                     $variant['sku'] = substr($variant['sku'], 0, 12);
@@ -95,7 +94,7 @@ class VariantProduct extends Concrete
                     $product->addVariant($object);
                     $product->save();
                 }
-            }*/
+            }
             return $object;
         } catch (\Exception $e) {
             echo "Error: {$e->getMessage()}\n";
