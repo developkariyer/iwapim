@@ -162,7 +162,7 @@ class VariantProduct extends Concrete
         $publishedStatus = $variant['published'] ?? false;
         $this->setParent($publishedStatus ?  $parent : $passiveFolder);
         $this->setLastUpdate(Carbon::now());
-        try {
+        /*try {
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
@@ -173,7 +173,7 @@ class VariantProduct extends Concrete
             echo "Trace:\n" . $e->getTraceAsString() . "\n";
             echo "=================================================\n";
             return false;
-        }
+        }*/
         echo "{$this->getId()} ";
         if (isset($variant['apiResponseJson'])) {
             echo "Is exist apiResponseJson\n";
