@@ -418,7 +418,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $this->listings = $this->getFromCache("LISTINGS.json");
 
         $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable('Test7' . $this->marketplace->getKey(), 190),
+            Utility::sanitizeVariable('Test8' . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
         $total = count($this->listings);
@@ -474,11 +474,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
-                break;
             }
             echo "OK\n";
             $index++;
-            break;
         }
     }
 
