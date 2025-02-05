@@ -174,9 +174,15 @@ class VariantProduct extends Concrete
             echo "Is exist apiResponseJson\n";
             $this->jsonWrite('apiResponseJson', $variant['apiResponseJson']);
         }
+        else {
+            echo "Is NOT exist apiResponseJson\n";
+        }
         if (isset($variant['parentResponseJson'])) {
             echo "Is exist parentResponseJson\n";
             $this->jsonWrite('parentResponseJson', $variant['parentResponseJson']);
+        }
+        else {
+            echo "Is NOT exist parentResponseJson\n";
         }
         return $result;
     }
