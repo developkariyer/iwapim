@@ -415,9 +415,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function import($updateFlag, $importFlag): void
     {
         $this->listings = [];
-        //$this->listings = $this->getFromCache("LISTINGS.json");
-        $jsonContent = file_get_contents(PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/" . $this->marketplace->getKey() . "/LISTINGS.json");
-        $this->listings = json_decode($jsonContent, true) ?? [];
+        $this->listings = $this->getFromCache("LISTINGS.json");
 
         $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable('Test7' . $this->marketplace->getKey(), 190),
@@ -449,21 +447,21 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
                  try{
-                    $variantObject = VariantProduct::addUpdateVariant(
+                    VariantProduct::addUpdateVariant(
                         variant: [
                             'imageUrl' => $this->getImage($listing, $mainListing),
                             'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
-                            'salePrice' => $listing['price'] ?? '',
-                            'saleCurrency' => $this->marketplace->getCurrency(),
-                            'attributes' => $listing['title'] ?? '',
+                            'salePrice' =>  "GRAPHQL" . $listing['price'] ?? '',
+                            'saleCurrency' =>  "GRAPHQL" . $this->marketplace->getCurrency(),
+                            'attributes' =>  "GRAPHQL" . $listing['title'] ?? '',
                             'title' => "GRAPHQL" . ($mainListing['title'] ?? '').($listing['title'] ?? ''),
                             'quantity' => $listing['inventory_quantity'] ?? 0,
-                            'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
-                            'apiResponseJson' => json_encode($listing),
+                            'uniqueMarketplaceId' =>  "GRAPHQL" . basename($listing['id'] ?? ''),
+                            'apiResponseJson' =>  json_encode($listing),
                             'parentResponseJson' => json_encode($parentResponseJson),
                             'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
-                            'sku' => $listing['sku'] ?? '',
-                            'ean' => $listing['barcode'] ?? '',
+                            'sku' =>  "GRAPHQL" . $listing['sku'] ?? '',
+                            'ean' =>  "GRAPHQL" . $listing['barcode'] ?? '',
                         ],
                         importFlag: $importFlag,
                         updateFlag: $updateFlag,
