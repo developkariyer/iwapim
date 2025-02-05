@@ -79,6 +79,7 @@ class VariantProduct extends Concrete
             $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
             print_r(json_encode($result));
             if ($result && empty($object->getMainProduct())) {
+                echo "Result and main empty \n";
                 if (!empty($variant['sku'])) {
                     $variant['sku'] = substr($variant['sku'], 0, 12);
                     if (!empty($variant['sku'])) {
