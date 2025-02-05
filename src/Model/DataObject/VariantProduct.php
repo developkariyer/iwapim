@@ -172,7 +172,6 @@ class VariantProduct extends Concrete
             echo "File: {$e->getFile()} - Line: {$e->getLine()}\n";
             echo "Trace:\n" . $e->getTraceAsString() . "\n";
             echo "=================================================\n";
-            exit;
             return false;
         }
         echo "{$this->getId()} ";
