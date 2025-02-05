@@ -173,33 +173,53 @@ class StickerController extends FrontendController
                 osp.variationSize,
                 osp.variationColor,
                 osp.productIdentifier,
-                opr.dest_id AS sticker_id
+                sticker_eu.dest_id AS sticker_id_eu,
+                sticker_normal.dest_id AS sticker_id
             FROM object_relations_gproduct org
             JOIN object_product osp ON osp.oo_id = org.dest_id
-            LEFT JOIN object_relations_product opr
-                ON opr.src_id = osp.oo_id
-                AND opr.type = 'asset'
-                AND opr.fieldname = 'sticker4x6eu'
+            LEFT JOIN object_relations_product sticker_eu
+                ON sticker_eu.src_id = osp.oo_id
+                AND sticker_eu.type = 'asset'
+                AND sticker_eu.fieldname = 'sticker4x6eu'
+            LEFT JOIN object_relations_product sticker_normal
+                ON sticker_normal.src_id = osp.oo_id
+                AND sticker_normal.type = 'asset'
+                AND sticker_normal.fieldname = 'sticker4x6iwasku'
             WHERE osp.productIdentifier = :productIdentifier AND org.src_id = :groupId;
         ";
+
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
         foreach ($products as &$product) {
+            if ($product['sticker_id_eu']) {
+                $stickerEu = Asset::getById($product['sticker_id_eu']);
+            } else {
+                if (isset($product['dest_id'])) {
+                    $productObject = Product::getById($product['dest_id']);
+                    if ($productObject) {
+                        $stickerEu = $productObject->checkSticker4x6eu();
+                    } else {
+                        $stickerEu = null;
+                    }
+                } else {
+                    $stickerEu = null;
+                }
+            }
             if ($product['sticker_id']) {
                 $sticker = Asset::getById($product['sticker_id']);
             } else {
                 if (isset($product['dest_id'])) {
                     $productObject = Product::getById($product['dest_id']);
-                    if (!$productObject) {
-                        continue;
+                    if ($productObject) {
+                        $sticker = $productObject->checkSticker4x6iwasku();
+                    } else {
+                        $sticker = null;
                     }
-                    $sticker = $productObject->checkSticker4x6eu();
-                }
-                else {
+                } else {
                     $sticker = null;
                 }
             }
-            $stickerPath = $sticker ? $sticker->getFullPath() : '';
-            $product['sticker_link'] = $stickerPath;
+            $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
+            $product['sticker_link'] = $sticker ? $sticker->getFullPath() : '';
         }
         unset($product);
         if ($products) {
