@@ -220,6 +220,7 @@ class StickerController extends FrontendController
             }
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
             $product['sticker_link'] = $sticker ? $sticker->getFullPath() : '';
+
         }
         unset($product);
         if ($products) {
