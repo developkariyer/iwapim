@@ -190,7 +190,7 @@ class StickerController extends FrontendController
 
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
         foreach ($products as &$product) {
-            if ($product['sticker_id_eu']) {
+            if (isset($product['sticker_id_eu'])) {
                 $stickerEu = Asset::getById($product['sticker_id_eu']);
             } else {
                 if (isset($product['dest_id'])) {
@@ -204,7 +204,7 @@ class StickerController extends FrontendController
                     $stickerEu = null;
                 }
             }
-            if ($product['sticker_id']) {
+            if (isset($product['sticker_id'])) {
                 $sticker = Asset::getById($product['sticker_id']);
             } else {
                 if (isset($product['dest_id'])) {
