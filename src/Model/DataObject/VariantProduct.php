@@ -162,7 +162,7 @@ class VariantProduct extends Concrete
         $publishedStatus = $variant['published'] ?? false;
         $this->setParent($publishedStatus ?  $parent : $passiveFolder);
         $this->setLastUpdate(Carbon::now());
-4        try {
+        try {
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
