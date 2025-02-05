@@ -166,6 +166,7 @@ class StickerController extends FrontendController
         $sql = "
             SELECT 
                 osp.iwasku,
+                org.dest_id,
                 osp.name,
                 osp.productCode,
                 osp.productCategory,
