@@ -454,7 +454,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                             'salePrice' => $listing['price'] ?? '',
                             'saleCurrency' => $this->marketplace->getCurrency(),
                             'attributes' => $listing['title'] ?? '',
-                            'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                            'title' => "GRAPHQL" . ($mainListing['title'] ?? '').($listing['title'] ?? ''),
                             'quantity' => $listing['inventory_quantity'] ?? 0,
                             'uniqueMarketplaceId' => basename($listing['id'] ?? ''),
                             'apiResponseJson' => json_encode($listing),
