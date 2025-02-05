@@ -189,7 +189,7 @@ class VariantProduct extends Concrete
         else {
             echo "Is NOT exist parentResponseJson\n";
         }
-        return $result;
+        return $this;
     }
 
     /**
