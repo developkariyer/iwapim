@@ -468,7 +468,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         marketplace: $this->marketplace,
                         parent: $parent
                     );
-                    print_r(json_encode($variantObject));
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";

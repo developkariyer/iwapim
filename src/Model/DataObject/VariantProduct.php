@@ -76,7 +76,7 @@ class VariantProduct extends Concrete
                 }
                 $object = new \Pimcore\Model\DataObject\VariantProduct();
             }
-            $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
+            $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
             //print_r(json_encode($result));
             /*if ($result && empty($object->getMainProduct())) {
                 echo "Result and main empty \n";
@@ -151,7 +151,7 @@ class VariantProduct extends Concrete
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
-        //$this->setEan($variant['ean'] ?? '');
+        $this->setEan('');
         $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
