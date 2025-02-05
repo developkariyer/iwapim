@@ -143,7 +143,7 @@ class VariantProduct extends Concrete
         while (VariantProduct::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
             $key = $key ? $key+1 : 1;
         }
-        /*$this->setKey(trim("$key_base$key"));
+        $this->setKey(trim("$key_base$key"));
         if (!empty($variant['imageUrl'])) {
             $this->setImageUrl($variant['imageUrl']);
         }
@@ -161,8 +161,8 @@ class VariantProduct extends Concrete
         $passiveFolder = Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri")));
         $publishedStatus = $variant['published'] ?? false;
         $this->setParent($publishedStatus ?  $parent : $passiveFolder);
-        $this->setLastUpdate(Carbon::now());*/
-        /*try {
+        $this->setLastUpdate(Carbon::now());
+        try {
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
@@ -173,7 +173,7 @@ class VariantProduct extends Concrete
             echo "Trace:\n" . $e->getTraceAsString() . "\n";
             echo "=================================================\n";
             return false;
-        }*/
+        }
         echo "{$this->getId()} ";
         if (isset($variant['apiResponseJson'])) {
             echo "Is exist apiResponseJson\n";

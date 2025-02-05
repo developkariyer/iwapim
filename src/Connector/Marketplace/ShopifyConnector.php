@@ -447,7 +447,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 echo $this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '');
-                 /*try{
+                 try{
                     VariantProduct::addUpdateVariant(
                         variant: [
                             'imageUrl' => $this->getImage($listing, $mainListing),
@@ -474,7 +474,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
-                }*/
+                }
             }
             echo "OK\n";
             $index++;
