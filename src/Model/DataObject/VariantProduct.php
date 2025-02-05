@@ -143,7 +143,22 @@ class VariantProduct extends Concrete
         while (VariantProduct::findOneByField('key', "$key_base$key", $this, unpublished: true)) {
             $key = $key ? $key+1 : 1;
         }
-        $this->setKey(trim("$key_base$key"));
+        echo "updating variant\n";
+        echo "Key: " . $key_base . $key ."\n";
+        echo "Image url: " . $variant['imageUrl'] ."\n";
+        echo "Url: " . $variant['urlLink'] ."\n";
+        echo "SalePrice: " . $variant['salePrice'] ."\n";
+        echo "SaleCurrency: " . $variant['saleCurrency'] ."\n";
+        echo "Title: " . $variant['title'] ."\n";
+        echo "Attributes: " . $variant['attributes'] ."\n";
+        echo "Quantity: " . $variant['quantity'] ."\n";
+        echo "UniqueMarketplaceId: " . $variant['uniqueMarketplaceId'] ."\n";
+        echo "Marketplace: " . $marketplace->getKey() ."\n";
+        echo "Marketplace type: " . $marketplace->getMarketplaceType() ."\n";
+        echo "Published: " . $variant['published'] ."\n";
+
+
+        /*$this->setKey(trim("$key_base$key"));
         if (!empty($variant['imageUrl'])) {
             $this->setImageUrl($variant['imageUrl']);
         }
@@ -161,7 +176,7 @@ class VariantProduct extends Concrete
         $passiveFolder = Utility::checkSetPath("_Pasif", Utility::checkSetPath($marketplace->getKey(), Utility::checkSetPath("Pazaryerleri")));
         $publishedStatus = $variant['published'] ?? false;
         $this->setParent($publishedStatus ?  $parent : $passiveFolder);
-        $this->setLastUpdate(Carbon::now());
+        $this->setLastUpdate(Carbon::now());*/
         /*try {
             $result = $this->save();
         } catch (Throwable $e) {
