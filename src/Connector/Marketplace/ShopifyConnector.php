@@ -447,7 +447,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
                  try{
-                    VariantProduct::addUpdateVariant(
+                    $variantObject = VariantProduct::addUpdateVariant(
                         variant: [
                             'imageUrl' => $this->getImage($listing, $mainListing),
                             'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
@@ -468,6 +468,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                         marketplace: $this->marketplace,
                         parent: $parent
                     );
+                    print_r(json_encode($variantObject));
                     echo "v";
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
