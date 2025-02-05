@@ -220,7 +220,6 @@ class StickerController extends FrontendController
             }
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
             $product['sticker_link'] = $sticker ? $sticker->getFullPath() : '';
-
         }
         unset($product);
         if ($products) {
@@ -259,6 +258,9 @@ class StickerController extends FrontendController
         if ($product instanceof Product) {
             if (!$product->getInheritedField('sticker4x6eu')) {
                 $product->checkSticker4x6eu();
+            }
+            if (!$product->getInheritedField('sticker4x6iwasku')) {
+                $product->checkSticker4x6iwasku();
             }
             $existingProducts = $group->getProducts();
             if (!in_array($product, $existingProducts, true)) {
