@@ -226,6 +226,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         do {
+            echo "do while \n";
             $query['variables']['cursor'] = $productCursor;
             $headersToApi = [
                 'json' => $query,
