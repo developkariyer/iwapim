@@ -10,7 +10,7 @@ use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\EtsyConnector;
 use App\Connector\Marketplace\HepsiburadaConnector;
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
-use App\Connector\Marketplace\ShopifyConnector2;
+use App\Connector\Marketplace\ShopifyConnector;
 use App\Connector\Marketplace\TakealotConnector;
 use App\Connector\Marketplace\TrendyolConnector;
 use App\Connector\Marketplace\WallmartConnector;
