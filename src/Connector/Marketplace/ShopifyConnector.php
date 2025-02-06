@@ -217,11 +217,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadListing2.graphql'),
             'variables' => [
-                'numProducts' => 50,
+                'numProducts' => 5,
                 'productCursor' => null,
-                'numVariants' => 50,
+                'numVariants' => 5,
                 'variantCursor' => null,
-                'numMedias' => 50,
+                'numMedias' => 5,
                 'mediaCursor' => null
             ]
         ];
