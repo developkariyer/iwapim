@@ -226,7 +226,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ]
         ];
         do {
-            echo "do while \n";
             $query['variables']['cursor'] = $productCursor;
             $headersToApi = [
                 'json' => $query,
@@ -235,13 +234,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ]
             ];
-            try {
-                $response = $this->httpClient->request('POST', $this->graphqlUrl . '/graphql.json', $headersToApi);
-                print_r($response->getContent());
-            } catch (ClientExceptionInterface $e) {
-                echo $e->getMessage();
-                break;
-            }
+            $response = $this->httpClient->request('POST', $this->graphqlUrl . '/graphql.json', $headersToApi);
+            print_r($response->getContent());
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo $statusCode . "\n";
