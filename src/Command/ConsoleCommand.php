@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Connector\Marketplace\ShopifyConnector3;
+use App\Connector\Marketplace\ShopifyConnector;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,13 +35,13 @@ class ConsoleCommand extends AbstractCommand
     {   // $this->setShopifySku();
 
         $shopifyConnectors = [
-            23978 => new ShopifyConnector3(Marketplace::getById(23978)),
-            84124 => new ShopifyConnector3(Marketplace::getById(84124)),
-            108415 => new ShopifyConnector3(Marketplace::getById(108415)),
-            108416 => new ShopifyConnector3(Marketplace::getById(108416)),
-            108417 => new ShopifyConnector3(Marketplace::getById(108417)),
-            108418 => new ShopifyConnector3(Marketplace::getById(108418)),
-            108419 => new ShopifyConnector3(Marketplace::getById(108419)),
+            23978 => new ShopifyConnector(Marketplace::getById(23978)),
+            84124 => new ShopifyConnector(Marketplace::getById(84124)),
+            108415 => new ShopifyConnector(Marketplace::getById(108415)),
+            108416 => new ShopifyConnector(Marketplace::getById(108416)),
+            108417 => new ShopifyConnector(Marketplace::getById(108417)),
+            108418 => new ShopifyConnector(Marketplace::getById(108418)),
+            108419 => new ShopifyConnector(Marketplace::getById(108419)),
         ];
 
         $variantObject = new VariantProduct\Listing();
