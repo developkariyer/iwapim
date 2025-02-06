@@ -77,9 +77,7 @@ class VariantProduct extends Concrete
                 $object = new \Pimcore\Model\DataObject\VariantProduct();
             }
             $result = $object->updateVariant($variant, $updateFlag, $marketplace, $parent);
-            echo "added variant\n";
             if ($result && empty($object->getMainProduct())) {
-                echo "Result and main empty \n";
                 if (!empty($variant['sku'])) {
                     $variant['sku'] = substr($variant['sku'], 0, 12);
                     if (!empty($variant['sku'])) {
@@ -151,7 +149,7 @@ class VariantProduct extends Concrete
         $this->setSaleCurrency($variant['saleCurrency'] ?? '');
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
-        //$this->setEan($variant['ean']  '');
+        $this->setEan($variant['ean'] ?? '');
         $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
@@ -165,25 +163,16 @@ class VariantProduct extends Concrete
             $result = $this->save();
         } catch (Throwable $e) {
             echo "Error: {$e->getMessage()}\n";
-            print_r("EERRRROOOORRRR HEEEERRRRREEEEEE");
             return false;
         }
         echo "{$this->getId()} ";
         if (isset($variant['apiResponseJson'])) {
-            echo "Is exist apiResponseJson\n";
             $this->jsonWrite('apiResponseJson', $variant['apiResponseJson']);
         }
-        else {
-            echo "Is NOT exist apiResponseJson\n";
-        }
         if (isset($variant['parentResponseJson'])) {
-            echo "Is exist parentResponseJson\n";
             $this->jsonWrite('parentResponseJson', $variant['parentResponseJson']);
         }
-        else {
-            echo "Is NOT exist parentResponseJson\n";
-        }
-        return $this;
+        return $result;
     }
 
     /**
