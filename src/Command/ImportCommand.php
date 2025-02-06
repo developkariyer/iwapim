@@ -10,7 +10,7 @@ use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\EtsyConnector;
 use App\Connector\Marketplace\HepsiburadaConnector;
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
-use App\Connector\Marketplace\ShopifyConnector;
+use App\Connector\Marketplace\ShopifyConnector3;
 use App\Connector\Marketplace\TakealotConnector;
 use App\Connector\Marketplace\TrendyolConnector;
 use App\Connector\Marketplace\WallmartConnector;
@@ -202,7 +202,7 @@ class ImportCommand extends AbstractCommand
                 $connector = match ($marketplaceType) {
                     'Amazon' => new AmazonConnector($marketplace),
                     'Etsy' => new EtsyConnector($marketplace),
-                    'Shopify' => new ShopifyConnector($marketplace),
+                    'Shopify' => new ShopifyConnector3($marketplace),
                     'Trendyol' => new TrendyolConnector($marketplace),
                     'Bol.com' => new BolConnector($marketplace),
                     'Ebay' => new EbayConnector($marketplace),

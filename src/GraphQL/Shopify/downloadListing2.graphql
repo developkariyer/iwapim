@@ -1,0 +1,96 @@
+query GetProducts($numProducts: Int!, $productCursor: String, $numVariants: Int!, $variantCursor: String, $numMedias: Int!, $mediaCursor: String) {
+    products(first: $numProducts, after: $productCursor) {
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        nodes {
+            id
+            title
+            descriptionHtml
+            vendor
+            productType
+            createdAt
+            handle
+            updatedAt
+            publishedAt
+            templateSuffix
+            tags
+            status
+            seo {
+                title
+                description
+            }
+            variants(first: $numVariants, after: $variantCursor) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+                nodes {
+                    id
+                    title
+                    price
+                    position
+                    inventoryPolicy
+                    compareAtPrice
+                    selectedOptions {
+                        name
+                        value
+                    }
+                    createdAt
+                    updatedAt
+                    taxable
+                    barcode
+                    sku
+                    inventoryItem {
+                        id
+                    }
+                    inventoryQuantity
+                    image {
+                        id
+                        altText
+                        width
+                        height
+                        src
+                    }
+                }
+            }
+            variantsCount {
+                count
+                precision
+            }
+            options(first:2) {
+                id
+                name
+                position
+                values
+            }
+            media (first: $numMedias, after: $mediaCursor) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+                nodes {
+                    id
+                    alt
+                    mediaContentType
+                    status
+                    preview {
+                        image {
+                            id
+                            altText
+                            width
+                            height
+                            url
+                        }
+                    }
+                }
+            }
+            mediaCount {
+                count
+                precision
+            }
+
+        }
+    }
+}
