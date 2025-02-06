@@ -256,7 +256,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             while ($variantHasNextPage) {
                 $query['variables']['variantCursor'] = $variantCursor;
                 $headersToApi['json'] = $query;
+                print_r($headersToApi['json']);
                 $response = $this->httpClient->request('POST', $this->apiUrl . '/graphql.json', $headersToApi);
+                print_r($response->getContent());
                 $statusCode = $response->getStatusCode();
                 if ($statusCode !== 200) {
                     echo $statusCode . "\n";
@@ -272,7 +274,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $variantHasNextPage = $variantsPageInfo['hasNextPage'] ?? null;
                 $variantCursor = $variantsPageInfo['cursor'] ?? null;
             };
-            print_r(json_encode($newData));
+            //print_r(json_encode($newData));
             break;
         } while ($productHasNextPage);
 
