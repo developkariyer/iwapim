@@ -234,11 +234,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ]
             ];
-            echo "Response start\n";
-            $response = $this->httpClient->request('POST', $this->graphqlUrl . '/graphql.json', $headersToApi);
-            echo "Response end\n";
-
-            print_r($response->getContent());
+            $response = $this->httpClient->request('POST', $this->apiUrl . '/graphql.json', $headersToApi);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo $statusCode . "\n";
