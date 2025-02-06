@@ -33,6 +33,28 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    public function customGoogleProductsMetaFieldSet()
+    {
+
+        /*$result = $this->getFromShopifyApi(
+            'PUT',
+            "products/5542194544802/metafields/18882579955898.json",
+            [],
+            null,
+            [
+                'metafield' => [
+                    'id'    => 18882579955898,
+                    'value' => false,
+                    'type'  => 'boolean'
+                ]
+            ]
+        );
+        print_r($result);*/
+
+        $metafields = $this->getFromShopifyApi('GET', "products/5542194544802/metafields.json");
+        print_r(json_encode($metafields));
+    }
+
     /**
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
@@ -90,7 +112,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-       if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->customGoogleProductsMetaFieldSet();
+       /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -99,7 +122,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();
+       $this->putListingsToCache();*/
     }
 
     /**
