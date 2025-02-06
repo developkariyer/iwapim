@@ -241,24 +241,38 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 break;
             }
             $newData = json_decode($response->getContent(), true);
-            print_r(json_encode($newData));
+            $productPageInfo = $newData['data']['products']['pageInfo'];
+            $productHasNextPage = $productPageInfo['hasNextPage'] ?? null;
+            $productCursor = $productPageInfo['cursor'] ?? null;
+            $variantsPageInfo = $newData ['data']['products']['nodes']['variants']['pageInfo'];
+            $variantHasNextPage = $variantsPageInfo['hasNextPage'] ?? null;
+            $variantCursor = $variantsPageInfo['cursor'] ?? null;
+            $mediasPageInfo = $newData ['data']['products']['nodes']['media']['pageInfo'];
+            $mediaHasNextPage = $mediasPageInfo['hasNextPage'] ?? null;
+            $mediaCursor = $mediasPageInfo['cursor'] ?? null;
             $itemsCount = count($newData['data']['products']['nodes'] ?? []);
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
-
-            /*$variantCursor = null;
             while ($variantHasNextPage) {
                 $query['variables']['variantCursor'] = $variantCursor;
                 $headersToApi['json'] = $query;
-                try {
-                    $response = $this->httpClient->request('POST', $this->graphqlUrl . '/graphql.json', $headersToApi);
-                } catch (ClientExceptionInterface $e) {
-                    echo $e->getMessage();
+                $response = $this->httpClient->request('POST', $this->apiUrl . '/graphql.json', $headersToApi);
+                $statusCode = $response->getStatusCode();
+                if ($statusCode !== 200) {
+                    echo $statusCode . "\n";
+                    break;
                 }
-                $newVari
-
-            };*/
-            $productHasNextPage = null;
+                $data = json_decode($response->getContent(), true);
+                $newVariantData = $data['data']['products']['nodes']['variants']['nodes'];
+                $newData['data']['products']['nodes']['variants']['nodes'] = array_merge(
+                    $newData['data']['products']['nodes']['variants']['nodes'] ?? [],
+                    $newVariantData
+                );
+                $variantsPageInfo = $data['data']['products']['nodes']['variants']['pageInfo'];
+                $variantHasNextPage = $variantsPageInfo['hasNextPage'] ?? null;
+                $variantCursor = $variantsPageInfo['cursor'] ?? null;
+            };
+            print_r(json_encode($newData));
             break;
         } while ($productHasNextPage);
 
