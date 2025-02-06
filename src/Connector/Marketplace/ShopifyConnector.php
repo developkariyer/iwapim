@@ -236,6 +236,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             ];
             try {
                 $response = $this->httpClient->request('POST', $this->graphqlUrl . '/graphql.json', $headersToApi);
+                print_r($response->getContent());
             } catch (ClientExceptionInterface $e) {
                 echo $e->getMessage();
                 break;
