@@ -251,6 +251,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $mediaHasNextPage = $mediasPageInfo['hasNextPage'] ?? null;
             $mediaCursor = $mediasPageInfo['cursor'] ?? null;
             $itemsCount = count($newData['data']['products']['nodes'] ?? []);
+            echo "Product Has Next Page: " . ($productHasNextPage ? 'true' : 'false') . PHP_EOL;
+            echo "Product Cursor: " . ($productCursor ?? 'null') . PHP_EOL;
+            echo "Variant Has Next Page: " . ($variantHasNextPage ? 'true' : 'false') . PHP_EOL;
+            echo "Variant Cursor: " . ($variantCursor ?? 'null') . PHP_EOL;
+            echo "Media Has Next Page: " . ($mediaHasNextPage ? 'true' : 'false') . PHP_EOL;
+            echo "Media Cursor: " . ($mediaCursor ?? 'null') . PHP_EOL;
+            echo "Items Count: " . $itemsCount . PHP_EOL;
+
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
             while ($variantHasNextPage) {
