@@ -71,9 +71,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
-            echo "Actual query cost: " . $newData['extensions']['cost']['actualQueryCost'];
-            echo "currentlyAvailable  cost: " . $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
-            echo "restoreRate : " . $newData['extensions']['cost']['throttleStatus']['restoreRate'];
+            echo "Actual query cost: " . $newData['extensions']['cost']['actualQueryCost'] . "-";
+            echo "currentlyAvailable  cost: " . $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'] . "-";
+            echo "restoreRate : " . $newData['extensions']['cost']['throttleStatus']['restoreRate'] . "-";
             // Nested Pagination
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
@@ -202,9 +202,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $totalNestedItems += count($items);
             print_r("Total $fieldKey/$nodeKey Count: $totalNestedItems\n");
             echo "NESTED\n";
-            echo "Actual query cost: " . $newData['extensions']['cost']['actualQueryCost'];
-            echo "currentlyAvailable  cost: " . $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
-            echo "restoreRate : " . $newData['extensions']['cost']['throttleStatus']['restoreRate'];
+            echo "Actual query cost: " . $newData['extensions']['cost']['actualQueryCost'] . "-";
+            echo "currentlyAvailable  cost: " . $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'] . "-";
+            echo "restoreRate : " . $newData['extensions']['cost']['throttleStatus']['restoreRate'] . "-";
 
         } while ($hasNextPage);
         return $collectedItems;
