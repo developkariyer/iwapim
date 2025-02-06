@@ -112,8 +112,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $this->customGoogleProductsMetaFieldSet();
-       /*if (!$forceDownload && $this->getListingsFromCache()) {
+        //$this->customGoogleProductsMetaFieldSet();
+       if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -122,7 +122,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();*/
+       $this->putListingsToCache();
     }
 
     /**
