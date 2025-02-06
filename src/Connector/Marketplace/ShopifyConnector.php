@@ -210,7 +210,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        echo "Getting from Shopify GraphQL\n";
+        /*echo "Getting from Shopify GraphQL\n";
         $allData = [];
         $productCursor = null;
         $totalCount = 0;
@@ -250,7 +250,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             print_r(json_encode($newData));
             $itemsCount = count($newData['data']['products']['nodes'] ?? []);
             $totalCount += $itemsCount;
-            echo "Count: $totalCount\n";
+            echo "Count: $totalCount\n";*/
 
             /*$variantCursor = null;
             while ($variantHasNextPage) {
@@ -263,14 +263,14 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 }
                 $newVari
 
-            };*/
+            };
             $productHasNextPage = null;
             break;
-        } while ($productHasNextPage);
+        } while ($productHasNextPage);*/
 
 
 
-        /*echo "GraphQL download\n";
+        echo "GraphQL download\n";
         if ($this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -287,7 +287,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     /**
