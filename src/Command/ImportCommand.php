@@ -202,7 +202,7 @@ class ImportCommand extends AbstractCommand
                 $connector = match ($marketplaceType) {
                     'Amazon' => new AmazonConnector($marketplace),
                     'Etsy' => new EtsyConnector($marketplace),
-                    'Shopify' => new ShopifyConnector3($marketplace),
+                    'Shopify' => new ShopifyConnector($marketplace),
                     'Trendyol' => new TrendyolConnector($marketplace),
                     'Bol.com' => new BolConnector($marketplace),
                     'Ebay' => new EbayConnector($marketplace),
