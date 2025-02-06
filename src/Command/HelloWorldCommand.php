@@ -21,15 +21,16 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
+    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
     /**
-     * @throws Exception
-     * @throws DuplicateFullPathException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $product = Product::getByIwasku("IMS00303XKBH", 1);
-        print_r($product->getId());
 
+        // Output "Hello, World!" as green text
+        // $this->writeInfo("Hello, World!", $output);
+
+        // Return success status code
         return Command::SUCCESS;
     }
 }
