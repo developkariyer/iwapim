@@ -71,6 +71,9 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
+            echo "Actual query cost: " . $newData['extensions']['cost']['actualQueryCost'];
+            echo "currentlyAvailable  cost: " . $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
+            echo "restoreRate : " . $newData['extensions']['cost']['throttleStatus']['restoreRate'];
             // Nested Pagination
             if ($key) {
                 $newData['data'][$key]['nodes'] = $this->processShopifyDataByKey($key, $newData['data'][$key]['nodes'] ?? []);
@@ -198,6 +201,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             $hasNextPage = $pageInfo['hasNextPage'] ?? null;
             $totalNestedItems += count($items);
             print_r("Total $fieldKey/$nodeKey Count: $totalNestedItems\n");
+            echo "NESTED\n";
+            echo "Actual query cost: " . $newData['extensions']['cost']['actualQueryCost'];
+            echo "currentlyAvailable  cost: " . $newData['extensions']['cost']['throttleStatus']['currentlyAvailable'];
+            echo "restoreRate : " . $newData['extensions']['cost']['throttleStatus']['restoreRate'];
+
         } while ($hasNextPage);
         return $collectedItems;
     }
@@ -210,85 +218,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        echo "Getting from Shopify GraphQL\n";
-        $allData = [];
-        $productCursor = null;
-        $totalCount = 0;
-        $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadListing2.graphql'),
-            'variables' => [
-                'numProducts' => 5,
-                'productCursor' => null,
-                'numVariants' => 5,
-                'variantCursor' => null,
-                'numMedias' => 5,
-                'mediaCursor' => null
-            ]
-        ];
-        do {
-            $query['variables']['cursor'] = $productCursor;
-            $headersToApi = [
-                'json' => $query,
-                'headers' => [
-                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                    'Content-Type' => 'application/json'
-                ]
-            ];
-            $response = $this->httpClient->request('POST', $this->apiUrl . '/graphql.json', $headersToApi);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo $statusCode . "\n";
-                break;
-            }
-            $newData = json_decode($response->getContent(), true);
-            $productPageInfo = $newData['data']['products']['pageInfo'];
-            $productHasNextPage = $productPageInfo['hasNextPage'] ?? null;
-            $productCursor = $productPageInfo['cursor'] ?? null;
-            $variantsPageInfo = $newData ['data']['products']['nodes']['variants']['pageInfo'];
-            $variantHasNextPage = $variantsPageInfo['hasNextPage'] ?? null;
-            $variantCursor = $variantsPageInfo['cursor'] ?? null;
-            $mediasPageInfo = $newData ['data']['products']['nodes']['media']['pageInfo'];
-            $mediaHasNextPage = $mediasPageInfo['hasNextPage'] ?? null;
-            $mediaCursor = $mediasPageInfo['cursor'] ?? null;
-            $itemsCount = count($newData['data']['products']['nodes'] ?? []);
-            echo "Product Has Next Page: " . ($productHasNextPage ? 'true' : 'false') . PHP_EOL;
-            echo "Product Cursor: " . ($productCursor ?? 'null') . PHP_EOL;
-            echo "Variant Has Next Page: " . ($variantHasNextPage ? 'true' : 'false') . PHP_EOL;
-            echo "Variant Cursor: " . ($variantCursor ?? 'null') . PHP_EOL;
-            echo "Media Has Next Page: " . ($mediaHasNextPage ? 'true' : 'false') . PHP_EOL;
-            echo "Media Cursor: " . ($mediaCursor ?? 'null') . PHP_EOL;
-            echo "Items Count: " . $itemsCount . PHP_EOL;
-
-            $totalCount += $itemsCount;
-            echo "Count: $totalCount\n";
-            while ($variantHasNextPage) {
-                $query['variables']['variantCursor'] = $variantCursor;
-                $headersToApi['json'] = $query;
-                print_r($headersToApi['json']);
-                $response = $this->httpClient->request('POST', $this->apiUrl . '/graphql.json', $headersToApi);
-                print_r($response->getContent());
-                $statusCode = $response->getStatusCode();
-                if ($statusCode !== 200) {
-                    echo $statusCode . "\n";
-                    break;
-                }
-                $data = json_decode($response->getContent(), true);
-                $newVariantData = $data['data']['products']['nodes']['variants']['nodes'];
-                $newData['data']['products']['nodes']['variants']['nodes'] = array_merge(
-                    $newData['data']['products']['nodes']['variants']['nodes'] ?? [],
-                    $newVariantData
-                );
-                $variantsPageInfo = $data['data']['products']['nodes']['variants']['pageInfo'];
-                $variantHasNextPage = $variantsPageInfo['hasNextPage'] ?? null;
-                $variantCursor = $variantsPageInfo['cursor'] ?? null;
-            };
-            //print_r(json_encode($newData));
-            break;
-        } while ($productHasNextPage);
-
-
-
-        /*echo "GraphQL download\n";
+        echo "GraphQL download\n";
         if ($this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -305,7 +235,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     /**
@@ -528,7 +458,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                  try{
                     VariantProduct::addUpdateVariant(
                         variant: [
-                            'imageUrl' => $this->getImage($listing, $mainListing),
+                            'imageUrl' => $this->getImage($listing, $mainListing) ?? '',
                             'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
                             'salePrice' =>   $listing['price'] ?? '',
                             'saleCurrency' =>   $this->marketplace->getCurrency(),
@@ -564,11 +494,17 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $lastImage = null;
         $images = $mainListing['media']['nodes'] ?? [];
         foreach ($images as $img) {
-            if (!is_numeric(basename($listing['image']['id'])) || basename($img['id']) === basename($listing['image']['id'])) {
-                return Utility::getCachedImage($img['preview']['image']['url']);
+            $imageId = $listing['image']['id'] ?? null;
+            $imgId = $img['id'] ?? null;
+            if ($imageId === null || $imgId === null) {
+                continue;
             }
+            if ( basename($imgId) === basename($imageId)) {
+                return Utility::getCachedImage($img['preview']['image']['url'] ?? '');
+            }
+
             if (empty($lastImage)) {
-                $lastImage = Utility::getCachedImage($img['preview']['image']['url']);
+                $lastImage = Utility::getCachedImage($img['preview']['image']['url'] ?? '');
             }
         }
         return $lastImage;
