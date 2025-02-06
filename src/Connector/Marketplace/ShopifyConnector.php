@@ -33,6 +33,59 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    public function customGoogleProductsField()
+    {
+        if ($this->marketplace->getKey() == "ShopifyIslamicEn") {
+            $listingsJson = file_get_contents(PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/ShopifyIslamicEn/LISTINGS.json');
+            $listings = json_decode($listingsJson, true);
+            foreach ($listings as $listing) {
+                $url = "products/". $listing['id'] ."/metafields.json";
+                $metafields = $this->getFromShopifyApi('GET', $url);
+                foreach ($metafields['metafields'] as $metafield) {
+                    if ($metafield['namespace'] === 'mm-google-shopping' and $metafield['key'] === 'custom_product' and $metafield['value'] === true) {
+                        echo $listing['id'] . ' - ' . $listing['title'] . "\n";
+                        $metafieldId = $metafield['id'];
+                        $putUrl = "products/". $listing['id'] ."/metafields/". $metafieldId . ".json";
+                        $result = $this->getFromShopifyApi(
+                            'PUT',
+                            $putUrl,
+                            [],
+                            null,
+                            [
+                                'metafield' => [
+                                    'id'    => $metafieldId,
+                                    'value' => false,
+                                    'type'  => 'boolean'
+                                ]
+                            ]
+                        );
+                        $resultUrl = PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/ShopifyIslamicEn/GoogleCustomProducts/' . $listing['id'] . '.json';
+                        file_put_contents($resultUrl, json_encode($result, JSON_PRETTY_PRINT));
+                    }
+                }
+            }
+        }
+        else {
+            echo  "PASSED\n";
+        }
+        /*$result = $this->getFromShopifyApi(
+            'PUT',
+            "products/5542194544802/metafields/18882579955898.json",
+            [],
+            null,
+            [
+                'metafield' => [
+                    'id'    => 18882579955898,
+                    'value' => false,
+                    'type'  => 'boolean'
+                ]
+            ]
+        );
+        print_r($result);*/
+        //$metafields = $this->getFromShopifyApi('GET', "products/6816648429754/metafields.json");
+        // print_r(json_encode($metafields));
+    }
+
     /**
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
@@ -90,7 +143,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-       if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->customGoogleProductsField();
+       /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
        }
@@ -99,7 +153,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
        }
-       $this->putListingsToCache();
+       $this->putListingsToCache();*/
     }
 
     /**
