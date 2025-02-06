@@ -264,7 +264,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 $newVari
 
             };*/
-
+            $productHasNextPage = null;
             break;
         } while ($productHasNextPage);
 
