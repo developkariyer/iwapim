@@ -64,7 +64,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                         sleep($restoreRate);
                         continue;
                     }
-                    echo "Failed to $method {$this->apiUrl}/graphql.json - " . $response->getContent() . PHP_EOL;
                     break;
                 } catch (\Exception $e) {
                     echo "Request Error: " . $e->getMessage() . PHP_EOL;
