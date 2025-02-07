@@ -90,8 +90,10 @@ class PdfGenerator
     public static function generate4x6iwasku(Product $product, $qrfile): Asset\Document
     {
         if (empty($product->getEanGtin())) {
+            error_log("EAN not found for product {$product->getIwasku()}, generating without EAN.");
             return self::generate4x6iwaskuWithoutEan($product, $qrfile);
         }
+        error_log("EAN found for product {$product->getIwasku()}, generating with EAN.");
         return self::generate4x6iwaskuWithEan($product, $qrfile);
     }
 
@@ -180,7 +182,7 @@ class PdfGenerator
         $asset->setData(file_get_contents($pdfFilePath));
         $asset->setParent(Utility::checkSetAssetPath('IWASKU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
         $asset->save();
-        unlink($pdfFilePath); // Clean up the temporary PDF file
+        //unlink($pdfFilePath); // Clean up the temporary PDF file
         return $asset;
     }
 
