@@ -90,6 +90,29 @@ class GoogleSheetsController extends FrontendController
                                         warehouse = 'NJ'
                                         AND iwasku NOT IN ('', 'NULL')";
 
+    static string $amazonSkuSql =  "SELECT 
+                                        CONCAT(ocv.id, '-', ocv.index) AS id,
+                                        ocv.title,
+                                        SUBSTRING_INDEX(
+                                            SUBSTRING_INDEX(ocv.urlLink, '\"', 14), 
+                                            '\"', -1 
+                                        ) AS url,
+                                        ocv.salePrice,
+                                        ocv.saleCurrency,
+                                        ocv.marketplaceId AS country,
+                                        ocv.sku,
+                                        ocv.listingId AS amazonId,
+                                        ocv.fulfillmentChannel,
+                                        ocv.status,
+                                        ocv.lastUpdate AS pimUpdate,
+                                        ocv.ean AS amazonEan,
+                                        oqv.oo_id AS listingId,
+                                        oqv.uniqueMarketplaceId AS asin
+                                    FROM object_collection_AmazonMarketplace_varyantproduct AS ocv
+                                    JOIN object_query_varyantproduct AS oqv 
+                                        ON ocv.id = oqv.oo_id  
+                                    ORDER BY `url` DESC";
+
     /**
      * @Route("/sheets/main", name="sheets")
      * @throws Exception
@@ -225,28 +248,7 @@ WHERE ovp.published = 1;");
     public function amazonSkuAction(): JsonResponse
     {
         $db = Db::get();
-        $skuData = $db->fetchAllAssociative("SELECT 
-    CONCAT(ocv.id, '-', ocv.index) AS id,
-    ocv.title,
-    SUBSTRING_INDEX(
-        SUBSTRING_INDEX(ocv.urlLink, '\"', 14), 
-        '\"', -1 
-    ) AS url,
-    ocv.salePrice,
-    ocv.saleCurrency,
-    ocv.marketplaceId AS country,
-    ocv.sku,
-    ocv.listingId AS amazonId,
-    ocv.fulfillmentChannel,
-    ocv.status,
-    ocv.lastUpdate AS pimUpdate,
-    ocv.ean AS amazonEan,
-    oqv.oo_id AS listingId,
-    oqv.uniqueMarketplaceId AS asin
-FROM object_collection_AmazonMarketplace_varyantproduct AS ocv
-JOIN object_query_varyantproduct AS oqv 
-    ON ocv.id = oqv.oo_id  
-ORDER BY `url` DESC");
+        $skuData = $db->fetchAllAssociative(self::$amazonSkuSql);
         return $this->json($skuData);
     }
 }
