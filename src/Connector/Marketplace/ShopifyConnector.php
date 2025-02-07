@@ -66,6 +66,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
             $allData = array_merge($allData, $newData);
+            echo "All datacount: " . count($allData) . "\n";
+            echo "New datacount: " . count($newData) . "\n";
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
