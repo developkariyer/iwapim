@@ -218,11 +218,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                $this->getImage($listing, $mainListing);
-                break;
-            }
-            break;
-            /*foreach ($mainListing['variants']['nodes'] as $listing) {
                 echo $this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '');
                 try{
                     VariantProduct::addUpdateVariant(
@@ -252,7 +247,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
                 }
-            }*/
+            }
             echo "OK\n";
             $index++;
         }
@@ -260,7 +255,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
 
     protected function getImage($listing, $mainListing): ?ExternalImage
     {
-        $lastImage = null;
+        $lastImage = '';
         $images = $mainListing['media']['nodes'] ?? [];
         foreach ($images as $img) {
             $imageId = $listing['image']['id'] ?? null;
