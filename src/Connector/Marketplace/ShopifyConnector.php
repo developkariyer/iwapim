@@ -54,7 +54,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 try {
                     $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
                     $newData = json_decode($response->getContent(), true);
-                    $allData[$key] = array_merge($allData[$key] ?? [], $newData['data'][$key]['nodes'] ?? []);
                     if (isset($newData['extensions']['cost'])) {
                         echo "Cost Info: " . json_encode($newData['extensions']['cost']) . PHP_EOL;
                     }
@@ -64,6 +63,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                         sleep($restoreRate);
                         continue;
                     }
+                    $allData[$key] = array_merge($allData[$key] ?? [], $newData['data'][$key]['nodes'] ?? []);
                     break;
                 } catch (\Exception $e) {
                     echo "Request Error: " . $e->getMessage() . PHP_EOL;
