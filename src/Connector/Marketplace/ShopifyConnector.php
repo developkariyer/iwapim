@@ -40,6 +40,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $allData = [];
         $cursor = null;
         $totalCount = 0;
+        if (!isset($allData['products'])) {
+            $allData['products'] = [];
+        }
         do {
             $data['variables']['cursor'] = $cursor;
             $headersToApi = [
