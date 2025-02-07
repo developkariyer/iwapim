@@ -262,7 +262,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
     {
         echo "Main Listing: " . json_encode($mainListing) . "\n\n\n\n";
         echo "Listing: " . json_encode($listing) . "\n\n\n\n";
-        /*$lastImage = null;
+        $lastImage = null;
         $images = $mainListing['media']['nodes'] ?? [];
         foreach ($images as $img) {
             $imageId = $listing['image']['id'] ?? null;
@@ -278,7 +278,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 $lastImage = Utility::getCachedImage($img['preview']['image']['url'] ?? '');
             }
         }
-        return $lastImage;*/
+        return $lastImage;
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
