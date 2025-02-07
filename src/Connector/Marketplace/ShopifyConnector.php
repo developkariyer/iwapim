@@ -253,7 +253,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         }
     }
 
-    protected function getImage($listing, $mainListing): ?ExternalImage
+    protected function getImage($listing, $mainListing)
     {
         $lastImage = '';
         $images = $mainListing['media']['nodes'] ?? [];
