@@ -66,6 +66,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
+            foreach ($newData['data'][$key]['nodes'] ?? [] as $node) {
+                echo "Processing ". $node['title'] . "\n";
+            }
 
             echo "All datacount: " . count($allData['data'][$key]['nodes'] ?? []) . "\n";
             echo "New datacount: " . count($newData['data'][$key]['nodes'] ?? []) . "\n";
