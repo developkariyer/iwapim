@@ -156,13 +156,15 @@ class PdfGenerator
 
         // Set position for the IWASKU text
 
-        $pdf->Image($eanBarcode, 15, 2, 30, 10); // EAN barcode image
+        $pdf->Image($eanBarcode, 30, 2, 30, 10); // EAN barcode image
 
         // Set the font and position for the product details (variation size, color, and identifier)
         $pdf->SetFont('Arial', '', 11);
-        $pdf->SetXY(2, 12);
-        $pdf->Cell(56, 4, "{$product->getIwasku()} | {$product->getEanGtin()}", 0, 1, 'C'); // 'C' for center alignment, 1 for moving to the next line
+        $pdf->SetXY(2, 2);
+        $pdf->Cell(28, 4, $product->getIwasku(), 0, 1, 'L'); // 'C' for center alignment, 1 for moving to the next line
+        $pdf->Cell(28, 4, $product->getEanGtin(), 0, 1, 'L'); // 'C' for center alignment, 1 for moving to the next line
 
+        $pdf->setXY(2, 13); // Adjusted to place below the IWASKU text
         $pdf->SetFont('Arial', '', 9);
         $text = $product->getInheritedField("productIdentifier") . " ". $product->getInheritedField("nameEnglish") . "\n";
         $text .= "(". $product->getInheritedField("name") . ")\n";
