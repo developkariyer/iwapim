@@ -40,7 +40,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $allData = [];
         $cursor = null;
         $totalCount = 0;
-        $allData['products'] = [];
+        $allData[$key] = [];
         do {
             $data['variables']['cursor'] = $cursor;
             $headersToApi = [
@@ -54,9 +54,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 try {
                     $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
                     $newData = json_decode($response->getContent(), true);
-                    if (isset($newData['extensions']['cost'])) {
-                        echo "Cost Info: " . json_encode($newData['extensions']['cost']) . PHP_EOL;
-                    }
+                    echo "Cost Info: " . json_encode($newData['extensions']['cost']) . PHP_EOL;
                     if ($newData['extensions']['cost']['throttleStatus']['currentlyAvailable'] < $newData['extensions']['cost']['actualQueryCost'] ) {
                         $restoreRate =  $this->rateLimitCalculate($newData['extensions']) ?? 5;
                         echo "Rate limit exceeded, waiting for {$restoreRate} seconds..." . PHP_EOL;
@@ -67,7 +65,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                     break;
                 } catch (\Exception $e) {
                     echo "Request Error: " . $e->getMessage() . PHP_EOL;
-                    sleep(10);
+                    break;
                 }
             }
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
