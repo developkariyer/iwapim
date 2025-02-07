@@ -260,8 +260,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
 
     protected function getImage($listing, $mainListing): ?ExternalImage
     {
-        echo "Main Listing: " . json_encode($mainListing) . "\n\n\n\n";
-        echo "Listing: " . json_encode($listing) . "\n\n\n\n";
         $lastImage = null;
         $images = $mainListing['media']['nodes'] ?? [];
         foreach ($images as $img) {
