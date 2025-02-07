@@ -75,7 +75,7 @@ class Inventory
     {
         $inventoryApi = $this->connector->amazonSellerConnector->fbaInventoryV1();
         foreach ($this->connector->getMarketplace()->getFbaRegions() ?? [] as $country) {
-            $summary = $this->connector->getFromCache("INVENTORY_{$country}.json");
+            $summary = $this->connector->getFromCache("INVENTORY_{$country}.json", 3600);
             if ($summary) {
                 $this->inventory[$country] = $summary;
                 continue;
