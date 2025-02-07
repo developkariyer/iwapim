@@ -140,6 +140,17 @@ class GoogleSheetsController extends FrontendController
     }
 
     /**
+     * @Route("/sheets/amazonsku", name="sheets_amazonsku")
+     * @throws Exception
+     */
+    public function amazonSkuAction(): JsonResponse
+    {
+        $db = Db::get();
+        $skuData = $db->fetchAllAssociative(self::$amazonSkuSql);
+        return $this->json($skuData);
+    }
+
+    /**
      * @Route("/sheets/amazonsales/pre", name="sheets_amazonsales_pre")
      * @throws Exception
      */
@@ -241,14 +252,4 @@ WHERE ovp.published = 1;");
         return $this->json($eanData);
     }
 
-    /**
-     * @Route("/sheets/amazonsku}", name="sheets_amazonsku")
-     * @throws Exception
-     */
-    public function amazonSkuAction(): JsonResponse
-    {
-        $db = Db::get();
-        $skuData = $db->fetchAllAssociative(self::$amazonSkuSql);
-        return $this->json($skuData);
-    }
 }
