@@ -2,6 +2,8 @@
 
 namespace App\Connector\Marketplace;
 
+use App\Utils\Utility;
+use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -116,9 +118,37 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
     }
 
 
-    public function downloadOrders()
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function downloadOrders(): void
     {
-        // TODO: Implement downloadOrders() method.
+        $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+            'marketplace_id' => $this->marketplace->getId()
+        ]);
+        $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        echo  "Last updated at: $lastUpdatedAt\n";
+        $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
+            'variables' => [
+                'numOrders' => 50,
+                'cursor' => null,
+                'filter' => $filter
+            ]
+        ];
+        $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
+        foreach ($orders as $order) {
+            Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                'marketplace_id' => $this->marketplace->getId(),
+                'order_id' => $order['id'],
+                'json' => json_encode($order)
+            ]);
+        }
     }
 
     public function downloadInventory()
