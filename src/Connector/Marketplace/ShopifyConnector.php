@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\Data\ExternalImage;
+use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -272,13 +273,122 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         return $lastImage;
     }
 
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    public function setSku(VariantProduct $listing, string $sku): void // not tested
     {
-        // TODO: Implement setInventory() method.
+        if (empty($sku)) {
+            echo "SKU is empty for {$listing->getKey()}\n";
+            return;
+        }
+        $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
+        $jsonSku = $apiResponse['sku'] ?? null;
+        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
+        if (!empty($jsonSku) && $jsonSku === $sku) {
+            echo "SKU is already set for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setSku.graphql'),
+            'variables' => [
+                'sku' => $sku,
+            ]
+        ];
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItemUpdate');
+        if (empty($response)) {
+            echo "Failed to set SKU for {$listing->getKey()}\n";
+            return;
+        }
+        echo "SKU set\n";
+        $this->putToCache("SETSKU_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$query, 'response'=>$response]);
     }
 
-    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void // not tested
     {
-        // TODO: Implement setPrice() method.
+        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setInventory.graphql'),
+            'variables' => [
+                'name' => 'available',
+                'quantities' => [
+                    'inventoryItemId' => $inventoryItemId,
+                    'locationId' => $locationId,
+                    'quantity' => $targetValue
+                ],
+                'reason' => 'restock'
+            ]
+        ];
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'inventorySetQuantities');
+        echo "Inventory set\n";
+        $filename = "SETINVENTORY_{$inventoryItemId}.json";
+        $this->putToCache($filename, ['request'=>$query, 'response'=>$response]);
     }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void // not tested
+    {
+        $currencies = [
+            'CANADIAN DOLLAR' => 'CAD',
+            'TL' => 'TL',
+            'EURO' => 'EUR',
+            'US DOLLAR' => 'USD',
+            'SWEDISH KRONA' => 'SEK',
+            'POUND STERLING' => 'GBP'
+        ];
+        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
+        if (empty($variantId)) {
+            echo "Failed to get variant id for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($targetPrice)) {
+            echo "Price is empty for {$listing->getKey()}\n";
+            return;
+        }
+        if (empty($targetCurrency)) {
+            $marketplace = $listing->getMarketplace();
+            if ($marketplace instanceof Marketplace) {
+                $marketplaceCurrency = $marketplace->getCurrency();
+                if (empty($marketplaceCurrency)) {
+                    if (isset($currencies[$marketplaceCurrency])) {
+                        $marketplaceCurrency = $currencies[$marketplaceCurrency];
+                    }
+                }
+            }
+        }
+        if (empty($marketplaceCurrency)) {
+            echo "Marketplace currency could not be found for {$listing->getKey()}\n";
+            return;
+        }
+        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $marketplaceCurrency);
+        if (empty($finalPrice)) {
+            echo "Failed to convert currency for {$listing->getKey()}\n";
+            return;
+        }
+        $variants = [];
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setPrice.graphql'),
+            'variables' => [
+                'productId' => $variantId,
+                'variants' => $variants
+            ]
+
+        ];
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
+        echo "Price set\n";
+        $filename = "SETPRICE_{$variantId}.json";
+        $this->putToCache($filename, ['request'=>$query, 'response'=>$response]);
+    }
+
 }
