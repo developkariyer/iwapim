@@ -52,7 +52,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             while (true) {
                 $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
                 $newData = json_decode($response->getContent(), true);
-                $allData = array_merge($allData, $newData);
+                $allData['products'] = array_merge($allData['products'], $newData['data'][$key]['nodes'] ?? []);
                 if ($response->getStatusCode() === 200) {
                     break;
                 }
@@ -70,7 +70,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 echo "Processing ". $node['title'] . "\n";
             }
 
-            echo "All datacount: " . count($allData['data'][$key]['nodes'] ?? []) . "\n";
+            echo "All datacount: " . count($allData['products']) . "\n";
             echo "New datacount: " . count($newData['data'][$key]['nodes'] ?? []) . "\n";
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
