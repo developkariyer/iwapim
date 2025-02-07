@@ -193,7 +193,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             Utility::sanitizeVariable('Test11' . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
         );
-        $total = count($this->listings);
+        $total = count($this->listings['products']);
         $index = 0;
         foreach ($this->listings['products'] as $mainListing) {
             echo "($index/$total) Processing Listing {$mainListing['id']}:{$mainListing['title']} ...\n";
@@ -218,7 +218,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                echo $this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '');
                 try{
                     VariantProduct::addUpdateVariant(
                         variant: [
