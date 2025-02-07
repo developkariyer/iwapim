@@ -144,6 +144,7 @@ class PdfGenerator
      */
     public static function generate4x6iwaskuWithEan(Product $product, $qrfile): Asset\Document
     {
+        error_log("Generating 4x6 label with EAN for product {$product->getIwasku()} for ean {$product->getEanGtin()}");
         $ean = $product->getEanGtin();
         $eanBarcode = self::generateEanBarcode($ean);
 
