@@ -51,24 +51,39 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 ]
             ];
             while (true) {
-                $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-                $newData = json_decode($response->getContent(), true);
-                $allData[$key] = array_merge($allData['products'], $newData['data'][$key]['nodes'] ?? []);
-                print_r($newData['extensions']);
-                if ($response->getStatusCode() === 200) {
+                try {
+                    $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+                    $newData = json_decode($response->getContent(), true);
+                    $allData[$key] = array_merge($allData[$key] ?? [], $newData['data'][$key]['nodes'] ?? []);
+                    if (isset($newData['extensions']['cost'])) {
+                        echo "Cost Info: " . json_encode($newData['extensions']['cost']) . PHP_EOL;
+                    }
+                    if ($response->getStatusCode() === 200) {
+                        echo "Request Success! " . PHP_EOL;
+                        break;
+                    }
+                    if ($response->getStatusCode() === 429) {
+                        if (isset($newData['extensions']['cost']['throttleStatus'])) {
+                            $restoreRate =  $this->rateLimitCalculate($newData['extensions']) ?? 5;
+                            echo "Rate limit exceeded, waiting for {$restoreRate} seconds..." . PHP_EOL;
+                            sleep($restoreRate);
+                            continue;
+                        }
+                        echo "Rate limit exceeded, waiting for default 10 seconds..." . PHP_EOL;
+                        sleep(10);
+                        continue;
+                    }
+                    echo "Failed to $method {$this->apiUrl}/graphql.json - " . $response->getContent() . PHP_EOL;
                     break;
+                } catch (\Exception $e) {
+                    echo "Request Error: " . $e->getMessage() . PHP_EOL;
+                    sleep(10);
                 }
-                if ($response->getStatusCode() === 429) {
-                    $this->processRateLimit($newData['extensions']);
-                    continue;
-                }
-                echo "Failed to $method $this->apiUrl/graphql.json: {$response->getContent()} \n";
-                break;
             }
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
-            echo "All datacount: " . count($allData['products']) . "\n";
+            echo "All DataCount: " . count($allData['products']) . "\n";
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
@@ -76,15 +91,15 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         return $allData;
     }
 
-    public function processRateLimit($extensions): void
+    public function rateLimitCalculate($extensions): Int
     {
         $actualQueryCost = $extensions['cost']['actualQueryCost'];
         $currentlyAvailable = $extensions['cost']['throttleStatus']['currentlyAvailable'];
         $restoreRate = $extensions['cost']['throttleStatus']['restoreRate'];
         if ($actualQueryCost > $currentlyAvailable) {
-            $requiredTimeToWait = ceil(($actualQueryCost - $currentlyAvailable) / $restoreRate);
-            sleep($requiredTimeToWait);
+            return ceil(($actualQueryCost - $currentlyAvailable) / $restoreRate);
         }
+        return 0;
     }
 
     /**
