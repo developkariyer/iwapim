@@ -40,9 +40,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $allData = [];
         $cursor = null;
         $totalCount = 0;
-        if (!isset($allData['products'])) {
-            $allData['products'] = [];
-        }
+        $allData['products'] = [];
         do {
             $data['variables']['cursor'] = $cursor;
             $headersToApi = [
@@ -55,7 +53,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             while (true) {
                 $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
                 $newData = json_decode($response->getContent(), true);
-                $allData['products'] = array_merge($allData['products'], $newData['data'][$key]['nodes'] ?? []);
+                $allData[$key] = array_merge($allData['products'], $newData['data'][$key]['nodes'] ?? []);
+                print_r($newData['extensions']);
                 if ($response->getStatusCode() === 200) {
                     break;
                 }
@@ -69,12 +68,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
             $totalCount += $itemsCount;
             echo "Count: $totalCount\n";
-            foreach ($newData['data'][$key]['nodes'] ?? [] as $node) {
-                echo "Processing ". $node['title'] . "\n";
-            }
-
             echo "All datacount: " . count($allData['products']) . "\n";
-            echo "New datacount: " . count($newData['data'][$key]['nodes'] ?? []) . "\n";
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
@@ -107,7 +101,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadListing2.graphql'),
+            'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
             'variables' => [
                 'numProducts' => 50,
                 'cursor' => null

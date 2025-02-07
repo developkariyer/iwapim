@@ -1,0 +1,41 @@
+query GetProducts($numProducts: Int!, $cursor: String) {
+    products(first: $numProducts, after: $cursor) {
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        nodes {
+            id
+            title
+            descriptionHtml
+            vendor
+            productType
+            createdAt
+            handle
+            updatedAt
+            publishedAt
+            templateSuffix
+            tags
+            status
+            seo {
+                title
+                description
+            }
+            variantsCount {
+                count
+                precision
+            }
+            options(first:2) {
+                id
+                name
+                position
+                values
+            }
+            mediaCount {
+                count
+                precision
+            }
+
+        }
+    }
+}
