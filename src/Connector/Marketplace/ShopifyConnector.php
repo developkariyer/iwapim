@@ -142,12 +142,15 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
+        echo "Api finish\n";
         foreach ($orders as $order) {
+            print_r(json_encode($order));
             Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
                 'marketplace_id' => $this->marketplace->getId(),
                 'order_id' => $order['id'],
                 'json' => json_encode($order)
             ]);
+            break;
         }
     }
 
