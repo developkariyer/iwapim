@@ -76,7 +76,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            break;
         } while ($hasNextPage);
         return $allData;
     }
@@ -137,23 +136,19 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
             'variables' => [
-                'numOrders' => 2,
+                'numOrders' => 50,
                 'cursor' => null,
                 'filter' => $filter
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        echo "Api finish\n";
-        print_r(json_encode($orders));
-        /*foreach ($orders as $order) {
-            print_r(json_encode($order));
+        foreach ($orders['orders'] as $order) {
             Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
                 'marketplace_id' => $this->marketplace->getId(),
                 'order_id' => $order['id'],
                 'json' => json_encode($order)
             ]);
-            break;
-        }*/
+        }
     }
 
     public function downloadInventory()
