@@ -87,7 +87,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $currentlyAvailable = $extensions['cost']['throttleStatus']['currentlyAvailable'];
         $restoreRate = $extensions['cost']['throttleStatus']['restoreRate'];
         $waitTime = ceil(($actualQueryCost - $currentlyAvailable) / $restoreRate) + 1;
-        return max($waitTime, 5);
+        return max($waitTime, 10);
     }
 
     /**
