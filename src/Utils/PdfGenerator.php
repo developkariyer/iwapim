@@ -2,20 +2,26 @@
 
 namespace App\Utils;
 
-use chillerlan\QRCode\{QRCode, QROptions};
+use chillerlan\QRCode\{Data\QRCodeDataException, Output\QRCodeOutputException, QRCode, QROptions};
 use chillerlan\QRCode\Common\EccLevel;
 use chillerlan\QRCode\Data\QRMatrix;
+use ErrorException;
+use Picqer\Barcode\BarcodeGeneratorPNG;
+use Picqer\Barcode\Exceptions\UnknownTypeException;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use setasign\Fpdi\Fpdi;
-use App\Utils\Utility;
-use App\Utils\QRImageWithLogo;
 use Pimcore\Model\DataObject\Product;
 
 use Pimcore\Model\Asset;
+use const PIMCORE_PROJECT_ROOT;
 
 class PdfGenerator
 {
 
-    private static function generateQR(string $qrcode, string $qrlink)
+    /**
+     * @throws QRCodeDataException | ErrorException | QRCodeOutputException
+     */
+    private static function generateQR(string $qrcode, string $qrlink): string
     {
         $options = new QROptions;
         $options->version = 5;
@@ -36,12 +42,15 @@ class PdfGenerator
         $qrCode = new QRCode($options);
         $qrCode->addByteSegment($qrlink);
         $qrOutputInterface = new QRImageWithLogo($options, $qrCode->getQRMatrix());
-        $qrImagePath = \PIMCORE_PROJECT_ROOT . "/tmp/qrcode/$qrcode.png";
-        $logoPath = \PIMCORE_PROJECT_ROOT . '/public/custom/iwapim.png';
+        $qrImagePath = PIMCORE_PROJECT_ROOT . "/tmp/qrcode/$qrcode.png";
+        $logoPath = PIMCORE_PROJECT_ROOT . '/public/custom/iwapim.png';
         $qrOutputInterface->dump($qrImagePath, $logoPath);
         return $qrImagePath;
     }
 
+    /**
+     * @throws QRCodeDataException | QRCodeOutputException | DuplicateFullPathException | ErrorException
+     */
     public static function generate2x5(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
     {
 
@@ -62,7 +71,7 @@ class PdfGenerator
         $pdf->MultiCell(30, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C');
         $pdf->Line(20, 1, 20, 24);
 
-        $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
 
         // Save PDF as Pimcore Asset
@@ -75,35 +84,49 @@ class PdfGenerator
         return $asset;
     }
 
-    public static function generate4x6iwasku(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
+    /**
+     * @throws DuplicateFullPathException|UnknownTypeException
+     */
+    public static function generate4x6iwasku(Product $product, $qrfile): Asset\Document
+    {
+        if (empty($product->getEanGtin())) {
+            return self::generate4x6iwaskuWithoutEan($product, $qrfile);
+        }
+        return self::generate4x6iwaskuWithEan($product, $qrfile);
+    }
+
+    /**
+     * @throws DuplicateFullPathException
+     */
+    public static function generate4x6iwaskuWithoutEan(Product $product, $qrfile): Asset\Document
     {
         $pdf = new Fpdi('L', 'mm', [60, 40]); // Landscape mode, 60x40 mm page
         $pdf->SetAutoPageBreak(false); // Disable automatic page break
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetFont('Arial', 'B', 13);
-    
+
         // Set position for the IWASKU text
         $pdf->SetXY(0, 2); // Adjusted Y position for better placement
         $pdf->Cell(60, 10, "IWASKU: {$product->getIwasku()}", 0, 1, 'C'); // 'C' for center alignment, 1 for moving to the next line
-    
+
         // Set the font and position for the product details (variation size, color, and identifier)
         $pdf->SetFont('Arial', '', 10); // Slightly smaller font for product details
         $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
-    
+
         // Prepare text
         $text = $product->getInheritedField("productIdentifier") . " ". $product->getInheritedField("nameEnglish") . "\n";
         $text .= "(". $product->getInheritedField("name") . ")\n";
         $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
         $text .= "Color: " . $product->getInheritedField("variationColor");
-    
+
         // Adjusted width and height for the MultiCell
         $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
-    
+
         // Output PDF to file
-        $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
-    
+
         // Save PDF as Pimcore Asset
         $asset = new Asset\Document();
         $asset->setFilename($qrfile);
@@ -114,7 +137,91 @@ class PdfGenerator
         return $asset;
     }
 
-    public static function generate4x6eu(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
+    /**
+     * @throws DuplicateFullPathException|UnknownTypeException
+     */
+    public static function generate4x6iwaskuWithEan(Product $product, $qrfile): Asset\Document
+    {
+        $ean = $product->getEanGtin();
+        $eanBarcode = self::generateEanBarcode($ean);
+
+        $pdf = new Fpdi('L', 'mm', [60, 40]); // Landscape mode, 60x40 mm page
+        $pdf->SetAutoPageBreak(false); // Disable automatic page break
+        $pdf->AddPage();
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetFont('Arial', 'B', 13);
+
+        // Set position for the IWASKU text
+        $pdf->SetXY(0, 2); // Adjusted Y position for better placement
+        $pdf->Cell(30, 10, $product->getIwasku(), 0, 0, 'L'); // 'C' for center alignment, 1 for moving to the next line
+
+        $pdf->Image($eanBarcode, 2, 28, 30, 10); // EAN barcode image
+
+        // Set the font and position for the product details (variation size, color, and identifier)
+        $pdf->SetFont('Arial', '', 10); // Slightly smaller font for product details
+        $pdf->SetXY(2, 12); // Adjusted to place below the IWASKU text
+
+        // Prepare text
+        $text = $product->getInheritedField("productIdentifier") . " ". $product->getInheritedField("nameEnglish") . "\n";
+        $text .= "(". $product->getInheritedField("name") . ")\n";
+        $text .= "Size: " . $product->getInheritedField("variationSize") . "\n";
+        $text .= "Color: " . $product->getInheritedField("variationColor");
+
+        // Adjusted width and height for the MultiCell
+        $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
+
+        // Output PDF to file
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        $pdf->Output($pdfFilePath, 'F');
+
+        // Save PDF as Pimcore Asset
+        $asset = new Asset\Document();
+        $asset->setFilename($qrfile);
+        $asset->setData(file_get_contents($pdfFilePath));
+        $asset->setParent(Utility::checkSetAssetPath('IWASKU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
+        $asset->save();
+        unlink($pdfFilePath); // Clean up the temporary PDF file
+        return $asset;
+    }
+
+    /**
+     * Generates a high-resolution EAN-13 barcode PNG.
+     * If the image’s height is more than 1/3 of its width, trims its height.
+     *
+     * @throws UnknownTypeException
+     */
+    public static function generateEanBarcode($ean): string
+    {
+        $generator = new BarcodeGeneratorPNG();
+        $barcodeData = $generator->getBarcode($ean, $generator::TYPE_EAN_13, 2, 300);
+        $rawPath = PIMCORE_PROJECT_ROOT . "/tmp/{$ean}_raw.png";
+        file_put_contents($rawPath, $barcodeData);
+        $img = imagecreatefrompng($rawPath);
+        $w = imagesx($img);
+        $h = imagesy($img);
+        $targetHeight = intval($w / 3);
+        if ($h > $targetHeight) {
+            $cropped = imagecreatetruecolor($w, $targetHeight);
+            imagealphablending($cropped, false);
+            imagesavealpha($cropped, true);
+            imagecopy($cropped, $img, 0, 0, 0, 0, $w, $targetHeight);
+            $finalPath = PIMCORE_PROJECT_ROOT . "/tmp/{$ean}.png";
+            imagepng($cropped, $finalPath);
+            imagedestroy($cropped);
+        } else {
+            $finalPath = PIMCORE_PROJECT_ROOT . "/tmp/{$ean}.png";
+            copy($rawPath, $finalPath);
+        }
+        imagedestroy($img);
+        unlink($rawPath);
+        return $finalPath;
+    }
+
+
+    /**
+     * @throws DuplicateFullPathException
+     */
+    public static function generate4x6eu(Product $product, $qrfile): Asset\Document
     {
         $pdf = new Fpdi('L', 'mm', [60, 40]); 
         $pdf->SetAutoPageBreak(false); 
@@ -122,10 +229,10 @@ class PdfGenerator
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetFont('helvetica', '', 6);
     
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
-        $pdf->Image(\PIMCORE_PROJECT_ROOT . '/public/custom/iwablack.png', 40, 2, 18, 18);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/iwablack.png', 40, 2, 18, 18);
     
         $pdf->SetXY(10, 1.7);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
@@ -148,7 +255,7 @@ class PdfGenerator
         $pdf->SetXY(48, 27);
         $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD\nGPSR", 'windows-1254', 'UTF-8'), 0, 'C');
 
-        $pdfFilePath = \PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
     
         $asset = new Asset\Document();
