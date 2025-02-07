@@ -4,7 +4,9 @@ namespace App\Connector\Marketplace;
 
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
+use Pimcore\Model\DataObject\Data\ExternalImage;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -151,6 +153,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         }
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadInventory()
     {
         $inventory = $this->getFromCache('INVENTORY.json');
@@ -173,9 +181,104 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $this->putToCache('INVENTORY.json', $inventories);
     }
 
+    /**
+     * @throws DuplicateFullPathException
+     */
     public function import($updateFlag, $importFlag)
     {
-        // TODO: Implement import() method.
+        $this->listings = [];
+        $this->listings = $this->getFromCache("LISTINGS.json");
+
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable('Test10' . $this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $mainListing) {
+            echo "($index/$total) Processing Listing {$mainListing['id']}:{$mainListing['title']} ...\n";
+            $parent = Utility::checkSetPath(
+                Utility::sanitizeVariable($mainListing['productType'] ?? 'Tasnif-Edilmemiş'),
+                $marketplaceFolder
+            );
+            if (!empty($mainListing['title'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($mainListing['title']),
+                    $parent
+                );
+            }
+            if (($mainListing['status'] ?? 'ACTIVE') !== 'ACTIVE') {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable('_Pasif'),
+                    $marketplaceFolder
+                );
+            }
+            $parentResponseJson = $mainListing;
+            if (isset($parentResponseJson['variants']['nodes'])) {
+                unset($parentResponseJson['variants']['nodes']);
+            }
+            foreach ($mainListing['variants']['nodes'] as $listing) {
+                $this->getImage($listing, $mainListing);
+                break;
+            }
+            break;
+            /*foreach ($mainListing['variants']['nodes'] as $listing) {
+                echo $this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '');
+                try{
+                    VariantProduct::addUpdateVariant(
+                        variant: [
+                            'imageUrl' => $this->getImage($listing, $mainListing) ?? '',
+                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
+                            'salePrice' =>   $listing['price'] ?? '',
+                            'saleCurrency' =>   $this->marketplace->getCurrency(),
+                            'attributes' =>   $listing['title'] ?? '',
+                            'title' =>  ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                            'quantity' => $listing['inventory_quantity'] ?? 0,
+                            'uniqueMarketplaceId' =>  basename($listing['id'] ?? ''),
+                            'apiResponseJson' =>  json_encode($listing),
+                            'parentResponseJson' => json_encode($parentResponseJson),
+                            'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                            'sku' =>   $listing['sku'] ?? '',
+                            'ean' =>   $listing['barcode'] ?? '',
+                        ],
+                        importFlag: $importFlag,
+                        updateFlag: $updateFlag,
+                        marketplace: $this->marketplace,
+                        parent: $parent
+                    );
+                    echo "v";
+                } catch (\Exception $e) {
+                    echo "Error: " . $e->getMessage() . "\n";
+                    echo "Sku: " . $listing['sku'] ?? '' . "\n";
+                    echo "ERRROR VARIANT: \n";
+                }
+            }*/
+            echo "OK\n";
+            $index++;
+        }
+    }
+
+    protected function getImage($listing, $mainListing): ?ExternalImage
+    {
+        echo "Main Listing: " . json_encode($mainListing) . "\n\n\n\n";
+        echo "Listing: " . json_encode($listing) . "\n\n\n\n";
+        $lastImage = null;
+        $images = $mainListing['media']['nodes'] ?? [];
+        foreach ($images as $img) {
+            $imageId = $listing['image']['id'] ?? null;
+            $imgId = $img['id'] ?? null;
+            if ($imageId === null || $imgId === null) {
+                continue;
+            }
+            if ( basename($imgId) === basename($imageId)) {
+                return Utility::getCachedImage($img['preview']['image']['url'] ?? '');
+            }
+
+            if (empty($lastImage)) {
+                $lastImage = Utility::getCachedImage($img['preview']['image']['url'] ?? '');
+            }
+        }
+        return $lastImage;
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
