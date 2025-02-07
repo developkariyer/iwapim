@@ -153,7 +153,24 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
 
     public function downloadInventory()
     {
-        // TODO: Implement downloadInventory() method.
+        $inventory = $this->getFromCache('INVENTORY.json');
+        if (!empty($inventory)) {
+            echo "Using cached inventory\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadInventory.graphql'),
+            'variables' => [
+                'numItems' => 50,
+                'cursor' => null
+            ]
+        ];
+        $inventories = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
+        if (empty($inventories)) {
+            echo "Failed to download inventory\n";
+            return;
+        }
+        $this->putToCache('INVENTORY.json', $inventories);
     }
 
     public function import($updateFlag, $importFlag)
