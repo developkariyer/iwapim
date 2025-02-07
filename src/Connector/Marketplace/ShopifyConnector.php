@@ -188,7 +188,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
     {
         $this->listings = [];
         $this->listings = $this->getFromCache("LISTINGS.json");
-
         $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable('Test11' . $this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
