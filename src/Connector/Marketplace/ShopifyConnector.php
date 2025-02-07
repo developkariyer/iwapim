@@ -2,12 +2,13 @@
 
 namespace App\Connector\Marketplace;
 
+use Pimcore\Model\DataObject\VariantProduct;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class ShopifyConnector
+class ShopifyConnector  extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
 
@@ -112,9 +113,28 @@ class ShopifyConnector
     }
 
 
+    public function downloadOrders()
+    {
+        // TODO: Implement downloadOrders() method.
+    }
 
+    public function downloadInventory()
+    {
+        // TODO: Implement downloadInventory() method.
+    }
 
+    public function import($updateFlag, $importFlag)
+    {
+        // TODO: Implement import() method.
+    }
 
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null)
+    {
+        // TODO: Implement setInventory() method.
+    }
 
-
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null)
+    {
+        // TODO: Implement setPrice() method.
+    }
 }
