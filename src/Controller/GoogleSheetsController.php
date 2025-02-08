@@ -113,7 +113,7 @@ class GoogleSheetsController extends FrontendController
                                     FROM object_collection_AmazonMarketplace_varyantproduct AS ocv
                                     JOIN object_query_varyantproduct AS oqv 
                                         ON ocv.id = oqv.oo_id
-                                    ORDER BY url DESC;";
+                                    ORDER BY id;";
 
     /*                                    JOIN objects AS obj
                                         ON obj.id = oqv.oo_id
@@ -372,7 +372,7 @@ class GoogleSheetsController extends FrontendController
     public function eanCatalogAction(): JsonResponse
     {
         $db = Db::get();
-        $eanData = $db->fetchAllAssociative("SELECT iwasku, eanGtin, requireEan, id, `key`, variationSize, variationColor, productIdentifier, productCategory, name FROM object_product WHERE iwasku IS NOT NULL AND iwasku != '' AND published = 1");
+        $eanData = $db->fetchAllAssociative("SELECT iwasku, eanGtin, requireEan, id, `key`, variationSize, variationColor, productIdentifier, productCategory, name FROM object_product WHERE iwasku IS NOT NULL AND iwasku != '' ORDER BY id;"); //" AND published = 1");
         return $this->json($eanData);
     }
 
@@ -383,7 +383,7 @@ class GoogleSheetsController extends FrontendController
     public function eanListingAction(): JsonResponse
     {
         $db = Db::get();
-        $eanData = $db->fetchAllAssociative("SELECT ovp.id, ovp.key, ovp.ean, ovp.uniqueMarketplaceId, orp.src_id AS product_id FROM object_varyantproduct AS ovp LEFT JOIN object_relations_product AS orp ON orp.dest_id = ovp.id AND orp.fieldname = 'listingItems';");  //" WHERE ovp.published = 1;");
+        $eanData = $db->fetchAllAssociative("SELECT ovp.id, ovp.key, ovp.ean, ovp.uniqueMarketplaceId, orp.src_id AS product_id FROM object_varyantproduct AS ovp LEFT JOIN object_relations_product AS orp ON orp.dest_id = ovp.id AND orp.fieldname = 'listingItems' ORDER BY ovp.id;");  //" WHERE ovp.published = 1;");
         return $this->json($eanData);
     }
 
