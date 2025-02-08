@@ -106,6 +106,7 @@ class GoogleSheetsController extends FrontendController
                                         ocv.listingId AS amazonId,
                                         ocv.fulfillmentChannel,
                                         ocv.status,
+                                        ocv.quantity,
                                         ocv.lastUpdate AS pimUpdate,
                                         ocv.ean AS amazonEan,
                                         oqv.oo_id AS listingId,
