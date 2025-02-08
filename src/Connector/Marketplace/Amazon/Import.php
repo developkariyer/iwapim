@@ -235,7 +235,7 @@ class Import
         $amazonCollection->setStatus($listing['status'] ?? '');
         $amazonCollection->setQuantity((int)($listing['quantity'] ?? 0));
         $amazonCollection->setSaleCurrency(AmazonConstants::getAmazonSaleCurrency($country));
-        $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? '');
+        $amazonCollection->setFulfillmentChannel($listing['fulfillment-channel'] ?? $listing['fulfilment-channel'] ?? '');
         $amazonCollection->setMarketplace($marketplace);
         $amazonCollection->setSku($listing['seller-sku'] ?? '');
         $ean = trim($listing['product-id'] ?? '');
