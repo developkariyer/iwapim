@@ -93,7 +93,7 @@ class GoogleSheetsController extends FrontendController
                                         AND iwasku NOT IN ('', 'NULL')";
 
     static string $amazonSkuSql =  "SELECT 
-                                        CONCAT(ocv.id, '-', ocv.index) AS id,
+                                        CONCAT(ocv.id, '-', ocv.listingId) AS id,
                                         ocv.title,
                                         SUBSTRING_INDEX(
                                             SUBSTRING_INDEX(ocv.urlLink, '\"', 14), 
