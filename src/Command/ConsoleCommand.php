@@ -852,6 +852,10 @@ class ConsoleCommand extends AbstractCommand
                         $amazonListings = $variantProduct->getAmazonMarketplace();
                         $newline = "\n";
                         foreach ($amazonListings as $amazonListing) {
+                            $currentEan = $amazonListing->getEan();
+                            if ($currentEan === $ean) {
+                                continue;
+                            }
                             $sku = $amazonListing->getSku();
                             $country = $amazonListing->getMarketplaceId();
                             if (empty($sku)) {
