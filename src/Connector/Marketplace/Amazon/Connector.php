@@ -84,12 +84,14 @@ class Connector extends MarketplaceConnectorAbstract
      */
     private function initSellerConnector($marketplace): SellerConnector
     {
-        $endpoint = match ($marketplace->getMainMerchant()) {
+        $endpoint = Constants::amazonMerchant[$marketplace->getMainMerchant()]['endpoint'] ?? null;
+/*
+            match ($marketplace->getMainMerchant()) {
             "SG", "AU", "JP", "IN" => Endpoint::FE,
             "UK", "FR", "DE", "IT", "ES", "NL", "SE", "PL", "TR", "SA", "AE", "EG" , "IE" => Endpoint::EU,
             "CA", "US", "MX", "BR" => Endpoint::NA,
             default => null
-        };
+        };*/
         if ($endpoint === null) {
             throw new Exception("Country code is not valid");
         }
