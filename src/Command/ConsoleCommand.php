@@ -815,6 +815,7 @@ class ConsoleCommand extends AbstractCommand
             'UK' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUK')),
             'US' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUS')),
             'CA' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonCA')),
+            'JP' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonJP')),
         ];
 
         $listingObject = new Product\Listing();
@@ -860,6 +861,7 @@ class ConsoleCommand extends AbstractCommand
                                 'AU' => $amazonConnectors['AU'],
                                 'US','MX' => $amazonConnectors['US'],
                                 'CA' => $amazonConnectors['CA'],
+                                'JP' => $amazonConnectors['JP'],
                                 default => $amazonConnectors['UK'],
                             };
                             echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
