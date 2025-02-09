@@ -854,6 +854,7 @@ class ConsoleCommand extends AbstractCommand
                         foreach ($amazonListings as $amazonListing) {
                             $currentEan = $amazonListing->getEan();
                             if ($currentEan === $ean) {
+                                echo "\n  Amazon: {$marketplace->getKey()} $currentEan SKIPPING\n";
                                 continue;
                             }
                             $sku = $amazonListing->getSku();
