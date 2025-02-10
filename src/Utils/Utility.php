@@ -306,11 +306,7 @@ class Utility
             $db = \Pimcore\Db::get();
             $sql = file_get_contents($filePath);
             $stmt = $db->prepare($sql);
-            try {
-                $stmt->executeStatement($params);
-            } catch (\Exception $e) {
-                echo $e->getMessage();
-            }
+            $stmt->executeStatement($params);
         } catch (\Exception $e) {
             throw $e;
         }
