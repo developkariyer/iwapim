@@ -293,6 +293,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'setSku.graphql'),
             'variables' => [
+                'id' => $inventoryItemId,
                 'sku' => $sku,
             ]
         ];
@@ -347,13 +348,10 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             'SWEDISH KRONA' => 'SEK',
             'POUND STERLING' => 'GBP'
         ];
-        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
-        if (empty($variantId)) {
+        $variantId = basename(json_decode($listing->jsonRead('apiResponseJson'), true)['id']);
+        $productId = basename(json_decode($listing->jsonRead('parentResponseJson'), true)['id']);
+        if (empty($variantId) || empty($productId) || empty($targetPrice)) {
             echo "Failed to get variant id for {$listing->getKey()}\n";
-            return;
-        }
-        if (empty($targetPrice)) {
-            echo "Price is empty for {$listing->getKey()}\n";
             return;
         }
         if (empty($targetCurrency)) {
@@ -376,12 +374,14 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             echo "Failed to convert currency for {$listing->getKey()}\n";
             return;
         }
-        $variants = [];
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'setPrice.graphql'),
             'variables' => [
-                'productId' => $variantId,
-                'variants' => $variants
+                'productId' => $productId,
+                'variants' => [
+                    'id' => $variantId,
+                    'price' => $finalPrice,
+                ]
             ]
 
         ];
@@ -389,6 +389,41 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         echo "Price set\n";
         $filename = "SETPRICE_{$variantId}.json";
         $this->putToCache($filename, ['request'=>$query, 'response'=>$response]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function setBarcode(VariantProduct $listing, string $barcode): void //not tested
+    {
+        if (empty($barcode)) {
+            echo "Barcode is empty for {$listing->getKey()}";
+            return;
+        }
+        $variantId = basename(json_decode($listing->jsonRead('apiResponseJson'), true)['id']);
+        $productId = basename(json_decode($listing->jsonRead('parentResponseJson'), true)['id']);
+        if (empty($variantId) || empty($productId) || empty($targetPrice)) {
+            echo "Failed to get variant id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setBarcode.graphql'),
+            'variables' => [
+                'productId' => $productId,
+                'variants' => [
+                    'id' => $variantId,
+                    'barcode' => $barcode,
+                ]
+            ]
+
+        ];
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
+        if (empty($response)) {
+            echo "Failed to set barcode for {$listing->getKey()}";
+            return;
+        }
+        echo "Barcode set to $barcode";
+        $this->putToCache("SETBARCODE_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$query, 'response'=>$response]);
     }
 
 }
