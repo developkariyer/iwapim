@@ -4,6 +4,7 @@ INSERT INTO iwa_marketplace_orders_line_items (
     fulfillments_status, tracking_company, fulfillments_status_control, referring_site, landing_site
 )
 SELECT
+
     :marketplaceType,
     :marketPlaceId,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.created_at')) AS created_at,
