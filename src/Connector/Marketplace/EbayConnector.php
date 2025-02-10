@@ -12,7 +12,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class EbayConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'loginTokenUrl' => "https://auth.ebay.com/oauth2/authorize"
+        'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth2/token"
     ];
 
     public static string $marketplaceType = 'Ebay';
@@ -26,7 +26,19 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     protected function getConsentRequest(): void
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
+        $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
+            ],
+            'body' => [
+                'grant_type' => 'authorization_code',
+                'code' => $this->marketplace->getEbayAuthCode(),
+                'redirect_uri' => $this->marketplace->getEbayRuName()
+            ]
+        ]);
+        print_r($response->getContent());
+        /*$response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
                 'client_id' => $this->marketplace->getEbayClientId(),
                 'redirect_uri' => $this->marketplace->getRedirectUri(),
@@ -37,7 +49,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         if ($response->getStatusCode() !== 200) {
             throw new Exception('Failed Ebay login');
         }
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
 
 
