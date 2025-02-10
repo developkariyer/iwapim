@@ -31,11 +31,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
             ],
-            'body' => http_build_query([
+            'form_params' => [
                 'grant_type' => 'authorization_code',
                 'code' => $this->marketplace->getEbayAuthCode(),
                 'redirect_uri' => $this->marketplace->getEbayRuName()
-            ])
+            ]
         ]);
         print_r($response->getStatusCode());
         print_r($response->getContent());
