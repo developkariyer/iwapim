@@ -35,8 +35,7 @@ class CurrencyCommand extends AbstractCommand
         $xml = simplexml_load_file($url);
         $json = json_encode($xml);
         $array = json_decode($json, TRUE);
-        print_r($array);
-	    /*echo "Current Date: ".date('m/d/Y')."\n";
+	    echo "Current Date: ".date('m/d/Y')."\n";
         echo "TCMP Date: ".$array['@attributes']['Date']."\n";
         list($month, $day, $year) = explode('/', $array['@attributes']['Date']);
         $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
@@ -55,7 +54,7 @@ class CurrencyCommand extends AbstractCommand
             $currencyObject->save();
             $this->updateCurrencyHistoryTable($currency,$date);
             echo "\n";
-        }*/
+        }
         return Command::SUCCESS;
     }
 
