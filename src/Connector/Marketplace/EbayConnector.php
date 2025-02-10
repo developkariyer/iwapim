@@ -26,19 +26,27 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     protected function getConsentRequest(): void
     {
-        $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
-            'headers' => [
-                'Content-Type' => 'application/x-www-form-urlencoded',
-                'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
-            ],
-            'form_params' => [
-                'grant_type' => 'authorization_code',
-                'code' => $this->marketplace->getEbayAuthCode(),
-                'redirect_uri' => $this->marketplace->getEbayRuName()
-            ]
-        ]);
-        print_r($response->getStatusCode());
-        print_r($response);
+        try {
+            $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
+                ],
+                'form_params' => [
+                    'grant_type' => 'authorization_code',
+                    'code' => $this->marketplace->getEbayAuthCode(),
+                    'redirect_uri' => $this->marketplace->getEbayRuName()
+                ]
+            ]);
+
+            echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
+            echo "Response Body: " . $response->getBody() . "\n";
+
+        } catch (\Exception $e) {
+            echo "Hata: " . $e->getMessage() . "\n";
+            echo "Hata Kodu: " . $e->getCode() . "\n";
+        }
+
         /*$response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
                 'client_id' => $this->marketplace->getEbayClientId(),
