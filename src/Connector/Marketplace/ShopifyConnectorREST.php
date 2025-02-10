@@ -15,7 +15,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class ShopifyConnector2 extends MarketplaceConnectorAbstract
+class ShopifyConnectorREST extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
 
