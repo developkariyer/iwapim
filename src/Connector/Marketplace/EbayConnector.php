@@ -37,7 +37,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'redirect_uri' => $this->marketplace->getEbayRuName()
             ]
         ]);
-        print_r($response->getContent());
+        print_r($response);
         /*$response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
                 'client_id' => $this->marketplace->getEbayClientId(),
