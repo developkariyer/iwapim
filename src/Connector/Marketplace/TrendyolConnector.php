@@ -17,23 +17,30 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TrendyolConnector extends MarketplaceConnectorAbstract
 {
-    private static array $apiUrl = [
-        'offers' => 'products?approved=true',
-        'orders' => 'orders',
-        'inventory_price' => 'products/price-and-inventory',
-        'batch_requests' => 'products/batch-requests/'
-    ];
+    private static array $apiUrl = [];
 
     public static string $marketplaceType = 'Trendyol';
 
     public function __construct($marketplace)
     {
         parent::__construct($marketplace);
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/", [
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
             ]
         ]);
+        $sellerId = $this->marketplace->getTrendyolSellerId();
+        static::$apiUrl = [
+            'offers' => 'product/sellers/' . $sellerId . '/products?approved=true',
+            'orders' => 'order/sellers/' . $sellerId . '/orders',
+            'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
+            'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/'
+        ];
+        /* $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/", [
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+            ]
+        ]);*/
     }
 
     /**
