@@ -381,7 +381,7 @@ class GoogleSheetsController extends FrontendController
     public function eanListingAction(): JsonResponse
     {
         $db = Db::get();
-        $eanData = $db->fetchAllAssociative("SELECT ovp.id, ovp.key, ovp.ean, ovp.uniqueMarketplaceId, orp.src_id AS product_id FROM object_varyantproduct AS ovp LEFT JOIN object_relations_product AS orp ON orp.dest_id = ovp.id AND orp.fieldname = 'listingItems' WHERE ovp.published = 1 ORDER BY ovp.id;");
+        $eanData = $db->fetchAllAssociative("SELECT ovp.id, ovp.key, ovp.ean, ovp.uniqueMarketplaceId, ovp.salePrice, ovp.saleCurrency, ovp.lastUpdate, ovp.imageUrl, orp.src_id AS product_id FROM object_varyantproduct AS ovp LEFT JOIN object_relations_product AS orp ON orp.dest_id = ovp.id AND orp.fieldname = 'listingItems' WHERE ovp.published = 1 ORDER BY ovp.id;");
         return $this->json($eanData);
     }
 
