@@ -154,7 +154,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     'imageUrl' => Utility::getCachedImage($listing['image_url']),
                     'urlLink' => $this->getUrlLink($this->createUrlLink($listing['offer_url'], $listing['title'])),
                     'salePrice' => $listing['selling_price'] ?? 0,
-                    'saleCurrency' => 'ZAR',
+                    'saleCurrency' => 'SOUTH AFRICAN RAND',
                     'title' => $listing['title'] ?? '',
                     'attributes' => $listing['title'] ?? '',
                     'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
