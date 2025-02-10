@@ -38,7 +38,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getStatusCode());
-        print_r($response->getContent());
+        print_r($response);
         /*$response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
             'headers' => [
                 'client_id' => $this->marketplace->getEbayClientId(),
