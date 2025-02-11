@@ -94,6 +94,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         // control expiresIn
+        $this->refreshToAccessToken();
 
     }
 
