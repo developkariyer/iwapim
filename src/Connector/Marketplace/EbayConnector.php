@@ -108,8 +108,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ]
             ]);
-            $data = $response->toArray();
-            print_r($data);
+            print_r($response);
             echo $response->getStatusCode();
             echo $response->getContent();
         } catch (\Exception $e) {
