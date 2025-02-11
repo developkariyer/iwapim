@@ -136,28 +136,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 $xmlContent = $response->getContent();
                 $xmlObject = simplexml_load_string($xmlContent);
                 $jsonResponse = json_encode($xmlObject);
-                print_r($jsonResponse);
                 $responseObject = json_decode($jsonResponse);
                 if ($responseObject->Ack === 'Failure') {
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
                 if (isset($jsonResponse['ItemArray']['Item']) && !empty($jsonResponse['ItemArray']['Item'])) {
-                    echo "im hereeeeeeeeeeeee!\n";
                     foreach ($jsonResponse['ItemArray']['Item'] as $item) {
-                        $itemID = $item['ItemID'];
-                        $itemExists = false;
-                        foreach ($allData as $existingItem) {
-                            if ($existingItem['ItemID'] == $itemID) {
-                                $itemExists = true;
-                                break;
-                            }
-                        }
-                        if (!$itemExists) {
                             $allData[] = $item;
-                            print_r("ALLLLLLLLLLLLLLLLL DATAAAAAAAAAAAAA\n");
-                            print_r($allData);
-                        }
+                            print_r($item);
                     }
                 }
                 $startDate = $startDate + $interval;
