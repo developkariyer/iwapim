@@ -17,6 +17,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public static string $marketplaceType = 'Ebay';
 
+    private  static $expiresIn = 0;
+
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
@@ -24,7 +26,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    protected function codeToRefreshToken(): void // !! 11.02.2025 expires 1.5 year
+    protected function codeToRefreshToken(): void // !! 11.02.2025 expires refresh token 1.5 year
     {
         try {
             $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
@@ -77,7 +79,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Unknown Error: " . $e->getMessage() . "\n";
         }
-
+        $responseArray  = $response->toArray();
+        $accessToken    = $responseArray['access_token'];
+        static::$expiresIn = $responseArray['expires_in'];
+        $this->marketplace->setEbayAccessToken($accessToken);
     }
 
 
