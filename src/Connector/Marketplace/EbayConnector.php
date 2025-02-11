@@ -97,9 +97,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->refreshToAccessToken();
         $allData = [];
         $accessToken = $this->marketplace->getEbayAccessToken();
-        $startDate = new DateTime('2022-04-01');
-        $currentDate = new DateTime();
-        $interval = new DateInterval('P120D');
+        $startDate = strtotime('2022-04-01');
+        $currentDate = time();
+        $interval = 120 * 24 * 60 * 60;
         $url = "https://api.ebay.com/ws/api.dll";
         $headers = [
             "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
@@ -158,7 +158,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         }
                     }
                 }
-                $startDate = new DateTime($endTime);
+                $startDate = $startDate + $interval;
             } catch (\Exception $e) {
                 echo 'Hata: ' . $e->getMessage();
                 break;
