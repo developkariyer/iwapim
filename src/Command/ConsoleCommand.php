@@ -956,13 +956,15 @@ class ConsoleCommand extends AbstractCommand
                     $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
                     $listingInfo = $listingInfos['listing'] ?? [];
                     $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'] ?? '';
+                    $brand = $listingInfo['attributes']['brand'] ?? '';
+                    $productDescription = mb_strtolower($listingInfo['attributes']['productDescription'] ?? '');
+                    $madeInTurkey = mb_substr_count($productDescription, 'made in türkiye')  ||
+                        mb_substr_count($productDescription, 'made in turkey') ||
+                        mb_substr_count($productDescription, 'made in turkiye');
+
+                    $this->dbUpdateAmazonMarketplace($country, $sku, $amazonListing->getListingId(), $countryOfOrigin, $madeInTurkey, $brand);
                     if ($countryOfOrigin === 'TR') {
                         echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SAVING and SKIPPING\n";
-                        $productDescription = mb_strtolower($listingInfo['attributes']['productDescription'] ?? '');
-                        $madeInTurkey = mb_substr_count($productDescription, 'made in türkiye')  ||
-                            mb_substr_count($productDescription, 'made in turkey') ||
-                            mb_substr_count($productDescription, 'made in turkiye');
-                        $this->dbUpdateAmazonMarketplace($country, $sku, $amazonListing->getListingId(), $countryOfOrigin, $madeInTurkey);
                         continue;
                     }
                     echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
@@ -992,18 +994,36 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws Exception
      */
-    private function dbUpdateAmazonMarketplace($country, $sku, $listingId, $countryOfOrigin, $madeInTurkey): void
+    private function dbUpdateAmazonMarketplace($country, $sku, $listingId, $countryOfOrigin, $madeInTurkey, $brand): void
     {
+        $variables = "";
+        $values = [];
+        if (!empty($countryOfOrigin)) {
+            $variables .= "countryOfOrigin = :countryOfOrigin,";
+            $values['countryOfOrigin'] = $countryOfOrigin;
+        }
+        if (!empty($madeInTurkey)) {
+            $variables .= "madeInTurkiye = :madeInTurkey,";
+            $values['madeInTurkey'] = $madeInTurkey;
+        }
+        if (!empty($brand)) {
+            $variables .= "brand = :brand,";
+            $values['brand'] = $brand;
+        }
+        if (empty($variables)) {
+            return;
+        }
+        $variables = rtrim($variables, ",");
+        echo "  Updating DB using ".json_encode($values)."\n";
         $db = Db::get();
-        $query = "UPDATE object_collection_AmazonMarketplace_varyantproduct
-            SET countryOfOrigin = :countryOfOrigin, madeInTurkiye = :madeInTurkey
-            WHERE sku = :sku AND marketplaceId = :country AND listingId = :listingId";
+        $query = "UPDATE object_collection_AmazonMarketplace_varyantproduct SET ".$variables." WHERE sku = :sku AND marketplaceId = :country AND listingId = :listingId";
         $db->executeQuery($query, [
             'sku' => $sku,
             'country' => $country,
             'listingId' => $listingId,
             'countryOfOrigin' => $countryOfOrigin,
             'madeInTurkey' => $madeInTurkey,
+            'brand' => $brand,
         ]);
     }
 
