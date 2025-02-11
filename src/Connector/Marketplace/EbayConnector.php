@@ -112,6 +112,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom> 
                  <StartTimeTo>2025-02-11T00:00:00.000Z</StartTimeTo>
               <IncludeWatchCount>true</IncludeWatchCount>
+              <ReturnPolicy> ReturnPolicyType
+                <Description> string </Description>
+                <EAN> string </EAN>
+               </ReturnPolicy>
+        
               <Pagination>
                 <EntriesPerPage>2</EntriesPerPage>
               </Pagination>
