@@ -952,6 +952,7 @@ class ConsoleCommand extends AbstractCommand
                         'JP' => $amazonConnectors['JP'],
                         default => $amazonConnectors['UK'],
                     };
+                    echo "  ";
                     $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
                     $listingInfo = $listingInfos['listing'] ?? [];
                     $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'] ?? '';
