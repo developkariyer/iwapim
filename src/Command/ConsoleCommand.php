@@ -994,7 +994,11 @@ class ConsoleCommand extends AbstractCommand
     private function dbUpdateAmazonMarketplace($country, $sku, $listingId, $countryOfOrigin, $madeInTurkey, $brand): void
     {
         $variables = "";
-        $values = [];
+        $values = [
+            'sku' => $sku,
+            'country' => $country,
+            'listingId' => $listingId,
+        ];
         if (!empty($countryOfOrigin)) {
             $variables .= "countryOfOrigin = :countryOfOrigin,";
             $values['countryOfOrigin'] = $countryOfOrigin;
@@ -1014,14 +1018,7 @@ class ConsoleCommand extends AbstractCommand
         echo "  Updating DB using ".json_encode($values)."\n";
         $db = Db::get();
         $query = "UPDATE object_collection_AmazonMarketplace_varyantproduct SET ".$variables." WHERE sku = :sku AND marketplaceId = :country AND listingId = :listingId";
-        $db->executeQuery($query, [
-            'sku' => $sku,
-            'country' => $country,
-            'listingId' => $listingId,
-            'countryOfOrigin' => $countryOfOrigin,
-            'madeInTurkey' => $madeInTurkey,
-            'brand' => $brand,
-        ]);
+        $db->executeQuery($query, $values);
     }
 
 
