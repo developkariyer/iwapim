@@ -113,6 +113,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                  <StartTimeTo>2025-02-11T00:00:00.000Z</StartTimeTo>
               <IncludeWatchCount>true</IncludeWatchCount>
               <IncludeVariations>true</IncludeVariations>
+              <SKUArray>true</SKUArray>
               <Pagination>
                 <EntriesPerPage>2</EntriesPerPage>
               </Pagination>
