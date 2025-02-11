@@ -64,6 +64,7 @@ class Utils
      */
     public function getInfo($sku, $country = null, $forced = false, $noDefinition = false): array
     {
+        echo "Retrieving info for $sku in $country (forced: $forced, without definition: $noDefinition)\n";
         if (empty($country)) {
             $country = $this->connector->mainCountry;
         }
