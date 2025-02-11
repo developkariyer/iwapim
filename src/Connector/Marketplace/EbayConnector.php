@@ -111,7 +111,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
               <IncludeVariations>true</IncludeVariations>
               <SKUArray>true</SKUArray>
               <Pagination>
-                <EntriesPerPage>2</EntriesPerPage>
+                <EntriesPerPage>200</EntriesPerPage>
               </Pagination>
             </GetSellerListRequest>';
 
