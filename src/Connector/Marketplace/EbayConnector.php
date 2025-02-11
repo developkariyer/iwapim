@@ -144,7 +144,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 if (isset($responseObject->ItemArray->Item)) {
                     foreach ($responseObject->ItemArray->Item as $item) {
                         $allData[] = $item;
-                        print_r($item);
                     }
                 }
 
