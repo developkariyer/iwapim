@@ -28,7 +28,7 @@ class Utils
             $country = $this->connector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
-        $listing = $this->connector->getFromCache("LISTING_{$country}_{$safeSku}.json", 7*86400);
+        $listing = $this->connector->getFromCache("LISTING_{$country}_{$safeSku}.json", 86400);
         if (empty($listing)) {
             $listing = $listingsApi->getListingsItem(
                 sellerId: $this->connector->getMarketplace()->getMerchantId(),
@@ -62,14 +62,14 @@ class Utils
     /**
      * @throws JsonException|RandomException
      */
-    public function getInfo($sku, $country = null): void
+    public function getInfo($sku, $country = null, $forced = false, $noDefinition = false): array
     {
         if (empty($country)) {
             $country = $this->connector->mainCountry;
         }
         $safeSku = preg_replace('/[^a-zA-Z0-9._-]/', '_', $sku);
         $listing = $this->connector->getFromCache("LISTING_{$country}_{$safeSku}.json", 7*86400);
-        if (empty($listing)) {
+        if ($forced || empty($listing)) {
             $listingsApi = $this->connector->amazonSellerConnector->listingsItemsV20210801();
             $listing = $listingsApi->getListingsItem(
                 sellerId: $this->connector->getMarketplace()->getMerchantId(),
@@ -81,8 +81,9 @@ class Utils
             $this->connector->putToCache("LISTING_{$country}_{$safeSku}.json", $listing);
         }
         $productType = $listing['summaries'][0]['productType'] ?? '';
-        if (empty($productType)) { return; }
-
+        if ($noDefinition || empty($productType)) {
+            return ['listing' => $listing, 'definition' => null];
+        }
         $safeProductType = preg_replace('/[^a-zA-Z0-9._-]/', '_', $productType);
         $definition = $this->connector->getFromCache("PRODUCTTYPE_{$country}_{$safeProductType}.json");
         if (empty($definition)) {
@@ -95,6 +96,7 @@ class Utils
             $definition = $definition->json();
             $this->connector->putToCache("PRODUCTTYPE_{$country}_{$safeProductType}.json", $definition);
         }
+        return ['listing' => $listing, 'definition' => $definition];
     }
 
     /**
@@ -219,6 +221,30 @@ class Utils
         $this->patchCustom($sku, $country, $patches);
     }
 
+    /**
+     * @throws RandomException
+     * @throws JsonException
+     */
+    public function patchSetCountryOfOrigin($sku, $country = null) : void
+    {
+        if (empty($country)) {
+            $country = $this->connector->mainCountry;
+        }
+
+        $patches = [
+            new PatchOperation(
+                op: "replace",
+                path: "/attributes/country_of_origin",
+                value: [
+                    [
+                        "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
+                        "value" => "TR",
+                    ]
+                ]
+            )
+        ];
+        $this->patchCustom($sku, $country, $patches);
+    }
 
 
 

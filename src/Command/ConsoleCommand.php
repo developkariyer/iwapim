@@ -895,6 +895,116 @@ class ConsoleCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws RandomException
+     * @throws JsonException
+     * @throws \Exception
+     */
+    public function commandSetAmazonCountryOfOrigin(): void
+    {   //  $this->setAmazonBarcode();
+        $amazonConnectors = [
+            'AU' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonAU')),
+            'UK' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUK')),
+            'US' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUS')),
+            'CA' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonCA')),
+            'JP' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonJP')),
+        ];
+
+        $listingObject = new VariantProduct\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->filterByUniqueMarketplaceId('B%', 'LIKE');
+        $pageSize = 15;
+        $offset = 0;
+        $listingObject->setLimit($pageSize);
+        $index = $offset;
+        while (true) {
+            $listingObject->setOffset($offset);
+            $listings = $listingObject->load();
+            if (empty($listings)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($listings as $listing) {
+                $index++;
+                echo "\rProcessing $index {$listing->getId()} ";
+                $marketplace = $listing->getMarketplace();
+                $marketplaceType = $marketplace->getMarketplaceType();
+                if ($marketplaceType !== 'Amazon') {
+                    continue;
+                }
+                $amazonListings = $listing->getAmazonMarketplace();
+                $newline = "\n";
+                foreach ($amazonListings as $amazonListing) {
+                    $currentCountryOfOrigin = $amazonListing->getMadeInTurkiye();
+                    $sku = $amazonListing->getSku();
+                    $country = $amazonListing->getMarketplaceId();
+                    if ($currentCountryOfOrigin === 'TR') {
+                        echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SKIPPING\n";
+                        continue;
+                    }
+                    if (empty($sku)) {
+                        continue;
+                    }
+                    $amazonConnector = match ($country) {
+                        'AU' => $amazonConnectors['AU'],
+                        'US', 'MX' => $amazonConnectors['US'],
+                        'CA' => $amazonConnectors['CA'],
+                        'JP' => $amazonConnectors['JP'],
+                        default => $amazonConnectors['UK'],
+                    };
+                    [$listingInfo,] = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
+                    $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'] ?? '';
+                    if ($countryOfOrigin === 'TR') {
+                        echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SAVING and SKIPPING\n";
+                        $productDescription = mb_strtolower($listingInfo['attributes']['productDescription'] ?? '');
+                        $madeInTurkey = mb_substr_count($productDescription, 'made in türkiye')  ||
+                            mb_substr_count($productDescription, 'made in turkey') ||
+                            mb_substr_count($productDescription, 'made in turkiye');
+                        $this->dbUpdateAmazonMarketplace($country, $sku, $amazonListing->getListingId(), $countryOfOrigin, $madeInTurkey);
+                        continue;
+                    }
+                    echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
+                    $newline = "";
+                    $maxRetries = 3;
+                    $attempt = 0;
+                    $success = false;
+                    while ($attempt < $maxRetries && !$success) {
+                        try {
+                            $amazonConnector->utilsHelper->patchSetCountryOfOrigin($sku, $country);
+                            $success = true;
+                        } catch (\Exception $e) {
+                            $attempt++;
+                            echo "Attempt $attempt failed: " . $e->getMessage() . "\n";
+                            if ($attempt >= $maxRetries) {
+                                echo "Max retry limit reached. Skipping.\n";
+                                break;
+                            }
+                            sleep(min(pow(2, $attempt), 15));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function dbUpdateAmazonMarketplace($country, $sku, $listingId, $countryOfOrigin, $madeInTurkey): void
+    {
+        $db = Db::get();
+        $query = "UPDATE object_collection_AmazonMarketplace_varyantproduct
+            SET countryOfOrigin = :countryOfOrigin, madeInTurkiye = :madeInTurkey
+            WHERE sku = :sku AND marketplaceId = :country AND listingId = :listingId";
+        $db->executeQuery($query, [
+            'sku' => $sku,
+            'country' => $country,
+            'listingId' => $listingId,
+            'countryOfOrigin' => $countryOfOrigin,
+            'madeInTurkey' => $madeInTurkey,
+        ]);
+    }
+
 
     /**
      * @throws \Exception
