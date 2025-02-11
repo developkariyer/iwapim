@@ -142,9 +142,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
-                $responseArray = $jsonResponse->toArray();
-                if (isset($responseArray['ItemArray']['Item']) && !empty($responseArray['ItemArray']['Item'])) {
-                    foreach ($responseArray['ItemArray']['Item'] as $item) {
+                if (isset($jsonResponse['ItemArray']['Item']) && !empty($jsonResponse['ItemArray']['Item'])) {
+                    foreach ($jsonResponse['ItemArray']['Item'] as $item) {
                         $itemID = $item['ItemID'];
                         $itemExists = false;
                         foreach ($allData as $existingItem) {
