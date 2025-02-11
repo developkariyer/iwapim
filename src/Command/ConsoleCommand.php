@@ -853,7 +853,7 @@ class ConsoleCommand extends AbstractCommand
                         $newline = "\n";
                         foreach ($amazonListings as $amazonListing) {
                             $currentEan = $amazonListing->getEan();
-                            if ($currentEan === $ean) {
+                            if (!empty($currentEan)) { //$currentEan === $ean
                                 echo "\n  Amazon: {$marketplace->getKey()} $currentEan SKIPPING\n";
                                 continue;
                             }
