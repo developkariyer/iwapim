@@ -104,13 +104,13 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
             <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
               <RequesterCredentials>
-                <eBayAuthToken>' . $accessToken . '</eBayAuthToken> <!-- Token dinamik olarak buraya ekleniyor -->
+                <eBayAuthToken>' . $accessToken . '</eBayAuthToken> 
               </RequesterCredentials>
               <ErrorLanguage>en_US</ErrorLanguage>
               <WarningLevel>High</WarningLevel>
               <GranularityLevel>Coarse</GranularityLevel>
-              <StartTimeFrom>2024-10-12T21:59:59.005Z</StartTimeFrom>
-              <StartTimeTo>2025-02-10T21:59:59.005Z</StartTimeTo>
+                <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom> 
+                 <StartTimeTo>2025-02-11T00:00:00.000Z</StartTimeTo>
               <IncludeWatchCount>true</IncludeWatchCount>
               <Pagination>
                 <EntriesPerPage>2</EntriesPerPage>
