@@ -108,8 +108,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             "Content-Type: text/xml"
         ];
         do {
-            $startTime = $startDate->format('Y-m-d\TH:i:s\Z');
-            $endTime = $startDate->add($interval)->format('Y-m-d\TH:i:s\Z');
+            $startTime = gmdate('Y-m-d\TH:i:s\Z', $startDate);
+            $endTime = gmdate('Y-m-d\TH:i:s\Z', $startDate + $interval);
             $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
                 <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
                   <RequesterCredentials>
