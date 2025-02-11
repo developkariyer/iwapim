@@ -48,21 +48,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Hata Kodu: " . $e->getCode() . "\n";
         }*/
 
-        try {
-            $response = $this->httpClient->request('GET', static::$apiUrl['authorizeUrl'], [
-                'headers' => [
-                    'client_id' => $this->marketplace->getEbayClientId(),
-                    'redirect_uri' => $this->marketplace->getRedirectUri(),
-                    'response_type' => 'code',
-                    'scope' => "https://api.ebay.com/oauth/api_scope ..."
-                ]
+        $authorizeUrl = "https://auth.sandbox.ebay.com/oauth2/authorize?" . http_build_query([
+                "client_id" => $this->marketplace->getEbayClientId(),
+                "redirect_uri" => $this->marketplace->getEbayRuName(),
+                "response_type" => "code",
+                "scope" => "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.inventory",
             ]);
 
-            echo "Response Status Code: " . $response->getStatusCode() . "\n";
-            echo "Response Content: " . $response->getContent();
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-        }
+        header("Location: " . $authorizeUrl);
+        exit;
     }
 
 
