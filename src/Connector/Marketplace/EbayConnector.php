@@ -95,26 +95,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         // control expiresIn
         //$this->refreshToAccessToken();
-
+        $allData = [];
         $accessToken = $this->marketplace->getEbayAccessToken();
-        $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
-            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-              <RequesterCredentials>
-                <eBayAuthToken>' . $accessToken . '</eBayAuthToken> 
-              </RequesterCredentials>
-              <ErrorLanguage>en_US</ErrorLanguage>
-              <WarningLevel>High</WarningLevel>
-              <GranularityLevel>Coarse</GranularityLevel>
-                 <StartTimeFrom>2024-05-01T00:00:00.000Z</StartTimeFrom> 
-                 <StartTimeTo>2024-08-11T00:00:00.000Z</StartTimeTo>
-              <IncludeWatchCount>true</IncludeWatchCount>
-              <IncludeVariations>true</IncludeVariations>
-              <SKUArray>true</SKUArray>
-              <Pagination>
-                <EntriesPerPage>200</EntriesPerPage>
-              </Pagination>
-            </GetSellerListRequest>';
-
+        $startDate = new DateTime('2022-04-01');
+        $currentDate = new DateTime();
+        $interval = new DateInterval('P120D');
         $url = "https://api.ebay.com/ws/api.dll";
         $headers = [
             "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
@@ -122,25 +107,67 @@ class EbayConnector extends MarketplaceConnectorAbstract
             "X-EBAY-API-SITEID: 0",
             "Content-Type: text/xml"
         ];
+        do {
+            $startTime = $startDate->format('Y-m-d\TH:i:s\Z');
+            $endTime = $startDate->add($interval)->format('Y-m-d\TH:i:s\Z');
+            $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
+                <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+                  <RequesterCredentials>
+                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+                  </RequesterCredentials>
+                  <ErrorLanguage>en_US</ErrorLanguage>
+                  <WarningLevel>High</WarningLevel>
+                  <GranularityLevel>Coarse</GranularityLevel>
+                  <StartTimeFrom>' . $startTime . '</StartTimeFrom>
+                  <StartTimeTo>' . $endTime . '</StartTimeTo>
+                  <IncludeWatchCount>true</IncludeWatchCount>
+                  <IncludeVariations>true</IncludeVariations>
+                  <SKUArray>true</SKUArray>
+                  <Pagination>
+                    <EntriesPerPage>200</EntriesPerPage>
+                  </Pagination>
+                </GetSellerListRequest>';
 
-        try {
-            $response = $this->httpClient->request('POST', $url, [
-                'headers' => $headers,
-                'body' => $xmlRequest
-            ]);
-            $xmlContent = $response->getContent();
+            try {
+                $response = $this->httpClient->request('POST', $url, [
+                    'headers' => $headers,
+                    'body' => $xmlRequest
+                ]);
+                $xmlContent = $response->getContent();
+                $xmlObject = simplexml_load_string($xmlContent);
+                $jsonResponse = json_encode($xmlObject);
 
-            $xmlObject = simplexml_load_string($xmlContent);
-
-            $jsonResponse = json_encode($xmlObject);
-            print_r($jsonResponse);
-        } catch (\Exception $e) {
-            echo 'Hata: ' . $e->getMessage();
-        }
-
-
-
-
+                print_r($jsonResponse);
+                $responseObject = json_decode($jsonResponse);
+                if ($responseObject->Ack === 'Failure') {
+                    echo "Error: " . $responseObject->Errors[0]->ShortMessage;
+                    break;
+                }
+                if (isset($responseObject->GetSellerListResponse->ItemArray->Item)) {
+                    foreach ($responseObject->GetSellerListResponse->ItemArray->Item as $item) {
+                        $itemID = (string)$item->ItemID;
+                        $itemExists = false;
+                        foreach ($allData as $existingItem) {
+                            if ($existingItem->ItemID == $itemID) {
+                                $itemExists = true;
+                                break;
+                            }
+                        }
+                        if (!$itemExists) {
+                            $allData[] = $item;
+                        }
+                    }
+                }
+                $startDate = new DateTime($endTime);
+            } catch (\Exception $e) {
+                echo 'Hata: ' . $e->getMessage();
+                break;
+            }
+        } while ($startDate < $currentDate);
+        echo "\n\n\n\n\n\n";
+        echo "------------------------------------------------------------------------------------------------\n";
+        print_r(json_encode($allData));
+        echo "------------------------------------------------------------------------------------------------\n";
     }
 
     public function downloadInventory(): void
