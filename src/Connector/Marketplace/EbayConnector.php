@@ -95,7 +95,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         // control expiresIn
         //$this->refreshToAccessToken();
-        $allData = [];
+        /*$allData = [];
         $accessToken = $this->marketplace->getEbayAccessToken();
         $startDate = strtotime('2022-04-01');
         $currentDate = time();
@@ -141,7 +141,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
-                print_r($responseObject['PaginationResult']);
+                print_r($jsonResponse['PaginationResult']);
 //                foreach ($jsonResponse['ItemArray']['Item'] as $item) {
 //                        $allData[] = $item;
 //                        print_r($item);
@@ -155,7 +155,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         echo "\n\n\n\n\n\n";
         echo "------------------------------------------------------------------------------------------------\n";
         print_r(json_encode($allData));
-        echo "------------------------------------------------------------------------------------------------\n";
+        echo "------------------------------------------------------------------------------------------------\n";*/
     }
 
     public function downloadInventory(): void
@@ -180,7 +180,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        $url = "https://api.ebay.com/sell/fulfillment/v1/order";
+       /* $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
@@ -191,7 +191,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'offset' => 0
             ]
         ]);
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
     
     protected function getImage($listing, $mainListing) 
