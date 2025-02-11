@@ -143,7 +143,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     break;
                 }
                 $responseArray = $response->toArray();
-                if (isset($responseArray['ItemArray']['Item']) && !empty($responseArray['ItemArray']['Item'])) {
+                /*if (isset($responseArray['ItemArray']['Item']) && !empty($responseArray['ItemArray']['Item'])) {
                     foreach ($responseArray['ItemArray']['Item'] as $item) {
                         $itemID = $item['ItemID'];
                         $itemExists = false;
@@ -157,7 +157,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                             $allData[] = $item;
                         }
                     }
-                }
+                }*/
                 $startDate = $startDate + $interval;
             } catch (\Exception $e) {
                 echo 'Hata: ' . $e->getMessage();
