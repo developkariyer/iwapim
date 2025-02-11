@@ -154,7 +154,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                             }
                         }
                         if (!$itemExists) {
-                            $allData['Products'] = $item;
+                            $allData[] = $item;
                         }
                     }
                 }
