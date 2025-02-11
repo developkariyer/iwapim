@@ -141,7 +141,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
-                print_r($responseObject->PaginationResult);
+                print_r($responseObject->PaginationResult->TotalNumberOfPages);
 //                foreach ($jsonResponse['ItemArray']['Item'] as $item) {
 //                        $allData[] = $item;
 //                        print_r($item);
