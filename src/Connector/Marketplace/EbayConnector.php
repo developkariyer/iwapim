@@ -105,8 +105,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
               <ErrorLanguage>en_US</ErrorLanguage>
               <WarningLevel>High</WarningLevel>
               <GranularityLevel>Coarse</GranularityLevel>
-                <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom> 
-                 <StartTimeTo>2025-02-11T00:00:00.000Z</StartTimeTo>
+                 <StartTimeFrom>2024-05-01T00:00:00.000Z</StartTimeFrom> 
+                 <StartTimeTo>2025-08-11T00:00:00.000Z</StartTimeTo>
               <IncludeWatchCount>true</IncludeWatchCount>
               <IncludeVariations>true</IncludeVariations>
               <SKUArray>true</SKUArray>
