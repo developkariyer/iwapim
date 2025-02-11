@@ -13,7 +13,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
         'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth2/token",
-        'authorizeUrl' => "https://auth.ebay.com/oauth2/authorize",
     ];
 
     public static string $marketplaceType = 'Ebay';
@@ -27,36 +26,32 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     protected function getConsentRequest(): void
     {
-        /*try {
+        try {
             $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
                 'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}")
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . base64_encode(
+                            "{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"
+                        ),
                 ],
-                'data' => [
-                    'grant_type' => 'authorization_code',
-                    'code' => $this->marketplace->getEbayAuthCode(),
-                    'redirect_uri' => $this->marketplace->getEbayRuName()
-                ]
+                'body' => http_build_query([
+                    'grant_type'    => 'authorization_code',
+                    'code'          => $this->marketplace->getEbayAuthCode(),
+                    'redirect_uri'  => $this->marketplace->getEbayRuName(),
+                ]),
             ]);
-
             echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
             echo "Response: " . $response->getContent() . "\n";
-
-        } catch (\Exception $e) {
+        } catch (\Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface $e) {
             echo "Hata: " . $e->getMessage() . "\n";
             echo "Hata Kodu: " . $e->getCode() . "\n";
-        }*/
+            echo "Response Hatası: " . $e->getResponse()->getContent(false) . "\n";
+        } catch (\Exception $e) {
+            echo "Bilinmeyen Hata: " . $e->getMessage() . "\n";
+        }
 
-        $authorizeUrl = "https://auth.sandbox.ebay.com/oauth2/authorize?" . http_build_query([
-                "client_id" => $this->marketplace->getEbayClientId(),
-                "redirect_uri" => $this->marketplace->getEbayRuName(),
-                "response_type" => "code",
-                "scope" => "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.inventory",
-            ]);
 
-        header("Location: " . $authorizeUrl);
-        exit;
+
     }
 
 
