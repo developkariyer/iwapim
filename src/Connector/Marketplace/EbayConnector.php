@@ -111,7 +111,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getContent());
-
+        print_r($response->getStatusCode());
+        $data = json_decode($response->getContent(), true);
+        print_r($data);
     }
 
     public function downloadOrders(): void
