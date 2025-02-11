@@ -93,12 +93,24 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-     //   $this->prepareToken();
-        $this->refreshToAccessToken();
+        // control expiresIn
+
     }
 
     public function downloadInventory(): void
     {
+        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        $response = $this->httpClient->request('GET', $url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getEbayAccessToken(),
+                'Content-Type'  => 'application/json',
+            ],
+            'query' => [
+                'limit'  => 5,
+                'offset' => 0,
+            ]
+        ]);
+        print_r($response->getContent());
 
     }
 
