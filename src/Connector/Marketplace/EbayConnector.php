@@ -12,7 +12,8 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class EbayConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth2/token"
+        'loginTokenUrl' => "https://api.ebay.com/identity/v1/oauth2/token",
+        'authorizeUrl' => "https://auth.ebay.com/oauth2/authorize",
     ];
 
     public static string $marketplaceType = 'Ebay';
@@ -26,7 +27,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     protected function getConsentRequest(): void
     {
-        try {
+        /*try {
             $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
@@ -45,9 +46,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Hata: " . $e->getMessage() . "\n";
             echo "Hata Kodu: " . $e->getCode() . "\n";
-        }
+        }*/
 
-        /*$response = $this->httpClient->request('GET', static::$apiUrl['loginTokenUrl'], [
+        $response = $this->httpClient->request('GET', static::$apiUrl['authorizeUrl'], [
             'headers' => [
                 'client_id' => $this->marketplace->getEbayClientId(),
                 'redirect_uri' => $this->marketplace->getRedirectUri(),
@@ -55,10 +56,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'scope' => "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/commerce.identity.readonly https://api.ebay.com/oauth/api_scope/sell.reputation https://api.ebay.com/oauth/api_scope/sell.reputation.readonly https://api.ebay.com/oauth/api_scope/commerce.notification.subscription https://api.ebay.com/oauth/api_scope/commerce.notification.subscription.readonly https://api.ebay.com/oauth/api_scope/sell.stores https://api.ebay.com/oauth/api_scope/sell.stores.readonly"
             ]
         ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new Exception('Failed Ebay login');
-        }
-        print_r($response->getContent());*/
+        print_r($response->getContent());
     }
 
 
