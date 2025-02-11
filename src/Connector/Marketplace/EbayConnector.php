@@ -24,9 +24,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    protected function getConsentRequest(): void
+    protected function codeToRefreshToken(): void // !! 11.02.2025 expires 1.5 year
     {
-
         try {
             $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
                 'headers' => [
@@ -44,17 +43,40 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
             echo "Response: " . $response->getContent() . "\n";
         } catch (\Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface $e) {
-            echo "Hata: " . $e->getMessage() . "\n";
-            echo "Hata Kodu: " . $e->getCode() . "\n";
-            echo "Response Hatası: " . $e->getResponse()->getContent(false) . "\n";
+            echo "Error: " . $e->getMessage() . "\n";
+            echo "Error Code: " . $e->getCode() . "\n";
+            echo "Response Error: " . $e->getResponse()->getContent(false) . "\n";
         } catch (\Exception $e) {
-            echo "Bilinmeyen Hata: " . $e->getMessage() . "\n";
+            echo "Unknown Error: " . $e->getMessage() . "\n";
         }
-        $array = $response->getContent();
-        $this->marketplace->setEbayRefreshToken($array['refresh_token']);
-        $this->marketplace->setEbayAccessToken($array['access_token']);
+    }
 
-
+    public function refreshToAccessToken(): void
+    {
+        $scope = "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/commerce.identity.readonly https://api.ebay.com/oauth/api_scope/sell.reputation https://api.ebay.com/oauth/api_scope/sell.reputation.readonly https://api.ebay.com/oauth/api_scope/commerce.notification.subscription https://api.ebay.com/oauth/api_scope/commerce.notification.subscription.readonly https://api.ebay.com/oauth/api_scope/sell.stores https://api.ebay.com/oauth/api_scope/sell.stores.readonly https://api.ebay.com/oauth/scope/sell.edelivery";
+        try {
+            $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
+                'headers' => [
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . base64_encode(
+                            "{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"
+                        ),
+                ],
+                'body' => http_build_query([
+                    'grant_type'    => 'refresh_token',
+                    'refresh_token' => $this->getEbayRefreshToken(),
+                    'scope'  => $scope
+                ]),
+            ]);
+            echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
+            echo "Response: " . $response->getContent() . "\n";
+        } catch (\Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            echo "Error Code: " . $e->getCode() . "\n";
+            echo "Response Error: " . $e->getResponse()->getContent(false) . "\n";
+        } catch (\Exception $e) {
+            echo "Unknown Error: " . $e->getMessage() . "\n";
+        }
 
     }
 
@@ -65,7 +87,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
      //   $this->prepareToken();
-        $this->getConsentRequest();
+        $this->refreshToAccessToken();
     }
 
     public function downloadInventory(): void
