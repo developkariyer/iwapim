@@ -953,36 +953,40 @@ class ConsoleCommand extends AbstractCommand
                         default => $amazonConnectors['UK'],
                     };
                     echo "  ";
-                    $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, false, true);
-                    $listingInfo = $listingInfos['listing'] ?? [];
+                    try {
+                        $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, false, true);
+                        $listingInfo = $listingInfos['listing'] ?? [];
 
-                    $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'][0]['value'] ?? '';
-                    $brand = $listingInfo['attributes']['brand'][0]['value'] ?? '';
-                    $madeInTurkey = mb_substr_count(mb_strtolower($listingInfo['attributes']['productDescription'][0]['value'] ?? ''), 'made in t');
-                    $this->dbUpdateAmazonMarketplace($country, $sku, $amazonListing->getListingId(), $countryOfOrigin, $madeInTurkey, $brand);
-                    if ($countryOfOrigin === 'TR') {
-                        echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SAVING and SKIPPING\n";
-                        continue;
-                    }
-                    echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
-                    $newline = "";
-                    $maxRetries = 3;
-                    $attempt = 0;
-                    $success = false;/*
-                    while ($attempt < $maxRetries && !$success) {
-                        try {
-                            $amazonConnector->utilsHelper->patchSetCountryOfOrigin($sku, $country);
-                            $success = true;
-                        } catch (\Exception $e) {
-                            $attempt++;
-                            echo "Attempt $attempt failed: " . $e->getMessage() . "\n";
-                            if ($attempt >= $maxRetries) {
-                                echo "Max retry limit reached. Skipping.\n";
-                                break;
-                            }
-                            sleep(min(pow(2, $attempt), 15));
+                        $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'][0]['value'] ?? '';
+                        $brand = $listingInfo['attributes']['brand'][0]['value'] ?? '';
+                        $madeInTurkey = mb_substr_count(mb_strtolower($listingInfo['attributes']['productDescription'][0]['value'] ?? ''), 'made in t');
+                        $this->dbUpdateAmazonMarketplace($country, $sku, $amazonListing->getListingId(), $countryOfOrigin, $madeInTurkey, $brand);
+                        if ($countryOfOrigin === 'TR') {
+                            echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SAVING and SKIPPING\n";
+                            continue;
                         }
-                    }*/
+                        echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
+                        $newline = "";
+                        $maxRetries = 3;
+                        $attempt = 0;
+                        $success = false;/*
+                        while ($attempt < $maxRetries && !$success) {
+                            try {
+                                $amazonConnector->utilsHelper->patchSetCountryOfOrigin($sku, $country);
+                                $success = true;
+                            } catch (\Exception $e) {
+                                $attempt++;
+                                echo "Attempt $attempt failed: " . $e->getMessage() . "\n";
+                                if ($attempt >= $maxRetries) {
+                                    echo "Max retry limit reached. Skipping.\n";
+                                    break;
+                                }
+                                sleep(min(pow(2, $attempt), 15));
+                            }
+                        }*/
+                    } catch (\Exception $e) {
+                        echo "Error: ".$e->getMessage()."\n";
+                    }
                 }
             }
         }
