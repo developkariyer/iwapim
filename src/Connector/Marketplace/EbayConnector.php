@@ -50,6 +50,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Bilinmeyen Hata: " . $e->getMessage() . "\n";
         }
+        $array = $response->getContent();
+        $this->marketplace->setEbayRefreshToken($array['refresh_token']);
+        $this->marketplace->setEbayAccessToken($array['access_token']);
 
 
 
