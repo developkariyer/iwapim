@@ -957,9 +957,9 @@ class ConsoleCommand extends AbstractCommand
                         $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, false, true);
                         $listingInfo = $listingInfos['listing'] ?? [];
 
-                        $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'][0]['value'] ?? '';
+                        $countryOfOrigin = $listingInfo['attributes']['country_of_origin'][0]['value'] ?? '';
                         $brand = $listingInfo['attributes']['brand'][0]['value'] ?? '';
-                        $madeInTurkey = mb_substr_count(mb_strtolower($listingInfo['attributes']['productDescription'][0]['value'] ?? ''), 'made in t');
+                        $madeInTurkey = mb_substr_count(mb_strtolower($listingInfo['attributes']['product_description'][0]['value'] ?? ''), 'made in t');
                         $this->dbUpdateAmazonMarketplace($country, $sku, $amazonListing->getListingId(), $countryOfOrigin, $madeInTurkey, $brand);
                         if ($countryOfOrigin === 'TR') {
                             echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SAVING and SKIPPING\n";
