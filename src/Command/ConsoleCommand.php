@@ -986,6 +986,7 @@ class ConsoleCommand extends AbstractCommand
                         }*/
                     } catch (\Exception $e) {
                         echo "Error: ".$e->getMessage()."\n";
+                        sleep(1);
                     }
                 }
             }
