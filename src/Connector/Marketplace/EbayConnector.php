@@ -117,7 +117,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
         $url = "https://api.ebay.com/ws/api.dll";
         $headers = [
-            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1131",
             "X-EBAY-API-CALL-NAME: GetSellerList",
             "X-EBAY-API-SITEID: 0",
             "Content-Type: text/xml"
