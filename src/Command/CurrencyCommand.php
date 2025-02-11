@@ -31,16 +31,24 @@ class CurrencyCommand extends AbstractCommand
 /*        self::$downloadFlag = $input->getOption('download');
         self::$marketplaceArg = $input->getArgument('marketplace');*/
 
+        $urlExtra = "https://www.tcmb.gov.tr/bilgiamackur/today.xml";
+        $xmlExtra = simplexml_load_file($urlExtra);
+        $jsonExtra = json_encode($xmlExtra  );
+        $arrayExtra = json_decode($jsonExtra, TRUE);
         $url = "https://www.tcmb.gov.tr/kurlar/today.xml";
         $xml = simplexml_load_file($url);
         $json = json_encode($xml);
         $array = json_decode($json, TRUE);
-	    echo "Current Date: ".date('m/d/Y')."\n";
+        echo "Current Date: ".date('m/d/Y')."\n";
         echo "TCMP Date: ".$array['@attributes']['Date']."\n";
         list($month, $day, $year) = explode('/', $array['@attributes']['Date']);
         $date = sprintf('%4d-%02d-%02d', $year, $month, $day);
+        if (isset($array['Currency']) && isset($arrayExtra['Currency'])) {
+            $array['Currency'] = array_merge($array['Currency'], $arrayExtra['Currency']);
+        }
         foreach ($array['Currency'] as $currency) {
-            echo trim($currency['CurrencyName']) . " - " . $currency['ForexBuying']/$currency['Unit'];
+            $rate = $currency['ForexBuying'] ?? $currency['ExchangeRate'] ?? 0;
+            echo trim($currency['CurrencyName']) . " - " . $rate/$currency['Unit'];
             $currencyObject = Currency::getByCurrencyCode(trim($currency['CurrencyName']), ['limit' => 1,'unpublished' => true]);
             if (!$currencyObject) {
                 echo " - Yeni";
@@ -50,25 +58,28 @@ class CurrencyCommand extends AbstractCommand
                 $currencyObject->setParent(Folder::getByPath('/Ayarlar/Sabitler/Döviz-Kurları'));
             }
             $currencyObject->setDate(Carbon::createFromFormat('m/d/Y', $array['@attributes']['Date']));
-            $currencyObject->setRate($currency['ForexBuying']/$currency['Unit']);
+            $currencyObject->setRate($rate/$currency['Unit']);
             $currencyObject->save();
-            $this->updateCurrencyHistoryTable($currency,$date);
+            $this->updateCurrencyHistoryTable($currency, $date, $rate);
             echo "\n";
         }
         return Command::SUCCESS;
     }
 
-    protected function updateCurrencyHistoryTable($currency,$date)
+    /**
+     * @throws Exception
+     */
+    protected function updateCurrencyHistoryTable($currency, $date, $rate): void
     {
         $currencyCode = $currency['@attributes']['CurrencyCode'];
-        $value = number_format($currency['ForexBuying'] / $currency['Unit'],2);
         $db = \Pimcore\Db::get();
         $sql = "
             INSERT INTO iwa_currency_history (date, currency, value) 
-            VALUES ('$date' , '$currencyCode', $value)
-            ON DUPLICATE KEY UPDATE value = $value, date = '$date'
+            VALUES ('$date' , '$currencyCode', $rate)
+            ON DUPLICATE KEY UPDATE value = $rate, date = '$date'
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->executeStatement();
     }
+
 }
