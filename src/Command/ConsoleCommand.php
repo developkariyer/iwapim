@@ -955,9 +955,11 @@ class ConsoleCommand extends AbstractCommand
                     echo "  ";
                     $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
                     $listingInfo = $listingInfos['listing'] ?? [];
-                    $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'] ?? '';
-                    $brand = $listingInfo['attributes']['brand'] ?? '';
-                    $productDescription = mb_strtolower($listingInfo['attributes']['productDescription'] ?? '');
+
+                    $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'][0]['value'] ?? '';
+                    $brand = $listingInfo['attributes']['brand'][0]['value'] ?? '';
+                    $productDescription = mb_strtolower($listingInfo['attributes']['productDescription'][0]['value'] ?? '');
+
                     $madeInTurkey = mb_substr_count($productDescription, 'made in türkiye')  ||
                         mb_substr_count($productDescription, 'made in turkey') ||
                         mb_substr_count($productDescription, 'made in turkiye');
