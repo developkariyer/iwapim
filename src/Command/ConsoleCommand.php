@@ -952,7 +952,8 @@ class ConsoleCommand extends AbstractCommand
                         'JP' => $amazonConnectors['JP'],
                         default => $amazonConnectors['UK'],
                     };
-                    [$listingInfo,] = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
+                    $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
+                    $listingInfo = $listingInfos['listing'] ?? [];
                     $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'] ?? '';
                     if ($countryOfOrigin === 'TR') {
                         echo "\n  Amazon: {$marketplace->getKey()} $sku $country already set to TR, SAVING and SKIPPING\n";
