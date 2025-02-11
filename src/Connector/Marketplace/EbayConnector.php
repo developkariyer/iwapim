@@ -109,8 +109,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'query' => [
                     'limit'  => 10,
-                    'offset' => 0,
-                    'sku' => ''
+                    'offset' => 0
                 ]
             ]);
 
