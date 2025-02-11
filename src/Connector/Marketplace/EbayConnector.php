@@ -130,7 +130,12 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'headers' => $headers,
                 'body' => $xmlRequest
             ]);
-            print_r($response->getContent());
+            $xmlContent = $response->getContent();
+
+            $xmlObject = simplexml_load_string($xmlContent);
+
+            $jsonResponse = json_encode($xmlObject);
+            print_r($jsonResponse);
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
