@@ -94,12 +94,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         // control expiresIn
-        $this->refreshToAccessToken();
+        //$this->refreshToAccessToken();
 
-    }
-
-    public function downloadInventory(): void
-    {
         $accessToken = $this->marketplace->getEbayAccessToken();
         $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
             <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
@@ -113,7 +109,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                  <StartTimeTo>2025-02-11T00:00:00.000Z</StartTimeTo>
               <IncludeWatchCount>true</IncludeWatchCount>
               <IncludeVariations>true</IncludeVariations>
-              <SKUArray>50</SKUArray>
+              <SKUArray>true</SKUArray>
               <Pagination>
                 <EntriesPerPage>2</EntriesPerPage>
               </Pagination>
@@ -121,7 +117,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
         $url = "https://api.ebay.com/ws/api.dll";
         $headers = [
-            "X-EBAY-API-COMPATIBILITY-LEVEL: 1131",
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
             "X-EBAY-API-CALL-NAME: GetSellerList",
             "X-EBAY-API-SITEID: 0",
             "Content-Type: text/xml"
@@ -141,6 +137,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
+
+
+
+
+    }
+
+    public function downloadInventory(): void
+    {
+
 
         /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
