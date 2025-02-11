@@ -102,7 +102,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->getEbayAccessToken(),
+                'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                 'Content-Type'  => 'application/json',
             ],
             'query' => [
