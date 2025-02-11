@@ -953,7 +953,7 @@ class ConsoleCommand extends AbstractCommand
                         default => $amazonConnectors['UK'],
                     };
                     echo "  ";
-                    $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
+                    $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, false, true);
                     $listingInfo = $listingInfos['listing'] ?? [];
 
                     $countryOfOrigin = $listingInfo['attributes']['countryOfOrigin'][0]['value'] ?? '';
