@@ -26,7 +26,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     protected function getConsentRequest(): void
     {
-        try {
+        $authCode = urldecode($this->marketplace->getEbayAuthCode());
+        echo "Decoded Auth Code: " . $authCode . "\n";
+        /*try {
             $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Content-Type'  => 'application/x-www-form-urlencoded',
@@ -48,7 +50,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Response Hatası: " . $e->getResponse()->getContent(false) . "\n";
         } catch (\Exception $e) {
             echo "Bilinmeyen Hata: " . $e->getMessage() . "\n";
-        }
+        }*/
 
 
 
