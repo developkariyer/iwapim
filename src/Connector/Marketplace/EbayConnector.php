@@ -136,25 +136,25 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 $xmlContent = $response->getContent();
                 $xmlObject = simplexml_load_string($xmlContent);
                 $jsonResponse = json_encode($xmlObject);
-
                 print_r($jsonResponse);
                 $responseObject = json_decode($jsonResponse);
                 if ($responseObject->Ack === 'Failure') {
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
-                if (isset($responseObject->GetSellerListResponse->ItemArray->Item)) {
-                    foreach ($responseObject->GetSellerListResponse->ItemArray->Item as $item) {
-                        $itemID = (string)$item->ItemID;
+                $responseArray = $response->toArray();
+                if (isset($responseArray['ItemArray']['Item'])) {
+                    foreach ($responseArray['ItemArray']['Item'] as $item) {
+                        $itemID = $item['ItemID'];
                         $itemExists = false;
                         foreach ($allData as $existingItem) {
-                            if ($existingItem->ItemID == $itemID) {
+                            if ($existingItem['ItemID'] == $itemID) {
                                 $itemExists = true;
                                 break;
                             }
                         }
                         if (!$itemExists) {
-                            $allData[] = $item;
+                            $allData['Products'] = $item;
                         }
                     }
                 }
