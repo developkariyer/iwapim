@@ -64,7 +64,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'body' => http_build_query([
                     'grant_type'    => 'refresh_token',
-                    'refresh_token' => $this->getEbayRefreshToken(),
+                    'refresh_token' => $this->marketplace->getEbayRefreshToken(),
                     'scope'  => $scope
                 ]),
             ]);
