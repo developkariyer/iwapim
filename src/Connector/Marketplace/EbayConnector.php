@@ -143,12 +143,12 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     break;
                 }
                 $responseArray = $response->toArray();
-                if (isset($responseArray['ItemArray']['Item'])) {
-                    foreach ($responseArray['ItemArray']['Item'] as $item) {
-                        $itemID = $item['ItemID'];
+                if (isset($responseObject->GetSellerListResponse->ItemArray->Item)) {
+                    foreach ($responseObject->GetSellerListResponse->ItemArray->Item as $item) {
+                        $itemID = (string)$item->ItemID;
                         $itemExists = false;
                         foreach ($allData as $existingItem) {
-                            if ($existingItem['ItemID'] == $itemID) {
+                            if ($existingItem->ItemID == $itemID) {
                                 $itemExists = true;
                                 break;
                             }
