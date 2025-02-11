@@ -25,6 +25,11 @@ query GetProducts($numProducts: Int!, $cursor: String) {
                 count
                 precision
             }
+            translations(locale: "ar") {
+                key
+                locale
+                value
+            }
             variants(first: 200) {
                 pageInfo {
                     hasNextPage
