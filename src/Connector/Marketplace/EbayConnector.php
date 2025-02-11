@@ -95,7 +95,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         // control expiresIn
         //$this->refreshToAccessToken();
-        /*$allData = [];
+        $allData = [];
         $accessToken = $this->marketplace->getEbayAccessToken();
         $startDate = strtotime('2022-04-01');
         $currentDate = time();
@@ -141,7 +141,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
-                print_r($jsonResponse['PaginationResult']);
+                print_r($responseObject->PaginationResult);
 //                foreach ($jsonResponse['ItemArray']['Item'] as $item) {
 //                        $allData[] = $item;
 //                        print_r($item);
@@ -155,7 +155,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         echo "\n\n\n\n\n\n";
         echo "------------------------------------------------------------------------------------------------\n";
         print_r(json_encode($allData));
-        echo "------------------------------------------------------------------------------------------------\n";*/
+        echo "------------------------------------------------------------------------------------------------\n";
     }
 
     public function downloadInventory(): void
