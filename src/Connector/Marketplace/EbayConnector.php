@@ -100,7 +100,42 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        $accessToken = $this->marketplace->getEbayAccessToken();
+        $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
+            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+              <RequesterCredentials>
+                <eBayAuthToken>' . $accessToken . '</eBayAuthToken> <!-- Token dinamik olarak buraya ekleniyor -->
+              </RequesterCredentials>
+              <ErrorLanguage>en_US</ErrorLanguage>
+              <WarningLevel>High</WarningLevel>
+              <GranularityLevel>Coarse</GranularityLevel>
+              <StartTimeFrom>2024-10-12T21:59:59.005Z</StartTimeFrom>
+              <StartTimeTo>2025-02-10T21:59:59.005Z</StartTimeTo>
+              <IncludeWatchCount>true</IncludeWatchCount>
+              <Pagination>
+                <EntriesPerPage>2</EntriesPerPage>
+              </Pagination>
+            </GetSellerListRequest>';
+
+        $url = "https://api.ebay.com/ws/api.dll";
+        $headers = [
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1131",
+            "X-EBAY-API-CALL-NAME: GetSellerList",
+            "X-EBAY-API-SITEID: 0",
+            "Content-Type: text/xml"
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'headers' => $headers,
+                'body' => $xmlRequest
+            ]);
+            print_r($response->getContent());
+        } catch (\Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
+
+        /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -113,7 +148,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo $response->getContent();
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }
+        }*/
     }
 
     public function downloadOrders(): void
