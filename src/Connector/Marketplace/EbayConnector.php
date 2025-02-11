@@ -107,7 +107,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ],
             'query' => [
                 'limit'  => 10,
-                'offset' => 0
+                'offset' => 0,
+                'sku' => ''
             ]
         ]);
         print_r($response->getContent());
