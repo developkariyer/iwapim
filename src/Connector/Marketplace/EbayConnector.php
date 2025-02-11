@@ -106,8 +106,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'Content-Type'  => 'application/json',
             ],
             'query' => [
-                'limit'  => 50,
-                'offset' => 1
+                'limit'  => 2,
+                'offset' => 0
             ]
         ]);
         print_r($response->getContent());
