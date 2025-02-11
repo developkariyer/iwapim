@@ -154,6 +154,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         }
                         if (!$itemExists) {
                             $allData[] = $item;
+                            print_r("ALLLLLLLLLLLLLLLLL DATAAAAAAAAAAAAA\n");
+                            print_r($allData);
                         }
                     }
                 }
