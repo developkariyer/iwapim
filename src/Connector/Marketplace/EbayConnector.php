@@ -141,10 +141,13 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $responseObject->Errors[0]->ShortMessage;
                     break;
                 }
-                foreach ($responseObject->ItemArray->Item as $item) {
-                      $allData[] = $item;
-                      print_r($item);
+                if (isset($responseObject->ItemArray->Item)) {
+                    foreach ($responseObject->ItemArray->Item as $item) {
+                        $allData[] = $item;
+                        print_r($item);
+                    }
                 }
+
                 $startDate = $startDate + $interval;
             } catch (\Exception $e) {
                 echo 'Hata: ' . $e->getMessage();
