@@ -26,9 +26,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     protected function getConsentRequest(): void
     {
-        $authCode = urldecode($this->marketplace->getEbayAuthCode());
-        echo "Decoded Auth Code: " . $authCode . "\n";
-        /*try {
+
+        try {
             $response = $this->httpClient->request('POST', self::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Content-Type'  => 'application/x-www-form-urlencoded',
@@ -38,7 +37,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'body' => http_build_query([
                     'grant_type'    => 'authorization_code',
-                    'code'          => $this->marketplace->getEbayAuthCode(),
+                    'code'          => urldecode($this->marketplace->getEbayAuthCode()),
                     'redirect_uri'  => $this->marketplace->getEbayRuName(),
                 ]),
             ]);
@@ -50,7 +49,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Response Hatası: " . $e->getResponse()->getContent(false) . "\n";
         } catch (\Exception $e) {
             echo "Bilinmeyen Hata: " . $e->getMessage() . "\n";
-        }*/
+        }
 
 
 
