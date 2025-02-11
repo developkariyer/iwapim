@@ -81,7 +81,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         }
         $responseArray  = $response->toArray();
         $accessToken    = $responseArray['access_token'];
+        print_r($accessToken);
         static::$expiresIn = $responseArray['expires_in'];
+        print_r(static::$expiresIn);
         $this->marketplace->setEbayAccessToken($accessToken);
     }
 
