@@ -48,16 +48,21 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Hata Kodu: " . $e->getCode() . "\n";
         }*/
 
-        $response = $this->httpClient->request('GET', static::$apiUrl['authorizeUrl'], [
-            'headers' => [
-                'client_id' => $this->marketplace->getEbayClientId(),
-                'redirect_uri' => $this->marketplace->getRedirectUri(),
-                'response_type' => 'code',
-                'scope' => "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/commerce.identity.readonly https://api.ebay.com/oauth/api_scope/sell.reputation https://api.ebay.com/oauth/api_scope/sell.reputation.readonly https://api.ebay.com/oauth/api_scope/commerce.notification.subscription https://api.ebay.com/oauth/api_scope/commerce.notification.subscription.readonly https://api.ebay.com/oauth/api_scope/sell.stores https://api.ebay.com/oauth/api_scope/sell.stores.readonly"
-            ]
-        ]);
-        print_r($response->getStatusCode());
-        print_r($response->getContent());
+        try {
+            $response = $this->httpClient->request('GET', static::$apiUrl['authorizeUrl'], [
+                'headers' => [
+                    'client_id' => $this->marketplace->getEbayClientId(),
+                    'redirect_uri' => $this->marketplace->getRedirectUri(),
+                    'response_type' => 'code',
+                    'scope' => "https://api.ebay.com/oauth/api_scope ..."
+                ]
+            ]);
+
+            echo "Response Status Code: " . $response->getStatusCode() . "\n";
+            echo "Response Content: " . $response->getContent();
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
 
