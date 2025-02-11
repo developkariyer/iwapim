@@ -94,8 +94,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         // control expiresIn
-        //$this->refreshToAccessToken();
-        $allData = [];
+        $this->refreshToAccessToken();
+        /*$allData = [];
         $accessToken = $this->marketplace->getEbayAccessToken();
         $startDate = strtotime('2022-04-01');
         $currentDate = time();
@@ -143,12 +143,12 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     break;
                 }
                 $responseArray = $response->toArray();
-                if (isset($responseObject->GetSellerListResponse->ItemArray->Item)) {
-                    foreach ($responseObject->GetSellerListResponse->ItemArray->Item as $item) {
-                        $itemID = (string)$item->ItemID;
+                if (isset($responseArray['ItemArray']['Item'])) {
+                    foreach ($responseArray['ItemArray']['Item'] as $item) {
+                        $itemID = $item['ItemID'];
                         $itemExists = false;
                         foreach ($allData as $existingItem) {
-                            if ($existingItem->ItemID == $itemID) {
+                            if ($existingItem['ItemID'] == $itemID) {
                                 $itemExists = true;
                                 break;
                             }
@@ -167,7 +167,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         echo "\n\n\n\n\n\n";
         echo "------------------------------------------------------------------------------------------------\n";
         print_r(json_encode($allData));
-        echo "------------------------------------------------------------------------------------------------\n";
+        echo "------------------------------------------------------------------------------------------------\n";*/
     }
 
     public function downloadInventory(): void
