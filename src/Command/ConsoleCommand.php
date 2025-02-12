@@ -969,7 +969,7 @@ class ConsoleCommand extends AbstractCommand
                         $newline = "";
                         $maxRetries = 3;
                         $attempt = 0;
-                        $success = false;
+                        $success = false;/*
                         while ($attempt < $maxRetries && !$success) {
                             try {
                                 $amazonConnector->utilsHelper->patchSetCountryOfOrigin($sku, $country);
@@ -983,7 +983,7 @@ class ConsoleCommand extends AbstractCommand
                                 }
                                 sleep(min(pow(2, $attempt), 15));
                             }
-                        }
+                        }*/
                     } catch (\Exception $e) {
                         echo "Error: ".$e->getMessage()."\n";
                         sleep(1);
