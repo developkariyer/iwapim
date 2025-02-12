@@ -954,7 +954,7 @@ class ConsoleCommand extends AbstractCommand
                     };
                     echo "  ";
                     try {
-                        $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, false, true);
+                        $listingInfos = $amazonConnector->utilsHelper->getInfo($sku, $country, true, true);
                         $listingInfo = $listingInfos['listing'] ?? [];
 
                         $countryOfOrigin = $listingInfo['attributes']['country_of_origin'][0]['value'] ?? '';
