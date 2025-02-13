@@ -1,0 +1,35 @@
+====== Ultimate Premium Products ======
+
+===== Marka Kimliği =====
+  * **Marka Açıklaması:**
+Ultimate Premium Products, **kaliteli malzemeler ve modern tasarımlar ile üretilmiş premium ev ve ofis dekorasyonu ürünleri sunan bir markadır**. Ürünler, yüksek işçilik kalitesi ve dayanıklılığı ile öne çıkmaktadır.  
+  * **Hedef Kitle:**  
+    - Lüks ve premium ev dekorasyonu arayan bireyler  
+    - Modern iç mimari ile uyumlu ürünler tercih eden kullanıcılar  
+    - Yüksek kaliteli ve uzun ömürlü mobilyalar isteyen müşteriler  
+  * **Ürün Kapsamı:**  
+    - Metal ve ahşap karışımı premium dekoratif ürünler  
+    - Özel tasarım mobilya ve aksesuarlar  
+    - Şık ve modern duvar panelleri  
+
+===== Logo ve Renk Paleti =====
+  * **Marka Logosu:**  
+    {{:iwaconcept:markalar:ultimate_premium_products_logo.svg|Ultimate Premium Products Logosu}}
+  * **Alternatif Logolar:**  
+    {{:iwaconcept:markalar:ultimate_premium_products_logo_white.svg|Beyaz Versiyon}}  
+    {{:iwaconcept:markalar:ultimate_premium_products_logo_black.svg|Siyah Versiyon}}  
+  * **Renk Paleti:**  
+    {{:iwaconcept:markalar:ultimate_premium_products_palet.svg|Renk Paleti}}
+    - **Ana Renk:** #2C3E50 (Koyu Gri-Mavi)  
+    - **İkincil Renkler:**  
+      - #BDC3C7 (Gri)  
+      - #E5C100 (Altın Sarısı)  
+      - #FFFFFF (Beyaz)  
+
+===== İlgili Dosyalar =====
+  * [[iwaconcept:markalar:logo_vektorler|Logo Vektör Dosyaları]]  
+  * [[iwaconcept:markalar:renk_paleti|Renk Paletleri ve Tipografi]]  
+  * [[iwaconcept:markalar:kullanim_kilavuzu|Marka Kullanım Kılavuzu]]  
+
+-----
+**Geri Dön:** [[iwaconcept:marka|Markalar Ana Sayfası]]

@@ -1,0 +1,42 @@
+.vshare {
+    aspect-ratio: 16/9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+div.vshare {
+    box-sizing: border-box;
+    border: 1px solid __border__;
+    cursor: pointer;
+    background-image: url(video.svg);
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-size: 5em 5em;
+}
+
+iframe.vshare__left,
+div.vshare__left {
+    float: left;
+    margin-right: 1em;
+}
+
+iframe.vshare__right,
+div.vshare__right {
+    float: right;
+    margin-left: 1em;
+}
+
+iframe.vshare__center,
+div.vshare__center {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+iframe.vshare__none,
+div.vshare__none {
+    margin: 1px 3px 1px 3px;
+}

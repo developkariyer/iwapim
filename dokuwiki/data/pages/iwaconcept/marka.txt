@@ -1,0 +1,48 @@
+====== Marka ======
+
+Bu bölüm, IWA Concept bünyesindeki markaların yönetimi ile ilgili genel kuralları içerir.  
+Her markanın kimliği, pazarlama stratejisi ve kullanımıyla ilgili bilgiler burada yer almaktadır.
+
+===== Genel Marka Yönetimi =====
+  * **Marka Kimliği ve Tutarlılık**  
+    - Markaların logoları, renk kodları ve tipografi standartları belirlenmiş olmalıdır.  
+    - Pazaryerleri, sosyal medya ve web sitesi gibi tüm kanallarda **tutarlı bir kimlik** korunmalıdır.  
+    - Marka mesajları, sloganlar ve görseller tüm platformlarda aynı algıyı yaratmalıdır.  
+
+  * **Ürün Kategorileri ve Marka Uyumu**  
+    - Her ürün, belirlenen **marka kapsamına uygun** olmalıdır.  
+    - Ürünlerin yanlış marka altında listelenmemesi için **kategori bazlı filtreleme** uygulanabilir.  
+    - Markanın sunduğu **değer önerisi (value proposition)** her üründe net olmalıdır.  
+
+  * **Pazaryeri ve Reklam Kullanımı**  
+    - **Amazon, eBay, Etsy gibi platformlarda** marka logoları ve açıklamaları tutarlı kullanılmalıdır.  
+    - Reklam materyalleri, markanın belirlediği **renk paleti ve tipografi** ile uyumlu olmalıdır.  
+    - **Influencer ve iş birliklerinde** markanın tonu ve mesajı ile uyumsuz içeriklerden kaçınılmalıdır.  
+
+  * **Görsel Standartlar**  
+    - Ürün fotoğrafları **beyaz arka plan, net aydınlatma ve profesyonel çekim kurallarına** uygun olmalıdır.  
+    - Her ürünün **ana görseli**, pazaryeri kurallarına uygun olacak şekilde belirlenmelidir.  
+    - Görsellerde **filigran, logo veya ekstra metin eklemekten kaçınılmalıdır (pazaryeri politikalarına bağlı olarak değişebilir).**  
+
+  * **Marka Koruma ve Sahiplik**  
+    - **Amazon Brand Registry, eBay Verified Rights Owner (VeRO) gibi programlara** marka kaydı yapılmalıdır.  
+    - Yetkisiz satıcıların veya taklit ürünlerin engellenmesi için **düzenli marka taramaları** yapılmalıdır.  
+    - Marka kullanım hakları açıkça belirlenmeli ve üçüncü taraflar için **kullanım kılavuzu** oluşturulmalıdır.  
+
+  * **İçerik ve Ürün Açıklamaları**  
+    - Ürün açıklamalarında **marka dili** korunmalıdır.  
+    - SEO uyumlu, ancak markanın kimliğini bozmayan içerikler oluşturulmalıdır.  
+    - Marka hikayesi ve müşteriyle kurulan duygusal bağ, ürün açıklamalarında yer almalıdır.  
+
+===== Markalar =====
+Aşağıdaki markalara tıklayarak ilgili markanın detaylı yönetim bilgilerine ulaşabilirsiniz:
+
+  * [[iwaconcept:markalar:iwa_concept|IWA Concept]]
+  * [[iwaconcept:markalar:colorfull_worlds|Colorfull Worlds]]
+  * [[iwaconcept:markalar:shukran_islamic_arts|Shukran Islamic Arts]]
+  * [[iwaconcept:markalar:ultimate_premium_products|Ultimate Premium Products]]
+
+===== Etsy Markaları =====
+Aşağıda Etsy mağazaları için oluşturulmuş mini markalar bulunmaktadır.
+
+{{namespace>iwaconcept:markalar:etsy?simple}}

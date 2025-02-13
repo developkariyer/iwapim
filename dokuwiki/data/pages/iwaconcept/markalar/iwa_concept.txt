@@ -1,0 +1,35 @@
+====== IWA Concept ======
+
+===== Marka Kimliği =====
+  * **Marka Açıklaması:**  
+    IWA Concept, modern ve geleneksel İslami sanatı **İslami duvar sanatı ve diğer İslami temalı ürünler** şeklinde birleştirerek estetik ve anlamı buluşturur.
+  * **Hedef Kitle:**  
+    - İslami dekorasyon ve sanat ürünleri arayan bireyler  
+    - Camiler, mescitler ve dini mekanlar  
+    - İslami hediye arayanlar  
+  * **Ürün Kapsamı:**  
+    - Metal duvar tabloları  
+    - Ahşap ve metal hat sanatı ürünleri  
+    - Seccade, tesbih ve diğer İslami aksesuarlar  
+
+===== Logo ve Renk Paleti =====
+  * **Marka Logosu:**  
+    {{:iwaconcept:markalar:iwa_concept_logo.svg?200|IWA Concept Logosu}}
+  * **Alternatif Logolar:**  
+    {{:iwaconcept:markalar:iwa_concept_logo_white.svg|Beyaz Versiyon}}  
+    {{:iwaconcept:markalar:iwa_concept_logo_black.svg|Siyah Versiyon}}  
+  * **Renk Paleti:**  
+    {{:iwaconcept:markalar:iwa_concept_palet.svg|Renk Paleti}}
+    - **Ana Renk:** #D4AF37 (Gold)  
+    - **İkincil Renkler:**  
+      - #000000 (Siyah)  
+      - #FFFFFF (Beyaz)  
+      - #8B4513 (Koyu Kahverengi)  
+
+===== İlgili Dosyalar =====
+  * [[iwaconcept:markalar:logo_vektorler|Logo Vektör Dosyaları]]  
+  * [[iwaconcept:markalar:renk_paleti|Renk Paletleri ve Tipografi]]  
+  * [[iwaconcept:markalar:kullanim_kilavuzu|Marka Kullanım Kılavuzu]]  
+
+-----
+**Geri Dön:** [[iwaconcept:marka|Markalar Ana Sayfası]]

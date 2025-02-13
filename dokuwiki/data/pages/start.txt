@@ -1,0 +1,19 @@
+====== IWA Concept ======
+
+Bu doküman, şirketin tüm operasyon süreçlerini kapsar. 
+Aşağıdaki bölümlerden ilgili başlığa tıklayarak erişebilirsiniz.
+
+
+  * [[iwaconcept:marka|Marka]]
+  * [[iwaconcept:urun_katalog|Ürün ve Katalog]]
+  * [[iwaconcept:tasarim|Tasarım]]
+  * [[iwaconcept:uretim|Üretim]]
+  * [[iwaconcept:pazaryeri|Pazaryeri]] 
+  * [[iwaconcept:reklam|Reklam]]
+  * [[iwaconcept:satis_musteri|Satış ve Sonrası]]
+  * [[iwaconcept:kargo|Kargo ve Nakliye]]
+  * [[iwaconcept:denetim_checklist|Denetim, Checklist ve Güncelleme]]
+
+**__Kılavuzlar ve Kaynaklar__**
+  * [[iwaconcept:dokuman_kullanimi|Bu Dokümanı Kullanma Kılavuzu]]
+  * [[iwaconcept:iwapim_rehberi|IWAPIM Kullanım Rehberi]]

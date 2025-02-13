@@ -1,0 +1,35 @@
+====== Shukran Islamic Arts ======
+
+===== Marka Kimliği =====
+  * **Marka Açıklaması:**
+Shukran Islamic Arts, **İslami duvar sanatı ve dekoratif ürünler** sunan bir markadır. IWA Concept’in ürün gamına benzer içeriklere sahip olup, belirli pazaryerlerinde alternatif bir marka olarak konumlandırılmıştır.  
+  * **Hedef Kitle:**  
+    - İslami sanat ve dekorasyon ürünleri arayan bireyler  
+    - Alternatif marka arayan müşteri segmentleri  
+    - İslami hediye kategorisine ilgi duyan kullanıcılar  
+  * **Ürün Kapsamı:**  
+    - Metal duvar tabloları  
+    - Ahşap ve metal hat sanatı ürünleri  
+    - Seccade, tesbih ve diğer İslami aksesuarlar  
+
+===== Logo ve Renk Paleti =====
+  * **Marka Logosu:**  
+    {{:iwaconcept:markalar:shukran_islamic_arts_logo.svg|Shukran Islamic Arts Logosu}}
+  * **Alternatif Logolar:**  
+    {{:iwaconcept:markalar:shukran_islamic_arts_logo_white.svg|Beyaz Versiyon}}  
+    {{:iwaconcept:markalar:shukran_islamic_arts_logo_black.svg|Siyah Versiyon}}  
+  * **Renk Paleti:**  
+    {{:iwaconcept:markalar:shukran_islamic_arts_palet.svg|Renk Paleti}}
+    - **Ana Renk:** #A67C52 (Koyu Altın)  
+    - **İkincil Renkler:**  
+      - #000000 (Siyah)  
+      - #F1E6D2 (Bej)  
+      - #FFFFFF (Beyaz)  
+
+===== İlgili Dosyalar =====
+  * [[iwaconcept:markalar:logo_vektorler|Logo Vektör Dosyaları]]  
+  * [[iwaconcept:markalar:renk_paleti|Renk Paletleri ve Tipografi]]  
+  * [[iwaconcept:markalar:kullanim_kilavuzu|Marka Kullanım Kılavuzu]]  
+
+-----
+**Geri Dön:** [[iwaconcept:marka|Markalar Ana Sayfası]]

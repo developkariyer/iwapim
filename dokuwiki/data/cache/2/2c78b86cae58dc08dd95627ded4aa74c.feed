@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generator="FeedCreator 1.8" -->
+<?xml-stylesheet href="https://docs.iwa.web.tr/lib/exe/css.php?s=feed" type="text/css"?>
+<rdf:RDF
+    xmlns="http://purl.org/rss/1.0/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel rdf:about="https://docs.iwa.web.tr/feed.php">
+        <title>IWA Concept</title>
+        <description></description>
+        <link>https://docs.iwa.web.tr/</link>
+        <image rdf:resource="https://docs.iwa.web.tr/lib/exe/fetch.php/wiki:logo.svg" />
+       <dc:date>2025-02-13T16:20:15+00:00</dc:date>
+        <items>
+            <rdf:Seq>
+            </rdf:Seq>
+        </items>
+    </channel>
+    <image rdf:about="https://docs.iwa.web.tr/lib/exe/fetch.php/wiki:logo.svg">
+        <title>IWA Concept</title>
+        <link>https://docs.iwa.web.tr/</link>
+        <url>https://docs.iwa.web.tr/lib/exe/fetch.php/wiki:logo.svg</url>
+    </image>
+</rdf:RDF>

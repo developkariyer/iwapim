@@ -1,0 +1,13 @@
+2025-02-13 11:03:48	/var/www/iwapim/dokuwiki/vendor/phpseclib/phpseclib/phpseclib/Crypt/Common/SymmetricKey.php(2595)	phpseclib3\Exception\BadDecryptionException: The ciphertext has an invalid padding length (142) compared to the block size (16)
+  #0 /var/www/iwapim/dokuwiki/vendor/phpseclib/phpseclib/phpseclib/Crypt/Common/SymmetricKey.php(1661): phpseclib3\Crypt\Common\SymmetricKey->unpad()
+  #1 /var/www/iwapim/dokuwiki/vendor/phpseclib/phpseclib/phpseclib/Crypt/Rijndael.php(1034): phpseclib3\Crypt\Common\SymmetricKey->decrypt()
+  #2 /var/www/iwapim/dokuwiki/inc/auth.php(470): phpseclib3\Crypt\Rijndael->decrypt()
+  #3 /var/www/iwapim/dokuwiki/inc/auth.php(324): auth_decrypt()
+  #4 /var/www/iwapim/dokuwiki/inc/auth.php(232): auth_login()
+  #5 [internal function]: auth_login_wrapper()
+  #6 /var/www/iwapim/dokuwiki/inc/Extension/Event.php(134): call_user_func_array()
+  #7 /var/www/iwapim/dokuwiki/inc/Extension/Event.php(200): dokuwiki\Extension\Event->trigger()
+  #8 /var/www/iwapim/dokuwiki/inc/auth.php(114): dokuwiki\Extension\Event::createAndTrigger()
+  #9 /var/www/iwapim/dokuwiki/inc/init.php(238): auth_setup()
+  #10 /var/www/iwapim/dokuwiki/doku.php(38): require_once('...')
+  #11 {main}

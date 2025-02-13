@@ -1,0 +1,93 @@
+====== Ürün ve Katalog ======
+
+Bu sayfa, ürün ve katalog yönetiminin temel prensiplerini ve en iyi uygulamalarını (best practices) içerir.  
+Katalog yönetimi, **tasarım, üretim, listing, reklam ve satış süreçleriyle doğrudan bağlantılıdır**.  
+Katalogun düzenli ve tutarlı olması, operasyonel verimlilik ve marka bütünlüğü için kritik öneme sahiptir.
+
+===== Katalog Yönetiminin Temel İlkeleri =====
+  * **Standartlaştırılmış Ürün Bilgisi:**  
+    - Ürün adları, açıklamaları, teknik özellikleri ve varyasyonları belirlenen standartlara uygun olmalıdır.  
+    - Her pazaryeri için farklı gereksinimler olsa da **temel ürün bilgileri değişmemelidir**.  
+  * **Doğru Kategorilendirme:**  
+    - Ürünler, **IWAPIM’de doğru kategorilere** atanmalıdır.  
+    - Yanlış kategori seçimi, SEO ve pazaryeri görünürlüğünü olumsuz etkiler.  
+  * **Varyasyon Yönetimi:**  
+    - Aynı ürünün farklı renk, boyut veya model varyasyonları, **tek bir listing içinde** toplanmalıdır.  
+    - Gereksiz duplicate listing'lerden kaçınılmalıdır.  
+  * **Ürün Kimlikleri ve SKU Yönetimi:**  
+    - Her ürün, **IWASKU** ile benzersiz şekilde tanımlanmalıdır.  
+    - **GTIN, EAN, UPC gibi küresel tanımlayıcı kodlar** gerektiği durumlarda IWAPIM üzerinden alınmalıdır.  
+  * **Görsel Standartlar:**  
+    - Ürün fotoğrafları **beyaz arka plan, yüksek çözünürlük ve net ışıklandırma kurallarına** uygun olmalıdır.  
+    - Görsellerin **IWAPIM’e doğru format ve isimlendirme ile yüklenmesi** gereklidir.  
+
+===== Katalog ve Diğer Süreçler Arasındaki İlişkiler =====
+  * **Tasarım ile İlişki:**  
+    - Yeni ürünler, katalog yapısına uygun şekilde tasarlanmalıdır.  
+    - Katalog için gerekli olan görsel, teknik detaylar ve varyasyon bilgileri tasarım sürecinde belirlenmelidir.  
+  * **Üretim ile İlişki:**  
+    - Üretime giren her ürünün katalogda tanımlı olması gerekir.  
+    - Üretim sonrası ürün özellikleri değişirse katalog güncellenmelidir.  
+  * **Listing ile İlişki:**  
+    - Katalog bilgileri, pazaryerlerine aktarılırken doğru biçimde uyarlanmalıdır.  
+    - Farklı platformların gereksinimlerine göre içerik optimize edilmelidir.  
+  * **Reklam ile İlişki:**  
+    - Katalog, reklam kampanyaları için referans olarak kullanılır.  
+    - Ürün açıklamaları ve görseller, reklam görselleri ile uyumlu olmalıdır.  
+  * **Satış ile İlişki:**  
+    - Kampanya ve fiyatlandırmalar katalog yönetimi ile eşleştirilmelidir.  
+    - Katalogdaki hatalı bilgiler, müşteri şikayetlerine yol açabilir.  
+
+===== Katalog Süreçleri =====
+Aşağıdaki süreçler, katalog yönetimiyle ilgili en kritik işlemleri tanımlar.  
+Her süreç için ilgili sayfaya tıklayarak detaylı adımlara ulaşabilirsiniz.
+
+==== Katalog Yönetimi ====
+  * [[iwaconcept:urun_katalog:yeni_kategori_ekleme|Kataloğa Yeni Kategori Ekleme]]
+  * [[iwaconcept:urun_katalog:yeni_urun_ekleme|Kataloğa Yeni Ürün Ekleme]]
+  * [[iwaconcept:urun_katalog:urun_bilgisi_degistirme|Ürün Bilgilerini Değiştirme]]
+  * [[iwaconcept:urun_katalog:urun_silme|Ürün Silme]]
+  * [[iwaconcept:urun_katalog:set_urun_tanimlama|Set Ürün Tanımlama]]
+
+==== Varyasyon Yönetimi ====
+  * [[iwaconcept:urun_katalog:varyasyon_ekleme|Ürüne Varyasyon Ekleme]]
+  * [[iwaconcept:urun_katalog:varyasyon_bilgisi_degistirme|Varyasyon Bilgilerini Değiştirme]]
+  * [[iwaconcept:urun_katalog:varyasyon_silme|Varyasyon Silme]]
+  * [[iwaconcept:urun_katalog:varyasyon_listing_baglama|Varyasyon ile Listing'in Bağlanması]]
+
+==== EAN ve Barkod Yönetimi ====
+  * [[iwaconcept:urun_katalog:yeni_ean_alma|Yeni EAN Alınması]]
+  * [[iwaconcept:urun_katalog:hatalı_ean_duzeltme|Hatalı EAN ile İlgili Yapılacak İşlem]]
+
+===== Ürün Kategorileri =====
+
+^ IWAPIM Kategori ^ Wisersell Kategori ^ Sorumlu Personel ^
+| AHM-Mobilya | Mobilya | İlker Bey |
+| CA-Haritalar | CFW Ahşap Harita | Elif Hanım |
+| CAS-Harita Setler | CFW Ahşap Harita | Elif Hanım |
+| CM-Trend Metal | CFW Metal |  |
+| CMA-Metal Üstü Haritalar | CFW Metal Üstü Ahşap |  |
+| CMS-Trend Metal Setler | CFW Metal |  |
+| CT-Islamic Çerçeveli | Shukran Cam |  |
+| CUS-Custom | Montaj Atölyesi |  |
+| DS-Al Sat | Alsat |  |
+| IA-Islamic Ahşap | IWA Ahşap |  |
+| IAS-Islamic Ahşap Setler | IWA Ahşap |  |
+| IJ-Islamic Jewelry | İslami Takı |  |
+| IM-Islamic Metal | IWA Metal |  |
+| IMS-Islamic Metal Setler | IWA Metal |  |
+| IT-Islamic Tabletop | IWA Tabletop |  |
+| ITS-Islamic Tabletop Setler | IWA Tabletop |  |
+| ITE-Tekstil | Tekstil |  |
+| KAS-Ramazan Paketleri |  |  |
+| KUL-Kulübeler | Motanj Atölyesi |  |
+| KV-Kanvaslar | Kanvas |  |
+| SAT-Cam Ahşap Tablo | Shukran Cam |  |
+| SC-Cam Ürünler | Shukran Cam |  |
+| SCS-Cam Ürün Setler | Shukran Cam |  |
+| TA-Trend Ahşap | Trend Ahşap |  |
+| TES-Tekstil Setler | Tekstil |  |
+| XS-Sarf | XSarf | Murat Aytaç Bey |
+
+-----
+**Geri Dön:** [[iwaconcept:start|Ana Sayfa]]

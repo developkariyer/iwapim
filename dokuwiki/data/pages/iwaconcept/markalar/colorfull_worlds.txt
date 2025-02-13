@@ -1,0 +1,35 @@
+====== Colorfull Worlds ======
+
+===== Marka Kimliği =====
+  * **Marka Açıklaması:**  
+    Colorfull Worlds, modern ve estetik tasarımlarıyla **duvar haritaları, trend metal sanat eserleri ve İslami olmayan dekoratif ürünler** sunan bir markadır.  
+  * **Hedef Kitle:**  
+    - Ev ve ofis dekorasyonu için yenilikçi tasarımlar arayanlar  
+    - Seyahat temalı haritalar ve dünya haritalarıyla ilgilenen bireyler  
+    - Metal sanat ve modern dekorasyon ürünlerini tercih edenler  
+  * **Ürün Kapsamı:**  
+    - Metal dünya haritaları  
+    - Modern ve soyut metal duvar sanatı  
+    - Tematik dekoratif tablolar  
+
+===== Logo ve Renk Paleti =====
+  * **Marka Logosu:**  
+    {{:iwaconcept:markalar:colorfull_worlds_logo.svg|Colorfull Worlds Logosu}}
+  * **Alternatif Logolar:**  
+    {{:iwaconcept:markalar:colorfull_worlds_logo_white.svg|Beyaz Versiyon}}  
+    {{:iwaconcept:markalar:colorfull_worlds_logo_black.svg|Siyah Versiyon}}  
+  * **Renk Paleti:**  
+    {{:iwaconcept:markalar:colorfull_worlds_palet.svg|Renk Paleti}}
+    - **Ana Renk:** #E67E22 (Turuncu)  
+    - **İkincil Renkler:**  
+      - #2980B9 (Mavi)  
+      - #2ECC71 (Yeşil)  
+      - #FFFFFF (Beyaz)  
+
+===== İlgili Dosyalar =====
+  * [[iwaconcept:markalar:logo_vektorler|Logo Vektör Dosyaları]]  
+  * [[iwaconcept:markalar:renk_paleti|Renk Paletleri ve Tipografi]]  
+  * [[iwaconcept:markalar:kullanim_kilavuzu|Marka Kullanım Kılavuzu]]  
+
+-----
+**Geri Dön:** [[iwaconcept:marka|Markalar Ana Sayfası]]
