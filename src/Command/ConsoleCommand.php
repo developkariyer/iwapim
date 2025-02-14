@@ -538,6 +538,7 @@ B0B4KF1Q21";
                                 try {
                                     $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
                                     $amazonListing->setValue('ean', '');
+                                    $amazonListing->save();
                                     $success = true;
                                 } catch (\Exception $e) {
                                     $attempt++;
