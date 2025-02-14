@@ -1,6 +1,5 @@
 # Ignore everything
 /*
-whoami.pdf
 # Unignore src/ folder and its contents
 !src/
 !src/**
@@ -10,3 +9,14 @@ whoami.pdf
 !.gitignore
 !LICENSE
 !dokuwiki/
+!var/
+!var/classes
+var/cache/
+var/logs/
+var/recyclebin/
+var/versions/
+var/tmp/
+var/config/
+var/admin/
+var/installer/
+var/python_venv/
