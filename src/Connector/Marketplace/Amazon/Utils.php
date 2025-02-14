@@ -198,16 +198,16 @@ class Utils
 
         $patches = [
             new PatchOperation(
-                op: "replace",
+                op: "delete",
                 path: "/attributes/externally_assigned_product_identifier",
                 value: [
                     [
                         "marketplace_id" => AmazonConstants::amazonMerchant[$country]['id'],
                         "type" => "ean",
-                        "value" => $ean
+//                        "value" => $ean
                     ]
                 ]
-            ),
+            ),/*
             new PatchOperation(
                 op: "delete",
                 path: "/attributes/externally_assigned_product_identifier",
@@ -217,7 +217,7 @@ class Utils
                         "type" => "upc",
                     ]
                 ]
-            )
+            )*/
         ];
         $this->patchCustom($sku, $country, $patches);
     }

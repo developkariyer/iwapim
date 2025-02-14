@@ -413,5 +413,4 @@ class GoogleSheetsController extends FrontendController
         return new JsonResponse($variantProducts, 200);
     }
 
-
 }
