@@ -434,11 +434,11 @@ class ConsoleCommand extends AbstractCommand
             foreach ($products as $product) {
                 $index++;
                 echo "\rProcessing $index {$product->getId()} {$product->getIwasku()} ";
-                $ean = $product->getEanGtin();
+                $ean = $product->getEanGtin();/*
                 if (empty($ean)) {
                     continue;
                 }
-                echo "EAN: $ean ";
+                echo "EAN: $ean ";*/
                 foreach ($product->getListingItems() as $variantProduct) {
                     if ($variantProduct->getLastUpdate() < $carbon3daysAgo) {
                         continue;
@@ -447,12 +447,12 @@ class ConsoleCommand extends AbstractCommand
                     if ($marketplace->getMarketplaceType() === 'Amazon') {
                         $amazonListings = $variantProduct->getAmazonMarketplace();
                         $newline = "\n";
-                        foreach ($amazonListings as $amazonListing) {
+                        foreach ($amazonListings as $amazonListing) {/*
                             $currentEan = $amazonListing->getEan();
                             if (!empty($currentEan)) { //$currentEan === $ean
                                 echo "\n  Amazon: {$marketplace->getKey()} $currentEan SKIPPING\n";
                                 continue;
-                            }
+                            }*/
                             $sku = $amazonListing->getSku();
                             $country = $amazonListing->getMarketplaceId();
                             if (empty($sku)) {
