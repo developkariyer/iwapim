@@ -401,7 +401,7 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws \Exception
      */
-    public function commandDeleteListings(): void
+    public function commandDeleteAmazonListings(): void
     {
         $amazonAsinsToDelete = "B0BGP1D7PL";/*
 B0BGL9XXPT
