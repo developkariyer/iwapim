@@ -531,12 +531,13 @@ B0B4KF1Q21";
                             };
                             echo "$newline  Amazon: {$amazonConnector->marketplace->getKey()} $sku $country ";
                             $newline = "";
-                            $maxRetries = 5;
+                            $maxRetries = 2;
                             $attempt = 0;
                             $success = false;
                             while ($attempt < $maxRetries && !$success) {
                                 try {
                                     $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
+                                    $amazonListing->setValue('ean', '');
                                     $success = true;
                                 } catch (\Exception $e) {
                                     $attempt++;
@@ -545,7 +546,7 @@ B0B4KF1Q21";
                                         echo "Max retry limit reached. Skipping.\n";
                                         break;
                                     }
-                                    sleep(min(pow(2, $attempt), 15));
+                                    sleep(max(pow(2, $attempt), 15));
                                 }
                             }
                         }
