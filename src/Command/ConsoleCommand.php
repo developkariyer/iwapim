@@ -398,6 +398,194 @@ class ConsoleCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function commandDeleteListings(): void
+    {
+        $amazonAsinsToDelete = "B0BGP1D7PL";/*
+B0BGL9XXPT
+B0BGLDLLW5
+B0BGLC7JRP
+B0C5JSDN5Q
+B09PJM8SJ6
+B0B51VZB7T
+B09TWCNCYG
+B09TWFKJZT
+B09V87TFXJ
+B09TWDJ5SM
+B0BBSP5PK5
+B0BBS765HH
+B0B51YP11T
+B0BDX1XZGJ
+B0BDX2NMD2
+B09FN7ZLMK
+B0BQRL1Y7T
+B0BDX1ZHJ6
+B09FJ3F3TB
+B09FJ49YFL
+B0BDLVGV43
+B0BDLTTKV7
+B0BDLWPJ6P
+B09SHS5ZTN
+B0B51V7Z45
+B0BDLW7CFJ
+B09SHSTHBW
+B0BBRHTF4L
+B0B51WWV9Y
+B0BBRC923T
+B0BB77PKK8
+B0B5XYT58L
+B0BB7YWKDD
+B0B5XWYZQ8
+B0BB78DLWN
+B0B5Y321W3
+B0BB7645VR
+B0B5XT517X
+B0BB74KGSF
+B09FM1LH55
+B09FLZQ5YM
+B0BDX2L4LZ
+B0BS72MZHY
+B0BDX2759T
+B0BDW9MPYP
+B0BDVMWCZG
+B0BDSQYBZ6
+B0BDSTLYS3
+B0BDVN5GB2
+B0BDVN81X9
+B0BDVLNBQG
+B0CKXPGZ9F
+B0BGY3PXXR
+B0894MX56F
+B089451N9Z
+B089463VG3
+B09H66D6KJ
+B09H67JT4T
+B09H671XN9
+B09H68G857
+B09LT65WRY
+B09LT419MW
+B0BRJGH5LL
+B089S44HV9
+B089S48D6P
+B089S3VVSZ
+B089S4M44X
+B089S39LGL
+B089S459R2
+B09KR37KP1
+B09KR127H3
+B09KQZDZGT
+B09KQZNN5J
+B09KQZX3BG
+B09KR1G6FN
+B09KQZQF8J
+B09KQZDW3P
+B08B5D3NWG
+B09GFZNMLV
+B08B5D98YG
+B08B5D1GK6
+B08B5CN1PB
+B09LTF84R3
+B09LTG9WFG
+B09LTGR42M
+B09LTGS5W4
+B09LTGWXSC
+B09LTGGSM3
+B09LTGD7TS
+B09LTGVNP2
+B089RFXVYC
+B09C41CSDV
+B09KNJXBCW
+B09C4296YJ
+B09KNKDYCZ
+B09KNHKTZJ
+B09KNHCBV5
+B09KNHMM5S
+B0D6VRW6SM
+B08BQ2RVNK
+B08BQH3LLB
+B08BN37117
+B08BN2R62B
+B08BX7HWXX
+B08BX7H8PR
+B0983Y3TZ2
+B09NQQLQYC
+B09NQR7R66
+B09NQRFWZY
+B09NQPKTRN
+B09NQRKXW6
+B09NQPGXGD
+B09NQRGGYF
+B09NQQW3WZ
+B09NQSJVVV
+B09NQRV73C
+B09NQQN6TF
+B09NQRSZS4
+B09C2D5CYW
+B09NQRKBQD
+B09NQQWSGH
+B09NQRHN18
+B09NQSN9VB
+B09NQPZDL1
+B0CFYLX4PX
+B09NQTBSPV
+B09NQQP35N
+B09NQR7RXD
+B09NQR3N1J
+B0CF5LBWX9
+B09NQSPCLJ
+B0BZD3MJJZ
+B09NQRG1T1
+B0BZD51W7D
+B0BZD3T5MQ
+B0BZD56GXK
+B0BZD5WZQM
+B09NQRVZ22
+B09NQSKQ9Y
+B09NQQPY1P
+B09NQRXZL3
+B09NQQH4QX
+B09NQR1L3Q";*/
+
+        $amazonConnectors = [
+            'AU' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonAU')),
+            'UK' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUK')),
+            'US' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonUS')),
+            'CA' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonCA')),
+            'JP' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonJP')),
+        ];
+        foreach (explode("\n", $amazonAsinsToDelete) as $asin) {
+            echo "\rProcessing $asin ";
+            $listing = VariantProduct::getByUniqueMarketplaceId(trim($asin), 1);
+            if (!$listing) {
+                echo "Not Found\n";
+                continue;
+            }
+            foreach ($listing->getAmazonMarketplace() as $amazonMarketplace) {
+                $carbon3daysAgo = Carbon::now()->subDays(3);
+                if ($amazonMarketplace->getLastUpdate() < $carbon3daysAgo) {
+                    continue;
+                }
+                $sku = $amazonMarketplace->getSku();
+                $country = $amazonMarketplace->getMarketplaceId();
+                $amazonConnector = match ($country) {
+                    'AU' => $amazonConnectors['AU'],
+                    'US','MX' => $amazonConnectors['US'],
+                    'CA' => $amazonConnectors['CA'],
+                    'JP' => $amazonConnectors['JP'],
+                    default => $amazonConnectors['UK'],
+                };
+                try {
+                    echo "\n  $sku $country ";
+                    $amazonConnector->utilsHelper->deleteListing($sku, $country);
+                    echo "Deleted\n";
+                } catch (\Exception $e) {
+                    echo "Error: ".$e->getMessage()."\n";
+                }
+            }
+        }
+    }
 
     /**
      * @throws RandomException

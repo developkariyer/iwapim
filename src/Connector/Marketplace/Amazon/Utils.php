@@ -247,6 +247,18 @@ class Utils
         $this->patchCustom($sku, $country, $patches);
     }
 
+    public function deleteListing($sku, $country = null): void
+    {
+        if (empty($country)) {
+            $country = $this->connector->mainCountry;
+        }
+        $listingsApi = $this->connector->amazonSellerConnector->listingsItemsV20210801();
+        $listingsApi->deleteListingsItem(
+            sellerId: $this->connector->getMarketplace()->getMerchantId(),
+            sku: rawurlencode($sku),
+            marketplaceIds: [AmazonConstants::amazonMerchant[$country]['id']]
+        );
+    }
 
 
 }
