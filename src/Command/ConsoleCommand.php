@@ -403,7 +403,7 @@ class ConsoleCommand extends AbstractCommand
      */
     public function commandDeleteAmazonListings(): void
     {
-        $amazonAsinsToDelete = "B0BGP1D7PL";/*
+        $amazonAsinsToDelete = "B0BGP1D7PL
 B0BGL9XXPT
 B0BGLDLLW5
 B0BGLC7JRP
@@ -546,7 +546,7 @@ B09NQSKQ9Y
 B09NQQPY1P
 B09NQRXZL3
 B09NQQH4QX
-B09NQR1L3Q";*/
+B09NQR1L3Q";
 
         $amazonConnectors = [
             'AU' => new AmazonConnector(Marketplace::getByPath('/Ayarlar/Pazaryerleri/Amazon/AmazonAU')),
