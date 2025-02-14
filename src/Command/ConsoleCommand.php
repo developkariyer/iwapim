@@ -511,12 +511,12 @@ B0B4KF1Q21";
                     if ($marketplace->getMarketplaceType() === 'Amazon') {
                         $amazonListings = $variantProduct->getAmazonMarketplace();
                         $newline = "\n";
-                        foreach ($amazonListings as $amazonListing) {/*
+                        foreach ($amazonListings as $amazonListing) {
                             $currentEan = $amazonListing->getEan();
-                            if (!empty($currentEan)) { //$currentEan === $ean
-                                echo "\n  Amazon: {$marketplace->getKey()} $currentEan SKIPPING\n";
+                            if (empty($currentEan)) { //$currentEan === $ean
+                                //echo "\n  Amazon: {$marketplace->getKey()} $currentEan SKIPPING\n";
                                 continue;
-                            }*/
+                            }
                             $sku = $amazonListing->getSku();
                             $country = $amazonListing->getMarketplaceId();
                             if (empty($sku)) {
@@ -537,8 +537,6 @@ B0B4KF1Q21";
                             while ($attempt < $maxRetries && !$success) {
                                 try {
                                     $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
-                                    $amazonListing->setValue('ean', '');
-                                    $amazonListing->save();
                                     $success = true;
                                 } catch (\Exception $e) {
                                     $attempt++;
