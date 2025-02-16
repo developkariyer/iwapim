@@ -486,7 +486,7 @@ B0B4KF1Q21";
         $offset = 0;
         $listingObject->setLimit($pageSize);
         $index = $offset;
-        $carbon3daysAgo = Carbon::now()->subDays(3);
+        $carbon3daysAgo = Carbon::now()->subDays(1);
         $connectors = [];
         while (true) {
             $listingObject->setOffset($offset);
