@@ -258,7 +258,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
             $count = 0;
             $variations = $mainListing['Variations']['Variation'] ?? [null];
-            echo $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']) . "\n";
+            echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
             /*foreach ($variations as $listing) {
                 $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
