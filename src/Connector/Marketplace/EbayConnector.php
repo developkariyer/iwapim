@@ -81,10 +81,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         }
         $responseArray  = $response->toArray();
         $accessToken    = $responseArray['access_token'];
-        print_r($accessToken);
         static::$expiresIn = $responseArray['expires_in'];
-        print_r(static::$expiresIn);
         $this->marketplace->setEbayAccessToken($accessToken);
+        $this->marketplace->save();
     }
 
 
@@ -93,6 +92,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
+        $this->refreshToAccessToken();
         // control expiresIn
         //$this->refreshToAccessToken();
         /*$allData = [];
