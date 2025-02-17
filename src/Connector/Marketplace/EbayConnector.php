@@ -271,7 +271,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         'parentResponseJson' => json_encode($parentResponseJson),
                         'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
                         'sku' => $listing['SKU'] ?? '',
-                        'ean' => $listing['VariationProductListingDetails']['UPC'] ?? '',
+                        //'ean' => $listing['VariationProductListingDetails']['UPC'] ?? '',
                     ],
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,
