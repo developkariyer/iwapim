@@ -257,7 +257,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['Variations']);
             }
             $count = 0;
-            foreach ($mainListing['Variations']['Variation'] as $listing) {
+            $variations = $mainListing['Variations']['Variation'] ?? [null];
+            foreach ($variations as $listing) {
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => Utility::getCachedImage($mainListing['PictureDetails']['PictureURL'][0]) ?? '',
