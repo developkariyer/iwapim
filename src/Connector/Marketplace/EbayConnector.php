@@ -120,7 +120,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   <ErrorLanguage>en_US</ErrorLanguage>
                   <WarningLevel>High</WarningLevel>
                   <GranularityLevel>Coarse</GranularityLevel>
-                  <DetailLevel>ReturnAll</DetailLevel> 
+                  <DetailLevel>GetItem</DetailLevel> 
                   <StartTimeFrom>' . $startTime . '</StartTimeFrom>
                   <StartTimeTo>' . $endTime . '</StartTimeTo>
                   <IncludeWatchCount>true</IncludeWatchCount>
