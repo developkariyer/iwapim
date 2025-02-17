@@ -120,7 +120,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   <IncludeWatchCount>true</IncludeWatchCount>
                   <IncludeVariations>true</IncludeVariations>
                   <SKUArray>
-                   <SKU>true</SKU>
+                   <SKU>VariationType</SKU>
                   </SKUArray>
                   <Pagination>
                     <EntriesPerPage>200</EntriesPerPage>
