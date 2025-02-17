@@ -196,15 +196,24 @@ class EbayConnector extends MarketplaceConnectorAbstract
         
     }
 
-    private function getAttributes($listing) {
+    private function getAttributes($listing): string
+    {
         $attributes = "";
         if (isset($listing['VariationSpecifics']['NameValueList'])) {
-            foreach ($listing['VariationSpecifics']['NameValueList'] as $item) {
-                $attributes .= $item['Value'] . " ";
+            $nameValueList = $listing['VariationSpecifics']['NameValueList'];
+            if (!is_array($nameValueList) || isset($nameValueList['Name'])) {
+                $nameValueList = [$nameValueList];
+            }
+            foreach ($nameValueList as $item) {
+                if (isset($item['Value'])) {
+                    $value = is_array($item['Value']) ? implode(', ', $item['Value']) : $item['Value'];
+                    $attributes .= $value . " ";
+                }
             }
         }
-        return $attributes;
+        return trim($attributes);
     }
+
 
     public function import($updateFlag, $importFlag): void
     {
