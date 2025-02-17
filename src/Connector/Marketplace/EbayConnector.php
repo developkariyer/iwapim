@@ -119,7 +119,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   <StartTimeTo>' . $endTime . '</StartTimeTo>
                   <IncludeWatchCount>true</IncludeWatchCount>
                   <IncludeVariations>true</IncludeVariations>
-                  <SKUArray>true</SKUArray>
+                  <SKUArray>
+                   <SKU> </SKU>
+                  </SKUArray>
                   <Pagination>
                     <EntriesPerPage>200</EntriesPerPage>
                   </Pagination>
@@ -144,7 +146,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     }
                 }
                 echo "Start Time: " . $startTime . " End Time: " . $endTime . "\n";
-                echo "Count: " . count($this->listings) . "\n";
+                echo "Total Count: " . count($this->listings) . "\n";
                 $startDate = $startDate + $interval;
             } catch (\Exception $e) {
                 echo 'Hata: ' . $e->getMessage();
