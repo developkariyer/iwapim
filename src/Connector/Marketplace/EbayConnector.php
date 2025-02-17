@@ -181,7 +181,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        $this->refreshToAccessToken();
         $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
