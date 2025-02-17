@@ -256,6 +256,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             if (isset($parentResponseJson['Variations'])) {
                 unset($parentResponseJson['Variations']);
             }
+            $count = 0;
             foreach ($mainListing['Variations']['Variation'] as $listing) {
                 VariantProduct::addUpdateVariant(
                     variant: [
@@ -266,7 +267,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         'attributes' => $this->getAttributes($listing),
                         'title' => $mainListing['Title'] ?? '',
                         'quantity' => $mainListing['Quantity'] ?? 0,
-                        'uniqueMarketplaceId' => $mainListing['ItemID'] ?? '',
+                        'uniqueMarketplaceId' => $mainListing['ItemID'] . $count ?? '',
                         'apiResponseJson' => json_encode($listing),
                         'parentResponseJson' => json_encode($parentResponseJson),
                         'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
@@ -279,6 +280,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     parent: $parent
                 );
                 echo "v";
+                $count++;
             }
             echo "OK\n";
             $index++;
