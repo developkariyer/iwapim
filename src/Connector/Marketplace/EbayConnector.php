@@ -2,6 +2,7 @@
 
 namespace App\Connector\Marketplace;
 
+use App\Utils\Utility;
 use Exception;
 use Pimcore\Model\DataObject\VariantProduct;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -217,33 +218,44 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag): void
     {
-        // main id title
+        if (empty($this->listings)) {
+            echo "Nothing to import\n";
+        }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;
         foreach ($this->listings as $mainListing) {
             echo "MainID: " . $mainListing['ItemID'] . "\n";
             echo "Title: " . $mainListing['Title'] . "\n";
             echo "Product Type: " . $mainListing['PrimaryCategory']['CategoryName'] . "\n";
             echo "Listing Status: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
-            foreach ($mainListing['Variations']['Variation'] as $listing) {
-                if (isset($listing['SKU'])) {
-                    echo "SKU: " . $listing['SKU'] . "\n";
+            if (isset($mainListing['PictureDetails']['PictureURL'])) {
+                echo "PictureURL: " . $mainListing['PictureDetails']['PictureURL'][0] . "\n";
+            }
+            if (isset($mainListing['ListingDetails']['ViewItemURL'])) {
+                echo "ViewItemURL: " . $mainListing['ListingDetails']['ViewItemURL'] . "\n";
+            }
+            if (isset($mainListing['SellingStatus'])) {
+                echo "CurrentPrice: " . $mainListing['SellingStatus']['CurrentPrice'] . "\n";
+                echo "Published: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
+            }
+            echo "Currency: " . $mainListing['Currency'] . "\n";
+            echo "Quantity: " . $mainListing['Quantity'] . "\n";
+            if (isset($mainListing['Variations'])) {
+                foreach ($mainListing['Variations']['Variation'] as $listing) {
+                    if (isset($listing['SKU'])) {
+                        echo "SKU: " . $listing['SKU'] . "\n";
+                    }
+                    if (isset($listing['VariationProductListingDetails']['UPC'])) {
+                        echo "UPC: " . $listing['VariationProductListingDetails']['UPC'] . "\n";
+                    }
+
+                    echo "Attributes: " . $this->getAttributes($listing) . "\n";
+                    echo "---------------------------------------------------------------------------------------------------------------\n";
                 }
-                if (isset($listing['VariationProductListingDetails']['UPC'])) {
-                    echo "UPC: " . $listing['VariationProductListingDetails']['UPC'] . "\n";
-                }
-                if (isset($mainListing['PictureDetails']['PictureURL'])) {
-                    echo "PictureURL: " . $mainListing['PictureDetails']['PictureURL'][0] . "\n";
-                }
-                if (isset($mainListing['ListingDetails']['ViewItemURL'])) {
-                    echo "ViewItemURL: " . $mainListing['ListingDetails']['ViewItemURL'] . "\n";
-                }
-                if (isset($mainListing['SellingStatus'])) {
-                    echo "CurrentPrice: " . $mainListing['SellingStatus']['CurrentPrice'] . "\n";
-                    echo "Published: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
-                }
-                echo "Currency: " . $mainListing['Currency'] . "\n";
-                echo "Attributes: " . $this->getAttributes($listing) . "\n";
-                echo "Quantity: " . $mainListing['Quantity'] . "\n";
-                echo "---------------------------------------------------------------------------------------------------------------\n";
             }
             echo "---------------------------------------------------------------------------------------------------------------\n";
         }
