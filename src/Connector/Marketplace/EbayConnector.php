@@ -231,6 +231,52 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $mainListing) {
             echo "($index/$total) Processing Listing {$mainListing['ItemID']}:{$mainListing['Title']} ...";
+            $parent = Utility::checkSetPath(
+                Utility::sanitizeVariable($mainListing['PrimaryCategory']['CategoryName'] ?? 'Tasnif-Edilmemiş'),
+                $marketplaceFolder
+            );
+            if (!empty($mainListing['Title'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($mainListing['Title']),
+                    $parent
+                );
+            }
+            if (($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') !== 'Active') {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable('_Pasif'),
+                    $marketplaceFolder
+                );
+            }
+            $parentResponseJson = $mainListing;
+            if (isset($parentResponseJson['Variations'])) {
+                unset($parentResponseJson['Variations']);
+            }
+            foreach ($mainListing['Variations']['Variation'] as $listing) {
+                VariantProduct::addUpdateVariant(
+                    variant: [
+                        'imageUrl' => $mainListing['PictureDetails']['PictureURL'][0] ?? '' ,
+                        'urlLink' => $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']),
+                        'salePrice' => $mainListing['SellingStatus']['CurrentPrice'] ?? '',
+                        'saleCurrency' => $mainListing['Currency'],
+                        'attributes' => $this->getAttributes($listing),
+                        'title' => $mainListing['Title'] ?? '',
+                        'quantity' => $mainListing['Quantity'] ?? 0,
+                        'uniqueMarketplaceId' => $mainListing['ItemID'] ?? '',
+                        'apiResponseJson' => json_encode($listing),
+                        'parentResponseJson' => json_encode($parentResponseJson),
+                        'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
+                        'sku' => $listing['SKU'] ?? '',
+                        'ean' => $listing['VariationProductListingDetails']['UPC'] ?? '',
+                    ],
+                    importFlag: $importFlag,
+                    updateFlag: $updateFlag,
+                    marketplace: $this->marketplace,
+                    parent: $parent
+                );
+                echo "v";
+            }
+            echo "OK\n";
+            $index++;
             /*echo "MainID: " . $mainListing['ItemID'] . "\n";
             echo "Title: " . $mainListing['Title'] . "\n";
             echo "Product Type: " . $mainListing['PrimaryCategory']['CategoryName'] . "\n";
