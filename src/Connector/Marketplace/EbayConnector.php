@@ -115,13 +115,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   <ErrorLanguage>en_US</ErrorLanguage>
                   <WarningLevel>High</WarningLevel>
                   <GranularityLevel>Coarse</GranularityLevel>
+                  <DetailLevel>ReturnAll</DetailLevel> 
                   <StartTimeFrom>' . $startTime . '</StartTimeFrom>
                   <StartTimeTo>' . $endTime . '</StartTimeTo>
                   <IncludeWatchCount>true</IncludeWatchCount>
                   <IncludeVariations>true</IncludeVariations>
-                  <SKUArray>
-                   <SKU>VariationType</SKU>
-                  </SKUArray>
                   <Pagination>
                     <EntriesPerPage>200</EntriesPerPage>
                   </Pagination>
