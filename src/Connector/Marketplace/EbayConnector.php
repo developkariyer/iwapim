@@ -128,7 +128,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     <EntriesPerPage>200</EntriesPerPage>
                   </Pagination>
                 </GetSellerListRequest>';
-
             try {
                 $response = $this->httpClient->request('POST', $url, [
                     'headers' => $headers,
@@ -231,7 +230,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $mainListing) {
-            echo "MainID: " . $mainListing['ItemID'] . "\n";
+            echo "($index/$total) Processing Listing {$mainListing['ItemID']}:{$mainListing['Title']} ...";
+            /*echo "MainID: " . $mainListing['ItemID'] . "\n";
             echo "Title: " . $mainListing['Title'] . "\n";
             echo "Product Type: " . $mainListing['PrimaryCategory']['CategoryName'] . "\n";
             echo "Listing Status: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
@@ -260,7 +260,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "---------------------------------------------------------------------------------------------------------------\n";
                 }
             }
-            echo "---------------------------------------------------------------------------------------------------------------\n";
+            echo "---------------------------------------------------------------------------------------------------------------\n";*/
         }
     }
 
