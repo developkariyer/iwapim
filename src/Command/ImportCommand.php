@@ -48,6 +48,7 @@ class ImportCommand extends AbstractCommand
         parent::__construct();
         $this->eventDispatcher = $eventDispatcher;
         $this->dataObjectListener = $dataObjectListener;
+     //   $this->notificationService = $notificationService;
     }
 
     protected function configure(): void
