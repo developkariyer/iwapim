@@ -195,9 +195,48 @@ class EbayConnector extends MarketplaceConnectorAbstract
         
     }
 
+    private function getAttributes($listing) {
+        $attributes = "";
+        if (isset($listing['VariationSpecifics']['NameValueList'])) {
+            foreach ($listing['VariationSpecifics']['NameValueList'] as $item) {
+                $attributes .= $item['Value'] . " ";
+            }
+        }
+        return $attributes;
+    }
+
     public function import($updateFlag, $importFlag): void
     {
-        
+        // main id title
+        foreach ($this->listings as $mainListing) {
+            echo "MainID: " . $mainListing['ItemID'] . "\n";
+            echo "Title: " . $mainListing['Title'] . "\n";
+            echo "Product Type: " . $mainListing['PrimaryCategory']['CategoryName'] . "\n";
+            echo "Listing Status: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
+            foreach ($mainListing['Variations']['Variation'] as $listing) {
+                if (isset($listing['SKU'])) {
+                    echo "SKU: " . $listing['SKU'] . "\n";
+                }
+                if (isset($listing['VariationProductListingDetails']['UPC'])) {
+                    echo "UPC: " . $listing['VariationProductListingDetails']['UPC'] . "\n";
+                }
+                if (isset($mainListing['PictureDetails']['PictureURL'])) {
+                    echo "PictureURL: " . $mainListing['PictureDetails']['PictureURL'][0] . "\n";
+                }
+                if (isset($mainListing['ListingDetails']['ViewItemURL'])) {
+                    echo "ViewItemURL: " . $mainListing['ListingDetails']['ViewItemURL'] . "\n";
+                }
+                if (isset($mainListing['SellingStatus'])) {
+                    echo "CurrentPrice: " . $mainListing['SellingStatus']['CurrentPrice'] . "\n";
+                    echo "Published: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
+                }
+                echo "Currency: " . $mainListing['Currency'] . "\n";
+                echo "Attributes: " . $this->getAttributes($listing) . "\n";
+                echo "Quantity: " . $mainListing['Quantity'] . "\n";
+                echo "---------------------------------------------------------------------------------------------------------------";
+            }
+            echo "---------------------------------------------------------------------------------------------------------------";
+        }
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
