@@ -254,7 +254,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             foreach ($mainListing['Variations']['Variation'] as $listing) {
                 VariantProduct::addUpdateVariant(
                     variant: [
-                        'imageUrl' => $mainListing['PictureDetails']['PictureURL'][0] ?? '' ,
+                        'imageUrl' => Utility::getCachedImage($mainListing['PictureDetails']['PictureURL'][0]) ?? '',
                         'urlLink' => $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']),
                         'salePrice' => $mainListing['SellingStatus']['CurrentPrice'] ?? '',
                         'saleCurrency' => $mainListing['Currency'],
