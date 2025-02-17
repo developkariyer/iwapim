@@ -151,6 +151,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 break;
             }
         } while ($startDate < $currentDate);
+        $this->listings = json_decode(json_encode($this->listings), true);
         $this->putListingsToCache();
     }
 
