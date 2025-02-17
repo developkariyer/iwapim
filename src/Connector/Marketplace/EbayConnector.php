@@ -5,6 +5,7 @@ namespace App\Connector\Marketplace;
 use App\Utils\Utility;
 use Exception;
 use Pimcore\Model\DataObject\VariantProduct;
+use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -218,6 +219,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
     }
 
 
+    /**
+     * @throws DuplicateFullPathException
+     * @throws Exception
+     */
     public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
