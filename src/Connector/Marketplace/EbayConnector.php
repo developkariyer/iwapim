@@ -71,7 +71,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ]),
             ]);
             echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
-            echo "Response: " . $response->getContent() . "\n";
         } catch (\Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface $e) {
             echo "Error: " . $e->getMessage() . "\n";
             echo "Error Code: " . $e->getCode() . "\n";
@@ -86,17 +85,14 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $this->marketplace->save();
     }
 
-
     /**
      * @throws Exception|TransportExceptionInterface
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->refreshToAccessToken();
-
         // control expiresIn
         //$this->refreshToAccessToken();
-        /*$allData = [];
+        $this->listings = [];
         $accessToken = $this->marketplace->getEbayAccessToken();
         $startDate = strtotime('2022-04-01');
         $currentDate = time();
@@ -144,20 +140,18 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 }
                 if (isset($responseObject->ItemArray->Item)) {
                     foreach ($responseObject->ItemArray->Item as $item) {
-                        $allData[] = $item;
+                        $this->listings[] = $item;
                     }
                 }
-
+                echo "Start Time: " . $startTime . " End Time: " . $endTime . "\n";
+                echo "Count: " . count($this->listings) . "\n";
                 $startDate = $startDate + $interval;
             } catch (\Exception $e) {
                 echo 'Hata: ' . $e->getMessage();
                 break;
             }
         } while ($startDate < $currentDate);
-        echo "\n\n\n\n\n\n";
-        echo "------------------------------------------------------------------------------------------------\n";
-        print_r(json_encode($allData));
-        echo "------------------------------------------------------------------------------------------------\n";*/
+        $this->putListingsToCache();
     }
 
     public function downloadInventory(): void
