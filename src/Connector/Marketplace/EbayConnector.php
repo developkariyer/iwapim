@@ -93,7 +93,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         // control expiresIn
         //$this->refreshToAccessToken();
-        $this->listings = [];
+        if (!$forceDownload && $this->getListingsFromCache()) {
+            echo "Using cached listings\n";
+            return;
+        }
         $accessToken = $this->marketplace->getEbayAccessToken();
         $startDate = strtotime('2022-04-01');
         $currentDate = time();
