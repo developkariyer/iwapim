@@ -259,9 +259,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $count = 0;
             $variations = $mainListing['Variations']['Variation'] ?? [null];
             foreach ($variations as $listing) {
+                $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
                     variant: [
-                        'imageUrl' => Utility::getCachedImage($mainListing['PictureDetails']['PictureURL'][0]) ?? '',
+                        'imageUrl' => Utility::getCachedImage(is_array($imageUrl) ? $imageUrl[0] : $imageUrl) ?? '',
                         'urlLink' => $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']),
                         'salePrice' => $mainListing['SellingStatus']['CurrentPrice'] ?? '',
                         'saleCurrency' => $mainListing['Currency'],
