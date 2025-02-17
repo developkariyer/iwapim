@@ -120,7 +120,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   <ErrorLanguage>en_US</ErrorLanguage>
                   <WarningLevel>High</WarningLevel>
                   <GranularityLevel>Coarse</GranularityLevel>
-                  <DetailLevel>ItemReturnAttributes</DetailLevel> 
+                  <DetailLevel>ReturnAll</DetailLevel> 
                   <StartTimeFrom>' . $startTime . '</StartTimeFrom>
                   <StartTimeTo>' . $endTime . '</StartTimeTo>
                   <IncludeWatchCount>true</IncludeWatchCount>
@@ -258,7 +258,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
             $count = 0;
             $variations = $mainListing['Variations']['Variation'] ?? [null];
-            foreach ($variations as $listing) {
+            echo $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']) . "\n";
+            /*foreach ($variations as $listing) {
                 $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
                     variant: [
@@ -283,7 +284,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 );
                 echo "v";
                 $count++;
-            }
+            }*/
             echo "OK\n";
             $index++;
             /*echo "MainID: " . $mainListing['ItemID'] . "\n";
