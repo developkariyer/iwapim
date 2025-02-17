@@ -94,7 +94,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         // control expiresIn
         //$this->refreshToAccessToken();
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -156,7 +156,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
         } while ($startDate < $currentDate);
         $this->listings = json_decode(json_encode($this->listings), true);
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     public function downloadInventory(): void
@@ -181,7 +181,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        $url = "https://api.ebay.com/sell/fulfillment/v1/order";
+       /* $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
@@ -192,7 +192,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'offset' => 0
             ]
         ]);
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
     
     protected function getImage($listing, $mainListing) 
@@ -225,7 +225,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        if (empty($this->listings)) {
+        /*if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -258,7 +258,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
             $count = 0;
             $variations = $mainListing['Variations']['Variation'] ?? [null];
-            echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
+            echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";*/
             /*foreach ($variations as $listing) {
                 $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
@@ -285,8 +285,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 echo "v";
                 $count++;
             }*/
-            echo "OK\n";
-            $index++;
+           // echo "OK\n";
+            //$index++;
             /*echo "MainID: " . $mainListing['ItemID'] . "\n";
             echo "Title: " . $mainListing['Title'] . "\n";
             echo "Product Type: " . $mainListing['PrimaryCategory']['CategoryName'] . "\n";
@@ -317,7 +317,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 }
             }
             echo "---------------------------------------------------------------------------------------------------------------\n";*/
-        }
+       // }
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
