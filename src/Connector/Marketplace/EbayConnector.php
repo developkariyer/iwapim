@@ -124,7 +124,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Error: " . $responseObject->Errors[0]->ShortMessage;
             return null;
         }
-        return $jsonResponse;
+        print_r($jsonResponse);
     }
 
 
@@ -135,7 +135,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         //$this->refreshToAccessToken();
-
+        $this->listingDetail();
 
         // control expiresIn
         //$this->refreshToAccessToken();
@@ -214,9 +214,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ]
             ]);
-            print_r($response);
-            echo $response->getStatusCode();
-            echo $response->getContent();
+            print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
