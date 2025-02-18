@@ -213,7 +213,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                     'Content-Type'  => 'application/json',
                 ],
-                'json' => [
+                'query' => [
                     'sku' => "AHM47WHITESPRUCESONE"
                 ]
             ]);
