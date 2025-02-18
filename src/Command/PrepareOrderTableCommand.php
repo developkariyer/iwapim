@@ -297,6 +297,9 @@ class PrepareOrderTableCommand extends AbstractCommand
         echo "Wallmart Total Price\n";
         Utility::executeSqlFile($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql', ['marketplaceType' => 'Wallmart']);
         echo "Complated Wallmart Total Price\n";
+        echo "Takealot Total Price\n";
+        Utility::executeSqlFile($this->extraColumnsSqlfilePath . 'calculateTotalPrice.sql', ['marketplaceType' => 'Takealot']);
+        echo "Complated Takealot Total Price\n";
     }
 
     /**
