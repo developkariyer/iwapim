@@ -212,15 +212,7 @@
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-            document.querySelectorAll('.product-card').forEach(function(card) {
-                card.addEventListener('click', function(event) {
-                    const clickedElement = event.target;
-                    const isInsideContent = clickedElement.closest('.card-body, .product-gallery, img');
-                    if (!isInsideContent) {
-                        card.classList.toggle('expanded');
-                    }
-                });
-            });
+
         });
     </script>
 
