@@ -113,7 +113,6 @@
                                         <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
                                         <b>IWASKU:</b> {{ product.iwaskuList|raw }}<br>
                                     </div>
-                                    </div>
                                 </div>
                             </td>
                             <td class="d-none d-md-table-cell" style="width: 320px; vertical-align: top; border: none; padding: 0;">
@@ -215,6 +214,11 @@
             });
             document.querySelectorAll('.product-card').forEach(function(card) {
                 card.addEventListener('click', function() {
+                    document.querySelectorAll('.product-card.expanded').forEach(function(openCard) {
+                        if (openCard !== card) {
+                            openCard.classList.remove('expanded');
+                        }
+                    });
                     card.classList.toggle('expanded');
                 });
             });
