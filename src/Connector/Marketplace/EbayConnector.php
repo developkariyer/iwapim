@@ -108,7 +108,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                  <RequesterCredentials>
                     <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
                   </RequesterCredentials>
-                  <ItemID>. '$itemId' .</ItemID>
+                  <ItemID>' . $itemId . '</ItemID>
                   <DetailLevel>ReturnAll</DetailLevel>
                   <ErrorLanguage>en_US</ErrorLanguage>
                 </GetItemRequest>';
