@@ -213,15 +213,12 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             document.querySelectorAll('.product-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    card.classList.toggle('expanded');
-                });
-                card.addEventListener('dblclick', function(event) {
-                    card.classList.remove('expanded');
-                    event.stopPropagation();
+                card.addEventListener('click', function(event) {
+                    if (!event.target.closest('.card-body, .product-gallery, img')) {
+                        card.classList.toggle('expanded');
+                    }
                 });
             });
-
         });
     </script>
 
