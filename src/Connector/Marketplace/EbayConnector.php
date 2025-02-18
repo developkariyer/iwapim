@@ -106,7 +106,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
                  <RequesterCredentials>
                     <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
                   </RequesterCredentials>
-                  <IncludeItemSpecifics> true </IncludeItemSpecifics>
                   <ItemID> "334921595917" </ItemID>
                   <SKU> SKUType (string) </SKU>
                   <TransactionID> string </TransactionID>
