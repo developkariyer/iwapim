@@ -88,11 +88,13 @@ class EbayConnector extends MarketplaceConnectorAbstract
     }
 
     /**
-     * @throws Exception|TransportExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
      */
-    public function download(bool $forceDownload = false): void
+    public function listingDetail($itemId)
     {
-        //$this->refreshToAccessToken();
         $url = "https://api.ebay.com/ws/api.dll";
         $accessToken = $this->marketplace->getEbayAccessToken();
         $headers = [
@@ -106,7 +108,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                  <RequesterCredentials>
                     <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
                   </RequesterCredentials>
-                  <ItemID>334921595917</ItemID>
+                  <ItemID>$itemId</ItemID>
                   <DetailLevel>ReturnAll</DetailLevel>
                   <ErrorLanguage>en_US</ErrorLanguage>
                 </GetItemRequest>';
@@ -117,7 +119,21 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $xmlContent = $response->getContent();
         $xmlObject = simplexml_load_string($xmlContent);
         $jsonResponse = json_encode($xmlObject);
-        print_r($jsonResponse);
+        $responseObject = json_decode($jsonResponse);
+        if ($responseObject->Ack === 'Failure') {
+            echo "Error: " . $responseObject->Errors[0]->ShortMessage;
+            return null;
+        }
+        return $jsonResponse;
+    }
+
+    /**
+     * @throws Exception|TransportExceptionInterface
+     */
+    public function download(bool $forceDownload = false): void
+    {
+        //$this->refreshToAccessToken();
+
 
         // control expiresIn
         //$this->refreshToAccessToken();
