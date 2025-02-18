@@ -213,8 +213,10 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             document.querySelectorAll('.product-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    card.classList.toggle('expanded');
+                card.addEventListener('click', function(event) {
+                    if (!event.target.closest('.card-body, .product-gallery, img')) {
+                        card.classList.toggle('expanded');
+                    }
                 });
                 card.querySelectorAll('.card-body, .product-gallery, img').forEach(function(child) {
                     child.addEventListener('click', function(event) {
