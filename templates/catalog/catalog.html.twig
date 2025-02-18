@@ -213,23 +213,15 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             document.querySelectorAll('.product-card').forEach(function(card) {
-                card.addEventListener('click', function(event) {
+                card.addEventListener('click', function() {
                     card.classList.toggle('expanded');
+                });
+                card.addEventListener('dblclick', function(event) {
+                    card.classList.remove('expanded');
                     event.stopPropagation();
                 });
-
-                card.querySelectorAll('*').forEach(function(child) {
-                    child.addEventListener('click', function(event) {
-                        event.stopPropagation();
-                    });
-                });
             });
 
-            document.addEventListener('click', function () {
-                document.querySelectorAll('.product-card.expanded').forEach(function(openCard) {
-                    openCard.classList.remove('expanded');
-                });
-            });
         });
     </script>
 
