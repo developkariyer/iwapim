@@ -206,9 +206,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-
-
-        /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -221,7 +219,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo $response->getContent();
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }*/
+        }
     }
 
     public function downloadOrders(): void
