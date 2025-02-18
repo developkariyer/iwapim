@@ -206,15 +206,12 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        $url = "https://api.ebay.com/sell/inventory/v1/offer";
+        $url = "https://api.ebay.com/sell/inventory/v1/offer?sku=AHM47WHITESPRUCESONE";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                     'Content-Type'  => 'application/json',
-                ],
-                'query' => [
-                    'sku' => "AHM47WHITESPRUCESONE"
                 ]
             ]);
             print_r($response->getContent());
