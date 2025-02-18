@@ -213,13 +213,9 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             document.querySelectorAll('.product-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    document.querySelectorAll('.product-card.expanded').forEach(function(openCard) {
-                        if (openCard !== card) {
-                            openCard.classList.remove('expanded');
-                        }
-                    });
+                card.addEventListener('click', function(event) {
                     card.classList.toggle('expanded');
+                    event.stopPropagation();
                 });
             });
         });
