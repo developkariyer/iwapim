@@ -217,6 +217,18 @@
                     card.classList.toggle('expanded');
                     event.stopPropagation();
                 });
+
+                card.querySelectorAll('*').forEach(function(child) {
+                    child.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                    });
+                });
+            });
+
+            document.addEventListener('click', function () {
+                document.querySelectorAll('.product-card.expanded').forEach(function(openCard) {
+                    openCard.classList.remove('expanded');
+                });
             });
         });
     </script>
