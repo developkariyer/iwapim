@@ -217,7 +217,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'sku' => 'AHM47WHITESPRUCESONE'
                 ]
             ]);
-            print_r($response->getContent());
+            print_r($response);
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
