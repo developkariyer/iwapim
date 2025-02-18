@@ -127,6 +127,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
         return $jsonResponse;
     }
 
+
+
     /**
      * @throws Exception|TransportExceptionInterface
      */
@@ -224,18 +226,18 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-       /* $url = "https://api.ebay.com/sell/fulfillment/v1/order";
+        $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                 'Content-Type'  => 'application/json',
             ],
             'query' => [
-                'limit'  => 10,
+                'limit'  => 50,
                 'offset' => 0
             ]
         ]);
-        print_r($response->getContent());*/
+        print_r($response->getContent());
     }
     
     protected function getImage($listing, $mainListing) 
