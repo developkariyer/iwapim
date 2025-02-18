@@ -119,11 +119,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $xmlContent = $response->getContent();
         $xmlObject = simplexml_load_string($xmlContent);
         $jsonResponse = json_encode($xmlObject);
-        $responseObject = json_decode($jsonResponse);
-        if ($responseObject->Ack === 'Failure') {
-            echo "Error: " . $responseObject->Errors[0]->ShortMessage;
-            return null;
-        }
         print_r($jsonResponse);
     }
 
