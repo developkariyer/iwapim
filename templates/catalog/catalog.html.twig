@@ -112,6 +112,7 @@
                                     <div class="col-12" style="font-size: smaller;">
                                         <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
                                         <b>IWASKU:</b> {{ product.iwaskuList|raw }}<br>
+                                        TEEESTT
                                     </div>
                                 </div>
                             </td>
@@ -212,7 +213,11 @@
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-
+            document.querySelectorAll('.product-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    card.classList.toggle('expanded');
+                });
+            });
         });
     </script>
 
