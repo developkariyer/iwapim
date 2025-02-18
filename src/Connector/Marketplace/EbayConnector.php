@@ -221,6 +221,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
+            echo 'Cevap: ' . $e->getResponse()->getBody();
         }
     }
 
