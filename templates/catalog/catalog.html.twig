@@ -216,6 +216,9 @@
                 card.addEventListener('click', function() {
                     card.classList.toggle('expanded');
                 });
+                card.addEventListener('dblclick', function(event) {
+                    card.classList.remove('expanded');
+                });
             });
         });
     </script>
