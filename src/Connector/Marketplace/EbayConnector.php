@@ -92,8 +92,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->refreshToAccessToken();
+        //$this->refreshToAccessToken();
         $url = "https://api.ebay.com/ws/api.dll";
+        $accessToken = $this->marketplace->getEbayAccessToken();
         $headers = [
             "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
             "X-EBAY-API-CALL-NAME: GetSellerList",
@@ -102,7 +103,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         ];
         $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
                 <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-                  <IncludeItemCompatibilityList> true </IncludeItemCompatibilityList>
+                 <RequesterCredentials>
+                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+                  </RequesterCredentials>
                   <IncludeItemSpecifics> true </IncludeItemSpecifics>
                   <ItemID> "334921595917" </ItemID>
                   <SKU> SKUType (string) </SKU>
