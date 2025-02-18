@@ -215,9 +215,7 @@
             document.querySelectorAll('.product-card').forEach(function(card) {
                 let isClickedOnce = false;
                 card.addEventListener('click', function(event) {
-                    if (!card.classList.contains('expanded')) {
-                        card.classList.add('expanded');
-                    }
+                    card.classList.add('expanded');
                     event.stopPropagation();
                 });
                 card.addEventListener('dblclick', function(event) {
