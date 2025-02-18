@@ -92,6 +92,39 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
+        $this->refreshToAccessToken();
+        $url = "https://api.ebay.com/ws/api.dll";
+        $headers = [
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
+            "X-EBAY-API-CALL-NAME: GetSellerList",
+            "X-EBAY-API-SITEID: 0",
+            "Content-Type: text/xml"
+        ];
+        $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
+                <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+                  <IncludeItemCompatibilityList> true </IncludeItemCompatibilityList>
+                  <IncludeItemSpecifics> true </IncludeItemSpecifics>
+                  <ItemID> "334921595917" </ItemID>
+                  <SKU> SKUType (string) </SKU>
+                  <TransactionID> string </TransactionID>
+                  <VariationSpecifics> NameValueListArrayType
+                    <NameValueList> NameValueListType
+                      <Name> string </Name>
+                      <Value> string </Value>
+                    </NameValueList>
+                  </VariationSpecifics>
+                  <DetailLevel> ReturnAll </DetailLevel>
+                  <ErrorLanguage> en_US </ErrorLanguage>
+                </GetItemRequest>';
+        $response = $this->httpClient->request('POST', $url, [
+            'headers' => $headers,
+            'body' => $xmlRequest
+        ]);
+        $xmlContent = $response->getContent();
+        $xmlObject = simplexml_load_string($xmlContent);
+        $jsonResponse = json_encode($xmlObject);
+        print_r($jsonResponse);
+
         // control expiresIn
         //$this->refreshToAccessToken();
         /*if (!$forceDownload && $this->getListingsFromCache()) {
