@@ -216,6 +216,11 @@
                 card.addEventListener('click', function() {
                     card.classList.toggle('expanded');
                 });
+                card.querySelectorAll('.card-body, .product-gallery, img').forEach(function(child) {
+                    child.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                    });
+                });
             });
         });
     </script>
