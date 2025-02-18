@@ -214,14 +214,13 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'sku' => "AHM47WHITESPRUCESONE",
+                    'sku' => 'AHM47WHITESPRUCESONE',
                     'format' => 'JSON'
                 ]
             ]);
             print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-            echo 'Cevap: ' . $e->getResponse()->getBody();
         }
     }
 
