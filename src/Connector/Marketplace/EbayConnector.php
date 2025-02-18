@@ -214,9 +214,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ]
             ]);
-            print_r($response);
-            echo $response->getStatusCode();
-            echo $response->getContent();
+            print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
