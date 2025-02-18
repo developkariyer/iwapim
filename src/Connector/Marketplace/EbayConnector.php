@@ -107,16 +107,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
                   </RequesterCredentials>
                   <ItemID> "334921595917" </ItemID>
-                  <SKU> SKUType (string) </SKU>
-                  <TransactionID> string </TransactionID>
-                  <VariationSpecifics> NameValueListArrayType
-                    <NameValueList> NameValueListType
-                      <Name> string </Name>
-                      <Value> string </Value>
-                    </NameValueList>
-                  </VariationSpecifics>
-                  <DetailLevel> ReturnAll </DetailLevel>
-                  <ErrorLanguage> en_US </ErrorLanguage>
+                  <DetailLevel>ReturnAll</DetailLevel>
+                  <ErrorLanguage>en_US</ErrorLanguage>
                 </GetItemRequest>';
         $response = $this->httpClient->request('POST', $url, [
             'headers' => $headers,
