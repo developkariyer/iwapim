@@ -216,7 +216,6 @@
                 let isClickedOnce = false;
                 card.addEventListener('click', function(event) {
                     card.classList.add('expanded');
-                    event.stopPropagation();
                 });
                 card.addEventListener('dblclick', function(event) {
                     if (card.classList.contains('expanded')) {
