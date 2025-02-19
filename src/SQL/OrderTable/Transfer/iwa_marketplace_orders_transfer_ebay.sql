@@ -6,21 +6,21 @@ INSERT INTO iwa_marketplace_orders_line_items (
 SELECT
     :marketplaceType,
     :marketPlaceId,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.creationDate')) AS created_at,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderId')) AS order_id,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyItemId')) AS product_id,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyVariationId')) AS variant_id,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.lineItemCost.value')) AS price,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.lineItemCost.currency')) AS currency,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')) AS quantity,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.title')) AS variant_title,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.stateOrProvince')) AS shipping_province,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.city')) AS shipping_city,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.countryCode')) AS shipping_country_code,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.total.value')) AS total_price,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.priceSubtotal.value')) AS subtotal_price,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderFulfillmentStatus')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelStatus.cancelState')) AS fulfillments_status_control
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.creationDate')), NULL) AS created_at,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderId')), NULL) AS order_id,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyItemId')), NULL) AS product_id,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyVariationId')), NULL) AS variant_id,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.lineItemCost.value')), NULL) AS price,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.lineItemCost.currency')), NULL) AS currency,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.quantity')), NULL) AS quantity,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.title')), NULL) AS variant_title,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.stateOrProvince')), NULL) AS shipping_province,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.city')), NULL) AS shipping_city,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.countryCode')), NULL) AS shipping_country_code,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.total.value')), NULL) AS total_price,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.priceSubtotal.value')), NULL) AS subtotal_price,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderFulfillmentStatus')), NULL) AS fulfillments_status,
+    COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelStatus.cancelState')), NULL) AS fulfillments_status_control
 FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.lineItems[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
