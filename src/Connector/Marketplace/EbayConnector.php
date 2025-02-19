@@ -132,7 +132,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        //$this->refreshToAccessToken();
+        $this->refreshToAccessToken();
         $this->listingDetail("335558398396");
 
         // control expiresIn
