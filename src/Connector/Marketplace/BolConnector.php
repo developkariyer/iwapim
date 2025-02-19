@@ -314,7 +314,11 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $now = strtotime('now');
         try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Bolcom/select_last_updated_at.sql', [
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.orderPlacedDateTime')), '%Y-%m-%d'), DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) as lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id;";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
                 'marketplace_id' => $this->marketplace->getId()
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
@@ -371,7 +375,10 @@ class BolConnector extends MarketplaceConnectorAbstract
                     }
                     $order['orderDetail'] = $orderDetail;
                     try {
-                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                        $sqlInsertMarketplaceOrder = "
+                                INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                                VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                        Utility::executeSql($sqlInsertMarketplaceOrder, [
                             'marketplace_id' => $this->marketplace->getId(),
                             'order_id' => $order['orderId'],
                             'json' => json_encode($order)
