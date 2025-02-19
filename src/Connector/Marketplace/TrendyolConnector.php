@@ -104,7 +104,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 break;
             }
             $data = $response->toArray();
-            $returns = $data['content'];
+            $returns = $data['content'] ?? [];
             $allReturns = array_merge($allReturns, $returns);
             $page++;
             echo ".";
