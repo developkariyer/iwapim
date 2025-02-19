@@ -110,6 +110,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   </RequesterCredentials>
                   <ItemID>' . $itemId . '</ItemID>
                   <IncludeItemSpecifics>true</IncludeItemSpecifics>
+                  <IncludeSelector>Details</IncludeSelector>
                   <IncludeVariations>true</IncludeVariations>
                   <DetailLevel>ReturnAll</DetailLevel>
                   <ErrorLanguage>en_US</ErrorLanguage>
@@ -132,7 +133,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         //$this->refreshToAccessToken();
-        //$this->listingDetail("335558398396");
+        $this->listingDetail("335558398396");
 
         // control expiresIn
         //$this->refreshToAccessToken();
