@@ -429,11 +429,30 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->putToCache('INVENTORY.json', $inventory);*/
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RandomException
+     */
     public function downloadReturns(): void
     {
         $this->prepareToken();
-        $response = $this->httpClient->request("GET", static::$apiUrl['returns']);
-        print_r($response->getContent());
+        $returns = [];
+        $page = 1;
+        do {
+            $response = $this->httpClient->request("GET", static::$apiUrl['returns'],['query' => ['page' => $page]]);
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to download returns: " . $response->getContent() . "\n";
+                break;
+            }
+            $data = $response->toArray();
+            $returns = $data['returns'] ?? [];
+            $page++;
+            echo "Count: " . count($returns) . "Page: " . $page . "\n";
+        } while (count($returns) === 50);
+        $this->putToCache('RETURNS.json', $returns);
     }
 
     /**
