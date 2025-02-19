@@ -19,7 +19,7 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.buyer.buyerRegistrationAddress.contactAddress.countryCode')) AS shipping_country_code,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.total.value')) AS total_price,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.priceSubtotal.value')) AS subtotal_price,
-    JSON_UNQUOTE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderFulfillmentStatus')), NULL) AS fulfillments_status,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderFulfillmentStatus')) AS fulfillments_status,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelStatus.cancelState')) AS fulfillments_status_control
 FROM
     iwa_marketplace_orders
