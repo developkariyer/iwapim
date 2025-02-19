@@ -47,4 +47,4 @@ ON DUPLICATE KEY UPDATE
      total_price = VALUES(total_price),
      subtotal_price = VALUES(subtotal_price),
      fulfillments_status = VALUES(fulfillments_status),
-     fulfillments_status_control = VALUES(fulfillments_status_control),
+     fulfillments_status_control = VALUES(fulfillments_status_control)
