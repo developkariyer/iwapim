@@ -80,13 +80,37 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $this->downloadReturns();
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws RandomException
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadReturns(): void
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['returns']);
-        print_r($response->getContent());
-
-
-
+        $page = 0;
+        $allReturns = [];
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['returns'], [
+                'query' => [
+                    'page' => $page
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $returns = $data['content'];
+            $allReturns = array_merge($allReturns, $returns);
+            $page++;
+            echo ".";
+            sleep(1);
+        } while ($page <= $data['totalPages']);
+        $this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
