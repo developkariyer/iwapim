@@ -145,7 +145,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $now = date('Y-m-d');
         try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ciceksepeti/select_last_updated_at.sql', [
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(
+                DATE_FORMAT(MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderModifyDate')), '%d/%m/%Y')), '%Y-%m-%d'),
+                DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m-%d')) AS lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id;";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
                 'marketplace_id' => $this->marketplace->getId()
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
@@ -182,7 +188,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     $data = $response->toArray();
                     $orders = $data['supplierOrderListWithBranch'];
                     foreach ($orders as $order) {
-                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                        $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                        Utility::executeSqlFile($sqlInsertMarketplaceOrder, [
                             'marketplace_id' => $this->marketplace->getId(),
                             'order_id' => $order['orderId'],
                             'json' => json_encode($order)

@@ -228,7 +228,12 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         /*$url = "https://api.ebay.com/sell/fulfillment/v1/order";
         try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ebay/select_last_updated_at.sql', [
+            $sqlLastUpdatedAt = "
+                    SELECT COALESCE(MAX(json_extract(json, '$.lastModifiedDate')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
+                    FROM iwa_marketplace_orders
+                    WHERE marketplace_id = :marketplace_id
+                    LIMIT 1;";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
                 'marketplace_id' => $this->marketplace->getId()
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
@@ -261,7 +266,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 $orders = $data['orders'];
                 $orderCount += count($orders);
                 foreach ($orders as $order) {
-                    Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                    $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json)
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                    Utility::executeSql($sqlInsertMarketplaceOrder, [
                         'marketplace_id' => $this->marketplace->getId(),
                         'order_id' => $order['orderId'],
                         'json' => json_encode($order)

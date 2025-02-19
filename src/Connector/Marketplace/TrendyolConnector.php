@@ -90,7 +90,13 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Trendyol/select_last_updated_at.sql', [
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(json_extract(json, '$.lastModifiedDate') / 1000)), '%Y-%m-%d'),DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-%d')) AS lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id
+                LIMIT 1;
+            ";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
                 'marketplace_id' => $this->marketplace->getId()
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
@@ -127,7 +133,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     $data = $response->toArray();
                     $orders = $data['content'];
                     foreach ($orders as $order) {
-                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                        $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                        Utility::executeSql($sqlInsertMarketplaceOrder, [
                             'marketplace_id' => $this->marketplace->getId(),
                             'order_id' => $order['orderNumber'],
                             'json' => json_encode($order)

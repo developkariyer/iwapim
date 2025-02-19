@@ -144,7 +144,11 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id;";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
                 'marketplace_id' => $this->marketplace->getId()
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
@@ -155,7 +159,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'orders');
         try {
             foreach ($orders as $order) {
-                Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                $sqlInsertMarketplaceOrder = "
+                    INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                    VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                Utility::executeSql($sqlInsertMarketplaceOrder, [
                     'marketplace_id' => $this->marketplace->getId(),
                     'order_id' => $order['id'],
                     'json' => json_encode($order)

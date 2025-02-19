@@ -209,7 +209,12 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         try {
-            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Wallmart/select_last_updated_at.sql',['marketplace_id' => $this->marketplace->getId()]);
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(DATE_FORMAT(FROM_UNIXTIME(MAX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderLines.orderLine[0].statusDate')) / 1000)), '%Y-%m-%d'),DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 180 DAY), '%Y-%m-%d')) AS lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id
+                LIMIT 1";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, ['marketplace_id' => $this->marketplace->getId()]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -249,7 +254,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $data = $response->toArray();
                     $orders = $data['list']['elements']['order'];
                     foreach ($orders as $order) {
-                        Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                        $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                        Utility::executeSql($sqlInsertMarketplaceOrder, [
                             'marketplace_id' => $this->marketplace->getId(),
                             'order_id' => $order['purchaseOrderId'],
                             'json' => json_encode($order)
