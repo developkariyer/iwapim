@@ -218,20 +218,57 @@ class EbayConnector extends MarketplaceConnectorAbstract
         }
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadOrders(): void
     {
         $url = "https://api.ebay.com/sell/fulfillment/v1/order";
-        $response = $this->httpClient->request('GET', $url, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
-                'Content-Type'  => 'application/json',
-            ],
-            'query' => [
-                'limit'  => 50,
-                'offset' => 0
-            ]
-        ]);
-        print_r($response->getContent());
+        // creation data last 2 years ago support !!!!!!!!!!!!!1
+        $offset = 0;
+        $limit = 200;
+        $orderCount = 0;
+        do{
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'limit'  => $limit,
+                    'offset' => $offset
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            try {
+                $data = $response->toArray();
+                $orders = $data['orders'];
+                $orderCount += count($orders);
+                foreach ($orders as $order) {
+                    Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                        'marketplace_id' => $this->marketplace->getId(),
+                        'order_id' => $order['orderId'],
+                        'json' => json_encode($order)
+                    ]);
+                }
+                $totalElements = $data['total'];
+                $count = count($orders);
+                $offset += $limit;
+                echo "-----------------------------\n";
+                echo "Total Elements: $totalElements\n";
+                echo "Items on this page: $count\n";
+                echo "-----------------------------\n";
+            } catch (\Exception $e) {
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+        }while($orderCount < $totalElements);
     }
     
     protected function getImage($listing, $mainListing) 
