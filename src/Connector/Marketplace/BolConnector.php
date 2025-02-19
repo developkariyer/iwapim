@@ -451,6 +451,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             $returns = $data['returns'] ?? [];
             $page++;
             echo "Count: " . count($returns) . "Page: " . $page . "\n";
+            usleep(3000000);
         } while (count($returns) === 50);
         $this->putToCache('RETURNS.json', $returns);
     }
