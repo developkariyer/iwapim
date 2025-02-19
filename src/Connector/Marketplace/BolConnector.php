@@ -27,6 +27,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         'orders' => "/retailer/orders/",
         'offers' => "/retailer/offers/",
         'inventory' => "/retailer/inventory/",
+        'returns' => "/retailer/returns/",
     ];
     public static string $marketplaceType = 'Bol.com';
 
@@ -425,6 +426,13 @@ class BolConnector extends MarketplaceConnectorAbstract
         $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
         $inventory[]  = $response->toArray();
         $this->putToCache('INVENTORY.json', $inventory);
+    }
+
+    public function downloadReturns(): void
+    {
+        $this->prepareToken();
+        $response = $this->httpClient->request("GET", static::$apiUrl['returns']);
+        print_r($response->getContent());
     }
 
     /**
