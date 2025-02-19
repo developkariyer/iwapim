@@ -34,7 +34,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'offers' => 'product/sellers/' . $sellerId . '/products?approved=true',
             'orders' => 'order/sellers/' . $sellerId . '/orders',
             'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
-            'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/'
+            'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
+            'returns' => 'order/sellers/' . $sellerId . '/claims',
         ];
     }
 
@@ -76,6 +77,15 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
+    }
+
+    public function downloadReturns(): void
+    {
+        $response = $this->httpClient->request('GET', static::$apiUrl['returns']);
+        print_r($response->getContent());
+
+
+
     }
 
     /**
