@@ -228,6 +228,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         // creation data last 2 years ago support !!!!!!!!!!!!!1
+        try {
+            $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ebay/select_last_updated_at.sql', [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
+        echo "Last Updated At: $lastUpdatedAt\n";
         $offset = 0;
         $limit = 200;
         $orderCount = 0;
@@ -239,7 +248,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'query' => [
                     'limit'  => $limit,
-                    'offset' => $offset
+                    'offset' => $offset,
+                    'filter' => 'creationDate:['  . $lastUpdatedAt . ']'
                 ]
             ]);
             $statusCode = $response->getStatusCode();
