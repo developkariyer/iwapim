@@ -241,17 +241,24 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $limit = 200;
         $orderCount = 0;
         do{
-            $response = $this->httpClient->request('GET', $url, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
-                    'Content-Type'  => 'application/json',
-                ],
-                'query' => [
-                    'limit'  => $limit,
-                    'offset' => $offset,
-                    'filter' => 'creationDate:[' . $lastUpdatedAt . '..' . gmdate('Y-m-d\TH:i:s.000\Z') . ']'
-                ]
-            ]);
+            try {
+                $response = $this->httpClient->request('GET', $url, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                        'Content-Type'  => 'application/json',
+                    ],
+                    'query' => [
+                        'limit'  => $limit,
+                        'offset' => $offset,
+                        'filter' => 'creationDate:['  . $lastUpdatedAt . '..]'
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                echo "Hata Kodu: " . $e->getCode() . "\n";
+                echo "Hata Mesajı: " . $e->getMessage() . "\n";
+                echo "Hata Detayı: " . $e->getTraceAsString() . "\n";
+            }
+
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
