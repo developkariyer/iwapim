@@ -407,6 +407,7 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
+        $this->prepareToken();
         $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
         print_r($response->getContent());
     }
