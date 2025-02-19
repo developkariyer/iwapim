@@ -25,7 +25,8 @@ class BolConnector extends MarketplaceConnectorAbstract
         'catalogProductsUrl' => "/retailer/content/catalog-products/",
         'commissionUrl' => "/retailer/commission/",
         'orders' => "/retailer/orders/",
-        "offers" => "/retailer/offers/"
+        'offers' => "/retailer/offers/",
+        'inventory' => "/retailer/inventory/",
     ];
     public static string $marketplaceType = 'Bol.com';
 
@@ -406,6 +407,8 @@ class BolConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
+        $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
+        print_r($response->getContent());
     }
 
     /**
