@@ -131,8 +131,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->refreshToAccessToken();
-        $this->listingDetail("335558398396");
+        //$this->refreshToAccessToken();
+        //$this->listingDetail("335558398396");
 
         // control expiresIn
         //$this->refreshToAccessToken();
@@ -219,7 +219,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        /*$url = "https://api.ebay.com/sell/fulfillment/v1/order";
+        $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
@@ -230,7 +230,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'offset' => 0
             ]
         ]);
-        print_r($response->getContent());*/
+        print_r($response->getContent());
     }
     
     protected function getImage($listing, $mainListing) 
