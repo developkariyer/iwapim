@@ -227,7 +227,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $url = "https://api.ebay.com/sell/fulfillment/v1/order";
-        // creation data last 2 years ago support !!!!!!!!!!!!!1
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ebay/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
