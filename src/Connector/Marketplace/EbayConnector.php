@@ -133,7 +133,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         //$this->refreshToAccessToken();
-        $this->listingDetail("335558398396");
+        //$this->listingDetail("335558398396");
 
         // control expiresIn
         //$this->refreshToAccessToken();
@@ -204,7 +204,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -215,7 +215,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }
+        }*/
     }
 
     /**
@@ -226,7 +226,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        $url = "https://api.ebay.com/sell/fulfillment/v1/order";
+        /*$url = "https://api.ebay.com/sell/fulfillment/v1/order";
         try {
             $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Ebay/select_last_updated_at.sql', [
                 'marketplace_id' => $this->marketplace->getId()
@@ -277,7 +277,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             } catch (\Exception $e) {
                 echo "Error: " . $e->getMessage() . "\n";
             }
-        }while($orderCount < $totalElements);
+        }while($orderCount < $totalElements);*/
     }
     
     protected function getImage($listing, $mainListing) 
