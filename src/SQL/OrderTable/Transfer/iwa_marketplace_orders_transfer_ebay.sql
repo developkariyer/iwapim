@@ -20,7 +20,7 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.total.value')) AS total_price,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.pricingSummary.priceSubtotal.value')) AS subtotal_price,
     JSON_UNQUOTE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderFulfillmentStatus')), NULL) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelStatus.cancelState')) AS fulfillments_status_control,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelStatus.cancelState')) AS fulfillments_status_control
 FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.lineItems[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
