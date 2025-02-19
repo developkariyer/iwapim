@@ -439,7 +439,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadReturns(): void
     {
         $this->prepareToken();
-        $returns = [];
+        $allReturns = [];
         $page = 1;
         do {
             $response = $this->httpClient->request("GET", static::$apiUrl['returns'],['query' => ['page' => $page]]);
@@ -448,12 +448,13 @@ class BolConnector extends MarketplaceConnectorAbstract
                 break;
             }
             $data = $response->toArray();
-            $returns = array_merge($returns,$data['returns']);
+            $returns = $data['returns'] ?? [];
+            $allReturns = array_merge($allReturns,$returns);
             $page++;
             echo "Count: " . count($returns) . "Page: " . $page . "\n";
             usleep(3000000);
         } while (count($returns) === 50);
-        $this->putToCache('RETURNS.json', $returns);
+        $this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
