@@ -249,7 +249,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'query' => [
                     'limit'  => $limit,
                     'offset' => $offset,
-                    'filter' => 'creationDate:['  . $lastUpdatedAt . '..]'
+                    'filter' => 'creationDate:[' . $lastUpdatedAt . '..' . gmdate('Y-m-d\TH:i:s.000\Z') . ']'
                 ]
             ]);
             $statusCode = $response->getStatusCode();
