@@ -25,10 +25,7 @@ FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.lineItems[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
 WHERE
-     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyVariationId')) IS NOT NULL
-     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyVariationId')) != 'null'
-     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.legacyVariationId')) != ''
-     AND marketplace_id = :marketPlaceId
+     marketplace_id = :marketPlaceId
 ON DUPLICATE KEY UPDATE
      marketplace_type = VALUES(marketplace_type),
      marketplace_id = VALUES(marketplace_id),
