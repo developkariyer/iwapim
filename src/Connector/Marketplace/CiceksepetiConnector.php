@@ -227,16 +227,35 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->downloadReturns();
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws RandomException
+     */
     public function downloadReturns(): void
     {
-        $response = $this->httpClient->request('POST', static::$apiUrl['orders'], ['json' => ['page' => 0, 'pageSize' => 20]]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        print_r($response->getContent());
-
+        $page = 0;
+        $pageSize = 50;
+        $allReturns = [];
+        do {
+            $response = $this->httpClient->request('POST', static::$apiUrl['orders'], ['json' => ['page' => $page, 'pageSize' => $pageSize]]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                return;
+            }
+            $data = $response->toArray();
+            $returns = $data['supplierOrderListWithBranch'] ?? [];
+            $allReturns = array_merge($allReturns,$returns);
+            $page++;
+            $pageCount = $data['pageCount'];
+            echo "Count: " . count($allReturns) . "Page: " . $page . "\n";
+            sleep(5);
+        } while ($page <= $pageCount);
+        $this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
