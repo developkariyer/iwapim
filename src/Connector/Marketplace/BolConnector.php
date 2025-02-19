@@ -448,7 +448,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 break;
             }
             $data = $response->toArray();
-            $returns = $data['returns'] ?? [];
+            $returns = array_merge($returns,$data['returns']);
             $page++;
             echo "Count: " . count($returns) . "Page: " . $page . "\n";
             usleep(3000000);
