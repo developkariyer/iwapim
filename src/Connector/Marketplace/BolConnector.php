@@ -405,12 +405,26 @@ class BolConnector extends MarketplaceConnectorAbstract
         unset($order); 
     }
 
-    public function downloadInventory(): void
+    /**
+     * @throws RandomException
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws DecodingExceptionInterface
+     */
+    public function downloadInventory(): void // LVB/FBB
     {
+        $inventory = $this->getFromCache('INVENTORY.json');
+        if (!empty($inventory)) {
+            echo "Using cached inventory\n";
+            return;
+        }
+        $inventory = [];
         $this->prepareToken();
         $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
-        print_r($response->getContent());
-        print_r($response->getStatusCode());
+        $inventory[]  = $response->toArray();
+        $this->putToCache('INVENTORY.json', $inventory);
     }
 
     /**
