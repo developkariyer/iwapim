@@ -227,6 +227,18 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     }
 
+    public function downloadReturns(): void
+    {
+        $response = $this->httpClient->request('POST', static::$apiUrl['orders'], ['json' => ['page' => 0, 'pageSize' => 20]]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        print_r($response->getContent());
+
+    }
+
     /**
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
