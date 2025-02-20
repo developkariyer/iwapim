@@ -133,7 +133,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 }
                 echo ".";
                 usleep(720000);
-            } while (($nextCursor !== null && count($data) < $totalData) || count($data) < $totalItems));
+            } while (($nextCursor !== null && count($data) < $totalData) || count($data) < $totalItems);
 
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
