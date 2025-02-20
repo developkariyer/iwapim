@@ -297,11 +297,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $limit = 200;
         $allInventories = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['inventory'], [
-                'query' => [
-                    'limit' => $limit
-                ]
-            ]);
+            $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
