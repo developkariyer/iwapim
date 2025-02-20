@@ -293,7 +293,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
+
     }
 
     /**
