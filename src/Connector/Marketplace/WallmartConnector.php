@@ -296,6 +296,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
         print_r($response->getContent());
+        print_r($response->getStatusCode());
         /*$offset = 0;
         $limit = 200;
         $allReturns = [];
