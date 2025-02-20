@@ -24,7 +24,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'associations' => 'items/associations',
         'orders' => 'orders',
         'inventory' => 'inventory',
-        'price' => 'price'
+        'price' => 'price',
+        'returns' => 'returns',
     ];
     public static string $marketplaceType = 'Wallmart';
     private static int $expires_in;
@@ -285,6 +286,13 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
+
+    }
+
+    public function downloadReturns(): void
+    {
+        $response = $this->httpClient->request('GET',  static::$apiUrl['returns']);
+        print_r($response->getContent());
 
     }
 
