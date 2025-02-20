@@ -126,6 +126,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $headersToApi['query']['nextCursor'] = $nextCursor;
                 }
                 echo ".";
+                echo "Total items: " . $totalItems;
+                print_r($headersToApi);
                 usleep(720000);
             } while ($nextCursor !== null || count($data) < $totalItems);
 
