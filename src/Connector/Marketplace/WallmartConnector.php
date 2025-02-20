@@ -118,6 +118,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
                 $nextCursor = $newData['meta']['nextCursor'] ?? null;
                 $headersToApi['query']['nextCursor'] = $nextCursor;
+                echo "Next cursor: " . $nextCursor . "\n";
+                print_r($headersToApi);
                 echo ".";
                 usleep(720000);
             } while ($nextCursor !== null);
