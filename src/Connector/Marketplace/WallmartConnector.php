@@ -293,19 +293,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        try {
-            $this->prepareToken();
-            $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
-
-            print_r($response->getStatusCode());
-            print_r($response->getContent());
-        } catch (\Exception $e) {
-            echo 'Hata: ' . $e->getMessage();
-        }
-
-        /*$offset = 0;
+        $offset = 0;
         $limit = 200;
-        $allReturns = [];
+        $allInventories = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['inventory'], [
                 'query' => [
@@ -319,14 +309,14 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 break;
             }
             $data = $response->toArray();
-            $returns = $data['returnOrders'] ?? [];
-            $allReturns = array_merge($allReturns, $returns);
+            $inventories = $data['elements']['inventories'] ?? [];
+            $allInventories = array_merge($allInventories, $inventories);
             $offset += $limit;
             echo ".";
             sleep(1);
             $total = $data['meta']['totalCount'] ?? 0;
-        } while (count($allReturns) < $total);
-        $this->putToCache('INVENTORY.json', $allReturns);*/
+        } while (count($allInventories) < $total);
+        $this->putToCache('INVENTORY.json', $allInventories);
     }
 
     /**
