@@ -116,10 +116,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 }
                 $newData = json_decode($response->getContent(), true);
                 $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
-                $nextCursor = $newData['meta']['next_cursor'] ?? null;
-                $headersToApi['query']['next_cursor'] = $nextCursor;
-                echo "Next cursor: " . $nextCursor;
-                print_r($headersToApi);
+                $nextCursor = $newData['meta']['nextCursor'] ?? null;
+                $headersToApi['query']['nextCursor'] = $nextCursor;
                 echo ".";
                 usleep(720000);
             } while ($nextCursor !== null);
@@ -141,7 +139,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50], 'ItemResponse');
+        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'nextCursor' => null], 'ItemResponse');
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
