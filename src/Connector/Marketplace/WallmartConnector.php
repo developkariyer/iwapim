@@ -116,9 +116,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
                 }
                 $newData = json_decode($response->getContent(), true);
-                $data = array_merge($data,
+                $data = array_merge(
+                    $data,
                     $key
-                        ? ($newData[$key][$secondKey] ?? [])
+                        ? ($secondKey ? ($newData[$key][$secondKey] ?? []) : ($newData[$key] ?? []))
                         : $newData
                 );
                 if ($paginationType === 'offset') {
