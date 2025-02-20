@@ -118,7 +118,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $newData = json_decode($response->getContent(), true);
                 if ($key) {
                     $newData = $newData[$key] ?? [];
-                    if (isset($newData['inventories'])) {
+                    if (isset($newData[$key]['inventories'])) {
                         $data = array_merge($data, $newData['inventories']);
                     } else {
                         $data = array_merge($data, $newData);
