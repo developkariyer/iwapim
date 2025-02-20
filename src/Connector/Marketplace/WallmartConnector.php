@@ -150,7 +150,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'offset' => 0], 'ItemResponse', null, 'offset');
+        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'offset' => 0], 'ItemResponse',null, null,'offset');
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
@@ -258,7 +258,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'createdEndDate' => date('Y-m-d', $endDate),
                 'productInfo' => 'true'
             ];
-            $orders = $this->getFromWallmartApi('GET', 'orders', $query, 'list', null, 'cursor');
+            $orders = $this->getFromWallmartApi('GET', 'orders', $query, 'list', null, null,'cursor');
             $allOrders = array_merge($allOrders, $orders['elements']['order']);
             echo "Count: " . count($orders['elements']['order']) . "\n";
             echo "Total Count: " . count($allOrders) . "\n";
@@ -291,7 +291,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', null, 'cursor');
+        $allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
         $this->putToCache('INVENTORY.json', $allInventories);
     }
 
