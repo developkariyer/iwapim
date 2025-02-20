@@ -28,7 +28,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         'returns' => 'returns',
     ];
     public static string $marketplaceType = 'Wallmart';
-    private static int $expires_in;
     private static string $correlationId;
 
     /**
@@ -60,12 +59,13 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
+     * @throws RandomException
      */
     public function prepareToken(): void
     {
-        $httpClientWallmart = HttpClient::create();
+        static::$correlationId = $this->generateCorrelationId();
         try {
-            $response = $httpClientWallmart->request('POST', static::$apiUrl['loginTokenUrl'], [
+            $response = $this->httpClient->request('POST', "https://api-gateway.walmart.com/v3/token", [
                 'headers' => [
                     'Accept' => 'application/json',
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getWallmartClientId()}:{$this->marketplace->getWallmartSecretKey()}"),
@@ -81,7 +81,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
-            static::$expires_in = time() + $data['expires_in'];
             $this->marketplace->setWallmartAccessToken($data['access_token']);
             $this->marketplace->save();
         } catch (\Exception $e) {
@@ -90,45 +89,57 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     }
 
     /**
+     * @throws RandomException
+     */
+    public function getFromWallmartApi($method, $parameter, $query = [], $key = null, $body = null)
+    {
+        $this->prepareToken();
+        static::$correlationId = $this->generateCorrelationId();
+        $data = [];
+        $url = "https://marketplace.walmartapis.com/v3/" . $parameter;
+        $headersToApi = [
+            'query' => $query,
+            'headers' => [
+                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
+                'WM_QOS.CORRELATION_ID' => static::$correlationId,
+                'WM_SVC.NAME' => 'Walmart Marketplace',
+                'Accept' => 'application/json'
+            ],
+            'json' => $body
+        ];
+        try {
+            $nextCursor = null;
+            do {
+                $response = $this->httpClient->request($method, $url, $headersToApi);
+                if ($response->getStatusCode() !== 200) {
+                    echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
+                }
+                $newData = json_decode($response->getContent(), true);
+                $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
+                $nextCursor = $newData['meta']['next_cursor'] ?? null;
+                $headersToApi['query']['next_cursor'] = $nextCursor;
+                echo ".";
+                usleep(720000);
+            } while ($nextCursor !== null);
+
+        } catch (\Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+        }
+
+        return $data;
+    }
+
+    /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
      * @throws RandomException
      */
     public function download(bool $forceDownload = false): void
     {
-       if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareToken();
-       }
-       echo "Token is valid. Proceeding with download...\n";
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
-        $offset = 0;
-        $limit = 20;
-        $this->listings = [];
-        do {
-            $response = $this->httpClient->request('GET',  static::$apiUrl['offers'], [
-                'query' => [
-                    'limit' => $limit,
-                    'offset' => $offset
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            $data = $response->toArray();
-            $products = $data['ItemResponse'];
-            $totalItems = $data['totalItems'];
-            $this->listings = array_merge($this->listings, $products);
-            echo "Offset: " . $offset . " " . count($this->listings) . " ";
-            $offset += $limit;
-            echo ".";
-            sleep(1);  
-            echo "Total Items: " . $totalItems . "\n";
-            echo "Count: " . count($this->listings) . "\n";
-        } while (count($this->listings) < $totalItems);
+        $this->listings = $this->getFromWallmartApi('GET', 'offers', ['limit' => 50], 'ItemResponse');
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
