@@ -91,7 +91,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     /**
      * @throws RandomException
      */
-    public function getFromWallmartApi($method, $parameter, $query = [], $key = null, $body = null)
+    public function getFromWallmartApi($method, $parameter, $query = [], $key = null, $body = null, $paginationType = null)
     {
         $this->prepareToken();
         static::$correlationId = $this->generateCorrelationId();
@@ -117,7 +117,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 }
                 $newData = json_decode($response->getContent(), true);
                 $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
-                if ($parameter === 'items') {
+                if ($paginationType === 'offset') {
                     $totalItems = $newData['totalItems'] ?? 0;
                     $headersToApi['query']['offset'] += $headersToApi['query']['limit'];
                 }
@@ -126,8 +126,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $headersToApi['query']['nextCursor'] = $nextCursor;
                 }
                 echo ".";
-                echo "Total items: " . $totalItems;
-                print_r($headersToApi);
                 usleep(720000);
             } while ($nextCursor !== null || count($data) < $totalItems);
 
@@ -148,7 +146,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'offset' => 0], 'ItemResponse');
+        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'offset' => 0], 'ItemResponse', null, 'offset');
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
