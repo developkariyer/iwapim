@@ -305,7 +305,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadReturns(): void
     {
-        $allReturns = $this->getFromWallmartApi('GET', 'returns', ['limit' => 5, 'nextCursor' => null], 'returnOrders', null,null, 'cursor');
+        $allReturns = $this->getFromWallmartApi('GET', 'returns', ['limit' => 5, 'offset' => 0], 'returnOrders', null,null, 'offset');
         $this->putToCache('RETURNS.json', $allReturns);
     }
 
