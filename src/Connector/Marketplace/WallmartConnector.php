@@ -246,7 +246,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
 
         $allOrders = [];
-        while($startDate < time()) {
+        while($startDate <= time()) {
             echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
             $query = [
                 'limit' => 50,
