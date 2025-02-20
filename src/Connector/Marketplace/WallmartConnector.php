@@ -91,7 +91,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     /**
      * @throws RandomException
      */
-    public function getFromWallmartApi($method, $parameter, $query = [], $key = null, $body = null, $paginationType = null)
+    public function getFromWallmartApi($method, $parameter, $query = [], $key = null, $secondKey = null, $body = null, $paginationType = null)
     {
         $this->prepareToken();
         static::$correlationId = $this->generateCorrelationId();
@@ -116,16 +116,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
                 }
                 $newData = json_decode($response->getContent(), true);
-                if ($key) {
-                    $newData = $newData[$key] ?? [];
-                    if (isset($newData[$key]['inventories'])) {
-                        $data = array_merge($data, $newData['inventories']);
-                    } else {
-                        $data = array_merge($data, $newData);
-                    }
-                } else {
-                    $data = array_merge($data, $newData);
-                }
+                $data = array_merge($data,
+                    $key
+                        ? ($newData[$key][$secondKey] ?? [])
+                        : $newData
+                );
                 if ($paginationType === 'offset') {
                     $totalItems = $newData['totalItems'] ?? 0;
                     $headersToApi['query']['offset'] += $headersToApi['query']['limit'];
