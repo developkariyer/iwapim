@@ -256,6 +256,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             ];
             $orders = $this->getFromWallmartApi('GET', 'orders', $query, 'list', null, 'cursor');
             $allOrders = array_merge($allOrders, $orders['elements']['order']);
+            echo "Count: " . count($orders['elements']['order']) . "\n";
+            echo "Total Count: " . count($allOrders) . "\n";
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
             if ($startDate >= $now) {
