@@ -293,10 +293,16 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $this->prepareToken();
-        $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
-        print_r($response->getContent());
-        print_r($response->getStatusCode());
+        try {
+            $this->prepareToken();
+            $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
+
+            print_r($response->getStatusCode());
+            print_r($response->getContent());
+        } catch (\Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
+
         /*$offset = 0;
         $limit = 200;
         $allReturns = [];
