@@ -283,14 +283,29 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         } while($startDate < strtotime('now'));
         echo "Orders downloaded\n";
     }
-    
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadInventory(): void
     {
-
+        $this->downloadReturns();
     }
 
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
     public function downloadReturns(): void
     {
+        $this->prepareToken();
         $response = $this->httpClient->request('GET',  static::$apiUrl['returns']);
         print_r($response->getContent());
 
