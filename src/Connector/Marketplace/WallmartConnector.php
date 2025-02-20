@@ -17,16 +17,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class WallmartConnector extends MarketplaceConnectorAbstract
 {
-    private static array $apiUrl = [
-        'loginTokenUrl' => "https://api-gateway.walmart.com/v3/token",
-        'offers' => 'items',
-        'item' => 'items/',
-        'associations' => 'items/associations',
-        'orders' => 'orders',
-        'inventory' => 'inventories',
-        'price' => 'price',
-        'returns' => 'returns',
-    ];
     public static string $marketplaceType = 'Wallmart';
     private static string $correlationId;
 
@@ -37,20 +27,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
         $randomHex = bin2hex(random_bytes(4));
         return substr($randomHex, 0, 4) . '-' . substr($randomHex, 4, 4);
-    }
-
-    public function __construct($marketplace)
-    {
-        parent::__construct($marketplace);
-        static::$correlationId = $this->generateCorrelationId();
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://marketplace.walmartapis.com/v3/", [
-            'headers' => [
-                'WM_SEC.ACCESS_TOKEN' => $this->marketplace->getWallmartAccessToken(),
-                'WM_QOS.CORRELATION_ID' => static::$correlationId,
-                'WM_SVC.NAME' => 'Walmart Marketplace',
-                'Accept' => 'application/json'
-            ]
-        ]);
     }
 
     /**
@@ -126,7 +102,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $totalItems = $newData['totalItems'] ?? 0;
                     $headersToApi['query']['offset'] += $headersToApi['query']['limit'];
                 }
-                else {
+                else if ($paginationType === 'cursor') {
                     $nextCursor = $newData['meta']['nextCursor'] ?? null;
                     $totalData = $newData['meta']['totalCount'] ?? 0;
                     $headersToApi['query']['nextCursor'] = $nextCursor;
@@ -138,7 +114,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
-
         return $data;
     }
 
@@ -293,9 +268,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        //$allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
-        //$this->putToCache('INVENTORY.json', $allInventories);
-        $this->downloadReturns();
+        $allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
+        $this->putToCache('INVENTORY.json', $allInventories);
     }
 
     /**
@@ -325,32 +299,18 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Error: Barcode is missing\n";
             return;
         }
-        $request = [
-            'query' => [
-                'sku' => $sku
-            ],
-            'json' => [
-                'sku' => $sku,
-                'quantity' => [
-                    'unit' => 'EACH',
-                    'amount' => $targetValue
-                ]
+        $json = [
+            'sku' => $sku,
+            'quantity' => [
+                'unit' => 'EACH',
+                'amount' => $targetValue
             ]
         ];
-        $response = $this->httpClient->request('GET',  static::$apiUrl['inventory'], [
-            $request['query'],
-            $request['json']
-        ]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
+        $response = $this->getFromWallmartApi('PUT', 'inventory', ['sku'=> $sku], null, null, $json, null);
         echo "Inventory set to $targetValue\n";
         $date = date('YmdHis');
-        $data = $response->toArray();
         $filename = "SETINVENTORY_{$sku}_{$date}.json";
-        $this->putToCache($filename, ['request' => $request, 'response' => $data]);
+        $this->putToCache($filename, ['request' => $json, 'response' => $response]);
     }
 
     /**
@@ -385,9 +345,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 ]
             ]
         ];
-        $response = $this->httpClient->request('GET',  static::$apiUrl['price'], [
-            'json' => $json
-        ]);
+        $response = $this->getFromWallmartApi('PUT', 'price', null, null, null, $json, null);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -395,9 +353,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         }
         echo "Price set to $finalPrice\n";
         $date = date('YmdHis');
-        $data = $response->toArray();
         $filename = "SETPRICE_{$sku}_{$date}.json";
-        $this->putToCache($filename, ['request' => $json, 'response' => $data]);
+        $this->putToCache($filename, ['request' => $json, 'response' => $response]);
     }
    
 }
