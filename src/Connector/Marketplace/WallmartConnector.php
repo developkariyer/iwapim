@@ -142,7 +142,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 5, 'nextCursor' => null], 'ItemResponse');
+        $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 200, 'nextCursor' => null], 'ItemResponse');
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
