@@ -259,7 +259,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $allOrders = array_merge($allOrders, $orders['elements']['order']);
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        } while($startDate < strtotime('now'));
+        } while($startDate >= $now);
+
         foreach ($allOrders as $order) {
             $sqlInsertMarketplaceOrder = "
                             INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
