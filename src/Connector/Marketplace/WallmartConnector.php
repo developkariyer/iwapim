@@ -293,6 +293,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
+        $this->prepareToken();
         $limit = 50;
         $allInventories = [];
         $nextCursor = null;
