@@ -275,58 +275,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 'json' => json_encode($order)
             ]);
         }
-
-
-        /*$limit = 200;
-        $offset = 0;
-        echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
-        echo "Downloading orders...\n";
-        do {
-            do {
-                $response = $this->httpClient->request('GET',  static::$apiUrl['orders'], [
-                    'query' => [
-                        'limit' => $limit,
-                        'offset' => $offset,
-                        'createdStartDate' =>date('Y-m-d', $startDate),
-                        'createdEndDate' => date('Y-m-d', $endDate),
-                        'productInfo' => 'true'
-                    ]
-                ]);
-                $statusCode = $response->getStatusCode();
-                if ($statusCode !== 200) {
-                    echo "Error: $statusCode\n";
-                    return;
-                }
-                try {
-                    $data = $response->toArray();
-                    $orders = $data['list']['elements']['order'];
-                    foreach ($orders as $order) {
-                        $sqlInsertMarketplaceOrder = "
-                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
-                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
-                        Utility::executeSql($sqlInsertMarketplaceOrder, [
-                            'marketplace_id' => $this->marketplace->getId(),
-                            'order_id' => $order['purchaseOrderId'],
-                            'json' => json_encode($order)
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    echo "Error: " . $e->getMessage() . "\n";
-                }
-                $offset += $limit;
-                $total = $data['list']['meta']['totalCount'] ?? 0;
-                echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
-                echo "Offset: " . $offset . " " . count($orders ?? []) . " ";
-                echo "Total: " . $total . "\n";
-                echo ".";
-            } while($total == $limit);
-            $offset = 0;
-            $startDate = $endDate;
-            $endDate = min(strtotime('+2 weeks', $startDate), $now);
-            if ($startDate >= $now) {
-                break;
-            }
-        } while($startDate < strtotime('now'));*/
         echo "Orders downloaded\n";
     }
 
