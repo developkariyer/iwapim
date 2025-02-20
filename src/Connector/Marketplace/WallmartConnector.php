@@ -313,10 +313,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $inventories = $data['elements']['inventories'] ?? [];
             $allInventories = array_merge($allInventories, $inventories);
             $nextCursor = $data['meta']['nextCursor'] ?? null;
-            print_r($data['meta']);
+            print_r($nextCursor);
             echo ".";
             sleep(1);
-        } while (!$nextCursor);
+        } while ($nextCursor !== null);
         $this->putToCache('INVENTORY.json', $allInventories);
     }
 
