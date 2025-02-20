@@ -294,13 +294,16 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         $this->prepareToken();
-        $offset = 0;
+        $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
+        print_r($response->getContent());
+        /*$offset = 0;
         $limit = 200;
         $allReturns = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['inventory'], [
                 'query' => [
-                    'limit' => $limit
+                    'limit' => $limit,
+                    'offset' => $offset
                 ]
             ]);
             $statusCode = $response->getStatusCode();
@@ -316,7 +319,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             sleep(1);
             $total = $data['meta']['totalCount'] ?? 0;
         } while (count($allReturns) < $total);
-        $this->putToCache('INVENTORY.json', $allReturns);
+        $this->putToCache('INVENTORY.json', $allReturns);*/
     }
 
     /**
