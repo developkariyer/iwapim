@@ -60,7 +60,7 @@ class CurrencyCommand extends AbstractCommand
             $currencyObject->setDate(Carbon::createFromFormat('m/d/Y', $array['@attributes']['Date']));
             $currencyObject->setRate($rate/$currency['Unit']);
             $currencyObject->save();
-            $this->updateCurrencyHistoryTable($currency, $date, $rate);
+            $this->updateCurrencyHistoryTable($currency, $date, $rate/$currency['Unit']);
             echo "\n";
         }
         return Command::SUCCESS;
