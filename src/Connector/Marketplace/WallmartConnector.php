@@ -291,8 +291,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
-        $this->putToCache('INVENTORY.json', $allInventories);
+        //$allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
+        //$this->putToCache('INVENTORY.json', $allInventories);
+        $this->downloadReturns();
     }
 
     /**
@@ -304,30 +305,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadReturns(): void
     {
-        $this->prepareToken();
-        $offset = 0;
-        $limit = 200;
-        $allReturns = [];
-        do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['returns'], [
-                'query' => [
-                    'limit' => $limit,
-                    'offset' => $offset
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            $data = $response->toArray();
-            $returns = $data['returnOrders'] ?? [];
-            $allReturns = array_merge($allReturns, $returns);
-            $offset += $limit;
-            echo ".";
-            sleep(1);
-            $total = $data['meta']['totalCount'] ?? 0;
-        } while (count($allReturns) < $total);
+        $allReturns = $this->getFromWallmartApi('GET', 'returns', ['limit' => 50, 'nextCursor' => null], 'returnOrders', null,null, 'cursor');
         $this->putToCache('RETURNS.json', $allReturns);
     }
 
