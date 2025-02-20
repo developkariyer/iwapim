@@ -128,11 +128,12 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 }
                 else {
                     $nextCursor = $newData['meta']['nextCursor'] ?? null;
+                    $totalData = $newData['meta']['totalCount'] ?? 0;
                     $headersToApi['query']['nextCursor'] = $nextCursor;
                 }
                 echo ".";
                 usleep(720000);
-            } while ($nextCursor !== null || count($data) < $totalItems);
+            } while (($nextCursor !== null && count($data) < $totalData) || count($data) < $totalItems));
 
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
