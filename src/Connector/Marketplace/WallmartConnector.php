@@ -244,9 +244,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-180 day');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-
         $allOrders = [];
-        while($startDate <= time()) {
+        do {
             echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
             $query = [
                 'limit' => 50,
@@ -259,7 +258,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             $allOrders = array_merge($allOrders, $orders['elements']['order']);
             $startDate = $endDate;
             $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        };
+            if ($startDate >= $now) {
+                break;
+            }
+        } while($startDate < strtotime('now'));
 
         foreach ($allOrders as $order) {
             $sqlInsertMarketplaceOrder = "
