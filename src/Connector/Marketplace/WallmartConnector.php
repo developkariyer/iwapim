@@ -294,10 +294,15 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         $offset = 0;
-        $limit = 200;
+        $limit = 50;
         $allInventories = [];
         do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['inventory']);
+            $response = $this->httpClient->request('GET', static::$apiUrl['inventory'], [
+                'query' => [
+                    'limit' => $limit,
+                    'offset' => $offset
+                ]
+            ]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
