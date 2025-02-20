@@ -221,10 +221,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareToken();
-            sleep(1);
-        }
         $now = time();
         $now = strtotime(date('Y-m-d 00:00:00', $now));
         try {
@@ -264,6 +260,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                         'productInfo' => 'true'
                     ]
                 ]);
+                print_r(json_encode($response->getContent()));
                 $statusCode = $response->getStatusCode();
                 if ($statusCode !== 200) {
                     echo "Error: $statusCode\n";
