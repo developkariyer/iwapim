@@ -243,9 +243,36 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         } else {
             $startDate = strtotime('-180 day');
         }
-        echo "Start Date: " . date('Y-m-d', $startDate) . "\n";
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        $limit = 200;
+
+        $allOrders = [];
+        do {
+            echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
+            $query = [
+                'limit' => 50,
+                'nextCursor' => null,
+                'createdStartDate' =>date('Y-m-d', $startDate),
+                'createdEndDate' => date('Y-m-d', $endDate),
+                'productInfo' => 'true'
+            ];
+            $orders = $this->getFromWallmartApi('GET', 'orders', $query, 'list', null, 'cursor');
+            $allOrders = array_merge($allOrders, $orders['elements']['order']);
+            $startDate = $endDate;
+            $endDate = min(strtotime('+2 weeks', $startDate), $now);
+        } while($startDate < strtotime('now'));
+        foreach ($allOrders as $order) {
+            $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceOrder, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'order_id' => $order['purchaseOrderId'],
+                'json' => json_encode($order)
+            ]);
+        }
+
+
+        /*$limit = 200;
         $offset = 0;
         echo  "Start Date: " . date('Y-m-d', $startDate) . " End Date: " . date('Y-m-d', $endDate) . "\n";
         echo "Downloading orders...\n";
@@ -260,7 +287,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                         'productInfo' => 'true'
                     ]
                 ]);
-                print_r(json_encode($response->getContent()));
                 $statusCode = $response->getStatusCode();
                 if ($statusCode !== 200) {
                     echo "Error: $statusCode\n";
@@ -295,7 +321,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
-        } while($startDate < strtotime('now'));
+        } while($startDate < strtotime('now'));*/
         echo "Orders downloaded\n";
     }
 
