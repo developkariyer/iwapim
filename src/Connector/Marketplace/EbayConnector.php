@@ -379,32 +379,33 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $variations = $mainListing['Variations']['Variation'] ?? [null];
             echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
             foreach ($variations as $listing) {
-                echo "\nVariantSpec: "  . $this->getAttributes($listing) . "\n";
+                echo "\nVariantSpec: " . preg_replace('/[^A-Za-z0-9, ]/', '', preg_replace('/\s+/', ' ', trim($this->getAttributes($listing)))) . "\n";
 
-               /* $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
-                VariantProduct::addUpdateVariant(
-                    variant: [
-                        'imageUrl' => Utility::getCachedImage(is_array($imageUrl) ? $imageUrl[0] : $imageUrl) ?? '',
-                        'urlLink' => $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']),
-                        'salePrice' => $mainListing['SellingStatus']['CurrentPrice'] ?? '',
-                        'saleCurrency' => $mainListing['Currency'],
-                        'attributes' => $this->getAttributes($listing),
-                        'title' => $mainListing['Title'] ?? '',
-                        'quantity' => $mainListing['Quantity'] ?? 0,
-                        'uniqueMarketplaceId' => $mainListing['ItemID'] . '_' . $listing['VariationProductListingDetails']['UPC'] ?? '',
-                        'apiResponseJson' => json_encode($listing),
-                        'parentResponseJson' => json_encode($parentResponseJson),
-                        'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
-                        'sku' => $listing['SKU'] ?? '',
-                        //'ean' => $listing['VariationProductListingDetails']['UPC'] ?? '',
-                    ],
-                    importFlag: $importFlag,
-                    updateFlag: $updateFlag,
-                    marketplace: $this->marketplace,
-                    parent: $parent
-                );
-                echo "v";
-                $count++;*/
+
+                /* $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
+                 VariantProduct::addUpdateVariant(
+                     variant: [
+                         'imageUrl' => Utility::getCachedImage(is_array($imageUrl) ? $imageUrl[0] : $imageUrl) ?? '',
+                         'urlLink' => $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']),
+                         'salePrice' => $mainListing['SellingStatus']['CurrentPrice'] ?? '',
+                         'saleCurrency' => $mainListing['Currency'],
+                         'attributes' => $this->getAttributes($listing),
+                         'title' => $mainListing['Title'] ?? '',
+                         'quantity' => $mainListing['Quantity'] ?? 0,
+                         'uniqueMarketplaceId' => $mainListing['ItemID'] . '_' . $listing['VariationProductListingDetails']['UPC'] ?? '',
+                         'apiResponseJson' => json_encode($listing),
+                         'parentResponseJson' => json_encode($parentResponseJson),
+                         'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
+                         'sku' => $listing['SKU'] ?? '',
+                         //'ean' => $listing['VariationProductListingDetails']['UPC'] ?? '',
+                     ],
+                     importFlag: $importFlag,
+                     updateFlag: $updateFlag,
+                     marketplace: $this->marketplace,
+                     parent: $parent
+                 );
+                 echo "v";
+                 $count++;*/
             }
         }
     }
