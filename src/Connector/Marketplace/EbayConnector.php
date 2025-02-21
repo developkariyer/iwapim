@@ -379,7 +379,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $variations = $mainListing['Variations']['Variation'] ?? [null];
             echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
             foreach ($variations as $listing) {
-                echo "\nVariantSpec: " . preg_replace('/[^A-Za-z0-9, ]/', '', preg_replace('/\s+/', ' ', trim($this->getAttributes($listing)))) . "\n";
+                echo "\nVariantSpec: " . str_replace(' ', '', preg_replace('/[^A-Za-z0-9,]/', '', $this->getAttributes($listing))) . "\n";
 
 
                 /* $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
