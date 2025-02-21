@@ -318,7 +318,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        /*if (empty($this->listings)) {
+        if (empty($this->listings)) {
             echo "Nothing to import\n";
         }
         $marketplaceFolder = Utility::checkSetPath(
@@ -351,8 +351,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
             $count = 0;
             $variations = $mainListing['Variations']['Variation'] ?? [null];
-            echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";*/
-            /*foreach ($variations as $listing) {
+            echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
+            foreach ($variations as $listing) {
                 $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
                     variant: [
@@ -363,7 +363,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         'attributes' => $this->getAttributes($listing),
                         'title' => $mainListing['Title'] ?? '',
                         'quantity' => $mainListing['Quantity'] ?? 0,
-                        'uniqueMarketplaceId' => $mainListing['ItemID'] . $count ?? '',
+                        'uniqueMarketplaceId' => $mainListing['ItemID'] . '_' . $listing['VariationProductListingDetails']['UPC'] ?? '',
                         'apiResponseJson' => json_encode($listing),
                         'parentResponseJson' => json_encode($parentResponseJson),
                         'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
@@ -377,40 +377,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 );
                 echo "v";
                 $count++;
-            }*/
-           // echo "OK\n";
-            //$index++;
-            /*echo "MainID: " . $mainListing['ItemID'] . "\n";
-            echo "Title: " . $mainListing['Title'] . "\n";
-            echo "Product Type: " . $mainListing['PrimaryCategory']['CategoryName'] . "\n";
-            echo "Listing Status: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
-            if (isset($mainListing['PictureDetails']['PictureURL'])) {
-                echo "PictureURL: " . $mainListing['PictureDetails']['PictureURL'][0] . "\n";
             }
-            if (isset($mainListing['ListingDetails']['ViewItemURL'])) {
-                echo "ViewItemURL: " . $mainListing['ListingDetails']['ViewItemURL'] . "\n";
-            }
-            if (isset($mainListing['SellingStatus'])) {
-                echo "CurrentPrice: " . $mainListing['SellingStatus']['CurrentPrice'] . "\n";
-                echo "Published: " . $mainListing['SellingStatus']['ListingStatus'] . "\n";
-            }
-            echo "Currency: " . $mainListing['Currency'] . "\n";
-            echo "Quantity: " . $mainListing['Quantity'] . "\n";
-            if (isset($mainListing['Variations'])) {
-                foreach ($mainListing['Variations']['Variation'] as $listing) {
-                    if (isset($listing['SKU'])) {
-                        echo "SKU: " . $listing['SKU'] . "\n";
-                    }
-                    if (isset($listing['VariationProductListingDetails']['UPC'])) {
-                        echo "UPC: " . $listing['VariationProductListingDetails']['UPC'] . "\n";
-                    }
-
-                    echo "Attributes: " . $this->getAttributes($listing) . "\n";
-                    echo "---------------------------------------------------------------------------------------------------------------\n";
-                }
-            }
-            echo "---------------------------------------------------------------------------------------------------------------\n";*/
-       // }
+        }
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
