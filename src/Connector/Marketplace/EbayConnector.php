@@ -136,7 +136,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'query' => [
                     'legacy_item_id'  => $itemId,
-                    'fieldgroups' => 'PRODUCT'
+                    'fieldgroups' => 'ADDITIONAL_SELLER_DETAILS'
                 ]
             ]);
             echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
