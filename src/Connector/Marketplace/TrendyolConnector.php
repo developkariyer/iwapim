@@ -114,7 +114,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-      //  $this->downloadReturns();
+        $this->downloadReturns();
     }
 
     /**
