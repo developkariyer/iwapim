@@ -90,7 +90,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $this->sellerId . '/products?approved=true", ['page' => 0], 'content', null);
+        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $this->sellerId . '/products?approved=true", 'content', null);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
