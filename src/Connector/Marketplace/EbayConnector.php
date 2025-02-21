@@ -138,6 +138,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'legacy_item_id'  => $itemId
                 ]
             ]);
+            echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
         } catch (\Exception $e) {
             echo "HTTP Status Code: " . $e->getStatusCode() . "\n";
             echo "Error Code: " . $e->getErrorCode() . "\n";
