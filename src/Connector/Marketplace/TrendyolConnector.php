@@ -21,8 +21,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public static string $marketplaceType = 'Trendyol';
 
+    private string $sellerId;
     public function __construct($marketplace)
     {
+        $this->sellerId = $this->marketplace->getTrendyolSellerId();
         parent::__construct($marketplace);
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
@@ -39,11 +41,39 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         ];
     }
 
-    public function getFromTrendyolApi($method, $parameter, $query = [], $key = null, $body = null)
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     */
+    public function getFromTrendyolApi($method, $parameter, $query = [], $key = null, $body = null): array
     {
-
-
-
+        $data = [];
+        $url = "https://apigw.trendyol.com/integration/" . $parameter;
+        $headersToApi = [
+            'query' => $query,
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+            ],
+            'json' => $body
+        ];
+        $page = 0;
+        do {
+            $response = $this->httpClient->request($method, $url, $headersToApi);
+            if ($response->getStatusCode() !== 200) {
+                echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
+            }
+            sleep(1);
+            $newData = json_decode($response->getContent(), true);
+            $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
+            $page++;
+            if (isset($headersToApi['query']['page'])) {
+                $headersToApi['query']['page'] = $page;
+            }
+            echo ".";
+        } while($page <= $newData['totalPages']);
+        return $data;
     }
 
     /**
@@ -59,26 +89,11 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $page = 0;
-        $this->listings = [];
-        do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                'query' => [
-                    'page' => $page
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            $data = $response->toArray();
-            $products = $data['content'];
-            $this->listings = array_merge($this->listings, $products);
-            $page++;
-            echo ".";
-            sleep(1);  
-        } while ($page <= $data['totalPages']);
+        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $this->sellerId . '/products?approved=true", ['page' => 0], 'content', null);
+        if (empty($this->listings)) {
+            echo "Failed to download listings\n";
+            return;
+        }
         $this->putListingsToCache();
     }
 
