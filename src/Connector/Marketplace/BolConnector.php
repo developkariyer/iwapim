@@ -462,7 +462,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
         $this->prepareToken();
         try {
-            $response = $this->httpClient->request("GET", static::$apiUrl['insights'], ['query' => ['ean' => $ean, 'date' =>  date('Y-m-d', strtotime('-1 months'))]]);
+            $response = $this->httpClient->request("GET", static::$apiUrl['insights'], ['query' => ['ean' => $ean, 'date' =>  date('Y-m-d', strtotime('-3 months'))]]);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
