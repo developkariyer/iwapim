@@ -127,6 +127,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getItemByLegacyId($itemId)
     {
+        $this->refreshToAccessToken();
         $url = "https://api.ebay.com/item/get_item_by_legacy_id";
         try {
             $response = $this->httpClient->request('GET', $url, [
