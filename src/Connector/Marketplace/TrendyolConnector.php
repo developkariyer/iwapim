@@ -26,7 +26,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         parent::__construct($marketplace);
         $sellerId = $this->marketplace->getTrendyolSellerId();
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/", [
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
             ]
