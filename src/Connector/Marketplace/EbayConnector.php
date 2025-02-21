@@ -125,10 +125,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         print_r($jsonResponse);
     }
 
-    public function getItemByLegacyId()
+    public function getItemByLegacyId($itemId)
     {
-        print_r($this->listings);
-        /*$url = "https://api.ebay.com/buy/browse/v1/item/get_item_by_legacy_id";
+        $url = "https://api.ebay.com/buy/browse/v1/item/get_item_by_legacy_id";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -149,7 +148,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Error Type: " . $e->getMessage() . "\n";
         }
 
-        print_r($response->getContent());*/
+        print_r($response->getContent());
 
     }
 
@@ -160,10 +159,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         //$this->refreshToAccessToken();
         //$this->listingDetail("335529397881");
-        $this->getItemByLegacyId();
+        //$this->getItemByLegacyId("335747688599");
 
         // control expiresIn
-        /*$this->refreshToAccessToken();
+        $this->refreshToAccessToken();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -226,7 +225,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
         } while ($startDate < $currentDate);
         $this->listings = json_decode(json_encode($this->listings), true);
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     public function downloadInventory(): void
