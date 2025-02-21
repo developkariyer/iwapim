@@ -28,6 +28,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         'offers' => "/retailer/offers/",
         'inventory' => "/retailer/inventory/",
         'returns' => "/retailer/returns/",
+        'insights' => "/retailer/insights/product-ranks/",
     ];
     public static string $marketplaceType = 'Bol.com';
 
@@ -416,7 +417,8 @@ class BolConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void // LVB/FBB
     {
-        $inventory = $this->getFromCache('INVENTORY.json');
+        $this->downloadInsights(8683672059068);
+        /*$inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -425,7 +427,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
         $inventory[]  = $response->toArray();
-        $this->putToCache('INVENTORY.json', $inventory);
+        $this->putToCache('INVENTORY.json', $inventory);*/
     }
 
     /**
@@ -455,6 +457,18 @@ class BolConnector extends MarketplaceConnectorAbstract
         } while (count($returns) === 50);
         $this->putToCache('RETURNS.json', $allReturns);
     }
+
+    public function downloadInsights($ean)
+    {
+        $this->prepareToken();
+        $response = $this->httpClient->request("GET", static::$apiUrl['insights'],['query' => ['ean' => $ean, 'date' => strtotime('-3 months')]]);
+        if ($response->getStatusCode() !== 200) {
+            echo "Failed to download returns: " . $response->getContent() . "\n";
+        }
+        print_r($response->getContent());
+    }
+
+
 
     /**
      * @param VariantProduct $listing
