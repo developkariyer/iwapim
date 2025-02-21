@@ -317,8 +317,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        
-        
+
     }
     
     public function downloadInventory(): void
