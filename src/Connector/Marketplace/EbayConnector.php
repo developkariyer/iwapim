@@ -158,7 +158,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         //$this->refreshToAccessToken();
         //$this->listingDetail("335529397881");
-        $this->getItemByLegacyId("334989215049");
+        $this->getItemByLegacyId("v1|334989215049");
 
         // control expiresIn
         /*$this->refreshToAccessToken();
