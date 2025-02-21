@@ -53,6 +53,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'json' => $body
         ];
         while ($nextLink) {
+            echo "getFromShopifyApi";
+
             $response = $this->httpClient->request($method, $nextLink, $headersToApi);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
@@ -78,8 +80,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             echo ".";
-            echo "getFromShopifyApi";
-
         }
         return $data;
     }
