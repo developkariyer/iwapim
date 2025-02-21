@@ -22,7 +22,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Trendyol';
 
     private string $sellerId;
-    public function __construct($marketplace)
+    /*public function __construct($marketplace)
     {
         parent::__construct($marketplace);
         $sellerId = $this->marketplace->getTrendyolSellerId();
@@ -38,7 +38,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
             'returns' => 'order/sellers/' . $sellerId . '/claims',
         ];
-        /*$this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
+
+
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
             ]
@@ -50,8 +52,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
             'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
             'returns' => 'order/sellers/' . $sellerId . '/claims',
-        ];*/
-    }
+        ];
+    }*/
 
     /**
      * @throws RedirectionExceptionInterface
@@ -103,7 +105,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        /*$this->sellerId = $this->marketplace->getTrendyolSellerId();
+        $this->sellerId = $this->marketplace->getTrendyolSellerId();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -113,9 +115,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
 
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -139,7 +141,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo ".";
             sleep(1);
         } while ($page <= $data['totalPages']);
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     public function downloadInventory(): void
