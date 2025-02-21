@@ -39,6 +39,13 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         ];
     }
 
+    public function getFromTrendyolApi($method, $parameter, $query = [], $key = null, $body = null)
+    {
+
+
+
+    }
+
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
