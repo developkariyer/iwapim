@@ -57,12 +57,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             ],
             'json' => $body
         ];
-        echo "getFromTrendyolApi()";
-
         $page = 0;
         do {
             $response = $this->httpClient->request($method, $url, $headersToApi);
-            print_r($response->getContent());
+            print_r($response);
             if ($response->getStatusCode() !== 200) {
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
             }
