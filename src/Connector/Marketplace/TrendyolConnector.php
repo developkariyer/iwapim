@@ -22,10 +22,9 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Trendyol';
 
     private string $sellerId;
-    public function __construct($marketplace)
+    /*public function __construct($marketplace)
     {
-        $this->sellerId = $this->marketplace->getTrendyolSellerId();
-       /* parent::__construct($marketplace);
+       parent::__construct($marketplace);
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
@@ -38,8 +37,8 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
             'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
             'returns' => 'order/sellers/' . $sellerId . '/claims',
-        ];*/
-    }
+        ];
+    }*/
 
     /**
      * @throws RedirectionExceptionInterface
@@ -85,6 +84,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
+        $this->sellerId = $this->marketplace->getTrendyolSellerId();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
