@@ -349,16 +349,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 ]
             ]
         ];
-        $response = $this->httpClient->request('POST', static::$apiUrl['inventory_price'], ['json' => $request]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        $data = $response->toArray();
+        $response = $this->getFromTrendyolApi('POST', "inventory/sellers/" . $this->sellerId . "/products/price-and-inventory", [], null, $request);
         $combinedData = [
-            'inventory' => $data,
-            'batchRequestResult' => $this->getBatchRequestResult($data['batchRequestId']),
+            'inventory' => $response,
+            'batchRequestResult' => $this->getBatchRequestResult($response['batchRequestId']),
         ];
         $combinedJson = json_encode($combinedData);
         $filename = "SETINVENTORY_{$barcode}.json";
@@ -400,16 +394,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 ]
             ]
         ];
-        $response = $this->httpClient->request('POST', static::$apiUrl['inventory_price'], ['json' => $request]);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return;
-        }
-        $data = $response->toArray();
+        $response = $this->getFromTrendyolApi('POST', "inventory/sellers/" . $this->sellerId . "/products/price-and-inventory", [], null, $request);
         $combinedData = [
-            'price' => $data,
-            'batchRequestResult' => $this->getBatchRequestResult($data['batchRequestId']),
+            'price' => $response,
+            'batchRequestResult' => $this->getBatchRequestResult($response['batchRequestId']),
         ];
         $combinedJson = json_encode($combinedData);
         $filename = "SETPRICE_{$barcode}.json";
@@ -420,18 +408,11 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
     public function getBatchRequestResult($batchRequestId): array
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['batch_requests'] . $batchRequestId);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            echo "Error: $statusCode\n";
-            return [];
-        }
-        return $response->toArray();
+        return $this->getFromTrendyolApi('GET', "product/sellers/" . $this->sellerId . "/products/batch-requests/" . $batchRequestId);
     }
 
 }
