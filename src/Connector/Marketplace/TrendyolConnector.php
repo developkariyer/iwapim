@@ -25,7 +25,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function __construct($marketplace)
     {
         $this->sellerId = $this->marketplace->getTrendyolSellerId();
-        parent::__construct($marketplace);
+       /* parent::__construct($marketplace);
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
@@ -38,7 +38,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
             'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
             'returns' => 'order/sellers/' . $sellerId . '/claims',
-        ];
+        ];*/
     }
 
     /**

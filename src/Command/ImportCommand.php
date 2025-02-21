@@ -257,9 +257,9 @@ class ImportCommand extends AbstractCommand
                 echo "done.\n";
                 $notificationMessage .= "\n";
             }
-            if ($notificationSendFlag) {
-              //$this->notificationService->sendToUser(2, 1, 'Import completed!', $notificationMessage);
-            }
+            /*if ($notificationSendFlag) {
+              $this->notificationService->sendToUser(2, 1, 'Import completed!', $notificationMessage);
+            }*/
             //$this->addListeners();
             return Command::SUCCESS;
         } catch (Exception|\Exception) {
