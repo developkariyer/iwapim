@@ -129,27 +129,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $allReturns  =  $this->getFromTrendyolApi('GET',  "order/sellers/" . $this->sellerId . "/claims", ['page' => 0], 'content', null);
         $this->putToCache('RETURNS.json', $allReturns);
-        /*$page = 0;
-        $allReturns = [];
-        do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['returns'], [
-                'query' => [
-                    'page' => $page
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            $data = $response->toArray();
-            $returns = $data['content'] ?? [];
-            $allReturns = array_merge($allReturns, $returns);
-            $page++;
-            echo ".";
-            sleep(1);
-        } while ($page <= $data['totalPages']);
-        $this->putToCache('RETURNS.json', $allReturns);*/
     }
 
     /**
@@ -186,9 +165,41 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             $startDate = strtotime('-3 months');
         }
         $endDate = min(strtotime('+2 weeks', $startDate), $now);
-        $size = 200;
+        $allOrders = [];
         do {
-            $page = 0;
+            echo "Date Range: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
+            echo "-----------------------------\n";
+            $query = [
+                'page' => 0,
+                'size' => 200,
+                'startDate' => $startDate * 1000,
+                'endDate' => $endDate *1000
+            ];
+            $orders = $this->getFromTrendyolApi('GET', "order/sellers/" . $this->sellerId . "/orders" , $query, 'content');
+            $allOrders = array_merge($allOrders, $orders);
+            $startDate = $endDate;
+            $endDate = min(strtotime('+2 weeks', $startDate), $now);
+            if ($startDate >= $now) {
+                break;
+            }
+        } while ($startDate < strtotime('now'));
+
+        foreach ($allOrders as $order) {
+            $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceOrder, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'order_id' => $order['orderNumber'],
+                'json' => json_encode($order)
+            ]);
+
+        }
+        echo "Orders downloaded\n";
+
+
+
+        /*do {
             do {
                 $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
                     'query' => [
@@ -237,7 +248,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             if ($startDate >= $now) {
                 break;
             }
-        } while ($startDate < strtotime('now'));
+        } while ($startDate < strtotime('now'));*/
     }
 
     private function getAttributes($listing): string
