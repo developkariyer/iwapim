@@ -105,12 +105,12 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->sellerId = $this->marketplace->getTrendyolSellerId();
+        $sellerId = $this->marketplace->getTrendyolSellerId();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $this->sellerId . '/products?approved=true", ['page' => 0], 'content', null);
+        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $sellerId . '/products?approved=true", ['page' => 0], 'content', null);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
