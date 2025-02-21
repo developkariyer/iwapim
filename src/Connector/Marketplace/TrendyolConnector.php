@@ -50,6 +50,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         $data = [];
         $url = "https://apigw.trendyol.com/integration/" . $parameter;
+        echo "getFromTrendyolApi()";
         $headersToApi = [
             'query' => $query,
             'headers' => [
