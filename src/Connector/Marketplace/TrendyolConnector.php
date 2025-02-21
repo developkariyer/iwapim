@@ -114,7 +114,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
+
     }
 
     /**
@@ -354,7 +354,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'inventory' => $response,
             'batchRequestResult' => $this->getBatchRequestResult($response['batchRequestId']),
         ];
-        $combinedJson = json_encode($combinedData);
         $filename = "SETINVENTORY_{$barcode}.json";
         $this->putToCache($filename, ['request' => $request, 'response' => $combinedData]);
     }
@@ -399,7 +398,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             'price' => $response,
             'batchRequestResult' => $this->getBatchRequestResult($response['batchRequestId']),
         ];
-        $combinedJson = json_encode($combinedData);
         $filename = "SETPRICE_{$barcode}.json";
         $this->putToCache($filename, ['request' => $request, 'response' => $combinedData]);
     }
