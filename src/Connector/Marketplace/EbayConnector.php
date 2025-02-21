@@ -128,15 +128,22 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function getItemByLegacyId($itemId)
     {
         $url = "https://api.ebay.com/item/get_item_by_legacy_id";
-        $response = $this->httpClient->request('GET', $url, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
-                'Content-Type'  => 'application/json',
-            ],
-            'query' => [
-                'legacy_item_id'  => $itemId
-            ]
-        ]);
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'legacy_item_id'  => $itemId
+                ]
+            ]);
+        } catch (\Exception $e) {
+            echo "HTTP Status Code: " . $e->getStatusCode() . "\n";
+            echo "Error Code: " . $e->getErrorCode() . "\n";
+            echo "Error Type: " . $e->getMessage() . "\n";
+        }
+
         print_r($response->getContent());
 
     }
