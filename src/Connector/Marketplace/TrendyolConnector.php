@@ -59,8 +59,13 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         ];
         $page = 0;
         do {
-            $response = $this->httpClient->request($method, $url, $headersToApi);
-            print_r($response->getContent());
+            try {
+                $response = $this->httpClient->request($method, $url, $headersToApi);
+                print_r($response->getContent());
+            } catch (\Exception $e) {
+                echo "Hata oluştu: " . $e->getMessage();
+            }
+
             if ($response->getStatusCode() !== 200) {
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
             }
@@ -90,7 +95,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Using cached listings\n";
             return;
         }
-        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $this->sellerId . '/products?approved=true", 'content', null);
+        $this->listings = $this->getFromTrendyolApi('GET', "product/sellers/' . $this->sellerId . '/products?approved=true", ['page' => 0], 'content', null);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
