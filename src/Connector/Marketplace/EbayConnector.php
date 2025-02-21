@@ -125,7 +125,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         print_r($jsonResponse);
     }
 
-    public function getItemByLegacyId($itemId)
+    public function getItemByLegacyId()
     {
         print_r($this->listings);
         /*$url = "https://api.ebay.com/buy/browse/v1/item/get_item_by_legacy_id";
