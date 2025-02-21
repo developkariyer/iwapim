@@ -379,7 +379,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $variations = $mainListing['Variations']['Variation'] ?? [null];
             echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
             foreach ($variations as $listing) {
-                $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
+                echo "\nVariantSpec: "  . $this->getAttributes($listing) . "\n";
+               /* $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
                     variant: [
                         'imageUrl' => Utility::getCachedImage(is_array($imageUrl) ? $imageUrl[0] : $imageUrl) ?? '',
@@ -399,7 +400,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,
                     marketplace: $this->marketplace,
-                    parent: $parent
+                    parent: $parent*/
                 );
                 echo "v";
                 $count++;
