@@ -125,20 +125,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         echo "Attributes Downloaded\n";
     }
 
-    public function buybox()
-    {
-        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/buybox-orders/merchantid/{$this->marketplace->getSellerId()}", [
-            'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]
-        ]);
-        print_r($response->getContent());
-
-    }
-
     protected function getAttributes($variantTypeAttributes): string
     {
         $attributeString = "";
@@ -337,7 +323,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        $this->buybox();
 
     }
 
