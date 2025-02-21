@@ -180,7 +180,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadReturns()
     {
-        $returns = $this->getFromShopifyApi('GET', 'refunds.json', [], 'refunds');
+        $returns = $this->getFromShopifyApi('GET', 'refunds.json');
         $this->putToCache('RETURNS.json', $returns);
     }
 
