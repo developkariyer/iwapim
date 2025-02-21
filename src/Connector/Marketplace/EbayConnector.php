@@ -136,8 +136,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->listingDetail("335558398396");
 
         // control expiresIn
-        //$this->refreshToAccessToken();
-        /*if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->refreshToAccessToken();
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -199,7 +199,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
         } while ($startDate < $currentDate);
         $this->listings = json_decode(json_encode($this->listings), true);
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     public function downloadInventory(): void
