@@ -41,6 +41,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function getFromShopifyApi($method, $parameter, $query = [], $key = null, $body = null): ?array
     {
+        echo "getFromShopifyApi";
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
         $headersToApi = [
@@ -53,11 +54,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'json' => $body
         ];
         while ($nextLink) {
-            try {
-                $response = $this->httpClient->request($method, $nextLink, $headersToApi);
-            } catch (\Exception $e) {
-                echo $e->getMessage();
-            }
+            $response = $this->httpClient->request($method, $nextLink, $headersToApi);
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
@@ -180,7 +177,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
 
     public function downloadReturns()
     {
-        $returns = $this->getFromShopifyApi('GET', 'refunds.json');
+        $returns = $this->getFromShopifyApi('GET', 'refunds.json', [], 'refunds');
         $this->putToCache('RETURNS.json', $returns);
     }
 
