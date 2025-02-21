@@ -136,7 +136,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'query' => [
                     'legacy_item_id'  => $itemId,
-                    'fieldgroups' => 'ADDITIONAL_SELLER_DETAILS'
+                    'fieldgroups' => 'PRODUCT'
                 ]
             ]);
             echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
@@ -159,7 +159,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         //$this->refreshToAccessToken();
         //$this->listingDetail("335529397881");
-        $this->getItemByLegacyId("335751016543");
+        $this->getItemByLegacyId("335747688599");
 
         // control expiresIn
         /*$this->refreshToAccessToken();
