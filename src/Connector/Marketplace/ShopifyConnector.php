@@ -41,7 +41,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function getFromShopifyApi($method, $parameter, $query = [], $key = null, $body = null): ?array
     {
-        echo "getFromShopifyApi";
         $data = [];
         $nextLink = "{$this->apiUrl}/{$parameter}";
         $headersToApi = [
@@ -79,6 +78,8 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 ]
             ];
             echo ".";
+            echo "getFromShopifyApi";
+
         }
         return $data;
     }
