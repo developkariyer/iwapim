@@ -54,7 +54,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         ];
         while ($nextLink) {
             $response = $this->httpClient->request($method, $nextLink, $headersToApi);
-            echo $response->getStatusCode();
             if ($response->getStatusCode() !== 200) {
                 echo "Failed to $method $nextLink: {$response->getContent()}\n";
                 return null;
@@ -111,8 +110,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
-        /*$inventory = $this->getFromCache('INVENTORY.json');
+        $inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -134,7 +132,7 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
                 'inventory_levels' => $inventoryLevels
             ];
         }
-        $this->putToCache('INVENTORY.json', $inventory);*/
+        $this->putToCache('INVENTORY.json', $inventory);
     }
 
     /**
@@ -173,12 +171,6 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
-    }
-
-    public function downloadReturns()
-    {
-        $returns = $this->getFromShopifyApi('GET', 'refunds.json', [], 'refunds');
-        $this->putToCache('RETURNS.json', $returns);
     }
 
     // Not Used
