@@ -380,6 +380,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
             foreach ($variations as $listing) {
                 echo "\nVariantSpec: "  . $this->getAttributes($listing) . "\n";
+
                /* $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                 VariantProduct::addUpdateVariant(
                     variant: [
@@ -400,10 +401,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     importFlag: $importFlag,
                     updateFlag: $updateFlag,
                     marketplace: $this->marketplace,
-                    parent: $parent*/
+                    parent: $parent
                 );
                 echo "v";
-                $count++;
+                $count++;*/
             }
         }
     }
