@@ -379,10 +379,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $variations = $mainListing['Variations']['Variation'] ?? [null];
             echo $mainListing['ListingDetails']['ViewItemURL'] . "\n";
             foreach ($variations as $listing) {
-                echo "\nVariantSpec: " . str_replace(' ', '', preg_replace('/[^A-Za-z0-9,]/', '', $this->getAttributes($listing))) . "\n";
-
-
-                /* $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
+                $imageUrl = $mainListing['PictureDetails']['PictureURL'][0] ?? '';
                  VariantProduct::addUpdateVariant(
                      variant: [
                          'imageUrl' => Utility::getCachedImage(is_array($imageUrl) ? $imageUrl[0] : $imageUrl) ?? '',
@@ -392,7 +389,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                          'attributes' => $this->getAttributes($listing),
                          'title' => $mainListing['Title'] ?? '',
                          'quantity' => $mainListing['Quantity'] ?? 0,
-                         'uniqueMarketplaceId' => $mainListing['ItemID'] . '_' . $listing['VariationProductListingDetails']['UPC'] ?? '',
+                         'uniqueMarketplaceId' => $mainListing['ItemID'] . '_' . str_replace(' ', '', preg_replace('/[^A-Za-z0-9,]/', '', $this->getAttributes($listing)))  ?? '',
                          'apiResponseJson' => json_encode($listing),
                          'parentResponseJson' => json_encode($parentResponseJson),
                          'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
@@ -405,7 +402,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                      parent: $parent
                  );
                  echo "v";
-                 $count++;*/
+                 $count++;
             }
         }
     }
