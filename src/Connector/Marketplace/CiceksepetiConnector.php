@@ -20,7 +20,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         'offers' => "Products/",
         'updateInventoryPrice' => "Products/price-and-stock/",
         'batchStatus' => "Products/batch-status/",
-        'orders' => "Order/GetOrders/"
+        'orders' => "Order/GetOrders/",
+        'returns' => "Order/getcanceledorders/",
     ];
 
     public static string $marketplaceType = 'Ciceksepeti';
@@ -224,7 +225,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-
+        $this->downloadReturns();
     }
 
     /**
@@ -241,7 +242,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $pageSize = 50;
         $allReturns = [];
         do {
-            $response = $this->httpClient->request('POST', static::$apiUrl['orders'], ['json' => ['page' => $page, 'pageSize' => $pageSize]]);
+            $response = $this->httpClient->request('POST', static::$apiUrl['returns'], ['json' => ['page' => $page, 'pageSize' => $pageSize]]);
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
                 echo "Error: $statusCode\n";
