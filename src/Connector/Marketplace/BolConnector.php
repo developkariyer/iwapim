@@ -461,7 +461,11 @@ class BolConnector extends MarketplaceConnectorAbstract
     public function downloadInsights($ean)
     {
         $this->prepareToken();
-        $response = $this->httpClient->request("GET", static::$apiUrl['insights'],['query' => ['ean' => $ean, 'date' => strtotime('-3 months')]]);
+        try {
+            $response = $this->httpClient->request("GET", static::$apiUrl['insights'],['query' => ['ean' => $ean, 'date' => strtotime('-3 months')]]);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
         if ($response->getStatusCode() !== 200) {
             echo "Failed to download returns: " . $response->getContent() . "\n";
         }
