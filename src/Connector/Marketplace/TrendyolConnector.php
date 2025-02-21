@@ -21,7 +21,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
     public static string $marketplaceType = 'Trendyol';
 
-    private string $sellerId;
     /*public function __construct($marketplace)
     {
         parent::__construct($marketplace);
@@ -74,13 +73,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         ];
         $page = 0;
         do {
-            try {
-                $response = $this->httpClient->request($method, $url, $headersToApi);
-                print_r($response->getContent());
-            } catch (\Exception $e) {
-                echo "Hata oluştu: " . $e->getMessage();
-            }
-
+            $response = $this->httpClient->request($method, $url, $headersToApi);
             if ($response->getStatusCode() !== 200) {
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
             }
@@ -116,32 +109,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->putListingsToCache();
-
-        /*if (!$forceDownload && $this->getListingsFromCache()) {
-            echo "Using cached listings\n";
-            return;
-        }
-        $page = 0;
-        $this->listings = [];
-        do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                'query' => [
-                    'page' => $page
-                ]
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                echo "Error: $statusCode\n";
-                break;
-            }
-            $data = $response->toArray();
-            $products = $data['content'];
-            $this->listings = array_merge($this->listings, $products);
-            $page++;
-            echo ".";
-            sleep(1);
-        } while ($page <= $data['totalPages']);
-        $this->putListingsToCache();*/
     }
 
     public function downloadInventory(): void
