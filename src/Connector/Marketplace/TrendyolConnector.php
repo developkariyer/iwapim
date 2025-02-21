@@ -24,7 +24,12 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     private string $sellerId;
     public function __construct($marketplace)
     {
-       parent::__construct($marketplace);
+        parent::__construct($marketplace);
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://api.trendyol.com/sapigw/suppliers/{$this->marketplace->getTrendyolSellerId()}/", [
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
+            ]
+        ]);
         /*$this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
             'headers' => [
                 'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
@@ -90,7 +95,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->sellerId = $this->marketplace->getTrendyolSellerId();
+        /*$this->sellerId = $this->marketplace->getTrendyolSellerId();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -100,6 +105,32 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
+        $this->putListingsToCache();*/
+
+        if (!$forceDownload && $this->getListingsFromCache()) {
+            echo "Using cached listings\n";
+            return;
+        }
+        $page = 0;
+        $this->listings = [];
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                'query' => [
+                    'page' => $page
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $products = $data['content'];
+            $this->listings = array_merge($this->listings, $products);
+            $page++;
+            echo ".";
+            sleep(1);
+        } while ($page <= $data['totalPages']);
         $this->putListingsToCache();
     }
 
