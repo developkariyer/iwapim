@@ -389,7 +389,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                          'attributes' => $this->getAttributes($listing),
                          'title' => $mainListing['Title'] ?? '',
                          'quantity' => $mainListing['Quantity'] ?? 0,
-                         'uniqueMarketplaceId' => $mainListing['ItemID'] . '_' . str_replace(' ', '', preg_replace('/[^A-Za-z0-9,]/', '', $this->getAttributes($listing)))  ?? '',
+                         'uniqueMarketplaceId' => $mainListing['ItemID'] ,
                          'apiResponseJson' => json_encode($listing),
                          'parentResponseJson' => json_encode($parentResponseJson),
                          'published' => ($mainListing['SellingStatus']['ListingStatus'] ?? 'Active') === 'Active',
