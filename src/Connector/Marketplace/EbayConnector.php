@@ -243,7 +243,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     <RequesterCredentials>
         <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
     </RequesterCredentials>
-    <StartTimeFrom>2023-12-01T00:00:00.000Z</StartTimeFrom>
+    <StartTimeFrom>2024-10-01T00:00:00.000Z</StartTimeFrom>
 <StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
     <IncludeVariations>true</IncludeVariations>
     <IncludeWatchCount>true</IncludeWatchCount>
