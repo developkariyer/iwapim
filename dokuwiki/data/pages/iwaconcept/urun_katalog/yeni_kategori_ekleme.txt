@@ -1,0 +1,5 @@
+{{ :iwaconcept:kategori_ekle.mp4 | Yeni Kategori Ekle}}
+
+PIM içinde iki türlü kategori tanımlı.
+  - Ürün isimlerinin başında gördüğünüz 3 harfli kısaltmalardan oluşan ve sadece bizim ürünleri ayırt etmemize yarayan sanal kategori. Bunlar yine kolay bulabilmemiz için ürünleri klasörlere ayırmamızı sağlıyor.
+  - Üretim ve Wisersell tarafından kullanılan kategori. Bunun nasıl oluşturulacağı ve Wisersell'e aktarılacağı videoda gösterilmiştir.

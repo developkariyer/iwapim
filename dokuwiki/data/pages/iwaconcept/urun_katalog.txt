@@ -5,8 +5,30 @@ Katalog yönetimi, **tasarım, üretim, listing, reklam ve satış süreçleriyl
 Katalogun düzenli ve tutarlı olması, operasyonel verimlilik ve marka bütünlüğü için kritik öneme sahiptir.
 
 ===== Katalog Yönetiminin Temel İlkeleri =====
+==== Ürün Tanıtıcı Adı ====
+IWA içinde kullanageldiğimiz kısa tanıtıcı koddur. Aşağıdaki formüle göre üretilir:
+  * 2 veya 3 harf (A..Z) (Büyük harflerle) (PIM kategorisi)
+  * Çizgi (-)
+  * 3 rakam (000-999) (3 rakam yapmak için başına 0 eklenmeli) (Kategorideki sırası)
+  * 1 harf (A..Z) (Alt ürün tanımlayıcı)
+
+==== WS Kategori ====
+Üretim ve Wisersell tarafından kullanılan kategorilerdir.
+
+==== Ürün Adı ====
+  * Mümkün olduğunca kısa olmalı.
+  * Gerekmedikçe Türkçe dışında kelime kullanılmamalı.
+  * Yanlış veya çift anlamlandırmaya izin vermemeli.
+  * Sadece harf (A..Z), rakam (0..9), nokta (.), çizgi (-) ve boşluk ( ) içermeli.
+  * Renk, ebat, adet gibi bilgileri içermemeli.
+  * Eğer set ise setin içindeki ürünlerin kodları ismin sonuna eklenmeli.
+
+==== Ürün Kodu ====
+
+
+
   * **Standartlaştırılmış Ürün Bilgisi:**  
-    - Ürün adları, açıklamaları, teknik özellikleri ve varyasyonları belirlenen standartlara uygun olmalıdır.  
+    - Ürün adları, kısa, Türkçe, yanlış anlamaya izin vermeyecek şekilde, herhangi bir özel karakter kullanılmadan verilmelidir.  
     - Her pazaryeri için farklı gereksinimler olsa da **temel ürün bilgileri değişmemelidir**.  
   * **Doğru Kategorilendirme:**  
     - Ürünler, **IWAPIM’de doğru kategorilere** atanmalıdır.  
@@ -38,26 +60,33 @@ Katalogun düzenli ve tutarlı olması, operasyonel verimlilik ve marka bütünl
     - Kampanya ve fiyatlandırmalar katalog yönetimi ile eşleştirilmelidir.  
     - Katalogdaki hatalı bilgiler, müşteri şikayetlerine yol açabilir.  
 
-===== Katalog Süreçleri =====
-Aşağıdaki süreçler, katalog yönetimiyle ilgili en kritik işlemleri tanımlar.  
-Her süreç için ilgili sayfaya tıklayarak detaylı adımlara ulaşabilirsiniz.
+===== Katalog Yönetimi =====
+==== Kataloğa Yeni Kategori Ekleme ====
+{{ :iwaconcept:kategori_ekle.mp4?1024 | Kataloğa Yeni Kategori Ekleme}}
+==== Kataloğa Yeni Ürün Ekleme ====
+{{ :iwaconcept:urun_ekle.mp4?1024 | Kataloğa Yeni Ürün Ekleme}}
+==== Ürün Bilgilerini Değiştirme ====
+{{ :iwaconcept:urun_degistir.mp4?1024 | Ürün Bilgilerini Değiştirme}}
+==== Ürün Silme ====
+{{ :iwaconcept:urun_sil.mp4?1024 | Ürün Silme}}
+==== Set Ürün Tanımlama ====
+{{ :iwaconcept:set_tanimla.mp4?1024 | Set Ürün Tanımlama}}
 
-==== Katalog Yönetimi ====
-  * [[iwaconcept:urun_katalog:yeni_kategori_ekleme|Kataloğa Yeni Kategori Ekleme]]
-  * [[iwaconcept:urun_katalog:yeni_urun_ekleme|Kataloğa Yeni Ürün Ekleme]]
-  * [[iwaconcept:urun_katalog:urun_bilgisi_degistirme|Ürün Bilgilerini Değiştirme]]
-  * [[iwaconcept:urun_katalog:urun_silme|Ürün Silme]]
-  * [[iwaconcept:urun_katalog:set_urun_tanimlama|Set Ürün Tanımlama]]
+===== Varyasyon Yönetimi =====
+==== Ürüne Varyasyon Ekleme ====
+{{ :iwaconcept:varyasyon_ekle.mp4?1024 | Ürüne Varyasyon Ekleme}}
+==== Varyasyon Bilgilerini Değiştirme ====
+{{ :iwaconcept:varyasyon_degistir.mp4?1024 | Varyasyon Bilgilerini Değiştirme}}
+==== Varyasyon Silme ====
+{{ :iwaconcept:varyasyon_sil.mp4?1024 | Varyasyon Silme}}
+==== Varyasyon ile Listing'in Bağlanması ====
+{{ :iwaconcept:varyasyon_bagla.mp4?1024 | Varyasyon ile Listing'in Bağlanması}}
 
-==== Varyasyon Yönetimi ====
-  * [[iwaconcept:urun_katalog:varyasyon_ekleme|Ürüne Varyasyon Ekleme]]
-  * [[iwaconcept:urun_katalog:varyasyon_bilgisi_degistirme|Varyasyon Bilgilerini Değiştirme]]
-  * [[iwaconcept:urun_katalog:varyasyon_silme|Varyasyon Silme]]
-  * [[iwaconcept:urun_katalog:varyasyon_listing_baglama|Varyasyon ile Listing'in Bağlanması]]
-
-==== EAN ve Barkod Yönetimi ====
-  * [[iwaconcept:urun_katalog:yeni_ean_alma|Yeni EAN Alınması]]
-  * [[iwaconcept:urun_katalog:hatalı_ean_duzeltme|Hatalı EAN ile İlgili Yapılacak İşlem]]
+===== EAN ve Barkod Yönetimi =====
+==== Yeni EAN Alınması ====
+{{ :iwaconcept:ean_yeni.mp4?1024 | Yeni EAN Alınması}}
+==== Hatalı EAN ile İlgili Yapılacak İşlem ====
+{{ :iwaconcept:ean_hatali.mp4?1024 | Hatalı EAN ile İlgili Yapılacak İşlem}}
 
 ===== Ürün Kategorileri =====
 

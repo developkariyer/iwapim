@@ -1,34 +1,20 @@
-1739447006	93.193.84.230	C	start	iwapim	created		680
-1739448641	93.193.84.230	E	start	iwapim			-27
-1739448692	93.193.84.230	e	start	iwapim			9
-1739448710	93.193.84.230	E	start	iwapim			-10
-1739448821	93.193.84.230	e	start	iwapim			-24
-1739449117	93.193.84.230	E	start	iwapim			121
-1739449131	93.193.84.230	C	iwaconcept:marka	iwapim	oluşturuldu		4
-1739451991	93.193.84.230	E	start	iwapim			-57
-1739452002	93.193.84.230	E	start	iwapim			1
-1739452019	93.193.84.230	E	start	iwapim			8
-1739452031	93.193.84.230	E	start	iwapim			9
-1739452092	93.193.84.230	E	start	iwapim			4
-1739452518	93.193.84.230	E	iwaconcept:marka	iwapim			2804
-1739453084	93.193.84.230	E	start	iwapim			4
-1739454320	93.193.84.230	C	iwaconcept:markalar:iwa_concept	iwapim	oluşturuldu		1431
-1739454952	93.193.84.230	E	iwaconcept:markalar:iwa_concept	iwapim			4
-1739455004	93.193.84.230	E	iwaconcept:markalar:iwa_concept	iwapim	[Logo ve Renk Paleti] 		0
-1739455120	93.193.84.230	C	iwaconcept:markalar:colorfull_worlds	iwapim	oluşturuldu		1507
-1739455373	93.193.84.230	C	iwaconcept:markalar:shukran_islamic_arts	iwapim	oluşturuldu		1591
-1739455413	93.193.84.230	E	iwaconcept:markalar:shukran_islamic_arts	iwapim			-12
-1739455491	93.193.84.230	C	iwaconcept:markalar:ultimate_premium_products	iwapim	oluşturuldu		1678
-1739455505	93.193.84.230	E	iwaconcept:markalar:ultimate_premium_products	iwapim			-4
-1739455514	93.193.84.230	E	iwaconcept:markalar:ultimate_premium_products	iwapim			-4
-1739456399	93.193.84.230	E	iwaconcept:marka	iwapim	[Markalar] 		156
-1739456668	93.193.84.230	C	iwaconcept:urun_katalog	iwapim	oluşturuldu		3975
-1739456991	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Best Practices (En İyi Uygulamalar)] 		175
-1739457087	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Dikkat Edilecek Hususlar] 		-417
-1739457121	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Dikkat Edilecek Hususlar] 		-723
-1739457862	93.193.84.230	E	iwaconcept:urun_katalog	iwapim			897
 1739458226	93.193.84.230	E	iwaconcept:urun_katalog	iwapim			792
 1739458279	93.193.84.230	E	iwaconcept:urun_katalog	iwapim			32
 1739459620	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Ürün Kategorileri] 		1051
 1739459670	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Ürün Kategorileri] 		-793
 1739459811	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Ürün Kategorileri] 		64
+1739622345	93.193.84.230	C	iwaconcept:urun_katalog:yeni_kategori_ekleme	iwapim	oluşturuldu		482
+1739622383	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		60
+1739622406	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		27
+1739622425	93.193.84.230	E	iwaconcept:urun_katalog	iwapim			-4
+1739622577	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		6
+1739622673	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		4
+1739622791	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		-4
+1739622807	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		-1
+1739622819	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		1
+1739622853	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		9
+1739622914	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		-4
+1739622950	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetimi] 		20
+1739623123	93.193.84.230	E	iwaconcept:urun_katalog	iwapim			-441
+1739623285	93.193.84.230	E	iwaconcept:urun_katalog	iwapim			429
+1739628393	93.193.84.230	E	iwaconcept:urun_katalog	iwapim	[Katalog Yönetiminin Temel İlkeleri] 		869
