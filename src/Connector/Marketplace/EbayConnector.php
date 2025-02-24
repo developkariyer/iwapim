@@ -248,6 +248,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
               <GranularityLevel>Coarse</GranularityLevel>
               <DetailLevel>ReturnAll</DetailLevel>
               <WarningLevel>High</WarningLevel>
+              <Pagination>
+                <EntriesPerPage>10</EntriesPerPage> 
+                <PageNumber>1</PageNumber> 
+            </Pagination>
+
             </GetSellerListRequest>
 ';
         try {
