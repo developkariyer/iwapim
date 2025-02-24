@@ -243,8 +243,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     <RequesterCredentials>
         <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
     </RequesterCredentials>
-    <StartTimeFrom>2025-02-01T00:00:00.000Z</StartTimeFrom>
-    <StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
+    <StartTimeFrom>2023-12-01T00:00:00.000Z</StartTimeFrom>
+<StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
     <IncludeVariations>true</IncludeVariations>
     <IncludeWatchCount>true</IncludeWatchCount>
     <GranularityLevel>Coarse</GranularityLevel>
@@ -260,7 +260,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 'headers' => $headers,
                 'body' => $xmlRequest
             ]);
-            print_r($response->getContent());
+            $xmlContent = $response->getContent();
+            $xmlObject = simplexml_load_string($xmlContent);
+            $jsonResponse = json_encode($xmlObject);
+            print_r($jsonResponse);
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
