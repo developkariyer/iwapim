@@ -228,10 +228,45 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $this->putListingsToCache();*/
     }
 
+    public function getSellerList()
+    {
+        $headers = [
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
+            "X-EBAY-API-CALL-NAME: GetSellerList",
+            "X-EBAY-API-SITEID: 0",
+            "Content-Type: text/xml"
+        ];
+        $accessToken = $this->marketplace->getEbayAccessToken();
+        $url = "https://api.ebay.com/ws/api.dll";
+        $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
+                <RequesterCredentials>
+                <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+              </RequesterCredentials>
+            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+              <IncludeVariations>true</IncludeVariations>
+              <IncludeWatchCount>true</IncludeWatchCount>
+              <GranularityLevel>Coarse</GranularityLevel>
+              <DetailLevel>ReturnAll</DetailLevel>
+              <WarningLevel>High</WarningLevel>
+            </GetSellerListRequest>
+';
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'headers' => $headers,
+                'body' => $xmlRequest
+            ]);
+            print_r($response->getContent());
+        } catch (\Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
+
+    }
+
     public function downloadInventory(): void
     {
         $this->refreshToAccessToken();
-        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        $this->getSellerList();
+        /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -242,7 +277,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }
+        }*/
     }
 
     /**
