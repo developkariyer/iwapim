@@ -127,7 +127,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getItemByLegacyId($itemId)
     {
-        $url = "https://api.ebay.com/item/get_item_by_legacy_id";
+        $url = "https://api.ebay.com/buy/browse/v1/item/get_item_by_legacy_id";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -158,7 +158,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         $this->refreshToAccessToken();
-        $this->getItemByLegacyId("334936898383");
+        $this->listingDetail("334936898383");
+        //$this->getItemByLegacyId("335747688599");
 
         // control expiresIn
        /* $this->refreshToAccessToken();
