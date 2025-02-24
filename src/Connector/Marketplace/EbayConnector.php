@@ -239,10 +239,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $accessToken = $this->marketplace->getEbayAccessToken();
         $url = "https://api.ebay.com/ws/api.dll";
         $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
-                <RequesterCredentials>
+            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+             <RequesterCredentials>
                 <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
               </RequesterCredentials>
-            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
               <IncludeVariations>true</IncludeVariations>
               <IncludeWatchCount>true</IncludeWatchCount>
               <GranularityLevel>Coarse</GranularityLevel>
