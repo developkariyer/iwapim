@@ -58,6 +58,8 @@ class PrepareOrderTableCommand extends AbstractCommand
 
         if($input->getOption('extraColumns')) {
             $this->extraColumns();
+            $this->currencyRate();
+            $this->calculatePriceUsd();
         }
         return Command::SUCCESS;
     }
