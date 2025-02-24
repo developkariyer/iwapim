@@ -239,22 +239,22 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $accessToken = $this->marketplace->getEbayAccessToken();
         $url = "https://api.ebay.com/ws/api.dll";
         $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
-            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-             <RequesterCredentials>
-                <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
-              </RequesterCredentials>
-              <IncludeVariations>true</IncludeVariations>
-              <IncludeWatchCount>true</IncludeWatchCount>
-              <GranularityLevel>Coarse</GranularityLevel>
-              <DetailLevel>ReturnAll</DetailLevel>
-              <WarningLevel>High</WarningLevel>
-              <Pagination>
-                <EntriesPerPage>10</EntriesPerPage> 
-                <PageNumber>1</PageNumber> 
-            </Pagination>
-
-            </GetSellerListRequest>
-';
+<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+    <RequesterCredentials>
+        <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+    </RequesterCredentials>
+    <StartTimeFrom>2025-02-01T00:00:00.000Z</StartTimeFrom>
+    <StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
+    <IncludeVariations>true</IncludeVariations>
+    <IncludeWatchCount>true</IncludeWatchCount>
+    <GranularityLevel>Coarse</GranularityLevel>
+    <DetailLevel>ReturnAll</DetailLevel>
+    <WarningLevel>High</WarningLevel>
+    <Pagination>
+        <EntriesPerPage>200</EntriesPerPage>
+        <PageNumber>1</PageNumber>
+    </Pagination>
+</GetSellerListRequest>';
         try {
             $response = $this->httpClient->request('POST', $url, [
                 'headers' => $headers,
