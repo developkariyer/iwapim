@@ -82,10 +82,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceIds = Utility::fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $fileNames = [
-//            'Shopify' => [
-//                'old' => 'iwa_marketplace_orders_transfer_shopify_old.sql',
-//                'new' => 'iwa_marketplace_orders_transfer_shopify_new.sql'
-//            ],
+            //'Shopify' => 'iwa_marketplace_orders_transfer_shopify.sql',
             'Trendyol' => 'iwa_marketplace_orders_transfer_trendyol.sql',
             'Bol.com' => 'iwa_marketplace_orders_transfer_bolcom.sql',
             'Etsy' => 'iwa_marketplace_orders_transfer_etsy.sql',
@@ -95,9 +92,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             'Ciceksepeti' => 'iwa_marketplace_orders_transfer_ciceksepeti.sql',
             'Wayfair' => 'iwa_marketplace_orders_transfer_wayfair.sql',
         ];
-        $thresholdDate = strtotime('2025-02-26 17:00:00');
-        $orders = Utility::fetchFromSql("SELECT * FROM iwa_marketplace_orders");
         foreach ($marketplaceIds as $marketplaceId) {
+            $id = $marketplaceId['marketplace_id'];
             if (isset($this->marketplaceListWithIds[$id])) {
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
