@@ -128,7 +128,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getItemRest($itemId)
     {
-        $url = "https://api.ebay.com/buy/browse/v1/item/" ;
+        $url = "https://api.ebay.com/buy/browse/v1/item/" . $itemId;
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -177,9 +177,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->refreshToAccessToken();
-        $this->getItemRest("334936877779");
-        //$this->listingDetail("334936877779");
+       // $this->refreshToAccessToken();
+        //$this->getItemRest("334936877779");
+        $this->listingDetail("334936877779");
         //$this->getItemByLegacyId("334936898383");
 
         // control expiresIn
