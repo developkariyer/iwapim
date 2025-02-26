@@ -176,7 +176,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->refreshToAccessToken();
+       // $this->refreshToAccessToken();
         $this->getItemRest("334936898383");
        // $this->listingDetail("334936898383");
         //$this->getItemByLegacyId("334936898383");
