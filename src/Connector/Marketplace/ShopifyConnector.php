@@ -166,6 +166,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                     'order_id' => $order['id'],
                     'json' => json_encode($order)
                 ]);*/
+                break;
             }
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
