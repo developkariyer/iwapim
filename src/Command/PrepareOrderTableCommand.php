@@ -110,7 +110,8 @@ class PrepareOrderTableCommand extends AbstractCommand
                         $createdAtStr = $order['created_at'];
                         $createdAt = strtotime($createdAtStr);
                         $sqlFile = ($createdAt >= $thresholdDate) ? $fileNames['Shopify']['new'] : $fileNames['Shopify']['old'];
-                        Utility::executeSqlFile($this->transferSqlfilePath . $sqlFile, [
+                        $filePath = $this->transferSqlfilePath . $sqlFile;
+                        Utility::executeSqlFile($filePath, [
                             'marketPlaceId' => $id,
                             'marketplaceType' => $marketplaceType
                         ]);
