@@ -125,6 +125,28 @@ class EbayConnector extends MarketplaceConnectorAbstract
         print_r($jsonResponse);
     }
 
+    public function getItemRest($itemId)
+    {
+        $url = "https://api.ebay.com/buy/browse/v1/item/" . $itemId;
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ]
+            ]);
+            echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
+            print_r($response->getContent());
+
+        } catch (\Exception $e) {
+            echo "HTTP Status Code: " . $e->getStatusCode() . "\n";
+            echo "Error Code: " . $e->getErrorCode() . "\n";
+            echo "Error Type: " . $e->getMessage() . "\n";
+        }
+
+        print_r($response->getContent());
+    }
+
     public function getItemByLegacyId($itemId)
     {
         $url = "https://api.ebay.com/buy/browse/v1/item/get_item_by_legacy_id";
@@ -158,8 +180,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         $this->refreshToAccessToken();
-        //$this->listingDetail("334936898383");
-        $this->getItemByLegacyId("334936898383");
+        $this->getItemRest("334936898383");
+       // $this->listingDetail("334936898383");
+        //$this->getItemByLegacyId("334936898383");
 
         // control expiresIn
        /* $this->refreshToAccessToken();
