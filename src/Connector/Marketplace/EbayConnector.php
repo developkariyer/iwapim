@@ -138,7 +138,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
             print_r($response->getContent());
 
         } catch (\Exception $e) {
-            echo "HTTP Status Code: " . $e->getStatusCode() . "\n";
             echo "Error Code: " . $e->getErrorCode() . "\n";
             echo "Error Type: " . $e->getMessage() . "\n";
         }
