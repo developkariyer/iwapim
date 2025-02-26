@@ -157,14 +157,15 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
         try {
             foreach ($orders as $order) {
-                $sqlInsertMarketplaceOrder = "
+                print_r(json_encode($order));
+                /*$sqlInsertMarketplaceOrder = "
                     INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
                     VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
                 Utility::executeSql($sqlInsertMarketplaceOrder, [
                     'marketplace_id' => $this->marketplace->getId(),
                     'order_id' => $order['id'],
                     'json' => json_encode($order)
-                ]);
+                ]);*/
             }
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
