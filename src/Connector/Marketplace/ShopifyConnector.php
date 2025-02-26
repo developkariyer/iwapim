@@ -191,8 +191,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function import($updateFlag, $importFlag): void
     {
-        $this->listings = [];
-        $this->listings = $this->getFromCache("LISTINGS.json");
+        if (empty($this->listings)) {
+            echo "Nothing to import\n";
+        }
         $marketplaceFolder = Utility::checkSetPath(
             Utility::sanitizeVariable($this->marketplace->getKey(), 190),
             Utility::checkSetPath('Pazaryerleri')
