@@ -138,7 +138,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
             print_r($response->getContent());
 
         } catch (\Exception $e) {
-            echo "Error Code: " . $e->getErrorCode() . "\n";
             echo "Error Type: " . $e->getMessage() . "\n";
         }
 
