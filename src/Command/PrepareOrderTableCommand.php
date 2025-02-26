@@ -96,12 +96,12 @@ class PrepareOrderTableCommand extends AbstractCommand
             'Wayfair' => 'iwa_marketplace_orders_transfer_wayfair.sql',
         ];
         $thresholdDate = strtotime('2025-02-26 17:00:00');
+        $orders = Utility::fetchFromSql("SELECT * FROM iwa_marketplace_orders");
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id'];
             $marketplaceType = $this->marketplaceListWithIds[$id];
             echo "Marketplace ID: $id - Type: $marketplaceType\n";
             if ($marketplaceType === 'Shopify') {
-                $orders = Utility::fetchFromSql("SELECT * FROM iwa_marketplace_orders WHERE marketplace_id = :id", ['id' => $id]);
                 foreach ($orders as $order) {
                     $createdAtStr = $order['created_at'];
                     $createdAt = strtotime($createdAtStr);
