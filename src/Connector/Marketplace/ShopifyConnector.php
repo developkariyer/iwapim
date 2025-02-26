@@ -162,7 +162,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                     VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
                 Utility::executeSql($sqlInsertMarketplaceOrder, [
                     'marketplace_id' => $this->marketplace->getId(),
-                    'order_id' => $order['id'],
+                    'order_id' => basename($order['id']),
                     'json' => json_encode($order)
                 ]);
             }
