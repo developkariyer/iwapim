@@ -80,7 +80,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            break;
         } while ($hasNextPage);
         return $allData;
     }
@@ -159,15 +158,14 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         try {
             foreach ($orders as $order) {
                 print_r(json_encode($order));
-                /*$sqlInsertMarketplaceOrder = "
+                $sqlInsertMarketplaceOrder = "
                     INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
                     VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
                 Utility::executeSql($sqlInsertMarketplaceOrder, [
                     'marketplace_id' => $this->marketplace->getId(),
                     'order_id' => $order['id'],
                     'json' => json_encode($order)
-                ]);*/
-                break;
+                ]);
             }
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
