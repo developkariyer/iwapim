@@ -149,7 +149,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
             'variables' => [
-                'numOrders' => 1,
+                'numOrders' => 50,
                 'cursor' => null,
                 'filter' => $filter
             ]
