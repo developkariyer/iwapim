@@ -132,10 +132,18 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
-            'marketplace_id' => $this->marketplace->getId()
-        ]);
-        $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        try {
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(MAX(json_extract(json, '$.updatedAt')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id;";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
         echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
@@ -147,12 +155,19 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        foreach ($orders['orders'] as $order) {
-            Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
-                'marketplace_id' => $this->marketplace->getId(),
-                'order_id' => $order['id'],
-                'json' => json_encode($order)
-            ]);
+        try {
+            foreach ($orders as $order) {
+                $sqlInsertMarketplaceOrder = "
+                    INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                    VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                Utility::executeSql($sqlInsertMarketplaceOrder, [
+                    'marketplace_id' => $this->marketplace->getId(),
+                    'order_id' => $order['id'],
+                    'json' => json_encode($order)
+                ]);
+            }
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
         }
     }
 
