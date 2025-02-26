@@ -2,12 +2,11 @@
 
 namespace App\Connector\Marketplace;
 
-use Doctrine\DBAL\Exception;
-use Pimcore\Db;
-use Pimcore\Model\DataObject\Data\ExternalImage;
-use Pimcore\Model\DataObject\VariantProduct;
-use Pimcore\Model\DataObject\Marketplace;
 use App\Utils\Utility;
+use Doctrine\DBAL\Exception;
+use Pimcore\Model\DataObject\Data\ExternalImage;
+use Pimcore\Model\DataObject\Marketplace;
+use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Random\RandomException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -15,9 +14,11 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class ShopifyConnector extends MarketplaceConnectorAbstract
+class ShopifyConnector  extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
+
+    private string $graphqlUrl = PIMCORE_PROJECT_ROOT . '/src/GraphQL/Shopify/';
 
     private string $apiUrl;
 
@@ -39,100 +40,57 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function getFromShopifyApi($method, $parameter, $query = [], $key = null, $body = null): ?array
+    public function getFromShopifyApiGraphql($method, $data, $key = null): ?array
     {
-        $data = [];
-        $nextLink = "{$this->apiUrl}/{$parameter}";
-        $headersToApi = [
-            'query' => $query,
-            'headers' => [
-                'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ],
-            'json' => $body
-        ];
-        while ($nextLink) {
-            $response = $this->httpClient->request($method, $nextLink, $headersToApi);
-            if ($response->getStatusCode() !== 200) {
-                echo "Failed to $method $nextLink: {$response->getContent()}\n";
-                return null;
-            }
-            usleep(200000);
-            $newData = json_decode($response->getContent(), true);
-            $data = array_merge($data, $key ? ($newData[$key] ?? []) : $newData);
-            $headers = $response->getHeaders(false);
-            $links = $headers['link'] ?? [];
-            $nextLink = null;
-            foreach ($links as $link) {
-                if (preg_match('/<([^>]+)>;\s*rel="next"/', $link, $matches)) {
-                    $nextLink = $matches[1];
+        echo "Getting from Shopify GraphQL\n";
+        $allData = [];
+        $cursor = null;
+        $totalCount = 0;
+        $allData[$key] = [];
+        do {
+            $data['variables']['cursor'] = $cursor;
+            $headersToApi = [
+                'json' => $data,
+                'headers' => [
+                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
+                    'Content-Type' => 'application/json'
+                ]
+            ];
+            while (true) {
+                try {
+                    $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
+                    $newData = json_decode($response->getContent(), true);
+                    echo "Cost Info: " . json_encode($newData['extensions']['cost']) . PHP_EOL;
+                    if ($newData['extensions']['cost']['throttleStatus']['currentlyAvailable'] < $newData['extensions']['cost']['actualQueryCost'] ) {
+                        $restoreRate =  $this->rateLimitCalculate($newData['extensions']) ?? 5;
+                        echo "Rate limit exceeded, waiting for {$restoreRate} seconds..." . PHP_EOL;
+                        sleep($restoreRate);
+                        continue;
+                    }
+                    $allData[$key] = array_merge($allData[$key] ?? [], $newData['data'][$key]['nodes'] ?? []);
+                    break;
+                } catch (\Exception $e) {
+                    echo "Request Error: " . $e->getMessage() . PHP_EOL;
                     break;
                 }
             }
-            $headersToApi = [
-                'headers' => [
-                    'X-Shopify-Access-Token' => $this->marketplace->getAccessToken(),
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ]
-            ];
-            echo ".";
-        }
-        return $data;
+            $itemsCount = count($newData['data'][$key]['nodes'] ?? []);
+            $totalCount += $itemsCount;
+            echo "$key Count: $totalCount\n";
+            $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
+            $cursor = $pageInfo['endCursor'] ?? null;
+            $hasNextPage = $pageInfo['hasNextPage'] ?? false;
+        } while ($hasNextPage);
+        return $allData;
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface|RandomException
-     */
-    public function download($forceDownload = false): void
+    public function rateLimitCalculate($extensions): Int
     {
-       if (!$forceDownload && $this->getListingsFromCache()) {
-            echo "Using cached listings\n";
-            return;
-       }
-       $this->listings = $this->getFromShopifyApi('GET', 'products.json', ['limit' => 50], 'products');
-       if (empty($this->listings)) {
-            echo "Failed to download listings\n";
-            return;
-       }
-       $this->putListingsToCache();
-    }
-
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface|RandomException
-     */
-    public function downloadInventory(): void
-    {
-        $inventory = $this->getFromCache('INVENTORY.json');
-        if (!empty($inventory)) {
-            echo "Using cached inventory\n";
-            return;
-        }
-        $inventory = [];
-        $locations = $this->getFromShopifyApi('GET', 'locations.json', [], 'locations');
-        if (empty($locations)) {
-            echo "Failed to get locations\n";
-            return;
-        }
-        foreach ($locations as $location) {
-            $inventoryLevels = $this->getFromShopifyApi('GET', "inventory_levels.json", ['limit' => 50, 'location_ids' => $location['id']], 'inventory_levels');
-            if (empty($inventoryLevels)) {
-                echo "Failed to get inventory levels for location {$location['id']}\n";
-                continue;
-            }
-            $inventory[] = [
-                'location' => $location,
-                'inventory_levels' => $inventoryLevels
-            ];
-        }
-        $this->putToCache('INVENTORY.json', $inventory);
+        $actualQueryCost = $extensions['cost']['actualQueryCost'];
+        $currentlyAvailable = $extensions['cost']['throttleStatus']['currentlyAvailable'];
+        $restoreRate = $extensions['cost']['throttleStatus']['restoreRate'];
+        $waitTime = ceil(($actualQueryCost - $currentlyAvailable) / $restoreRate) + 1;
+        return max($waitTime, 10);
     }
 
     /**
@@ -140,151 +98,30 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws RandomException
      */
-    public function downloadOrders(): void
+    public function download($forceDownload = false): void
     {
-        try {
-            $sqlLastUpdatedAt = "
-                SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
-                FROM iwa_marketplace_orders
-                WHERE marketplace_id = :marketplace_id;";
-            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
-                'marketplace_id' => $this->marketplace->getId()
-            ]);
-            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+        echo "GraphQL download\n";
+        if ($this->getListingsFromCache()) {
+            echo "Using cached listings\n";
+            return;
         }
-        echo  "Last updated at: $lastUpdatedAt\n";
-        $orders = $this->getFromShopifyApi('GET', 'orders.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'orders');
-        try {
-            foreach ($orders as $order) {
-                $sqlInsertMarketplaceOrder = "
-                    INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
-                    VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
-                Utility::executeSql($sqlInsertMarketplaceOrder, [
-                    'marketplace_id' => $this->marketplace->getId(),
-                    'order_id' => $order['id'],
-                    'json' => json_encode($order)
-                ]);
-            }
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
-        }
-    }
-
-    // Not Used
-    private function downloadAbondonedCheckouts(): void
-    {
-        echo "Downloading abandoned checkouts\n";
-        $db = Db::get();
-        $lastUpdatedAt = $db->fetchOne(
-            "SELECT COALESCE(MAX(json_extract(json, '$.updated_at')), '2000-01-01T00:00:00Z') FROM iwa_marketplace_abandoned_checkouts WHERE marketplace_id = ?",
-            [$this->marketplace->getId()]
-        );
-        $checkouts = $this->getFromShopifyApi('GET', 'checkouts.json', ['status' => 'any', 'updated_at_min' => $lastUpdatedAt], 'checkouts');
-        $db->beginTransaction();
-        try {
-            foreach ($checkouts as $checkout) {
-                $db->executeStatement(
-                    "INSERT INTO iwa_marketplace_abandoned_checkouts (marketplace_id, checkout_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                    [
-                        $this->marketplace->getId(),
-                        $checkout['id'],
-                        json_encode($checkout)
-                    ]
-                );
-            }
-            $db->commit();
-        } catch (\Exception $e) {
-            $db->rollBack();
-            echo "Error: " . $e->getMessage() . "\n";
-        }
-    }
-
-    protected function getImage($listing, $mainListing): ?ExternalImage
-    {
-        $lastImage = null;
-        $images = $mainListing['images'] ?? [];
-        foreach ($images as $img) {
-            if (!is_numeric($listing['image_id']) || $img['id'] === $listing['image_id']) {
-                return Utility::getCachedImage($img['src']);
-            } 
-            if (empty($lastImage)) {
-                $lastImage = Utility::getCachedImage($img['src']);
-            }
-        }
-        if (!empty($mainListing['image']['src'])) {
-            return Utility::getCachedImage($mainListing['image']['src']);
-        }
-        return $lastImage;
-    }
-
-    /**
-     * @throws DuplicateFullPathException
-     * @throws \Exception
-     */
-    public function import($updateFlag, $importFlag): void
-    {
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
+            'variables' => [
+                'numProducts' => 50,
+                'cursor' => null
+            ]
+        ];
+        $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
         if (empty($this->listings)) {
-            echo "Nothing to import\n";
+            echo "Failed to download listings\n";
+            return;
         }
-        $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
-            Utility::checkSetPath('Pazaryerleri')
-        );
-        $total = count($this->listings);
-        $index = 0;
-        foreach ($this->listings as $mainListing) {
-            echo "($index/$total) Processing Listing {$mainListing['id']}:{$mainListing['title']} ...";
-            $parent = Utility::checkSetPath(
-                Utility::sanitizeVariable($mainListing['product_type'] ?? 'Tasnif-Edilmemiş'),
-                $marketplaceFolder
-            );
-            if (!empty($mainListing['title'])) {
-                $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable($mainListing['title']),
-                    $parent
-                );    
-            }
-            if (($mainListing['status'] ?? 'active') !== 'active') {
-                $parent = Utility::checkSetPath(
-                    Utility::sanitizeVariable('_Pasif'),
-                    $marketplaceFolder
-                );
-            }
-            $parentResponseJson = $mainListing;
-            if (isset($parentResponseJson['variants'])) {
-                unset($parentResponseJson['variants']);
-            }
-            foreach ($mainListing['variants'] as $listing) {
-                VariantProduct::addUpdateVariant(
-                    variant: [
-                        'imageUrl' => $this->getImage($listing, $mainListing),
-                        'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
-                        'salePrice' => $listing['price'] ?? '',
-                        'saleCurrency' => $this->marketplace->getCurrency(),
-                        'attributes' => $listing['title'] ?? '',
-                        'title' => ($mainListing['title'] ?? '').($listing['title'] ?? ''),
-                        'quantity' => $listing['inventory_quantity'] ?? 0,
-                        'uniqueMarketplaceId' => $listing['id'] ?? '',
-                        'apiResponseJson' => json_encode($listing),
-                        'parentResponseJson' => json_encode($parentResponseJson),
-                        'published' => ($mainListing['status'] ?? 'active') === 'active',
-                        'sku' => $listing['sku'] ?? '',
-                        'ean' => $listing['barcode'] ?? '',
-                    ],
-                    importFlag: $importFlag,
-                    updateFlag: $updateFlag,
-                    marketplace: $this->marketplace,
-                    parent: $parent
-                );
-                echo "v";
-            }
-            echo "OK\n";
-            $index++;
-        }
+        $this->putListingsToCache();
     }
+
 
     /**
      * @throws TransportExceptionInterface
@@ -293,22 +130,30 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
+    public function downloadOrders(): void
     {
-        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
-        if (empty($inventoryItemId)) {
-            echo "Failed to get inventory item id for {$listing->getKey()}\n";
-            return;
-        }
-        $request = [
-            'location_id' => $locationId,
-            'inventory_item_id' => $inventoryItemId,
-            'available' => $targetValue
+        $result = Utility::fetchFromSqlFile(parent::SQL_PATH . 'Shopify/select_last_updated_at.sql', [
+            'marketplace_id' => $this->marketplace->getId()
+        ]);
+        $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        echo  "Last updated at: $lastUpdatedAt\n";
+        $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
+            'variables' => [
+                'numOrders' => 50,
+                'cursor' => null,
+                'filter' => $filter
+            ]
         ];
-        $response = $this->getFromShopifyApi('POST', "inventory_levels/set.json", [], null, $request);
-        echo "Inventory set\n";
-        $filename = "SETINVENTORY_{$inventoryItemId}.json";
-        $this->putToCache($filename, ['request'=>$request, 'response'=>$response]);
+        $orders = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
+        foreach ($orders['orders'] as $order) {
+            Utility::executeSqlFile(parent::SQL_PATH . 'insert_marketplace_orders.sql', [
+                'marketplace_id' => $this->marketplace->getId(),
+                'order_id' => $order['id'],
+                'json' => json_encode($order)
+            ]);
+        }
     }
 
     /**
@@ -316,38 +161,120 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
-     * @throws Exception|RandomException
+     * @throws RandomException
      */
-    public function setSku(VariantProduct $listing, string $sku): void
+    public function downloadInventory(): void
     {
-        if (empty($sku)) {
-            echo "SKU is empty for {$listing->getKey()}\n";
+        $inventory = $this->getFromCache('INVENTORY.json');
+        if (!empty($inventory)) {
+            echo "Using cached inventory\n";
             return;
         }
-        $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
-        $jsonSku = $apiResponse['sku'] ?? null;
-        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
-        if (!empty($jsonSku) && $jsonSku === $sku) {
-            //echo "SKU is already set for {$listing->getKey()}: $jsonSku\n";
-            return;
-        }
-        if (empty($inventoryItemId)) {
-            echo "Failed to get inventory item id for {$listing->getKey()}\n";
-            return;
-        }
-        $request = [
-            'inventory_item' => [
-                'id' => $inventoryItemId,
-                'sku' => $sku
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'downloadInventory.graphql'),
+            'variables' => [
+                'numItems' => 50,
+                'cursor' => null
             ]
         ];
-        $response = $this->getFromShopifyApi('PUT', "inventory_items/{$inventoryItemId}.json", [], null, $request);
-        if (empty($response)) {
-            echo "Failed to set SKU for {$listing->getKey()}\n";
+        $inventories = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItems');
+        if (empty($inventories)) {
+            echo "Failed to download inventory\n";
             return;
         }
-        echo "$sku SKU set\n";
-        $this->putToCache("SETSKU_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$request, 'response'=>$response]);
+        $this->putToCache('INVENTORY.json', $inventories);
+    }
+
+    /**
+     * @throws DuplicateFullPathException
+     * @throws RandomException
+     */
+    public function import($updateFlag, $importFlag): void
+    {
+        $this->listings = [];
+        $this->listings = $this->getFromCache("LISTINGS.json");
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable('Test11' . $this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings['products']);
+        $index = 0;
+        foreach ($this->listings['products'] as $mainListing) {
+            echo "($index/$total) Processing Listing {$mainListing['id']}:{$mainListing['title']} ...\n";
+            $parent = Utility::checkSetPath(
+                Utility::sanitizeVariable($mainListing['productType'] ?? 'Tasnif-Edilmemiş'),
+                $marketplaceFolder
+            );
+            if (!empty($mainListing['title'])) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($mainListing['title']),
+                    $parent
+                );
+            }
+            if (($mainListing['status'] ?? 'ACTIVE') !== 'ACTIVE') {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable('_Pasif'),
+                    $marketplaceFolder
+                );
+            }
+            $parentResponseJson = $mainListing;
+            if (isset($parentResponseJson['variants']['nodes'])) {
+                unset($parentResponseJson['variants']['nodes']);
+            }
+            foreach ($mainListing['variants']['nodes'] as $listing) {
+                try{
+                    VariantProduct::addUpdateVariant(
+                        variant: [
+                            'imageUrl' => $this->getImage($listing, $mainListing) ?? '',
+                            'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
+                            'salePrice' =>   $listing['price'] ?? '',
+                            'saleCurrency' =>   $this->marketplace->getCurrency(),
+                            'attributes' =>   $listing['title'] ?? '',
+                            'title' =>  ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                            'quantity' => $listing['inventory_quantity'] ?? 0,
+                            'uniqueMarketplaceId' =>  basename($listing['id'] ?? ''),
+                            'apiResponseJson' =>  json_encode($listing),
+                            'parentResponseJson' => json_encode($parentResponseJson),
+                            'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                            'sku' =>   $listing['sku'] ?? '',
+                            'ean' =>   $listing['barcode'] ?? '',
+                        ],
+                        importFlag: $importFlag,
+                        updateFlag: $updateFlag,
+                        marketplace: $this->marketplace,
+                        parent: $parent
+                    );
+                    echo "v";
+                } catch (\Exception $e) {
+                    echo "Error: " . $e->getMessage() . "\n";
+                    echo "Sku: " . $listing['sku'] ?? '' . "\n";
+                    echo "ERRROR VARIANT: \n";
+                }
+            }
+            echo "OK\n";
+            $index++;
+        }
+    }
+
+    protected function getImage($listing, $mainListing)
+    {
+        $lastImage = '';
+        $images = $mainListing['media']['nodes'] ?? [];
+        foreach ($images as $img) {
+            $imageId = $listing['image']['id'] ?? null;
+            $imgId = $img['id'] ?? null;
+            if ($imageId === null || $imgId === null) {
+                continue;
+            }
+            if ( basename($imgId) === basename($imageId)) {
+                return Utility::getCachedImage($img['preview']['image']['url'] ?? '');
+            }
+
+            if (empty($lastImage)) {
+                $lastImage = Utility::getCachedImage($img['preview']['image']['url'] ?? '');
+            }
+        }
+        return $lastImage;
     }
 
     /**
@@ -358,30 +285,70 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function setBarcode(VariantProduct $listing, string $barcode): void
+    public function setSku(VariantProduct $listing, string $sku): void // not tested
     {
-        if (empty($barcode)) {
-            echo "Barcode is empty for {$listing->getKey()}";
+        if (empty($sku)) {
+            echo "SKU is empty for {$listing->getKey()}\n";
             return;
         }
-        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id'];
-        if (empty($variantId)) {
-            echo "Failed to get variant id for {$listing->getKey()}";
+        $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
+        $jsonSku = $apiResponse['sku'] ?? null;
+        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
+        if (!empty($jsonSku) && $jsonSku === $sku) {
+            echo "SKU is already set for {$listing->getKey()}\n";
             return;
         }
-        $request = [
-            'variant' => [
-                'id' => $variantId,
-                'barcode' => $barcode
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setSku.graphql'),
+            'variables' => [
+                'id' => $inventoryItemId,
+                'sku' => $sku,
             ]
         ];
-        $response = $this->getFromShopifyApi('PUT', "variants/{$variantId}.json", [], null, $request);
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'inventoryItemUpdate');
         if (empty($response)) {
-            echo "Failed to set barcode for {$listing->getKey()}";
+            echo "Failed to set SKU for {$listing->getKey()}\n";
             return;
         }
-        echo "Barcode set to $barcode";
-        $this->putToCache("SETBARCODE_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$request, 'response'=>$response]);
+        echo "SKU set\n";
+        $this->putToCache("SETSKU_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$query, 'response'=>$response]);
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws RandomException
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
+    public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void // not tested
+    {
+        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        if (empty($inventoryItemId)) {
+            echo "Failed to get inventory item id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setInventory.graphql'),
+            'variables' => [
+                'name' => 'available',
+                'quantities' => [
+                    'inventoryItemId' => $inventoryItemId,
+                    'locationId' => $locationId,
+                    'quantity' => $targetValue
+                ],
+                'reason' => 'restock'
+            ]
+        ];
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'inventorySetQuantities');
+        echo "Inventory set\n";
+        $filename = "SETINVENTORY_{$inventoryItemId}.json";
+        $this->putToCache($filename, ['request'=>$query, 'response'=>$response]);
     }
 
     /**
@@ -389,9 +356,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
-     * @throws Exception|RandomException
+     * @throws Exception
+     * @throws RandomException
      */
-    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
+    public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void // not tested
     {
         $currencies = [
             'CANADIAN DOLLAR' => 'CAD',
@@ -401,13 +369,10 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             'SWEDISH KRONA' => 'SEK',
             'POUND STERLING' => 'GBP'
         ];
-        $variantId = json_decode($listing->jsonRead('apiResponseJson'), true)['id']; 
-        if (empty($variantId)) {
+        $variantId = basename(json_decode($listing->jsonRead('apiResponseJson'), true)['id']);
+        $productId = basename(json_decode($listing->jsonRead('parentResponseJson'), true)['id']);
+        if (empty($variantId) || empty($productId) || empty($targetPrice)) {
             echo "Failed to get variant id for {$listing->getKey()}\n";
-            return;
-        }
-        if (empty($targetPrice)) {
-            echo "Price is empty for {$listing->getKey()}\n";
             return;
         }
         if (empty($targetCurrency)) {
@@ -430,16 +395,57 @@ class ShopifyConnector extends MarketplaceConnectorAbstract
             echo "Failed to convert currency for {$listing->getKey()}\n";
             return;
         }
-        $request = [
-            'variant' => [
-                'id' => $variantId,
-                'price' => $finalPrice
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setPrice.graphql'),
+            'variables' => [
+                'productId' => $productId,
+                'variants' => [
+                    'id' => $variantId,
+                    'price' => $finalPrice,
+                ]
             ]
+
         ];
-        $response = $this->getFromShopifyApi('PUT', "variants/{$variantId}.json", [], null, $request);
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
         echo "Price set\n";
         $filename = "SETPRICE_{$variantId}.json";
-        $this->putToCache($filename, ['request'=>$request, 'response'=>$response]);
+        $this->putToCache($filename, ['request'=>$query, 'response'=>$response]);
+    }
+
+    /**
+     * @throws Exception
+     * @throws RandomException
+     */
+    public function setBarcode(VariantProduct $listing, string $barcode): void //not tested
+    {
+        if (empty($barcode)) {
+            echo "Barcode is empty for {$listing->getKey()}";
+            return;
+        }
+        $variantId = basename(json_decode($listing->jsonRead('apiResponseJson'), true)['id']);
+        $productId = basename(json_decode($listing->jsonRead('parentResponseJson'), true)['id']);
+        if (empty($variantId) || empty($productId) || empty($targetPrice)) {
+            echo "Failed to get variant id for {$listing->getKey()}\n";
+            return;
+        }
+        $query = [
+            'query' => file_get_contents($this->graphqlUrl . 'setBarcode.graphql'),
+            'variables' => [
+                'productId' => $productId,
+                'variants' => [
+                    'id' => $variantId,
+                    'barcode' => $barcode,
+                ]
+            ]
+
+        ];
+        $response = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
+        if (empty($response)) {
+            echo "Failed to set barcode for {$listing->getKey()}";
+            return;
+        }
+        echo "Barcode set to $barcode";
+        $this->putToCache("SETBARCODE_{$listing->getUniqueMarketplaceId()}.json", ['request'=>$query, 'response'=>$response]);
     }
 
 }

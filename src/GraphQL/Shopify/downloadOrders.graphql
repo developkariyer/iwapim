@@ -14,6 +14,53 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             closedAt
             confirmed
             poNumber
+            lineItems (first:100) {
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+                nodes {
+                    id
+                    sku
+                    name
+                    title
+                    duties {
+                        id
+                        countryCodeOfOrigin
+                        harmonizedSystemCode
+                        price {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                    }
+                    vendor
+                    taxable
+                    quantity
+                    isGiftCard
+                    product {
+                        id
+                    }
+                    variant {
+                        id
+                        title
+                        price
+                    }
+                    requiresShipping
+                }
+            }
+            shippingAddress {
+                city
+                company
+                country
+                countryCodeV2
+                province
+            }
             taxLines {
                 rate
                 price
@@ -41,7 +88,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                 }
             }
             createdAt
-
             registeredSourceUrl
             taxExempt
             updatedAt

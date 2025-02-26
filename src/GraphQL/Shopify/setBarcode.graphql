@@ -5,7 +5,7 @@ mutation ProductVariantsUpdate($productId: ID!,  $variants: [ProductVariantsBulk
         }
         productVariants {
             id
-            price
+            barcode
         }
         userErrors {
             field
