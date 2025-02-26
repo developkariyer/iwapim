@@ -82,10 +82,7 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceIds = Utility::fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $fileNames = [
-            'Shopify' => [
-                'old' => 'iwa_marketplace_orders_transfer_shopify_old.sql',
-                'new' => 'iwa_marketplace_orders_transfer_shopify_new.sql'
-            ],
+            'Shopify' => 'iwa_marketplace_orders_transfer_shopify.sql',
             'Trendyol' => 'iwa_marketplace_orders_transfer_trendyol.sql',
             'Bol.com' => 'iwa_marketplace_orders_transfer_bolcom.sql',
             'Etsy' => 'iwa_marketplace_orders_transfer_etsy.sql',
@@ -97,31 +94,34 @@ class PrepareOrderTableCommand extends AbstractCommand
         ];
         $thresholdDate = strtotime('2025-02-26 17:00:00');
         foreach ($marketplaceIds as $marketplaceId) {
-            $id = $marketplaceId['marketplace_id']; 
-            if (isset($this->marketplaceListWithIds[$id])) {
-                $marketplaceType = $this->marketplaceListWithIds[$id];
-                echo "Marketplace ID: $id - Type: $marketplaceType\n";
-                if ($marketplaceType === 'Shopify') {
-                    $orders = Utility::fetchFromSql(
-                        "SELECT created_at FROM iwa_marketplace_orders WHERE marketplace_id = :id",
-                        ['id' => $id]
-                    );
-                    foreach ($orders as $order) {
-                        $createdAtStr = $order['created_at'];
-                        $createdAt = strtotime($createdAtStr);
-                        $sqlFile = ($createdAt >= $thresholdDate) ? $fileNames['Shopify']['new'] : $fileNames['Shopify']['old'];
-                        $filePath = $this->transferSqlfilePath . $sqlFile;
-                        Utility::executeSqlFile($filePath, [
-                            'marketPlaceId' => $id,
-                            'marketplaceType' => $marketplaceType
-                        ]);
+            $id = $marketplaceId['marketplace_id'];
+            $marketplaceType = $this->marketplaceListWithIds[$id];
+            echo "Marketplace ID: $id - Type: $marketplaceType\n";
+            if ($marketplaceType === 'Shopify') {
+                $orders = Utility::fetchFromSql("SELECT * FROM iwa_marketplace_orders WHERE marketplace_id = :id", ['id' => $id]);
+                foreach ($orders as $order) {
+                    $createdAtStr = $order['created_at'];
+                    $createdAt = strtotime($createdAtStr);
+                    $sqlFile = ($createdAt >= $thresholdDate) ? $fileNames['Shopify']['new'] : $fileNames['Shopify']['old'];
+                    $filePath = $this->transferSqlfilePath . $sqlFile;
+                    if (isset($fileNames[$marketplaceType])) {
+                        Utility::executeSqlFile($filePath, ['marketPlaceId' => $id, 'marketplaceType' => $marketplaceType]);
                     }
                 }
-                else {
+            }
+            else {
+                if (isset($fileNames[$marketplaceType])) {
+                    Utility::executeSqlFile($this->transferSqlfilePath . $fileNames[$marketplaceType], ['marketPlaceId' => $id, 'marketplaceType' => $marketplaceType]);
+                }
+            }
+            /*if (isset($this->marketplaceListWithIds[$id])) {
+                $marketplaceType = $this->marketplaceListWithIds[$id];
+                echo "Marketplace ID: $id - Type: $marketplaceType\n";
+                if (isset($fileNames[$marketplaceType])) {
                     Utility::executeSqlFile($this->transferSqlfilePath . $fileNames[$marketplaceType], ['marketPlaceId' => $id, 'marketplaceType' => $marketplaceType]);
                 }
                 echo "Complated: $marketplaceType\n";
-            }
+            }*/
         }
     }
 
