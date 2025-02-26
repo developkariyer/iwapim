@@ -109,10 +109,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
                   </RequesterCredentials>
                   <ItemID>' . $itemId . '</ItemID>
+                   <IncludeItemCompatibilityList>true</IncludeItemCompatibilityList>
                   <IncludeItemSpecifics>true</IncludeItemSpecifics>
                   <IncludeSelector>Details</IncludeSelector>
                   <IncludeVariations>true</IncludeVariations>
-                  <DetailLevel>ReturnAll</DetailLevel>
+                  <DetailLevel>ItemReturnAttributes</DetailLevel>
                   <ErrorLanguage>en_US</ErrorLanguage>
                 </GetItemRequest>';
         $response = $this->httpClient->request('POST', $url, [
@@ -177,8 +178,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
        // $this->refreshToAccessToken();
-        $this->getItemRest("334936877779");
-       // $this->listingDetail("334936898383");
+        //$this->getItemRest("334936877779");
+        $this->listingDetail("334936877779");
         //$this->getItemByLegacyId("334936898383");
 
         // control expiresIn
