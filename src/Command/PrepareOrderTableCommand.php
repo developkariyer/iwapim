@@ -102,7 +102,7 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 if ($marketplaceType === 'Shopify') {
-                    $orders = Utility::fetchFromSqlFile(
+                    $orders = Utility::fetchFromSql(
                         "SELECT created_at FROM iwa_marketplace_orders WHERE marketplace_id = :id",
                         ['id' => $id]
                     );
@@ -111,7 +111,6 @@ class PrepareOrderTableCommand extends AbstractCommand
                         $createdAt = strtotime($createdAtStr);
                         $sqlFile = ($createdAt >= $thresholdDate) ? $fileNames['Shopify']['new'] : $fileNames['Shopify']['old'];
                         $filePath = $this->transferSqlfilePath . $sqlFile;
-                        print_r($filePath);
                         Utility::executeSqlFile($filePath, [
                             'marketPlaceId' => $id,
                             'marketplaceType' => $marketplaceType
