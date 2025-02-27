@@ -117,13 +117,21 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return $data;
     }
 
+    public function itemSearch()
+    {
+        $response = $this->getFromWallmartApi('GET', 'items/walmart/search', ['gtin' => '08684089400603']);
+        print_r($response->getContent());
+
+    }
+
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
      * @throws RandomException
      */
     public function download(bool $forceDownload = false): void
     {
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->itemSearch();
+       /* if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -132,7 +140,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     protected function getAttributes($listing): string
