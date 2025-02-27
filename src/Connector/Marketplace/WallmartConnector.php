@@ -57,8 +57,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
-            $this->marketplace->setWallmartAccessToken($data['access_token']);
-            $this->marketplace->save();
+            print_r($response->getContent());
+            //$this->marketplace->setWallmartAccessToken($data['access_token']);
+            //$this->marketplace->save();
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
@@ -136,7 +137,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        if (!$forceDownload && $this->getListingsFromCache()) {
+        $this->prepareToken();
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -158,7 +160,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     public function getEan($gtin)
