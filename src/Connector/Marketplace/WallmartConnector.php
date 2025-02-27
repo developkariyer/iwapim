@@ -43,7 +43,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $expiresAt = $this->marketplace->getWallmartExpiresIn();
         $currentTimestamp = time();
         if ($expiresAt && ($expiresAt - $currentTimestamp) > 60) {
-            echo "Token is valid expires at $expiresAt \n";
+            echo "Token is valid expires seconds " . $expiresAt - $currentTimestamp . "\n";
             return;
         }
         echo "Token is not valid creating token\n";
