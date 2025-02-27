@@ -124,13 +124,19 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     }
 
+    public function allCatalog()
+    {
+        $catalog = $this->getFromWallmartApi('POST', 'items/catalog/search', ['limit' => 50, 'offset' => 0], 'payload',null, null,'offset');
+        print_r(json_encode($catalog));
+    }
+
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
      * @throws RandomException
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->itemSearch();
+        $this->allCatalog();
        /* if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
