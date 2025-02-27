@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Utils\Utility;
 
 #[AsCommand(
