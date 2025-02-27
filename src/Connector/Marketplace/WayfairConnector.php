@@ -39,7 +39,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->marketplace->getWayfairClientIdProd(),
                     'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                    'audience' => 'https://api.wayfair.com/'
+                    'audience' => 'https://api.wayfair.io/'
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
@@ -63,7 +63,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         echo "Downloading Wayfair...\n";
-      //  $this->prepareToken();
+        $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
