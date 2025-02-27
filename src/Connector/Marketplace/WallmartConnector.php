@@ -161,6 +161,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $this->putListingsToCache();
     }
 
+    public function getEan($gtin)
+    {
+        return ltrim($gtin, '0');
+    }
     protected function getAttributes($listing): string
     {
         $attributeString = "";
@@ -198,7 +202,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             }
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' =>  '',
+                    'imageUrl' => Utility::getCachedImage($listing['extra']['items'][0]['images'][0]['url'] ?? ''),
                     'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
                     'salePrice' => $listing['price']['amount'] ?? 0,
                     'saleCurrency' => $listing['price']['currency'] ?? 'USD',
@@ -206,8 +210,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'attributes' => $this->getAttributes($listing) ?? '',
                     'uniqueMarketplaceId' => $listing['wpid'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-                    'published' => $listing['publishedStatus'] === 'PUBLISHED',
+                    'published' => $listing['lifecycleStatus'] === 'ACTIVE' ? 1 : 0,
+                    'quantity' => $listing['inventory']['quantity']['amount'] ?? 0,
                     'sku' => $listing['sku'] ?? '',
+                    'ean' => $this->getEan($listing['gtin'])
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
