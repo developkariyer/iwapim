@@ -63,7 +63,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         echo "Downloading Wayfair...\n";
-        $this->prepareToken();
+      //  $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
@@ -83,7 +83,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $variables = [
             'supplierId' => 194115
         ];
-        $response = $this->httpClient->request('GET',static::$apiUrl['catalog'], [
+        $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
                 'Content-Type' => 'application/json'
