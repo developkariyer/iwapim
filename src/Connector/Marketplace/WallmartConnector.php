@@ -120,7 +120,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function itemSearch()
     {
         $response = $this->getFromWallmartApi('GET', 'items/walmart/search', ['gtin' => '08684089400603']);
-        print_r($response->getContent());
+        print_r($response);
 
     }
 
