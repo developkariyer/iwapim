@@ -40,9 +40,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function prepareToken(): void
     {
         static::$correlationId = $this->generateCorrelationId();
-        $expiresIn = $this->marketplace->getWallmartExpiresIn();
-        if ($expiresIn && $expiresIn > 60) {
-            echo "Token is valid expires in $expiresIn seconds\n";
+        $expiresAt = $this->marketplace->getWallmartExpiresIn();
+        $currentTimestamp = time();
+        if ($expiresAt && ($expiresAt - $currentTimestamp) > 60) {
+            echo "Token is valid expires at $expiresAt \n";
             return;
         }
         echo "Token is not valid creating token\n";
@@ -63,8 +64,10 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
+            $expiresIn = $data['expires_in'];
+            $expiresAt = $currentTimestamp + $expiresIn;
             $this->marketplace->setWallmartAccessToken($data['access_token']);
-            $this->marketplace->setWallmartExpiresIn($data['expires_in']);
+            $this->marketplace->setWallmartExpiresIn($expiresAt);
             $this->marketplace->save();
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage();
