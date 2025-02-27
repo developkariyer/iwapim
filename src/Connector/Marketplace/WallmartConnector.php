@@ -205,7 +205,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'imageUrl' => Utility::getCachedImage($listing['extra']['items'][0]['images'][0]['url'] ?? ''),
                     'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']  ?? ''),
                     'salePrice' => $listing['price']['amount'] ?? 0,
-                    'saleCurrency' => $listing['price']['currency'] ?? 'USD',
+                    'saleCurrency' => $listing['price']['currency'] ?? '',
                     'title' => $listing['productName'] ?? '',
                     'attributes' => $this->getAttributes($listing) ?? '',
                     'uniqueMarketplaceId' => $listing['wpid'] ?? '',
