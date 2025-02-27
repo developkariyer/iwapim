@@ -66,10 +66,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
       //  $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
-        query supplierCatalog(
+        query catalog (
             \$supplierId: Int!
         ) {
-            supplierCatalog(
+            catalog (
                 supplierId: \$supplierId
             ) {
                 supplierId
