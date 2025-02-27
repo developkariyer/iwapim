@@ -126,7 +126,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function allCatalog()
     {
-        $catalog = $this->getFromWallmartApi('POST', 'items/catalog/search', ['limit' => 50], 'payload',null, null,'offset');
+        $catalog = $this->getFromWallmartApi('POST', 'items/catalog/search', 'payload',null, null,'offset');
         print_r(json_encode($catalog));
     }
 
