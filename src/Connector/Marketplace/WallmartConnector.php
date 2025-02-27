@@ -117,11 +117,12 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return $data;
     }
 
-    public function itemSearch()
+    /**
+     * @throws RandomException
+     */
+    public function itemSearch($gtin): array
     {
-        $response = $this->getFromWallmartApi('GET', 'items/walmart/search', ['gtin' => '08684089400603']);
-        print_r(json_encode($response));
-
+        return $this->getFromWallmartApi('GET', 'items/walmart/search', ['gtin' => $gtin]);
     }
 
     /**
@@ -130,17 +131,25 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->itemSearch();
-       /* if (!$forceDownload && $this->getListingsFromCache()) {
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
-        }
+        }*/
+        $this->listings = [];
         $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'offset' => 0], 'ItemResponse',null, null,'offset');
+        foreach ($this->listings as &$listing) {
+            if (!empty($listing['gtin'])) {
+                $listing['extra'] = $this->itemSearch($listing['gtin']);
+            } else {
+                $listing['extra'] = null;
+            }
+        }
+        unset($listing);
         if (empty($this->listings)) {
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     protected function getAttributes($listing): string
