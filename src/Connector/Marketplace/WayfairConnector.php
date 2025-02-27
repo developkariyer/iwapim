@@ -65,7 +65,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         echo "Downloading Wayfair...\n";
       //  $this->prepareToken();
         $query = <<<GRAPHQL
-        query productClasses() {
+        query productClasses {
             productClasses {
                 classes {
                     className
