@@ -66,11 +66,13 @@ class WayfairConnector extends MarketplaceConnectorAbstract
       //  $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
-        query catalog (
-            \$supplierId: Int!
+        query supplierCatalog(
+            \$supplierId: Int!,
+             \$paginationOptions: PaginationOptions
         ) {
-            catalog (
+            supplierCatalog(
                 supplierId: \$supplierId
+                paginationOptions: \$paginationOptions
             ) {
                 supplierId
                 products {
@@ -81,7 +83,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         GRAPHQL;
         $variables = [
-            'supplierId' => 194115
+            'supplierId' => 194115,
+            'paginationOptions' => [
+                'page' => 1,
+                'pageSize' => 10
+            ]
         ];
         $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
             'headers' => [
