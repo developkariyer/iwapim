@@ -147,7 +147,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['title']} ...";
+            //echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['title']} ...";
             /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['offer_url'])) {
                 $parent = Utility::checkSetPath(
