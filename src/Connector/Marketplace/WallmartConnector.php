@@ -203,7 +203,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             VariantProduct::addUpdateVariant(
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['extra']['items'][0]['images'][0]['url'] ?? ''),
-                    'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']) ?? '',
+                    'urlLink' => $this->getUrlLink("https://www.walmart.com/ip/" . str_replace(' ', '-', $listing['productName']) . "/" . $listing['wpid']  ?? ''),
                     'salePrice' => $listing['price']['amount'] ?? 0,
                     'saleCurrency' => $listing['price']['currency'] ?? 'USD',
                     'title' => $listing['productName'] ?? '',
