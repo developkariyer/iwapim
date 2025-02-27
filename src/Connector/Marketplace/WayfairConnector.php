@@ -63,7 +63,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         echo "Downloading Wayfair...\n";
-        $this->prepareToken();
+       // $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
