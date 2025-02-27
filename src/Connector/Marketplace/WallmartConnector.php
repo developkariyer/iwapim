@@ -127,7 +127,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
 
     public function itemInventory($sku): array
     {
-        return $this->getFromWallmartApi('GET', '/inventories/' . $sku , []);
+        return $this->getFromWallmartApi('GET', '/inventory', ['sku' => $sku]);
     }
 
     /**
