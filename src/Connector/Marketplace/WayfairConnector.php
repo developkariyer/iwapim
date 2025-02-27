@@ -64,7 +64,27 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     {
         echo "Downloading Wayfair...\n";
       //  $this->prepareToken();
-        echo "Token is valid. Proceeding with download...\n";
+        $query = <<<GRAPHQL
+        query productClasses() {
+            productClasses() {
+                classes {
+                    className
+                }
+            }
+        }
+        GRAPHQL;
+        $response = $this->httpClient->request('POST',static::$apiUrl['catalog'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query
+            ]
+        ]);
+        print_r($response->getStatusCode());
+        print_r($response->getContent());
+       /* echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
             \$supplierId: Int!,
@@ -100,7 +120,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getStatusCode());
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
 
     /**
