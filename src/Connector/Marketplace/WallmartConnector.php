@@ -146,8 +146,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->prepareToken();
-        /*if (!$forceDownload && $this->getListingsFromCache()) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
@@ -169,7 +168,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
             echo "Failed to download listings\n";
             return;
         }
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     public function getEan($gtin)
@@ -224,7 +223,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     'published' => $listing['lifecycleStatus'] === 'ACTIVE' ? 1 : 0,
                     'quantity' => $listing['inventory']['quantity']['amount'] ?? 0,
                     'sku' => $listing['sku'] ?? '',
-                    'ean' => $this->getEan($listing['gtin'])
+                    'ean' => ltrim($listing['gtin'], '0') ?? ''
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
