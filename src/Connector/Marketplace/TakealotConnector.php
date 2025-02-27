@@ -125,6 +125,12 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         return $urlParts[count($urlParts) - 1];
     }
 
+    public function getAttributes ($title)
+    {
+        $pos = strpos($title, '-');
+        return ($pos !== false) ? trim(substr($title, $pos + 1)) : '';
+    }
+
     /**
      * @throws DuplicateFullPathException
      * @throws \Exception
@@ -142,7 +148,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo "($index/$total) Processing Listing {$listing['sku']}:{$listing['title']} ...";
-            $parent = Utility::checkSetPath($marketplaceFolder);
+            /*$parent = Utility::checkSetPath($marketplaceFolder);
             if (!empty($listing['offer_url'])) {
                 $parent = Utility::checkSetPath(
                     Utility::sanitizeVariable($this->getParentId($listing['offer_url'])),
@@ -156,7 +162,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     'salePrice' => $listing['selling_price'] ?? 0,
                     'saleCurrency' => 'ZAR',
                     'title' => $listing['title'] ?? '',
-                    'attributes' => $listing['title'] ?? '',
+                    'attributes' => $this->getAttributes($listing['title']),
                     'uniqueMarketplaceId' => $listing['tsin_id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['status'] === 'Buyable',
@@ -168,7 +174,8 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                 parent: $parent
             );
             echo "OK\n";
-            $index++;
+            $index++;*/
+            echo $this->getAttributes($listing['title']) . "\n";
         }    
     }
 
