@@ -41,12 +41,11 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     {
         static::$correlationId = $this->generateCorrelationId();
         $expiresIn = $this->marketplace->getWallmartExpiresIn();
-        $currentTimestamp = time();
-        if ($expiresIn && ($expiresIn - $currentTimestamp) > 60) {
+        if ($expiresIn && $expiresIn > 60) {
+            echo "Token is valid expires in $expiresIn seconds\n";
             return;
         }
-        echo "Current timestamp: $currentTimestamp\n";
-        echo "Expires in: $expiresIn seconds\n";
+        echo "Token is not valid creating token\n";
         try {
             $response = $this->httpClient->request('POST', "https://api-gateway.walmart.com/v3/token", [
                 'headers' => [
