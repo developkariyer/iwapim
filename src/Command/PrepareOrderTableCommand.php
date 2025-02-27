@@ -82,7 +82,10 @@ class PrepareOrderTableCommand extends AbstractCommand
         }
         $marketplaceIds = Utility::fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $fileNames = [
-            //'Shopify' => 'iwa_marketplace_orders_transfer_shopify.sql',
+            'Shopify' => [
+                'old' => 'iwa_marketplace_orders_transfer_shopify_old.sql' ,
+                'new' => 'iwa_marketplace_orders_transfer_shopify_new.sql'
+            ],
             'Trendyol' => 'iwa_marketplace_orders_transfer_trendyol.sql',
             'Bol.com' => 'iwa_marketplace_orders_transfer_bolcom.sql',
             'Etsy' => 'iwa_marketplace_orders_transfer_etsy.sql',
@@ -98,9 +101,23 @@ class PrepareOrderTableCommand extends AbstractCommand
                 $marketplaceType = $this->marketplaceListWithIds[$id];
                 echo "Marketplace ID: $id - Type: $marketplaceType\n";
                 if (isset($fileNames[$marketplaceType])) {
-                    Utility::executeSqlFile($this->transferSqlfilePath . $fileNames[$marketplaceType], ['marketPlaceId' => $id, 'marketplaceType' => $marketplaceType]);
+                    if (is_array($fileNames[$marketplaceType])) {
+                        foreach ($fileNames[$marketplaceType] as $key => $file) {
+                            Utility::executeSqlFile($this->transferSqlfilePath . $file, [
+                                'marketPlaceId' => $id,
+                                'marketplaceType' => $marketplaceType
+                            ]);
+                            echo "Executed: $marketplaceType ($key)\n";
+                        }
+                    } else {
+                        Utility::executeSqlFile($this->transferSqlfilePath . $fileNames[$marketplaceType], [
+                            'marketPlaceId' => $id,
+                            'marketplaceType' => $marketplaceType
+                        ]);
+                        echo "Executed: $marketplaceType\n";
+                    }
                 }
-                echo "Complated: $marketplaceType\n";
+                echo "Completed: $marketplaceType\n";
             }
         }
     }
