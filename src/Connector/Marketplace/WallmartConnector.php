@@ -125,23 +125,32 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         return $this->getFromWallmartApi('GET', 'items/walmart/search', ['gtin' => $gtin]);
     }
 
+    public function itemInventory($sku): array
+    {
+        return $this->getFromWallmartApi('GET', '/inventories/' . $sku , []);
+    }
+
     /**
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|DecodingExceptionInterface|ClientExceptionInterface
      * @throws RandomException
      */
     public function download(bool $forceDownload = false): void
     {
-        /*if (!$forceDownload && $this->getListingsFromCache()) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
-        }*/
-        $this->listings = [];
+        }
         $this->listings = $this->getFromWallmartApi('GET', 'items', ['limit' => 50, 'offset' => 0], 'ItemResponse',null, null,'offset');
         foreach ($this->listings as &$listing) {
             if (!empty($listing['gtin'])) {
                 $listing['extra'] = $this->itemSearch($listing['gtin']);
             } else {
                 $listing['extra'] = null;
+            }
+            if (!empty($listing['sku'])) {
+                $listing['inventory'] = $this->itemInventory($listing['sku']);
+            } else {
+                $listing['inventory'] = null;
             }
         }
         unset($listing);
