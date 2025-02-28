@@ -87,32 +87,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $this->marketplace->save();
     }
 
-    public function getSimilarItems($itemId)
-    {
-        $url = "https://api.ebay.com/ws/api.dll";
-        $accessToken = $this->marketplace->getEbayAccessToken();
-        $headers = [
-            "X-EBAY-API-COMPATIBILITY-LEVEL: 1227",
-            "X-EBAY-API-CALL-NAME: getSimilarItems",
-            "X-EBAY-API-SITEID: 0",
-            "Content-Type: text/xml"
-        ];
-        $xmlRequest = '<getSimilarItemsRequest xmlns="http://www.ebay.com/marketplace/services">
-                 <RequesterCredentials>
-                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
-                  </RequesterCredentials>
-              <itemId> $itemId </itemId>
-            </getSimilarItemsRequest>';
-        $response = $this->httpClient->request('POST', $url, [
-            'headers' => $headers,
-            'body' => $xmlRequest
-        ]);
-        $xmlContent = $response->getContent();
-        $xmlObject = simplexml_load_string($xmlContent);
-        $jsonResponse = json_encode($xmlObject);
-        print_r($jsonResponse);
-    }
-
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
@@ -137,9 +111,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                   <ItemID>' . $itemId . '</ItemID>
                    <IncludeItemCompatibilityList>true</IncludeItemCompatibilityList>
                   <IncludeItemSpecifics>true</IncludeItemSpecifics>
-                  <IncludeSelector>Details</IncludeSelector>
                   <IncludeVariations>true</IncludeVariations>
-                  <DetailLevel>ItemReturnAttributes</DetailLevel>
                   <ErrorLanguage>en_US</ErrorLanguage>
                 </GetItemRequest>';
         $response = $this->httpClient->request('POST', $url, [
