@@ -153,8 +153,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'legacy_item_id'  => $itemId,
-                    'legacy_variation_id' => $variationId,
+                    'legacy_item_id'  => $itemId
                     'fieldgroups' => 'PRODUCT'
                 ]
             ]);
@@ -176,8 +175,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         //$this->getItemRest("334936877779");
         //$this->listingDetail("334936877779");
-        $this->getMyeBaySelling();
-        //$this->getItemByLegacyId("334936877779", "0");
+        //$this->getMyeBaySelling();
+        $this->getItemByLegacyId("334936877779");
 
         // control expiresIn
        /* $this->refreshToAccessToken();
