@@ -87,6 +87,29 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $this->marketplace->save();
     }
 
+    public function getSimilarItems($itemId)
+    {
+        $url = "https://api.ebay.com/ws/api.dll";
+        $accessToken = $this->marketplace->getEbayAccessToken();
+        $headers = [
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1227",
+            "X-EBAY-API-CALL-NAME: getSimilarItems",
+            "X-EBAY-API-SITEID: 0",
+            "Content-Type: text/xml"
+        ];
+        $xmlRequest = '<getSimilarItemsRequest xmlns="http://www.ebay.com/marketplace/services">
+              <itemId> $itemId </itemId>
+            </getSimilarItemsRequest>';
+        $response = $this->httpClient->request('POST', $url, [
+            'headers' => $headers,
+            'body' => $xmlRequest
+        ]);
+        $xmlContent = $response->getContent();
+        $xmlObject = simplexml_load_string($xmlContent);
+        $jsonResponse = json_encode($xmlObject);
+        print_r($jsonResponse);
+    }
+
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
@@ -179,7 +202,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
        // $this->refreshToAccessToken();
         //$this->getItemRest("334936877779");
-        $this->listingDetail("334936877779");
+        $this->getSimilarItems("334936877779");
+        //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936898383");
 
