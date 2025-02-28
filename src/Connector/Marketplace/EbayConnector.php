@@ -143,7 +143,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         print_r($response->getContent());
     }
 
-    public function getItemByLegacyId($itemId)
+    public function getItemByLegacyId($itemId, $variationId)
     {
         $url = "https://api.ebay.com/buy/browse/v1/item/get_item_by_legacy_id";
         try {
@@ -154,6 +154,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ],
                 'query' => [
                     'legacy_item_id'  => $itemId,
+                    'legacy_variation_id' => $variationId,
                     'fieldgroups' => 'PRODUCT'
                 ]
             ]);
@@ -175,10 +176,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->getItemRest("334936877779");
+        //$this->getItemRest("334936877779");
         //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
-        //$this->getItemByLegacyId("334936898383");
+        $this->getItemByLegacyId("334936877779", "544159666107");
 
         // control expiresIn
        /* $this->refreshToAccessToken();
