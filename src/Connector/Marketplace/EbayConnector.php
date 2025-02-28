@@ -176,7 +176,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getItemRest("334936877779");
         //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
-        $this->getItemByLegacyId("334936877779");
+        //$this->getItemByLegacyId("334936877779");
 
         // control expiresIn
        /* $this->refreshToAccessToken();
@@ -338,7 +338,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         //$this->refreshToAccessToken();
-        /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -349,7 +349,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             print_r($response->getContent());
         } catch (\Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }*/
+        }
     }
 
     /**
