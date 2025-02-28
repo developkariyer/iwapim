@@ -167,8 +167,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Error Type: " . $e->getMessage() . "\n";
         }
 
-        print_r($response->getContent());
-
     }
 
     /**
@@ -179,7 +177,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getItemRest("334936877779");
         //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
-        $this->getItemByLegacyId("334936877779", "544159666107");
+        $this->getItemByLegacyId("334936877779", "");
 
         // control expiresIn
        /* $this->refreshToAccessToken();
