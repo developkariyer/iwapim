@@ -153,7 +153,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'legacy_item_id'  => $itemId
+                    'legacy_item_id'  => $itemId,
                     'fieldgroups' => 'PRODUCT'
                 ]
             ]);
