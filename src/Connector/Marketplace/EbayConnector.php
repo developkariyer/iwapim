@@ -98,7 +98,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $url = "https://api.ebay.com/ws/api.dll";
         $accessToken = $this->marketplace->getEbayAccessToken();
         $headers = [
-            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1097",
             "X-EBAY-API-CALL-NAME: GetItem",
             "X-EBAY-API-SITEID: 0",
             "Content-Type: text/xml"
@@ -179,8 +179,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
        // $this->refreshToAccessToken();
         //$this->getItemRest("334936877779");
-        //$this->listingDetail("334936877779");
-        $this->getMyeBaySelling();
+        $this->listingDetail("334936877779");
+        //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936898383");
 
         // control expiresIn
