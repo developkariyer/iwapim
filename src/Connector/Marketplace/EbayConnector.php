@@ -98,6 +98,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
             "Content-Type: text/xml"
         ];
         $xmlRequest = '<getSimilarItemsRequest xmlns="http://www.ebay.com/marketplace/services">
+                 <RequesterCredentials>
+                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+                  </RequesterCredentials>
               <itemId> $itemId </itemId>
             </getSimilarItemsRequest>';
         $response = $this->httpClient->request('POST', $url, [
