@@ -62,8 +62,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        echo "Downloading Wayfair...\n";
-      //  $this->prepareToken();
+        /*echo "Downloading Wayfair...\n";
+        $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
         query supplierCatalog(
@@ -100,7 +100,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getStatusCode());
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
 
     /**
@@ -112,9 +112,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        if (!isset(static::$expires_in) || time() >= static::$expires_in) {
-            $this->prepareTokenProd();
-        }
+        $this->prepareToken();
         $db = Db::get();
         $fromDate = "2024-05-01T00:00:00Z";
         $limit = 200;
