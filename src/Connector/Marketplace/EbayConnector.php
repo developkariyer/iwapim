@@ -98,7 +98,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $url = "https://api.ebay.com/ws/api.dll";
         $accessToken = $this->marketplace->getEbayAccessToken();
         $headers = [
-            "X-EBAY-API-COMPATIBILITY-LEVEL: 1227",
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1395",
             "X-EBAY-API-CALL-NAME: GetItem",
             "X-EBAY-API-SITEID: 0",
             "Content-Type: text/xml"
