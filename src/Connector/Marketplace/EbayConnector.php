@@ -260,22 +260,22 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $accessToken = $this->marketplace->getEbayAccessToken();
         $url = "https://api.ebay.com/ws/api.dll";
         $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
-<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-    <RequesterCredentials>
-        <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
-    </RequesterCredentials>
-    <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom>
-<StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
-    <IncludeVariations>true</IncludeVariations>
-    <IncludeWatchCount>true</IncludeWatchCount>
-    <GranularityLevel>Coarse</GranularityLevel>
-    <DetailLevel>ReturnAll</DetailLevel>
-    <WarningLevel>High</WarningLevel>
-    <Pagination>
-        <EntriesPerPage>200</EntriesPerPage>
-        <PageNumber>1</PageNumber>
-    </Pagination>
-</GetSellerListRequest>';
+            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+                <RequesterCredentials>
+                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+                </RequesterCredentials>
+                <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom>
+            <StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
+                <IncludeVariations>true</IncludeVariations>
+                <IncludeWatchCount>true</IncludeWatchCount>
+                <GranularityLevel>Coarse</GranularityLevel>
+                <DetailLevel>ReturnAll</DetailLevel>
+                <WarningLevel>High</WarningLevel>
+                <Pagination>
+                    <EntriesPerPage>200</EntriesPerPage>
+                    <PageNumber>1</PageNumber>
+                </Pagination>
+            </GetSellerListRequest>';
         try {
             $response = $this->httpClient->request('POST', $url, [
                 'headers' => $headers,
@@ -291,10 +291,58 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     }
 
+
+    public function getMyeBaySelling()
+    {
+        $url = "https://api.ebay.com/ws/api.dll";
+        $accessToken = $this->marketplace->getEbayAccessToken();
+        $headers = [
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
+            "X-EBAY-API-CALL-NAME: GetItem",
+            "X-EBAY-API-SITEID: 0",
+            "Content-Type: text/xml"
+        ];
+        $xmlRequest = '<?xml version="1.0" encoding="utf-8"?>
+<GetMyeBaySellingRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+  <RequesterCredentials>
+                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+                  </RequesterCredentials>
+  <ActiveList> ItemListCustomizationType
+    <Include>true</Include>
+    <IncludeNotes>true</IncludeNotes>
+  </ActiveList>
+  <HideVariations> boolean </HideVariations>
+  <ScheduledList> ItemListCustomizationType
+    <Include>true</Include>
+    <IncludeNotes>true</IncludeNotes>
+  </ScheduledList>
+  <SellingSummary> ItemListCustomizationType
+    <Include>true</Include>
+  </SellingSummary>
+  <SoldList> ItemListCustomizationType
+    <Include>true</Include>
+    <IncludeNotes>true</IncludeNotes>
+  </SoldList>
+  <UnsoldList> ItemListCustomizationType
+    <Include>true</Include>
+    <IncludeNotes>true</IncludeNotes>
+  </UnsoldList>
+  <DetailLevel>ReturnAll</DetailLevel>
+</GetMyeBaySellingRequest>';
+        $response = $this->httpClient->request('POST', $url, [
+            'headers' => $headers,
+            'body' => $xmlRequest
+        ]);
+        $xmlContent = $response->getContent();
+        $xmlObject = simplexml_load_string($xmlContent);
+        $jsonResponse = json_encode($xmlObject);
+        print_r($jsonResponse);
+
+    }
     public function downloadInventory(): void
     {
         $this->refreshToAccessToken();
-        $this->getSellerList();
+        $this->getMyeBaySelling();
         /*$url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         try {
             $response = $this->httpClient->request('GET', $url, [
