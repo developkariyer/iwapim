@@ -311,7 +311,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     <Include>true</Include>
     <IncludeNotes>true</IncludeNotes>
   </ActiveList>
-  <HideVariations> boolean </HideVariations>
+  <HideVariations>false</HideVariations>
   <ScheduledList> ItemListCustomizationType
     <Include>true</Include>
     <IncludeNotes>true</IncludeNotes>
