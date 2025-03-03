@@ -44,11 +44,9 @@ class HelloWorldCommand extends AbstractCommand
     {
         foreach ($jsonData as $index => $item) {
             if (isset($item['registrationDateTime'])) {
-                echo "Found registration date in item $index: " . $item['registrationDateTime'] . "\n";
                 $existingData['date'] = $item['registrationDateTime'];
             }
             if (isset($item['returnItems'])) {
-                echo "Processing return items from item $index\n";
                 foreach ($item['returnItems'] as $returnItem) {
                     if (!isset($returnItem['ean'])) {
                         echo "EAN not found in return item\n";
@@ -80,6 +78,7 @@ class HelloWorldCommand extends AbstractCommand
                 }
             }
         }
+        print_r(json_encode($existingData));
         return $existingData;
     }
 
@@ -89,8 +88,8 @@ class HelloWorldCommand extends AbstractCommand
     {
         $directory = PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/';
         $returnsData = $this->getReturnsFiles($directory);
-        $mergedJsonPath = PIMCORE_PROJECT_ROOT . '/tmp/merged_returns.json';
-        file_put_contents($mergedJsonPath, json_encode($returnsData, JSON_PRETTY_PRINT));
+        //$mergedJsonPath = PIMCORE_PROJECT_ROOT . '/tmp/merged_returns.json';
+        //file_put_contents($mergedJsonPath, json_encode($returnsData, JSON_PRETTY_PRINT));
         return Command::SUCCESS;
     }
 }
