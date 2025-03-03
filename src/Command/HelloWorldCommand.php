@@ -76,7 +76,7 @@ class HelloWorldCommand extends AbstractCommand
                             'status' => $returnItem['handled'],
                             'date' => $existingData['date'] ?? '',
                             "quantity" => $returnItem['expectedQuantity'],
-                            'json' => $jsonData
+                            'json' => json_encode($item)
                         ];
                         $output[$index] = $newData;
                     }
