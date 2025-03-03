@@ -30,9 +30,9 @@ class HelloWorldCommand extends AbstractCommand
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
                 switch ($marketplaceName) {
-//                    case 'BolIwa':
-//                        $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
-//                        break;
+                    case 'BolIwa':
+                        $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
+                        break;
                     case 'TrendyolCfw':
                     case 'TrendyolIwa':
                     case 'TrendyolFurni':
@@ -60,9 +60,7 @@ class HelloWorldCommand extends AbstractCommand
                     echo $order_id . "\t" . $productId . "\n";
                     $sql = "select iwasku, variant_name, parent_name, quantity from iwa_marketplace_orders_line_items where product_id = ? and order_id = ?";
                     $data = Utility::fetchFromSql($sql, [$productId, $order_id]);
-                    print_r($data);
-                    echo "Iwasku: " . $data['iwasku'] . "\n";
-                   /* foreach ($item['claimItems'] as $claimItem) {
+                    foreach ($item['claimItems'] as $claimItem) {
                         $newData = [
                             'date' => $date,
                             'iwasku' => $data[0]['iwasku'],
@@ -78,7 +76,7 @@ class HelloWorldCommand extends AbstractCommand
                             'json' => json_encode($item)
                         ];
                         $output[$index] = $newData;
-                    }*/
+                    }
                 }
             }
         }
