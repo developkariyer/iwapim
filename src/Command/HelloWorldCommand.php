@@ -36,7 +36,7 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $directory = PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/';
-        $returnsData = getReturnsFiles($directory);
+        $returnsData = $this->getReturnsFiles($directory);
         print_r($returnsData);
 
         // Output "Hello, World!" as green text
