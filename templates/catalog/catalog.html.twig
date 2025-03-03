@@ -109,7 +109,7 @@
                         <tr>
                             <td style="width: 150px; vertical-align: top; border: none; padding: 0;">
                                 <div style="height: 120px; width: 150px;">
-                                    <img src="{{ product.image }}" alt="Product Image" style="height: 100%; max-width: 150px; width: auto; display: block;">
+                                    <img src="{{ product.image }}" class="product-main-image" alt="Product Image" style="height: 100%; max-width: 150px; width: auto; display: block;">
                                 </div>
                             </td>                                                        
                             <td style="vertical-align: top; border: none; padding: 3px; overflow: hidden;">
@@ -257,12 +257,13 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             document.querySelectorAll('.product-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    card.classList.add('expanded');
-                });
-                card.addEventListener('dblclick', function() {
-                    card.classList.remove('expanded');
-                });
+                let productImage = card.querySelector('.product-main-image');
+                if (productImage) {
+                    productImage.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        card.classList.toggle('expanded');
+                    });
+                }
             });
         });
     </script>
