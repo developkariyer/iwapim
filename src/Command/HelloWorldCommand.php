@@ -41,22 +41,24 @@ class HelloWorldCommand extends AbstractCommand
     }
 
     public function processBol($jsonData, $existingData) {
-       foreach ($jsonData['returnItems'] as $returnItem) {
-            $ean = $returnItem['ean'];
-            $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
-            if ($variant) {
+        if (isset($jsonData['returnItems']) && is_array($jsonData['returnItems'])) {
+            foreach ($jsonData['returnItems'] as $returnItem) {
+                $ean = $returnItem['ean'];
+                $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
+                if ($variant) {
+                    print_r($variant->getTitle());
+                } else {
+                    echo "Variant not found for EAN: $ean\n";
+                }
+
                 print_r($variant->getTitle());
-            } else {
-                echo "Variant not found for EAN: $ean\n";
+
+                $existingData['date'] = $jsonData['registrationDateTime'] ?? '';
+                $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
+                $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
             }
+        }
 
-            print_r($variant->getTitle());
-
-            $existingData['date'] = $jsonData['registrationDateTime'] ?? '';
-            $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
-            $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
-
-       }
 
 
         return $existingData;
