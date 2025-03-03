@@ -210,7 +210,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 'cursor' => null
             ]
         ];
-        $returnables = $this->getFromShopifyApiGraphql('POST', $query, 'returnableFulfillments');
+        $returnables = $this->getFromShopifyApiGraphql('POST', $query);
         print_r(json_encode($returnables));
 
     }
