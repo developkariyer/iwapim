@@ -30,13 +30,14 @@ class HelloWorldCommand extends AbstractCommand
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
                 switch ($marketplaceName) {
-                    //case 'BolIwa':
-                       // $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
-                        //break;
-                    case 'TrendyolFurni':
+                    case 'BolIwa':
+                        $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
+                        break;
                     case 'TrendyolCfw':
                     case 'TrendyolIwa':
+                    case 'TrendyolFurni':
                         $returnsFiles[$marketplaceName] = $this->processTrendyol($jsonData);
+                        break;
                     default:
                         break;
                 }
@@ -59,8 +60,23 @@ class HelloWorldCommand extends AbstractCommand
                     echo $order_id . "\t" . $productId . "\n";
                     $sql = "select iwasku, variant_name, parent_name, quantity from iwa_marketplace_orders_line_items where product_id = ? and order_id = ?";
                     $data = Utility::fetchFromSql($sql, [$productId, $order_id]);
-                    print_r($data);
-                    echo "IWASKU: $item[iwasku]\n";
+
+                    foreach ($item['claimItems'] as $claimItem) {
+                        $newData = [
+                            'date' => $date,
+                            'iwasku' => $data[0]['iwasku'],
+                            'variantName' => $data[0]['variant_name'],
+                            'parentName' => $data[0]['parent_name'],
+                            'mainReason' => $claimItem['trendyolClaimItemReason']['name'] ?? '',
+                            'detailReason' => $claimItem['trendyolClaimItemReason']['externalReasonId'] ?? '',
+                            'status' => $claimItem['claimItemStatus']['name'] ?? '',
+                            'reasonCode' => $claimItem['trendyolClaimItemReason']['code'] ?? '',
+                            'customerNote' => $claimItem['note'] ?? '',
+                            'date' => $existingData['date'] ?? '',
+                            'quantity' => $data[0]['quantity'],
+                            'json' => json_encode($item)
+                        ];
+                    }
                 }
             }
         }
@@ -100,6 +116,8 @@ class HelloWorldCommand extends AbstractCommand
                             'mainReason' => $returnItem['returnReason']['mainReason'] ?? '',
                             'detailReason' => $returnItem['returnReason']['detailedReason'] ?? '',
                             'status' => $returnItem['handled'],
+                            'reasonCode' => '',
+                            'customerCode' => '',
                             'date' => $existingData['date'] ?? '',
                             "quantity" => $returnItem['expectedQuantity'],
                             'json' => json_encode($item)
