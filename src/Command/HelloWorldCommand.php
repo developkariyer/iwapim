@@ -29,9 +29,9 @@ class HelloWorldCommand extends AbstractCommand
             $returnsFilePath = $marketplaceDir . 'RETURNS.json';
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
-                $returnsFiles[$marketplaceName]['json'] = $jsonData;
+                //$returnsFiles[$marketplaceName]['json'] = $jsonData;
                 match ($marketplaceName) {
-                    'BolIwa' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData, $returnsFiles[$marketplaceName]),
+                    'BolIwa' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData),
                     default => null
                 };
 
@@ -41,13 +41,10 @@ class HelloWorldCommand extends AbstractCommand
         return $returnsFiles;
     }
 
-    public function processBol($jsonData, $existingData)
+    public function processBol($jsonData)
     {
         $output = [];
         foreach ($jsonData as $index => $item) {
-            if (isset($item['registrationDateTime'])) {
-                $existingData['date'] = $item['registrationDateTime'];
-            }
             if (isset($item['returnItems'])) {
                 foreach ($item['returnItems'] as $returnItem) {
                     if (!isset($returnItem['ean'])) {
@@ -70,6 +67,7 @@ class HelloWorldCommand extends AbstractCommand
                         $variantName = array_pop($parts);
                         $parentName = array_pop($parts);
                         $newData = [
+                            'date' => $item['registrationDateTime'],
                             'iwasku' => $iwasku,
                             'variantName' => $variantName,
                             'parentName' => $parentName,
