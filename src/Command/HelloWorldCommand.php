@@ -41,7 +41,13 @@ class HelloWorldCommand extends AbstractCommand
     }
 
     public function processBol($jsonData, $existingData) {
-        var_dump($jsonData);
+
+        if (isset($jsonData['returnItems']) && is_array($jsonData['returnItems']) && !empty($jsonData['returnItems'])) {
+            echo "returnItems is set and not empty\n";
+        } else {
+            echo "returnItems is either not set or empty\n";
+        }
+
         /*if (isset($jsonData['returnItems'])) {
             echo "ISSET IF";
             foreach ($jsonData['returnItems'] as $returnItem) {
