@@ -74,8 +74,10 @@ class HelloWorldCommand extends AbstractCommand
                             'parentName' => $parentName,
                             'mainReason' => $returnItem['returnReason']['mainReason'] ?? '',
                             'detailReason' => $returnItem['returnReason']['detailedReason'] ?? '',
+                            'status' => $returnItem['handled'],
                             'date' => $existingData['date'] ?? '',
-                            'json' => $existingData['json'] ?? ''
+                            "quantity" => $returnItem['expectedQuantity']
+                            //'json' => $existingData['json'] ?? ''
                         ];
                         $output[$index] = $newData;
                     }
