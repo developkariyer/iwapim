@@ -50,8 +50,16 @@ class HelloWorldCommand extends AbstractCommand
         $output = [];
         foreach ($jsonData as $index => $item) {
             $timestamp = $item['orderDate'];
-            $date = date("yyyy-mm-dd", $timestamp);
+            $date = date('Y-m-d H:i:s', $timestamp);
             echo "DATE: $date\n ";
+            if (isset($item['items'])) {
+                foreach ($item['items'] as $item) {
+                    $productId = $item['orderLine']['id'];
+                    $sql = "Select iwasku, variant_name, parent_name, quantity from iwa_marketplace_orders where product_id = ?";
+                    $data =  Utility::fetchFromSql($sql, [$productId]);
+                    print_r($data);
+                }
+            }
         }
 
     }
