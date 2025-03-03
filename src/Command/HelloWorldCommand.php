@@ -82,6 +82,7 @@ class HelloWorldCommand extends AbstractCommand
                 }
             }
         }
+        print_r(json_encode($output));
         return $output;
     }
 
