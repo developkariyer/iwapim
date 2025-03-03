@@ -57,9 +57,10 @@ class HelloWorldCommand extends AbstractCommand
                 foreach ($item['items'] as $item) {
                     $productId = $item['orderLine']['id'];
                     echo $order_id . "\t" . $productId . "\n";
-                    $sql = "select * from iwa_marketplace_orders_line_items where product_id = ? and order_id = ?";
+                    $sql = "select iwasku, variant_name, parent_name, quantity from iwa_marketplace_orders_line_items where product_id = ? and order_id = ?";
                     $data = Utility::fetchFromSql($sql, [$productId, $order_id]);
                     print_r($data);
+                    echo "IWASKU: $item[iwasku]\n";
                 }
             }
         }
