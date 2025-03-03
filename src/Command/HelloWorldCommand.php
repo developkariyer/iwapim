@@ -42,8 +42,7 @@ class HelloWorldCommand extends AbstractCommand
 
     public function processBol($jsonData, $existingData)
     {
-
-        var_dump($jsonData['returnItems']);
+        print_r(json_encode($jsonData));
 
         /*if (isset($jsonData['returnItems'])) {
             echo "ISSET IF";
