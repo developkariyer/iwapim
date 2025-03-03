@@ -31,12 +31,12 @@ class HelloWorldCommand extends AbstractCommand
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
                 switch ($marketplaceName) {
                     case 'BolIwa':
-                        $returnsFiles = $this->processBol($jsonData, $marketplaceName);
+                        $returnsFiles = array_merge($returnsFiles, $this->processBol($jsonData, $marketplaceName));
                         break;
                     case 'TrendyolCfw':
                     case 'TrendyolIwa':
                     case 'TrendyolFurni':
-                        $returnsFiles = $this->processTrendyol($jsonData, $marketplaceName);
+                        $returnsFiles = array_merge($returnsFiles, $this->processTrendyol($jsonData, $marketplaceName));
                         break;
                     default:
                         break;
@@ -64,16 +64,16 @@ class HelloWorldCommand extends AbstractCommand
                         $newData = [
                             'date' => $date,
                             'marketplaceName' => $marketplaceName,
-                            'iwasku' => $data[0]['iwasku'],
-                            'variantName' => $data[0]['variant_name'],
-                            'parentName' => $data[0]['parent_name'],
+                            'iwasku' => $data[0]['iwasku'] ?? '',
+                            'variantName' => $data[0]['variant_name'] ?? '',
+                            'parentName' => $data[0]['parent_name'] ?? '',
                             'mainReason' => $claimItem['trendyolClaimItemReason']['name'] ?? '',
                             'detailReason' => $claimItem['trendyolClaimItemReason']['externalReasonId'] ?? '',
                             'status' => $claimItem['claimItemStatus']['name'] ?? '',
                             'reasonCode' => $claimItem['trendyolClaimItemReason']['code'] ?? '',
                             'customerNote' => $claimItem['note'] ?? '',
                             'date' => $existingData['date'] ?? '',
-                            'quantity' => $data[0]['quantity'],
+                            'quantity' => $data[0]['quantity'] ?? '',
                             'json' => json_encode($item)
                         ];
                         $output[$index] = $newData;
