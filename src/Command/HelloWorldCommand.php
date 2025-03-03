@@ -26,17 +26,16 @@ class HelloWorldCommand extends AbstractCommand
         foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
         $returnsFiles = [];
             $marketplaceName = basename($marketplaceDir);
-            echo $marketplaceDir . "\n";
-            /*$returnsFilePath = $marketplaceDir . 'RETURNS.json';
+            $returnsFilePath = $marketplaceDir . 'RETURNS.json';
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
-                //$returnsFiles[$marketplaceName]['json'] = $jsonData;
+                $returnsFiles[$marketplaceName]['json'] = $jsonData;
                 match ($marketplaceName) {
                     'BolIwa' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData, $returnsFiles[$marketplaceName]),
                     default => null
                 };
 
-            }*/
+            }
         }
         print_r(json_encode($returnsFiles));
         return $returnsFiles;
