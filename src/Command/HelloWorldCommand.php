@@ -32,8 +32,7 @@ class HelloWorldCommand extends AbstractCommand
                 $returnsFiles[$marketplaceName]['json'] = $jsonData;
                 match ($marketplaceName) {
                     'Bol' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData, $returnsFiles[$marketplaceName]),
-                    'Amazon' => $returnsFiles[$marketplaceName] = processAmazon($jsonData, $returnsFiles[$marketplaceName]),
-                    default => $returnsFiles[$marketplaceName] = processDefault($jsonData, $returnsFiles[$marketplaceName])
+                    default => null
                 };
 
             }
