@@ -101,7 +101,7 @@ class CatalogController extends FrontendController
                 $variationSizeList[] = $child['variationSize'];
                 $variationColorList[] = $child['variationColor'];
                 $tooltip = htmlspecialchars("{$child['variationSize']}-{$child['variationColor']}");
-                $iwaskuList[] = "<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
+                $iwaskuList[] = [ 'iwasku' => $child['iwasku'], 'tooltip'=>$tooltip];   //"<span data-bs-toggle='tooltip' title='$tooltip'>{$child['iwasku']}</span>";
                 if (strlen($imageUrl) == 0) {
                     $imageUrl = $this->getThumbnail($child['imageUrl'] ?? '', 'katalog');
                 }
