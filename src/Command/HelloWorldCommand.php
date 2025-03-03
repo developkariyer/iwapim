@@ -26,7 +26,7 @@ class HelloWorldCommand extends AbstractCommand
         foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
         $returnsFiles = [];
             $marketplaceName = basename($marketplaceDir);
-            echo $marketplaceName . "\n";
+            echo $marketplaceDir . "\n";
             /*$returnsFilePath = $marketplaceDir . 'RETURNS.json';
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
