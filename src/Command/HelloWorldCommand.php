@@ -41,8 +41,7 @@ class HelloWorldCommand extends AbstractCommand
     }
 
     public function processBol($jsonData, $existingData) {
-        print_r($jsonData);
-       /* foreach ($jsonData['returnItems'] as $returnItem) {
+       foreach ($jsonData['returnItems'] as $returnItem) {
             $ean = $returnItem['ean'];
             $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
             if ($variant) {
@@ -57,7 +56,7 @@ class HelloWorldCommand extends AbstractCommand
             $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
             $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
 
-        }*/
+       }
 
 
         return $existingData;
