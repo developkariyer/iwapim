@@ -76,11 +76,12 @@ class HelloWorldCommand extends AbstractCommand
                             'quantity' => $data[0]['quantity'],
                             'json' => json_encode($item)
                         ];
+                        $output[$index] = $newData;
                     }
                 }
             }
         }
-
+        return $output;
     }
 
     public function processBol($jsonData)
