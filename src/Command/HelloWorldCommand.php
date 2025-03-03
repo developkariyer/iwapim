@@ -49,7 +49,8 @@ class HelloWorldCommand extends AbstractCommand
     {
         $output = [];
         foreach ($jsonData as $index => $item) {
-            echo $item['orderDate'];
+            $date = date('Y-m-d H:i:s', $item['orderDate']);
+            echo "DATE: $date\n ";
         }
 
     }
