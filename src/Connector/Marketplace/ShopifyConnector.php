@@ -180,8 +180,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $this->downloadReturnableOrders();
-        /*$inventory = $this->getFromCache('INVENTORY.json');
+        $inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -198,23 +197,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             echo "Failed to download inventory\n";
             return;
         }
-        $this->putToCache('INVENTORY.json', $inventories);*/
+        $this->putToCache('INVENTORY.json', $inventories);
     }
-
-    public function downloadReturnableOrders()
-    {
-        $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadReturanbleOrders.graphql'),
-            'variables' => [
-                'numItems' => 50,
-                'cursor' => null
-            ]
-        ];
-        $returnables = $this->getFromShopifyApiGraphql('POST', $query);
-        print_r(json_encode($returnables));
-
-    }
-
 
     /**
      * @throws DuplicateFullPathException
