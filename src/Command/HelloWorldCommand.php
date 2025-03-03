@@ -23,8 +23,8 @@ use Pimcore\Model\DataObject\GroupProduct;
 class HelloWorldCommand extends AbstractCommand
 {
     public function getReturnsFiles($dir) {
-        $returnsFiles = [];
         foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
+        $returnsFiles = [];
             $marketplaceName = basename($marketplaceDir);
             $returnsFilePath = $marketplaceDir . 'RETURNS.json';
             if (file_exists($returnsFilePath)) {
@@ -44,6 +44,12 @@ class HelloWorldCommand extends AbstractCommand
         foreach ($jsonData['returnItems'] as $returnItem) {
             $ean = $returnItem['ean'];
             $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
+            if ($variant) {
+                print_r($variant->getTitle());
+            } else {
+                echo "Variant not found for EAN: $ean\n";
+            }
+
             print_r($variant->getTitle());
 
             $existingData['date'] = $jsonData['registrationDateTime'] ?? '';
