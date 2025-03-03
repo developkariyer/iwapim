@@ -76,7 +76,7 @@ class HelloWorldCommand extends AbstractCommand
                             'detailReason' => $returnItem['returnReason']['detailedReason'] ?? '',
                             'date' => $existingData['date'] ?? ''
                         ];
-                        $output[] = json_encode($newData);
+                        $output[$index] = $newData;
                     }
                 }
             }
