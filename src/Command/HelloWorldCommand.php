@@ -67,7 +67,7 @@ class HelloWorldCommand extends AbstractCommand
                         $variantName = array_pop($parts);
                         $parentName = array_pop($parts);
                         $newData = [
-                            'date' => $item['registrationDateTime'],
+                            'date' => $item[0]['registrationDateTime'],
                             'iwasku' => $iwasku,
                             'variantName' => $variantName,
                             'parentName' => $parentName,
