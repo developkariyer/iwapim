@@ -76,15 +76,14 @@ class HelloWorldCommand extends AbstractCommand
                             'detailReason' => $returnItem['returnReason']['detailedReason'] ?? '',
                             'status' => $returnItem['handled'],
                             'date' => $existingData['date'] ?? '',
-                            "quantity" => $returnItem['expectedQuantity']
-                            //'json' => $existingData['json'] ?? ''
+                            "quantity" => $returnItem['expectedQuantity'],
+                            'json' => $existingData['json'] ?? ''
                         ];
                         $output[$index] = $newData;
                     }
                 }
             }
         }
-        print_r(json_encode($output));
         return $output;
     }
 
@@ -94,8 +93,8 @@ class HelloWorldCommand extends AbstractCommand
     {
         $directory = PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/';
         $returnsData = $this->getReturnsFiles($directory);
-        //$mergedJsonPath = PIMCORE_PROJECT_ROOT . '/tmp/merged_returns.json';
-        //file_put_contents($mergedJsonPath, json_encode($returnsData, JSON_PRETTY_PRINT));
+        $mergedJsonPath = PIMCORE_PROJECT_ROOT . '/tmp/merged_returns.json';
+        file_put_contents($mergedJsonPath, json_encode($returnsData, JSON_PRETTY_PRINT));
         return Command::SUCCESS;
     }
 }
