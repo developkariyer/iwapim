@@ -41,7 +41,7 @@ class HelloWorldCommand extends AbstractCommand
     }
 
     public function processBol($jsonData, $existingData) {
-        if (isset($jsonData['returnItems']) && is_array($jsonData['returnItems'])) {
+        if (isset($jsonData['returnItems'])) {
             foreach ($jsonData['returnItems'] as $returnItem) {
                 $ean = $returnItem['ean'];
                 $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
