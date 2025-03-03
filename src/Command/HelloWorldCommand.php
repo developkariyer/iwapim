@@ -23,21 +23,21 @@ use Pimcore\Model\DataObject\GroupProduct;
 class HelloWorldCommand extends AbstractCommand
 {
     public function getReturnsFiles($dir) {
-        foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
         $returnsFiles = [];
+        foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
             $marketplaceName = basename($marketplaceDir);
             $returnsFilePath = $marketplaceDir . 'RETURNS.json';
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
-                //$returnsFiles[$marketplaceName]['json'] = $jsonData;
-                match ($marketplaceName) {
-                    'BolIwa' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData),
-                    default => null
-                };
-
+                switch ($marketplaceName) {
+                    case 'BolIwa':
+                        $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-        print_r(json_encode($returnsFiles));
         return $returnsFiles;
     }
 
