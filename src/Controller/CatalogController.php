@@ -35,18 +35,25 @@ class CatalogController extends FrontendController
         $params = [];
         $limit = (int) $pageSize;
         $offset = (int) $page * $pageSize;
-        $sql = "SELECT `id`, `productIdentifier`, `name`, `category`, `segment`, `children` FROM iwa_catalog WHERE 1=1";        
+        $sql = "SELECT `id`, `productIdentifier`, `name`, `category`, `segment`, `children` FROM iwa_catalog";
+        $sqlWhere = "";
         if ($category !== 'all') {
-            $sql .= " AND (";
-            $sql .= "LOWER(`category`) = LOWER(:category COLLATE utf8mb4_unicode_ci)";
-            $sql .= " OR LOWER(`segment`) = LOWER(:category COLLATE utf8mb4_unicode_ci)";
-            $sql .= ")";
+            $sqlWhere .= " WHERE (";
+            $sqlWhere .= "LOWER(`category`) = LOWER(:category COLLATE utf8mb4_unicode_ci)";
+            $sqlWhere .= " OR LOWER(`segment`) = LOWER(:category COLLATE utf8mb4_unicode_ci)";
+            $sqlWhere .= ")";
             $params['category'] = $category;
         }
         if ($query !== 'all') {
-            $sql .= " AND LOWER(`children`) LIKE LOWER(:query COLLATE utf8mb4_unicode_ci)";
+            if (empty($sqlWhere)) {
+                $sqlWhere = " WHERE";
+            } else {
+                $sqlWhere .= " AND";
+            }
+            $sqlWhere .= " LOWER(`children`) LIKE LOWER(:query COLLATE utf8mb4_unicode_ci)";
             $params['query'] = "%$query%";
         }
+        $sql .= $sqlWhere;
         if ($countOnly) {
             return $db->fetchOne("SELECT COUNT(*) AS total_count FROM ($sql) AS result", $params);
         } else {
@@ -130,7 +137,7 @@ class CatalogController extends FrontendController
                 'name' => $product['name'] ?? '',
                 'variationSizeList' => implode(' | ', $variationSizeList),
                 'variationColorList' => implode(' | ', $variationColorList),
-                'iwaskuList' => implode(' | ', $iwaskuList),
+                'iwaskuList' => $iwaskuList, //implode(' | ', $iwaskuList),
                 'image' => $imageUrl,
                 'album' => array_unique($album),
             ];

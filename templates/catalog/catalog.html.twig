@@ -60,6 +60,12 @@
         .row.g-0 {
             margin: 0;
         }
+        .sku {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -111,7 +117,12 @@
                                     <h5 class="card-title">{{ product.productIdentifier }} {{ product.name }}</h5>
                                     <div class="col-12" style="font-size: smaller;">
                                         <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
-                                        <b>IWASKU:</b> {{ product.iwaskuList|raw }}<br>
+                                        <b>IWASKU:</b>
+                                        {% for item in product.iwaskuList %}
+                                            <span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">{{ item.iwasku }}</span>
+                                            {% if not loop.last %} | {% endif %}
+                                        {% endfor %}
+                                        <br>
                                     </div>
                                 </div>
                             </td>
@@ -205,6 +216,39 @@
                 let selectedCategory = $(this).val();
                 window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
             });
+
+            $(document).on('click', '.sku', function() {
+                let iwasku = $(this).data('iwasku');
+
+                navigator.clipboard.writeText(iwasku).then(() => {
+                    showCopyNotification(iwasku);
+                }).catch(err => {
+                    console.error("Failed to copy: ", err);
+                });
+            });
+
+            function showCopyNotification(iwasku) {
+                let notification = $('<div class="copy-notification">Copied: ' + iwasku + '</div>');
+                $('body').append(notification);
+                notification.css({
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    background: '#28a745',
+                    color: 'white',
+                    padding: '10px 15px',
+                    borderRadius: '5px',
+                    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+                    zIndex: 1000,
+                    opacity: 0
+                }).animate({ opacity: 1 }, 300);
+
+                setTimeout(() => {
+                    notification.fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                }, 2000);
+            }
         });
 
         document.addEventListener('DOMContentLoaded', function () {
