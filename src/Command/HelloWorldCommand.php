@@ -67,7 +67,7 @@ class HelloWorldCommand extends AbstractCommand
                         $variantName = array_pop($parts);
                         $parentName = array_pop($parts);
                         $newData = [
-                            'date' => $item['registrationDateTime'],
+                            'date' => $index['registrationDateTime'],
                             'iwasku' => $iwasku,
                             'variantName' => $variantName,
                             'parentName' => $parentName,
@@ -75,14 +75,14 @@ class HelloWorldCommand extends AbstractCommand
                             'detailReason' => $returnItem['returnReason']['detailedReason'] ?? '',
                             'status' => $returnItem['handled'],
                             'date' => $existingData['date'] ?? '',
-                            "quantity" => $returnItem['expectedQuantity']
+                            "quantity" => $returnItem['expectedQuantity'],
+                            'json' => $jsonData
                         ];
                         $output[$index] = $newData;
                     }
                 }
             }
         }
-        print_r(json_encode($output));
         return $output;
     }
 
