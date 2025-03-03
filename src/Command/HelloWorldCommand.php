@@ -24,10 +24,10 @@ class HelloWorldCommand extends AbstractCommand
     function getReturnsFiles($dir) {
         $returnsFiles = [];
         foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
+            $marketplaceName = basename($marketplaceDir);
             $returnsFilePath = $marketplaceDir . 'RETURNS.json';
-
             if (file_exists($returnsFilePath)) {
-                $returnsFiles[$marketplaceDir] = json_decode(file_get_contents($returnsFilePath), true);
+                $returnsFiles[$marketplaceName] = json_decode(file_get_contents($returnsFilePath), true);
             }
         }
         return $returnsFiles;
@@ -37,12 +37,8 @@ class HelloWorldCommand extends AbstractCommand
     {
         $directory = PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/';
         $returnsData = $this->getReturnsFiles($directory);
-        print_r($returnsData);
-
-        // Output "Hello, World!" as green text
-       // $this->writeInfo("Hello, World!", $output);
-
-        // Return success status code
+        $mergedJsonPath = PIMCORE_PROJECT_ROOT . '/tmp/merged_returns.json';
+        file_put_contents($mergedJsonPath, json_encode($returnsData, JSON_PRETTY_PRINT));
         return Command::SUCCESS;
     }
 }
