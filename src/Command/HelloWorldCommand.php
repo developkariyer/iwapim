@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
                 $returnsFiles[$marketplaceName]['json'] = $jsonData;
                 match ($marketplaceName) {
-                    'Bol' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData, $returnsFiles[$marketplaceName]),
+                    'BolIwa' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData, $returnsFiles[$marketplaceName]),
                     default => null
                 };
 
