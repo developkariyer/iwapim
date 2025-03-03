@@ -47,7 +47,10 @@ class HelloWorldCommand extends AbstractCommand
 
     public function processTrendyol($jsonData)
     {
-        print_r(json_encode($jsonData));
+        $output = [];
+        foreach ($jsonData as $index => $item) {
+            echo $item['orderDate'];
+        }
 
     }
 
