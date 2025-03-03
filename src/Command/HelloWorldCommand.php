@@ -42,6 +42,7 @@ class HelloWorldCommand extends AbstractCommand
 
     public function processBol($jsonData, $existingData) {
         if (isset($jsonData['returnItems'])) {
+            echo "ISSET IF";
             foreach ($jsonData['returnItems'] as $returnItem) {
                 $ean = $returnItem['ean'];
                 $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
@@ -58,7 +59,9 @@ class HelloWorldCommand extends AbstractCommand
                 $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
             }
         }
-
+        else {
+            echo "NOT ISSET IF";
+        }
 
 
         return $existingData;
