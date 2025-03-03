@@ -42,9 +42,9 @@ class HelloWorldCommand extends AbstractCommand
 
     public function processBol($jsonData, $existingData)
     {
-        print_r(json_encode($jsonData));
+        $jsonData =  json_encode($jsonData);
 
-        /*if (isset($jsonData['returnItems'])) {
+        if (isset($jsonData['returnItems'])) {
             echo "ISSET IF";
             foreach ($jsonData['returnItems'] as $returnItem) {
                 $ean = $returnItem['ean'];
@@ -62,7 +62,7 @@ class HelloWorldCommand extends AbstractCommand
         else {
             echo "NOT ISSET IF";
         }
-        return $existingData;*/
+        return $existingData;
     }
 
 
