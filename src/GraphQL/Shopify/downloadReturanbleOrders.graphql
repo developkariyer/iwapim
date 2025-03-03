@@ -1,0 +1,11 @@
+query returnableFulfillments($numItems: Int!, $cursor: String) {
+    returnableFulfillments(first: $numItems, after: $cursor) {
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        nodes {
+            id
+        }
+    }
+}
