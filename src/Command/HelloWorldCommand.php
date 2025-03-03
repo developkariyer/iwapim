@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
@@ -21,17 +22,42 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
-    function getReturnsFiles($dir) {
+    public function getReturnsFiles($dir) {
         $returnsFiles = [];
         foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
             $marketplaceName = basename($marketplaceDir);
             $returnsFilePath = $marketplaceDir . 'RETURNS.json';
             if (file_exists($returnsFilePath)) {
-                $returnsFiles[$marketplaceName] = json_decode(file_get_contents($returnsFilePath), true);
+                $jsonData = json_decode(file_get_contents($returnsFilePath), true);
+                $returnsFiles[$marketplaceName]['json'] = $jsonData;
+                match ($marketplaceName) {
+                    'Bol' => $returnsFiles[$marketplaceName] = $this->processBol($jsonData, $returnsFiles[$marketplaceName]),
+                    'Amazon' => $returnsFiles[$marketplaceName] = processAmazon($jsonData, $returnsFiles[$marketplaceName]),
+                    default => $returnsFiles[$marketplaceName] = processDefault($jsonData, $returnsFiles[$marketplaceName])
+                };
+
             }
         }
         return $returnsFiles;
     }
+
+    public function processBol($jsonData, $existingData) {
+        foreach ($jsonData['returnItems'] as $returnItem) {
+            $ean = $returnItem['ean'];
+            $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
+            print_r($variant->getTitle());
+
+            $existingData['date'] = $jsonData['registrationDateTime'] ?? '';
+            $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
+            $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
+
+        }
+
+
+        return $existingData;
+    }
+
+
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
