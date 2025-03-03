@@ -30,15 +30,25 @@ class HelloWorldCommand extends AbstractCommand
             if (file_exists($returnsFilePath)) {
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
                 switch ($marketplaceName) {
-                    case 'BolIwa':
-                        $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
-                        break;
+                    //case 'BolIwa':
+                       // $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
+                        //break;
+                    case 'TrendyolFurni':
+                    case 'TrendyolCfw':
+                    case 'TrendyolIwa':
+                        $returnsFiles[$marketplaceName] = $this->processTrendyol($jsonData);
                     default:
                         break;
                 }
             }
         }
         return $returnsFiles;
+    }
+
+    public function processTrendyol($jsonData)
+    {
+        print_r(json_encode($jsonData));
+
     }
 
     public function processBol($jsonData)
@@ -67,7 +77,7 @@ class HelloWorldCommand extends AbstractCommand
                         $variantName = array_pop($parts);
                         $parentName = array_pop($parts);
                         $newData = [
-                            'date' => $item[0]['registrationDateTime'],
+                            'date' => $item['registrationDateTime'],
                             'iwasku' => $iwasku,
                             'variantName' => $variantName,
                             'parentName' => $parentName,
