@@ -42,28 +42,33 @@ class HelloWorldCommand extends AbstractCommand
 
     public function processBol($jsonData, $existingData)
     {
-        print_r(array_keys($jsonData));
-        //$jsonArray = json_decode($jsonData, true);
-        //print_r($jsonArray);
-        /*if (isset($jsonData['returnItems'])) {
-            echo "ISSET IF";
-            foreach ($jsonData['returnItems'] as $returnItem) {
-                $ean = $returnItem['ean'];
-                $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
-                if ($variant) {
-                    print_r($variant->getTitle());
-                } else {
-                    echo "Variant not found for EAN: $ean\n";
+        foreach ($jsonData as $index => $item) {
+            if (isset($item['registrationDateTime'])) {
+                echo "Found registration date in item $index: " . $item['registrationDateTime'] . "\n";
+                $existingData['date'] = $item['registrationDateTime'];
+            }
+            if (isset($item['returnItems'])) {
+                echo "Processing return items from item $index\n";
+                foreach ($item['returnItems'] as $returnItem) {
+                    if (!isset($returnItem['ean'])) {
+                        echo "EAN not found in return item\n";
+                        continue;
+                    }
+                    $ean = $returnItem['ean'];
+                    $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
+                    if ($variant) {
+                        echo "Found variant: " . $variant->getTitle() . "\n";
+                    } else {
+                        echo "Variant not found for EAN: $ean\n";
+                    }
+                    if (isset($returnItem['returnReason'])) {
+                        $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
+                        $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
+                    }
                 }
-                $existingData['date'] = $jsonData['registrationDateTime'] ?? '';
-                $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
-                $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
             }
         }
-        else {
-            echo "NOT ISSET IF";
-        }
-        return $existingData;*/
+        return $existingData;
     }
 
 
