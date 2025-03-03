@@ -21,11 +21,23 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
-    private string $sqlPath = PIMCORE_PROJECT_ROOT . '/src/SQL/Sticker/';
-    /**
-     */
+    function getReturnsFiles($dir) {
+        $returnsFiles = [];
+        foreach (glob($dir . '*/', GLOB_ONLYDIR) as $marketplaceDir) {
+            $returnsFilePath = $marketplaceDir . 'RETURNS.json';
+
+            if (file_exists($returnsFilePath)) {
+                $returnsFiles[$marketplaceDir] = json_decode(file_get_contents($returnsFilePath), true);
+            }
+        }
+        return $returnsFiles;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $directory = PIMCORE_PROJECT_ROOT . '/tmp/marketplaces/';
+        $returnsData = getReturnsFiles($directory);
+        print_r($returnsData);
 
         // Output "Hello, World!" as green text
        // $this->writeInfo("Hello, World!", $output);
