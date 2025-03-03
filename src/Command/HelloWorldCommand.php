@@ -50,7 +50,7 @@ class HelloWorldCommand extends AbstractCommand
         $output = [];
         foreach ($jsonData as $index => $item) {
             $timestamp = $item['orderDate'];
-            $date = date("y-m-d", $timestamp);
+            $date = date("yyyy-mm-dd", $timestamp);
             echo "DATE: $date\n ";
         }
 
