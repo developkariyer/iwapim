@@ -41,7 +41,8 @@ class HelloWorldCommand extends AbstractCommand
     }
 
     public function processBol($jsonData, $existingData) {
-        if (isset($jsonData['returnItems'])) {
+        var_dump($jsonData);
+        /*if (isset($jsonData['returnItems'])) {
             echo "ISSET IF";
             foreach ($jsonData['returnItems'] as $returnItem) {
                 $ean = $returnItem['ean'];
@@ -51,9 +52,6 @@ class HelloWorldCommand extends AbstractCommand
                 } else {
                     echo "Variant not found for EAN: $ean\n";
                 }
-
-                print_r($variant->getTitle());
-
                 $existingData['date'] = $jsonData['registrationDateTime'] ?? '';
                 $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
                 $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
@@ -62,9 +60,7 @@ class HelloWorldCommand extends AbstractCommand
         else {
             echo "NOT ISSET IF";
         }
-
-
-        return $existingData;
+        return $existingData;*/
     }
 
 
