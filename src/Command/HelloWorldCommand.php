@@ -40,13 +40,10 @@ class HelloWorldCommand extends AbstractCommand
         return $returnsFiles;
     }
 
-    public function processBol($jsonData, $existingData) {
+    public function processBol($jsonData, $existingData)
+    {
 
-        if (isset($jsonData['returnItems']) && is_array($jsonData['returnItems']) && !empty($jsonData['returnItems'])) {
-            echo "returnItems is set and not empty\n";
-        } else {
-            echo "returnItems is either not set or empty\n";
-        }
+        var_dump($jsonData['returnItems']);
 
         /*if (isset($jsonData['returnItems'])) {
             echo "ISSET IF";
