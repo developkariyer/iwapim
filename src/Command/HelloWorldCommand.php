@@ -42,6 +42,7 @@ class HelloWorldCommand extends AbstractCommand
 
     public function processBol($jsonData, $existingData)
     {
+        $output = [];
         foreach ($jsonData as $index => $item) {
             if (isset($item['registrationDateTime'])) {
                 $existingData['date'] = $item['registrationDateTime'];
@@ -67,19 +68,21 @@ class HelloWorldCommand extends AbstractCommand
                         $parts = explode('/', trim($path, '/'));
                         $variantName = array_pop($parts);
                         $parentName = array_pop($parts);
-                        $existingData['iwasku'] = $iwasku;
-                        $existingData['variantName'] = $variantName;
-                        $existingData['parentName'] = $parentName;
-                    }
-                    if (isset($returnItem['returnReason'])) {
-                        $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
-                        $existingData['detailReason'] = $returnItem['returnReason']['detailedReason'] ?? '';
+                        $newData = [
+                            'iwasku' => $iwasku,
+                            'variantName' => $variantName,
+                            'parentName' => $parentName,
+                            'mainReason' => $returnItem['returnReason']['mainReason'] ?? '',
+                            'detailReason' => $returnItem['returnReason']['detailedReason'] ?? '',
+                            'date' => $existingData['date'] ?? ''
+                        ];
+                        $output[] = json_encode($newData);
                     }
                 }
             }
         }
-        print_r(json_encode($existingData));
-        return $existingData;
+        print_r(json_encode($output));
+        return $output;
     }
 
 
