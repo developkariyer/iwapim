@@ -55,11 +55,23 @@ class HelloWorldCommand extends AbstractCommand
                         continue;
                     }
                     $ean = $returnItem['ean'];
-                    $variant = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
-                    if ($variant) {
-                        echo "Found variant: " . $variant->getTitle() . "\n";
-                    } else {
-                        echo "Variant not found for EAN: $ean\n";
+                    $variantObject = VariantProduct::findOneByField('ean', $ean, $unpublished = true);
+                    if ($variantObject) {
+                        $mainProductObjectArray = $variantObject->getMainProduct();
+                    }
+                    if(!$mainProductObjectArray) {
+                        return;
+                    }
+                    $mainProductObject = reset($mainProductObjectArray);
+                    if ($mainProductObject instanceof Product) {
+                        $iwasku =  $mainProductObject->getInheritedField('Iwasku');
+                        $path = $mainProductObject->getFullPath();
+                        $parts = explode('/', trim($path, '/'));
+                        $variantName = array_pop($parts);
+                        $parentName = array_pop($parts);
+                        $existingData['iwasku'] = $iwasku;
+                        $existingData['variantName'] = $variantName;
+                        $existingData['parentName'] = $parentName;
                     }
                     if (isset($returnItem['returnReason'])) {
                         $existingData['mainReason'] = $returnItem['returnReason']['mainReason'] ?? '';
