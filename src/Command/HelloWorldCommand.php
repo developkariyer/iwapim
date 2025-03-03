@@ -31,12 +31,12 @@ class HelloWorldCommand extends AbstractCommand
                 $jsonData = json_decode(file_get_contents($returnsFilePath), true);
                 switch ($marketplaceName) {
                     case 'BolIwa':
-                        $returnsFiles[$marketplaceName] = $this->processBol($jsonData);
+                        $returnsFiles = $this->processBol($jsonData, $marketplaceName);
                         break;
                     case 'TrendyolCfw':
                     case 'TrendyolIwa':
                     case 'TrendyolFurni':
-                        $returnsFiles[$marketplaceName] = $this->processTrendyol($jsonData);
+                        $returnsFiles = $this->processTrendyol($jsonData, $marketplaceName);
                         break;
                     default:
                         break;
@@ -46,7 +46,7 @@ class HelloWorldCommand extends AbstractCommand
         return $returnsFiles;
     }
 
-    public function processTrendyol($jsonData)
+    public function processTrendyol($jsonData, $marketplaceName)
     {
         $output = [];
         foreach ($jsonData as $index => $item) {
@@ -63,6 +63,7 @@ class HelloWorldCommand extends AbstractCommand
                     foreach ($item['claimItems'] as $claimItem) {
                         $newData = [
                             'date' => $date,
+                            'marketplaceName' => $marketplaceName,
                             'iwasku' => $data[0]['iwasku'],
                             'variantName' => $data[0]['variant_name'],
                             'parentName' => $data[0]['parent_name'],
@@ -83,7 +84,7 @@ class HelloWorldCommand extends AbstractCommand
         return $output;
     }
 
-    public function processBol($jsonData)
+    public function processBol($jsonData, $marketplaceName)
     {
         $output = [];
         foreach ($jsonData as $index => $item) {
@@ -110,6 +111,7 @@ class HelloWorldCommand extends AbstractCommand
                         $parentName = array_pop($parts);
                         $newData = [
                             'date' => $item['registrationDateTime'],
+                            'marketplaceName' =>  $marketplaceName,
                             'iwasku' => $iwasku,
                             'variantName' => $variantName,
                             'parentName' => $parentName,
