@@ -455,6 +455,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($allReturns) . "Page: " . $page . "\n";
             usleep(3000000);
         } while (count($returns) === 50);
+        echo "Complate returns \n";
         $sql = "Select * from iwa_marketplace_orders_line_items where order_id = :order_id ";
         foreach ($allReturns as &$return) {
             foreach ($return['returnItems'] as &$returnItem) {
