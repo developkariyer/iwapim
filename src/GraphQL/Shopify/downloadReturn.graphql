@@ -1,5 +1,5 @@
-query getOrders {
-    orders(first: 50) {
+query getOrders($filter: String) {
+    orders(first: 50, query: $filter) {
         pageInfo {
             hasNextPage
             endCursor

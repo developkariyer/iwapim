@@ -210,8 +210,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadReturns()
     {
+        $filter = 'updated_at:>= 01.01.2025';
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
+            'variables' => [
+                'filter' => $filter
+            ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
         $this->putToCache('Returns.json', $returns);
