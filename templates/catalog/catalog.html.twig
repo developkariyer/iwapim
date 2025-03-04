@@ -121,9 +121,7 @@
                                         <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
                                         <b>IWASKU:</b>
                                         {% for item in product.iwaskuList %}
-                                            <span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">
-                                                {{ item.iwasku }}
-                                            </span>
+                                            <span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">{{ item.iwasku }}</span>
                                             {% if not loop.last %}<span>|</span>{% endif %}
                                         {% endfor %}
                                         <br>
