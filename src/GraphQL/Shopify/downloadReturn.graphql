@@ -16,6 +16,14 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     id
                     name
                     status
+                    returnLineItems (first:50) {
+                        nodes {
+                            customerNote
+                            refundedQuantity
+                            returnReason
+                            returnReasonNote
+                        }
+                    }
                 }
             }
         }
