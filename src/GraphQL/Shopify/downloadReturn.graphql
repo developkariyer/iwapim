@@ -1,12 +1,12 @@
-query getOrders($numOrders: Int!, $cursor: String) {
-    orders(first: $numOrders, after: $cursor) {
+query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
+    orders(first: $numOrders, after: $cursor, query: $filter) {
         pageInfo {
             hasNextPage
             endCursor
         }
         nodes {
             id
-            poNumber
+            updatedAt
             returns (first:50) {
                 nodes {
                     decline {

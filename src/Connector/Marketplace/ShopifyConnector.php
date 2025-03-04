@@ -211,12 +211,13 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadReturns()
     {
+        $lastMonth = date('Y-m-d', strtotime('-30 days'));
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
                     'numOrders' => 50,
                     'cursor' => null,
-                    'return_status' => 'returned'
+                    'query' => "updated_at:>=$lastMonth returns.status:returned"
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
