@@ -233,7 +233,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         foreach ($returnOrders as $order) {
             echo "Id: " . $order['order_id'] . "\n";
         }
-        print_r(json_encode($returnOrders));
+        //sprint_r(json_encode($returnOrders));
     }
 
     public function downloadInventory(): void
