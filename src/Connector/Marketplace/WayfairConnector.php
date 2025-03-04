@@ -17,6 +17,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
         'catalog' => 'https://api.wayfair.com/v1/supplier-catalog-api/graphql',
         'url' => 'https://api.wayfair.com/v1/graphql',
+        'returnOrder' => 'https://api.wayfair.io/v1/supplier-order-api/graphql'
     ];
     public static string $marketplaceType = 'Wayfair';
 
