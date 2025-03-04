@@ -417,7 +417,8 @@ class BolConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void // LVB/FBB
     {
-        if (!empty($inventory)) {
+        $this->downloadReturns();
+        /*if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
         }
@@ -425,7 +426,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
         $inventory[]  = $response->toArray();
-        $this->putToCache('INVENTORY.json', $inventory);
+        $this->putToCache('INVENTORY.json', $inventory);*/
     }
 
     /**
