@@ -460,7 +460,12 @@ class BolConnector extends MarketplaceConnectorAbstract
         foreach ($allReturns as &$return) {
             foreach ($return['returnItems'] as &$returnItem) {
                 $orderId = $returnItem['orderId'];
-                $order = Utility::fetchFromSql($sql, ['order_id' => $orderId]);
+                echo  "Order id: " . $orderId . "\n";
+                try {
+                    $order = Utility::fetchFromSql($sql, ['order_id' => $orderId]);
+                } catch (\Exception $e) {
+                    echo "Error: " . $e->getMessage() . "\n";
+                }
                 $return['orderDetail'] = $order;
             }
         }
