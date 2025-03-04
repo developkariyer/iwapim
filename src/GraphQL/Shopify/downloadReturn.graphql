@@ -1,0 +1,25 @@
+query {
+    return {
+        status
+        name
+        returnLineItems(first: 10) {
+            edges {
+                node {
+                     ReturnLineItem {
+                        fulfillmentLineItem {
+                            lineItem {
+                                name
+                            }
+                        }
+                        totalWeight {
+                            value
+                        }
+                    }
+                    quantity
+                    returnReason
+                    returnReasonNote
+                }
+            }
+        }
+    }
+}
