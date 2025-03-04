@@ -475,7 +475,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                             VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
             Utility::executeSql($sqlInsertMarketplaceReturn, [
                 'marketplace_id' => $this->marketplace->getId(),
-                'return_id' => ['returnId'],
+                'return_id' => $return['returnId'],
                 'json' => json_encode($return)
             ]);
             echo "Inserting order: " . $return['returnId'] . "\n";
