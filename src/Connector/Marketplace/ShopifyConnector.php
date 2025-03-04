@@ -210,14 +210,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadReturns()
     {
-        $filter = 'updated_at:>=' . (string) "2025-01-01T00:00:00Z";
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
                 'variables' => [
                     'numOrders' => 50,
-                    'cursor' => null,
-                    'filter' => $filter
+                    'cursor' => null
                 ]
             ]
         ];
