@@ -434,6 +434,7 @@ class BolConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws RandomException
+     * @throws DecodingExceptionInterface
      */
     public function downloadReturns(): void
     {
@@ -453,6 +454,14 @@ class BolConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($allReturns) . "Page: " . $page . "\n";
             usleep(3000000);
         } while (count($returns) === 50);
+        $sql = "Select * from iwa_marketplace_orders_line_items where order_id = :order_id ";
+        foreach ($allReturns as &$return) {
+            foreach ($return['returnItems'] as &$returnItem) {
+                $orderId = $returnItem['orderId'];
+                $order = Utility::fetchFromSql($sql, ['order_id' => $orderId]);
+                $return['orderDetail'] = $order;
+            }
+        }
         $this->putToCache('RETURNS.json', $allReturns);
     }
 
