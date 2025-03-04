@@ -59,7 +59,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             while (true) {
                 try {
                     $response = $this->httpClient->request($method, $this->apiUrl . '/graphql.json', $headersToApi);
-                    print_r($response->getContent());
                     $newData = json_decode($response->getContent(), true);
                     echo "Cost Info: " . json_encode($newData['extensions']['cost']) . PHP_EOL;
                     if ($newData['extensions']['cost']['throttleStatus']['currentlyAvailable'] < $newData['extensions']['cost']['actualQueryCost'] ) {
@@ -214,10 +213,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
-                'variables' => [
                     'numOrders' => 50,
                     'cursor' => null
-                ]
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
