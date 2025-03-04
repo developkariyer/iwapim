@@ -242,6 +242,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         print_r(json_encode($returnOrders));
     }
 
+
     public function downloadInventory(): void
     {
         $this->downloadReturns();
