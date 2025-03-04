@@ -1,5 +1,5 @@
-query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
-    orders(first: $numOrders, after: $cursor, query: $filter) {
+query getOrders {
+    orders(first: 50) {
         pageInfo {
             hasNextPage
             endCursor
@@ -63,7 +63,7 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                     id
                     name
                     status
-                    
+
                 }
             }
         }

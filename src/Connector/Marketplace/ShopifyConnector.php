@@ -201,6 +201,13 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $this->putToCache('INVENTORY.json', $inventories);*/
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws RandomException
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function downloadReturns()
     {
         $query = [
