@@ -68,6 +68,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                         continue;
                     }
                     $allData[$key] = array_merge($allData[$key] ?? [], $newData['data'][$key]['nodes'] ?? []);
+                    print_r(json_encode($newData));
                     break;
                 } catch (\Exception $e) {
                     echo "Request Error: " . $e->getMessage() . PHP_EOL;
