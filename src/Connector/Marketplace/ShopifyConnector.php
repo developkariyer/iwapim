@@ -220,7 +220,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        $this->putToCache('Returns.json', $returns);
+
     }
 
     /**
