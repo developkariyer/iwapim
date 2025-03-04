@@ -214,11 +214,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
                     'numOrders' => 50,
-                    'cursor' => null
+                    'cursor' => null,
+                    'return_status' => 'returned'
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-
+        $this->putToCache('Returns.json', $returns);
     }
 
     /**
