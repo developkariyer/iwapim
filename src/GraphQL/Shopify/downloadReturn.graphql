@@ -1,7 +1,10 @@
 query {
-    return {
+    return(id: "gid://shopify/Return/945000954") {
         status
         name
+        order {
+            id
+        }
         returnLineItems(first: 10) {
             edges {
                 node {
