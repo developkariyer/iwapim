@@ -28,7 +28,7 @@ class CleanCommand extends AbstractCommand
 
     static int $level = 0;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('asset', null, InputOption::VALUE_NONE, 'If set, the task will list tagged objects, other options are ignored.')

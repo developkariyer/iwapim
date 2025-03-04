@@ -117,7 +117,8 @@ class GoogleSheetsController extends FrontendController
                                     FROM object_collection_AmazonMarketplace_varyantproduct AS ocv
                                     JOIN object_query_varyantproduct AS oqv 
                                         ON ocv.id = oqv.oo_id
-                                    ORDER BY id;"; //JOIN objects AS obj ON obj.id = oqv.oo_id WHERE obj.published = 1
+                                    JOIN objects AS obj ON obj.id = oqv.oo_id WHERE obj.published = 1
+                                    ORDER BY id;"; //
 
 
 
