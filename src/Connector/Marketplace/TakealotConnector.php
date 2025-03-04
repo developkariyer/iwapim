@@ -224,10 +224,17 @@ class TakealotConnector extends MarketplaceConnectorAbstract
             sleep(1);
         } while ($data['page_summary'] === $size);
     }
-    
+
+    public function downloadReturns()
+    {
+        $sql = 'SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = "Takealot" AND fulfillments_status = "Returned"';
+        $returnOrders = Utility::fetchFromSql($sql);
+        print_r(json_encode($returnOrders));
+    }
+
     public function downloadInventory(): void
     {
-
+        $this->downloadReturns();
     }
 
     /**
