@@ -227,13 +227,18 @@ class TakealotConnector extends MarketplaceConnectorAbstract
 
     public function downloadReturns()
     {
-        $sql = 'SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = "Takealot" AND fulfillments_status = "Returned"';
-        $sqlExtra = 'SELECT * FROM `iwa_marketplace_orders` where order_id :order_id';
+        $sql = 'SELECT 
+                    oli.*, 
+                    o.* 
+                FROM 
+                    `iwa_marketplace_orders_line_items` oli
+                INNER JOIN 
+                    `iwa_marketplace_orders` o 
+                    ON oli.order_id = o.order_id
+                WHERE 
+                    oli.marketplace_type = "Takealot" 
+                AND oli.fulfillments_status = "Returned";';
         $returnOrders = Utility::fetchFromSql($sql);
-        foreach ($returnOrders as &$order) {
-            $order['json'] = Utility::fetchFromSql($sqlExtra, ['order_id' => $order['order_id']]);
-        }
-        unset($order);
         print_r(json_encode($returnOrders));
     }
 
