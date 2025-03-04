@@ -217,7 +217,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             'variables' => [
                     'numOrders' => 50,
                     'cursor' => null,
-                    'query' => "updated_at:>=$lastMonth returns.status:returned"
+                    'query' => "returns.status:returned"
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
