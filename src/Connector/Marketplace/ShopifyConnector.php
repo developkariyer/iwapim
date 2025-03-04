@@ -80,7 +80,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             $pageInfo = $newData['data'][$key]['pageInfo'] ?? null;
             $cursor = $pageInfo['endCursor'] ?? null;
             $hasNextPage = $pageInfo['hasNextPage'] ?? false;
-            break;
         } while ($hasNextPage);
         return $allData;
     }
@@ -215,7 +214,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         $query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
-                'filter' => $filter
+                'filter' => $filter,
+                'variables' => [
+                    'numOrders' => 50,
+                    'cursor' => null,
+                    'filter' => $filter
+                ]
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');

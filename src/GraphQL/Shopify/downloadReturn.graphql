@@ -1,59 +1,12 @@
-query getOrders($filter: String) {
-    orders(first: 50, query: $filter) {
+query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
+    orders(first: $numOrders, after: $cursor, query: $filter) {
         pageInfo {
             hasNextPage
             endCursor
         }
         nodes {
             id
-            name
-            note
-            tags
-            test
-            currencyCode
-            closedAt
-            confirmed
             poNumber
-            lineItems (first:100) {
-                pageInfo {
-                    endCursor
-                    hasNextPage
-                }
-                nodes {
-                    id
-                    sku
-                    name
-                    title
-                    duties {
-                        id
-                        countryCodeOfOrigin
-                        harmonizedSystemCode
-                        price {
-                            shopMoney {
-                                amount
-                                currencyCode
-                            }
-                            presentmentMoney {
-                                amount
-                                currencyCode
-                            }
-                        }
-                    }
-                    vendor
-                    taxable
-                    quantity
-                    isGiftCard
-                    product {
-                        id
-                    }
-                    variant {
-                        id
-                        title
-                        price
-                    }
-                    requiresShipping
-                }
-            }
             returns (first:50) {
                 nodes {
                     decline {
