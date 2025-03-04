@@ -14,6 +14,17 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             closedAt
             confirmed
             poNumber
+            returns (first:50) {
+                nodes {
+                    decline {
+                        note
+                        reason
+                    }
+                    id
+                    name
+                    status
+                }
+            }
             lineItems (first:100) {
                 pageInfo {
                     endCursor
