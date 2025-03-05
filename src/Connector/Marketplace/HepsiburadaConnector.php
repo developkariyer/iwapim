@@ -329,7 +329,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'limit' => 10
             ]
         ]);
-        print_r(json_encode($response->getContent()));
+        print_r($response->getContent());
         print_r($response->getStatusCode());
     }
     
