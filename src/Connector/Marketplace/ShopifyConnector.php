@@ -68,7 +68,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                         continue;
                     }
                     $allData[$key] = array_merge($allData[$key] ?? [], $newData['data'][$key]['nodes'] ?? []);
-                    print_r(json_encode($newData));
                     break;
                 } catch (\Exception $e) {
                     echo "Request Error: " . $e->getMessage() . PHP_EOL;
@@ -220,7 +219,10 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        $this->putToCache('Returns.json', $returns);
+        foreach ($returns['orders'] as $order) {
+            echo "order #: " . basename($order['id']) . "\n";
+        }
+       //$this->putToCache('Returns.json', $returns);
     }
 
     /**
