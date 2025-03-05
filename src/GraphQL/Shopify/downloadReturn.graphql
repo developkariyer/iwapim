@@ -26,7 +26,7 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                             id
                             note
                         }
-                        lineItems {
+                        lineItems (first:50) {
                             nodes {
                                 variant {
                                     id
