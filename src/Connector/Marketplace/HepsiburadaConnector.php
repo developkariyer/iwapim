@@ -329,7 +329,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'limit' => 10
             ]
         ]);
-        print_r($response->getContent());
+        print_r(json_encode($response->getContent()));
     }
     
     public function downloadInventory(): void
