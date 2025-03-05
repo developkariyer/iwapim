@@ -317,7 +317,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function detailOrder($orderId)
     {
-        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/ordernumber" . $orderId, [
+        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/ordernumber/" . $orderId, [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
