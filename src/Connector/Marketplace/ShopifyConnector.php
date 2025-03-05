@@ -219,10 +219,17 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        foreach ($returns['orders'] as $order) {
-            echo "order #: " . basename($order['id']) . "\n";
+        foreach ($returns['orders'] as $return) {
+            $orderId = basename($return['id']);
+            $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id";
+            try {
+                $order = Utility::fetchFromSql($sql, ['order_id' => $orderId]);
+            } catch (\Exception $e) {
+                echo "Error: " . $e->getMessage() . "\n";
+            }
+            $return['orderDetail'] = $order;
         }
-       //$this->putToCache('Returns.json', $returns);
+       $this->putToCache('Returns.json', $returns);
     }
 
     /**
