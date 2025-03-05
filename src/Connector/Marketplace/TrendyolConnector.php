@@ -128,19 +128,15 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     public function downloadReturns(): void
     {
         $allReturns  =  $this->getFromTrendyolApi('GET',  "order/sellers/" . $this->sellerId . "/claims", ['page' => 0], 'content', null);
-        foreach ($allReturns as $return) {
-            //Variant Main Product Bulalım
-            foreach ($return['items'] as $item) {
+        foreach ($allReturns as &$return) {
+            foreach ($return['items'] as &$item) {
                 $productId = $item['orderLine']['id'];
-                $sql = "select * from iwa_marketplace_orders_line_items where product_id = :product_id";
-                $order = Utility::fetchFromSql($sql, ['product_id' => $productId]);
-                print_r(json_encode($order));
-                break;
+                $sql = "select * from iwa_marketplace_orders_line_items where marketplace_key = :marketplace_key  and product_id = :product_id";
+                $order = Utility::fetchFromSql($sql, ['marketplace_key'=> $this->marketplace->getKey() , 'product_id' => $productId]);
+                $item['order'] = $order;
             }
-            break;
         }
-        //$this->putToCache('RETURNS.json', $allReturns);
-
+        $this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
