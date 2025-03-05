@@ -315,9 +315,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return $response->toArray();
     }
 
-    public function detailOrder($orderId)
+    public function detailOrder($orderNumber)
     {
-        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/ordernumber/" . $orderId, [
+        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/ordernumber/" . $orderNumber, [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
@@ -325,17 +325,15 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ]);
-        print_r($response->getStatusCode());
-        print_r($response->getContent());
         if ($response->getStatusCode() !== 200) {
-            return $response->getContent();
+            $result  = $response->toArray();
+            return $result;
         }
     }
 
     public function downloadOrders(): void
     {
-        print_r($this->detailOrder(4586003603));
-        /*$response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
+        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
@@ -347,8 +345,14 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'limit' => 25
             ]
         ]);
-        print_r($response->getContent());
-        print_r($response->getStatusCode());*/
+        $data = $response->toArray();
+        $orders = $data['items'] ?? [];
+        foreach ($orders as &$order) {
+            $orderNumber = $order['OrderNumber'];
+            $order['detail'] = $this->detailOrder($orderNumber);
+            sleep(0.2);
+        }
+        $this->putToCache('ORDERS.json', $orders);
     }
     
     public function downloadInventory(): void
