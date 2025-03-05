@@ -26,15 +26,6 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
                             id
                             note
                         }
-                        lineItems (first:50) {
-                            nodes {
-                                variant {
-                                    id
-                                    displayName
-                                    barcode
-                                }
-                            }
-                        }
                     }
                     returnLineItems (first:50) {
                         nodes {
