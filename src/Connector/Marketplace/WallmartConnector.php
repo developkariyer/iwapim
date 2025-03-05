@@ -324,7 +324,15 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function downloadReturns(): void
     {
         $allReturns = $this->getFromWallmartApi('GET', 'returns', ['limit' => 5, 'nextCursor' => null], 'returnOrders', null,null, 'cursor');
-        $this->putToCache('RETURNS.json', $allReturns);
+        foreach ($allReturns as $return) {
+            foreach ($return['returnOrderLines'] as $orderLine) {
+                $sku = $orderLine['item']['sku'];
+                echo "Sku: " . $sku . "\n";
+            }
+        }
+
+
+        //$this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
