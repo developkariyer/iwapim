@@ -455,13 +455,13 @@ class BolConnector extends MarketplaceConnectorAbstract
             usleep(3000000);
         } while (count($returns) === 50);
         echo "Complate returns \n";
-        $sql = "Select * from iwa_marketplace_orders_line_items where order_id = :order_id ";
         foreach ($allReturns as &$return) {
             foreach ($return['returnItems'] as &$returnItem) {
                 $orderId = $returnItem['orderId'];
+                $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id and product_id = :product_id";
                 echo  "Order id: " . $orderId . "\n";
                 try {
-                    $order = Utility::fetchFromSql($sql, ['order_id' => $orderId]);
+                    $order = Utility::fetchFromSql($sql, ['order_id' => $orderId, 'product_id' => $returnItem['ean']]);
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                 }
