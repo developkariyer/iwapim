@@ -333,7 +333,7 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                         SELECT object_id
                         FROM iwa_json_store
                         WHERE field_name = 'apiResponseJson'  AND JSON_UNQUOTE(JSON_EXTRACT(json_data, :jsonPath)) = :uniqueId LIMIT 1;";
-                $jsonPath = '$.' . $sku;
+                $jsonPath = '$.' . '"sku"';
                 $result = Utility::fetchFromSql($sql, ['jsonPath' => $jsonPath, 'uniqueId' => $sku]);
                 $objectId = $result[0]['object_id'] ?? null;
                 $variantObject = VariantProduct::getById($objectId);
