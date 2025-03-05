@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace;
 
 use Doctrine\DBAL\Exception;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Pimcore\Model\Element\DuplicateFullPathException;
@@ -325,8 +326,8 @@ class WallmartConnector extends MarketplaceConnectorAbstract
     public function downloadReturns(): void
     {
         $allReturns = $this->getFromWallmartApi('GET', 'returns', ['limit' => 5, 'nextCursor' => null], 'returnOrders', null,null, 'cursor');
-        foreach ($allReturns as $return) {
-            foreach ($return['returnOrderLines'] as $orderLine) {
+        foreach ($allReturns as &$return) {
+            foreach ($return['returnOrderLines'] as &$orderLine) {
                 $sku = $orderLine['item']['sku'];
                 echo "Sku: " . $sku . "\n";
                 $sql = "
@@ -337,13 +338,24 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $result = Utility::fetchFromSql($sql, ['jsonPath' => $jsonPath, 'uniqueId' => $sku]);
                 $objectId = $result[0]['object_id'] ?? null;
                 $variantObject = VariantProduct::getById($objectId);
-                echo "Object ID: " . $variantObject->getTitle() . "\n";
-
+                $mainProductObjectArray = $variantObject->getMainProduct();
+                if(!$mainProductObjectArray) {
+                    return;
+                }
+                $mainProductObject = reset($mainProductObjectArray);
+                if ($mainProductObject instanceof Product) {
+                    $iwasku =  $mainProductObject->getInheritedField('Iwasku');
+                    $path = $mainProductObject->getFullPath();
+                    $parts = explode('/', trim($path, '/'));
+                    $variantName = array_pop($parts);
+                    $parentName = array_pop($parts);
+                    $orderLine['item']['iwasku'] = $iwasku;
+                    $orderLine['item']['variantName'] = $variantName;
+                    $orderLine['item']['parentName'] = $parentName;
+                }
             }
         }
-
-
-        //$this->putToCache('RETURNS.json', $allReturns);
+        $this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
