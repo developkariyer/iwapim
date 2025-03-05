@@ -315,9 +315,25 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return $response->toArray();
     }
 
+    public function detailOrder($orderId)
+    {
+        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/ordernumber" . $orderId, [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            return $response->getContent();
+        }
+    }
+
     public function downloadOrders(): void
     {
-        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
+        print_r($this->detailOrder(4586003603));
+        /*$response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
@@ -330,7 +346,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getContent());
-        print_r($response->getStatusCode());
+        print_r($response->getStatusCode());*/
     }
     
     public function downloadInventory(): void
