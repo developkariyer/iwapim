@@ -332,7 +332,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        print_r($this->detailOrder(4586003603));
+        print_r($this->detailOrder("4586003603"));
         /*$response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
