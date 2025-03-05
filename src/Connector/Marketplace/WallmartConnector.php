@@ -339,9 +339,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                 $objectId = $result[0]['object_id'] ?? null;
                 $variantObject = VariantProduct::getById($objectId);
                 $mainProductObjectArray = $variantObject->getMainProduct();
-                if(!$mainProductObjectArray) {
-                    return;
-                }
                 $mainProductObject = reset($mainProductObjectArray);
                 if ($mainProductObject instanceof Product) {
                     $iwasku =  $mainProductObject->getInheritedField('Iwasku');
