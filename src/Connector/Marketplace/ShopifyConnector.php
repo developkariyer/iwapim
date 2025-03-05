@@ -219,7 +219,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        foreach ($returns['orders'] as $return) {
+        foreach ($returns['orders'] as &$return) {
             $orderId = basename($return['id']);
             $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id";
             try {
