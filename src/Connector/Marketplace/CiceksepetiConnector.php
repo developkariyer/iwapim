@@ -240,6 +240,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $response = $this->httpClient->request('POST', static::$apiUrl['returns']);
         print_r(json_encode($response->getContent()));
+        print_r(json_encode($response->getStatusCode()));
         /*$page = 0;
         $pageSize = 50;
         $allReturns = [];
