@@ -238,7 +238,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      */
     public function downloadReturns(): void
     {
-        $page = 0;
+        $response = $this->httpClient->request('POST', static::$apiUrl['returns']);
+        print_r(json_encode($response->getContent()));
+        /*$page = 0;
         $pageSize = 50;
         $allReturns = [];
         do {
@@ -249,7 +251,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 return;
             }
             $data = $response->toArray();
-            print_r(json_encode($response->getContent()));
             $returns = $data['supplierOrderListWithBranch'] ?? [];
             $allReturns = array_merge($allReturns,$returns);
             $page++;
@@ -257,7 +258,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($allReturns) . "Page: " . $page . "\n";
             sleep(5);
         } while ($page <= $pageCount);
-        $this->putToCache('RETURNS.json', $allReturns);
+        $this->putToCache('RETURNS.json', $allReturns);*/
     }
 
     /**
