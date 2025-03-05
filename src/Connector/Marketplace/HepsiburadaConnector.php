@@ -317,7 +317,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/cancelled", [
+        $response = $this->httpClient->request('GET', "https://oms-external-sit.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 "User-Agent" => "colorfullworlds_dev",
@@ -326,7 +326,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ],
             'query' => [
                 'offset' => 0,
-                'limit' => 10
+                'limit' => 25
             ]
         ]);
         print_r($response->getContent());
