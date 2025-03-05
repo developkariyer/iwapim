@@ -325,9 +325,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ]);
-        if ($response->getStatusCode() !== 200) {
-            $result  = $response->toArray();
-            return $result;
+        if ($response->getStatusCode() === 200) {
+            return $response->toArray();
         }
     }
 
