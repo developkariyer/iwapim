@@ -9,13 +9,33 @@ query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
             updatedAt
             returns (first:50) {
                 nodes {
+                    id
+                    name
                     decline {
                         note
                         reason
                     }
-                    id
-                    name
                     status
+                    order {
+                        cancellation {
+                            staffNote
+                        }
+                        confirmed
+                        currencyCode
+                        customer {
+                            id
+                            note
+                        }
+                        lineItems {
+                            nodes {
+                                variant {
+                                    id
+                                    displayName
+                                    barcode
+                                }
+                            }
+                        }
+                    }
                     returnLineItems (first:50) {
                         nodes {
                             customerNote
