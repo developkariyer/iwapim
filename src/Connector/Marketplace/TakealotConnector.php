@@ -239,7 +239,17 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     oli.marketplace_type = "Takealot" 
                 AND oli.fulfillments_status = "Returned";';
         $returnOrders = Utility::fetchFromSql($sql);
-        print_r(json_encode($returnOrders));
+        foreach ($returnOrders as $return) {
+            $sqlInsertMarketplaceReturn = "
+                            INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
+                            VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceReturn, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'return_id' => $return['order_id'],
+                'json' => json_encode($return)
+            ]);
+            echo "Inserting order: " . $return['order_id'] . "\n";
+        }
     }
 
 
