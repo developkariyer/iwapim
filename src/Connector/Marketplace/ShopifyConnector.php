@@ -229,7 +229,17 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             }
             $return['orderDetail'] = $order;
         }
-       $this->putToCache('Returns.json', $returns);
+        foreach ($returns['orders'] as $return) {
+            $sqlInsertMarketplaceReturn = "
+                            INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
+                            VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceReturn, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'return_id' => basename($return['id']),
+                'json' => json_encode($return)
+            ]);
+            echo "Inserting order: " . $return['id'] . "\n";
+        }
     }
 
     /**
