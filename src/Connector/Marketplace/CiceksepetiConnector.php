@@ -225,7 +225,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
+
     }
 
     /**
@@ -238,14 +238,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      */
     public function downloadReturns(): void
     {
-        try {
-            $testResponse = $this->httpClient->request('POST', static::$apiUrl['returns'], ['json' => ['page'=> 0, 'pageSize'=> 100]]);
-            echo "Bağlantı başarılı. HTTP Kodu: " . $testResponse->getStatusCode();
-            print_r($testResponse->getContent());
-        } catch (\Exception $e) {
-            echo "API'ye bağlanılamadı: " . $e->getMessage();
-        }
-        /*$page = 0;
+        $page = 0;
         $pageSize = 50;
         $allReturns = [];
         do {
@@ -263,7 +256,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($allReturns) . "Page: " . $page . "\n";
             sleep(5);
         } while ($page <= $pageCount);
-        $this->putToCache('RETURNS.json', $allReturns);*/
+        $this->putToCache('RETURNS.json', $allReturns);
     }
 
     /**
