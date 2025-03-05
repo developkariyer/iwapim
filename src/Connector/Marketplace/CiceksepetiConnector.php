@@ -249,6 +249,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 return;
             }
             $data = $response->toArray();
+            print_r(json_encode($response->getContent()));
             $returns = $data['supplierOrderListWithBranch'] ?? [];
             $allReturns = array_merge($allReturns,$returns);
             $page++;
