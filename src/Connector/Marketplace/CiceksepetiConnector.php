@@ -239,7 +239,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadReturns(): void
     {
         try {
-            $testResponse = $this->httpClient->request('GET', static::$apiUrl['returns']);
+            $testResponse = $this->httpClient->request('POST', static::$apiUrl['returns']);
             echo "Bağlantı başarılı. HTTP Kodu: " . $testResponse->getStatusCode();
         } catch (\Exception $e) {
             echo "API'ye bağlanılamadı: " . $e->getMessage();
