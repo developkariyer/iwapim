@@ -131,6 +131,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         foreach ($allReturns as &$return) {
             foreach ($return['items'] as &$item) {
                 $productId = $item['orderLine']['id'];
+                echo  "Product ID: " . $productId . "\n";
                 $sql = "select * from iwa_marketplace_orders_line_items where marketplace_key = :marketplace_key  and product_id = :product_id";
                 $order = Utility::fetchFromSql($sql, ['marketplace_key'=> $this->marketplace->getKey() , 'product_id' => $productId]);
                 $item['order'] = $order;
