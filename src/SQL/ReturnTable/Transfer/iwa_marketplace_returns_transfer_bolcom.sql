@@ -26,9 +26,9 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.returnReason.mainReason')) AS main_reason,
     JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.returnReason.customerComments')) AS customer_comment
 FROM
-    iwa_marketplace_orders
-    LEFT JOIN JSON_TABLE(json, '$.returnItems[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
-    LEFT JOIN JSON_TABLE(json, '$.return_item.processingResults[*]' COLUMNS ( value JSON PATH '$' )) AS processing_result
+    iwa_marketplace_returns
+    CROSS JOIN JSON_TABLE(json, '$.returnItems[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
+    CROSS JOIN JSON_TABLE(return_item.value, '$.processingResults[*]' COLUMNS ( value JSON PATH '$' )) AS processing_result
 WHERE
     JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.ean')) IS NOT NULL
     AND JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.ean')) != 'null'
