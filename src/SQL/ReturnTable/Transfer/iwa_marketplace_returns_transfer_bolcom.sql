@@ -6,9 +6,9 @@ INSERT INTO iwa_marketplace_returns_line_items (
 SELECT
     :marketplaceType,
     :marketPlaceId,
-    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.return_item.orderDetail')) AS iwasku,
-    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.return_item.parent_identifier')) AS parent_identifier,
-    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.return_item.product_type')) AS product_type,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.iwasku')) AS iwasku,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.parent_identifier')) AS parent_identifier,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.product_type')) AS product_type,
     JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.variant_name')) AS variant_name,
     JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.orderDetail.parent_name')) AS parent_name,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.registrationDateTime')) AS created_at,
