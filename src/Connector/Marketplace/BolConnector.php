@@ -4,6 +4,7 @@ namespace App\Connector\Marketplace;
 
 use Doctrine\DBAL\Exception;
 use Pimcore\Model\DataObject\Folder;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Random\RandomException;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -468,8 +469,32 @@ class BolConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $return['orderDetail'] = $order;
-                if (isEmpty($return['orderDetail'])) {
-                    echo "Order Detail not found\n";
+                if (!is_array($return['orderDetail']) || isEmpty($return['orderDetail'])) {
+                    $ean = $returnItem['orderId'];
+                    $sql = "
+                        SELECT object_id
+                        FROM iwa_json_store
+                        WHERE field_name = 'apiResponseJson'  AND JSON_UNQUOTE(JSON_EXTRACT(json_data, :jsonPath)) = :uniqueId LIMIT 1;";
+                    $jsonPath = '$.' . '"ean"';
+                    $result = Utility::fetchFromSql($sql, ['jsonPath' => $jsonPath, 'uniqueId' => $ean]);
+                    $objectId = $result[0]['object_id'] ?? null;
+                    $variantObject = VariantProduct::getById($objectId);
+                    $mainProductObjectArray = $variantObject->getMainProduct();
+                    $mainProductObject = reset($mainProductObjectArray);
+                    if ($mainProductObject instanceof Product) {
+                        $iwasku =  $mainProductObject->getInheritedField('Iwasku');
+                        $path = $mainProductObject->getFullPath();
+                        $parts = explode('/', trim($path, '/'));
+                        $variantName = array_pop($parts);
+                        $parentName = array_pop($parts);
+                        $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
+                        $productType = strtok($productIdentifier,'-');
+                        $return['orderDetail']['iwasku'] = $iwasku;
+                        $return['orderDetail']['variantName'] = $variantName;
+                        $return['orderDetail']['parentName'] = $parentName;
+                        $return['orderDetail']['productIdentifier'] = $productIdentifier;
+                        $return['orderDetail']['productType'] = $productType;
+                    }
                 }
             }
         }
