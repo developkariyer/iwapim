@@ -479,6 +479,9 @@ class BolConnector extends MarketplaceConnectorAbstract
                     $jsonPath = '$.ean';
                     $result = Utility::fetchFromSql($sql, ['jsonPath' => $jsonPath, 'uniqueId' => $ean]);
                     $objectId = $result[0]['object_id'] ?? null;
+                    if (!$objectId) {
+                        continue;
+                    }
                     $variantObject = VariantProduct::getById($objectId);
                     $mainProductObjectArray = $variantObject->getMainProduct();
                     $mainProductObject = reset($mainProductObjectArray);
