@@ -1,0 +1,1 @@
+SELECT DISTINCT marketplace_id FROM iwa_marketplace_orders
