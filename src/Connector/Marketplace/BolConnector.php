@@ -471,11 +471,12 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $return['orderDetail'] = $order;
                 if (!is_array($return['orderDetail']) || isEmpty($return['orderDetail'])) {
                     $ean = $returnItem['orderId'];
+                    echo  "EAN: " . $ean . "\n";
                     $sql = "
                         SELECT object_id
                         FROM iwa_json_store
                         WHERE field_name = 'apiResponseJson'  AND JSON_UNQUOTE(JSON_EXTRACT(json_data, :jsonPath)) = :uniqueId LIMIT 1;";
-                    $jsonPath = '$.' . '"ean"';
+                    $jsonPath = '$.ean';
                     $result = Utility::fetchFromSql($sql, ['jsonPath' => $jsonPath, 'uniqueId' => $ean]);
                     $objectId = $result[0]['object_id'] ?? null;
                     $variantObject = VariantProduct::getById($objectId);
