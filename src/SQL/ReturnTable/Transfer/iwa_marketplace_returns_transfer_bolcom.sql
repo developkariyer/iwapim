@@ -27,8 +27,8 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.returnReason.customerComments')) AS customer_comment
 FROM
     iwa_marketplace_orders
-    CROSS JOIN JSON_TABLE(json, '$.returnItems[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
-    CROSS JOIN JSON_TABLE(json, '$.return_item.processingResults[*]' COLUMNS ( value JSON PATH '$' )) AS processing_result
+    LEFT JOIN JSON_TABLE(json, '$.returnItems[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
+    LEFT JOIN JSON_TABLE(json, '$.return_item.processingResults[*]' COLUMNS ( value JSON PATH '$' )) AS processing_result
 WHERE
     marketplace_id = :marketPlaceId
 ON DUPLICATE KEY UPDATE
