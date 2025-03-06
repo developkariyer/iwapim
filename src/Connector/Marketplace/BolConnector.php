@@ -468,7 +468,9 @@ class BolConnector extends MarketplaceConnectorAbstract
                     if (!empty($order)) {
                         $returnItem['orderDetail'] = reset($order);
                     }
-
+                    else {
+                        $returnItem['orderDetail'] = false;
+                    }
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                 }
