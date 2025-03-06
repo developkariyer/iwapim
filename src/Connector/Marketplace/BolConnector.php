@@ -459,6 +459,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         } while (count($returns) === 50);
         echo "Complate returns \n";
         foreach ($allReturns as &$return) {
+            $i = 0;
             foreach ($return['returnItems'] as &$returnItem) {
                 $orderId = $returnItem['orderId'];
                 $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id and product_id = :product_id";
@@ -493,13 +494,15 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $parentName = array_pop($parts);
                         $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
                         $productType = strtok($productIdentifier,'-');
-                        $return['orderDetail']['iwasku'] = $iwasku;
-                        $return['orderDetail']['variantName'] = $variantName;
-                        $return['orderDetail']['parentName'] = $parentName;
-                        $return['orderDetail']['productIdentifier'] = $productIdentifier;
-                        $return['orderDetail']['productType'] = $productType;
+                        $return['orderDetail'][$i]['iwasku'] = $iwasku;
+                        $return['orderDetail'][$i]['variantName'] = $variantName;
+                        $return['orderDetail'][$i]['parentName'] = $parentName;
+                        $return['orderDetail'][$i]['productIdentifier'] = $productIdentifier;
+                        $return['orderDetail'][$i]['productType'] = $productType;
+                        echo "Iwasku: " . $iwasku . "\n";
                     }
                 }
+                $i++;
             }
         }
         foreach ($allReturns as $return) {
