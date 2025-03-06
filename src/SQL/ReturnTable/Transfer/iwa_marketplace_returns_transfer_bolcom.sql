@@ -1,14 +1,21 @@
 INSERT INTO iwa_marketplace_returns_line_items (
-    marketplace_type, marketplace_id, iwasku, parent_identifier, product_type,
+    marketplace_type, marketplace_id, iwasku, parent_identifier, product_type, variant_name, parent_name,
 )
 SELECT
     :marketplaceType,
     :marketPlaceId,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.return_item.orderDetail')) AS iwasku,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.return_item.parent_identifier')) AS parent_identifier,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.return_item.product_type')) AS product_type,
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.'))
+
+
+
 
 
 FROM
     iwa_marketplace_orders
-    CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
+    CROSS JOIN JSON_TABLE(json, '$.returnItems[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
     CROSS JOIN JSON_TABLE(json, '$.orderDetail.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item_detail
 WHERE
     JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.product.bolProductId')) IS NOT NULL

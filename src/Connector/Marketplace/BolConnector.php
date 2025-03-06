@@ -499,10 +499,10 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
                         $productType = strtok($productIdentifier,'-');
                         $returnItem['orderDetail']['iwasku'] = $iwasku;
-                        $returnItem['orderDetail']['variantName'] = $variantName;
-                        $returnItem['orderDetail']['parentName'] = $parentName;
-                        $returnItem['orderDetail']['productIdentifier'] = $productIdentifier;
-                        $returnItem['orderDetail']['productType'] = $productType;
+                        $returnItem['orderDetail']['variant_name'] = $variantName;
+                        $returnItem['orderDetail']['parent_name'] = $parentName;
+                        $returnItem['orderDetail']['parent_identifier'] = $productIdentifier;
+                        $returnItem['orderDetail']['product_type'] = $productType;
                         echo "Iwasku: " . $iwasku . "\n";
                     }
                 }
