@@ -14,6 +14,7 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use function iter\isEmpty;
 
 class BolConnector extends MarketplaceConnectorAbstract
 {
@@ -417,7 +418,8 @@ class BolConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void // LVB/FBB
     {
-        if (!empty($inventory)) {
+        $this->downloadReturns();
+        /*if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
         }
@@ -425,7 +427,7 @@ class BolConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $response = $this->httpClient->request("GET", static::$apiUrl['inventory']);
         $inventory[]  = $response->toArray();
-        $this->putToCache('INVENTORY.json', $inventory);
+        $this->putToCache('INVENTORY.json', $inventory);*/
     }
 
     /**
@@ -466,6 +468,9 @@ class BolConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $return['orderDetail'] = $order;
+                if (isEmpty($return['orderDetail'])) {
+                    echo "Order Detail not found\n";
+                }
             }
         }
         foreach ($allReturns as $return) {
