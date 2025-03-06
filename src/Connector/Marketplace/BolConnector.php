@@ -465,11 +465,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                 echo  "Order id: " . $orderId . "\n";
                 try {
                     $order = Utility::fetchFromSql($sql, ['order_id' => $orderId, 'product_id' => $returnItem['ean']]);
+                    $returnItem['orderDetail'] = $order[0];
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                 }
-                $returnItem['orderDetail'] = $order;
-                if (!is_array($returnItem['orderDetail']) || isEmpty($returnItem['orderDetail'])) {
+                if (isEmpty($returnItem['orderDetail'])) {
                     $ean = $returnItem['ean'];
                     echo  "EAN: " . $ean . "\n";
                     $sql = "
