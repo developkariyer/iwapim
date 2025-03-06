@@ -48,7 +48,7 @@ ON DUPLICATE KEY UPDATE
     quantity = VALUES(quantity),
     variant_title = VALUES(variant_title),
     shipping_country = VALUES(shipping_country),
-    shippping_country_code = VALUES(shipping_country_code),
+    shipping_country_code = VALUES(shipping_country_code),
     return_status = VALUES(return_status),
     reason = VALUES(reason),
     main_reason = VALUES(main_reason),
