@@ -80,6 +80,4 @@ class PrepareReturnTableCommand extends AbstractCommand
         }
     }
 
-
-
 }
