@@ -470,7 +470,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                 }
                 $returnItem['orderDetail'] = $order;
-                if (!is_array($return['orderDetail']) || isEmpty($return['orderDetail'])) {
+                if (!is_array($returnItem['orderDetail']) || isEmpty($returnItem['orderDetail'])) {
                     $ean = $returnItem['ean'];
                     echo  "EAN: " . $ean . "\n";
                     $sql = "
