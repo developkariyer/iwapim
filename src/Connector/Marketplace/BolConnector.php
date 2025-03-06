@@ -471,7 +471,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 }
                 $return['orderDetail'] = $order;
                 if (!is_array($return['orderDetail']) || isEmpty($return['orderDetail'])) {
-                    $ean = $returnItem['orderId'];
+                    $ean = $returnItem['ean'];
                     echo  "EAN: " . $ean . "\n";
                     $sql = "
                         SELECT object_id
