@@ -459,7 +459,6 @@ class BolConnector extends MarketplaceConnectorAbstract
         } while (count($returns) === 50);
         echo "Complate returns \n";
         foreach ($allReturns as &$return) {
-            $i = 0;
             foreach ($return['returnItems'] as &$returnItem) {
                 $orderId = $returnItem['orderId'];
                 $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id and product_id = :product_id";
@@ -502,7 +501,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                         echo "Iwasku: " . $iwasku . "\n";
                     }
                 }
-                $i++;
             }
         }
         foreach ($allReturns as $return) {
