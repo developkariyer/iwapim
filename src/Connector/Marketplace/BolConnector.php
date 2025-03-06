@@ -469,7 +469,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                 }
-                $return['orderDetail'] = $order;
+                $returnItem['orderDetail'] = $order;
                 if (!is_array($return['orderDetail']) || isEmpty($return['orderDetail'])) {
                     $ean = $returnItem['ean'];
                     echo  "EAN: " . $ean . "\n";
@@ -494,11 +494,11 @@ class BolConnector extends MarketplaceConnectorAbstract
                         $parentName = array_pop($parts);
                         $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
                         $productType = strtok($productIdentifier,'-');
-                        $return['orderDetail'][$i]['iwasku'] = $iwasku;
-                        $return['orderDetail'][$i]['variantName'] = $variantName;
-                        $return['orderDetail'][$i]['parentName'] = $parentName;
-                        $return['orderDetail'][$i]['productIdentifier'] = $productIdentifier;
-                        $return['orderDetail'][$i]['productType'] = $productType;
+                        $returnItem['orderDetail']['iwasku'] = $iwasku;
+                        $returnItem['orderDetail']['variantName'] = $variantName;
+                        $returnItem['orderDetail']['parentName'] = $parentName;
+                        $returnItem['orderDetail']['productIdentifier'] = $productIdentifier;
+                        $returnItem['orderDetail']['productType'] = $productType;
                         echo "Iwasku: " . $iwasku . "\n";
                     }
                 }
