@@ -30,6 +30,9 @@ FROM
     LEFT JOIN JSON_TABLE(json, '$.returnItems[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
     LEFT JOIN JSON_TABLE(json, '$.return_item.processingResults[*]' COLUMNS ( value JSON PATH '$' )) AS processing_result
 WHERE
+    JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.ean')) IS NOT NULL
+    AND JSON_UNQUOTE(JSON_EXTRACT(return_item.value, '$.ean')) != 'null'
+    AND JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.ean')) != ''
     marketplace_id = :marketPlaceId
 ON DUPLICATE KEY UPDATE
     marketplace_type = VALUES(marketplace_type),
