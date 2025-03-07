@@ -379,20 +379,15 @@ class BolConnector extends MarketplaceConnectorAbstract
                         }
                     }
                     $order['orderDetail'] = $orderDetail;
-                    try {
-                        $sqlInsertMarketplaceOrder = "
-                                INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
-                                VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
-                        Utility::executeSql($sqlInsertMarketplaceOrder, [
-                            'marketplace_id' => $this->marketplace->getId(),
-                            'order_id' => $order['orderId'],
-                            'json' => json_encode($order)
-                        ]);
-                        echo "Inserting order: " . $order['orderId'] . "\n";
-                    }
-                    catch (\Exception $e) {
-                        echo "Error: " . $e->getMessage() . "\n";
-                    }
+                    $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+                    Utility::executeSql($sqlInsertMarketplaceOrder, [
+                        'marketplace_id' => $this->marketplace->getId(),
+                        'order_id' => $order['orderId'],
+                        'json' => json_encode($order)
+                    ]);
+                    echo "Inserting order: " . $order['orderId'] . "\n";
                     usleep(50000);
                 }
                 $page++;

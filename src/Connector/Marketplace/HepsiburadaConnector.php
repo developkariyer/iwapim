@@ -349,9 +349,17 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         foreach ($orders as &$order) {
             $orderNumber = $order['OrderNumber'];
             $order['detail'] = $this->detailOrder($orderNumber);
+            $sqlInsertMarketplaceOrder = "
+                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
+                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceOrder, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'order_id' => $order['orderNumber'],
+                'json' => json_encode($order)
+            ]);
+            echo "Inserting order: " . $order['orderId'] . "\n";
             sleep(0.2);
         }
-        $this->putToCache('ORDERS.json', $orders);
     }
     
     public function downloadInventory(): void
