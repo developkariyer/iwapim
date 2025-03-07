@@ -345,8 +345,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         $data = $response->toArray();
+        print_r(json_encode($data));
         $orders = $data['items'] ?? [];
-        foreach ($orders as &$order) {
+        /*foreach ($orders as &$order) {
             $orderNumber = $order['OrderNumber'];
             $order['detail'] = $this->detailOrder($orderNumber);
             $sqlInsertMarketplaceOrder = "
@@ -358,7 +359,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'json' => json_encode($order)
             ]);
             sleep(0.2);
-        }
+        }*/
     }
     
     public function downloadInventory(): void
