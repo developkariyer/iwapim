@@ -311,8 +311,9 @@ class WallmartConnector extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
-        $this->putToCache('INVENTORY.json', $allInventories);
+        $this->downloadReturns();
+        //$allInventories = $this->getFromWallmartApi('GET', 'inventories', ['limit' => 50, 'nextCursor' => null], 'elements', 'inventories',null, 'cursor');
+        //$this->putToCache('INVENTORY.json', $allInventories);
     }
 
     /**
