@@ -345,9 +345,13 @@ class WallmartConnector extends MarketplaceConnectorAbstract
                     $parts = explode('/', trim($path, '/'));
                     $variantName = array_pop($parts);
                     $parentName = array_pop($parts);
+                    $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
+                    $productType = strtok($productIdentifier,'-');
                     $orderLine['item']['iwasku'] = $iwasku;
                     $orderLine['item']['variantName'] = $variantName;
                     $orderLine['item']['parentName'] = $parentName;
+                    $orderLine['item']['parent_identifier'] = $productIdentifier;
+                    $orderLine['item']['product_type'] = $productType;
                 }
             }
         }
