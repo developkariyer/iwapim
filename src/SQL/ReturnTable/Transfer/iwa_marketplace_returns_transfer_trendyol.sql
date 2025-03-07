@@ -29,7 +29,7 @@ FROM
     CROSS JOIN JSON_TABLE(return_item.value, '$.claimItems[*]' COLUMNS ( value JSON PATH '$' )) AS status
 WHERE
     marketplace_id = :marketPlaceId
-    ON DUPLICATE KEY UPDATE
+ON DUPLICATE KEY UPDATE
     marketplace_type = VALUES(marketplace_type),
     marketplace_id = VALUES(marketplace_id),
     iwasku = VALUES(iwasku),
