@@ -3,6 +3,7 @@
 namespace App\Connector\Marketplace;
 
 use Doctrine\DBAL\Exception;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Random\RandomException;
@@ -132,15 +133,34 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
             foreach ($return['items'] as &$item) {
                 $barcode = $item['orderLine']['barcode'];
                 echo "Barcode: " . $barcode . "\n";
-
-
-
-
-                $productId = $item['orderLine']['id'];
-                echo  "Product ID: " . $productId . "\n";
-                $sql = "select * from iwa_marketplace_orders_line_items where marketplace_key = :marketplace_key  and product_id = :product_id";
-                $order = Utility::fetchFromSql($sql, ['marketplace_key'=> $this->marketplace->getKey() , 'product_id' => $productId]);
-                $item['order'] = $order;
+                $sql = "
+                        SELECT object_id
+                        FROM iwa_json_store
+                        WHERE field_name = 'apiResponseJson'  AND JSON_UNQUOTE(JSON_EXTRACT(json_data, :jsonPath)) = :uniqueId LIMIT 1;";
+                $jsonPath = '$.barcode';
+                $result = Utility::fetchFromSql($sql, ['jsonPath' => $jsonPath, 'uniqueId' => $barcode]);
+                $objectId = $result[0]['object_id'] ?? null;
+                if (!$objectId) {
+                    continue;
+                }
+                $variantObject = VariantProduct::getById($objectId);
+                $mainProductObjectArray = $variantObject->getMainProduct();
+                $mainProductObject = reset($mainProductObjectArray);
+                if ($mainProductObject instanceof Product) {
+                    $iwasku =  $mainProductObject->getInheritedField('Iwasku');
+                    $path = $mainProductObject->getFullPath();
+                    $parts = explode('/', trim($path, '/'));
+                    $variantName = array_pop($parts);
+                    $parentName = array_pop($parts);
+                    $productIdentifier = $mainProductObject->getInheritedField('ProductIdentifier');
+                    $productType = strtok($productIdentifier,'-');
+                    $item['orderLine']['iwasku'] = $iwasku;
+                    $item['orderLine']['variant_name'] = $variantName;
+                    $item['orderLine']['parent_name'] = $parentName;
+                    $item['orderLine']['parent_identifier'] = $productIdentifier;
+                    $item['orderLine']['product_type'] = $productType;
+                    echo "Iwasku: " . $iwasku . "\n";
+                }
             }
         }
         foreach ($allReturns as $return) {
