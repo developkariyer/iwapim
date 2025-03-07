@@ -180,8 +180,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
-        /*$inventory = $this->getFromCache('INVENTORY.json');
+        $inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -198,7 +197,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             echo "Failed to download inventory\n";
             return;
         }
-        $this->putToCache('INVENTORY.json', $inventories);*/
+        $this->putToCache('INVENTORY.json', $inventories);
     }
 
     /**
@@ -229,8 +228,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             }
             $return['orderDetail'] = $order;
         }
-        $this->putToCache('RETURNS.json', $returns);
-        /*foreach ($returns['orders'] as $return) {
+        foreach ($returns['orders'] as $return) {
             $sqlInsertMarketplaceReturn = "
                             INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
                             VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
@@ -240,7 +238,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 'json' => json_encode($return)
             ]);
             echo "Inserting order: " . $return['id'] . "\n";
-        }*/
+        }
     }
 
     /**
