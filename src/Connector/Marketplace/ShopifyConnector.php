@@ -180,7 +180,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $inventory = $this->getFromCache('INVENTORY.json');
+        $this->downloadReturns();
+        /*$inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -197,7 +198,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             echo "Failed to download inventory\n";
             return;
         }
-        $this->putToCache('INVENTORY.json', $inventories);
+        $this->putToCache('INVENTORY.json', $inventories);*/
     }
 
     /**
