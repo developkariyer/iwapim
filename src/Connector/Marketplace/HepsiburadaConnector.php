@@ -357,7 +357,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'order_id' => $order['OrderNumber'],
                 'json' => json_encode($order)
             ]);
-            echo "Inserting order: " . $order['orderId'] . "\n";
             sleep(0.2);
         }
     }
