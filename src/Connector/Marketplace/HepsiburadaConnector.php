@@ -354,7 +354,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                             VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
             Utility::executeSql($sqlInsertMarketplaceOrder, [
                 'marketplace_id' => $this->marketplace->getId(),
-                'order_id' => $order['orderNumber'],
+                'order_id' => $order['OrderNumber'],
                 'json' => json_encode($order)
             ]);
             echo "Inserting order: " . $order['orderId'] . "\n";
