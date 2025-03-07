@@ -332,22 +332,37 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     public function downloadOrders(): void
     {
-        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
-            'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ],
-            'query' => [
-                'offset' => 0,
-                'limit' => 25
-            ]
-        ]);
-        $data = $response->toArray();
-        print_r(json_encode($data));
-        $orders = $data['items'] ?? [];
-        /*foreach ($orders as &$order) {
+        $orders = [];
+        $offset = 0;
+        $limit = 10;
+        do {
+            $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/delivered", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                    "User-Agent" => "colorfullworlds_dev",
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'query' => [
+                    'offset' => $offset,
+                    'limit' => $limit
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $order = $data['items'] ?? [];
+            $orders = array_merge($orders, $order);
+            $totalItems = $data['totalCount'];
+            echo "Offset: " . $offset . " " . $offset . " ";
+            echo "Total Items: " . $totalItems . "\n";
+            echo "Count: " . count($orders) . "\n";
+            $offset += $limit;
+        } while (count($orders) < $totalItems);
+        foreach ($orders as &$order) {
             $orderNumber = $order['OrderNumber'];
             $order['detail'] = $this->detailOrder($orderNumber);
             $sqlInsertMarketplaceOrder = "
@@ -359,7 +374,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'json' => json_encode($order)
             ]);
             sleep(0.2);
-        }*/
+        }
     }
     
     public function downloadInventory(): void
