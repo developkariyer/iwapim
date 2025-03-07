@@ -22,7 +22,7 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(status.value, '$.customerClaimItemReason.name')) AS customer_comment,
     JSON_UNQUOTE(JSON_EXTRACT(status.value, '$.trendyolClaimItemReason.code')) AS reason_code,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerFirstName')) AS customer_first_name,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerLastName')) AS customer_last_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerLastName')) AS customer_last_name
 FROM
     iwa_marketplace_returns
     CROSS JOIN JSON_TABLE(json, '$.items[*]' COLUMNS ( value JSON PATH '$' )) AS return_item
