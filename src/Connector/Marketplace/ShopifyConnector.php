@@ -215,7 +215,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             'variables' => [
                     'numOrders' => 50,
                     'cursor' => null,
-                    'filter' => "updated_at:>=2025.02.01 return_status:return_requested OR return_status:in_progress OR return_status:inspection_complete OR return_status:returned OR return_status:return_failed"
+                    'filter' => "return_status:return_requested OR return_status:in_progress OR return_status:inspection_complete OR return_status:returned OR return_status:return_failed"
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
@@ -229,8 +229,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             }
             $return['orderDetail'] = $order;
         }
-        $this->putToCache("Returns.json", $returns);
-       /* foreach ($returns['orders'] as $return) {
+       // $this->putToCache("Returns.json", $returns);
+        foreach ($returns['orders'] as $return) {
             $sqlInsertMarketplaceReturn = "
                             INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
                             VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
@@ -240,7 +240,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 'json' => json_encode($return)
             ]);
             echo "Inserting order: " . $return['id'] . "\n";
-        }*/
+        }
     }
 
     /**
