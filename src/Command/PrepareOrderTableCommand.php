@@ -148,7 +148,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     protected function prepareOrderTable($uniqueMarketplaceId, $marketplaceType): void
     {
         $variantObject = match ($marketplaceType) {
-            'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti' => $this->findVariantProduct($uniqueMarketplaceId),
+            'Shopify', 'Etsy', 'Amazon', 'Takealot', 'Ciceksepeti', 'Hepsiburada' => $this->findVariantProduct($uniqueMarketplaceId),
             'Trendyol' => $this->findVariantProduct($uniqueMarketplaceId,'"productCode"'),
             'Bol.com' => $this->findVariantProduct($uniqueMarketplaceId,'"product-ids".bolProductId'),
             'Wallmart' => $this->findVariantProduct($uniqueMarketplaceId,'"sku"'),
