@@ -5,7 +5,7 @@ INSERT INTO iwa_marketplace_returns_line_items (
 SELECT
     :marketplaceType,
     :marketPlaceId,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.marketplace_key')) AS marketplace_key
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.marketplace_key')) AS marketplace_key,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.iwasku')) AS iwasku,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.parent_identifier')) AS parent_identifier,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.product_type')) AS product_type,
