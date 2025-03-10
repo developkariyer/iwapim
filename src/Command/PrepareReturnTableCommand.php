@@ -68,10 +68,11 @@ class PrepareReturnTableCommand extends AbstractCommand
         $marketplaceIds = Utility::fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $fileNames = [
             'Bol.com'  =>  'iwa_marketplace_returns_transfer_bolcom.sql',
-            'Trendyol' => 'iwa_marketplace_returns_transfer_trendyol.sql',
-            'Wallmart' => 'iwa_marketplace_returns_transfer_wallmart.sql',
-            'Takealot' => 'iwa_marketplace_returns_transfer_takealot.sql',
-            'Shopify'  =>  'iwa_marketplace_returns_transfer_shopify.sql'
+            'Trendyol' =>  'iwa_marketplace_returns_transfer_trendyol.sql',
+            'Wallmart' =>  'iwa_marketplace_returns_transfer_wallmart.sql',
+            'Takealot' =>  'iwa_marketplace_returns_transfer_takealot.sql',
+            'Shopify'  =>  'iwa_marketplace_returns_transfer_shopify.sql',
+            'Amazon'   =>  'iwa_marketplace_returns_transfer_amazon.sql'
         ];
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id'];
