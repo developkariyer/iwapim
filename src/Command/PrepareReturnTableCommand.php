@@ -63,7 +63,8 @@ class PrepareReturnTableCommand extends AbstractCommand
         $fileNames = [
             'Bol.com' => 'iwa_marketplace_returns_transfer_bolcom.sql',
             'Trendyol' => 'iwa_marketplace_returns_transfer_trendyol.sql',
-            'Wallmart' => 'iwa_marketplace_returns_transfer_wallmart.sql'
+            'Wallmart' => 'iwa_marketplace_returns_transfer_wallmart.sql',
+            'Takealot' => 'iwa_marketplace_returns_transfer_takealot.sql',
         ];
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id'];
