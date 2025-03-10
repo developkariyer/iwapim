@@ -73,7 +73,8 @@ class PrepareReturnTableCommand extends AbstractCommand
             'Takealot' =>  'iwa_marketplace_returns_transfer_takealot.sql',
             'Shopify'  =>  'iwa_marketplace_returns_transfer_shopify.sql',
             'Amazon'   =>  'iwa_marketplace_returns_transfer_amazon.sql',
-            'Etsy'     =>  'iwa_marketplace_returns_transfer_etsy.sql'
+            'Etsy'     =>  'iwa_marketplace_returns_transfer_etsy.sql',
+            'Wayfair'  =>  'iwa_marketplace_returns_transfer_wayfair.sql'
         ];
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id'];
