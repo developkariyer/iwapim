@@ -1,7 +1,7 @@
 INSERT INTO iwa_marketplace_returns_line_items (
     marketplace_type, marketplace_id, marketplace_key, iwasku, parent_identifier, product_type, variant_name, parent_name, created_at,
     return_id, order_id, variant_id, product_price_USD,	total_price_USD, quantity, variant_title, shipping_country,
-    shipping_country_code, return_status, reason, main_reason, customer_comment
+    shipping_country_code, return_status
 )
 SELECT
     :marketplaceType,
