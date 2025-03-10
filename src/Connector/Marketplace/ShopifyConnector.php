@@ -214,7 +214,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
                     'numOrders' => 50,
-                    'cursor' => null
+                    'cursor' => null,
+                    'filter' => "return_status:return_requested OR return_status:in_progress OR return_status:inspection_complete OR return_status:returned OR return_status:return_failed"
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
