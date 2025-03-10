@@ -60,14 +60,14 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Etsy' and fulfillments_status != 'Completed'";
         $returnOrders = Utility::fetchFromSql($sql, []);
         foreach ($returnOrders as $return) {
-            $sqlInsertMarketplaceReturn = "
+            /*$sqlInsertMarketplaceReturn = "
                             INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
                             VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
             Utility::executeSql($sqlInsertMarketplaceReturn, [
                 'marketplace_id' => $this->marketplace->getId(),
                 'return_id' => $return['order_id'],
                 'json' => json_encode($return)
-            ]);
+            ]);*/
             echo "Inserting order: " . $return['order_id'] . "\n";
         }
     }
