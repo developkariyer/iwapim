@@ -74,7 +74,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
+
     }
 
     protected function getAttributes($listing): string

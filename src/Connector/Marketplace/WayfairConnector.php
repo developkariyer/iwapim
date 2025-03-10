@@ -219,7 +219,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
+
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
