@@ -180,8 +180,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
-        $this->downloadReturns();
-        /*$inventory = $this->getFromCache('INVENTORY.json');
+        $inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
@@ -198,7 +197,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             echo "Failed to download inventory\n";
             return;
         }
-        $this->putToCache('INVENTORY.json', $inventories);*/
+        $this->putToCache('INVENTORY.json', $inventories);
     }
 
     /**
@@ -223,7 +222,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]);
             echo "Inserting order: " . $return['order_id'] . "\n";
         }
-
 
         /*$query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
