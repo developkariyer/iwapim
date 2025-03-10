@@ -31,6 +31,7 @@ class PrepareReturnTableCommand extends AbstractCommand
     {
         $this
             ->addOption('transfer',null, InputOption::VALUE_NONE, 'Transfer iwa_marketplace_returns to iwa_marketplace_returns_line_items')
+            ->addOption('extraColumns',null, InputOption::VALUE_NONE, 'Insert extra columns')
         ;
     }
 
@@ -42,7 +43,7 @@ class PrepareReturnTableCommand extends AbstractCommand
         if($input->getOption('transfer')) {
             $this->transferReturns();
         }
-        if($input->getOption('extra')) {
+        if($input->getOption('extraColumns')) {
             $this->setMarketplaceKey();
         }
         return Command::SUCCESS;
