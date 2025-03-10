@@ -17,4 +17,6 @@ SET is_canceled =
           WHEN marketplace_type = 'Ciceksepeti' AND fulfillments_status_control != 'null' THEN 'cancelled'
           WHEN marketplace_type = 'Takealot' AND fulfillments_status = 'Returned' OR fulfillments_status = 'Cancelled by Customer'  THEN 'cancelled'
           WHEN marketplace_type = 'Takealot' AND fulfillments_status = 'Returned' OR fulfillments_status = 'Cancelled by Customer' THEN 'not_cancelled'
-END;
+          WHEN marketplace_type = 'Wayfair' AND fulfillments_status = 'true' THEN 'cancelled'
+          WHEN marketplace_type = 'Wayfair' AND fulfillments_status = 'false' THEN 'not_cancelled'
+    END;
