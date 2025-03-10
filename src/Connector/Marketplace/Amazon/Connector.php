@@ -141,8 +141,7 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        //$this->ordersHelper->downloadOrders();
-        $this->downloadReturns();
+        $this->ordersHelper->downloadOrders();
     }
 
     public function downloadReturns()
