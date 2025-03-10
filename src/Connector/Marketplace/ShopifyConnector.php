@@ -212,7 +212,17 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
     {
         $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Shopify' and is_canceled = 'cancelled'";
         $returnOrders = Utility::fetchFromSql($sql, []);
-        $this->putToCache("Returns.json", $returnOrders);
+        foreach ($returnOrders as $return) {
+            $sqlInsertMarketplaceReturn = "
+                            INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
+                            VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceReturn, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'return_id' => $return['order_id'],
+                'json' => json_encode($return)
+            ]);
+            echo "Inserting order: " . $return['id'] . "\n";
+        }
 
 
         /*$query = [
