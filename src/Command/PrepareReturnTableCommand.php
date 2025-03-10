@@ -25,6 +25,8 @@ class PrepareReturnTableCommand extends AbstractCommand
     private array $marketplaceListWithIds = [];
 
     private string $transferSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/ReturnTable/Transfer/';
+
+    private string $extraColumnsSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/ReturnTable/ExtraColumns/';
     protected function configure(): void
     {
         $this
@@ -39,6 +41,9 @@ class PrepareReturnTableCommand extends AbstractCommand
     {
         if($input->getOption('transfer')) {
             $this->transferReturns();
+        }
+        if($input->getOption('extra')) {
+            $this->setMarketplaceKey();
         }
         return Command::SUCCESS;
     }
@@ -61,11 +66,11 @@ class PrepareReturnTableCommand extends AbstractCommand
         }
         $marketplaceIds = Utility::fetchFromSqlFile($this->transferSqlfilePath . 'selectMarketplaceIds.sql');
         $fileNames = [
-            'Bol.com' => 'iwa_marketplace_returns_transfer_bolcom.sql',
+            'Bol.com'  =>  'iwa_marketplace_returns_transfer_bolcom.sql',
             'Trendyol' => 'iwa_marketplace_returns_transfer_trendyol.sql',
             'Wallmart' => 'iwa_marketplace_returns_transfer_wallmart.sql',
             'Takealot' => 'iwa_marketplace_returns_transfer_takealot.sql',
-            'Shopify' => 'iwa_marketplace_returns_transfer_shopify.sql'
+            'Shopify'  =>  'iwa_marketplace_returns_transfer_shopify.sql'
         ];
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id'];
@@ -80,6 +85,24 @@ class PrepareReturnTableCommand extends AbstractCommand
                         echo "Executed: $marketplaceType\n";
                 }
                 echo "Completed: $marketplaceType\n";
+            }
+        }
+    }
+
+    public function setMarketplaceKey(): void
+    {
+        $values = Utility::fetchFromSqlFile($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyFetch.sql');
+        foreach ($values as $row) {
+            $id = $row['marketplace_id'];
+            $marketplace = Marketplace::getById($id);
+            if ($marketplace) {
+                $marketplaceKey = $marketplace->getKey();
+                Utility::executeSqlFile($this->extraColumnsSqlfilePath . 'updateMarketPlaceKey.sql', [
+                    'marketplaceKey' => $marketplaceKey,
+                    'marketplaceId' => $id,
+                ]);
+            } else {
+                echo "Marketplace not found for ID: $id\n";
             }
         }
     }

@@ -41,7 +41,7 @@ ON DUPLICATE KEY UPDATE
     return_id = VALUES(return_id),
     order_id = VALUES(order_id),
     variant_id = VALUES(variant_id),
-    variant_title =    VALUES(variant_title),
+    variant_title = VALUES(variant_title),
     return_status = VALUES(return_status),
     reason = VALUES(reason),
     main_reason = VALUES(main_reason),
