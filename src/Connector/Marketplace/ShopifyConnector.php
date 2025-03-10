@@ -219,7 +219,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]
         ];
         $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        /*foreach ($returns['orders'] as &$return) {
+        foreach ($returns['orders'] as &$return) {
             $orderId = basename($return['id']);
             $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id";
             try {
@@ -228,9 +228,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 echo "Error: " . $e->getMessage() . "\n";
             }
             $return['orderDetail'] = $order;
-        }*/
-        $this->putToCache("Returns.json", $returns);
-        /*foreach ($returns['orders'] as $return) {
+        }
+        //$this->putToCache("Returns.json", $returns);
+        foreach ($returns['orders'] as $return) {
             $sqlInsertMarketplaceReturn = "
                             INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
                             VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
@@ -240,7 +240,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 'json' => json_encode($return)
             ]);
             echo "Inserting order: " . $return['id'] . "\n";
-        }*/
+        }
     }
 
     /**
