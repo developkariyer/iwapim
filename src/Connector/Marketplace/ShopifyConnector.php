@@ -210,7 +210,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadReturns()
     {
-        $query = [
+        $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Shopify' and is_canceled = 'cancelled'";
+        $returnOrders = Utility::fetchFromSql($sql, []);
+        $this->putToCache("Returns.json", $returnOrders);
+
+
+        /*$query = [
             'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
             'variables' => [
                     'numOrders' => 50,
@@ -240,7 +245,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 'json' => json_encode($return)
             ]);
             echo "Inserting order: " . $return['id'] . "\n";
-        }
+        }*/
     }
 
     /**
