@@ -221,7 +221,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 'return_id' => $return['order_id'],
                 'json' => json_encode($return)
             ]);
-            echo "Inserting order: " . $return['id'] . "\n";
+            echo "Inserting order: " . $return['order_id'] . "\n";
         }
 
 
