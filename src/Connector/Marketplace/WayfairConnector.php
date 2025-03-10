@@ -148,6 +148,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                         partNumber,
                         quantity,
                         price,
+                        isCancelled,
                         event {
                             startDate,
                             endDate
