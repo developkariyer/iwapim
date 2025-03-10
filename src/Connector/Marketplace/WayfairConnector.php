@@ -197,7 +197,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
     public function downloadReturns()
     {
-        $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Wayfair' and is_canceled != 'cancelled'";
+        $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Wayfair' and is_canceled = 'cancelled'";
         $returnOrders = Utility::fetchFromSql($sql, []);
         foreach ($returnOrders as $return) {
             $sqlInsertMarketplaceReturn = "
