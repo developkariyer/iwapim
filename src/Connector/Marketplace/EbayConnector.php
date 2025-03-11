@@ -19,7 +19,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public static string $marketplaceType = 'Ebay';
 
-    private  static $expiresIn = 0;
+    private static $expiresIn = 0;
 
     /**
      * @throws TransportExceptionInterface
@@ -50,7 +50,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Error: " . $e->getMessage() . "\n";
             echo "Error Code: " . $e->getCode() . "\n";
             echo "Response Error: " . $e->getResponse()->getContent(false) . "\n";
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "Unknown Error: " . $e->getMessage() . "\n";
         }
     }
@@ -77,7 +77,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "Error: " . $e->getMessage() . "\n";
             echo "Error Code: " . $e->getCode() . "\n";
             echo "Response Error: " . $e->getResponse()->getContent(false) . "\n";
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "Unknown Error: " . $e->getMessage() . "\n";
         }
         $responseArray  = $response->toArray();
@@ -136,7 +136,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ]);
             print_r($response->getContent());
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "Error Type: " . $e->getMessage() . "\n";
         }
 
@@ -160,7 +160,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             echo "HTTP Status Code: " . $response->getStatusCode() . "\n";
             print_r(json_decode($response->getContent(false), true));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "HTTP Status Code: " . $e->getStatusCode() . "\n";
             echo "Error Code: " . $e->getErrorCode() . "\n";
             echo "Error Type: " . $e->getMessage() . "\n";
@@ -281,7 +281,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $xmlObject = simplexml_load_string($xmlContent);
             $jsonResponse = json_encode($xmlObject);
             print_r($jsonResponse);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
 
@@ -347,7 +347,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             print_r($response->getContent());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
     }
@@ -524,5 +524,32 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
 
     }
+
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function searchProduct(string $searchText, int $page = 1, int $limit = 10): array
+    {
+        $url = "https://api.ebay.com/buy/browse/v1/item_summary/search";
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'q'     => $searchText,
+                    'limit' => $limit,
+                    'offset'=> ($page - 1) * $limit
+                ]
+            ]);
+            return json_decode($response->getContent(false), true);
+        } catch (ClientExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|TransportExceptionInterface|Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            return [];
+        }
+    }
+
 
 }

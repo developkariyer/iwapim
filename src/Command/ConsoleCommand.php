@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\ShopifyConnector;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
@@ -52,6 +53,17 @@ class ConsoleCommand extends AbstractCommand
             }
         }
         $this->addArgument('runCommand', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function commandSearchEbayProduct(): void
+    {
+        $ebayObject = Marketplace::getByMarketplaceType('Ebay', 1);
+        $ebayConnector = new EbayConnector($ebayObject);
+        $searchResults = $ebayConnector->searchProduct('ATE 13044157182');
+        print_r($searchResults);
     }
 
     protected static function getJwtRemainingTime($jwt): int
