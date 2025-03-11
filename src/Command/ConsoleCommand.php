@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Connector\Marketplace\EbayConnector;
+use App\Connector\Marketplace\EbayConnector2;
 use App\Connector\Marketplace\ShopifyConnector;
 use App\Utils\Utility;
 use Carbon\Carbon;
@@ -60,6 +61,17 @@ class ConsoleCommand extends AbstractCommand
             }
         }
         $this->addArgument('runCommand', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
+    }
+
+
+    public function commandEbayInventoryItems(): void
+    {
+        $ebayConnector = new EbayConnector2(Marketplace::getByMarketplaceType('Ebay', 1));
+        $response = $ebayConnector->getInventoryItems();
+        Utility::setCustomCache('ebay_inventory_items', PIMCORE_PROJECT_ROOT . '/tmp/ebay', json_encode($response, JSON_PRETTY_PRINT));
+        print_r($response);
+        exit;
+
     }
 
     /**
