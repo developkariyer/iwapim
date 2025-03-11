@@ -103,7 +103,7 @@ class ConsoleCommand extends AbstractCommand
                 if (empty($image) && !empty($productInfo['image']['imageUrl'])) {
                     $image = $productInfo['image']['imageUrl'];
                 }
-                if (!empty($productInfo['price']['value'])) {
+                if (!empty($productInfo['price']['value']) && $productInfo['price']['currency'] === 'USD') {
                     $price = (float)$productInfo['price']['value'];
                     if ($minPrice === 0 || $price < $minPrice) {
                         $minPrice = $price;
