@@ -111,6 +111,7 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
      */
     private function getAccessToken(): void
     {
+        echo "API CALL: getAccessToken\n";
         $url = "https://api.ebay.com/identity/v1/oauth2/token";
         $method = 'POST';
         $data = [
@@ -139,6 +140,7 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
      */
     private function getRefreshToken(): void
     {
+        echo "API CALL: getRefreshToken\n";
         $url = "https://api.ebay.com/identity/v1/oauth2/token";
         $method = 'POST';
         $data = [
@@ -162,6 +164,7 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
      */
     public function getInventoryItems(): array
     {
+        echo "API CALL: getInventoryItems\n";
         $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
         $method = 'GET';
         $data = [
