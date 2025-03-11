@@ -67,7 +67,7 @@ class ConsoleCommand extends AbstractCommand
             $this->ebayConnector = new EbayConnector($ebayObject);
             $this->ebayConnector->refreshToAccessToken();
         }
-        return $this->ebayConnector->searchProduct($searchText, 1, 3); //'ATE 13044157182'
+        return $this->ebayConnector->searchProduct($searchText, 1, 10); //'ATE 13044157182'
     }
 
     /**
@@ -79,9 +79,10 @@ class ConsoleCommand extends AbstractCommand
         $db = Db::get();
         $brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 100");
         foreach ($brandCodes as $brandCode) {
+            echo "- $brandCode\n";
             $searchResult = $this->commandSearchEbayProduct($brandCode);
+            $code = trim(substr($brandCode, strpos($brandCode, " ") + 1));
             if (empty($searchResult)) {
-                echo "No product found for $brandCode\n";
                 continue;
             }
             $minPrice = 0;
@@ -89,7 +90,14 @@ class ConsoleCommand extends AbstractCommand
             $title = "";
             $image = "";
             foreach ($searchResult['itemSummaries'] as $productInfo) {
-                if (empty($title) && !empty($productInfo['title'])) {
+                if (!empty($productInfo['title'])) {
+                    $cleanTitle = preg_replace("/[^a-zA-Z0-9]/", "", $productInfo['title']);
+                    if (!str_contains($cleanTitle, $code)) {
+                        continue;
+                    }
+                }
+                echo "  - {$productInfo['title']}\n";
+                if (empty($title)) {
                     $title = $productInfo['title'];
                 }
                 if (empty($image) && !empty($productInfo['image']['imageUrl'])) {
