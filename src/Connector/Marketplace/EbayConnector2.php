@@ -17,8 +17,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class EbayConnector2 extends MarketplaceConnectorAbstract
 {
-    private static string $scopes = "
-        https://api.ebay.com/oauth/api_scope
+    private static string $scopes = "https://api.ebay.com/oauth/api_scope
         https://api.ebay.com/oauth/api_scope/sell.marketing.readonly
         https://api.ebay.com/oauth/api_scope/sell.marketing
         https://api.ebay.com/oauth/api_scope/sell.inventory.readonly
@@ -91,13 +90,17 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
         }
         $data['headers'] = array_merge($data['headers'] ?? [], $this->headers($type));
         try {
+            echo "Calling API with following parameters:\n";
+            echo "Method: $method\n";
+            echo "URL: $url\n";
+            echo "Data: " . json_encode($data, JSON_PRETTY_PRINT) . "\n";
             $response = $this->httpClient->request($method, $url, $data);
             if ($response->getStatusCode() != 200) {
-                throw new Exception('API call failed: ' . $response->getContent());
+                throw new Exception("API call failed with {$response->getStatusCode()}: {$response->getContent()}");
             }
             return $response->toArray();
         } catch (Exception $e) {
-            throw new Exception('API call failed: ' . $e->getMessage());
+            throw new Exception('API call failed with exception: ' . $e->getMessage());
         }
     }
 
@@ -118,7 +121,7 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
             'body' => http_build_query([
                 'grant_type' => 'refresh_token',
                 'refresh_token' => $this->marketplace->getEbayRefreshToken(),
-                'scope' => self::$scopes
+                'scope' => str_replace("\n", " ", self::$scopes)
             ]),
         ];
         try {   
