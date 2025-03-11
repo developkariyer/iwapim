@@ -58,14 +58,58 @@ class ConsoleCommand extends AbstractCommand
     /**
      * @throws \Exception
      */
-    public function commandSearchEbayProduct(): void
+    public function commandSearchEbayProduct(string $searchText = ""): array
     {
         $ebayObject = Marketplace::getByMarketplaceType('Ebay', 1);
         $ebayConnector = new EbayConnector($ebayObject);
         $ebayConnector->refreshToAccessToken();
         $ebayConnector->downloadInventory();
-        $searchResults = $ebayConnector->searchProduct('ATE 13044157182');
-        print_r($searchResults);
+        return $ebayConnector->searchProduct($searchText, 1, 3); //'ATE 13044157182'
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function commandGetPrices(): void
+    {
+        $db = Db::get();
+        $brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 100");
+        foreach ($brandCodes as $brandCode) {
+            $searchResult = $this->commandSearchEbayProduct($brandCode);
+            if (empty($searchResult)) {
+                echo "No product found for $brandCode\n";
+                continue;
+            }
+            $minPrice = 0;
+            $maxPrice = 0;
+            $title = "";
+            $image = "";
+            foreach ($searchResult['itemSummaries'] as $productInfo) {
+                if (empty($title) && !empty($productInfo['title'])) {
+                    $title = $productInfo['title'];
+                }
+                if (empty($image) && !empty($productInfo['image']['imageUrl'])) {
+                    $image = $productInfo['image']['imageUrl'];
+                }
+                if (!empty($productInfo['price']['value'])) {
+                    $price = (float)$productInfo['price']['value'];
+                    if ($minPrice === 0 || $price < $minPrice) {
+                        $minPrice = $price;
+                    }
+                    if ($price > $maxPrice) {
+                        $maxPrice = $price;
+                    }
+                }
+            }
+            $db->executeQuery("UPDATE iwa_autoparts_parts SET min_price = :minPrice, max_price = :maxPrice, title = :title, image = :image WHERE brand_code = :brandCode", [
+                'minPrice' => $minPrice,
+                'maxPrice' => $maxPrice,
+                'title' => $title,
+                'image' => $image,
+                'brandCode' => $brandCode
+            ]);
+        }
     }
 
     protected static function getJwtRemainingTime($jwt): int
