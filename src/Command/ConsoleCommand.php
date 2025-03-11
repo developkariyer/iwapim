@@ -67,7 +67,7 @@ class ConsoleCommand extends AbstractCommand
             $this->ebayConnector = new EbayConnector($ebayObject);
             $this->ebayConnector->refreshToAccessToken();
         }
-        return $this->ebayConnector->searchProduct($searchText, 1, 10); //'ATE 13044157182'
+        return $this->ebayConnector->searchProduct($searchText, 1, 20); //'ATE 13044157182'
     }
 
     /**
