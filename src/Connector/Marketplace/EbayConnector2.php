@@ -105,7 +105,7 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
                 'offset' => 0
             ]
         ];
-        $response = $this->apiCall($method, $url, $data);
+        $response = $this->apiCall($method, $url);
         return $response ?? [];
     }
 
