@@ -17,6 +17,7 @@ class GoogleSheetsController extends FrontendController
 {
     static string $iwaskuSql = "SELECT DISTINCT iwasku FROM iwa_amazon_daily_sales_summary ORDER BY iwasku";
     static string $asin2iwaskuSql = "SELECT DISTINCT regkey AS asin, regvalue AS iwasku FROM iwa_registry WHERE regtype='asin-to-iwasku' ORDER BY asin";
+    static string $ebayCarParts = "SELECT iap.brand_code, COALESCE(iap.title, '') as title, COALESCE(iap.min_price, 0) AS min_price, COALESCE(iap.max_price, 0) AS max_price, MIN(iai.price) AS input_min_price, MAX(iai.price) AS input_max_price, COALESCE(SUM(iai.stock), 0) AS total_stock FROM iwa_autoparts_parts iap LEFT JOIN iwa_autoparts_inventory iai ON iap.brand_code = iai.brand_code AND iai.price > 0 GROUP BY iap.brand_code, iap.title, iap.min_price, iap.max_price;";
     static string $asinPreSql =    "SELECT 
                                         iwasku,
                                         MAX(CASE WHEN sales_channel = 'Amazon.com' THEN asin END) AS us_asin,
@@ -414,6 +415,17 @@ class GoogleSheetsController extends FrontendController
         }
 
         return new JsonResponse($variantProducts, 200);
+    }
+
+    /**
+     * @Route("/sheets/ebaycarparts", name="sheets_ebaycarparts")
+     * @throws Exception
+     */
+    public function ebayCarPartsAction(): JsonResponse
+    {
+        $db = Db::get();
+        $carPartsData = $db->fetchAllAssociative(self::$ebayCarParts);
+        return $this->json($carPartsData);
     }
 
 }

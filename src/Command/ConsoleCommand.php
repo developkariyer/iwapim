@@ -37,12 +37,16 @@ use Throwable;
 class ConsoleCommand extends AbstractCommand
 {
     private ?EbayConnector $ebayConnector;
+    private int $ebayBrowseApiCounter;
     private NotificationService $notificationService;
+
+
 
     function __construct(NotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
         $this->ebayConnector = null;
+        $this->ebayBrowseApiCounter = 0;
         parent::__construct(self::$defaultName);
     }
 
@@ -70,7 +74,17 @@ class ConsoleCommand extends AbstractCommand
         }
         $result = json_decode(Utility::getCustomCache(urlencode($searchText), PIMCORE_PROJECT_ROOT . '/tmp/ebay'), true);
         if (empty($result)) {
-            $result = $this->ebayConnector->searchProduct($searchText, 1, 20);
+            if ($this->ebayBrowseApiCounter>5000) {
+                return [];
+            }
+            try {
+                $result = $this->ebayConnector->searchProduct($searchText, 1, 20);
+            } catch (Throwable $e) {
+                $this->ebayConnector->refreshToAccessToken();
+                sleep(10);
+                return [];
+            }
+            $this->ebayBrowseApiCounter++;
             Utility::setCustomCache(urlencode($searchText), PIMCORE_PROJECT_ROOT . '/tmp/ebay', json_encode($result, JSON_PRETTY_PRINT));
         }
         return $result;
