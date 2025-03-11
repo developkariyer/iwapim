@@ -55,16 +55,19 @@ class ConsoleCommand extends AbstractCommand
         $this->addArgument('runCommand', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
     }
 
+    public EbayConnector $ebayConnector;
+
     /**
      * @throws \Exception
      */
     public function commandSearchEbayProduct(string $searchText = ""): array
     {
-        $ebayObject = Marketplace::getByMarketplaceType('Ebay', 1);
-        $ebayConnector = new EbayConnector($ebayObject);
-        $ebayConnector->refreshToAccessToken();
-        $ebayConnector->downloadInventory();
-        return $ebayConnector->searchProduct($searchText, 1, 3); //'ATE 13044157182'
+        if (!$this->ebayConnector) {
+            $ebayObject = Marketplace::getByMarketplaceType('Ebay', 1);
+            $this->ebayConnector = new EbayConnector($ebayObject);
+            $this->ebayConnector->refreshToAccessToken();
+        }
+        return $this->ebayConnector->searchProduct($searchText, 1, 3); //'ATE 13044157182'
     }
 
     /**
