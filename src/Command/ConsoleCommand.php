@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\ShopifyConnector;
+use App\Utils\Utility;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
 use JsonException;
@@ -67,7 +68,12 @@ class ConsoleCommand extends AbstractCommand
             $this->ebayConnector = new EbayConnector($ebayObject);
             $this->ebayConnector->refreshToAccessToken();
         }
-        return $this->ebayConnector->searchProduct($searchText, 1, 20); //'ATE 13044157182'
+        $result = json_decode(Utility::getCustomCache(urlencode($searchText), PIMCORE_PROJECT_ROOT . '/tmp/ebay'), true);
+        if (empty($result)) {
+            $result = $this->ebayConnector->searchProduct($searchText, 1, 20);
+            Utility::setCustomCache(urlencode($searchText), PIMCORE_PROJECT_ROOT . '/tmp/ebay', json_encode($result, JSON_PRETTY_PRINT));
+        }
+        return $result;
     }
 
     /**
@@ -77,7 +83,8 @@ class ConsoleCommand extends AbstractCommand
     public function commandGetPrices(): void
     {
         $db = Db::get();
-        $brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 100000");
+        //$brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 100000");
+        $brandCodes = $db->fetchFirstColumn("SELECT iap.brand_code, min_price, max_price, min(iai.price) AS input_min_price, max(iai.price) AS input_max_price FROM iwa_autoparts_parts iap JOIN iwa_autoparts_inventory iai ON iap.brand_code = iai.brand_code AND iai.price > 0 WHERE ((not iap.min_price > 0) AND (not iap.max_price > 0)) OR (min_price IS NULL AND max_price IS NULL) GROUP BY iap.brand_code, min_price, max_price HAVING MIN(iai.price) > 500 ORDER BY `input_min_price` DESC");
         foreach ($brandCodes as $brandCode) {
             echo "- $brandCode\n";
             $searchResult = $this->commandSearchEbayProduct($brandCode);
@@ -114,8 +121,10 @@ class ConsoleCommand extends AbstractCommand
                 }
             }
             if (empty($minPrice) || empty($title)) {
-                //continue;
+                echo "  * EMPTY\n";
+                continue;
             }
+            echo "  * $minPrice $maxPrice\n";
             $db->executeQuery("UPDATE iwa_autoparts_parts SET min_price = :minPrice, max_price = :maxPrice, title = :title, image = :image WHERE brand_code = :brandCode", [
                 'minPrice' => $minPrice,
                 'maxPrice' => $maxPrice,
