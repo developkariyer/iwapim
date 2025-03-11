@@ -114,7 +114,7 @@ class ConsoleCommand extends AbstractCommand
                 }
             }
             if (empty($minPrice) || empty($title)) {
-                continue;
+                //continue;
             }
             $db->executeQuery("UPDATE iwa_autoparts_parts SET min_price = :minPrice, max_price = :maxPrice, title = :title, image = :image WHERE brand_code = :brandCode", [
                 'minPrice' => $minPrice,
