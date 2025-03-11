@@ -62,6 +62,7 @@ class ConsoleCommand extends AbstractCommand
     {
         $ebayObject = Marketplace::getByMarketplaceType('Ebay', 1);
         $ebayConnector = new EbayConnector($ebayObject);
+        $ebayConnector->downloadInventory();
         $searchResults = $ebayConnector->searchProduct('ATE 13044157182');
         print_r($searchResults);
     }
