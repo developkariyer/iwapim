@@ -89,7 +89,7 @@ class ConsoleCommand extends AbstractCommand
             $maxPrice = 0;
             $title = "";
             $image = "";
-            foreach ($searchResult['itemSummaries'] as $productInfo) {
+            foreach ($searchResult['itemSummaries'] ?? [] as $productInfo) {
                 if (!empty($productInfo['title'])) {
                     $cleanTitle = preg_replace("/[^a-zA-Z0-9]/", "", $productInfo['title']);
                     if (!str_contains($cleanTitle, $code)) {
