@@ -77,7 +77,7 @@ class ConsoleCommand extends AbstractCommand
     public function commandGetPrices(): void
     {
         $db = Db::get();
-        $brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 1000");
+        $brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 100000");
         foreach ($brandCodes as $brandCode) {
             echo "- $brandCode\n";
             $searchResult = $this->commandSearchEbayProduct($brandCode);
