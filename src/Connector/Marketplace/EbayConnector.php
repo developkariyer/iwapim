@@ -93,7 +93,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function listingDetail($itemId)
+    public function listingDetail($itemId): void
     {
         $url = "https://api.ebay.com/ws/api.dll";
         $accessToken = $this->marketplace->getEbayAccessToken();

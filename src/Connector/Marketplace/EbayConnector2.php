@@ -6,11 +6,39 @@
 
 namespace App\Connector\Marketplace;
 
+use Exception;
+use InvalidArgumentException;
 use Pimcore\Model\DataObject\VariantProduct;
-use App\Utils\Utility;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class EbayConnector2 extends MarketplaceConnectorAbstract
 {
+    private static string $scopes = "
+        https://api.ebay.com/oauth/api_scope
+        https://api.ebay.com/oauth/api_scope/sell.marketing.readonly
+        https://api.ebay.com/oauth/api_scope/sell.marketing
+        https://api.ebay.com/oauth/api_scope/sell.inventory.readonly
+        https://api.ebay.com/oauth/api_scope/sell.inventory
+        https://api.ebay.com/oauth/api_scope/sell.account.readonly
+        https://api.ebay.com/oauth/api_scope/sell.account
+        https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly
+        https://api.ebay.com/oauth/api_scope/sell.fulfillment
+        https://api.ebay.com/oauth/api_scope/sell.analytics.readonly
+        https://api.ebay.com/oauth/api_scope/sell.finances
+        https://api.ebay.com/oauth/api_scope/sell.payment.dispute
+        https://api.ebay.com/oauth/api_scope/commerce.identity.readonly
+        https://api.ebay.com/oauth/api_scope/sell.reputation 
+        https://api.ebay.com/oauth/api_scope/sell.reputation.readonly 
+        https://api.ebay.com/oauth/api_scope/commerce.notification.subscription 
+        https://api.ebay.com/oauth/api_scope/commerce.notification.subscription.readonly 
+        https://api.ebay.com/oauth/api_scope/sell.stores 
+        https://api.ebay.com/oauth/api_scope/sell.stores.readonly 
+        https://api.ebay.com/oauth/scope/sell.edelivery";
+
 
     private string $accessToken = '';
     private int $accessTokenExpiresAt = 0;
@@ -18,7 +46,16 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
     public static string $marketplaceType = 'Ebay';
 
 
-    private function headers($type = 'API_CALL'): array
+    /**
+     * @param string $type
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    private function headers(string $type = 'API_CALL'): array
     {
         if ($type === 'API_CALL' && (!$this->accessToken || $this->accessTokenExpiresAt < time())) {
             $this->getAccessToken();
@@ -36,65 +73,93 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
         };
     }
 
-    private function apiCall(string $method, string $url, array $body = [], string $type = 'API_CALL')
+    /**
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws Exception
+     */
+    private function apiCall(string $method, string $url, array $data = [], string $type = 'API_CALL'): array
     {
         if (!in_array($type, ['REFRESH_TOKEN', 'ACCESS_TOKEN', 'API_CALL'])) {
-            throw new \InvalidArgumentException('Invalid type');
+            throw new InvalidArgumentException('Invalid type');
         }
         if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
-            throw new \InvalidArgumentException('Invalid method');
+            throw new InvalidArgumentException('Invalid method');
         }
+        $data['headers'] = array_merge($data['headers'] ?? [], $this->headers($type));
         try {
-            $response = $this->httpClient->request(
-                $method,
-                $url,
-                [
-                    'body' => $body,
-                    'headers' => $this->headers($type),
-                ]
-            );
+            $response = $this->httpClient->request($method, $url, $data);
             if ($response->getStatusCode() != 200) {
-                throw new \Exception('API call failed: ' . $response->getContent());
+                throw new Exception('API call failed: ' . $response->getContent());
             }
             return $response->toArray();
-        } catch (\Exception $e) {
-            throw new \Exception('API call failed: ' . $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception('API call failed: ' . $e->getMessage());
         }
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws Exception
+     */
     private function getAccessToken(): void
     {
         $url = "https://api.ebay.com/identity/v1/oauth2/token";
         $method = 'POST';
-        $body = [
-            'grant_type' => 'refresh_token',
-            'refresh_token' => $this->marketplace->getEbayRefreshToken(),
-            'scope' => "https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing.readonly https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory.readonly https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account.readonly https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly https://api.ebay.com/oauth/api_scope/sell.fulfillment https://api.ebay.com/oauth/api_scope/sell.analytics.readonly https://api.ebay.com/oauth/api_scope/sell.finances https://api.ebay.com/oauth/api_scope/sell.payment.dispute https://api.ebay.com/oauth/api_scope/commerce.identity.readonly https://api.ebay.com/oauth/api_scope/sell.reputation https://api.ebay.com/oauth/api_scope/sell.reputation.readonly https://api.ebay.com/oauth/api_scope/commerce.notification.subscription https://api.ebay.com/oauth/api_scope/commerce.notification.subscription.readonly https://api.ebay.com/oauth/api_scope/sell.stores https://api.ebay.com/oauth/api_scope/sell.stores.readonly https://api.ebay.com/oauth/scope/sell.edelivery"
+        $data = [
+            'body' => http_build_query([
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $this->marketplace->getEbayRefreshToken(),
+                'scope' => self::$scopes
+            ]),
         ];
         try {   
-            $response =$this->apiCall($method, $url, $body, 'ACCESS_TOKEN');
-        } catch (\Exception $e) {
+            $response =$this->apiCall($method, $url, $data, 'ACCESS_TOKEN');
+        } catch (Exception) {
             $this->getRefreshToken();
-            throw new \Exception('New refresh token is requested. Save it and re-run the script.');
+            throw new Exception('New refresh token is requested. Save it and re-run the script.');
         }
         $this->accessToken = $response['access_token'] ?? '';
         $this->accessTokenExpiresAt = time() + $response['expires_in'] ?? 0;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     private function getRefreshToken(): void
     {
         $url = "https://api.ebay.com/identity/v1/oauth2/token";
         $method = 'POST';
-        $body = [
-            'grant_type' => 'authorization_code',
-            'code' => urldecode($this->marketplace->getEbayAuthCode()),
-            'redirect_uri' => $this->marketplace->getEbayRuName(),
+        $data = [
+            'body' => http_build_query([
+                'grant_type' => 'authorization_code',
+                'code' => urldecode($this->marketplace->getEbayAuthCode()),
+                'redirect_uri' => $this->marketplace->getEbayRuName(),
+            ]),
         ];
-        $response =$this->apiCall($method, $url, $body, 'REFRESH_TOKEN');
+        $response =$this->apiCall($method, $url, $data, 'REFRESH_TOKEN');
         echo "Refresh token: " . $response['refresh_token'] . "\n";
         // TODO: save refresh token
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function getInventoryItems(): array
     {
         $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
@@ -105,8 +170,7 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
                 'offset' => 0
             ]
         ];
-        $response = $this->apiCall($method, $url);
-        return $response ?? [];
+        return $this->apiCall($method, $url, $data);
     }
 
     public function download(bool $forceDownload = false): void
@@ -133,6 +197,13 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
     {
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function searchProduct(string $searchText, int $page = 1, int $limit = 10): array
     {
         $method = 'GET';
