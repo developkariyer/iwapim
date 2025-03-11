@@ -123,7 +123,8 @@ class EbayConnector2 extends MarketplaceConnectorAbstract
         ];
         try {   
             $response =$this->apiCall($method, $url, $data, 'ACCESS_TOKEN');
-        } catch (Exception) {
+        } catch (Exception $e) {
+            echo "API CALL: getAccessToken failed: ". $e->getMessage() . "\n";
             $this->getRefreshToken();
             throw new Exception('New refresh token is requested. Save it and re-run the script.');
         }
