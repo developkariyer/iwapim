@@ -35,11 +35,13 @@ use Throwable;
 )]
 class ConsoleCommand extends AbstractCommand
 {
+    private ?EbayConnector $ebayConnector;
     private NotificationService $notificationService;
 
     function __construct(NotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
+        $this->ebayConnector = null;
         parent::__construct(self::$defaultName);
     }
 
@@ -54,8 +56,6 @@ class ConsoleCommand extends AbstractCommand
         }
         $this->addArgument('runCommand', InputArgument::OPTIONAL, "If provied, command to execute. Here is a list of allowed commands: $methodNames");
     }
-
-    public EbayConnector $ebayConnector;
 
     /**
      * @throws \Exception
