@@ -217,7 +217,8 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             'X-EBAY-API-CALL-NAME' => 'GetSellerList',
             'X-EBAY-API-SITEID' => 0,
         ];
-        $data['body'] = $xml->asXML();
+        $data['body'] = trim($xml->asXML());
+        echo $data['body'] . "\n";
         return $this->apiCall($method, $url, $data, self::XML_CALL);
     }
 
