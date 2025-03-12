@@ -230,7 +230,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $granularity = $dom->createElement('GranularityLevel', 'Fine');
         $root->appendChild($granularity);
         $pagination = $dom->createElement('Pagination');
-        $entriesPerPage = $dom->createElement('EntriesPerPage', '250');
+        $entriesPerPage = $dom->createElement('EntriesPerPage', '200');
         $pageNumber = $dom->createElement('PageNumber', '1');
         $pagination->appendChild($entriesPerPage);
         $pagination->appendChild($pageNumber);
