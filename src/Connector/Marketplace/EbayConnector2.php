@@ -70,7 +70,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
                 'Content-Type' => 'application/json',
             ],
             self::XML_CALL => [
-                'Content-Type: text/xml',
+                'Content-Type' => 'text/xml; charset=utf-8',
             ],
             self::REFRESH_TOKEN, self::ACCESS_TOKEN => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -245,9 +245,9 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             </GetSellerListRequest>';
 
         $data['headers'] = [
-            'X-EBAY-API-COMPATIBILITY-LEVEL: 1349',
-            'X-EBAY-API-CALL-NAME: GetSellerList',
-            'X-EBAY-API-SITEID: 0',
+            'X-EBAY-API-COMPATIBILITY-LEVEL' => '1349',
+            'X-EBAY-API-CALL-NAME' => 'GetSellerList',
+            'X-EBAY-API-SITEID' => '0',
         ];
         $data['body'] = $xmlBody;
         echo $data['body'] . "\n";
