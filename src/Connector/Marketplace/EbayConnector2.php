@@ -81,6 +81,16 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
     }
 
     /**
+     * @throws Exception
+     */
+    private static function xmlToArray(string $xml): array
+    {
+        $xmlObject = new SimpleXMLElement($xml, LIBXML_NOCDATA);
+        $json = json_encode($xmlObject);
+        return json_decode($json, true);
+    }
+
+    /**
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
@@ -98,16 +108,12 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         }
         $data['headers'] = array_merge($data['headers'] ?? [], $this->headers($type));
         try {
-            echo "Calling API with following parameters:\n";
-            echo "Method: $method\n";
-            echo "URL: $url\n";
-            echo "Data:\n" . print_r($data, true) . "\n";
             $response = $this->httpClient->request($method, $url, $data);
             if ($response->getStatusCode() != 200) {
-//                throw new Exception("API call failed with {$response->getStatusCode()}: {$response->getContent(false)}");
                 echo "API call failed with {$response->getStatusCode()}\n";
+                throw new Exception("API call failed with {$response->getStatusCode()}: {$response->getContent(false)}");
             }
-            return $response->toArray();
+            return ($type === self::XML_CALL) ? static::xmlToArray($response->getContent(false)) : $response->toArray();
         } catch (Exception $e) {
             if (isset($response)) {
                 echo "Response Status Code: " . $response->getStatusCode() . "\n";
@@ -232,41 +238,12 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $dom->appendChild($root);
         $xmlBody = $dom->saveXML();
 
-        $xmlBody = '<?xml version="1.0" encoding="UTF-8"?>
-            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-                <RequesterCredentials>
-                    <eBayAuthToken>'.$this->getAccessToken().'</eBayAuthToken>
-                </RequesterCredentials>
-                <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom>
-            <StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
-                <IncludeVariations>true</IncludeVariations>
-                <IncludeWatchCount>true</IncludeWatchCount>
-                <GranularityLevel>Coarse</GranularityLevel>
-                <DetailLevel>ReturnAll</DetailLevel>
-                <WarningLevel>High</WarningLevel>
-                <Pagination>
-                    <EntriesPerPage>200</EntriesPerPage>
-                    <PageNumber>1</PageNumber>
-                </Pagination>
-            </GetSellerListRequest>';
-
         $data['headers'] = [
             'X-EBAY-API-COMPATIBILITY-LEVEL' => '1349',
             'X-EBAY-API-CALL-NAME' => 'GetSellerList',
             'X-EBAY-API-SITEID' => '0',
         ];
         $data['body'] = $xmlBody;
-        echo $data['body'] . "\n";
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($xmlBody);
-        if ($xml === false) {
-            echo "Invalid XML Detected:\n";
-            foreach (libxml_get_errors() as $error) {
-                echo $error->message . "\n";
-            }
-            libxml_clear_errors();
-            exit;
-        }
         return $this->apiCall($method, $url, $data, self::XML_CALL);
     }
 
