@@ -63,12 +63,9 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
      */
     private function headers(string $type = self::API_CALL): array
     {
-        if ($type === self::API_CALL && (!$this->accessToken || $this->accessTokenExpiresAt < time())) {
-            $this->getAccessToken();
-        }
         return match ($type) {
             self::API_CALL => [
-                'Authorization' => "Bearer {$this->accessToken}",
+                'Authorization' => 'Bearer '.$this->getAccessToken(),
                 'Content-Type' => 'application/json',
             ],
             self::XML_CALL => [
@@ -122,8 +119,11 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    private function getAccessToken(): void
+    private function getAccessToken(): string
     {
+        if ($this->accessToken && $this->accessTokenExpiresAt > time()) {
+            return $this->accessToken;
+        }
         echo "API CALL: getAccessToken\n";
         $url = "https://api.ebay.com/identity/v1/oauth2/token";
         $method = 'POST';
@@ -143,6 +143,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         }
         $this->accessToken = $response['access_token'] ?? '';
         $this->accessTokenExpiresAt = time() + $response['expires_in'] ?? 0;
+        return $this->accessToken;
     }
 
     /**
@@ -203,7 +204,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $url = "https://api.ebay.com/ws/api.dll";
         $method = 'GET';
         $xml = new SimpleXMLElement('<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents"/>');
-        $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', $this->accessToken);
+        $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', $this->getAccessToken());
         $xml->addChild('GranularityLevel', 'Fine');
         //$xml->addChild('IncludeVariations', 'true');
 
