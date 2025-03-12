@@ -6,6 +6,7 @@
 
 namespace App\Connector\Marketplace;
 
+use DOMDocument;
 use Exception;
 use InvalidArgumentException;
 use Pimcore\Model\DataObject\VariantProduct;
@@ -197,27 +198,51 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws \DOMException
      */
     public function getSellerList(): array
     {
         echo "API CALL: getSellerList\n";
         $url = "https://api.ebay.com/ws/api.dll";
         $method = 'POST';
-        $xml = new SimpleXMLElement('<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents"/>');
-        $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', htmlspecialchars($this->getAccessToken()));
-        $xml->addChild('GranularityLevel', 'Fine');
-        //$xml->addChild('IncludeVariations', 'true');
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
 
-        $pagination = $xml->addChild('Pagination');
-        $pagination->addChild('EntriesPerPage', '50');
-        $pagination->addChild('PageNumber', '1');
+        // Root element
+        $root = $dom->createElement('GetSellerListRequest');
+        $root->setAttribute('xmlns', 'urn:ebay:apis:eBLBaseComponents');
+
+        // RequesterCredentials
+        $requesterCredentials = $dom->createElement('RequesterCredentials');
+        $authToken = $dom->createElement('eBayAuthToken', $this->getAccessToken());
+        $requesterCredentials->appendChild($authToken);
+        $root->appendChild($requesterCredentials);
+
+        // GranularityLevel
+        $granularity = $dom->createElement('GranularityLevel', 'Fine');
+        $root->appendChild($granularity);
+
+        // Pagination
+        $pagination = $dom->createElement('Pagination');
+        $entriesPerPage = $dom->createElement('EntriesPerPage', '50');
+        $pageNumber = $dom->createElement('PageNumber', '1');
+        $pagination->appendChild($entriesPerPage);
+        $pagination->appendChild($pageNumber);
+        $root->appendChild($pagination);
+
+        // Append root to document
+        $dom->appendChild($root);
+
+        // Get XML string
+        $xmlBody = $dom->saveXML();
 
         $data['headers'] = [
             'X-EBAY-API-COMPATIBILITY-LEVEL' => 1349,
             'X-EBAY-API-CALL-NAME' => 'GetSellerList',
             'X-EBAY-API-SITEID' => 0,
         ];
-        $data['body'] = trim($xml->asXML());
+        $data['body'] = $xmlBody;
         echo $data['body'] . "\n";
         return $this->apiCall($method, $url, $data, self::XML_CALL);
     }
