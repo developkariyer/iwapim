@@ -231,17 +231,23 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
                 <RequesterCredentials>
                     <eBayAuthToken>'.$this->getAccessToken().'</eBayAuthToken>
                 </RequesterCredentials>
-                <GranularityLevel>Fine</GranularityLevel>
+                <StartTimeFrom>2024-11-01T00:00:00.000Z</StartTimeFrom>
+            <StartTimeTo>2025-02-24T23:59:59.000Z</StartTimeTo>
+                <IncludeVariations>true</IncludeVariations>
+                <IncludeWatchCount>true</IncludeWatchCount>
+                <GranularityLevel>Coarse</GranularityLevel>
+                <DetailLevel>ReturnAll</DetailLevel>
+                <WarningLevel>High</WarningLevel>
                 <Pagination>
-                    <EntriesPerPage>50</EntriesPerPage>
+                    <EntriesPerPage>200</EntriesPerPage>
                     <PageNumber>1</PageNumber>
                 </Pagination>
             </GetSellerListRequest>';
 
         $data['headers'] = [
-            'X-EBAY-API-COMPATIBILITY-LEVEL' => 1349,
-            'X-EBAY-API-CALL-NAME' => 'GetSellerList',
-            'X-EBAY-API-SITEID' => 0,
+            'X-EBAY-API-COMPATIBILITY-LEVEL: 1349',
+            'X-EBAY-API-CALL-NAME: GetSellerList',
+            'X-EBAY-API-SITEID: 0',
         ];
         $data['body'] = $xmlBody;
         echo $data['body'] . "\n";
