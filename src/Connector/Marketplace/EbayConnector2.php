@@ -103,7 +103,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             echo "Data: " . json_encode($data, JSON_PRETTY_PRINT) . "\n";
             $response = $this->httpClient->request($method, $url, $data);
             if ($response->getStatusCode() != 200) {
-                throw new Exception("API call failed with {$response->getStatusCode()}: {$response->getContent()}");
+                throw new Exception("API call failed with {$response->getStatusCode()}: {$response->getContent(false)}");
             }
             return $response->toArray();
         } catch (Exception $e) {
