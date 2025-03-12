@@ -235,6 +235,10 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $pagination->appendChild($entriesPerPage);
         $pagination->appendChild($pageNumber);
         $root->appendChild($pagination);
+        $now = gmdate('Y-m-d\TH:i:s\Z'); // Current time in UTC
+        $endTime = gmdate('Y-m-d\TH:i:s\Z', strtotime('+119 days'));
+        $root->appendChild($dom->createElement('EndTimeFrom', $now));
+        $root->appendChild($dom->createElement('EndTimeTo', $endTime));
         $dom->appendChild($root);
         $xmlBody = $dom->saveXML();
 
