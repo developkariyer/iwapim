@@ -108,6 +108,11 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             }
             return $response->toArray();
         } catch (Exception $e) {
+            if (isset($response)) {
+                echo "Response Status Code: " . $response->getStatusCode() . "\n";
+                echo "Response Headers:\n" . print_r($response->getHeaders(false), true) . "\n";
+                echo "Raw Response Body:\n" . $response->getContent(false) . "\n";
+            }
             throw new Exception('API call failed with exception: ' . $e->getMessage());
         }
     }
