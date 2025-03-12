@@ -251,6 +251,16 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         ];
         $data['body'] = $xmlBody;
         echo $data['body'] . "\n";
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($xmlBody);
+        if ($xml === false) {
+            echo "Invalid XML Detected:\n";
+            foreach (libxml_get_errors() as $error) {
+                echo $error->message . "\n";
+            }
+            libxml_clear_errors();
+            exit;
+        }
         return $this->apiCall($method, $url, $data, self::XML_CALL);
     }
 
