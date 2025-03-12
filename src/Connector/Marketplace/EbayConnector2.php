@@ -204,7 +204,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $url = "https://api.ebay.com/ws/api.dll";
         $method = 'POST';
         $xml = new SimpleXMLElement('<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents"/>');
-        $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', $this->getAccessToken());
+        $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', htmlspecialchars($this->getAccessToken()));
         $xml->addChild('GranularityLevel', 'Fine');
         //$xml->addChild('IncludeVariations', 'true');
 
