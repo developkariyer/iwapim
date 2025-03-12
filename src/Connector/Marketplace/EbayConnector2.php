@@ -212,7 +212,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $pagination->addChild('EntriesPerPage', '50');
         $pagination->addChild('PageNumber', '1');
 
-        $data['header'] = [
+        $data['headers'] = [
             'X-EBAY-API-COMPATIBILITY-LEVEL' => '1349',
             'X-EBAY-API-CALL-NAME' => 'GetSellerList',
             'X-EBAY-API-SITEID' => '0',
