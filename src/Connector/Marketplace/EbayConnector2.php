@@ -70,7 +70,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
                 'Content-Type' => 'application/json',
             ],
             self::XML_CALL => [
-                'Content-Type' => 'text/xml; charset=utf-8',
+                'Content-Type: text/xml',
             ],
             self::REFRESH_TOKEN, self::ACCESS_TOKEN => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -205,38 +205,38 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         echo "API CALL: getSellerList\n";
         $url = "https://api.ebay.com/ws/api.dll";
         $method = 'POST';
+
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = false;
-
-        // Root element
         $root = $dom->createElement('GetSellerListRequest');
         $root->setAttribute('xmlns', 'urn:ebay:apis:eBLBaseComponents');
-
-        // RequesterCredentials
         $requesterCredentials = $dom->createElement('RequesterCredentials');
         $authToken = $dom->createElement('eBayAuthToken', $this->getAccessToken());
         $requesterCredentials->appendChild($authToken);
         $root->appendChild($requesterCredentials);
-
-        // GranularityLevel
         $granularity = $dom->createElement('GranularityLevel', 'Fine');
         $root->appendChild($granularity);
-
-        // Pagination
         $pagination = $dom->createElement('Pagination');
         $entriesPerPage = $dom->createElement('EntriesPerPage', '50');
         $pageNumber = $dom->createElement('PageNumber', '1');
         $pagination->appendChild($entriesPerPage);
         $pagination->appendChild($pageNumber);
         $root->appendChild($pagination);
-
-        // Append root to document
         $dom->appendChild($root);
-
-        // Get XML string
         $xmlBody = $dom->saveXML();
-        $xmlBody = preg_replace('/\s+/', ' ', $xmlBody);
+
+        $xmlBody = '<?xml version="1.0" encoding="UTF-8"?>
+            <GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+                <RequesterCredentials>
+                    <eBayAuthToken>'.$this->getAccessToken().'</eBayAuthToken>
+                </RequesterCredentials>
+                <GranularityLevel>Fine</GranularityLevel>
+                <Pagination>
+                    <EntriesPerPage>50</EntriesPerPage>
+                    <PageNumber>1</PageNumber>
+                </Pagination>
+            </GetSellerListRequest>';
 
         $data['headers'] = [
             'X-EBAY-API-COMPATIBILITY-LEVEL' => 1349,
