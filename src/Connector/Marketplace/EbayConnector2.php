@@ -202,7 +202,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
     {
         echo "API CALL: getSellerList\n";
         $url = "https://api.ebay.com/ws/api.dll";
-        $method = 'GET';
+        $method = 'POST';
         $xml = new SimpleXMLElement('<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents"/>');
         $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', $this->getAccessToken());
         $xml->addChild('GranularityLevel', 'Fine');
