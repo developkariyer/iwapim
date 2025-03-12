@@ -151,7 +151,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             $response =$this->apiCall($method, $url, $data, self::ACCESS_TOKEN);
         } catch (Exception $e) {
             echo "API CALL: getAccessToken failed: ". $e->getMessage() . "\n";
-            //$this->getRefreshToken();
+            $this->getRefreshToken();
             throw new Exception('New refresh token is requested. Save it and re-run the script.');
         }
         $this->accessToken = $response['access_token'] ?? '';

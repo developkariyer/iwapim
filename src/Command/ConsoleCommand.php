@@ -25,6 +25,7 @@ use Pimcore\Model\DataObject\VariantProduct;
 use Pimcore\Model\DataObject\GroupProduct;
 use App\Connector\Marketplace\Amazon\Connector as AmazonConnector;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -64,6 +65,15 @@ class ConsoleCommand extends AbstractCommand
     }
 
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws RandomException
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws \Exception
+     */
     public function commandEbayInventoryItems(): void
     {
         $ebayConnector = new EbayConnector2(Marketplace::getByMarketplaceType('Ebay', 1));
@@ -74,6 +84,15 @@ class ConsoleCommand extends AbstractCommand
 
     }
 
+    /**
+     * @throws RandomException
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws \DOMException
+     */
     public function commandEbaySellerList(): void
     {
         $ebayConnector = new EbayConnector2(Marketplace::getByMarketplaceType('Ebay', 1));
@@ -121,6 +140,9 @@ class ConsoleCommand extends AbstractCommand
         //$brandCodes = $db->fetchFirstColumn("SELECT brand_code FROM iwa_autoparts_parts WHERE min_price IS NULL AND max_price IS NULL ORDER BY brand_code LIMIT 100000");
         $brandCodes = $db->fetchFirstColumn("SELECT iap.brand_code, min_price, max_price, min(iai.price) AS input_min_price, max(iai.price) AS input_max_price FROM iwa_autoparts_parts iap JOIN iwa_autoparts_inventory iai ON iap.brand_code = iai.brand_code AND iai.price > 0 WHERE ((not iap.min_price > 0) AND (not iap.max_price > 0)) OR (min_price IS NULL AND max_price IS NULL) GROUP BY iap.brand_code, min_price, max_price HAVING MIN(iai.price) > 500 ORDER BY `input_min_price` DESC");
         foreach ($brandCodes as $brandCode) {
+            if (empty($brandCode)) {
+                continue;
+            }
             echo "- $brandCode\n";
             $searchResult = $this->commandSearchEbayProduct($brandCode);
             $code = trim(substr($brandCode, strpos($brandCode, " ") + 1));
