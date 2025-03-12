@@ -92,7 +92,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
      */
     private function apiCall(string $method, string $url, array $data = [], string $type = self::API_CALL): array
     {
-        if (!in_array($type, [self::REFRESH_TOKEN, self::ACCESS_TOKEN, self::API_CALL])) {
+        if (!in_array($type, [self::REFRESH_TOKEN, self::ACCESS_TOKEN, self::API_CALL, self::XML_CALL])) {
             throw new InvalidArgumentException('Invalid type');
         }
         if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
