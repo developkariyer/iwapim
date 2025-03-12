@@ -230,7 +230,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $granularity = $dom->createElement('GranularityLevel', 'Fine');
         $root->appendChild($granularity);
         $pagination = $dom->createElement('Pagination');
-        $entriesPerPage = $dom->createElement('EntriesPerPage', '50');
+        $entriesPerPage = $dom->createElement('EntriesPerPage', '250');
         $pageNumber = $dom->createElement('PageNumber', '1');
         $pagination->appendChild($entriesPerPage);
         $pagination->appendChild($pageNumber);
@@ -239,6 +239,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
         $endTime = gmdate('Y-m-d\TH:i:s\Z', strtotime('+119 days'));
         $root->appendChild($dom->createElement('EndTimeFrom', $now));
         $root->appendChild($dom->createElement('EndTimeTo', $endTime));
+        $root->appendChild($dom->createElement('IncludeVariations', 'true'));
         $dom->appendChild($root);
         $xmlBody = $dom->saveXML();
 
