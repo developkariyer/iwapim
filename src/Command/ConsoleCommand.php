@@ -74,6 +74,15 @@ class ConsoleCommand extends AbstractCommand
 
     }
 
+    public function commandEbaySellerList(): void
+    {
+        $ebayConnector = new EbayConnector2(Marketplace::getByMarketplaceType('Ebay', 1));
+        $response = $ebayConnector->getSellerList();
+        Utility::setCustomCache('ebay_seller_list', PIMCORE_PROJECT_ROOT . '/tmp/ebay', json_encode($response, JSON_PRETTY_PRINT));
+        print_r($response);
+        exit;
+    }
+
     /**
      * @throws \Exception
      */

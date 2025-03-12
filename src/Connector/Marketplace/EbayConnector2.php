@@ -9,6 +9,7 @@ namespace App\Connector\Marketplace;
 use Exception;
 use InvalidArgumentException;
 use Pimcore\Model\DataObject\VariantProduct;
+use SimpleXMLElement;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -39,6 +40,12 @@ https://api.ebay.com/oauth/api_scope/sell.stores.readonly
 https://api.ebay.com/oauth/scope/sell.edelivery";
 
 
+    const string API_CALL = 'API_CALL';
+    const string XML_CALL = 'XML_CALL';
+    const string REFRESH_TOKEN = 'REFRESH_TOKEN';
+    const string ACCESS_TOKEN = 'ACCESS_TOKEN';
+
+
     private string $accessToken = '';
     private int $accessTokenExpiresAt = 0;
 
@@ -54,17 +61,20 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    private function headers(string $type = 'API_CALL'): array
+    private function headers(string $type = self::API_CALL): array
     {
-        if ($type === 'API_CALL' && (!$this->accessToken || $this->accessTokenExpiresAt < time())) {
+        if ($type === self::API_CALL && (!$this->accessToken || $this->accessTokenExpiresAt < time())) {
             $this->getAccessToken();
         }
         return match ($type) {
-            'API_CALL' => [
-                'Authorization' => 'Bearer ' . $this->accessToken,
+            self::API_CALL => [
+                'Authorization' => "Bearer {$this->accessToken}",
                 'Content-Type' => 'application/json',
             ],
-            'REFRESH_TOKEN', 'ACCESS_TOKEN' => [
+            self::XML_CALL => [
+                "Content-Type" => "text/xml",
+            ],
+            self::REFRESH_TOKEN, self::ACCESS_TOKEN => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getEbayClientId()}:{$this->marketplace->getEbayClientSecret()}"),
             ],
@@ -80,9 +90,9 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
      * @throws ServerExceptionInterface
      * @throws Exception
      */
-    private function apiCall(string $method, string $url, array $data = [], string $type = 'API_CALL'): array
+    private function apiCall(string $method, string $url, array $data = [], string $type = self::API_CALL): array
     {
-        if (!in_array($type, ['REFRESH_TOKEN', 'ACCESS_TOKEN', 'API_CALL'])) {
+        if (!in_array($type, [self::REFRESH_TOKEN, self::ACCESS_TOKEN, self::API_CALL])) {
             throw new InvalidArgumentException('Invalid type');
         }
         if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
@@ -125,7 +135,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             ]),
         ];
         try {   
-            $response =$this->apiCall($method, $url, $data, 'ACCESS_TOKEN');
+            $response =$this->apiCall($method, $url, $data, self::ACCESS_TOKEN);
         } catch (Exception $e) {
             echo "API CALL: getAccessToken failed: ". $e->getMessage() . "\n";
             //$this->getRefreshToken();
@@ -154,7 +164,7 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
                 'redirect_uri' => $this->marketplace->getEbayRuName(),
             ]),
         ];
-        $response =$this->apiCall($method, $url, $data, 'REFRESH_TOKEN');
+        $response =$this->apiCall($method, $url, $data, self::REFRESH_TOKEN);
         echo "Refresh token: " . $response['refresh_token'] . "\n";
         // TODO: save refresh token
     }
@@ -178,6 +188,36 @@ https://api.ebay.com/oauth/scope/sell.edelivery";
             ]
         ];
         return $this->apiCall($method, $url, $data);
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function getSellerList(): array
+    {
+        echo "API CALL: getSellerList\n";
+        $url = "https://api.ebay.com/ws/api.dll";
+        $method = 'GET';
+        $xml = new SimpleXMLElement('<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents"/>');
+        $xml->addChild('RequesterCredentials')->addChild('eBayAuthToken', $this->accessToken);
+        $xml->addChild('GranularityLevel', 'Fine');
+        //$xml->addChild('IncludeVariations', 'true');
+
+        $pagination = $xml->addChild('Pagination');
+        $pagination->addChild('EntriesPerPage', '50');
+        $pagination->addChild('PageNumber', '1');
+
+        $data['header'] = [
+            'X-EBAY-API-COMPATIBILITY-LEVEL' => '1349',
+            'X-EBAY-API-CALL-NAME' => 'GetSellerList',
+            'X-EBAY-API-SITEID' => '0',
+        ];
+        $data['body'] = $xml->asXML();
+        return $this->apiCall($method, $url, $data, self::XML_CALL);
     }
 
     public function download(bool $forceDownload = false): void
