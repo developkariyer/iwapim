@@ -178,7 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
-        $this->getDefaultCategoryTreeId();
+        $this->fetchItemAspects();
 
         // control expiresIn
        /* $this->refreshToAccessToken();
@@ -339,7 +339,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function fetchItemAspects()
     {
-        $url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/0/fetch_item_aspects";
+        $url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/100/fetch_item_aspects";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -353,7 +353,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $gzipContent = $response->getContent();
             $jsonContent = gzdecode($gzipContent);
             $dataArray = json_decode($jsonContent, true);
-            $this->putToCache("CATEGORIES", $dataArray);
+            $this->putToCache("MOTORS_CATEGORIES", $dataArray);
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
