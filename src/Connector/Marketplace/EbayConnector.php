@@ -361,7 +361,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getFulFillmentsPolicy()
     {
-        $url = "https://api.ebay.com/sell/account/v1/fulfillment_policy";
+        $url = "https://api.ebay.com/sell/account/v1/return_policy";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
