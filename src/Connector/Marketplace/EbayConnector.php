@@ -177,8 +177,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
-        $this->refreshToAccessToken();
-        $this->getDefaultCategoryTreeId();
+
+        $this->fetchItemAspects();
 
         // control expiresIn
        /* $this->refreshToAccessToken();
@@ -335,6 +335,25 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $jsonResponse = json_encode($xmlObject);
         print_r($jsonResponse);
 
+    }
+
+    public function fetchItemAspects()
+    {
+        $url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/0/fetch_item_aspects";
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'marketplace_id' => 'EBAY_US'
+                ]
+            ]);
+            print_r($response->getContent());
+        } catch (Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
     }
 
     public function getDefaultCategoryTreeId()
