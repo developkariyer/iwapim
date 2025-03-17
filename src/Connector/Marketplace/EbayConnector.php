@@ -178,7 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
-        $this->fetchItemAspects();
+        $this->getDefaultCategoryTreeId();
 
         // control expiresIn
        /* $this->refreshToAccessToken();
@@ -363,6 +363,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
     {
         //eBay UK (ebay.co.uk)	EBAY_GB
         //eBay US (ebay.com)	EBAY_US
+        //eBay Motors US (ebay.com/motors)	EBAY_MOTORS_US
         $url = "https://api.ebay.com/commerce/taxonomy/v1/get_default_category_tree_id";
         try {
             $response = $this->httpClient->request('GET', $url, [
@@ -371,7 +372,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'marketplace_id' => 'EBAY_US'
+                    'marketplace_id' => 'EBAY_MOTORS_US'
                 ]
             ]);
             print_r($response->getContent());
