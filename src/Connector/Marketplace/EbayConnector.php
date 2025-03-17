@@ -352,7 +352,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
             ]);
             $gzipContent = $response->getContent();
             $jsonContent = gzdecode($gzipContent);
-            $this->putToCache("CATEGORIES", $jsonContent);
+            $dataArray = json_decode($jsonContent, true);
+            $this->putToCache("CATEGORIES", $dataArray);
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
