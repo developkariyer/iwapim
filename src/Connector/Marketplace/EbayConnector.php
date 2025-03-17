@@ -178,7 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
-        $this->fetchItemAspects();
+        $this->getFulFillmentsPolicy();
 
         // control expiresIn
        /* $this->refreshToAccessToken();
@@ -357,6 +357,29 @@ class EbayConnector extends MarketplaceConnectorAbstract
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
+    }
+
+    public function getFulFillmentsPolicy()
+    {
+        $url = "https://api.ebay.com/sell/account/v1/fulfillment_policy";
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'marketplace_id' => 'EBAY_US'
+                ]
+            ]);
+            $gzipContent = $response->getContent();
+            $jsonContent = gzdecode($gzipContent);
+            $dataArray = json_decode($jsonContent, true);
+            $this->putToCache("MOTORS_CATEGORIES", $dataArray);
+        } catch (Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
+
     }
 
     public function getDefaultCategoryTreeId()
