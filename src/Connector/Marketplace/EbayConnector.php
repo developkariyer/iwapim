@@ -350,7 +350,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'marketplace_id' => 'EBAY_US'
                 ]
             ]);
-            print_r($response->getContent());
+            $gzipContent = $response->getContent();
+            $jsonContent = gzdecode($gzipContent);
+            $this->putToCache("CATEGORIES", $jsonContent);
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
