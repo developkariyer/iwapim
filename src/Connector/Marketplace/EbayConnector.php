@@ -178,6 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
+        $this->refreshToAccessToken();
         $this->getFulFillmentsPolicy();
 
         // control expiresIn
