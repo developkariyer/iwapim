@@ -369,7 +369,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'marketplace_id' => 'EBAY_US'
+                    'marketplace_id' => 'EBAY_MOTORS_US'
                 ]
             ]);
             print_r($response->getContent());
