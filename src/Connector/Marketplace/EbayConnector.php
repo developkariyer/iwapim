@@ -177,6 +177,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
+        $this->refreshToAccessToken();
+        $this->getDefaultCategoryTreeId();
 
         // control expiresIn
        /* $this->refreshToAccessToken();
@@ -287,7 +289,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     }
 
-
     public function getMyeBaySelling()
     {
         $url = "https://api.ebay.com/ws/api.dll";
@@ -335,6 +336,28 @@ class EbayConnector extends MarketplaceConnectorAbstract
         print_r($jsonResponse);
 
     }
+
+    public function getDefaultCategoryTreeId()
+    {
+        //eBay UK (ebay.co.uk)	EBAY_GB
+        //eBay US (ebay.com)	EBAY_US
+        $url = "https://api.ebay.com/commerce/taxonomy/v1/get_default_category_tree_id";
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
+                    'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'marketplace_id' => 'EBAY_US'
+                ]
+            ]);
+            print_r($response->getContent());
+        } catch (Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
+    }
+
     public function downloadInventory(): void
     {
         //$this->refreshToAccessToken();
