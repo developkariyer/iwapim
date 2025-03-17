@@ -361,18 +361,22 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getFulFillmentsPolicy()
     {
-        $url = "https://api.ebay.com/sell/account/v1/fulfillment_policy?marketplace_id=100";
+        $url = "https://api.ebay.com/sell/account/v1/fulfillment_policy";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                     'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'marketplace_id' => 'FulfillmentPolicy'
                 ]
             ]);
             print_r($response->getContent());
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
+
     }
 
     public function getDefaultCategoryTreeId()
