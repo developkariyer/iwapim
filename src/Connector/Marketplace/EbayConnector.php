@@ -371,7 +371,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Language' => 'en-US'
                 ],
                 'query' => [
-                    'marketplace_id' => 'EBAY_MOTORS_US'
+                    'marketplace_id' => 'EBAY_US'
                 ]
             ]);
             print_r($response->getContent());
