@@ -178,6 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
+        $this->refreshToAccessToken();
         $this->getFulFillmentsPolicy();
 
         // control expiresIn
@@ -361,12 +362,13 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getFulFillmentsPolicy()
     {
-        $url = "https://api.ebay.com/sell/account/v1/return_policy";
+        $url = "https://api.ebay.com/sell/account/v1/fulfillment_policy";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                     'Content-Type'  => 'application/json',
+                    'Content-Language' => 'en-US'
                 ],
                 'query' => [
                     'marketplace_id' => 'EBAY_MOTORS_US'
