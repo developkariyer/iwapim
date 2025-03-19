@@ -137,10 +137,11 @@ class CacheImagesCommand extends AbstractCommand
         $listingImageList = [];
         foreach ($json['attributes']['images'] ?? [] as $image) {
             $image = preg_replace('#(?<=https://)//#', '/', $image);
-            $listingImageList[] = static::processImage($image, static::$hepsiburadaFolder,"Hepsiburada_" . basename($image));
+            echo $image . "\n";
+            // $listingImageList[] = static::processImage($image, static::$hepsiburadaFolder,"Hepsiburada_" . basename($image));
         }
-        $listingImageList = array_unique($listingImageList);
-        $variant->fixImageCache($listingImageList);
+      //  $listingImageList = array_unique($listingImageList);
+      //  $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()} ";
     }
 
