@@ -23,7 +23,7 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].cancellationReason')) AS fulfillments_status_control,
     SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', LENGTH(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name'))) -
     LENGTH(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', ''))) AS customer_first_name,
-    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', -1) AS customer_last_name
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', -1) AS customer_last_name,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerEmailId')) AS customer_email
 FROM
     iwa_marketplace_orders
