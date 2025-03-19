@@ -143,4 +143,8 @@ class Connector extends MarketplaceConnectorAbstract
         // Implement setPrice() method.
     }
 
+    public function downloadReturns(): void
+    {
+        // TODO: Implement downloadReturns() method.
+    }
 }
