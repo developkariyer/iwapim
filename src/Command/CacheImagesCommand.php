@@ -139,6 +139,7 @@ class CacheImagesCommand extends AbstractCommand
             $image = str_replace('//', '/', $image);
             $image = str_replace(' ', '%20', $image);
             $listingImageList[] = static::processImage($image, static::$hepsiburadaFolder,"Hepsiburada_" . basename($image));
+            echo "{$variant->getId()} ";
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
