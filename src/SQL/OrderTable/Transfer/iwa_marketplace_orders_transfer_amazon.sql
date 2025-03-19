@@ -1,6 +1,6 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title,
-    total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company)
+    total_discount, shipping_city, shipping_country_code, province_code, total_price, fulfillments_status,tracking_company, customer_email)
 SELECT
     :marketplaceType,
     :marketPlaceId,
@@ -24,7 +24,8 @@ SELECT
     ) AS province_code,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderTotal.Amount')) AS total_price,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.OrderStatus')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.FulfillmentChannel')) AS tracking_company
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.FulfillmentChannel')) AS tracking_company,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.BuyerInfo.BuyerEmail')) AS customer_email
 FROM
     iwa_marketplace_orders
     CROSS JOIN JSON_TABLE(json, '$.OrderItems[*]' COLUMNS (value JSON PATH '$')) AS line_item
@@ -50,4 +51,5 @@ ON DUPLICATE KEY UPDATE
      total_price = VALUES(total_price),
      fulfillments_status = VALUES(fulfillments_status),
      province_code = VALUES(province_code),
-     tracking_company = VALUES(tracking_company);
+     tracking_company = VALUES(tracking_company),
+     customer_email = VALUES(customer_email);

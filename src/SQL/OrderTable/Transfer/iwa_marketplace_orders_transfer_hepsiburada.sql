@@ -1,6 +1,6 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
-    shipping_city, shipping_country_code, total_price, fulfillments_status, tracking_company
+    shipping_city, shipping_country_code, total_price, fulfillments_status, tracking_company, customer_first_name, customer_last_name, customer_email
 )
 SELECT
     :marketplaceType,
@@ -19,7 +19,11 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.shippingAddress.countryCode')) AS shipping_country_code,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.totalPrice')) AS total_price,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.status')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.cargoCompanyModel.name')) AS tracking_company
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.cargoCompanyModel.name')) AS tracking_company,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.detail.customer.name')), ' ', LENGTH(JSON_UNQUOTE(JSON_EXTRACT(json, '$.detail.customer.name'))) -
+                                                                     LENGTH(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.detail.customer.name')), ' ', ''))) AS customer_first_name,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.detail.customer.name')), ' ', -1) AS customer_last_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.detail.invoice.address.email')) AS customer_email
 FROM
     iwa_marketplace_orders
     CROSS JOIN JSON_TABLE(json, '$.detail.items[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -41,4 +45,7 @@ ON DUPLICATE KEY UPDATE
     shipping_country_code = VALUES(shipping_country_code),
     total_price = VALUES(total_price),
     fulfillments_status = VALUES(fulfillments_status),
-    tracking_company = VALUES(tracking_company)
+    tracking_company = VALUES(tracking_company),
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name),
+    customer_email = VALUES(customer_email);

@@ -1,6 +1,7 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity,
-    variant_title,  shipping_city, shipping_country_code, fulfillments_status, fulfillments_status_control
+    variant_title,  shipping_city, shipping_country_code, fulfillments_status, fulfillments_status_control, customer_first_name,
+    customer_last_name, customer_email
 )
 SELECT
     :marketplaceType,
@@ -17,7 +18,10 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.city')) AS shipping_city,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.countryCode')) AS shipping_country_code,
     COALESCE(JSON_UNQUOTE(JSON_EXTRACT(order_item.value, '$.fulfilmentStatus')), NULL) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.cancellationRequest')) AS fulfillments_status_control
+    JSON_UNQUOTE(JSON_EXTRACT(order_item_detail.value, '$.cancellationRequest')) AS fulfillments_status_control,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.firstName')) AS customer_first_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.surname')) AS customer_last_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderDetail.shipmentDetails.email')) AS customer_email
 FROM
     iwa_marketplace_orders
     CROSS JOIN JSON_TABLE(json, '$.orderItems[*]' COLUMNS ( value JSON PATH '$' )) AS order_item
@@ -41,4 +45,7 @@ ON DUPLICATE KEY UPDATE
     shipping_city = VALUES(shipping_city),
     shipping_country_code = VALUES(shipping_country_code),
     fulfillments_status = VALUES(fulfillments_status),
-    fulfillments_status_control = VALUES(fulfillments_status_control);
+    fulfillments_status_control = VALUES(fulfillments_status_control),
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name),
+    customer_email = VALUES(customer_email);

@@ -1,6 +1,7 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title,
-    shipping_province, shipping_city, shipping_country_code, fulfillments_status, tracking_company, fulfillments_status_control
+    shipping_province, shipping_city, shipping_country_code, fulfillments_status, tracking_company, fulfillments_status_control, customer_first_name,
+    customer_last_name, customer_email
 )
 SELECT
     :marketplaceType,
@@ -19,7 +20,11 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.country')) AS shipping_country_code,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].status')) AS fulfillments_status,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].trackingInfo.carrierName.carrier')) AS tracking_company,
-    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].cancellationReason')) AS fulfillments_status_control
+    JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.orderLineStatuses.orderLineStatus[0].cancellationReason')) AS fulfillments_status_control,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', LENGTH(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name'))) -
+    LENGTH(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', ''))) AS customer_first_name,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.postalAddress.name')), ' ', -1) AS customer_last_name
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerEmailId')) AS customer_email
 FROM
     iwa_marketplace_orders
         CROSS JOIN JSON_TABLE(json, '$.orderLines.orderLine[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
@@ -44,4 +49,7 @@ ON DUPLICATE KEY UPDATE
     shipping_country_code = VALUES(shipping_country_code),
     fulfillments_status = VALUES(fulfillments_status),
     tracking_company = VALUES(tracking_company),
-    fulfillments_status_control = VALUES(fulfillments_status_control);
+    fulfillments_status_control = VALUES(fulfillments_status_control),
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name),
+    customer_email = VALUES(customer_email);

@@ -1,6 +1,7 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, order_id, product_id, variant_id, price,
-    currency, quantity, variant_title, fulfillments_status, tracking_company
+    currency, quantity, variant_title, fulfillments_status, tracking_company, customer_first_name,
+    customer_last_name
 )
 SELECT
     :marketplaceType,
@@ -14,7 +15,10 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.quantity')) AS quantity,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.product_title')) AS variant_title,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.sale_status')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.dc')) AS tracking_company
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.dc')) AS tracking_company,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customer')), ' ', LENGTH(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customer'))) -
+                                                                     LENGTH(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customer')), ' ', ''))) AS customer_first_name,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customer')), ' ', -1) AS customer_last_name
 FROM
     iwa_marketplace_orders
 WHERE
@@ -34,4 +38,6 @@ ON DUPLICATE KEY UPDATE
     quantity = VALUES(quantity),
     variant_title = VALUES(variant_title),
     fulfillments_status = VALUES(fulfillments_status),
-    tracking_company = VALUES(tracking_company);
+    tracking_company = VALUES(tracking_company)
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name);

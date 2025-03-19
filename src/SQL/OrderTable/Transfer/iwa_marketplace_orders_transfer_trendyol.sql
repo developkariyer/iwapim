@@ -1,6 +1,7 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
-    shipping_city, shipping_company, shipping_country_code,total_price, subtotal_price, fulfillments_status, tracking_company)
+    shipping_city, shipping_company, shipping_country_code,total_price, subtotal_price, fulfillments_status, tracking_company, customer_first_name,
+    customer_last_name, customer_email)
 SELECT
     :marketplaceType,
     :marketPlaceId,
@@ -20,7 +21,10 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS subtotal_price,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.status')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoProviderName')) AS tracking_company,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerFirstName')) AS customer_first_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerLastName')) AS customer_last_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerEmail')) AS customer_email
 FROM
     iwa_marketplace_orders
     CROSS JOIN JSON_TABLE(json, '$.lines[*]' COLUMNS (
@@ -50,4 +54,7 @@ ON DUPLICATE KEY UPDATE
     total_price = VALUES(total_price),
     subtotal_price = VALUES(subtotal_price),
     fulfillments_status = VALUES(fulfillments_status),
-    tracking_company = VALUES(tracking_company);
+    tracking_company = VALUES(tracking_company),
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name),
+    customer_email = VALUES(customer_email);

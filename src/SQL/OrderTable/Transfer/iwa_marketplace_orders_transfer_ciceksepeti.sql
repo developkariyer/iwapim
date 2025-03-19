@@ -1,6 +1,7 @@
 INSERT INTO iwa_marketplace_orders_line_items (
     marketplace_type, marketplace_id, created_at, closed_at, order_id, product_id, variant_id, price, currency, quantity, variant_title, total_discount,
-    shipping_city, shipping_country_code, shipping_company, total_price, fulfillments_status, tracking_company, fulfillments_status_control
+    shipping_city, shipping_country_code, shipping_company, total_price, fulfillments_status, tracking_company, fulfillments_status_control, customer_first_name,
+    customer_last_name, customer_email
 )
 SELECT
     :marketplaceType,
@@ -22,7 +23,11 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.totalPrice')) AS total_price,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.orderProductStatus')) AS fulfillments_status,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.cargoCompany')) AS tracking_company,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancellationResult')) AS fulfillments_status_control
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancellationResult')) AS fulfillments_status_control,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.receiverName')), ' ', LENGTH(JSON_UNQUOTE(JSON_EXTRACT(json, '$.receiverName'))) -
+    LENGTH(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.receiverName')), ' ', ''))) AS customer_first_name,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.receiverName')), ' ', -1) AS customer_last_name,
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.invoiceEmail')) AS customer_email
 FROM
     iwa_marketplace_orders
 WHERE
@@ -49,4 +54,7 @@ ON DUPLICATE KEY UPDATE
     subtotal_price = VALUES(subtotal_price),
     fulfillments_status = VALUES(fulfillments_status),
     tracking_company = VALUES(tracking_company),
-    fulfillments_status_control = VALUES(fulfillments_status_control)
+    fulfillments_status_control = VALUES(fulfillments_status_control),
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name),
+    customer_email = VALUES(customer_email);
