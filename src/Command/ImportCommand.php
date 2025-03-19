@@ -76,6 +76,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('import', null, InputOption::VALUE_NONE, 'Imports downloaded listing data to create missing objects in the specified marketplace.')
             ->addOption('update', null, InputOption::VALUE_NONE, 'Updates existing objects with the downloaded data in the specified marketplace.')
             ->addOption('orders', null, InputOption::VALUE_NONE, 'Downloads orders from the specified marketplace.')
+            ->addOption('returns', null, InputOption::VALUE_NONE, 'Downloads returns from the specified marketplace.')
             ->addOption('inventory', null, InputOption::VALUE_NONE, 'Downloads inventory data from the specified marketplace.')
             ->addOption('attributes', null, InputOption::VALUE_NONE, 'Download marketplace information required for making listings.')
         ;
