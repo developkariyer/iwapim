@@ -38,6 +38,6 @@ ON DUPLICATE KEY UPDATE
     quantity = VALUES(quantity),
     variant_title = VALUES(variant_title),
     fulfillments_status = VALUES(fulfillments_status),
-    tracking_company = VALUES(tracking_company)
+    tracking_company = VALUES(tracking_company),
     customer_first_name = VALUES(customer_first_name),
     customer_last_name = VALUES(customer_last_name);
