@@ -31,6 +31,7 @@ class CacheImagesCommand extends AbstractCommand
     static ?Folder $shopifyFolder;
     static ?Folder $trendyolFolder;
     static ?Folder $bolcomFolder;
+    static ?Folder $hepsiburadaFolder;
 
     protected function configure(): void
     {
@@ -40,6 +41,7 @@ class CacheImagesCommand extends AbstractCommand
             ->addOption('shopify', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
             ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
             ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be processed.')
+            ->addOption('hepsiburada', null, InputOption::VALUE_NONE, 'If set, Hepsiburada objects will be processed.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
@@ -54,6 +56,7 @@ class CacheImagesCommand extends AbstractCommand
         static::$shopifyFolder = Utility::checkSetAssetPath('Shopify', static::$cacheFolder);
         static::$trendyolFolder = Utility::checkSetAssetPath('Trendyol', static::$cacheFolder);
         static::$bolcomFolder = Utility::checkSetAssetPath('Bol.com', static::$cacheFolder);
+        static::$hepsiburadaFolder = Utility::checkSetAssetPath('Hepsiburada', static::$cacheFolder);
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
@@ -78,7 +81,7 @@ class CacheImagesCommand extends AbstractCommand
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
                     continue;
                 }
-                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com'])) {
+                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada'])) {
                     echo " $variantType ";
                 } else {
                     continue;
@@ -98,6 +101,9 @@ class CacheImagesCommand extends AbstractCommand
                         break;
                     case 'Bol.com':
                         if ($input->getOption('bolcom') || $input->getOption('all')) self::processBolCom($variant);
+                        break;
+                    case 'Hepsiburada':
+                        if ($input->getOption('hepsiburada') || $input->getOption('all')) self::processHepsiburada($variant);
                         break;
                     default:
                         break;
@@ -119,6 +125,18 @@ class CacheImagesCommand extends AbstractCommand
         $listingImageList = [];
         foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
+        }
+        $listingImageList = array_unique($listingImageList);
+        $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
+    }
+
+    protected static function processHepsiburada(VariantProduct $variant): void
+    {
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $listingImageList = [];
+        foreach ($json['attributes']['images'] ?? [] as $image) {
+            $listingImageList[] = static::processImage($image, static::$trendyolFolder, "Hepsiburada_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image.".jpg");
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
