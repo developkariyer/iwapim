@@ -153,11 +153,12 @@ class CacheImagesCommand extends AbstractCommand
     protected static function processShopify($variant): void
     {
         $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
-        $imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
+        //$imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
+        $imageArray = $parentJson['media']['nodes'] ?? [];
         $listingImageList = [];
         $variantImage = null;
         foreach ($imageArray as $image) {
-            $id = $image["id"] ?? '';
+            $id = basename($image["id"]) ?? '';
             $src = $image['src'] ??'';
             $variant_ids = $parentJson['variant_ids'] ?? [];
             if (empty($id) || empty($src)) {
