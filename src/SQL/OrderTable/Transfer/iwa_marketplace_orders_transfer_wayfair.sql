@@ -14,10 +14,13 @@ SELECT
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerCity')) as shipping_city,
     JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerState')) AS shipping_province,
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.isCancelled')) AS fulfillments_status,
-    JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.carrierCode')) AS tracking_company
+    JSON_UNQUOTE(JSON_EXTRACT(json, '$.shippingInfo.carrierCode')) AS tracking_company,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerName')), ' ', LENGTH(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerName'))) -
+    LENGTH(REPLACE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerName')), ' ', ''))) AS customer_first_name,
+    SUBSTRING_INDEX(JSON_UNQUOTE(JSON_EXTRACT(json, '$.customerName')), ' ', -1) AS customer_last_name
 FROM
     iwa_marketplace_orders
-        CROSS JOIN JSON_TABLE(json, '$.products[*]' COLUMNS (value JSON PATH '$')) AS line_item
+    CROSS JOIN JSON_TABLE(json, '$.products[*]' COLUMNS (value JSON PATH '$')) AS line_item
 WHERE
     JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.partNumber')) IS NOT NULL
     AND JSON_UNQUOTE(JSON_EXTRACT(line_item.value, '$.partNumber')) != 'null'
@@ -34,4 +37,6 @@ ON DUPLICATE KEY UPDATE
     shipping_city = VALUES(shipping_city),
     shipping_province = VALUES(shipping_province),
     fulfillments_status = VALUES(fulfillments_status),
-    tracking_company = VALUES(tracking_company);
+    tracking_company = VALUES(tracking_company),
+    customer_first_name = VALUES(customer_first_name),
+    customer_last_name = VALUES(customer_last_name);
