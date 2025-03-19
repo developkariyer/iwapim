@@ -144,7 +144,7 @@ class Connector extends MarketplaceConnectorAbstract
         $this->ordersHelper->downloadOrders();
     }
 
-    public function downloadReturns()
+    public function downloadReturns(): void
     {
         $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Amazon' and is_canceled = 'cancelled'";
         $returnOrders = Utility::fetchFromSql($sql, []);

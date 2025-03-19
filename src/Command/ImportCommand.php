@@ -124,6 +124,7 @@ class ImportCommand extends AbstractCommand
         $importFlag = $input->getOption('import');
         $updateFlag = $input->getOption('update');
         $ordersFlag = $input->getOption('orders');
+        $returnsFlag = $input->getOption('returns');
         $inventoryFlag = $input->getOption('inventory');
         $attributesFlag = $input->getOption('attributes');
 
@@ -244,6 +245,11 @@ class ImportCommand extends AbstractCommand
                     echo "    Getting orders... ";
                     $connector->downloadOrders();
                     $notificationMessage .= "- Ordes downloaded";
+                }
+                if ($returnsFlag) {
+                    echo "    Getting returns... ";
+                    $connector->downloadReturns();
+                    $notificationMessage .= "- Returns downloaded";
                 }
                 if ($inventoryFlag) {
                     echo "    Getting inventory... ";

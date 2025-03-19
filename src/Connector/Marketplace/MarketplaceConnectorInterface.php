@@ -33,6 +33,12 @@ interface MarketplaceConnectorInterface
     public function downloadInventory(): void;
 
     /**
+     * Download the marketplace returns from API
+     * @return void
+     */
+    public function downloadReturns(): void;
+
+    /**
      * Add/update Pimcore VariantProduct objects for marketplace listings
      * @param $updateFlag
      * @param $importFlag

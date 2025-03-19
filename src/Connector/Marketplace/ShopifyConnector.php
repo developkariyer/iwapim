@@ -207,7 +207,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function downloadReturns()
+    public function downloadReturns(): void
     {
         $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Shopify' and is_canceled = 'cancelled'";
         $returnOrders = Utility::fetchFromSql($sql, []);

@@ -225,7 +225,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
         } while ($data['page_summary'] === $size);
     }
 
-    public function downloadReturns()
+    public function downloadReturns(): void
     {
         $sql = 'SELECT 
                     oli.*, 

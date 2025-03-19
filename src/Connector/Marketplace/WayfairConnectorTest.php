@@ -762,4 +762,8 @@ class WayfairConnectorTest extends MarketplaceConnectorAbstract
 
     }
 
+    public function downloadReturns(): void
+    {
+        // TODO: Implement downloadReturns() method.
+    }
 }

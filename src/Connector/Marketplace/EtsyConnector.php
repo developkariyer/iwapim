@@ -55,7 +55,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
         echo "Finished.\n";
     }
 
-    public function downloadReturns()
+    public function downloadReturns(): void
     {
         $sql = "SELECT * FROM `iwa_marketplace_orders_line_items` WHERE marketplace_type = 'Etsy' and fulfillments_status != 'Completed'";
         $returnOrders = Utility::fetchFromSql($sql, []);
