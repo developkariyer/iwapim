@@ -428,6 +428,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
+        $this->refreshToAccessToken();
         $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         try {
             $sqlLastUpdatedAt = "

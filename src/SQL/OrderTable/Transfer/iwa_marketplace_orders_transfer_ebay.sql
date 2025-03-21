@@ -23,7 +23,7 @@ SELECT
     COALESCE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.cancelStatus.cancelState')), NULL) AS fulfillments_status_control
 FROM
     iwa_marketplace_orders
-        CROSS JOIN JSON_TABLE(json, '$.lineItems[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
+    CROSS JOIN JSON_TABLE(json, '$.lineItems[*]' COLUMNS ( value JSON PATH '$' )) AS line_item
 WHERE
      marketplace_id = :marketPlaceId
 ON DUPLICATE KEY UPDATE
