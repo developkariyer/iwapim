@@ -384,7 +384,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                             'aspect_required' => $item['aspectConstraint']['aspectRequired'],
                             'aspect_usage' => $item['aspectConstraint']['aspectUsage'],
                             'aspect_enabled_variation' => $item['aspectConstraint']['aspectEnabledForVariations'],
-                            'aspect_applicable_to' => $item['aspectConstraint']['aspectApplicableTo']
+                            'aspect_applicable_to' => json_encode($item['aspectConstraint']['aspectApplicableTo'])
                         ];
                         Utility::executeSql($categoryAspectSql, $params);
                         $db = Db::get();
