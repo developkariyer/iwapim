@@ -360,6 +360,10 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     $categoryId = $categoryAspect['category']['categoryId'];
                     $categoryName = $categoryAspect['category']['categoryName'];
                     echo "Category ID: $categoryId Category Name: $categoryName\n";
+                    $sql = "INSERT INTO  iwa_ebay_category(category_id, category_name, category_tree_id, category_tree_version, category_tree_name)
+                            VALUES (:categoryId, :categoryName, :categoryTreeId, :categoryTreeVersion, :categoryTreeName)";
+                    Utility::executeSql($sql, [$categoryId, $categoryName, $categoryTreeId, $categoryTreeVersion, $categoryTreeName]);
+
                 }
             }
             //$this->putToCache("MOTORS_CATEGORIES", $dataArray);
