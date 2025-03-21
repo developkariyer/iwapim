@@ -359,8 +359,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 foreach ($dataArray['categoryAspects'] as $categoryAspect) {
                     $categoryId = $categoryAspect['category']['categoryId'];
                     $categoryName = $categoryAspect['category']['categoryName'];
-                    echo "Category ID: $categoryId Category Name: $categoryName\n";
-                    $sql = "INSERT INTO  iwa_ebay_category(category_id, category_name, category_tree_id, category_tree_version, category_tree_name)
+                    $categorySql = "INSERT INTO  iwa_ebay_category(category_id, category_name, category_tree_id, category_tree_version, category_tree_name)
                             VALUES (:categoryId, :categoryName, :categoryTreeId, :categoryTreeVersion, :categoryTreeName)";
                     $params = [
                         'categoryId' => $categoryId,
@@ -369,10 +368,39 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         'categoryTreeVersion' => $categoryTreeVersion,
                         'categoryTreeName' => $categoryTreeIdName
                     ];
-                    Utility::executeSql($sql, $params);
+                    Utility::executeSql($categorySql, $params);
+                    foreach ($categoryAspect['aspects'] as $item) {
+                        $categoryAspectSql  = " 
+                            INSERT INTO iwa_ebay_category_aspects (category_id, aspect_name, aspect_data_type, aspect_cardinality, aspect_mode, aspect_required, aspect_usage,
+                                                                   aspect_enabled_variation, aspect_applicable_to)
+                            VALUES (:category_id, :aspect_name, :aspect_data_type, :aspect_cardinality, :aspect_mode, :aspect_required, :aspect_usage,
+                                    :aspect_enabled_variation, :aspect_applicable_to)";
+                        $params = [
+                            'category_id' => $categoryId,
+                            'aspect_name' => $item['localizedAspectName'],
+                            'aspect_data_type' => $item['aspectConstraint']['aspectDataType'],
+                            'aspect_cardinality' => $item['aspectConstraint']['itemToAspectCardinality'],
+                            'aspect_mode' => $item['aspectConstraint']['aspectMode'],
+                            'aspect_required' => $item['aspectConstraint']['aspectRequired'],
+                            'aspect_usage' => $item['aspectConstraint']['aspectUsage'],
+                            'aspect_enabled_variation' => $item['aspectConstraint']['aspectEnabledForVariations'],
+                            'aspect_applicable_to' => $item['aspectConstraint']['aspectApplicableTo']
+                        ];
+                        Utility::executeSql($categoryAspectSql, $params);
+                        $db = Db::get();
+                        $aspectId = $db->lastInsertId();
+                        foreach ($item['aspectValues'] as $values) {
+                            $valueSql = "INSERT INTO iwa_ebay_category_aspects_values (aspect_id, aspect_value) VALUES (:aspect_id, :aspect_value)";
+                            $params = [
+                                'aspect_id' => $aspectId,
+                                'aspect_value' => $values['localizedValue']
+                            ];
+                            Utility::executeSql($valueSql, $params);
+                        }
+                    }
+                    echo ".";
                 }
             }
-            //$this->putToCache("MOTORS_CATEGORIES", $dataArray);
         } catch (Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
