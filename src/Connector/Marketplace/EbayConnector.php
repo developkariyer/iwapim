@@ -178,9 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
-        $this->refreshToAccessToken();
-        $this->getFulFillmentsPolicy();
-
+        $this->getDefaultCategoryTreeId("EBAY_US");
         // control expiresIn
        /* $this->refreshToAccessToken();
         if (!$forceDownload && $this->getListingsFromCache()) {
@@ -381,7 +379,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     }
 
-    public function getDefaultCategoryTreeId()
+    public function getDefaultCategoryTreeId($marketplaceId)
     {
         //eBay UK (ebay.co.uk)	EBAY_GB
         //eBay US (ebay.com)	EBAY_US
@@ -394,7 +392,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'marketplace_id' => 'EBAY_MOTORS_US'
+                    'marketplace_id' => $marketplaceId
                 ]
             ]);
             print_r($response->getContent());
