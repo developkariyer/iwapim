@@ -376,19 +376,49 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             sleep(0.2);
         }
     }
-
     public function downloadReturns(): void
     {
-        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/cancelled", [
-            'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]
-        ]);
-        print_r(json_encode($response->getContent()));
-
+        $returns = [];
+        $offset = 0;
+        $limit = 10;
+        do {
+            $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/orders/merchantid/{$this->marketplace->getSellerId()}/cancelled}", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                    "User-Agent" => "colorfullworlds_dev",
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'query' => [
+                    'offset' => $offset,
+                    'limit' => $limit
+                ]
+            ]);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                echo "Error: $statusCode\n";
+                break;
+            }
+            $data = $response->toArray();
+            $return = $data['items'] ?? [];
+            $returns = array_merge($returns, $return);
+            $totalItems = $data['totalCount'];
+            echo "Offset: " . $offset . " " . $offset . " ";
+            echo "Total Items: " . $totalItems . "\n";
+            echo "Count: " . count($returns) . "\n";
+            $offset += $limit;
+        } while (count($returns) < $totalItems);
+        foreach ($allReturns as $return) {
+            $sqlInsertMarketplaceReturn = "
+                            INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
+                            VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
+            Utility::executeSql($sqlInsertMarketplaceReturn, [
+                'marketplace_id' => $this->marketplace->getId(),
+                'return_id' => $return['orderNumber'],
+                'json' => json_encode($return)
+            ]);
+            echo "Inserting RETURN: " . $return['orderNumber'] . "\n";
+        }
     }
     
     public function downloadInventory(): void
