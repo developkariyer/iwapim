@@ -93,7 +93,8 @@ class PrepareOrderTableCommand extends AbstractCommand
             'Wallmart' => 'iwa_marketplace_orders_transfer_wallmart.sql',
             'Ciceksepeti' => 'iwa_marketplace_orders_transfer_ciceksepeti.sql',
             'Wayfair' => 'iwa_marketplace_orders_transfer_wayfair.sql',
-            'Hepsiburada' => 'iwa_marketplace_orders_transfer_hepsiburada.sql'
+            'Hepsiburada' => 'iwa_marketplace_orders_transfer_hepsiburada.sql',
+            'Ebay' => 'iwa_marketplace_orders_transfer_ebay.sql'
         ];
         foreach ($marketplaceIds as $marketplaceId) {
             $id = $marketplaceId['marketplace_id'];
