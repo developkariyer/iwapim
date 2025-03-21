@@ -408,7 +408,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Count: " . count($returns) . "\n";
             $offset += $limit;
         } while (count($returns) < $totalItems);
-        foreach ($allReturns as $return) {
+        foreach ($returns as $return) {
             $sqlInsertMarketplaceReturn = "
                             INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
                             VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
