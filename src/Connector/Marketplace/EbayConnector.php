@@ -428,7 +428,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        /*$url = "https://api.ebay.com/sell/fulfillment/v1/order";
+        $url = "https://api.ebay.com/sell/fulfillment/v1/order";
         try {
             $sqlLastUpdatedAt = "
                     SELECT COALESCE(MAX(json_extract(json, '$.lastModifiedDate')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
@@ -487,7 +487,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             } catch (\Exception $e) {
                 echo "Error: " . $e->getMessage() . "\n";
             }
-        }while($orderCount < $totalElements);*/
+        }while($orderCount < $totalElements);
     }
     
     protected function getImage($listing, $mainListing) 
