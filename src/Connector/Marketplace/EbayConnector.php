@@ -362,12 +362,19 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     echo "Category ID: $categoryId Category Name: $categoryName\n";
                     $sql = "INSERT INTO  iwa_ebay_category(category_id, category_name, category_tree_id, category_tree_version, category_tree_name)
                             VALUES (:categoryId, :categoryName, :categoryTreeId, :categoryTreeVersion, :categoryTreeName)";
-                    Utility::executeSql($sql, [$categoryId, $categoryName, $categoryTreeId, $categoryTreeVersion, $categoryTreeIdName]);
+                    $params = [
+                        'categoryId' => $categoryId,
+                        'categoryName' => $categoryName,
+                        'categoryTreeId' => $categoryTreeId,
+                        'categoryTreeVersion' => $categoryTreeVersion,
+                        'categoryTreeName' => $categoryTreeIdName
+                    ];
+                    Utility::executeSql($sql, $params);
                 }
             }
             //$this->putToCache("MOTORS_CATEGORIES", $dataArray);
         } catch (Exception $e) {
-            echo 'Hata: ' . $e->getMessage();
+            echo 'Error: ' . $e->getMessage();
         }
     }
 
