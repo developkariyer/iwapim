@@ -376,14 +376,24 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             sleep(0.2);
         }
     }
+
+    public function downloadReturns(): void
+    {
+        $response = $this->httpClient->request('GET', "https://oms-external.hepsiburada.com/packages/merchantid/{$this->marketplace->getSellerId()}/cancelled", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        print_r(json_encode($response->getContent()));
+
+    }
     
     public function downloadInventory(): void
     {
 
     }
 
-    public function downloadReturns(): void
-    {
-        // TODO: Implement downloadReturns() method.
-    }
 }
