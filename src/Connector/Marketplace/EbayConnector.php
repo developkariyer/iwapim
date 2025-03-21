@@ -178,7 +178,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
-        $this->getDefaultCategoryTreeId("EBAY_US");
+        $this->fetchItemAspects("EBAY_US");
         // control expiresIn
        /* $this->refreshToAccessToken();
         if (!$forceDownload && $this->getListingsFromCache()) {
@@ -336,9 +336,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     }
 
-    public function fetchItemAspects()
+    public function fetchItemAspects($categoryTreeIdName)
     {
-        $url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/100/fetch_item_aspects";
+        $categoryTree = $this->getDefaultCategoryTreeId($categoryTreeIdName);
+        $categoryTreeId = $categoryTree['categoryTreeId'];
+        $categoryTreeVersion = $categoryTree['categoryTreeVersion'];
+        echo "CategoryTreeIdName: " . $categoryTreeIdName . "\n";
+        echo "CategoryTreeId: " . $categoryTreeId . "\n";
+        echo "CategoryTreeVersion: " . $categoryTreeVersion . "\n";
+        /*$url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/100/fetch_item_aspects";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -346,7 +352,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'marketplace_id' => 'EBAY_US'
+                    'marketplace_id' => $categoryTreeIdName
                 ]
             ]);
             $gzipContent = $response->getContent();
@@ -355,7 +361,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $this->putToCache("MOTORS_CATEGORIES", $dataArray);
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }
+        }*/
     }
 
     public function getFulFillmentsPolicy()
@@ -395,7 +401,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'marketplace_id' => $marketplaceId
                 ]
             ]);
-            print_r($response->getContent());
+            if ($response->getStatusCode() == 200) {
+                return $response->getContent();
+            }
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
         }
