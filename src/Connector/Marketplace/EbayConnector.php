@@ -341,10 +341,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $categoryTree = $this->getDefaultCategoryTreeId($categoryTreeIdName);
         $categoryTreeId = $categoryTree['categoryTreeId'];
         $categoryTreeVersion = $categoryTree['categoryTreeVersion'];
-        echo "CategoryTreeIdName: " . $categoryTreeIdName . "\n";
-        echo "CategoryTreeId: " . $categoryTreeId . "\n";
-        echo "CategoryTreeVersion: " . $categoryTreeVersion . "\n";
-        /*$url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/100/fetch_item_aspects";
+        $url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/" . $categoryTreeId . "/fetch_item_aspects";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
@@ -358,10 +355,17 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $gzipContent = $response->getContent();
             $jsonContent = gzdecode($gzipContent);
             $dataArray = json_decode($jsonContent, true);
-            $this->putToCache("MOTORS_CATEGORIES", $dataArray);
+            if (isset($dataArray)) {
+                foreach ($dataArray['categoryAspects'] as $categoryAspect) {
+                    $categoryId = $categoryAspect['category']['categoryId'];
+                    $categoryName = $categoryAspect['category']['categoryName'];
+                    echo "Category ID: $categoryId Category Name: $categoryName\n";
+                }
+            }
+            //$this->putToCache("MOTORS_CATEGORIES", $dataArray);
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
-        }*/
+        }
     }
 
     public function getFulFillmentsPolicy()
