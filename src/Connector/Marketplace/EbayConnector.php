@@ -402,7 +402,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                 ]
             ]);
             if ($response->getStatusCode() == 200) {
-                return $response->getContent();
+                return $response->toArray();
             }
         } catch (Exception $e) {
             echo 'Hata: ' . $e->getMessage();
