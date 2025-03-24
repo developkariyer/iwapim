@@ -180,8 +180,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getItemByLegacyId("334936877779");
 
 
-        $this->refreshToAccessToken();
-        $this->fetchItemAspects("EBAY_US");
+        //$this->refreshToAccessToken();
+        //$this->fetchItemAspects("EBAY_US");
 
 
         // control expiresIn
