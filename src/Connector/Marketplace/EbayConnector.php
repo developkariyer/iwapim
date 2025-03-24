@@ -394,13 +394,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
                         Utility::executeSql($categoryAspectSql, $params);
                         $db = Db::get();
                         $aspectId = $db->lastInsertId();
-                        foreach ($item['aspectValues'] as $values) {
-                            $valueSql = "INSERT INTO iwa_ebay_category_aspects_values (aspect_id, value) VALUES (:aspect_id, :value)";
-                            $params = [
-                                'aspect_id' => $aspectId,
-                                'value' => $values['localizedValue']
-                            ];
-                            Utility::executeSql($valueSql, $params);
+                        if (isset($item['aspectValues'])) {
+                            foreach ($item['aspectValues'] as $values) {
+                                $valueSql = "INSERT INTO iwa_ebay_category_aspects_values (aspect_id, value) VALUES (:aspect_id, :value)";
+                                $params = [
+                                    'aspect_id' => $aspectId,
+                                    'value' => $values['localizedValue']
+                                ];
+                                Utility::executeSql($valueSql, $params);
+                            }
                         }
                     }
                     echo ".";
