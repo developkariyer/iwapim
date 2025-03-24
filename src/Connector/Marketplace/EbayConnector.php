@@ -179,7 +179,11 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
+
+        $this->refreshToAccessToken();
         $this->fetchItemAspects("EBAY_US");
+
+
         // control expiresIn
        /* $this->refreshToAccessToken();
         if (!$forceDownload && $this->getListingsFromCache()) {
@@ -378,14 +382,14 @@ class EbayConnector extends MarketplaceConnectorAbstract
                                     :aspect_enabled_variation, :aspect_applicable_to)";
                         $params = [
                             'category_id' => $categoryId,
-                            'aspect_name' => $item['localizedAspectName'],
-                            'aspect_data_type' => $item['aspectConstraint']['aspectDataType'],
-                            'aspect_cardinality' => $item['aspectConstraint']['itemToAspectCardinality'],
-                            'aspect_mode' => $item['aspectConstraint']['aspectMode'],
-                            'aspect_required' => $item['aspectConstraint']['aspectRequired'],
-                            'aspect_usage' => $item['aspectConstraint']['aspectUsage'],
-                            'aspect_enabled_variation' => $item['aspectConstraint']['aspectEnabledForVariations'],
-                            'aspect_applicable_to' => json_encode($item['aspectConstraint']['aspectApplicableTo'])
+                            'aspect_name' => $item['localizedAspectName'] ?? '',
+                            'aspect_data_type' => $item['aspectConstraint']['aspectDataType'] ?? '',
+                            'aspect_cardinality' => $item['aspectConstraint']['itemToAspectCardinality'] ?? '',
+                            'aspect_mode' => $item['aspectConstraint']['aspectMode'] ?? '',
+                            'aspect_required' => $item['aspectConstraint']['aspectRequired'] ?? '',
+                            'aspect_usage' => $item['aspectConstraint']['aspectUsage'] ?? '',
+                            'aspect_enabled_variation' => $item['aspectConstraint']['aspectEnabledForVariations'] ?? '',
+                            'aspect_applicable_to' => json_encode($item['aspectConstraint']['aspectApplicableTo'] ?? '')
                         ];
                         Utility::executeSql($categoryAspectSql, $params);
                         $db = Db::get();
