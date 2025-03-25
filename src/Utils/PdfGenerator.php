@@ -231,7 +231,7 @@ class PdfGenerator
 
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
-        //$pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/iwablack.png', 40, 2, 18, 18);
 
         $pdf->SetXY(10, 1.7);
