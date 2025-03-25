@@ -600,7 +600,7 @@ class Product extends Concrete
         foreach ($variantObjects as $variant) {
             if ($variant->getFnsku() !== null) {
                 $fnsku = $variant->getFnsku();
-                $asset = PdfGenerator::generateFnskuBarcode($this, $fnsku, "{$fnsku}_fnsku.pdf");
+                $asset = PdfGenerator::generateFnskuBarcode($this, $fnsku, "{$fnsku}_{$this->getKey()}_fnsku.pdf");
                 if ($asset) {
                     $assets[] = $asset;
                 }
