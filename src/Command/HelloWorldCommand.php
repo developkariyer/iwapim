@@ -30,12 +30,13 @@ class HelloWorldCommand extends AbstractCommand
             echo "Finded" ;
             $variantProducts =  $product->getListingItems();
             foreach ($variantProducts as $variantProduct) {
-                print_r($variantProduct->getFnsku());
-                echo "\n";
+                if ($variantProduct instanceof VariantProduct) {
+                    if ($variantProduct->getFnsku() !== null) {
+                        echo $variantProduct->getFnsku() . "\n";
+                    }
+                }
             }
-
         }
-
         return Command::SUCCESS;
     }
 }
