@@ -221,6 +221,54 @@ class PdfGenerator
         return $finalPath;
     }
 
+    public static function generateFnskuBarcode(Product $product, $fnsku, $qrfile): Asset\Document
+    {
+        $pdf = new Fpdi('L', 'mm', [80, 60]);
+        $pdf->SetAutoPageBreak(false);
+        $pdf->AddPage();
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetFont('helvetica', '', 6);
+
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
+        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/iwablack.png', 40, 2, 18, 18);
+
+        $pdf->SetXY(10, 1.7);
+        $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
+
+        $pdf->SetXY(10, 11.6);
+        $pdf->Cell(15, 3, mb_convert_encoding("Emre Bedel", 'windows-1254', 'UTF-8'), 0, 0, 'L');
+        $pdf->SetXY(1, 14.5);
+        $pdf->Cell(25, 3, mb_convert_encoding("responsible@iwaconcept.com", 'windows-1254', 'UTF-8'), 0, 0, 'L');
+
+        $pdf->SetXY(1, 18);
+        $pdf->MultiCell(30, 2, mb_convert_encoding("PN: {$product->getInheritedField("iwasku")}\nSN: {$product->getInheritedField("productIdentifier")}", 'windows-1254', 'UTF-8'), 0, 'L');
+
+        $text =  $product->getInheritedField("productIdentifier") ." ";
+        $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor") ;
+        // FNSKU EKLE
+        $text .= $fnsku;
+
+        $pdf->SetXY(1, 23);
+        $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
+
+        $pdf->SetFont('arial', 'B', 6);
+        $pdf->SetXY(48, 27);
+        $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD\nGPSR", 'windows-1254', 'UTF-8'), 0, 'C');
+
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        $pdf->Output($pdfFilePath, 'F');
+
+        $asset = new Asset\Document();
+        $asset->setFilename($qrfile);
+        $asset->setData(file_get_contents($pdfFilePath));
+        $asset->setParent(Utility::checkSetAssetPath('FNSKU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
+        $asset->save();
+        unlink($pdfFilePath);
+        return $asset;
+    }
+
 
     /**
      * @throws DuplicateFullPathException

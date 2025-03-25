@@ -26,7 +26,8 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $product = Product::findByField('iwasku', 'ITS00402Z5XC');
-        if ($product instanceof Product) {
+        $product->checkStickerFnsku();
+       /* if ($product instanceof Product) {
             echo "Finded\n" ;
             $variantProducts =  $product->getListingItems();
             foreach ($variantProducts as $variantProduct) {
@@ -36,7 +37,7 @@ class HelloWorldCommand extends AbstractCommand
                     }
                 }
             }
-        }
+        }*/
         return Command::SUCCESS;
     }
 }

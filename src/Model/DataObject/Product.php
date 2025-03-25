@@ -593,6 +593,24 @@ class Product extends Concrete
         return $asset;
     }
 
+    public function checkStickerFnsku(): mixed
+    {
+        $variantObjects  = $this->getListingItems();
+        $assets = [];
+        foreach ($variantObjects as $variant) {
+            if ($variant->getFnsku() !== null) {
+                $fnsku = $variant->getFnsku();
+                $asset = PdfGenerator::generateFnskuBarcode($this, $fnsku, "{$fnsku}_fnsku.pdf");
+                if ($asset) {
+                    $assets[] = $asset;
+                }
+            }
+        }
+        $this->setStickerFnsku($assets);
+        $this->save();
+        return $assets;
+    }
+
     /**
      * Generates a 4x6 EU sticker PDF and sets it to the current object.
      *
