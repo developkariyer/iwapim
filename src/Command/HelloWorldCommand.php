@@ -28,7 +28,12 @@ class HelloWorldCommand extends AbstractCommand
         $product = Product::findByField('iwasku', 'SC04000J0MY1');
         if ($product instanceof Product) {
             echo "Finded" ;
-            print_r($product->getIwasku());
+            $variantProducts =  $product->getListingItems();
+            foreach ($variantProducts as $variantProduct) {
+                print_r($variantProduct->getFnsku());
+                echo "\n";  
+            }
+
         }
 
         return Command::SUCCESS;
