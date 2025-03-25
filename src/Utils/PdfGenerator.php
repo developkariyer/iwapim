@@ -223,7 +223,7 @@ class PdfGenerator
 
     public static function generateFnskuBarcode(Product $product, $fnsku, $qrfile): Asset\Document
     {
-        $pdf = new Fpdi('L', 'mm', [80, 60]);
+        $pdf = new Fpdi('L', 'mm', [60, 40]);
         $pdf->SetAutoPageBreak(false);
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
@@ -246,8 +246,9 @@ class PdfGenerator
         $pdf->MultiCell(30, 2, mb_convert_encoding("PN: {$product->getInheritedField("iwasku")}\nSN: {$product->getInheritedField("productIdentifier")}", 'windows-1254', 'UTF-8'), 0, 'L');
 
 
-        // FNSKU EKLE
-        $text = $fnsku;
+        $text =  $product->getInheritedField("productIdentifier") ." ";
+        $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor") ;
+        $text .= $fnsku;
 
         $pdf->SetXY(1, 23);
         $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
