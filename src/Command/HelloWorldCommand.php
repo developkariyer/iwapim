@@ -28,7 +28,7 @@ class HelloWorldCommand extends AbstractCommand
         $product = Product::findByField('iwasku', 'ITS00402Z5XC');
         $product->checkStickerFnsku();
         $group = GroupProduct::getById(271263);
-        $group->setProducts($product);
+        $group->setProducts([$product]);
        /* if ($product instanceof Product) {
             echo "Finded\n" ;
             $variantProducts =  $product->getListingItems();
