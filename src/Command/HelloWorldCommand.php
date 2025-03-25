@@ -30,7 +30,6 @@ class HelloWorldCommand extends AbstractCommand
             echo "Finded" ;
             $variantProducts =  $product->getListingItems();
             foreach ($variantProducts as $variantProduct) {
-                print_r($variantProduct->getAmazonMarketplace() . " ");
                 print_r($variantProduct->getFnsku());
                 echo "\n";
             }
