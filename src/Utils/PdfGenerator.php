@@ -262,12 +262,12 @@ class PdfGenerator
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
         $pdf->Image($asinBarcode, 33, 2, 26, 8);
-        $pdf->Image($fnskuBarcode,3,16,26,8);
+        $pdf->Image($fnskuBarcode,33,14,26,8);
 
         $pdf->SetXY(39, 11);
         $pdf->MultiCell(56, 2, mb_convert_encoding($asin, 'windows-1254', 'UTF-8'), 0, 'L');
 
-        $pdf->SetXY(39, 25);
+        $pdf->SetXY(39, 23);
         $pdf->MultiCell(56, 2, mb_convert_encoding($fnsku, 'windows-1254', 'UTF-8'), 0, 'L');
 
 
