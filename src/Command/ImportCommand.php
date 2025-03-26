@@ -82,7 +82,7 @@ class ImportCommand extends AbstractCommand
         ;
     }
 
-    private function removeListeners(): void
+    /*private function removeListeners(): void
     {
         $this->eventDispatcher->removeSubscriber($this->dataObjectListener);
     }
@@ -90,7 +90,7 @@ class ImportCommand extends AbstractCommand
     private function addListeners(): void
     {
         $this->eventDispatcher->addSubscriber($this->dataObjectListener);
-    }
+    }*/
 
     private static function listMarketplaces($marketplaces): int
     {
