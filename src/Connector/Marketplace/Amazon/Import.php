@@ -242,6 +242,5 @@ class Import
         if (str_starts_with($ean, '868408')) {
             $amazonCollection->setEan($ean);
         }
-        echo $country . "\n";
     }
 }
