@@ -221,18 +221,46 @@ class PdfGenerator
         return $finalPath;
     }
 
-    public static function generateFnskuBarcode(Product $product, $fnsku, $qrfile): Asset\Document
+    public static function generateFnskuBarcode($fnsku): string
+    {
+        $generator = new BarcodeGeneratorPNG();
+        $barcodeData = $generator->getBarcode($fnsku, $generator::TYPE_CODE_128, 2, 300);
+        $rawPath = PIMCORE_PROJECT_ROOT . "/tmp/{$fnsku}_raw.png";
+        file_put_contents($rawPath, $barcodeData);
+        $img = imagecreatefrompng($rawPath);
+        $w = imagesx($img);
+        $h = imagesy($img);
+        $targetHeight = intval($w / 3);
+        if ($h > $targetHeight) {
+            $cropped = imagecreatetruecolor($w, $targetHeight);
+            imagealphablending($cropped, false);
+            imagesavealpha($cropped, true);
+            imagecopy($cropped, $img, 0, 0, 0, 0, $w, $targetHeight);
+            $finalPath = PIMCORE_PROJECT_ROOT . "/tmp/{$fnsku}.png";
+            imagepng($cropped, $finalPath);
+            imagedestroy($cropped);
+        } else {
+            $finalPath = PIMCORE_PROJECT_ROOT ."/tmp/{$fnsku}.png";
+            copy($rawPath, $finalPath);
+        }
+        imagedestroy($img);
+        unlink($rawPath);
+        return $finalPath;
+    }
+
+    public static function generate4x6Fnsku(Product $product, $fnsku, $qrfile): Asset\Document
     {
         $pdf = new Fpdi('L', 'mm', [60, 40]);
         $pdf->SetAutoPageBreak(false);
         $pdf->AddPage();
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetFont('helvetica', '', 6);
+        $fnskuBarcode = self::generateFnskuBarcode($fnsku);
 
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
-        $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/iwablack.png', 40, 2, 18, 18);
+        $pdf->Image($fnskuBarcode, 40, 2, 26, 8);
 
         $pdf->SetXY(10, 1.7);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
