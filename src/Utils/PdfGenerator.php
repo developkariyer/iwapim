@@ -291,6 +291,11 @@ class PdfGenerator
         $pdf->SetXY(1, 23);
         $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
 
+        $text2 = $product->getInheritedField("name");
+        $pdf->SetXY(1, 25);
+        $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text2)), 'windows-1254', 'UTF-8'), 0, 'L');
+
+
         $pdf->SetFont('arial', 'B', 6);
         $pdf->SetXY(48, 27);
         $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD\nGPSR", 'windows-1254', 'UTF-8'), 0, 'C');
