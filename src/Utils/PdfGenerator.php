@@ -260,7 +260,7 @@ class PdfGenerator
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/factory.png', 2, 2, 8, 8);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/eurp.png', 2, 11, 8, 4);
         $pdf->Image(PIMCORE_PROJECT_ROOT . '/public/custom/icons.png', 1, 27, 48, 12);
-        $pdf->Image($fnskuBarcode, 30, 2, 26, 8);
+        $pdf->Image($fnskuBarcode, 33, 2, 26, 8);
 
         $pdf->SetXY(10, 1.7);
         $pdf->MultiCell(32, 3, mb_convert_encoding("IWA Concept Ltd.Sti.\nAnkara/Türkiye\niwaconcept.com", 'windows-1254', 'UTF-8'), 0, 'L');
