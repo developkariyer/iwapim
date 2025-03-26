@@ -277,7 +277,7 @@ class PdfGenerator
         $text =  $product->getInheritedField("productIdentifier") ." ";
         $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor") ;
         $text2 = $fnsku;
-        $pdf->SetXY(40, 11);
+        $pdf->SetXY(38, 11);
         $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text2)), 'windows-1254', 'UTF-8'), 0, 'L');
 
 
