@@ -598,17 +598,14 @@ class Product extends Concrete
         $assets = [];
         $sql = "SELECT asin, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku GROUP BY asin, fnsku";
         $result = Utility::fetchFromSql($sql, ['iwasku' => $this->getIwasku()]);
-        //print_r($result);
         foreach ($result as $item) {
-            echo $item['fnsku'] . "\n";
-            echo $item['asin'] . "\n";
-          //  $asset  = PdfGenerator::generate4x6Fnsku($this, $item['fnsku'], $item['asin'], "{$asin}_{$fnsku}_{$this->getKey()}_fnsku.pdf");
-            //if ($asset) {
-              //  $assets[] = $asset;
-            //}
+            $asset  = PdfGenerator::generate4x6Fnsku($this, $item['fnsku'], $item['asin'], "{$item['asin']}_{$item['fnsku']}_{$this->getKey()}_fnsku.pdf");
+            if ($asset) {
+                $assets[] = $asset;
+            }
         }
-        //$this->setStickerFnsku($assets);
-        //$this->save();
+        $this->setStickerFnsku($assets);
+        $this->save();
 
         /*$variantObjects  = $this->getListingItems();
         $assets = [];
