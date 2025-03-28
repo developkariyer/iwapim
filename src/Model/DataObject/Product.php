@@ -596,7 +596,7 @@ class Product extends Concrete
     public function checkStickerFnsku(): mixed
     {
         $assets = [];
-        $sql = "SELECT warehouse, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku";
+        $sql = "SELECT asin, warehouse, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku";
         $result = Utility::fetchFromSql($sql, ['iwasku' => $this->getIwasku()]);
         print_r($result);
         /*$variantObjects  = $this->getListingItems();
