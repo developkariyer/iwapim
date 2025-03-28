@@ -597,7 +597,7 @@ class Product extends Concrete
     {
         $assets = [];
         $iwasku = $this->getIwasku();
-        $sql = "SELECT  warehouse, asin, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku GROUP BY asin, fnsku";
+        $sql = "SELECT  warehouse, asin, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku";
         $result = Utility::fetchFromSql($sql, ['iwasku' => $iwasku]);
         foreach ($result as $item) {
             $asset  = PdfGenerator::generate4x6Fnsku($this, $item['fnsku'], $item['asin'], "{$item['warehouse']}_{$item['asin']}_{$item['fnsku']}_{$iwasku}.pdf");
