@@ -207,32 +207,19 @@
                         });
                         let detailsHtml = '';
                         products.forEach(product => {
-                            let fnskuOptions = '';
-                            if (product.sticker_fnsku.length > 0) {
-                                product.sticker_fnsku.forEach(link => {
-                                    const parts = link.split('_');
-                                    if (parts.length >= 3) {
-                                        const region = parts[0];
-                                        const asin = parts[1];
-                                        const fnsku = parts[2];
-                                        fnskuOptions += `<option value="${link}" data-region="${region}" data-asin="${asin}" data-fnsku="${fnsku}">${fnsku}</option>`;
-                                    }
+                            if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
+                                console.log(`Ürün: ${product.productIdentifier}`);
+                                product.sticker_fnsku.forEach((link, index) => {
+                                    console.log(`  FNSKU ${index + 1}: ${link}`);
                                 });
+                            } else {
+                                console.log(`Ürün: ${product.productIdentifier} - FNSKU etiketi bulunamadı.`);
                             }
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
                             <a href="${product.sticker_link}" target="_blank">IWASKU Link</a>
                             <br/>
-                            ${fnskuOptions ? `
-                                    <br/>
-                                    <select class="fnsku-dropdown" data-product-id="${product.productIdentifier}">
-                                        <option value="">FNSKU Seç</option>
-                                        ${fnskuOptions}
-                                    </select>
-                                    <button class="download-fnsku" data-product-id="${product.productIdentifier}">İndir</button>
-                                    ` : '<br/><span>FNSKU etiketi bulunamadı.</span>'}
-                                    <br/>
                             `;
                         });
                         detailsContainer.innerHTML = `
