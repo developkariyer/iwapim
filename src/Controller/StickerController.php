@@ -190,7 +190,7 @@ class StickerController extends FrontendController
             ON sticker_fnsku.src_id = osp.oo_id
             AND sticker_fnsku.type = 'asset'
             AND sticker_fnsku.fieldname = 'stickerFnsku' 
-            WHERE osp.productIdentifier =  :productIdentifier AND osp.dest_id = :groupId
+            WHERE osp.productIdentifier =  :productIdentifier AND org.src_id = :groupId
             GROUP BY osp.iwasku, org.dest_id, osp.name, osp.productCode, osp.productCategory, osp.imageUrl, osp.variationSize, osp.variationColor, osp.productIdentifier, sticker_eu.dest_id, sticker_normal.dest_id;";
 
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
