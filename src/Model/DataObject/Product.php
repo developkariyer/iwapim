@@ -597,7 +597,7 @@ class Product extends Concrete
     {
         $assets = [];
         $sql = "SELECT warehouse, fnsku FROM `iwa_inventory` WHERE iwasku :iwasku";
-        $result = Utility::fetchFromSql($sql, $this->getIwasku());
+        $result = Utility::fetchFromSql($sql, ['iwasku' => $this->getIwasku()]);
         print_r($result);
         /*$variantObjects  = $this->getListingItems();
         $assets = [];
