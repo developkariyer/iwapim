@@ -207,18 +207,11 @@
                         });
                         let detailsHtml = '';
                         products.forEach(product => {
-                            if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
-                                console.log(`Ürün: ${product.productIdentifier}`);
-                                product.sticker_fnsku.forEach((link, index) => {
-                                    console.log(`  FNSKU ${index + 1}: ${link}`);
-                                });
-                            } else {
-                                console.log(`Ürün: ${product.productIdentifier} - FNSKU etiketi bulunamadı.`);
-                            }
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
                             <a href="${product.sticker_link}" target="_blank">IWASKU Link</a>
+                            <p>TEST</p>
                             <br/>
                             `;
                         });
