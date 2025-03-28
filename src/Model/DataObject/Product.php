@@ -595,7 +595,11 @@ class Product extends Concrete
 
     public function checkStickerFnsku(): mixed
     {
-        $variantObjects  = $this->getListingItems();
+        $assets = [];
+        $sql = "SELECT warehouse, fnsku FROM `iwa_inventory` WHERE iwasku :iwasku";
+        $result = Utility::fetchFromSql($sql, $this->getIwasku());
+        print_r($result);
+        /*$variantObjects  = $this->getListingItems();
         $assets = [];
         foreach ($variantObjects as $variant) {
             if ($variant->getFnsku() !== null) {
@@ -608,7 +612,7 @@ class Product extends Concrete
             }
         }
         $this->setStickerFnsku($assets);
-        $this->save();
+        $this->save();*/
         return $assets;
     }
 
