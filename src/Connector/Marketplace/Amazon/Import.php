@@ -144,12 +144,12 @@ class Import
             $mainProduct = $variantProduct->getMainProduct();
             $skuRequired = empty($mainProduct);
             $mainProduct = is_array($mainProduct) ? reset($mainProduct) : $mainProduct;
-            if ($mainProduct instanceof Product) {
+            /*if ($mainProduct instanceof Product) {
                 echo "Reg ";
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
             } else {
                 echo "NoReg ";
-            }
+            }*/
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;
@@ -244,13 +244,13 @@ class Import
         }
         $sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku limit 1";
 
-        /*if (isset($listing['seller-sku']) && $listing['seller-sku'] !== '') {
+        if (isset($listing['seller-sku']) && $listing['seller-sku'] !== '') {
             $result  = Utility::fetchFromSql($sql, ['seller_sku' => $listing['seller-sku']]);
             if (!empty($result) && isset($result[0]['fnsku']) && $result[0]['fnsku'] !== '') {
                 $fnsku = $result[0]['fnsku'];
                 echo $fnsku . "\n";
                 $amazonCollection->setFnsku($fnsku);
             }
-        }*/
+        }
     }
 }
