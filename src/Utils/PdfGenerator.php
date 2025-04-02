@@ -282,11 +282,8 @@ class PdfGenerator
         $pdf->SetXY(1, 18);
         $pdf->MultiCell(30, 2, mb_convert_encoding("PN: {$product->getInheritedField("iwasku")}\nSN: {$product->getInheritedField("productIdentifier")}", 'windows-1254', 'UTF-8'), 0, 'L');
 
-
         $text =  $product->getInheritedField("productIdentifier") ." ";
         $text .= $product->getInheritedField("variationSize"). " " . $product->getInheritedField("variationColor") ;
-
-
 
         $pdf->SetXY(1, 23);
         $pdf->MultiCell(56, 2, mb_convert_encoding(Utility::keepSafeChars(Utility::removeTRChars($text)), 'windows-1254', 'UTF-8'), 0, 'L');
@@ -307,7 +304,7 @@ class PdfGenerator
         $asset = new Asset\Document();
         $asset->setFilename($qrfile);
         $asset->setData(file_get_contents($pdfFilePath));
-        $asset->setParent(Utility::checkSetAssetPath('FNSKU', Utility::checkSetAssetPath('Etiketler'))); // Ensure this folder exists in Pimcore
+        $asset->setParent(Utility::checkSetAssetPath('FNSKU', Utility::checkSetAssetPath('Etiketler')));
         $asset->save();
         unlink($pdfFilePath);
         return $asset;
