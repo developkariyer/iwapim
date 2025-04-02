@@ -23,8 +23,10 @@ use Pimcore\Model\DataObject\GroupProduct;
 class HelloWorldCommand extends AbstractCommand
 {
 
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         //$product = Product::findByField('iwasku', 'CA03300XW85K');
         //$product->checkStickerFnsku();
 

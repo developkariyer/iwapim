@@ -28,14 +28,14 @@ class Import
         $this->connector = $connector;
     }
 
-    
+
     private function getAttributes($listing): string
     {
         $title = $listing['item-name'];
         if (preg_match('/\(([^()]*)\)[^(]*$/', $title, $matches)) {
             return trim($matches[1]);
         }
-        return '';    
+        return '';
     }
 
     private function getTitle($listing): string
@@ -61,10 +61,7 @@ class Import
                 $parent = $parent['parent'] ?? [];
             }
             while (!empty($folderTree)) {
-                $folderName = array_pop($folderTree);
-                if ($folderName !== null && $folderName !== '') {
-                    $folder = Utility::checkSetPath($folderName, $folder);
-                }
+                $folder = Utility::checkSetPath(array_pop($folderTree), $folder);
             }
             return $folder;
         }
@@ -97,7 +94,7 @@ class Import
         foreach ($this->connector->listings as $asin=>$listing) {
             $index++;
             echo "($index/$total) Processing $asin ...";
-            if (empty($asin) || !is_string($asin)) {
+            if (empty($asin)) {
                 echo " $asin is really empty\n";
                 continue;
             }
