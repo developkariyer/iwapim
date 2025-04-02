@@ -37,7 +37,7 @@ class HelloWorldCommand extends AbstractCommand
         $asin = $variantProduct->getUniqueMarketplaceId();
         $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
         foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
-            $marketplaceId = $amazonMarketplace->getUniqueMarketplaceId();
+            $marketplaceId = $amazonMarketplace->getMarketplaceId();
             if (in_array($marketplaceId, $notEuArray)) {
                 continue;
             }
