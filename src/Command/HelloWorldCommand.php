@@ -25,8 +25,12 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $product = Product::findByField('iwasku', 'CA03300XW85K');
-        $product->checkStickerFnsku();
+        //$product = Product::findByField('iwasku', 'CA03300XW85K');
+        //$product->checkStickerFnsku();
+
+        $sql = "select fnsku from iwa_inventory where seller_sku :seller_sku";
+        $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => 'TEMPERED32']);
+        echo $fnsku . "\n";
 
        /* if ($product instanceof Product) {
             echo "Finded\n" ;
