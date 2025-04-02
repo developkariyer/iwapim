@@ -227,7 +227,6 @@ class Import
      */
     protected function setAmazonCollectionProperties(AmazonMarketplace $amazonCollection, $listing, $country, $marketplace): void
     {
-        print_r(json_encode($listing));
         $amazonCollection->setLastUpdate(Carbon::now());
         $amazonCollection->setMarketplaceId($country);
         $amazonCollection->setTitle($this->getTitle($listing));
