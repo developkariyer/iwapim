@@ -61,7 +61,10 @@ class Import
                 $parent = $parent['parent'] ?? [];
             }
             while (!empty($folderTree)) {
-                $folder = Utility::checkSetPath(array_pop($folderTree), $folder);
+                $folderName = array_pop($folderTree);
+                if ($folderName !== null && $folderName !== '') {
+                    $folder = Utility::checkSetPath($folderName, $folder);
+                }
             }
             return $folder;
         }
@@ -94,7 +97,7 @@ class Import
         foreach ($this->connector->listings as $asin=>$listing) {
             $index++;
             echo "($index/$total) Processing $asin ...";
-            if (empty($asin)) {
+            if (empty($asin) || !is_string($asin)) {
                 echo " $asin is really empty\n";
                 continue;
             }
@@ -156,13 +159,9 @@ class Import
                 }
                 foreach ($countryListings as $countryListing) {
                     echo "$country ";
-                    echo "Start Field Collection \n";
                     $this->processFieldCollection($variantProduct, $countryListing, $country);
-                    echo "End Field Collection \n";
-                    echo "Start SkuRequied\n";
                     if ($skuRequired) {
                         $sku = explode('_', $countryListing['seller-sku'] ?? '')[0] ?? '';
-                        echo "Start CheckIwasku\n";
                         if ($this->checkIwasku($sku)) {
                             $mainProduct = Product::getByIwasku($sku, 1);
                             if ($mainProduct instanceof Product) {
@@ -172,9 +171,7 @@ class Import
                                 }
                             }
                         }
-                        echo "End CheckIwasku\n";
                     }
-                    echo "End SkuRequied\n";
                 }
             }
             $variantProduct->save();
