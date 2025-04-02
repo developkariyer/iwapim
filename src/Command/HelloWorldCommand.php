@@ -36,6 +36,7 @@ class HelloWorldCommand extends AbstractCommand
             $marketplace = $variant->getMarketplace();
             $marketplacePath = $marketplace->getPath();
             $marketplacePathArray = explode('/', $marketplacePath);
+            array_pop($marketplacePathArray);
             $marketplaceType = array_pop($marketplacePathArray);
             print_r($marketplaceType);
             break;
