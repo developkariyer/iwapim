@@ -40,20 +40,27 @@ class HelloWorldCommand extends AbstractCommand
             $marketplacePathArray = explode('/', $marketplacePath);
             array_pop($marketplacePathArray);
             $marketplaceType = array_pop($marketplacePathArray);
+            // Control variant marketplace
             if ($marketplaceType === 'Amazon') {
                 $amazonMarketplaceCollection = $variant->getAmazonMarketplace();
                 $asin = $variant->getUniqueMarketplaceId();
                 $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
+                // Amazon MarketplaceCollection Loop
                 foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
                     $marketplaceId = $amazonMarketplace->getMarketplaceId();
+                    // Control EU
                     if (in_array($marketplaceId, $notEuArray)) {
                         continue;
                     }
-                    if ($marketplaceId)
-                        $fnsku = $amazonMarketplace->getFnsku();
+                    $fnsku = $amazonMarketplace->getFnsku();
+                    if (!isset($fnsku)) {
+                        continue;
+                    }
+                    // add new ASIN list
                     if (!isset($stickerFnskuList[$asin])) {
                         $stickerFnskuList[$asin] = [];
                     }
+                    // add new fnsku for asin
                     if (!in_array($fnsku, $stickerFnskuList[$asin])) {
                         $stickerFnskuList[$asin][] = $fnsku;
                     }
