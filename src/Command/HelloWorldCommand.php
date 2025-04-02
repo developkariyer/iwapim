@@ -32,9 +32,9 @@ class HelloWorldCommand extends AbstractCommand
 
         $variantProducts = VariantProduct::findByField('uniqueMarketplaceId', 'B0BBS765HH');
         $variantProduct = $variantProducts[0];
-        $amazonMarketplaceCollection = $variantProduct->getAmazonMarketplace;
+        $amazonMarketplaceCollection = $variantProduct->getAmazonMarketplace();
         foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
-            print_r($amazonMarketplace);
+            echo $amazonMarketplace->getMarketplaceId() . "\n";
         }
 
 
