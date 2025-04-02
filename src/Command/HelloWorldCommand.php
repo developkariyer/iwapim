@@ -34,7 +34,7 @@ class HelloWorldCommand extends AbstractCommand
         $variantProduct = $variantProducts[0];
         $amazonMarketplaceCollection = $variantProduct->getAmazonMarketplace;
         foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
-            echo $amazonMarketplace->getMarketplaceId() . "\n";
+            print_r($amazonMarketplace);
         }
 
 
