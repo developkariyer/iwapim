@@ -28,7 +28,7 @@ class HelloWorldCommand extends AbstractCommand
         //$product = Product::findByField('iwasku', 'CA03300XW85K');
         //$product->checkStickerFnsku();
 
-        $sql = "select fnsku from iwa_inventory where seller_sku :seller_sku";
+        $sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku";
         $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => 'TEMPERED32']);
         echo $fnsku . "\n";
 
