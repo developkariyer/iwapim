@@ -29,7 +29,7 @@ class HelloWorldCommand extends AbstractCommand
         //$product->checkStickerFnsku();
 
         $sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku";
-        $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => 'TEMPERED32'])[0];
+        $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => 'TEMPERED32'])[0]['fnsku'];
         echo $fnsku . "\n";
 
        /* if ($product instanceof Product) {
