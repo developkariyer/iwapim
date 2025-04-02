@@ -251,8 +251,6 @@ class Import
                 echo $fnsku . "\n";
                 $amazonCollection->setFnsku($fnsku);
             }
-            echo $fnsku . "\n";
-            $amazonCollection->setFnsku($fnsku);
         }
     }
 }
