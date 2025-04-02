@@ -33,7 +33,10 @@ class HelloWorldCommand extends AbstractCommand
         $product = Product::findByField('iwasku', 'CA03300XW85K');
         $variants = $product->getListingItems();
         foreach ($variants as $variant) {
-            echo $variant->getTitle() . "\n";
+            $marketplace = $variant->getMarketplace();
+            print_r($marketplace);
+            break;
+            echo $variant->getMa() . "\n";
         }
 
        /* $stickerFnskuList = [];
