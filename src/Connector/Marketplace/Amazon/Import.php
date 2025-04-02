@@ -156,9 +156,13 @@ class Import
                 }
                 foreach ($countryListings as $countryListing) {
                     echo "$country ";
+                    echo "Start Field Collection \n";
                     $this->processFieldCollection($variantProduct, $countryListing, $country);
+                    echo "End Field Collection \n";
+                    echo "Start SkuRequied\n";
                     if ($skuRequired) {
                         $sku = explode('_', $countryListing['seller-sku'] ?? '')[0] ?? '';
+                        echo "Start CheckIwasku\n";
                         if ($this->checkIwasku($sku)) {
                             $mainProduct = Product::getByIwasku($sku, 1);
                             if ($mainProduct instanceof Product) {
@@ -168,7 +172,9 @@ class Import
                                 }
                             }
                         }
+                        echo "End CheckIwasku\n";
                     }
+                    echo "End SkuRequied\n";
                 }
             }
             $variantProduct->save();
