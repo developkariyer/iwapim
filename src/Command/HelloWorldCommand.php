@@ -39,8 +39,6 @@ class HelloWorldCommand extends AbstractCommand
                 }
             }
         }*/
-
-
         return Command::SUCCESS;
     }
 }
