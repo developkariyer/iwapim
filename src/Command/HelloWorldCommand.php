@@ -30,11 +30,12 @@ class HelloWorldCommand extends AbstractCommand
         //$product = Product::findByField('iwasku', 'CA03300XW85K');
         //$product->checkStickerFnsku();
 
-        $variantProducts = VariantProduct::findByField('uniqueMarketplaceId', 'B0BBS765HH');
+        $variantProducts = VariantProduct::findByField('uniqueMarketplaceId', 'B08B5BJMR5');
         $variantProduct = $variantProducts[0];
         $amazonMarketplaceCollection = $variantProduct->getAmazonMarketplace();
         foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
             echo $amazonMarketplace->getMarketplaceId() . "\n";
+            echo $amazonMarketplace->getFnsku() . "\n";
         }
 
 
