@@ -144,7 +144,7 @@ class ImportCommand extends AbstractCommand
         $ozonFlag = $input->getOption('ozon');
         $allFlag = $input->getOption('all');
 
-        $this->removeListeners();
+      //  $this->removeListeners();
 
         $notificationMessage = "Import report for ".date("Y-m-d H:i:s").":\n";
         $notificationSendFlag = false;
