@@ -30,9 +30,9 @@ class HelloWorldCommand extends AbstractCommand
         //$product = Product::findByField('iwasku', 'CA03300XW85K');
         //$product->checkStickerFnsku();
 
-        $sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku limit 1";
-        $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => 'TEMPERED32'])[0]['fnsku'];
-        echo $fnsku . "\n";
+        $variantProduct = VariantProduct::findByField('uniqueMarketplaceId', 'B0BBS765HH');
+        echo $variantProduct->getTitle();
+
 
        /* if ($product instanceof Product) {
             echo "Finded\n" ;
