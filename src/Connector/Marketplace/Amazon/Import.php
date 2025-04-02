@@ -245,6 +245,7 @@ class Import
         $sql = "select fnsku from iwa_inventory where seller_sku :seller_sku";
         if (isset($listing['seller-sku']) && $listing['seller-sku'] !== '') {
             $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => $listing['seller-sku']]);
+            echo $fnsku . "\n";
             $amazonCollection->setFnsku($fnsku);
         }
     }
