@@ -30,16 +30,39 @@ class HelloWorldCommand extends AbstractCommand
         //$product = Product::findByField('iwasku', 'CA03300XW85K');
         //$product->checkStickerFnsku();
 
+        // Product Class Create FnskuPDF !!!!!!!/////////////////////////////////////////////////////////////////////////////
         $product = Product::findByField('iwasku', 'CA03300XW85K');
         $variants = $product->getListingItems();
+        $stickerFnskuList = [];
         foreach ($variants as $variant) {
             $marketplace = $variant->getMarketplace();
             $marketplacePath = $marketplace->getPath();
             $marketplacePathArray = explode('/', $marketplacePath);
             array_pop($marketplacePathArray);
             $marketplaceType = array_pop($marketplacePathArray);
-            print_r($marketplaceType);
+            if ($marketplaceType === 'Amazon') {
+                $amazonMarketplaceCollection = $variant->getAmazonMarketplace();
+                $asin = $variant->getUniqueMarketplaceId();
+                $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
+                foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
+                    $marketplaceId = $amazonMarketplace->getMarketplaceId();
+                    if (in_array($marketplaceId, $notEuArray)) {
+                        continue;
+                    }
+                    if ($marketplaceId)
+                        $fnsku = $amazonMarketplace->getFnsku();
+                    if (!isset($stickerFnskuList[$asin])) {
+                        $stickerFnskuList[$asin] = [];
+                    }
+                    if (!in_array($fnsku, $stickerFnskuList[$asin])) {
+                        $stickerFnskuList[$asin][] = $fnsku;
+                    }
+                }
+            }
         }
+        print_r($stickerFnskuList);
+
+        ///////////////////////////////////////////////////////////////////////////
 
        /* $stickerFnskuList = [];
         $variantProducts = VariantProduct::findByField('uniqueMarketplaceId', 'B08B5BJMR5');
