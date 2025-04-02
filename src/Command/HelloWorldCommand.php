@@ -35,7 +35,13 @@ class HelloWorldCommand extends AbstractCommand
         $variantProduct = $variantProducts[0];
         $amazonMarketplaceCollection = $variantProduct->getAmazonMarketplace();
         $asin = $variantProduct->getUniqueMarketplaceId();
+        $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
         foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
+            $marketplaceId = $amazonMarketplace->getUniqueMarketplaceId();
+            if (in_array($marketplaceId, $notEuArray)) {
+                continue;
+            }
+            if ($marketplaceId )
             $fnsku = $amazonMarketplace->getFnsku();
             if (!isset($stickerFnskuList[$asin])) {
                 $stickerFnskuList[$asin] = [];
