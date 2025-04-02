@@ -243,8 +243,14 @@ class Import
             $amazonCollection->setEan($ean);
         }
         $sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku limit 1";
+
         if (isset($listing['seller-sku']) && $listing['seller-sku'] !== '') {
-            $fnsku = Utility::fetchFromSql($sql, ['seller_sku' => 'TEMPERED32'])[0]['fnsku'];
+            $result  = Utility::fetchFromSql($sql, ['seller_sku' => $listing['seller-sku']]);
+            if (!empty($result) && isset($result[0]['fnsku']) && $result[0]['fnsku'] !== '') {
+                $fnsku = $result[0]['fnsku'];
+                echo $fnsku . "\n";
+                $amazonCollection->setFnsku($fnsku);
+            }
             echo $fnsku . "\n";
             $amazonCollection->setFnsku($fnsku);
         }
