@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
         //$product->checkStickerFnsku();
 
         $variantProduct = VariantProduct::findByField('uniqueMarketplaceId', 'B0BBS765HH');
-        echo $variantProduct->getTitle();
+        echo $variantProduct->getUniqueMarketplaceId();
 
 
        /* if ($product instanceof Product) {
