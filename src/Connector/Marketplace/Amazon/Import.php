@@ -144,12 +144,12 @@ class Import
             $mainProduct = $variantProduct->getMainProduct();
             $skuRequired = empty($mainProduct);
             $mainProduct = is_array($mainProduct) ? reset($mainProduct) : $mainProduct;
-            /*if ($mainProduct instanceof Product) {
+            if ($mainProduct instanceof Product) {
                 echo "Reg ";
                 Registry::setKey($asin, $mainProduct->getIwasku(), 'asin-to-iwasku');
             } else {
                 echo "NoReg ";
-            }*/
+            }
             foreach ($listing as $country=>$countryListings) {
                 if ($country === 'catalog') {
                     continue;

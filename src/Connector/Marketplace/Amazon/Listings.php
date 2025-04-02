@@ -69,9 +69,9 @@ class Listings
             $this->connector->putToCache("ASIN_{$asin}.json", $item);
             Utility::storeJsonData($this->connector->getMarketplace()->getId(), $asin, $item);
             $ean = $this->retrieveEan($item);
-            /*if (!empty($ean)) {
+            if (!empty($ean)) {
                 Registry::setKey($asin, $ean, 'asin-to-ean');
-            }*/
+            }
         }
         sleep(1);
     }
