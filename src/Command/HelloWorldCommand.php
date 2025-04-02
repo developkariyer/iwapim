@@ -39,7 +39,6 @@ class HelloWorldCommand extends AbstractCommand
             array_pop($marketplacePathArray);
             $marketplaceType = array_pop($marketplacePathArray);
             print_r($marketplaceType);
-            break;
         }
 
        /* $stickerFnskuList = [];
