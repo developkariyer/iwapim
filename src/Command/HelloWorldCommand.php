@@ -34,7 +34,10 @@ class HelloWorldCommand extends AbstractCommand
         $variants = $product->getListingItems();
         foreach ($variants as $variant) {
             $marketplace = $variant->getMarketplace();
-            print_r($marketplace->getPath());
+            $marketplacePath = $marketplace->getPath();
+            $marketplaceType = explode('/', $marketplacePath);
+            $marketplaceType = end($marketplaceType);
+            print_r($marketplaceType);
             break;
         }
 
