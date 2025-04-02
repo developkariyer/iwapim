@@ -34,9 +34,8 @@ class HelloWorldCommand extends AbstractCommand
         $variants = $product->getListingItems();
         foreach ($variants as $variant) {
             $marketplace = $variant->getMarketplace();
-            print_r($marketplace);
+            print_r($marketplace->getPath());
             break;
-            echo $variant->getMa() . "\n";
         }
 
        /* $stickerFnskuList = [];
