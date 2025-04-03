@@ -612,6 +612,9 @@ class Product extends Concrete
         // Filter amazon variant
         $stickerFnskuList = $this->createAmazonStickerFnskuList();
         print_r(json_encode($stickerFnskuList));
+        foreach ($stickerFnskuList as $asin => $values) {
+            echo "asin: " . $asin . "\n";
+        }
     }
 
     public function createAmazonStickerFnskuList()
