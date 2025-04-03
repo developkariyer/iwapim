@@ -210,7 +210,7 @@
                             let fnskuLinks = '';
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
                                 product.sticker_fnsku.forEach(fnsku => {
-                                    fnskuLinks += `<a href="${fnsku}" target="_blank">FNSKU Link</a> | `;
+                                    fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
                                 });
                             }
                             console.log(`
