@@ -595,21 +595,6 @@ class Product extends Concrete
 
     public function checkStickerFnsku()
     {
-        /*$assets = [];
-        $iwasku = $this->getIwasku();
-        $sql = "SELECT  warehouse, asin, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku";
-        $result = Utility::fetchFromSql($sql, ['iwasku' => $iwasku]);
-        foreach ($result as $item) {
-            $asset  = PdfGenerator::generate4x6Fnsku($this, $item['fnsku'], $item['asin'], "{$item['warehouse']}_{$item['asin']}_{$item['fnsku']}_{$iwasku}.pdf");
-            if ($asset) {
-                $assets[] = $asset;
-            }
-        }
-        $this->setStickerFnsku($assets);
-        $this->save();
-        return $assets;*/
-
-        // Filter amazon variant
         $iwasku = $this->getIwasku();
         $stickerFnskuList = $this->filterAmazonStickerFnskuList();
         $assets = [];
