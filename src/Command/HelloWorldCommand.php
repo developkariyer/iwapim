@@ -30,8 +30,50 @@ class HelloWorldCommand extends AbstractCommand
         //$product = Product::findByField('iwasku', 'CA03300XW85K');
         //$product->checkStickerFnsku();
 
-        // Product Class Create FnskuPDF !!!!!!!/////////////////////////////////////////////////////////////////////////////
+        // NEW ALGORITHM
         $product = Product::findByField('iwasku', 'CA03300XW85K');
+        $variants = $product->getListingItems();
+        $stickerFnskuList = [];
+        $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
+        foreach ($variants as $variant) {
+            $marketplace = $variant->getMarketplace();
+            $marketplacePath = $marketplace->getPath();
+            $marketplacePathArray = explode('/', $marketplacePath);
+            array_pop($marketplacePathArray);
+            $marketplaceType = array_pop($marketplacePathArray);
+
+            if ($marketplaceType === 'Amazon') {
+                $amazonMarketplaceCollection = $variant->getAmazonMarketplace();
+                $asin = $variant->getUniqueMarketplaceId();
+
+                foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
+                    $marketplaceId = $amazonMarketplace->getMarketplaceId();
+                    if (in_array($marketplaceId, $notEuArray)) {
+                        continue;
+                    }
+
+                    /*if (!isset($stickerFnskuList[$asin])) {
+                        $stickerFnskuList[$asin] = [];
+                    }*/
+
+                    $sql = "select * from iwa_inventory where asin = :asin and inventory_type = :inventoryType";
+                    $result = Utility::fetchFromSql($sql, ['asin' => $asin, 'inventoryType' => 'AMAZON_FBA']);
+                    print_r(json_encode($result));
+
+
+                    // add new fnsku for asin
+                  /*  if (!in_array($fnsku, $stickerFnskuList[$asin])) {
+                        $stickerFnskuList[$asin][] = $fnsku;
+                    }*/
+                }
+            }
+        }
+
+
+        //where  inventory type = FBA
+        // seller sku != amzn.gr != unexpected
+        // Product Class Create FnskuPDF !!!!!!!/////////////////////////////////////////////////////////////////////////////
+        /*$product = Product::findByField('iwasku', 'CA03300XW85K');
         $variants = $product->getListingItems();
         $stickerFnskuList = [];
         foreach ($variants as $variant) {
@@ -67,7 +109,7 @@ class HelloWorldCommand extends AbstractCommand
                 }
             }
         }
-        print_r($stickerFnskuList);
+        print_r($stickerFnskuList);*/
 
         ///////////////////////////////////////////////////////////////////////////
 

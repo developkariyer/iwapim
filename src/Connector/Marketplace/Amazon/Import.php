@@ -242,7 +242,9 @@ class Import
         if (str_starts_with($ean, '868408')) {
             $amazonCollection->setEan($ean);
         }
-        $sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku limit 1";
+
+        //HATALI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /*$sql = "select fnsku from iwa_inventory where seller_sku= :seller_sku limit 1";
 
         if (isset($listing['seller-sku']) && $listing['seller-sku'] !== '') {
             $result  = Utility::fetchFromSql($sql, ['seller_sku' => $listing['seller-sku']]);
@@ -251,6 +253,7 @@ class Import
                 echo $fnsku . "\n";
                 $amazonCollection->setFnsku($fnsku);
             }
-        }
+        }*/
+        ///////////////////////////////////////////////////////////////////////////////////
     }
 }
