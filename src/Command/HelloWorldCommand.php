@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
         //$product->checkStickerFnsku();
 
         // NEW ALGORITHM
-        $product = Product::findByField('iwasku', 'ITS00603908E');
+        $product = Product::findByField('iwasku', 'AHM0030S2DM0');
         $variants = $product->getListingItems();
         $stickerFnskuList = [];
         $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
