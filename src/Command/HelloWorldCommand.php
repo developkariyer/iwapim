@@ -70,20 +70,7 @@ class HelloWorldCommand extends AbstractCommand
                     $stickerEu = null;
                 }
             }
-            if (isset($product['sticker_id'])) {
-                $sticker = Asset::getById($product['sticker_id']);
-            } else {
-                if (isset($product['dest_id'])) {
-                    $productObject = Product::getById($product['dest_id']);
-                    if ($productObject) {
-                        $sticker = $productObject->checkSticker4x6iwasku();
-                    } else {
-                        $sticker = null;
-                    }
-                } else {
-                    $sticker = null;
-                }
-            }
+
             if (isset($product['sticker_ids_fnsku']) && !empty($product['sticker_ids_fnsku'])) {
                 $fnskuIds = explode(',', $product['sticker_ids_fnsku']);
                 $fnskuStickers = [];
@@ -111,7 +98,6 @@ class HelloWorldCommand extends AbstractCommand
                 }
             }
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
-            $product['sticker_link'] = $sticker ? $sticker->getFullPath() : '';
             $product['sticker_fnsku'] = $fnskuStickers ?? [];
         }
         print_r(json_encode($product));
