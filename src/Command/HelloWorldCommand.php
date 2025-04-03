@@ -52,8 +52,8 @@ class HelloWorldCommand extends AbstractCommand
                         continue;
                     }
 
-                    $sql = "select * from iwa_inventory where asin = :asin and inventory_type = :inventoryType";
-                    $result = Utility::fetchFromSql($sql, ['asin' => $asin, 'inventoryType' => 'AMAZON_FBA']);
+                    $sql = "select * from iwa_inventory where asin = :asin and inventory_type = 'AMAZON_FBA'";
+                    $result = Utility::fetchFromSql($sql, ['asin' => $asin]);
                     if (!empty($result)) {
                         if (!isset($stickerFnskuList[$asin])) {
                             $stickerFnskuList[$asin] = [];
