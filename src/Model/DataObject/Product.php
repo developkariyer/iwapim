@@ -610,6 +610,12 @@ class Product extends Concrete
         return $assets;*/
 
         // Filter amazon variant
+        $stickerFnskuList = $this->createAmazonStickerFnskuList();
+        print_r(json_encode($stickerFnskuList));
+    }
+
+    public function createAmazonStickerFnskuList()
+    {
         $variants = $this->filterAmazonVariants();
         $stickerFnskuList = [];
         $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
@@ -647,10 +653,8 @@ class Product extends Concrete
                     }
                 }
             }
-
         }
-        print_r(json_encode($stickerFnskuList));
-
+        return $stickerFnskuList;
     }
 
     public function filterAmazonVariants()
