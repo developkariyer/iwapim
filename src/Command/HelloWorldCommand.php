@@ -100,7 +100,7 @@ class HelloWorldCommand extends AbstractCommand
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
             $product['sticker_fnsku'] = $fnskuStickers ?? [];
         }
-        print_r(json_encode($product));
+        print_r(json_encode($products));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
