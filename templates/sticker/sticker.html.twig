@@ -210,13 +210,20 @@
                             let fnskuLinks = '';
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
                                 product.sticker_fnsku.forEach(fnsku => {
-                                    fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
+                                    const parts = fnsku.split('_');
+
+                                    const asin = parts[1];
+                                    const fnskuCode = parts[2];
+                                    const returnStatus = parts.includes('return') ? 'return' : 'notreturn';
+
+                                    fnskuLinks += `
+                                        <option value="${fnsku}">
+                                            ASIN: ${asin}, FNSKU: ${fnskuCode}, Status: ${returnStatus}
+                                        </option>
+                                    `;
+                                    //fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
                                 });
                             }
-                            console.log(`
-                               ${ product.sticker_fnsku.forEach(fnsku => {
-                            })}
-                            `);
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
