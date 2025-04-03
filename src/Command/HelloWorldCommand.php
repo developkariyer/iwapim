@@ -22,7 +22,7 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
-    public function getProductDetails($productIdentifier, $groupId): JsonResponse
+    public function getProductDetails($productIdentifier, $groupId)
     {
         $sql = "SELECT 
                 osp.iwasku,
