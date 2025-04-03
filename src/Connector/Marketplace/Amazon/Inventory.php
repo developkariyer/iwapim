@@ -37,7 +37,7 @@ class Inventory
         echo "Processing Inventory";
         $db = Db::get();
         $sql = "INSERT INTO iwa_inventory (inventory_type, warehouse, asin, fnsku, iwasku, seller_sku, item_condition, json_data, total_quantity) ".
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE iwasku = ?, item_condition = ?, total_quantity = ?, json_data = ?";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE iwasku = ?, seller_sku = ?, item_condition = ?, total_quantity = ?, json_data = ?";
         $inventoryType = 'AMAZON_FBA';
         foreach ($this->inventory as $country => $inventory) {
             $db->beginTransaction();
@@ -56,7 +56,7 @@ class Inventory
                     $jsonData = json_encode($item);
                     $db->executeStatement($sql, [
                         $inventoryType, $warehouse, $asin, $fnsku, $iwasku, $sellerSku, $itemCondition, $jsonData, $totalQuantity,
-                        $iwasku, $itemCondition, $totalQuantity, $jsonData
+                        $iwasku, $sellerSku, $itemCondition, $totalQuantity, $jsonData
                     ]);
                     Registry::setKey($fnsku, $asin, 'fnsku-to-asin');
                 }
