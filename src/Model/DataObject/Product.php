@@ -613,8 +613,6 @@ class Product extends Concrete
         $stickerFnskuList = $this->filterAmazonStickerFnskuList();
         $assets = [];
         foreach ($stickerFnskuList as $asin => $values) {
-            echo "\n";
-            echo "asin: " . $asin . "\n";
             foreach ($values['return'] as $fnsku) {
                 $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$asin}_{$fnsku}_return_4x6eufnsku.pdf");
                 if ($asset) {
