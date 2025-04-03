@@ -58,7 +58,7 @@ class HelloWorldCommand extends AbstractCommand
 
                     $sql = "select * from iwa_inventory where asin = :asin and inventory_type = :inventoryType";
                     $result = Utility::fetchFromSql($sql, ['asin' => $asin, 'inventoryType' => 'AMAZON_FBA']);
-                    print_r(json_encode($result));
+                    print_r($result);
 
 
                     // add new fnsku for asin
