@@ -207,10 +207,17 @@
                         });
                         let detailsHtml = '';
                         products.forEach(product => {
+                            let fnskuLinks = '';
+                            if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
+                                product.sticker_fnsku.forEach(fnsku => {
+                                    fnskuLinks += `<a href="${fnsku}" target="_blank">FNSKU Link</a> | `;
+                                });
+                            }
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
                             <a href="${product.sticker_link}" target="_blank">IWASKU Link</a> |
+                            ${fnskuLinks}
                             <br/>
                             `;
                         });
