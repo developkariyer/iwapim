@@ -214,7 +214,8 @@
                                 });
                             }
                             console.log(`
-                               ${product}
+                               ${ product.sticker_fnsku.forEach(fnsku => {
+                            })}
                             `);
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
