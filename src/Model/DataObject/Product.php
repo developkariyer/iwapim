@@ -593,9 +593,9 @@ class Product extends Concrete
         return $asset;
     }
 
-    public function checkStickerFnsku(): mixed
+    public function checkStickerFnsku()
     {
-        $assets = [];
+        /*$assets = [];
         $iwasku = $this->getIwasku();
         $sql = "SELECT  warehouse, asin, fnsku FROM `iwa_inventory` WHERE iwasku = :iwasku";
         $result = Utility::fetchFromSql($sql, ['iwasku' => $iwasku]);
@@ -607,22 +607,70 @@ class Product extends Concrete
         }
         $this->setStickerFnsku($assets);
         $this->save();
+        return $assets;*/
 
-        /*$variantObjects  = $this->getListingItems();
-        $assets = [];
-        foreach ($variantObjects as $variant) {
-            if ($variant->getFnsku() !== null) {
-                $fnsku = $variant->getFnsku();
-                $asin = $variant->getUniqueMarketplaceId();
-                $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$fnsku}_{$this->getKey()}_fnsku.pdf");
-                if ($asset) {
-                    $assets[] = $asset;
+        // Filter amazon variant
+        $variants = $this->filterAmazonVariants();
+        $stickerFnskuList = [];
+        $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
+        foreach ($variants as $variant) {
+            $amazonMarketplaceCollection = $variant->getAmazonMarketplace();
+            $asin = $variant->getUniqueMarketplaceId();
+            foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
+                $marketplaceId = $amazonMarketplace->getMarketplaceId();
+                if (in_array($marketplaceId, $notEuArray)) {
+                    continue;
+                }
+                $sql = "select * from iwa_inventory where asin = :asin and inventory_type = 'AMAZON_FBA'";
+                $result = Utility::fetchFromSql($sql, ['asin' => $asin]);
+                if (!empty($result)) {
+                    if (!isset($stickerFnskuList[$asin])) {
+                        $stickerFnskuList[$asin] = [];
+                    }
+                    foreach ($result as $item) {
+                        if (!isset($stickerFnskuList[$asin]['return']) || !isset($stickerFnskuList[$asin]['notReturn'])) {
+                            $stickerFnskuList[$asin]['return'] = [];
+                            $stickerFnskuList[$asin]['notReturn'] = [];
+                        }
+                        $returnControl = $item['seller_sku'] ?? '';
+                        $fnsku = $item['fnsku'] ?? '';
+                        if (!str_starts_with($returnControl, 'amzn.gr')) {
+                            if (!in_array($fnsku, $stickerFnskuList[$asin]['notReturn'])) {
+                                $stickerFnskuList[$asin]['notReturn'][] = $fnsku;
+                            }
+                        }
+                        else {
+                            if (!in_array($fnsku, $stickerFnskuList[$asin]['return'])) {
+                                $stickerFnskuList[$asin]['return'][] = $fnsku;
+                            }
+                        }
+                    }
                 }
             }
+
         }
-        $this->setStickerFnsku($assets);
-        $this->save();*/
-        return $assets;
+        print_r(json_encode($stickerFnskuList));
+
+    }
+
+    public function filterAmazonVariants()
+    {
+        $variants = $this->getListingItems();
+        $filteredVariants = [];
+        foreach ($variants as $variant) {
+            $marketplace = $variant->getMarketplace();
+            if (!$marketplace instanceof Marketplace) {
+                continue;
+            }
+            $marketplacePath = $marketplace->getPath();
+            $marketplacePathArray = explode('/', $marketplacePath);
+            array_pop($marketplacePathArray);
+            $marketplaceType = array_pop($marketplacePathArray);
+            if ($marketplaceType === 'Amazon') {
+                $filteredVariants[] = $variant;
+            }
+        }
+        return $filteredVariants;
     }
 
     /**
