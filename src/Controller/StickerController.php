@@ -248,7 +248,6 @@ class StickerController extends FrontendController
                     $sticker = null;
                 }
             }
-            error_log($fnskuStickers);
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
             $product['sticker_link'] = $sticker ? $sticker->getFullPath() : '';
             $product['sticker_fnsku'] = $fnskuStickers ?? [];
