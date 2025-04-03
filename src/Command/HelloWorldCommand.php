@@ -88,6 +88,7 @@ class HelloWorldCommand extends AbstractCommand
                 $fnskuIds = explode(',', $product['sticker_ids_fnsku']);
                 $fnskuStickers = [];
                 foreach ($fnskuIds as $fnskuId) {
+                    echo $fnskuId . "\n";
                     $sticker = Asset::getById($fnskuId);
                     if ($sticker) {
                         $fnskuStickers[] = $sticker->getFullPath();
