@@ -610,23 +610,32 @@ class Product extends Concrete
         return $assets;*/
 
         // Filter amazon variant
-        $stickerFnskuList = $this->createAmazonStickerFnskuList();
+        $stickerFnskuList = $this->filterAmazonStickerFnskuList();
+        $assets = [];
         foreach ($stickerFnskuList as $asin => $values) {
             echo "\n";
             echo "asin: " . $asin . "\n";
-            foreach ($values['return'] as $item) {
-                echo "RETURN\n";
-                echo $item . "\n";
+            foreach ($values['return'] as $fnsku) {
+                $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$asin}_{$fnsku}_return_4x6eufnsku.pdf");
+                if ($asset) {
+                    $assets[] = $asset;
+                }
             }
 
-            foreach ($values['notReturn'] as $item) {
-                echo "NOT RETURN\n";
-                echo $item . "\n";
+            foreach ($values['notReturn'] as $fnsku) {
+                $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$asin}_{$fnsku}_notreturn_4x6eufnsku.pdf");
+                if ($asset) {
+                    $assets[] = $asset;
+                }
             }
         }
+        $this->setStickerFnsku($assets);
+        $this->save();
+        return $assets;
     }
 
-    public function createAmazonStickerFnskuList()
+
+    public function filterAmazonStickerFnskuList()
     {
         $variants = $this->filterAmazonVariants();
         $stickerFnskuList = [];
