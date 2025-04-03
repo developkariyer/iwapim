@@ -213,7 +213,9 @@
                                     fnskuLinks += `<a href="${fnsku}" target="_blank">FNSKU Link</a> | `;
                                 });
                             }
-                            console.log(fnskuLinks)
+                            console.log(`
+                               ${fnskuLinks}
+                            `);
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
