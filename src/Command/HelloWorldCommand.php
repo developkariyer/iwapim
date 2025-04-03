@@ -88,10 +88,10 @@ class HelloWorldCommand extends AbstractCommand
                 $fnskuIds = explode(',', $product['sticker_ids_fnsku']);
                 $fnskuStickers = [];
                 foreach ($fnskuIds as $fnskuId) {
-                    $sticker = Asset::getById($fnskuId);
-                    if ($sticker) {
-                        echo $sticker->getFullPath() . "\n";
-                        $fnskuStickers[] = $sticker->getFullPath();
+                    $stickerFnsku = Asset::getById($fnskuId);
+                    if ($stickerFnsku) {
+                        echo $stickerFnsku->getFullPath() . "\n";
+                        $fnskuStickers[] = $stickerFnsku->getFullPath();
                     }
                 }
             }
@@ -99,15 +99,15 @@ class HelloWorldCommand extends AbstractCommand
                 if (isset($product['dest_id'])) {
                     $productObject = Product::getById($product['dest_id']);
                     if ($productObject) {
-                        $stickers = $productObject->checkStickerFnsku();
-                        foreach ($stickers as $sticker) {
-                            $fnskuStickers[] = $sticker->getFullPath();
+                        $stickersFnsku = $productObject->checkStickerFnsku();
+                        foreach ($stickersFnsku as $stickerFnsku) {
+                            $fnskuStickers[] = $stickerFnsku->getFullPath();
                         }
                     } else {
-                        $sticker = null;
+                        $stickerFnsku = null;
                     }
                 } else {
-                    $sticker = null;
+                    $stickerFnsku = null;
                 }
             }
             $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
