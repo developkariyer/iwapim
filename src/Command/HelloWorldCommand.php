@@ -52,23 +52,35 @@ class HelloWorldCommand extends AbstractCommand
                         continue;
                     }
 
-                    /*if (!isset($stickerFnskuList[$asin])) {
-                        $stickerFnskuList[$asin] = [];
-                    }*/
-
                     $sql = "select * from iwa_inventory where asin = :asin and inventory_type = :inventoryType";
                     $result = Utility::fetchFromSql($sql, ['asin' => $asin, 'inventoryType' => 'AMAZON_FBA']);
-                    print_r($result);
-
-
-                    // add new fnsku for asin
-                  /*  if (!in_array($fnsku, $stickerFnskuList[$asin])) {
-                        $stickerFnskuList[$asin][] = $fnsku;
-                    }*/
+                    if (!empty($result)) {
+                        if (!isset($stickerFnskuList[$asin])) {
+                            $stickerFnskuList[$asin] = [];
+                        }
+                        foreach ($result as $item) {
+                            if (!isset($stickerFnskuList[$asin]['return']) || !isset($stickerFnskuList[$asin]['notReturn'])) {
+                                $stickerFnskuList[$asin]['return'] = [];
+                                $stickerFnskuList[$asin]['notReturn'] = [];
+                            }
+                            $returnControl = $item['seller_sku'] ?? '';
+                            $fnsku = $item['fnsku'] ?? '';
+                            if (!str_starts_with($returnControl, 'amzn.gr')) {
+                                if (!in_array($fnsku, $stickerFnskuList[$asin]['notReturn'])) {
+                                    $stickerFnskuList[$asin]['notReturn'][] = $fnsku;
+                                }
+                            }
+                            else {
+                                if (!in_array($fnsku, $stickerFnskuList[$asin]['return'])) {
+                                    $stickerFnskuList[$asin]['return'][] = $fnsku;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-
+        print_r(json_encode($stickerFnskuList));
 
         //where  inventory type = FBA
         // seller sku != amzn.gr != unexpected
