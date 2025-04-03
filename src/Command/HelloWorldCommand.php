@@ -22,94 +22,12 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
-    public function getProductDetails($productIdentifier, $groupId)
-    {
-        $sql = "SELECT 
-                osp.iwasku,
-                org.dest_id,
-                osp.name,
-                osp.productCode,
-                osp.productCategory,
-                osp.imageUrl,
-                osp.variationSize,
-                osp.variationColor,
-                osp.productIdentifier,
-                sticker_eu.dest_id AS sticker_id_eu,
-                sticker_normal.dest_id AS sticker_id,
-                GROUP_CONCAT(sticker_fnsku.dest_id) AS sticker_ids_fnsku
-            FROM object_relations_gproduct org
-            JOIN object_product osp ON osp.oo_id = org.dest_id
-            LEFT JOIN object_relations_product sticker_eu
-            ON sticker_eu.src_id = osp.oo_id
-            AND sticker_eu.type = 'asset'
-            AND sticker_eu.fieldname = 'sticker4x6eu'
-            LEFT JOIN object_relations_product sticker_normal
-            ON sticker_normal.src_id = osp.oo_id
-            AND sticker_normal.type = 'asset'
-            AND sticker_normal.fieldname = 'sticker4x6iwasku'
-            LEFT JOIN object_relations_product sticker_fnsku
-            ON sticker_fnsku.src_id = osp.oo_id
-            AND sticker_fnsku.type = 'asset'
-            AND sticker_fnsku.fieldname = 'stickerFnsku' 
-            WHERE osp.productIdentifier =  :productIdentifier AND org.src_id = :groupId
-            GROUP BY osp.iwasku, org.dest_id, osp.name, osp.productCode, osp.productCategory, osp.imageUrl, osp.variationSize, osp.variationColor, osp.productIdentifier, sticker_eu.dest_id, sticker_normal.dest_id;";
-
-        $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
-        foreach ($products as &$product) {
-            if (isset($product['sticker_id_eu'])) {
-                $stickerEu = Asset::getById($product['sticker_id_eu']);
-            } else {
-                if (isset($product['dest_id'])) {
-                    $productObject = Product::getById($product['dest_id']);
-                    if ($productObject) {
-                        $stickerEu = $productObject->checkSticker4x6eu();
-                    } else {
-                        $stickerEu = null;
-                    }
-                } else {
-                    $stickerEu = null;
-                }
-            }
-
-            if (isset($product['sticker_ids_fnsku']) && !empty($product['sticker_ids_fnsku'])) {
-                $fnskuIds = explode(',', $product['sticker_ids_fnsku']);
-                $fnskuStickers = [];
-                foreach ($fnskuIds as $fnskuId) {
-                    echo "Fnsku IDS: " . $fnskuId . "\n";
-                    $stickerFnsku = Asset::getById($fnskuId);
-                    if ($stickerFnsku) {
-                        echo $stickerFnsku->getFullPath() . "\n";
-                        $fnskuStickers[] = $stickerFnsku->getFullPath();
-                    }
-                }
-            }
-            else {
-                if (isset($product['dest_id'])) {
-                    $productObject = Product::getById($product['dest_id']);
-                    if ($productObject) {
-                        $stickersFnsku = $productObject->checkStickerFnsku();
-                        foreach ($stickersFnsku as $stickerFnsku) {
-                            $fnskuStickers[] = $stickerFnsku->getFullPath();
-                        }
-                    } else {
-                        $stickerFnsku = null;
-                    }
-                } else {
-                    $stickerFnsku = null;
-                }
-            }
-            $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
-            $product['sticker_fnsku'] = $fnskuStickers ?? [];
-        }
-        print_r(json_encode($products));
-    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->getProductDetails('IT-004', 269397);
 
-       // $product = Product::findByField('iwasku', 'SC02400BKRMC');
-       // $product->checkStickerFnsku();
+       $product = Product::findByField('iwasku', 'SC02400BKRMC');
+       $product->checkStickerFnsku();
 
         // NEW ALGORITHM
         /*$product = Product::findByField('iwasku', 'SC02400BKRMC');
