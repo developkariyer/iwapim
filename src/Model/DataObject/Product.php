@@ -652,7 +652,9 @@ class Product extends Concrete
                         }
                         else {
                             if (!in_array($fnsku, $stickerFnskuList[$asin]['return'])) {
-                                $stickerFnskuList[$asin]['return'][] = $fnsku;
+                                if ($item['total_quantity'] > 0) {
+                                    $stickerFnskuList[$asin]['return'][] = $fnsku;
+                                }
                             }
                         }
                     }
