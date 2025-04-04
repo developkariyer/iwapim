@@ -208,53 +208,22 @@
                         let detailsHtml = '';
                         products.forEach(product => {
                             let fnskuLinks = '';
-                            const asinGroups = {};
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
                                 product.sticker_fnsku.forEach(fnsku => {
                                     const parts = fnsku.split('_');
+
                                     const asin = parts[1];
                                     const fnskuCode = parts[2];
                                     const returnStatus = parts.includes('return') ? 'return' : 'notreturn';
-                                    if (!asinGroups[asin]) {
-                                        asinGroups[asin] = { return: [], notreturn: [] };
-                                    }
-                                    asinGroups[asin][returnStatus].push(fnsku);
-                                });
-                            }
-                            for (const asin in asinGroups) {
-                                if (asinGroups.hasOwnProperty(asin)) {
-                                    const returnOptions = asinGroups[asin].return.map(fnsku => `
-                                        <a href="${fnsku}" target="_blank">${fnsku.split('_')[2]}</a><br>
-                                    `).join('');
-                                        const notReturnOptions = asinGroups[asin].notreturn.map(fnsku => `
-                                        <a href="${fnsku}" target="_blank">${fnsku.split('_')[2]}</a><br>
-                                    `).join('');
 
                                     fnskuLinks += `
-                                        <div class="asin-item">
-                                            <p class="asin-title" data-toggle="collapse" data-target="#collapse-return-${asin}" aria-expanded="false" aria-controls="collapse-return-${asin}">ASIN: ${asin}</p>
-
-                                            <div id="collapse-return-${asin}" class="collapse">
-                                                <div class="card card-body">
-                                                    <strong>Return</strong>
-                                                    ${returnOptions}
-                                                </div>
-                                            </div>
-
-                                            <p class="asin-title" data-toggle="collapse" data-target="#collapse-notreturn-${asin}" aria-expanded="false" aria-controls="collapse-notreturn-${asin}">Not Return</p>
-
-                                            <div id="collapse-notreturn-${asin}" class="collapse">
-                                                <div class="card card-body">
-                                                    <strong>Not Return</strong>
-                                                    ${notReturnOptions}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <option value="${fnsku}">
+                                            ASIN: ${asin}, FNSKU: ${fnskuCode}, Status: ${returnStatus}
+                                        </option>
                                     `;
-
-                                }
+                                    //fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
+                                });
                             }
-
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
@@ -279,22 +248,6 @@
                 });
         }
 
-        function toggleReturnDropdown(asin) {
-            const returnDropdown = document.getElementById(`return-dropdown-${asin}`);
-            const notReturnDropdown = document.getElementById(`notreturn-dropdown-${asin}`);
-
-            if (returnDropdown.style.display === 'none') {
-                returnDropdown.style.display = 'block';
-            } else {
-                returnDropdown.style.display = 'none';
-            }
-
-            if (notReturnDropdown.style.display === 'none') {
-                notReturnDropdown.style.display = 'block';
-            } else {
-                notReturnDropdown.style.display = 'none';
-            }
-        }
 
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
