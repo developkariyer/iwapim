@@ -209,20 +209,38 @@
                         products.forEach(product => {
                             let fnskuLinks = '';
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
+                                const asinMap = {};
                                 product.sticker_fnsku.forEach(fnsku => {
                                     const parts = fnsku.split('_');
-
                                     const asin = parts[1];
                                     const fnskuCode = parts[2];
                                     const returnStatus = parts.includes('return') ? 'return' : 'notreturn';
 
-                                    fnskuLinks += `
-                                        <option value="${fnsku}">
-                                            ASIN: ${asin}, FNSKU: ${fnskuCode}, Status: ${returnStatus}
-                                        </option>
-                                    `;
+                                    if (!asinMap[asin]) {
+                                        asinMap[asin] = { return: [], notreturn: [] };
+                                    }
+                                    asinMap[asin][returnStatus].push(fnsku);
                                     //fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
                                 });
+                            }
+                            for (const asin in asinMap) {
+                                if (asinMap.hasOwnProperty(asin)) {
+                                    fnskuLinks += `
+                                        <div class="asin-item">
+                                            <p class="asin" onclick="toggleReturnStatus('${asin}')">ASIN: ${asin}</p>
+                                            <div class="return-status" id="return-status-${asin}" style="display:none;">
+                                                <p><strong>Return Status:</strong>
+                                                    <span id="return-${asin}">${asinMap[asin].return.length > 0 ? 'Return' : 'Not Return'}</span>
+                                                </p>
+                                            </div>
+                                            <div class="fnsku-list" id="fnsku-list-${asin}" style="display:none;">
+                                                <p><strong>FNSKUs:</strong></p>
+                                                ${asinMap[asin].return.map(fnsku => `<a href="${fnsku}" target="_blank">${fnsku}</a>`).join('<br>')}
+                                                ${asinMap[asin].notreturn.map(fnsku => `<a href="${fnsku}" target="_blank">${fnsku}</a>`).join('<br>')}
+                                            </div>
+                                        </div>
+                                    `;
+                                }
                             }
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
@@ -248,7 +266,12 @@
                 });
         }
 
-
+        function toggleReturnStatus(asin) {
+            const statusDiv = document.getElementById(`return-status-${asin}`);
+            const fnskuListDiv = document.getElementById(`fnsku-list-${asin}`);
+            statusDiv.style.display = statusDiv.style.display === 'none' ? 'block' : 'none';
+            fnskuListDiv.style.display = fnskuListDiv.style.display === 'none' ? 'block' : 'none';
+        }
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
