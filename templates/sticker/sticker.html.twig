@@ -279,8 +279,18 @@
         function toggleReturnDropdown(asin) {
             const returnDropdown = document.getElementById(`return-dropdown-${asin}`);
             const notReturnDropdown = document.getElementById(`notreturn-dropdown-${asin}`);
-            returnDropdown.style.display = returnDropdown.style.display === 'none' ? 'block' : 'none';
-            notReturnDropdown.style.display = notReturnDropdown.style.display === 'none' ? 'block' : 'none';
+
+            if (returnDropdown.style.display === 'none') {
+                returnDropdown.style.display = 'block';
+            } else {
+                returnDropdown.style.display = 'none';
+            }
+
+            if (notReturnDropdown.style.display === 'none') {
+                notReturnDropdown.style.display = 'block';
+            } else {
+                notReturnDropdown.style.display = 'none';
+            }
         }
 
         function renderPagination() {
