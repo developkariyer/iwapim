@@ -51,15 +51,7 @@ class StickersCommand extends AbstractCommand
                         continue;
                     }
                     echo " generating ";
-                    $stickerEU = $productObject->checkSticker4x6eu();
-                    $productObject->setSticker4x6eu($stickerEU);
-                    $productObject->save();
-                    $stickerIwasku = $productObject->checkSticker4x6iwasku();
-                    $productObject->setSticker4x6iwasku($stickerIwasku);
-                    $productObject->save();
-                    $stickerFnskuList[] = $productObject->checkStickerFnsku();
-                    $productObject->setStickerFnsku($stickerFnskuList);
-                    $productObject->save();
+                    $sticker = $productObject->checkSticker4x6eu();
                 } else {
                     $sticker = Asset::getById($stickerId);
                 }
