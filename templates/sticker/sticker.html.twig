@@ -208,8 +208,8 @@
                         let detailsHtml = '';
                         products.forEach(product => {
                             let fnskuLinks = '';
+                            const asinMap = {};
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
-                                const asinMap = {};
                                 product.sticker_fnsku.forEach(fnsku => {
                                     const parts = fnsku.split('_');
                                     const asin = parts[1];
