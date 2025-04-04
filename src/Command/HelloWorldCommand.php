@@ -25,9 +25,10 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-       $product = Product::findByField('iwasku', 'SC02400BKRMC');
-       $product->checkStickerFnsku();
+        $stickerEu = Asset::getById(95320);
+        print_r($stickerEu);
+     //  $product = Product::findByField('iwasku', 'SC02400BKRMC');
+      // $product->checkStickerFnsku();
 
         // NEW ALGORITHM
         /*$product = Product::findByField('iwasku', 'SC02400BKRMC');
