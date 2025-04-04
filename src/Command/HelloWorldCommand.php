@@ -25,18 +25,12 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $stickerEu = Asset::getById(95320);
-        if ($stickerEu) {
-            echo "Yes";
-        }
-        else {
-            echo "No";
-        }
+
      //  $product = Product::findByField('iwasku', 'SC02400BKRMC');
       // $product->checkStickerFnsku();
 
         // NEW ALGORITHM
-        /*$product = Product::findByField('iwasku', 'SC02400BKRMC');
+        $product = Product::findByField('iwasku', 'CA03300XW85K');
         $variants = $product->getListingItems();
         $stickerFnskuList = [];
         $notEuArray = ['CA', 'US', 'MX', 'BR', 'SG', 'AU', 'JP'];
@@ -85,7 +79,7 @@ class HelloWorldCommand extends AbstractCommand
                 }
             }
         }
-        print_r(json_encode($stickerFnskuList));*/
+        print_r(json_encode($stickerFnskuList));
 
         //where  inventory type = FBA
         // seller sku != amzn.gr != unexpected
