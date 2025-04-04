@@ -512,6 +512,44 @@
             document.getElementById('stickerList').classList.remove('d-none');
             loadStickers(groupId, 1, searchTerm);
         }
+        function getColorBackground(colorName) {
+            const colorMap = {
+                'black': '#000000',
+                'white': '#ffffff',
+                'red': '#dc2626',
+                'blue': '#2563eb',
+                'green': '#16a34a',
+                'yellow': '#eab308',
+                'purple': '#9333ea',
+                'pink': '#ec4899',
+                'orange': '#ea580c',
+                'gray': '#6b7280',
+                'brown': '#92400e',
+                'navy': '#1e3a8a',
+                'teal': '#0d9488',
+                'silver': '#94a3b8',
+                'gold': '#b45309',
+                'beige': '#d4c19e',
+                'cream': '#fef3c7',
+                'tan': '#d2b48c',
+                'coral': '#f87171',
+                'maroon': '#7f1d1d',
+                'mint': '#a7f3d0',
+                'olive': '#84cc16',
+                'wine': '#7f1d1d',
+                'khaki': '#d4cb92'
+            };
+            const defaultColor = 'var(--text-secondary)';
+            const color = colorName.toLowerCase();
+
+            if (colorMap[color]) return colorMap[color];
+
+            for (const [key, value] of Object.entries(colorMap)) {
+                if (color.includes(key)) return value;
+            }
+
+            return defaultColor;
+        }
     </script>
     <style>
         :root {
@@ -912,7 +950,6 @@
             background-color: transparent;
             border-bottom: 2px solid var(--primary-color);
         }
-        /* Product Card Styling */
         .product-card {
             border: none;
             border-radius: var(--radius-md);
@@ -1050,50 +1087,6 @@
                 flex: 1;
                 justify-content: center;
             }
-        }
-
-        /* Helper function to determine background color for color badges */
-        function getColorBackground(colorName) {
-            const colorMap = {
-        'black': '#000000',
-        'white': '#ffffff',
-        'red': '#dc2626',
-        'blue': '#2563eb',
-        'green': '#16a34a',
-        'yellow': '#eab308',
-        'purple': '#9333ea',
-        'pink': '#ec4899',
-        'orange': '#ea580c',
-        'gray': '#6b7280',
-        'brown': '#92400e',
-        'navy': '#1e3a8a',
-        'teal': '#0d9488',
-        'silver': '#94a3b8',
-        'gold': '#b45309',
-        'beige': '#d4c19e',
-        'cream': '#fef3c7',
-        'tan': '#d2b48c',
-        'coral': '#f87171',
-        'maroon': '#7f1d1d',
-        'mint': '#a7f3d0',
-        'olive': '#84cc16',
-        'wine': '#7f1d1d',
-        'khaki': '#d4cb92'
-        };
-
-        // Default to a neutral color if not found
-        const defaultColor = 'var(--text-secondary)';
-            const color = colorName.toLowerCase();
-
-        // Check for exact matches first
-        if (colorMap[color]) return colorMap[color];
-
-        // Then check for partial matches
-        for (const [key, value] of Object.entries(colorMap)) {
-            if (color.includes(key)) return value;
-        }
-
-            return defaultColor;
         }
     </style>
 
