@@ -30,15 +30,43 @@
 {% block content %}
 <div class="container mt-2">
     <div class="row d-none" id="newStickerForm">
-        <div class="col-12 mt-5">
-            <h1>Yeni Etiket Grubu Oluştur</h1>
-            <form method="post" action="/sticker/add-sticker-group" class="mt-3">
-                <!--suppress HtmlFormInputWithoutLabel -->
-                <input type="text" name="form_data" placeholder="Grup İsmi" class="form-control mb-3">
-                <div class="d-flex flex-column">
-                    <button type="submit" class="btn btn-success mb-2">Grup Ekle</button>
+        <div class="new-sticker-group-section">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-gradient-success-light py-3">
+                    <h5 class="card-title mb-0 text-success">
+                        <i class="bi bi-folder-plus me-2"></i>Yeni Etiket Grubu Oluştur
+                    </h5>
                 </div>
-            </form>
+                <div class="card-body p-4">
+                    <form method="post" action="/sticker/add-sticker-group" class="sticker-group-form">
+                        <div class="mb-4">
+                            <label for="group_name" class="form-label">Grup İsmi</label>
+                            <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-collection"></i>
+                        </span>
+                                <input
+                                        type="text"
+                                        name="form_data"
+                                        id="group_name"
+                                        placeholder="Yeni grup ismini girin"
+                                        class="form-control form-control-lg border-start-0 ps-0"
+                                        required
+                                        autocomplete="off">
+                            </div>
+                            <small class="text-muted mt-1 d-block">
+                                <i class="bi bi-info-circle me-1"></i>Sadece harf, rakam, boşluk ve alt çizgi içerebilir (max 190 karakter)
+                            </small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-plus-lg me-2"></i>Grup Ekle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     <div class="new-sticker-section" id="newStickerProductForm">
@@ -1374,6 +1402,74 @@
 
         .sticker-form small.text-muted {
             font-size: 0.85rem;
+        }
+
+        .new-sticker-group-section {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bg-gradient-success-light {
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .text-success {
+            color: #10b981 !important;
+        }
+
+        .sticker-group-form .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .sticker-group-form .input-group-text {
+            color: var(--text-secondary);
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .sticker-group-form .form-control {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .sticker-group-form .form-control:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 0.15rem rgba(16, 185, 129, 0.15);
+        }
+
+        .sticker-group-form .form-control:focus + .input-group-text {
+            border-color: #10b981;
+        }
+
+        .sticker-group-form .btn-success {
+            background-color: #10b981;
+            border-color: #10b981;
+            transition: var(--transition);
+        }
+
+        .sticker-group-form .btn-success:hover {
+            background-color: #0d9488;
+            border-color: #0d9488;
+            transform: translateY(-1px);
+        }
+
+        .card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .card:hover {
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
         }
     </style>
 
