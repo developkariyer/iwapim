@@ -218,16 +218,16 @@
                                     if (!asinGroups[asin]) {
                                         asinGroups[asin] = { return: [], notreturn: [] };
                                     }
-                                    asinGroups[asin][returnStatus].push(fnskuCode);
+                                    asinGroups[asin][returnStatus].push(fnsku);
                                 });
                             }
                             for (const asin in asinGroups) {
                                 if (asinGroups.hasOwnProperty(asin)) {
-                                    const returnOptions = asinGroups[asin].return.map(fnskuCode => `
-                                        <a href="${fnskuCode}" target="_blank">${fnskuCode}</a><br>
+                                    const returnOptions = asinGroups[asin].return.map(fnsku => `
+                                        <a href="${fnsku}" target="_blank">${fnsku.split('_')[2]}</a><br>
                                     `).join('');
-                                        const notReturnOptions = asinGroups[asin].notreturn.map(fnskuCode => `
-                                        <a href="${fnskuCode}" target="_blank">${fnskuCode}</a><br>
+                                        const notReturnOptions = asinGroups[asin].notreturn.map(fnsku => `
+                                        <a href="${fnsku}" target="_blank">${fnsku.split('_')[2]}</a><br>
                                     `).join('');
 
                                     fnskuLinks += `
