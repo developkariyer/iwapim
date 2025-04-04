@@ -233,11 +233,19 @@
                                     fnskuLinks += `
                                         <div class="asin-item">
                                             <p class="asin-title" onclick="toggleReturnDropdown('${asin}')">ASIN: ${asin}</p>
-                                            <div class="fnsku-dropdown" id="fnsku-dropdown-${asin}" style="display:none;">
-                                                <p><strong>Return</strong></p>
-                                                ${returnOptions}
-                                                <p><strong>Not Return</strong></p>
-                                                ${notReturnOptions}
+                                            <div class="dropdown-container">
+                                                <div class="dropdown" id="return-dropdown-${asin}" style="display:none;">
+                                                    <button class="dropdown-toggle">Return</button>
+                                                    <div class="dropdown-menu">
+                                                        ${returnOptions}
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown" id="notreturn-dropdown-${asin}" style="display:none;">
+                                                    <button class="dropdown-toggle">Not Return</button>
+                                                    <div class="dropdown-menu">
+                                                        ${notReturnOptions}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     `;
@@ -269,8 +277,10 @@
         }
 
         function toggleReturnDropdown(asin) {
-            const fnskuDropdown = document.getElementById(`fnsku-dropdown-${asin}`);
-            fnskuDropdown.style.display = fnskuDropdown.style.display === 'none' ? 'block' : 'none';
+            const returnDropdown = document.getElementById(`return-dropdown-${asin}`);
+            const notReturnDropdown = document.getElementById(`notreturn-dropdown-${asin}`);
+            returnDropdown.style.display = returnDropdown.style.display === 'none' ? 'block' : 'none';
+            notReturnDropdown.style.display = notReturnDropdown.style.display === 'none' ? 'block' : 'none';
         }
 
         function renderPagination() {
