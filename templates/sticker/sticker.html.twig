@@ -232,19 +232,21 @@
 
                                     fnskuLinks += `
                                         <div class="asin-item">
-                                            <p class="asin-title" onclick="toggleReturnDropdown('${asin}')">ASIN: ${asin}</p>
-                                            <div class="dropdown-container">
-                                                <div class="dropdown" id="return-dropdown-${asin}" style="display:none;">
-                                                    <button class="dropdown-toggle">Return</button>
-                                                    <div class="dropdown-menu">
-                                                        ${returnOptions}
-                                                    </div>
+                                            <p class="asin-title" data-toggle="collapse" data-target="#collapse-return-${asin}" aria-expanded="false" aria-controls="collapse-return-${asin}">ASIN: ${asin}</p>
+
+                                            <div id="collapse-return-${asin}" class="collapse">
+                                                <div class="card card-body">
+                                                    <strong>Return</strong>
+                                                    ${returnOptions}
                                                 </div>
-                                                <div class="dropdown" id="notreturn-dropdown-${asin}" style="display:none;">
-                                                    <button class="dropdown-toggle">Not Return</button>
-                                                    <div class="dropdown-menu">
-                                                        ${notReturnOptions}
-                                                    </div>
+                                            </div>
+
+                                            <p class="asin-title" data-toggle="collapse" data-target="#collapse-notreturn-${asin}" aria-expanded="false" aria-controls="collapse-notreturn-${asin}">Not Return</p>
+
+                                            <div id="collapse-notreturn-${asin}" class="collapse">
+                                                <div class="card card-body">
+                                                    <strong>Not Return</strong>
+                                                    ${notReturnOptions}
                                                 </div>
                                             </div>
                                         </div>
