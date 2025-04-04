@@ -195,75 +195,71 @@ class StickerController extends FrontendController
 
         $products = Db::get()->fetchAllAssociative($sql, ['productIdentifier' => $productIdentifier, 'groupId' => $groupId]);
         foreach ($products as &$product) {
-            if (isset($product['sticker_id_eu'])) {
-                $stickerEu = Asset::getById($product['sticker_id_eu']);
-            } else {
-                if (isset($product['dest_id'])) {
-                    $productObject = Product::getById($product['dest_id']);
-                    if ($productObject) {
-                        $stickerEu = $productObject->checkSticker4x6eu();
-                    } else {
-                        $stickerEu = null;
-                    }
-                } else {
-                    $stickerEu = null;
-                }
-            }
-            if (isset($product['sticker_id'])) {
-                $sticker = Asset::getById($product['sticker_id']);
-            } else {
-                if (isset($product['dest_id'])) {
-                    $productObject = Product::getById($product['dest_id']);
-                    if ($productObject) {
-                        $sticker = $productObject->checkSticker4x6iwasku();
-                    } else {
-                        $sticker = null;
-                    }
-                } else {
-                    $sticker = null;
-                }
-            }
-            if (isset($product['sticker_ids_fnsku']) && !empty($product['sticker_ids_fnsku'])) {
-                $fnskuIds = explode(',', $product['sticker_ids_fnsku']);
-                $fnskuStickers = [];
-                foreach ($fnskuIds as $fnskuId) {
-                    $sticker = Asset::getById($fnskuId);
-                    if ($sticker) {
-                        $fnskuStickers[] = $sticker->getFullPath();
-                    }
-                }
-            }
-            else {
-                if (isset($product['dest_id'])) {
-                    $productObject = Product::getById($product['dest_id']);
-                    if ($productObject) {
-                        $stickers = $productObject->checkStickerFnsku();
-                        foreach ($stickers as $sticker) {
-                            $fnskuStickers[] = $sticker->getFullPath();
-                        }
-                    } else {
-                        $sticker = null;
-                    }
-                } else {
-                    $sticker = null;
-                }
-            }
-            $product['sticker_link_eu'] = $stickerEu ? $stickerEu->getFullPath() : '';
-            $product['sticker_link'] = $sticker ? $sticker->getFullPath() : '';
-            $product['sticker_fnsku'] = $fnskuStickers ?? [];
+            $product['sticker_link_eu'] = $this->resolveEuSticker($product);
+            $product['sticker_link'] = $this->resolveIwaskuSticker($product);
+            $product['sticker_fnsku'] = $this->resolveFnskuStickers($product);
         }
         unset($product);
-        if ($products) {
-            return new JsonResponse([
-                'success' => true,
-                'products' => $products
-            ]);
-        } else {
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Product not found.'
-            ]);
+        return new JsonResponse([
+            'success' => !empty($products),
+            'products' => $products ?: [],
+            'message' => empty($products) ? 'Product not found.' : null
+        ]);
+    }
+
+    /**
+     * Resolves the EU sticker asset path for a product
+     *
+     * @param array $product Product data from database
+     * @return string The full path to the EU sticker or empty string if not found
+     */
+    private function resolveEuSticker(array $product): string
+    {
+        if (!empty($product['sticker_id_eu'])) {
+            $stickerEu = Asset::getById($product['sticker_id_eu']);
+            if ($stickerEu) {
+                return $stickerEu->getFullPath();
+            }
         }
+
+        if (!empty($product['dest_id'])) {
+            $productObject = Product::getById($product['dest_id']);
+            if ($productObject) {
+                $stickerEu = $productObject->checkSticker4x6eu();
+                if ($stickerEu) {
+                    return $stickerEu->getFullPath();
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Resolves the IWASKU sticker asset path for a product
+     *
+     * @param array $product Product data from database
+     * @return string The full path to the IWASKU sticker or empty string if not found
+     */
+    private function resolveIwaskuSticker(array $product): string
+    {
+        if (!empty($product['sticker_id'])) {
+            $sticker = Asset::getById($product['sticker_id']);
+            if ($sticker) {
+                return $sticker->getFullPath();
+            }
+        }
+
+        if (!empty($product['dest_id'])) {
+            $productObject = Product::getById($product['dest_id']);
+            if ($productObject) {
+                $sticker = $productObject->checkSticker4x6iwasku();
+                if ($sticker) {
+                    return $sticker->getFullPath();
+                }
+            }
+        }
+
+        return '';
     }
 
     /**
