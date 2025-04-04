@@ -196,7 +196,8 @@
 
         function loadDetails(identifier, groupId) {
             const detailsContainer = document.getElementById(`details-content-${identifier}`);
-            detailsContainer.innerHTML = 'Loading details...';
+            detailsContainer.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+
             fetch(`/sticker/get-product-details/${identifier}/${groupId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -205,46 +206,182 @@
                         products.sort((a, b) => {
                             return a.variationSize.localeCompare(b.variationSize, undefined, { numeric: true });
                         });
+
                         let detailsHtml = '';
+
                         products.forEach(product => {
-                            let fnskuLinks = '';
+                            const fnskusByAsin = {};
+
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
                                 product.sticker_fnsku.forEach(fnsku => {
                                     const parts = fnsku.split('_');
-
                                     const asin = parts[1];
                                     const fnskuCode = parts[2];
                                     const returnStatus = parts.includes('return') ? 'return' : 'notreturn';
 
-                                    fnskuLinks += `
-                                        <option value="${fnsku}">
-                                            ASIN: ${asin}, FNSKU: ${fnskuCode}, Status: ${returnStatus}
-                                        </option>
-                                    `;
-                                    //fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
+                                    if (!fnskusByAsin[asin]) {
+                                        fnskusByAsin[asin] = {
+                                            return: [],
+                                            notreturn: []
+                                        };
+                                    }
+
+                                    fnskusByAsin[asin][returnStatus].push({
+                                        fullCode: fnsku,
+                                        code: fnskuCode
+                                    });
                                 });
                             }
+
                             detailsHtml += `
-                            ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
-                            <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
-                            <a href="${product.sticker_link}" target="_blank">IWASKU Link</a> |
-                            ${fnskuLinks} |
-                            <p>test</p>
-                            <br/>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.productIdentifier} ${product.name}</h5>
+                            <p class="card-text">
+                                Size: ${product.variationSize} | Color: ${product.variationColor} | IWASKU: ${product.iwasku}
+                            </p>
+                            <div class="mb-2">
+                                <a href="${product.sticker_link_eu}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="bi bi-link-45deg"></i> EU Link
+                                </a>
+                                <a href="${product.sticker_link}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-link-45deg"></i> IWASKU Link
+                                </a>
+                            </div>
+                    `;
+
+                            if (Object.keys(fnskusByAsin).length > 0) {
+                                detailsHtml += `
+                            <div class="accordion mt-2" id="asinAccordion-${product.iwasku}">
+                        `;
+
+                                Object.keys(fnskusByAsin).forEach((asin, index) => {
+                                    const asinId = `asin-${product.iwasku}-${asin}`;
+
+                                    detailsHtml += `
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button ${index > 0 ? 'collapsed' : ''}" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#${asinId}"
+                                            aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="${asinId}">
+                                            ASIN: ${asin}
+                                        </button>
+                                    </h2>
+                                    <div id="${asinId}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}"
+                                        data-bs-parent="#asinAccordion-${product.iwasku}">
+                                        <div class="accordion-body">
+                                            <ul class="nav nav-tabs" id="fnskuTabs-${asinId}" role="tablist">
                             `;
-                        });
-                        detailsContainer.innerHTML = `
-                            <div class="accordion" id="accordion-${identifier}">
-                                ${detailsHtml}
+
+                                    if (fnskusByAsin[asin].notreturn.length > 0) {
+                                        detailsHtml += `
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="notreturn-tab-${asinId}" data-bs-toggle="tab"
+                                            data-bs-target="#notreturn-${asinId}" type="button" role="tab"
+                                            aria-controls="notreturn-${asinId}" aria-selected="true">
+                                            Standard
+                                        </button>
+                                    </li>
+                                `;
+                                    }
+
+                                    if (fnskusByAsin[asin].return.length > 0) {
+                                        detailsHtml += `
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link ${fnskusByAsin[asin].notreturn.length === 0 ? 'active' : ''}"
+                                            id="return-tab-${asinId}" data-bs-toggle="tab"
+                                            data-bs-target="#return-${asinId}" type="button" role="tab"
+                                            aria-controls="return-${asinId}" aria-selected="${fnskusByAsin[asin].notreturn.length === 0 ? 'true' : 'false'}">
+                                            Return
+                                        </button>
+                                    </li>
+                                `;
+                                    }
+
+                                    detailsHtml += `
+                                            </ul>
+                                            <div class="tab-content mt-2" id="fnskuTabContent-${asinId}">
+                            `;
+
+                                    if (fnskusByAsin[asin].notreturn.length > 0) {
+                                        detailsHtml += `
+                                    <div class="tab-pane fade show active" id="notreturn-${asinId}"
+                                        role="tabpanel" aria-labelledby="notreturn-tab-${asinId}">
+                                        <div class="list-group">
+                                `;
+
+                                        fnskusByAsin[asin].notreturn.forEach(fnsku => {
+                                            detailsHtml += `
+                                        <a href="${fnsku.fullCode}" target="_blank" class="list-group-item list-group-item-action">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>FNSKU: ${fnsku.code}</span>
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="bi bi-printer"></i> Print
+                                                </span>
+                                            </div>
+                                        </a>
+                                    `;
+                                        });
+
+                                        detailsHtml += `
+                                        </div>
+                                    </div>
+                                `;
+                                    }
+
+                                    if (fnskusByAsin[asin].return.length > 0) {
+                                        detailsHtml += `
+                                    <div class="tab-pane fade ${fnskusByAsin[asin].notreturn.length === 0 ? 'show active' : ''}"
+                                        id="return-${asinId}" role="tabpanel" aria-labelledby="return-tab-${asinId}">
+                                        <div class="list-group">
+                                `;
+
+                                        fnskusByAsin[asin].return.forEach(fnsku => {
+                                            detailsHtml += `
+                                        <a href="${fnsku.fullCode}" target="_blank" class="list-group-item list-group-item-action">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>FNSKU: ${fnsku.code}</span>
+                                                <span class="badge bg-warning rounded-pill">
+                                                    <i class="bi bi-printer"></i> Print Return
+                                                </span>
+                                            </div>
+                                        </a>
+                                    `;
+                                        });
+
+                                        detailsHtml += `
+                                        </div>
+                                    </div>
+                                `;
+                                    }
+
+                                    detailsHtml += `
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                                });
+
+                                detailsHtml += `
                             </div>
                         `;
+                            }
+
+                            detailsHtml += `
+                        </div>
+                    </div>
+                    `;
+                        });
+
+                        detailsContainer.innerHTML = detailsHtml;
                     } else {
-                        detailsContainer.innerHTML = 'Failed to load details.';
+                        detailsContainer.innerHTML = '<div class="alert alert-danger">Failed to load details.</div>';
                     }
                 })
                 .catch(error => {
                     console.error('Error loading details:', error);
-                    detailsContainer.innerHTML = 'Error loading details.';
+                    detailsContainer.innerHTML = '<div class="alert alert-danger">Error loading details.</div>';
                 });
         }
 
