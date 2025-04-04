@@ -263,6 +263,45 @@ class StickerController extends FrontendController
     }
 
     /**
+     * Resolves the FNSKU sticker asset paths for a product
+     *
+     * @param array $product Product data from database
+     * @return array List of paths to FNSKU stickers
+     */
+    private function resolveFnskuStickers(array $product): array
+    {
+        $fnskuStickers = [];
+        $control = false;
+        if (!empty($product['sticker_ids_fnsku'])) {
+            $fnskuIds = explode(',', $product['sticker_ids_fnsku']);
+            foreach ($fnskuIds as $fnskuId) {
+                $sticker = Asset::getById($fnskuId);
+                if ($sticker) {
+                    $fnskuStickers[] = $sticker->getFullPath();
+                }
+            }
+            if (empty($fnskuStickers)) {
+                $control = true;
+            }
+        }
+        if ($control && !empty($product['dest_id'])) {
+            $productObject = Product::getById($product['dest_id']);
+            if ($productObject) {
+                $stickers = $productObject->checkStickerFnsku();
+                if (is_array($stickers)) {
+                    foreach ($stickers as $sticker) {
+                        if ($sticker) {
+                            $fnskuStickers[] = $sticker->getFullPath();
+                        }
+                    }
+                }
+            }
+        }
+
+        return $fnskuStickers;
+    }
+
+    /**
      * @Route("/sticker/add-sticker", name="sticker_new", methods={"POST"})
      * @param Request $request
      * @return Response
