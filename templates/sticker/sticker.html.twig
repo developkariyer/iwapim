@@ -278,21 +278,37 @@
                             }
 
                             detailsHtml += `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">${product.productIdentifier} ${product.name}</h5>
-                            <p class="card-text">
-                                Size: ${product.variationSize} | Color: ${product.variationColor} | IWASKU: ${product.iwasku}
-                            </p>
-                            <div class="mb-2">
-                                <a href="${product.sticker_link_eu}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="bi bi-link-45deg"></i> EU Link
-                                </a>
-                                <a href="${product.sticker_link}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-link-45deg"></i> IWASKU Link
-                                </a>
-                            </div>
-                    `;
+                                <div class="product-card mb-3">
+                                    <div class="card-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="product-title mb-0">
+                                                <span class="product-id">${product.productIdentifier}</span>
+                                                <span class="product-name">${product.name}</span>
+                                            </h5>
+                                            <div class="product-badges">
+                                                <span class="size-badge">${product.variationSize}</span>
+                                                ${product.variationColor ? `<span class="color-badge" style="background-color: ${getColorBackground(product.variationColor)};">${product.variationColor}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="product-metadata">
+                                            <div class="metadata-item">
+                                                <i class="bi bi-box-seam"></i>
+                                                <span>IWASKU: ${product.iwasku}</span>
+                                            </div>
+                                            <div class="product-actions">
+                                                <a href="${product.sticker_link_eu}" target="_blank" class="action-btn eu-link">
+                                                    <i class="bi bi-globe2"></i>
+                                                    <span>EU</span>
+                                                </a>
+                                                <a href="${product.sticker_link}" target="_blank" class="action-btn iwasku-link">
+                                                    <i class="bi bi-link-45deg"></i>
+                                                    <span>IWASKU</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                `;
 
                             if (Object.keys(fnskusByAsin).length > 0) {
                                 detailsHtml += `
@@ -498,7 +514,6 @@
         }
     </script>
     <style>
-        /* Professional Design System */
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
@@ -896,6 +911,189 @@
             color: var(--primary-color);
             background-color: transparent;
             border-bottom: 2px solid var(--primary-color);
+        }
+        /* Product Card Styling */
+        .product-card {
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: var(--transition);
+            background-color: var(--card-bg);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .card-header {
+            background-color: rgba(241, 245, 249, 0.5);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
+        }
+
+        .card-content {
+            padding: 1.25rem;
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .product-id {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .product-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .size-badge, .color-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .size-badge {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .color-badge {
+            color: #fff;
+            text-shadow: 0 0 1px rgba(0,0,0,0.5);
+        }
+
+        .product-metadata {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--text-tertiary);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .eu-link {
+            background-color: rgba(37, 99, 235, 0.08);
+            color: var(--primary-color);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .eu-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .iwasku-link {
+            background-color: rgba(100, 116, 139, 0.08);
+            color: var(--text-secondary);
+            border-color: rgba(100, 116, 139, 0.2);
+        }
+
+        .iwasku-link:hover {
+            background-color: var(--text-secondary);
+            color: white;
+        }
+
+        @media (max-width: 576px) {
+            .product-metadata {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .product-actions {
+                width: 100%;
+            }
+
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        /* Helper function to determine background color for color badges */
+        function getColorBackground(colorName) {
+            const colorMap = {
+        'black': '#000000',
+        'white': '#ffffff',
+        'red': '#dc2626',
+        'blue': '#2563eb',
+        'green': '#16a34a',
+        'yellow': '#eab308',
+        'purple': '#9333ea',
+        'pink': '#ec4899',
+        'orange': '#ea580c',
+        'gray': '#6b7280',
+        'brown': '#92400e',
+        'navy': '#1e3a8a',
+        'teal': '#0d9488',
+        'silver': '#94a3b8',
+        'gold': '#b45309',
+        'beige': '#d4c19e',
+        'cream': '#fef3c7',
+        'tan': '#d2b48c',
+        'coral': '#f87171',
+        'maroon': '#7f1d1d',
+        'mint': '#a7f3d0',
+        'olive': '#84cc16',
+        'wine': '#7f1d1d',
+        'khaki': '#d4cb92'
+        };
+
+        // Default to a neutral color if not found
+        const defaultColor = 'var(--text-secondary)';
+            const color = colorName.toLowerCase();
+
+        // Check for exact matches first
+        if (colorMap[color]) return colorMap[color];
+
+        // Then check for partial matches
+        for (const [key, value] of Object.entries(colorMap)) {
+            if (color.includes(key)) return value;
+        }
+
+            return defaultColor;
         }
     </style>
 
