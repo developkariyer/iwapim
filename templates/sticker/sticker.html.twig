@@ -153,67 +153,64 @@
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
                             return `
-<div class="sticker-item mb-4" id="sticker-${identifier}">
-    <div class="card shadow-sm border-0 rounded-lg bg-white hover-card">
-        <div class="accordion" id="accordion-${identifier}">
-            <div class="accordion-item border-0">
-                <h2 class="accordion-header m-0" id="heading-${identifier}">
-                    <button class="accordion-button position-relative p-0 bg-white border-0" type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapse-${identifier}"
-                        aria-expanded="false"
-                        aria-controls="collapse-${identifier}"
-                        onclick="loadDetails('${identifier}','${groupId}')">
+<div class="sticker-card" id="sticker-${identifier}">
+    <div class="sticker-item-wrapper">
+        <div class="sticker-primary-card">
+            <div class="accordion" id="accordion-${identifier}">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-${identifier}">
+                        <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse-${identifier}"
+                            aria-expanded="false"
+                            aria-controls="collapse-${identifier}"
+                            onclick="loadDetails('${identifier}','${groupId}')">
 
-                        <div class="row w-100 g-0 align-items-center">
-                            <div class="col-auto p-3 pe-0">
-                                <div class="sticker-image-container">
-                                    <img src="${mainSticker.image_link}"
-                                        alt="${mainSticker.product_name}"
-                                        class="sticker-image"
-                                        onerror="this.src='/images/no-image.png';this.onerror='';">
+                            <div class="sticker-content">
+                                <div class="sticker-thumbnail">
+                                    <div class="image-wrapper">
+                                        <img src="${mainSticker.image_link}"
+                                            alt="${mainSticker.product_name}"
+                                            onerror="this.src='/images/no-image.png';this.onerror='';">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col p-3">
+
                                 <div class="sticker-info">
-                                    <div class="d-flex flex-wrap justify-content-between align-items-center">
-                                        <div class="product-identifier">
-                                            <h5 class="card-title fs-5 fw-bold mb-0 text-primary">
-                                                ${identifier}
-                                            </h5>
-                                        </div>
-                                        <span class="category-badge d-none d-md-inline">
-                                            <i class="bi bi-tag-fill me-1"></i>${mainSticker.category}
+                                    <div class="sticker-header">
+                                        <h3 class="sticker-identifier">${identifier}</h3>
+                                        <span class="sticker-category desktop-only">
+                                            <i class="bi bi-tag-fill"></i>
+                                            <span>${mainSticker.category}</span>
                                         </span>
                                     </div>
-                                    <p class="product-name">
-                                        ${mainSticker.product_name}
-                                    </p>
-                                    <span class="category-badge-mobile d-md-none">
-                                        <i class="bi bi-tag-fill me-1"></i>${mainSticker.category}
+
+                                    <p class="sticker-name">${mainSticker.product_name}</p>
+
+                                    <span class="sticker-category mobile-only">
+                                        <i class="bi bi-tag-fill"></i>
+                                        <span>${mainSticker.category}</span>
                                     </span>
                                 </div>
-                            </div>
-                            <div class="expand-icon">
-                                <span class="accordion-icon">
-                                    <i class="bi bi-chevron-down"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </button>
-                </h2>
-                <div id="collapse-${identifier}"
-                    class="accordion-collapse collapse"
-                    aria-labelledby="heading-${identifier}"
-                    data-bs-parent="#accordion-${identifier}">
-                    <div class="accordion-body p-0">
-                        <div class="collapse-divider"></div>
-                        <div id="details-content-${identifier}" class="details-container">
-                            <div class="loading-container">
-                                <div class="spinner-grow text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+
+                                <div class="chevron-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
                                 </div>
-                                <span class="loading-text">Loading product details...</span>
+                            </div>
+                        </button>
+                    </h2>
+
+                    <div id="collapse-${identifier}"
+                        class="accordion-collapse collapse"
+                        aria-labelledby="heading-${identifier}"
+                        data-bs-parent="#accordion-${identifier}">
+                        <div class="accordion-body">
+                            <div id="details-content-${identifier}" class="details-container">
+                                <div class="loading-state">
+                                    <div class="loading-spinner"></div>
+                                    <span>Loading product details</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -501,183 +498,404 @@
         }
     </script>
     <style>
-        /* Designer-quality card styling */
-        .sticker-item .card {
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        /* Professional Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-tertiary: #94a3b8;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+            --hover-bg: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --transition: all 0.2s ease;
+        }
+
+        /* Sticker Card Design */
+        .sticker-card {
+            margin-bottom: 1.25rem;
+        }
+
+        .sticker-item-wrapper {
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .sticker-primary-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
-            border-radius: 12px;
+            transition: var(--transition);
         }
 
-        .hover-card {
-            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
-
-        .hover-card:hover {
+        .sticker-item-wrapper:hover .sticker-primary-card {
+            box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
         }
 
-        .sticker-image-container {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        /* Accordion Styling */
+        .accordion-item {
+            border: none;
         }
 
-        .sticker-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .sticker-item:hover .sticker-image {
-            transform: scale(1.05);
-        }
-
-        .product-identifier {
-            position: relative;
-            display: inline-block;
-        }
-
-        .product-identifier::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--bs-primary);
-            transition: width 0.3s ease;
-        }
-
-        .sticker-item:hover .product-identifier::after {
-            width: 100%;
-        }
-
-        .product-name {
-            font-size: 0.95rem;
-            margin: 6px 0 0;
-            color: #495057;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: color 0.2s ease;
-        }
-
-        .sticker-item:hover .product-name {
-            color: #212529;
-        }
-
-        .category-badge, .category-badge-mobile {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.35em 0.8em;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #6c757d;
-            background-color: rgba(108, 117, 125, 0.1);
-            border-radius: 30px;
-            transition: all 0.2s ease;
-        }
-
-        .sticker-item:hover .category-badge,
-        .sticker-item:hover .category-badge-mobile {
-            background-color: rgba(108, 117, 125, 0.18);
-            color: #495057;
+        .accordion-button {
+            padding: 0;
+            background: transparent;
+            box-shadow: none !important;
+            border-radius: var(--radius-lg) !important;
         }
 
         .accordion-button:not(.collapsed) {
-            background-color: #fff;
-            color: inherit;
+            color: var(--text-primary);
+            background-color: var(--card-bg);
         }
 
         .accordion-button:focus {
+            border-color: transparent;
+            outline: 0;
             box-shadow: none;
-            border-color: inherit;
-            z-index: auto;
         }
 
         .accordion-button::after {
             display: none;
         }
 
-        .expand-icon {
-            position: absolute;
-            right: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background-color: rgba(108, 117, 125, 0.1);
-            transition: all 0.3s ease;
+        .accordion-body {
+            padding: 0;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
         }
 
-        @media (max-width: 575.98px) {
-            .expand-icon {
-                right: 0.75rem;
-                width: 24px;
-                height: 24px;
+        /* Sticker Content Layout */
+        .sticker-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 1.25rem;
+            position: relative;
+        }
+
+        /* Image Container */
+        .sticker-thumbnail {
+            flex-shrink: 0;
+            margin-right: 1.25rem;
+        }
+
+        .image-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .sticker-item-wrapper:hover .image-wrapper img {
+            transform: scale(1.08);
+        }
+
+        /* Sticker Information */
+        .sticker-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sticker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .sticker-identifier {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin: 0;
+            line-height: 1.5;
+            position: relative;
+            display: inline-block;
+        }
+
+        .sticker-identifier::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .sticker-item-wrapper:hover .sticker-identifier::after {
+            width: 100%;
+        }
+
+        .sticker-name {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: var(--transition);
+            max-width: calc(100% - 30px);
+        }
+
+        .sticker-item-wrapper:hover .sticker-name {
+            color: var(--text-primary);
+        }
+
+        /* Category Styling */
+        .sticker-category {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            background-color: rgba(37, 99, 235, 0.08);
+            color: var(--primary-color);
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .sticker-category i {
+            font-size: 0.7rem;
+            margin-right: 0.35rem;
+        }
+
+        .sticker-item-wrapper:hover .sticker-category {
+            background-color: rgba(37, 99, 235, 0.12);
+        }
+
+        .desktop-only {
+            display: none;
+        }
+
+        .mobile-only {
+            display: inline-flex;
+            margin-top: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .desktop-only {
+                display: inline-flex;
+            }
+
+            .mobile-only {
+                display: none;
             }
         }
 
-        .accordion-button:not(.collapsed) .expand-icon {
-            background-color: var(--bs-primary);
+        /* Chevron Icon */
+        .chevron-icon {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            margin-left: 1rem;
+            border-radius: 50%;
+            background-color: rgba(100, 116, 139, 0.1);
+            color: var(--text-tertiary);
+            transition: var(--transition);
         }
 
-        .accordion-button:not(.collapsed) .expand-icon i {
+        .sticker-item-wrapper:hover .chevron-icon {
+            background-color: rgba(100, 116, 139, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .accordion-button:not(.collapsed) .chevron-icon {
+            background-color: var(--primary-color);
             color: white;
-            transform: rotate(-180deg);
         }
 
-        .expand-icon i {
-            transition: transform 0.3s ease, color 0.3s ease;
-            font-size: 0.875rem;
+        .accordion-button:not(.collapsed) .chevron-icon svg {
+            transform: rotate(180deg);
         }
 
-        .collapse-divider {
-            height: 1px;
-            background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.1), rgba(0,0,0,0.05));
+        .chevron-icon svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
         }
 
+        /* Details Container */
         .details-container {
             padding: 1.5rem;
         }
 
-        .loading-container {
+        /* Loading State */
+        .loading-state {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             padding: 2rem 0;
-            gap: 0.75rem;
+            color: var(--primary-color);
+            gap: 1rem;
         }
 
-        .loading-text {
-            color: var(--bs-primary);
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            animation: pulse 2s infinite;
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spinner 0.8s linear infinite;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
         }
 
-        .spinner-grow {
-            width: 1.75rem;
-            height: 1.75rem;
-            opacity: 0.7;
+        /* Responsive Adjustments */
+        @media (max-width: 576px) {
+            .image-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+
+            .sticker-content {
+                padding: 1rem;
+            }
+
+            .sticker-thumbnail {
+                margin-right: 1rem;
+            }
+
+            .chevron-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .chevron-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .sticker-identifier {
+                font-size: 1rem;
+            }
+
+            .sticker-name {
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Product Details Styling */
+        .card {
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--text-tertiary);
+            color: var(--text-tertiary);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--text-tertiary);
+            border-color: var(--text-tertiary);
+        }
+
+        /* List Group Styling */
+        .list-group-item {
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .list-group-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .list-group-item-action:focus, .list-group-item-action:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Badge Styling */
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: var(--warning) !important;
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            border-bottom-color: var(--border-color);
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-tertiary);
+            border: none;
+            padding: 0.5rem 1rem;
+            transition: var(--transition);
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--text-secondary);
+            border-color: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: transparent;
+            border-bottom: 2px solid var(--primary-color);
         }
     </style>
 
