@@ -153,72 +153,76 @@
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
                             return `
-                            <div class="sticker-item mb-4" id="sticker-${identifier}">
-                                <div class="card shadow-lg border-0 rounded-4 overflow-hidden hover-elevate">
-                                    <div class="accordion" id="accordion-${identifier}">
-                                        <div class="accordion-item border-0">
-                                            <h2 class="accordion-header" id="heading-${identifier}">
-                                                <button class="accordion-button position-relative p-0" type="button"
-                                                    data-bs-toggle="collapse"
-                                                    data-bs-target="#collapse-${identifier}"
-                                                    aria-expanded="false"
-                                                    aria-controls="collapse-${identifier}"
-                                                    onclick="loadDetails('${identifier}','${groupId}')">
+<div class="sticker-item mb-4" id="sticker-${identifier}">
+    <div class="card shadow-sm border-0 rounded-lg bg-white hover-card">
+        <div class="accordion" id="accordion-${identifier}">
+            <div class="accordion-item border-0">
+                <h2 class="accordion-header m-0" id="heading-${identifier}">
+                    <button class="accordion-button position-relative p-0 bg-white border-0" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse-${identifier}"
+                        aria-expanded="false"
+                        aria-controls="collapse-${identifier}"
+                        onclick="loadDetails('${identifier}','${groupId}')">
 
-                                                    <div class="row w-100 g-0 align-items-center">
-                                                        <div class="col-auto p-3 pe-0">
-                                                            <div class="sticker-image">
-                                                                <img src="${mainSticker.image_link}"
-                                                                    alt="${mainSticker.product_name}"
-                                                                    class="rounded-3 img-cover"
-                                                                    style="width: 80px; height: 80px; object-fit: cover;">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col p-3">
-                                                            <div class="sticker-info">
-                                                                <div class="d-flex flex-wrap justify-content-between align-items-center">
-                                                                    <h5 class="card-title fs-5 fw-bold mb-0 text-primary">
-                                                                        ${identifier}
-                                                                    </h5>
-                                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill fs-6 d-none d-md-inline">
-                                                                        <i class="bi bi-tag-fill"></i> ${mainSticker.category}
-                                                                    </span>
-                                                                </div>
-                                                                <p class="card-text mb-1 text-dark text-opacity-75 mt-1 line-clamp-1">
-                                                                    ${mainSticker.product_name}
-                                                                </p>
-                                                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill d-md-none">
-                                                                    <i class="bi bi-tag-fill"></i> ${mainSticker.category}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="position-absolute end-0 top-50 translate-middle-y me-4 d-none d-sm-block">
-                                                            <span class="accordion-icon">
-                                                                <i class="bi bi-chevron-down transition-transform"></i>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            </h2>
-                                            <div id="collapse-${identifier}"
-                                                class="accordion-collapse collapse"
-                                                aria-labelledby="heading-${identifier}"
-                                                data-bs-parent="#accordion-${identifier}">
-                                                <div class="accordion-body p-0">
-                                                    <div class="border-top"></div>
-                                                    <div id="details-content-${identifier}" class="p-4">
-                                                        <div class="d-flex justify-content-center py-4">
-                                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                                            <span class="text-primary">Loading details...</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div class="row w-100 g-0 align-items-center">
+                            <div class="col-auto p-3 pe-0">
+                                <div class="sticker-image-container">
+                                    <img src="${mainSticker.image_link}"
+                                        alt="${mainSticker.product_name}"
+                                        class="sticker-image"
+                                        onerror="this.src='/images/no-image.png';this.onerror='';">
                                 </div>
                             </div>
-                            `;
+                            <div class="col p-3">
+                                <div class="sticker-info">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                                        <div class="product-identifier">
+                                            <h5 class="card-title fs-5 fw-bold mb-0 text-primary">
+                                                ${identifier}
+                                            </h5>
+                                        </div>
+                                        <span class="category-badge d-none d-md-inline">
+                                            <i class="bi bi-tag-fill me-1"></i>${mainSticker.category}
+                                        </span>
+                                    </div>
+                                    <p class="product-name">
+                                        ${mainSticker.product_name}
+                                    </p>
+                                    <span class="category-badge-mobile d-md-none">
+                                        <i class="bi bi-tag-fill me-1"></i>${mainSticker.category}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="expand-icon">
+                                <span class="accordion-icon">
+                                    <i class="bi bi-chevron-down"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </button>
+                </h2>
+                <div id="collapse-${identifier}"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="heading-${identifier}"
+                    data-bs-parent="#accordion-${identifier}">
+                    <div class="accordion-body p-0">
+                        <div class="collapse-divider"></div>
+                        <div id="details-content-${identifier}" class="details-container">
+                            <div class="loading-container">
+                                <div class="spinner-grow text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span class="loading-text">Loading product details...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+`;
                         }).join('');
                         totalPages = data.pagination.total_pages;
                         if (searchTerm !== '') {
@@ -497,44 +501,184 @@
         }
     </script>
     <style>
+        /* Designer-quality card styling */
         .sticker-item .card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            border-radius: 12px;
         }
 
-        .hover-elevate:hover {
+        .hover-card {
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .hover-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
         }
 
-        .accordion-button:not(.collapsed) .bi-chevron-down {
-            transform: rotate(180deg);
+        .sticker-image-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .bi-chevron-down {
-            transition: transform 0.3s ease;
+        .sticker-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
         }
 
-        .line-clamp-1 {
+        .sticker-item:hover .sticker-image {
+            transform: scale(1.05);
+        }
+
+        .product-identifier {
+            position: relative;
+            display: inline-block;
+        }
+
+        .product-identifier::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--bs-primary);
+            transition: width 0.3s ease;
+        }
+
+        .sticker-item:hover .product-identifier::after {
+            width: 100%;
+        }
+
+        .product-name {
+            font-size: 0.95rem;
+            margin: 6px 0 0;
+            color: #495057;
             display: -webkit-box;
             -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            transition: color 0.2s ease;
         }
 
-        .transition-transform {
-            transition: transform 0.3s ease;
+        .sticker-item:hover .product-name {
+            color: #212529;
         }
 
-        .img-cover {
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        .category-badge, .category-badge-mobile {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35em 0.8em;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6c757d;
+            background-color: rgba(108, 117, 125, 0.1);
+            border-radius: 30px;
+            transition: all 0.2s ease;
+        }
+
+        .sticker-item:hover .category-badge,
+        .sticker-item:hover .category-badge-mobile {
+            background-color: rgba(108, 117, 125, 0.18);
+            color: #495057;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #fff;
+            color: inherit;
         }
 
         .accordion-button:focus {
             box-shadow: none;
+            border-color: inherit;
+            z-index: auto;
         }
 
         .accordion-button::after {
             display: none;
         }
+
+        .expand-icon {
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: rgba(108, 117, 125, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 575.98px) {
+            .expand-icon {
+                right: 0.75rem;
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        .accordion-button:not(.collapsed) .expand-icon {
+            background-color: var(--bs-primary);
+        }
+
+        .accordion-button:not(.collapsed) .expand-icon i {
+            color: white;
+            transform: rotate(-180deg);
+        }
+
+        .expand-icon i {
+            transition: transform 0.3s ease, color 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .collapse-divider {
+            height: 1px;
+            background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.1), rgba(0,0,0,0.05));
+        }
+
+        .details-container {
+            padding: 1.5rem;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 0;
+            gap: 0.75rem;
+        }
+
+        .loading-text {
+            color: var(--bs-primary);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .spinner-grow {
+            width: 1.75rem;
+            height: 1.75rem;
+            opacity: 0.7;
+        }
     </style>
+
 {% endblock %}
