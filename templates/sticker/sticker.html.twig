@@ -208,40 +208,44 @@
                         let detailsHtml = '';
                         products.forEach(product => {
                             let fnskuLinks = '';
-                            const asinMap = {};
+                            const asinGroups = {};
                             if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
                                 product.sticker_fnsku.forEach(fnsku => {
                                     const parts = fnsku.split('_');
                                     const asin = parts[1];
                                     const fnskuCode = parts[2];
                                     const returnStatus = parts.includes('return') ? 'return' : 'notreturn';
-
-                                    if (!asinMap[asin]) {
-                                        asinMap[asin] = { return: [], notreturn: [] };
+                                    if (!asinGroups[asin]) {
+                                        asinGroups[asin] = { return: [], notreturn: [] };
                                     }
-                                    asinMap[asin][returnStatus].push(fnsku);
-                                    //fnskuLinks += `<a href="${fnsku}" target="_blank">${fnsku}</a> | `;
+                                    asinGroups[asin][returnStatus].push(fnsku);
                                 });
                             }
-                            for (const asin in asinMap) {
-                                if (asinMap.hasOwnProperty(asin)) {
+                            for (const asin in asinGroups) {
+                                if (asinGroups.hasOwnProperty(asin)) {
+                                    const returnOptions = asinGroups[asin].return.map(fnsku => `
+                                        <a href="${fnsku}" target="_blank">${fnsku}</a><br>
+                                    `).join('');
+                                        const notReturnOptions = asinGroups[asin].notreturn.map(fnsku => `
+                                        <a href="${fnsku}" target="_blank">${fnsku}</a><br>
+                                    `).join('');
+
                                     fnskuLinks += `
                                         <div class="asin-item">
-                                            <p class="asin" onclick="toggleReturnStatus('${asin}')">ASIN: ${asin}</p>
-                                            <div class="return-status" id="return-status-${asin}" style="display:none;">
-                                                <p><strong>Return Status:</strong>
-                                                    <span id="return-${asin}">${asinMap[asin].return.length > 0 ? 'Return' : 'Not Return'}</span>
-                                                </p>
+                                            <p class="asin-title" onclick="toggleReturnDropdown('${asin}')">ASIN: ${asin}</p>
+                                            <div class="return-dropdown" id="return-dropdown-${asin}" style="display:none;">
+                                                <p><strong>Return</strong></p>
+                                                ${returnOptions}
                                             </div>
-                                            <div class="fnsku-list" id="fnsku-list-${asin}" style="display:none;">
-                                                <p><strong>FNSKUs:</strong></p>
-                                                ${asinMap[asin].return.map(fnsku => `<a href="${fnsku}" target="_blank">${fnsku}</a>`).join('<br>')}
-                                                ${asinMap[asin].notreturn.map(fnsku => `<a href="${fnsku}" target="_blank">${fnsku}</a>`).join('<br>')}
+                                            <div class="notreturn-dropdown" id="notreturn-dropdown-${asin}" style="display:none;">
+                                                <p><strong>Not Return</strong></p>
+                                                ${notReturnOptions}
                                             </div>
                                         </div>
                                     `;
                                 }
                             }
+
                             detailsHtml += `
                             ${product.productIdentifier} ${product.name} ${product.variationSize} ${product.variationColor} (${product.iwasku})
                             <a href="${product.sticker_link_eu}" target="_blank">EU Link</a> |
@@ -266,12 +270,13 @@
                 });
         }
 
-        function toggleReturnStatus(asin) {
-            const statusDiv = document.getElementById(`return-status-${asin}`);
-            const fnskuListDiv = document.getElementById(`fnsku-list-${asin}`);
-            statusDiv.style.display = statusDiv.style.display === 'none' ? 'block' : 'none';
-            fnskuListDiv.style.display = fnskuListDiv.style.display === 'none' ? 'block' : 'none';
+        function toggleReturnDropdown(asin) {
+            const returnDropdown = document.getElementById(`return-dropdown-${asin}`);
+            const notReturnDropdown = document.getElementById(`notreturn-dropdown-${asin}`);
+            returnDropdown.style.display = returnDropdown.style.display === 'none' ? 'block' : 'none';
+            notReturnDropdown.style.display = notReturnDropdown.style.display === 'none' ? 'block' : 'none';
         }
+
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination-container');
             paginationContainer.innerHTML = '';
