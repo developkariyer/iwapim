@@ -44,6 +44,7 @@ class HelloWorldCommand extends AbstractCommand
             if ($marketplaceType === 'Amazon') {
                 $amazonMarketplaceCollection = $variant->getAmazonMarketplace();
                 $asin = $variant->getUniqueMarketplaceId();
+                echo "ASIN: $asin\n";
 
                 foreach ($amazonMarketplaceCollection as $amazonMarketplace) {
                     $marketplaceId = $amazonMarketplace->getMarketplaceId();
