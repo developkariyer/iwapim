@@ -1461,6 +1461,7 @@
             transform: translateY(-1px);
         }
 
+        /* Common styles for both forms */
         .card {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             overflow: hidden;
@@ -1470,6 +1471,86 @@
 
         .card:hover {
             box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .new-sticker-section,
+        .new-sticker-group-section {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bg-gradient-primary-light {
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1));
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .card:hover {
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .sticker-form .form-label,
+        .sticker-group-form .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .sticker-form .input-group-text,
+        .sticker-group-form .input-group-text {
+            color: var(--text-secondary);
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .sticker-form .form-control,
+        .sticker-form .form-select,
+        .sticker-group-form .form-control {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .sticker-form .form-control:focus,
+        .sticker-form .form-select:focus,
+        .sticker-group-form .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.15);
+        }
+
+        .sticker-form .form-control:focus + .input-group-text,
+        .sticker-form .form-select:focus + .input-group-text,
+        .sticker-group-form .form-control:focus + .input-group-text {
+            border-color: var(--primary-color);
+        }
+
+        .sticker-form .btn-primary,
+        .sticker-group-form .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .sticker-form .btn-primary:hover,
+        .sticker-group-form .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .sticker-form small.text-muted,
+        .sticker-group-form small.text-muted {
+            font-size: 0.85rem;
         }
     </style>
 
