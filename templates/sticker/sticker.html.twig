@@ -233,11 +233,9 @@
                                     fnskuLinks += `
                                         <div class="asin-item">
                                             <p class="asin-title" onclick="toggleReturnDropdown('${asin}')">ASIN: ${asin}</p>
-                                            <div class="return-dropdown" id="return-dropdown-${asin}" style="display:none;">
+                                            <div class="fnsku-dropdown" id="fnsku-dropdown-${asin}" style="display:none;">
                                                 <p><strong>Return</strong></p>
                                                 ${returnOptions}
-                                            </div>
-                                            <div class="notreturn-dropdown" id="notreturn-dropdown-${asin}" style="display:none;">
                                                 <p><strong>Not Return</strong></p>
                                                 ${notReturnOptions}
                                             </div>
@@ -271,10 +269,8 @@
         }
 
         function toggleReturnDropdown(asin) {
-            const returnDropdown = document.getElementById(`return-dropdown-${asin}`);
-            const notReturnDropdown = document.getElementById(`notreturn-dropdown-${asin}`);
-            returnDropdown.style.display = returnDropdown.style.display === 'none' ? 'block' : 'none';
-            notReturnDropdown.style.display = notReturnDropdown.style.display === 'none' ? 'block' : 'none';
+            const fnskuDropdown = document.getElementById(`fnsku-dropdown-${asin}`);
+            fnskuDropdown.style.display = fnskuDropdown.style.display === 'none' ? 'block' : 'none';
         }
 
         function renderPagination() {
