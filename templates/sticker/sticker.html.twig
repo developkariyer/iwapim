@@ -153,73 +153,73 @@
                             const group = data.stickers[identifier];
                             const mainSticker = group[0];
                             return `
-<div class="sticker-card" id="sticker-${identifier}">
-    <div class="sticker-item-wrapper">
-        <div class="sticker-primary-card">
-            <div class="accordion" id="accordion-${identifier}">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading-${identifier}">
-                        <button class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapse-${identifier}"
-                            aria-expanded="false"
-                            aria-controls="collapse-${identifier}"
-                            onclick="loadDetails('${identifier}','${groupId}')">
+                            <div class="sticker-card" id="sticker-${identifier}">
+                                <div class="sticker-item-wrapper">
+                                    <div class="sticker-primary-card">
+                                        <div class="accordion" id="accordion-${identifier}">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="heading-${identifier}">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapse-${identifier}"
+                                                        aria-expanded="false"
+                                                        aria-controls="collapse-${identifier}"
+                                                        onclick="loadDetails('${identifier}','${groupId}')">
 
-                            <div class="sticker-content">
-                                <div class="sticker-thumbnail">
-                                    <div class="image-wrapper">
-                                        <img src="${mainSticker.image_link}"
-                                            alt="${mainSticker.product_name}"
-                                            onerror="this.src='/images/no-image.png';this.onerror='';">
+                                                        <div class="sticker-content">
+                                                            <div class="sticker-thumbnail">
+                                                                <div class="image-wrapper">
+                                                                    <img src="${mainSticker.image_link}"
+                                                                        alt="${mainSticker.product_name}"
+                                                                        onerror="this.src='/images/no-image.png';this.onerror='';">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="sticker-info">
+                                                                <div class="sticker-header">
+                                                                    <h3 class="sticker-identifier">${identifier}</h3>
+                                                                    <span class="sticker-category desktop-only">
+                                                                        <i class="bi bi-tag-fill"></i>
+                                                                        <span>${mainSticker.category}</span>
+                                                                    </span>
+                                                                </div>
+
+                                                                <p class="sticker-name">${mainSticker.product_name}</p>
+
+                                                                <span class="sticker-category mobile-only">
+                                                                    <i class="bi bi-tag-fill"></i>
+                                                                    <span>${mainSticker.category}</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="chevron-icon">
+                                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                </h2>
+
+                                                <div id="collapse-${identifier}"
+                                                    class="accordion-collapse collapse"
+                                                    aria-labelledby="heading-${identifier}"
+                                                    data-bs-parent="#accordion-${identifier}">
+                                                    <div class="accordion-body">
+                                                        <div id="details-content-${identifier}" class="details-container">
+                                                            <div class="loading-state">
+                                                                <div class="loading-spinner"></div>
+                                                                <span>Loading product details</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="sticker-info">
-                                    <div class="sticker-header">
-                                        <h3 class="sticker-identifier">${identifier}</h3>
-                                        <span class="sticker-category desktop-only">
-                                            <i class="bi bi-tag-fill"></i>
-                                            <span>${mainSticker.category}</span>
-                                        </span>
-                                    </div>
-
-                                    <p class="sticker-name">${mainSticker.product_name}</p>
-
-                                    <span class="sticker-category mobile-only">
-                                        <i class="bi bi-tag-fill"></i>
-                                        <span>${mainSticker.category}</span>
-                                    </span>
-                                </div>
-
-                                <div class="chevron-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
                             </div>
-                        </button>
-                    </h2>
-
-                    <div id="collapse-${identifier}"
-                        class="accordion-collapse collapse"
-                        aria-labelledby="heading-${identifier}"
-                        data-bs-parent="#accordion-${identifier}">
-                        <div class="accordion-body">
-                            <div id="details-content-${identifier}" class="details-container">
-                                <div class="loading-state">
-                                    <div class="loading-spinner"></div>
-                                    <span>Loading product details</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-`;
+                        `;
                         }).join('');
                         totalPages = data.pagination.total_pages;
                         if (searchTerm !== '') {
