@@ -131,28 +131,13 @@ class StickersCommand extends AbstractCommand
             $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$item->getId()]);
             echo " Products: ".count($products)."\n";
             foreach ($products as $product) {
-                print_r($product);
-                $stickerIds = $db->fetchAssociative("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='stickerFnsku'", [$product['dest_id']]);
-                foreach ($stickerIds as $stickerId) {
-                    if (!$stickerId || Asset::getById($stickerId)) {
-                        $productObject = Product::getById($product['dest_id']);
-                        if (!$productObject) {
-                            echo " product not found\n";
-                            continue;
-                        }
-                        echo " generating ";
-                        $sticker = $productObject->checkStickerFnsku();
-                    } else {
-                        $sticker = Asset::getById($stickerId);
-                    }
-                    if ($sticker) {
-                        echo $sticker->getFullPath();
-                        echo "\n";
-                    }
-                }
+                $productObject = Product::getById($product['dest_id']);
+                echo " generating ";
+                $sticker = $productObject->checkStickerFnsku();
+                echo $sticker->getFullPath();
+                echo "\n";
             }
         }
-
     }
 
     public function generateEuFnskuSticker()
