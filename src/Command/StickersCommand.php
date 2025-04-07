@@ -132,9 +132,8 @@ class StickersCommand extends AbstractCommand
             echo " Products: ".count($products)."\n";
             foreach ($products as $product) {
                 $stickerIds = $db->fetchAssociative("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='stickerFnsku'", [$product['dest_id']]);
-                print_r($stickerIds);
-                /*foreach ($stickerIds as $stickerId) {
-                    if (!$stickerId) {
+                foreach ($stickerIds as $stickerId) {
+                    if (!$stickerId || Asset::getById($stickerId);) {
                         $productObject = Product::getById($product['dest_id']);
                         if (!$productObject) {
                             echo " product not found\n";
@@ -149,7 +148,7 @@ class StickersCommand extends AbstractCommand
                         echo $sticker->getFullPath();
                         echo "\n";
                     }
-                }*/
+                }
             }
         }
 
