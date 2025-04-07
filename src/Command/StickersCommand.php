@@ -131,6 +131,7 @@ class StickersCommand extends AbstractCommand
             $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$item->getId()]);
             echo " Products: ".count($products)."\n";
             foreach ($products as $product) {
+                echo "Product: " . $product->getKey() . "\n";
                 $stickerIds = $db->fetchAssociative("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='stickerFnsku'", [$product['dest_id']]);
                 foreach ($stickerIds as $stickerId) {
                     if (!$stickerId || Asset::getById($stickerId)) {
