@@ -27,6 +27,7 @@ class StickersCommand extends AbstractCommand
             ->addOption('generateEu', null, InputOption::VALUE_NONE, 'Generate missing stickers')
             ->addOption('generateIwasku', null, InputOption::VALUE_NONE, 'Generate missing stickers')
             ->addOption('generateEuFnsku', null, InputOption::VALUE_NONE, 'Generate missing stickers')
+            ->addOption('generateEuFnskuByGroupId', null, InputOption::VALUE_NONE, 'Generate missing stickers')
         ;
     }
 
@@ -45,6 +46,10 @@ class StickersCommand extends AbstractCommand
 
         if ($input->getOption('generateEuFnsku')) {
             $this->generateEuFnskuSticker();
+        }
+
+        if ($input->getOption('generateEuFnskuByGroupId')) {
+            $this->generateEuFnskuStickerByGroupId(271263);
         }
 
         return Command::SUCCESS;
@@ -109,6 +114,40 @@ class StickersCommand extends AbstractCommand
                 if ($sticker) {
                     echo $sticker->getFullPath();
                     echo "\n";
+                }
+            }
+        }
+
+    }
+
+    public function generateEuFnskuStickerByGroupId($groupId)
+    {
+        $db = Db::get();
+        //$gproduct = new GroupProduct\Listing();
+        $gproduct = GroupProduct::getById($groupId);
+        $result = $gproduct->load();
+        foreach ($result as $item) {
+            echo "Group: ".$item->getKey();
+            $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$item->getId()]);
+            echo " Products: ".count($products)."\n";
+            foreach ($products as $product) {
+                $stickerIds = $db->fetchAssociative("SELECT dest_id FROM object_relations_product WHERE src_id = ? AND type='asset' AND fieldname='stickerFnsku'", [$product['dest_id']]);
+                foreach ($stickerIds as $stickerId) {
+                    if (!$stickerId) {
+                        $productObject = Product::getById($product['dest_id']);
+                        if (!$productObject) {
+                            echo " product not found\n";
+                            continue;
+                        }
+                        echo " generating ";
+                        $sticker = $productObject->checkStickerFnsku();
+                    } else {
+                        $sticker = Asset::getById($stickerId);
+                    }
+                    if ($sticker) {
+                        echo $sticker->getFullPath();
+                        echo "\n";
+                    }
                 }
             }
         }
