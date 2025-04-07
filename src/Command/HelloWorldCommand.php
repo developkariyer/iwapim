@@ -25,14 +25,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $sql = "select * from iwa_inventory where asin = 'B089463VG3' and inventory_type = 'AMAZON_FBA'";
-        $result = Utility::fetchFromSql($sql);
-        foreach ($result as $row) {
-            $json = $row['json_data'];
-            $data = json_decode($json, true);
-            $seller_sku = $data['sellerSku'];
-            echo "Seller sku: " . $seller_sku . "\n";
-        }
+        $product = Product::findByField('iwasku', 'CA001A05SXQ1');
+        $product->checkStickerFnsku();
         return Command::SUCCESS;
     }
 }
