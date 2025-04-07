@@ -599,15 +599,8 @@ class Product extends Concrete
         $stickerFnskuList = $this->filterAmazonStickerFnskuList();
         $assets = [];
         foreach ($stickerFnskuList as $asin => $values) {
-            foreach ($values['return'] as $fnsku) {
-                $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$iwasku}_{$asin}_{$fnsku}_return_4x6eufnsku.pdf");
-                if ($asset) {
-                    $assets[] = $asset;
-                }
-            }
-
-            foreach ($values['notReturn'] as $fnsku) {
-                $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$iwasku}_{$asin}_{$fnsku}_notreturn_4x6eufnsku.pdf");
+            foreach ($values as $fnsku) {
+                $asset = PdfGenerator::generate4x6Fnsku($this, $fnsku, $asin, "{$iwasku}_{$asin}_{$fnsku}_4x6eufnsku.pdf");
                 if ($asset) {
                     $assets[] = $asset;
                 }
@@ -639,22 +632,15 @@ class Product extends Concrete
                         $stickerFnskuList[$asin] = [];
                     }
                     foreach ($result as $item) {
-                        if (!isset($stickerFnskuList[$asin]['return']) || !isset($stickerFnskuList[$asin]['notReturn'])) {
-                            $stickerFnskuList[$asin]['return'] = [];
-                            $stickerFnskuList[$asin]['notReturn'] = [];
-                        }
-                        $returnControl = $item['seller_sku'] ?? '';
+                        $json = json_decode($item['json_data'], true);
+                        $returnControl = $json['sellerSku'] ?? '';
                         $fnsku = $item['fnsku'] ?? '';
-                        if (!str_starts_with($returnControl, 'amzn.gr')) {
-                            if (!in_array($fnsku, $stickerFnskuList[$asin]['notReturn'])) {
-                                $stickerFnskuList[$asin]['notReturn'][] = $fnsku;
-                            }
+                        if (str_starts_with($returnControl, 'amzn.gr')) {
+                            continue;
                         }
                         else {
-                            if (!in_array($fnsku, $stickerFnskuList[$asin]['return'])) {
-                                if ($item['total_quantity'] > 0) {
-                                    $stickerFnskuList[$asin]['return'][] = $fnsku;
-                                }
+                            if (!in_array($fnsku, $stickerFnskuList[$asin])) {
+                                    $stickerFnskuList[$asin][] = $fnsku;
                             }
                         }
                     }
