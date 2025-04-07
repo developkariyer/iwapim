@@ -611,7 +611,6 @@ class Product extends Concrete
         return $assets;
     }
 
-
     public function filterAmazonStickerFnskuList()
     {
         $variants = $this->filterAmazonVariants();
