@@ -132,7 +132,7 @@ class StickersCommand extends AbstractCommand
             echo " Products: ".count($products)."\n";
             foreach ($products as $product) {
                 $productObject = Product::getById($product['dest_id']);
-                echo " generating ";
+                echo " generating \n";
                 $sticker = $productObject->checkStickerFnsku();
                 echo  "Complated\n";
             }
