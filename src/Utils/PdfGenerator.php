@@ -250,6 +250,10 @@ class PdfGenerator
 
     public static function generate4x6Fnsku(Product $product, $fnsku, $asin, $qrfile)
     {
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        if (file_exists($pdfFilePath)) {
+            return null;
+        }
         $pdf = new Fpdi('L', 'mm', [60, 40]);
         $pdf->SetAutoPageBreak(false);
         $pdf->AddPage();
@@ -298,21 +302,16 @@ class PdfGenerator
         $pdf->SetXY(48, 27);
         $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD\nGPSR", 'windows-1254', 'UTF-8'), 0, 'C');
 
-        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+
         $pdf->Output($pdfFilePath, 'F');
 
-        if (!file_exists($pdfFilePath)) {
-            $asset = new Asset\Document();
-            $asset->setFilename($qrfile);
-            $asset->setData(file_get_contents($pdfFilePath));
-            $asset->setParent(Utility::checkSetAssetPath('FNSKU', Utility::checkSetAssetPath('Etiketler')));
-            $asset->save();
-            return $asset;
-        } else {
-            echo "File is exist: $pdfFilePath";
-        }
+        $asset = new Asset\Document();
+        $asset->setFilename($qrfile);
+        $asset->setData(file_get_contents($pdfFilePath));
+        $asset->setParent(Utility::checkSetAssetPath('FNSKU', Utility::checkSetAssetPath('Etiketler')));
+        $asset->save();
         unlink($pdfFilePath);
-        return null;
+        return $asset;
     }
 
 
