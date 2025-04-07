@@ -290,8 +290,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 );
             }
             $parentResponseJson = $mainListing;
-            print_r($mainListing);
-            
+
            /* if (isset($parentResponseJson['variants']['nodes'])) {
                 unset($parentResponseJson['variants']['nodes']);
             }*/
@@ -308,7 +307,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                             'quantity' => $listing['inventoryQuantity'] ?? 0,
                             'uniqueMarketplaceId' =>  basename($listing['id'] ?? ''),
                             'apiResponseJson' =>  json_encode($listing),
-                            'parentResponseJson' => json_encode($parentResponseJson),
+                            'parentResponseJson' => json_encode($mainListing),
                             'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                             'sku' =>   $listing['sku'] ?? '',
                             'ean' =>   $listing['barcode'] ?? '',
