@@ -125,7 +125,8 @@ class StickersCommand extends AbstractCommand
         $db = Db::get();
         //$gproduct = new GroupProduct\Listing();
         $gproduct = GroupProduct::getById($groupId);
-        $result = $gproduct->load();
+        $gproductListing = $gproduct->getListing();
+        $result = $gproductListing->load();
         foreach ($result as $item) {
             echo "Group: ".$item->getKey();
             $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$item->getId()]);
