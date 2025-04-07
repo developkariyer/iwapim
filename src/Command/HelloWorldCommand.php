@@ -25,6 +25,11 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $sql = "select * from iwa_inventory where asin = 'B089463VG3' and inventory_type = 'AMAZON_FBA'";
+        $result = Utility::fetchFromSql($sql);
+        foreach ($result as $row) {
+            print_r($row['json_data']);
+        }
         return Command::SUCCESS;
     }
 }
