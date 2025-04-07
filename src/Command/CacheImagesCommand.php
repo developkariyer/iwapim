@@ -186,7 +186,6 @@ class CacheImagesCommand extends AbstractCommand
             foreach ($variants as $variant) {
                 $variant_ids[] = basename($variant['id']);
             }
-            print_r($variant_ids);
 
             if (empty($id) || empty($src)) {
                 continue;
