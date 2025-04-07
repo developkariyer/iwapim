@@ -123,11 +123,10 @@ class StickersCommand extends AbstractCommand
     public function generateEuFnskuStickerByGroupId($groupId)
     {
         $db = Db::get();
-        //$gproduct = new GroupProduct\Listing();
-        $gproduct = GroupProduct::getById($groupId);
-        $gproductListing = $gproduct->getProducts();
-        //$result = $gproductListing->load();
-        foreach ($gproductListing as $item) {
+        $gproduct = new GroupProduct\Listing();
+        $gproduct->setCondition('id = ?', [$groupId]);
+        $result = $gproduct->load();
+        foreach ($result as $item) {
             echo "Group: ".$item->getKey();
             $products = $db->fetchAllAssociative("SELECT dest_id FROM object_relations_gproduct WHERE src_id = ? AND fieldname = 'products'", [$item->getId()]);
             echo " Products: ".count($products)."\n";
