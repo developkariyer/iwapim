@@ -180,8 +180,14 @@ class CacheImagesCommand extends AbstractCommand
         $variantImage = null;
         foreach ($imageArray as $image) {
             $id = basename($image["id"]) ?? '';
-            $src = $image['src'] ??'';
-            $variant_ids = $parentJson['variant_ids'] ?? [];
+            $src = $image['preview']['image']['url'] ??'';
+            $variants = $parentJson['variants'] ?? [];
+            $variant_ids = [];
+            foreach ($variants as $variant) {
+                $variant_ids[] = basename($variant['id']);
+            }
+            print_r($variant_ids);
+
             if (empty($id) || empty($src)) {
                 continue;
             }
