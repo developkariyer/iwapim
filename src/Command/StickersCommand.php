@@ -64,5 +64,8 @@ class StickersCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    // EU IWASKU EU-FNSKU
+
+
 }
 
