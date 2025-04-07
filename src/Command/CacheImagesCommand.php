@@ -181,7 +181,7 @@ class CacheImagesCommand extends AbstractCommand
         foreach ($imageArray as $image) {
             $id = basename($image["id"]) ?? '';
             $src = $image['preview']['image']['url'] ??'';
-            $variants = $parentJson['variants'] ?? [];
+            $variants = $parentJson['variants']['nodes'] ?? [];
             $variant_ids = [];
             foreach ($variants as $variant) {
                 $variant_ids[] = basename($variant['id']);
