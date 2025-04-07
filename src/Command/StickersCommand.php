@@ -134,8 +134,7 @@ class StickersCommand extends AbstractCommand
                 $productObject = Product::getById($product['dest_id']);
                 echo " generating ";
                 $sticker = $productObject->checkStickerFnsku();
-                echo $sticker->getFullPath();
-                echo "\n";
+                echo  "Complated\n";
             }
         }
     }
