@@ -133,7 +133,10 @@ class StickersCommand extends AbstractCommand
             foreach ($products as $product) {
                 $productObject = Product::getById($product['dest_id']);
                 echo " generating \n";
-                $sticker = $productObject->checkStickerFnsku();
+                $stickers = $productObject->checkStickerFnsku();
+                foreach ($stickers as $sticker) {
+                    echo $sticker->getFullPath();
+                }
                 echo  "Complated\n";
             }
         }
