@@ -290,6 +290,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 );
             }
             $parentResponseJson = $mainListing;
+            print_r($mainListing);
+            
            /* if (isset($parentResponseJson['variants']['nodes'])) {
                 unset($parentResponseJson['variants']['nodes']);
             }*/
