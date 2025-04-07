@@ -51,7 +51,7 @@ class PdfGenerator
     /**
      * @throws QRCodeDataException | QRCodeOutputException | DuplicateFullPathException | ErrorException
      */
-    public static function generate2x5(string $qrcode, string $qrlink, Product $product, $qrfile): Asset\Document
+    public static function generate2x5(string $qrcode, string $qrlink, Product $product, $qrfile)
     {
 
         $pdf = new Fpdi('L', 'mm', [50, 25]);
@@ -87,7 +87,7 @@ class PdfGenerator
     /**
      * @throws DuplicateFullPathException|UnknownTypeException
      */
-    public static function generate4x6iwasku(Product $product, $qrfile): Asset\Document
+    public static function generate4x6iwasku(Product $product, $qrfile)
     {
         if (empty($product->getEanGtin())) {
             error_log("EAN not found for product {$product->getIwasku()}, generating without EAN.");
@@ -100,8 +100,12 @@ class PdfGenerator
     /**
      * @throws DuplicateFullPathException
      */
-    public static function generate4x6iwaskuWithoutEan(Product $product, $qrfile): Asset\Document
+    public static function generate4x6iwaskuWithoutEan(Product $product, $qrfile)
     {
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        if (file_exists($pdfFilePath)) {
+            return null;
+        }
         $pdf = new Fpdi('L', 'mm', [60, 40]); // Landscape mode, 60x40 mm page
         $pdf->SetAutoPageBreak(false); // Disable automatic page break
         $pdf->AddPage();
@@ -126,7 +130,6 @@ class PdfGenerator
         $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
 
         // Output PDF to file
-        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
 
         // Save PDF as Pimcore Asset
@@ -142,8 +145,12 @@ class PdfGenerator
     /**
      * @throws DuplicateFullPathException|UnknownTypeException
      */
-    public static function generate4x6iwaskuWithEan(Product $product, $qrfile): Asset\Document
+    public static function generate4x6iwaskuWithEan(Product $product, $qrfile)
     {
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        if (file_exists($pdfFilePath)) {
+            return null;
+        }
         error_log("Generating 4x6 label with EAN for product {$product->getIwasku()} for ean {$product->getEanGtin()}");
         $ean = $product->getEanGtin();
         $eanBarcode = self::generateEanBarcode($ean);
@@ -175,7 +182,6 @@ class PdfGenerator
         $pdf->MultiCell(56, 4, Utility::keepSafeChars(Utility::removeTRChars($text)), 0, 'C'); // Left align, adjusted width for proper wrapping
 
         // Output PDF to file
-        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
         $pdf->Output($pdfFilePath, 'F');
 
         // Save PDF as Pimcore Asset
@@ -318,8 +324,12 @@ class PdfGenerator
     /**
      * @throws DuplicateFullPathException
      */
-    public static function generate4x6eu(Product $product, $qrfile): Asset\Document
+    public static function generate4x6eu(Product $product, $qrfile)
     {
+        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+        if (file_exists($pdfFilePath)) {
+            return null;
+        }
         $pdf = new Fpdi('L', 'mm', [60, 40]); 
         $pdf->SetAutoPageBreak(false); 
         $pdf->AddPage();
@@ -352,7 +362,7 @@ class PdfGenerator
         $pdf->SetXY(48, 27);
         $pdf->MultiCell(12, 3, mb_convert_encoding("Complies\nwith\nGPSD\nGPSR", 'windows-1254', 'UTF-8'), 0, 'C');
 
-        $pdfFilePath = PIMCORE_PROJECT_ROOT . "/tmp/$qrfile";
+
         $pdf->Output($pdfFilePath, 'F');
     
         $asset = new Asset\Document();
