@@ -290,9 +290,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 );
             }
             $parentResponseJson = $mainListing;
-            if (isset($parentResponseJson['variants']['nodes'])) {
+            /*if (isset($parentResponseJson['variants']['nodes'])) {
                 unset($parentResponseJson['variants']['nodes']);
-            }
+            }*/
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 try{
                     VariantProduct::addUpdateVariant(
