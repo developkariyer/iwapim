@@ -342,7 +342,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]['url'] ?? ''),
                     'urlLink' => $this->getUrlLink($listing['productUrl'] ?? ''),
                     'salePrice' => $listing['salePrice'] ?? 0,
-                    'saleCurrency' => 'TL',
+                    'saleCurrency' => $this->marketplace->getCurrency(),
                     'title' => $listing['title'] ?? '',
                     'attributes' => $this->getAttributes($listing),
                     'uniqueMarketplaceId' => $listing['id'] ?? '',
