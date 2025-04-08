@@ -487,7 +487,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
-            'query' => file_get_contents($getOrdersQuery),
+            'query' => $getOrdersQuery,
             'variables' => [
                 'numOrders' => 50,
                 'cursor' => null,
@@ -520,13 +520,45 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadInventory(): void
     {
+        $inventoryQuery = <<<GRAPHQL
+            query inventoryItems($numItems: Int!, $cursor: String) {
+                inventoryItems(first: $numItems, after: $cursor) {
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    nodes {
+                        id
+                        createdAt
+                        inventoryLevels (first: 50) {
+                            nodes {
+                                id
+                                location {
+                                    id
+                                    address {
+                                        address1
+                                        city
+                                        country
+                                    }
+                                }
+                                quantities (names: ["available","incoming","committed","reserved","damaged","safety_stock","quality_control"]){
+                                    name
+                                    quantity
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        GRAPHQL;
+
         $inventory = $this->getFromCache('INVENTORY.json');
         if (!empty($inventory)) {
             echo "Using cached inventory\n";
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadInventory.graphql'),
+            'query' => $inventoryQuery,
             'variables' => [
                 'numItems' => 50,
                 'cursor' => null
@@ -562,38 +594,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             ]);
             echo "Inserting order: " . $return['order_id'] . "\n";
         }
-
-        /*$query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadReturn.graphql'),
-            'variables' => [
-                    'numOrders' => 50,
-                    'cursor' => null,
-                    'filter' => "return_status:return_requested OR return_status:in_progress OR return_status:inspection_complete OR return_status:returned OR return_status:return_failed"
-            ]
-        ];
-        $returns = $this->getFromShopifyApiGraphql('POST', $query, 'orders');
-        foreach ($returns['orders'] as &$return) {
-            $orderId = basename($return['id']);
-            $sql = "select * from iwa_marketplace_orders_line_items where order_id = :order_id";
-            try {
-                $order = Utility::fetchFromSql($sql, ['order_id' => $orderId]);
-            } catch (\Exception $e) {
-                echo "Error: " . $e->getMessage() . "\n";
-            }
-            $return['orderDetail'] = $order;
-        }
-        //$this->putToCache("Returns.json", $returns);
-        foreach ($returns['orders'] as $return) {
-            $sqlInsertMarketplaceReturn = "
-                            INSERT INTO iwa_marketplace_returns (marketplace_id, return_id, json) 
-                            VALUES (:marketplace_id, :return_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
-            Utility::executeSql($sqlInsertMarketplaceReturn, [
-                'marketplace_id' => $this->marketplace->getId(),
-                'return_id' => basename($return['id']),
-                'json' => json_encode($return)
-            ]);
-            echo "Inserting order: " . $return['id'] . "\n";
-        }*/
     }
 
     /**
