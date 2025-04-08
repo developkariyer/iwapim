@@ -164,7 +164,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     'imageUrl' => Utility::getCachedImage($listing['attributes']['images'][0]) ?? '',
                     'urlLink' => $this->getUrlLink("https://www.hepsiburada.com/-p-" . $listing['hepsiburadaSku']) ?? '',
                     'salePrice' => $listing['price'] ?? 0,
-                    'saleCurrency' => 'TRY',
+                    'saleCurrency' => 'TL',
                     'title' =>  $listing['attributes']['productName']  ?? '',
                     'attributes' => $this->getAttributes($listing['attributes']['variantTypeAttributes']) ?? '',
                     'uniqueMarketplaceId' => $listing['hepsiburadaSku'] ?? '',
