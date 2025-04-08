@@ -93,7 +93,6 @@ class EtsyConnector extends MarketplaceConnectorAbstract
     }
 
     protected function getSalePrice($listing, $type='exists') {
-        echo $listing['offerings'][0]['price']['currency_code'] . "\n";
         if (!empty($listing['offerings']) && !empty($listing['offerings'][0]['price'])) {
             return match ($type) {
                 'price' => bcdiv((string) ($listing['offerings'][0]['price']['amount'] ?? '0'), '100', 4),
@@ -155,7 +154,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
                         'imageUrl' => null,
                         'urlLink' => $this->getUrlLink($mainListing['url'] ?? ''),
                         'salePrice' => $this->getSalePrice($listing, 'price'),
-                        'saleCurrency' => $this->getSalePrice($listing, 'currency'),
+                        'saleCurrency' => $this->getSalePrice($listing, 'currency') === 'USD' ? 'US DOLLAR' : '',
                         'attributes' => $this->getAttributes($listing),
                         'title' => ($mainListing['title'] ?? '').($this->getAttributes($listing)),
                         'uniqueMarketplaceId' => $listing['product_id'] ?? '',
