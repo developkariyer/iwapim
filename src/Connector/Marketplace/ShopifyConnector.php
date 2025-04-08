@@ -230,8 +230,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
     public function downloadOrders(): void
     {
         $getOrdersQuery = <<<GRAPHQL
-            query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
-                orders(first: $numOrders, after: $cursor, query: $filter) {
+            query getOrders(\$numOrders: Int!, \$cursor: String, \$filter: String) {
+                orders(first: \$numOrders, after: \$cursor, query: \$filter) {
                     pageInfo {
                         hasNextPage
                         endCursor
@@ -521,8 +521,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         $inventoryQuery = <<<GRAPHQL
-            query inventoryItems($numItems: Int!, $cursor: String) {
-                inventoryItems(first: $numItems, after: $cursor) {
+            query inventoryItems(\$numItems: Int!, \$cursor: String) {
+                inventoryItems(first: \$numItems, after: \$cursor) {
                     pageInfo {
                         hasNextPage
                         endCursor
