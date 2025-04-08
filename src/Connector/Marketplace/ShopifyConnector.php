@@ -18,8 +18,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Shopify';
 
-    private string $graphqlUrl = PIMCORE_PROJECT_ROOT . '/src/GraphQL/Shopify/';
-
     private string $apiUrl;
 
     public function __construct($marketplace)
