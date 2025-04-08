@@ -102,6 +102,8 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
+        $numProducts = 50;
+        $cursor = null;
         $getProductQuery = <<<GRAPHQL
             query GetProducts($numProducts: Int!, $cursor: String) {
                 products(first: $numProducts, after: $cursor) {
@@ -206,11 +208,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             return;
         }
         $query = [
-            'query' => $getProductQuery,
-            'variables' => [
-                'numProducts' => 50,
-                'cursor' => null
-            ]
+            'query' => $getProductQuery
         ];
         $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
         if (empty($this->listings)) {
