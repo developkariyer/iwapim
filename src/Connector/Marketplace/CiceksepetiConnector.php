@@ -117,7 +117,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
                     'urlLink' =>  $this->getUrlLink($listing['link']) ?? '',
                     'salePrice' => $listing['listPrice'] ?? 0,
-                    'saleCurrency' => 'TL',
+                    'saleCurrency' =>  $this->marketplace->getCurrency(),
                     'title' => $listing['productName'] ?? '',
                     'attributes' => $listing['variantName']  ?? '',
                     'uniqueMarketplaceId' =>  $listing['productCode'] ?? '',
