@@ -294,7 +294,24 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 unset($parentResponseJson['variants']['nodes']);
             }*/
             foreach ($mainListing['variants']['nodes'] as $listing) {
-                try{
+                $variant =  [
+                    'imageUrl' => $this->getImage($listing, $mainListing) ?? '',
+                    'urlLink' => $this->getUrlLink($this->marketplace->getMarketplaceUrl().'products/'.($mainListing['handle'] ?? '').'/?variant='.($listing['id'] ?? '')),
+                    'salePrice' =>   $listing['price'] ?? '',
+                    'saleCurrency' =>   $this->marketplace->getCurrency(),
+                    'attributes' =>   $listing['title'] ?? '',
+                    'title' =>  ($mainListing['title'] ?? '').($listing['title'] ?? ''),
+                    'quantity' => $listing['inventoryQuantity'] ?? 0,
+                    'uniqueMarketplaceId' =>  basename($listing['id'] ?? ''),
+                    //'apiResponseJson' =>  json_encode($listing),
+                    //'parentResponseJson' => json_encode($parentResponseJson),
+                    'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
+                    'sku' =>   $listing['sku'] ?? '',
+                    'ean' =>   $listing['barcode'] ?? '',
+                ];
+                print_r($variant);
+                break;
+                /*try{
                     VariantProduct::addUpdateVariant(
                         variant: [
                             'imageUrl' => $this->getImage($listing, $mainListing) ?? '',
@@ -321,7 +338,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
                     echo "ERRROR VARIANT: \n";
-                }
+                }*/
             }
             echo "OK\n";
             $index++;
