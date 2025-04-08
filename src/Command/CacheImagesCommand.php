@@ -174,24 +174,25 @@ class CacheImagesCommand extends AbstractCommand
     protected static function processShopify($variant): void
     {
         $parentJson = json_decode($variant->jsonRead('parentResponseJson'), true);
-        //$imageArray = array_merge($parentJson['image'] ?? [], $parentJson['images'] ?? []);
         $imageArray = $parentJson['media']['nodes'] ?? [];
         $listingImageList = [];
         $variantImage = null;
+        $variants = $parentJson['variants']['nodes'] ?? [];
+        $variant_ids = [];
+        foreach ($variants as $variantNode) {
+            $variant_ids[] = basename($variantNode['id']);
+        }
         foreach ($imageArray as $image) {
             $id = basename($image["id"]) ?? '';
-            $src = $image['preview']['image']['url'] ??'';
-            $variants = $parentJson['variants']['nodes'] ?? [];
-            $variant_ids = [];
-            foreach ($variants as $variant) {
-                $variant_ids[] = basename($variant['id']);
-            }
+            $src = $image['preview']['image']['url'] ?? '';
 
             if (empty($id) || empty($src)) {
                 continue;
             }
+
             $imgProcessed = static::processImage($src, static::$shopifyFolder, "Shopify_{$id}.jpg");
             $listingImageList[] = $imgProcessed;
+
             if (in_array($variant->getUniqueMarketplaceId(), $variant_ids)) {
                 $variantImage = $imgProcessed;
             }
