@@ -293,8 +293,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             /*if (isset($parentResponseJson['variants']['nodes'])) {
                 unset($parentResponseJson['variants']['nodes']);
             }*/
-            print_r($parentResponseJson['descriptionHtml']);
-            unset($parentResponseJson['descriptionHtml']);
+            $parentResponseJson['descriptionHtml'] = preg_replace('/https?:\/\//', '', $parentResponseJson['descriptionHtml']);
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 try{
                     VariantProduct::addUpdateVariant(
