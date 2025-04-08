@@ -102,11 +102,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
-        $numProducts = 50;
-        $cursor = null;
         $getProductQuery = <<<GRAPHQL
-            query GetProducts($numProducts: Int!, $cursor: String) {
-                products(first: $numProducts, after: $cursor) {
+            query GetProducts(\$numProducts: Int!, \$cursor: String) {
+                products(first: \$numProducts, after: \$cursor) {
                     pageInfo {
                         hasNextPage
                         endCursor
