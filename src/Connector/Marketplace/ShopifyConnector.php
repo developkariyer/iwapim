@@ -102,13 +102,111 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function download($forceDownload = false): void
     {
+        $getProductQuery = <<<GRAPHQL
+            query GetProducts($numProducts: Int!, $cursor: String) {
+                products(first: $numProducts, after: $cursor) {
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    nodes {
+                        id
+                        title
+                        descriptionHtml
+                        vendor
+                        productType
+                        createdAt
+                        handle
+                        updatedAt
+                        publishedAt
+                        templateSuffix
+                        tags
+                        status
+                        seo {
+                            title
+                            description
+                        }
+                        variantsCount {
+                            count
+                            precision
+                        }
+                        variants(first: 200) {
+                            pageInfo {
+                                hasNextPage
+                                endCursor
+                            }
+                            nodes {
+                                id
+                                title
+                                price
+                                position
+                                inventoryPolicy
+                                compareAtPrice
+                                selectedOptions {
+                                    name
+                                    value
+                                }
+                                createdAt
+                                updatedAt
+                                taxable
+                                barcode
+                                sku
+                                inventoryItem {
+                                    id
+                                }
+                                inventoryQuantity
+                                image {
+                                    id
+                                    altText
+                                    width
+                                    height
+                                    src
+                                }
+                            }
+                        }
+                        options(first:2) {
+                            id
+                            name
+                            position
+                            values
+                        }
+                        mediaCount {
+                            count
+                            precision
+                        }
+                        media (first: 100) {
+                            pageInfo {
+                                hasNextPage
+                                endCursor
+                            }
+                            nodes {
+                                id
+                                alt
+                                mediaContentType
+                                status
+                                preview {
+                                    image {
+                                        id
+                                        altText
+                                        width
+                                        height
+                                        url
+                                    }
+                                }
+                            }
+                        }
+            
+                    }
+                }
+            }
+        GRAPHQL;
         echo "GraphQL download\n";
         if ($this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadListing.graphql'),
+            'query' => $getProductQuery,
             'variables' => [
                 'numProducts' => 50,
                 'cursor' => null
@@ -121,7 +219,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         }
         $this->putListingsToCache();
     }
-
 
     /**
      * @throws TransportExceptionInterface
