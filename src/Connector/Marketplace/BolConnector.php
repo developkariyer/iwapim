@@ -289,7 +289,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                     'imageUrl' => '',
                     'urlLink' => $this->getUrlLink($listing['placement']['url'] ?? ''),
                     'salePrice' => $listing['bundlePricesPrice'] ?? '0.00',
-                    'saleCurrency' => 'EUR',
+                    'saleCurrency' => 'EURO',
                     'title' => $this->getAttribute($listing, ['Title']),
                     'attributes' => $this->getAttribute($listing, ['Dropdown Size HxWxL', 'Colour']),
                     'quantity' => $listing['correctedStock'] ?? 0,
