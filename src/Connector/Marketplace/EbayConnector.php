@@ -617,7 +617,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
                          'imageUrl' => Utility::getCachedImage(is_array($imageUrl) ? $imageUrl[0] : $imageUrl) ?? '',
                          'urlLink' => $this->getUrlLink($mainListing['ListingDetails']['ViewItemURL']),
                          'salePrice' => $mainListing['SellingStatus']['CurrentPrice'] ?? '',
-                         'saleCurrency' => $mainListing['Currency'],
+                         'saleCurrency' => $this->marketplace->getCurrency(),
                          'attributes' => $this->getAttributes($listing),
                          'title' => $mainListing['Title'] ?? '',
                          'quantity' => $mainListing['Quantity'] ?? 0,
