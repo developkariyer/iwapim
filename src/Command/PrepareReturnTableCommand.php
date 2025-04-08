@@ -26,7 +26,6 @@ class PrepareReturnTableCommand extends AbstractCommand
 
     private string $transferSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/ReturnTable/Transfer/';
 
-    private string $extraColumnsSqlfilePath = PIMCORE_PROJECT_ROOT . '/src/SQL/ReturnTable/ExtraColumns/';
     protected function configure(): void
     {
         $this
@@ -95,20 +94,32 @@ class PrepareReturnTableCommand extends AbstractCommand
 
     public function setMarketplaceKey(): void
     {
-        $values = Utility::fetchFromSqlFile($this->extraColumnsSqlfilePath . 'setMarketPlaceKeyFetch.sql');
+        $selectMarketplaceKeySql = "
+            SELECT
+                DISTINCT marketplace_id
+            FROM
+                iwa_marketplace_returns_line_items
+            WHERE
+                marketplace_id IS NOT NULL";
+
+        $updateMarketplaceKeySql = "
+            UPDATE iwa_marketplace_returns_line_items
+            SET marketplace_key = :marketplaceKey
+            WHERE marketplace_id = :marketplaceId;";
+
+        $values = Utility::fetchFromSql($selectMarketplaceKeySql);
         foreach ($values as $row) {
             $id = $row['marketplace_id'];
             $marketplace = Marketplace::getById($id);
             if ($marketplace) {
                 $marketplaceKey = $marketplace->getKey();
-                Utility::executeSqlFile($this->extraColumnsSqlfilePath . 'updateMarketPlaceKey.sql', [
+                Utility::executeSql($updateMarketplaceKeySql, [
                     'marketplaceKey' => $marketplaceKey,
-                    'marketplaceId' => $id,
+                    'marketplaceId' => $id
                 ]);
             } else {
                 echo "Marketplace not found for ID: $id\n";
             }
         }
     }
-
 }
