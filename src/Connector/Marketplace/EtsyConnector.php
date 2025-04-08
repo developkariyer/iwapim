@@ -154,7 +154,7 @@ class EtsyConnector extends MarketplaceConnectorAbstract
                         'imageUrl' => null,
                         'urlLink' => $this->getUrlLink($mainListing['url'] ?? ''),
                         'salePrice' => $this->getSalePrice($listing, 'price'),
-                        'saleCurrency' => $this->getSalePrice($listing, 'currency') === 'USD' ? 'US DOLLAR' : '',
+                        'saleCurrency' => $this->marketplace->getCurrency(),
                         'attributes' => $this->getAttributes($listing),
                         'title' => ($mainListing['title'] ?? '').($this->getAttributes($listing)),
                         'uniqueMarketplaceId' => $listing['product_id'] ?? '',
