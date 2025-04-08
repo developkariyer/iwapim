@@ -229,6 +229,249 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
+        $getOrdersQuery = <<<GRAPHQL
+            query getOrders($numOrders: Int!, $cursor: String, $filter: String) {
+                orders(first: $numOrders, after: $cursor, query: $filter) {
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    nodes {
+                        id
+                        name
+                        note
+                        tags
+                        test
+                        currencyCode
+                        closedAt
+                        confirmed
+                        poNumber
+                        returns (first:50) {
+                            nodes {
+                                decline {
+                                    note
+                                    reason
+                                }
+                                id
+                                name
+                                status
+                            }
+                        }
+                        lineItems (first:100) {
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                            nodes {
+                                id
+                                sku
+                                name
+                                title
+                                duties {
+                                    id
+                                    countryCodeOfOrigin
+                                    harmonizedSystemCode
+                                    price {
+                                        shopMoney {
+                                            amount
+                                            currencyCode
+                                        }
+                                        presentmentMoney {
+                                            amount
+                                            currencyCode
+                                        }
+                                    }
+                                }
+                                vendor
+                                taxable
+                                quantity
+                                isGiftCard
+                                product {
+                                    id
+                                }
+                                variant {
+                                    id
+                                    title
+                                    price
+                                }
+                                requiresShipping
+                            }
+                        }
+                        shippingAddress {
+                            city
+                            company
+                            country
+                            countryCodeV2
+                            province
+                        }
+                        taxLines {
+                            rate
+                            price
+                            title
+                            priceSet {
+                                shopMoney {
+                                    amount
+                                    currencyCode
+                                }
+                                presentmentMoney {
+                                    amount
+                                    currencyCode
+                                }
+                            }
+                            channelLiable
+                        }
+                        totalTaxSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        createdAt
+                        registeredSourceUrl
+                        taxExempt
+                        updatedAt
+                        sourceName
+                        totalPriceSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        cancelledAt
+                        landingPageUrl
+                        processedAt
+                        totalWeight
+                        cancelReason
+                        discountCodes
+                        referrerUrl
+                        subtotalPriceSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        taxesIncluded
+                        currentTotalTaxSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        displayFulfillmentStatus
+                        subtotalPriceSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        totalTipReceivedSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        confirmationNumber
+                        currentTotalPriceSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        totalDiscountsSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        presentmentCurrencyCode
+                        currentTotalTaxSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        paymentGatewayNames
+                        currentSubtotalPriceSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        currentTotalPriceSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        currentTotalDiscountsSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                        currentTotalDutiesSet {
+                            shopMoney {
+                                amount
+                                currencyCode
+                            }
+                            presentmentMoney {
+                                amount
+                                currencyCode
+                            }
+                        }
+                    }
+                }
+            }
+        GRAPHQL;
+
         try {
             $sqlLastUpdatedAt = "
                 SELECT COALESCE(MAX(json_extract(json, '$.updatedAt')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
@@ -244,7 +487,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
         echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'downloadOrders.graphql'),
+            'query' => file_get_contents($getOrdersQuery),
             'variables' => [
                 'numOrders' => 50,
                 'cursor' => null,
