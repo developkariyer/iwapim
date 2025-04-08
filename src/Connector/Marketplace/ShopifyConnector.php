@@ -317,6 +317,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                         parent: $parent
                     );
                     echo "v";
+                    print_r($parentResponseJson);
                 } catch (\Exception $e) {
                     echo "Error: " . $e->getMessage() . "\n";
                     echo "Sku: " . $listing['sku'] ?? '' . "\n";
