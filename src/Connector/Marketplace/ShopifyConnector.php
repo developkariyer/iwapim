@@ -293,6 +293,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             /*if (isset($parentResponseJson['variants']['nodes'])) {
                 unset($parentResponseJson['variants']['nodes']);
             }*/
+            unset($parentResponseJson['descriptionHtml']);
             foreach ($mainListing['variants']['nodes'] as $listing) {
                 try{
                     VariantProduct::addUpdateVariant(
@@ -306,7 +307,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                             'quantity' => $listing['inventoryQuantity'] ?? 0,
                             'uniqueMarketplaceId' =>  basename($listing['id'] ?? ''),
                             'apiResponseJson' =>  json_encode($listing),
-                            'parentResponseJson' => json_encode($parentResponseJson, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                            'parentResponseJson' => json_encode($parentResponseJson),
                             'published' =>  ($mainListing['status'] ?? 'ACTIVE') === 'ACTIVE',
                             'sku' =>   $listing['sku'] ?? '',
                             'ean' =>   $listing['barcode'] ?? '',
