@@ -697,13 +697,27 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function setSku(VariantProduct $listing, string $sku): void // not tested
     {
+        $setSkuQuery = <<<GRAPHQL
+            mutation inventoryItemUpdate(\$id: ID!, \$input: InventoryItemInput!) {
+                inventoryItemUpdate(id: \$id, input: \$input) {
+                    inventoryItem {
+                        id
+                        sku
+                    }
+                    userErrors {
+                        message
+                    }
+                }
+            }
+        GRAPHQL;
+
         if (empty($sku)) {
             echo "SKU is empty for {$listing->getKey()}\n";
             return;
         }
         $apiResponse = json_decode($listing->jsonRead('apiResponseJson'), true);
         $jsonSku = $apiResponse['sku'] ?? null;
-        $inventoryItemId = $apiResponse['inventory_item_id'] ?? null;
+        $inventoryItemId = basename($apiResponse['inventoryItem']['id']) ?? null;
         if (!empty($jsonSku) && $jsonSku === $sku) {
             echo "SKU is already set for {$listing->getKey()}\n";
             return;
@@ -713,7 +727,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'setSku.graphql'),
+            'query' => $setSkuQuery,
             'variables' => [
                 'id' => $inventoryItemId,
                 'sku' => $sku,
@@ -738,13 +752,33 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void // not tested
     {
-        $inventoryItemId = json_decode($listing->jsonRead('apiResponseJson'), true)['inventory_item_id'];
+        $setInventoryQuery = <<<GRAPHQL
+            mutation InventorySet(\$input: InventorySetQuantitiesInput!) {
+                inventorySetQuantities(input: \$input) {
+                    inventoryAdjustmentGroup {
+                        createdAt
+                        reason
+                        referenceDocumentUri
+                        changes {
+                            name
+                            delta
+                        }
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        GRAPHQL;
+
+        $inventoryItemId = basename(json_decode($listing->jsonRead('apiResponseJson'), true)['inventoryItem']['id']);
         if (empty($inventoryItemId)) {
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'setInventory.graphql'),
+            'query' => $setInventoryQuery,
             'variables' => [
                 'name' => 'available',
                 'quantities' => [
@@ -771,6 +805,24 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void // not tested
     {
+        $setPriceQuery = <<<GRAPHQL
+            mutation ProductVariantsUpdate(\$productId: ID!,  \$variants: [ProductVariantsBulkInput!]!) {
+                productVariantsBulkUpdate(productId: \$productId, variants: \$variants) {
+                    product {
+                        id
+                    }
+                    productVariants {
+                        id
+                        price
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        GRAPHQL;
+
         $currencies = [
             'CANADIAN DOLLAR' => 'CAD',
             'TL' => 'TL',
@@ -806,7 +858,7 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'setPrice.graphql'),
+            'query' => $setPriceQuery,
             'variables' => [
                 'productId' => $productId,
                 'variants' => [
@@ -814,7 +866,6 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                     'price' => $finalPrice,
                 ]
             ]
-
         ];
         $response = $this->getFromShopifyApiGraphql('POST', $query, 'productVariantsBulkUpdate');
         echo "Price set\n";
@@ -828,6 +879,24 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
      */
     public function setBarcode(VariantProduct $listing, string $barcode): void //not tested
     {
+        $setBarcodeQuery = <<<GRAPHQL
+        mutation ProductVariantsUpdate(\$productId: ID!,  \$variants: [ProductVariantsBulkInput!]!) {
+            productVariantsBulkUpdate(productId: \$productId, variants: \$variants) {
+                product {
+                    id
+                }
+                productVariants {
+                    id
+                    barcode
+                }
+                userErrors {
+                    field
+                    message
+                }
+            }
+        }
+        GRAPHQL;
+
         if (empty($barcode)) {
             echo "Barcode is empty for {$listing->getKey()}";
             return;
@@ -839,12 +908,12 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             return;
         }
         $query = [
-            'query' => file_get_contents($this->graphqlUrl . 'setBarcode.graphql'),
+            'query' => $setBarcodeQuery,
             'variables' => [
                 'productId' => $productId,
                 'variants' => [
                     'id' => $variantId,
-                    'barcode' => $barcode,
+                    'barcode' => $barcode
                 ]
             ]
 
