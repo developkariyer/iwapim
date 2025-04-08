@@ -208,7 +208,11 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             return;
         }
         $query = [
-            'query' => $getProductQuery
+            'query' => $getProductQuery,
+            'variables' => [
+                'numProducts' => 50,
+                'cursor' => null
+            ]
         ];
         $this->listings = $this->getFromShopifyApiGraphql('POST', $query, 'products');
         if (empty($this->listings)) {
