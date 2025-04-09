@@ -1,1027 +1,269 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="IWAPIM profesyonel ürün kataloğu">
-    <title>IWAPIM | Ürün Kataloğu</title>
-
-    <!-- Preload fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" as="style">
-
-    <!-- Stylesheets -->
+    <title>IWAPIM Katalog</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        :root {
-            /* Core color palette - Modern blue to purple gradient scheme */
-            --primary-gradient-start: #4361ee;
-            --primary-gradient-end: #3a0ca3;
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #7209b7;
-
-            /* Surface colors */
-            --surface-light: #ffffff;
-            --surface-medium: #f8f9ff;
-            --surface-dark: #e9ecf9;
-
-            /* Text colors */
-            --text-primary: #1a1f36;
-            --text-secondary: #4a5568;
-            --text-muted: #718096;
-            --text-light: #ffffff;
-
-            /* Status colors */
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --info-color: #3b82f6;
-
-            /* Border & Shadow */
-            --border-color: rgba(226, 232, 240, 0.7);
-            --shadow-sm: 0 2px 4px rgba(148, 163, 184, 0.05), 0 1px 2px rgba(15, 23, 42, 0.08);
-            --shadow-md: 0 4px 8px -2px rgba(148, 163, 184, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
-            --shadow-lg: 0 12px 24px -6px rgba(148, 163, 184, 0.15), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
-            --shadow-hover: 0 20px 25px -5px rgba(148, 163, 184, 0.10), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
-
-            /* Border radius */
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-
-            /* Animation */
-            --transition-fast: 150ms ease;
-            --transition-normal: 250ms ease;
-            --transition-slow: 350ms ease;
-
-            /* Layout */
-            --header-height: 4.5rem;
-            --max-content-width: 1440px;
-            --card-height: 180px;
+        body {
+            background-color: #070e53;
         }
+        .product-card {
+            background-color: #f5f5f5;
+            height: 120px;
+            overflow: hidden;
+            margin-bottom: 1px;
+            box-shadow: none;
+            padding: 0;
+        }
+        .product-card.expanded {
+            height: auto;
+        }
+        .product-main-image {
+            cursor: pointer;
+        }
+        .main-image {
+            height: 120px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            overflow: hidden;
+            flex-grow: 1;
+            text-overflow: ellipsis;
+            padding: 0;
+        }
+        .product-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 40px);
+            grid-gap: 0;
+            width: 320px;
 
-        /* Base styles */
-        * {
-            box-sizing: border-box;
+            border: none;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .product-gallery img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border: none;
             margin: 0;
             padding: 0;
         }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--surface-medium);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Typography enhancements */
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 600;
-            letter-spacing: -0.02em;
-        }
-
-        /* Header */
-        .app-header {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            height: var(--header-height);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-md);
-            color: var(--text-light);
-        }
-
-        .logo-container {
+        .page-container {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: all var(--transition-normal);
+            margin-top: 20px;
         }
-
-        .logo-icon:hover {
-            transform: rotate(5deg);
-            background-color: rgba(255, 255, 255, 0.25);
+        .row.g-0 {
+            margin: 0;
         }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .product-counter {
-            background-color: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-xl);
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-
-        /* Search controls */
-        .search-container {
-            background-color: var(--surface-light);
-            border-radius: var(--radius-lg);
-            padding: 1.75rem;
-            margin: -2rem auto 2rem;
-            box-shadow: var(--shadow-md);
-            position: relative;
-            z-index: 10;
-            max-width: calc(var(--max-content-width) - 3rem);
-        }
-
-        .control-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        /* Input controls */
-        .input-container {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1rem;
-            pointer-events: none;
-        }
-
-        .form-control, .form-select {
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            font-size: 0.95rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background-color: var(--surface-light);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
-            transition: all var(--transition-normal);
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-            outline: none;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            letter-spacing: 0.01em;
-            transition: all var(--transition-normal);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            border: none;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.35);
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--secondary-color));
-        }
-
-        .btn-secondary {
-            background-color: var(--surface-dark);
-            color: var(--text-primary);
-            border: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #dce1f5;
-            color: var(--secondary-color);
-        }
-
-        /* Product cards */
-        .catalog-container {
-            max-width: var(--max-content-width);
-            margin: 0 auto;
-        }
-
-        .product-card {
-            position: relative;
-            background-color: var(--surface-light);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            transition: all var(--transition-normal);
-            border: 1px solid var(--border-color);
-            height: var(--card-height);
-        }
-
-        .product-card.expanded {
-            height: auto;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .product-card:hover {
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-3px);
-        }
-
-        .product-image-container {
-            overflow: hidden;
-            position: relative;
-            width: 180px;
-            height: var(--card-height);
-        }
-
-        .product-image-badge {
-            position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.2rem 0.5rem;
-            border-radius: var(--radius-sm);
-            z-index: 2;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all var(--transition-normal);
-        }
-
-        .product-card:hover .product-image-badge {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .product-main-image {
-            width: 180px;
-            height: var(--card-height);
-            object-fit: cover;
-            transition: transform 0.6s var(--transition-normal);
-            cursor: pointer;
-        }
-
-        .product-card:hover .product-main-image {
-            transform: scale(1.08);
-        }
-
-        .product-content {
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .product-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .product-specs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 0.5rem 0 1rem;
-        }
-
-        .spec-badge {
-            background-color: var(--surface-dark);
-            color: var(--text-secondary);
-            padding: 0.35rem 0.75rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all var(--transition-normal);
-        }
-
-        .spec-badge:hover {
-            background-color: rgba(67, 97, 238, 0.1);
-            color: var(--primary-color);
-        }
-
-        .spec-badge i {
-            font-size: 0.7rem;
-            color: var(--primary-color);
-        }
-
-        .sku-container {
-            margin-top: auto;
-            border-top: 1px solid var(--border-color);
-            padding-top: 0.75rem;
-        }
-
-        .sku-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .sku-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
         .sku {
             cursor: pointer;
-            background-color: var(--surface-medium);
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.35rem 0.75rem;
-            border-radius: var(--radius-md);
-            transition: all var(--transition-normal);
-        }
-
-        .sku:hover {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.25);
-        }
-
-        .product-gallery {
-            padding: 1rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-            gap: 0.5rem;
-            border-left: 1px solid var(--border-color);
-            align-content: start;
-        }
-
-        .gallery-image {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            transition: all var(--transition-normal);
-            cursor: pointer;
-        }
-
-        .gallery-image:hover {
-            transform: scale(1.1) rotate(2deg);
-            box-shadow: var(--shadow-md);
-            border-color: var(--primary-color);
-            z-index: 5;
-        }
-
-        /* Pagination */
-        .pagination-container {
-            margin: 2.5rem 0 3.5rem;
-        }
-
-        .pagination {
-            display: flex;
-            gap: 0.35rem;
-        }
-
-        .page-item {
-            list-style: none;
-        }
-
-        .page-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            color: var(--text-secondary);
-            background-color: var(--surface-light);
-            border: 1px solid var(--border-color);
-            transition: all var(--transition-normal);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .page-link:hover {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
-        }
-
-        .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
-        }
-
-        .page-item.disabled .page-link {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        /* Copy notification */
-        .copy-notification {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
-            z-index: 1000;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            opacity: 0;
-            transform: translateY(1rem);
-        }
-
-        .notification-icon {
-            width: 24px;
-            height: 24px;
-            background-color: rgba(255, 255, 255, 0.25);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            background-color: var(--surface-light);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            opacity: 0.7;
-        }
-
-        .empty-state-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state-description {
-            color: var(--text-secondary);
-            max-width: 400px;
-            margin: 0 auto 1.5rem;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .search-container {
-                padding: 1.5rem;
-                margin-top: -1.5rem;
-            }
-
-            .product-gallery {
-                border-left: none;
-                border-top: 1px solid var(--border-color);
-                padding-top: 1rem;
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            }
-
-            .gallery-image {
-                width: 60px;
-                height: 60px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .app-header {
-                height: auto;
-                padding: 1rem 0;
-            }
-
-            .product-card {
-                height: auto;
-            }
-
-            .product-image-container {
-                width: 120px;
-                height: 120px;
-            }
-
-            .product-main-image {
-                width: 120px;
-                height: 120px;
-            }
-
-            .page-link {
-                width: 2.25rem;
-                height: 2.25rem;
-            }
-        }
-
-        /* Animation classes */
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .scale-in {
-            animation: scaleIn 0.3s ease forwards;
-        }
-
-        @keyframes scaleIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .slide-in {
-            animation: slideIn 0.4s ease forwards;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            color: blue;
+            text-decoration: underline;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-<!-- App Header -->
-<header class="app-header">
-    <div class="container-fluid px-4 h-100">
-        <div class="row h-100 align-items-center">
-            <div class="col-md-6">
-                <div class="logo-container">
-                    <div class="logo-icon">
-                        <i class="fas fa-cubes"></i>
-                    </div>
-                    <h1 class="logo-text mb-0">IWAPIM Katalog</h1>
-                </div>
-            </div>
-            <div class="col-md-6 d-flex justify-content-end">
-                <div class="product-counter">
-                    <i class="fas fa-layer-group me-2"></i>
-                    <span>{{ products|length }} / {{ totalProducts ?? 'Tüm' }} ürün</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
 
-<!-- Search Container -->
-<div class="container-fluid px-4">
-    <div class="search-container scale-in">
-        <div class="row g-3">
-            <div class="col-lg-5">
-                <label class="control-label" for="search-box">Ürün arama</label>
-                <div class="input-container">
-                    <i class="fas fa-search input-icon"></i>
-                    <input
-                            type="text"
-                            id="search-box"
-                            class="form-control"
-                            placeholder="SKU, ürün adı veya barkod ile arama yapın..."
-                            autocomplete="off"
-                    >
+    <div class="container-fluid">
+        <div class="row my-4 my-md-4">
+            <div class="col-md-6 mb-6 mb-md-0">
+                <div class="input-group">
+                    <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek arayın...">
+                    <button type="button" id="search-button" class="btn btn-primary">Ara</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/catalog'">Sıfırla</button>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <label class="control-label" for="category-select">Kategori</label>
-                <div class="input-container">
-                    <i class="fas fa-tag input-icon"></i>
-                    <select class="form-select" id="category-select">
-                        <option value="all" selected>Tüm Kategoriler</option>
-                        {% for type in productTypes %}
-                            <option value="{{ type }}">{{ type }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <select class="form-select" id="category-select">
+                    <option value="all" selected>Tüm Ürün Tipleri</option>
+                    {% for type in productTypes %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="col-lg-2">
-                <label class="control-label" for="page-size-select">Listeleme</label>
-                <div class="input-container">
-                    <i class="fas fa-list-ol input-icon"></i>
+            <div class="col-md-3">
+                <div class="d-flex justify-content-end">
                     <select class="form-select" id="page-size-select">
+                        <option value="5">5 Ürün</option>
                         <option value="10">10 Ürün</option>
                         <option value="20">20 Ürün</option>
                         <option value="50">50 Ürün</option>
                         <option value="100">100 Ürün</option>
+                        <option value="200">200 Ürün</option>
                     </select>
                 </div>
             </div>
-            <div class="col-lg-2 d-flex align-items-end">
-                <div class="d-grid gap-2 w-100">
-                    <button type="button" id="search-button" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i>Ara
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
 
-    <!-- Catalog Container -->
-    <div class="catalog-container">
-        {% if products|length > 0 %}
-            <div id="product-list">
-                {% for product in products %}
-                    <div class="product-card fade-in" style="animation-delay: {{ loop.index0 * 0.05 }}s">
-                        <div class="row g-0 h-100">
-                            <div class="col-auto">
-                                <div class="product-image-container">
-                                    <div class="product-image-badge">{{ loop.index }}</div>
-                                    <img
-                                            src="{{ product.image }}"
-                                            class="product-main-image"
-                                            alt="{{ product.name }}"
-                                            loading="lazy"
-                                            onclick="toggleCardExpansion(this)"
-                                    >
+        <!-- Product catalog container -->
+        <div id="catalog-container">
+            {% for product in products %}
+                <div class="card product-card">
+                    <table style="table-layout: fixed; width: 100%; height: 100%; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <tr>
+                            <td style="width: 150px; vertical-align: top; border: none; padding: 0;">
+                                <div style="height: 120px; width: 150px;">
+                                    <img src="{{ product.image }}" class="product-main-image" alt="Product Image" style="height: 100%; max-width: 150px; width: auto; display: block;">
                                 </div>
-                            </div>
-                            <div class="col">
-                                <div class="product-content">
-                                    <h2 class="product-title">{{ product.productIdentifier }} {{ product.name }}</h2>
-
-                                    <!-- Product specifications badges -->
-                                    <div class="product-specs">
-                                        {% if product.variationSizeList %}
-                                            <span class="spec-badge">
-                                                    <i class="fas fa-ruler"></i>
-                                                    {{ product.variationSizeList }}
-                                                </span>
-                                        {% endif %}
-
-                                        {% if product.variationColorList %}
-                                            <span class="spec-badge">
-                                                    <i class="fas fa-palette"></i>
-                                                    {{ product.variationColorList }}
-                                                </span>
-                                        {% endif %}
-
-                                        {% if product.brand is defined and product.brand %}
-                                            <span class="spec-badge">
-                                                    <i class="fas fa-building"></i>
-                                                    {{ product.brand }}
-                                                </span>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- SKU information -->
-                                    <div class="sku-container">
-                                        <div class="sku-label">
-                                            <i class="fas fa-barcode"></i>
-                                            SKU Kodları
-                                        </div>
-                                        <div class="sku-list">
-                                            {% for item in product.iwaskuList %}
-                                                <span
-                                                        class="sku"
-                                                        data-sku="{{ item.iwasku }}"
-                                                        data-bs-toggle="tooltip"
-                                                        title="{{ item.tooltip }}"
-                                                        onclick="copySku(this)"
-                                                >
-                                                        {{ item.iwasku }}
-                                                    </span>
-                                            {% endfor %}
-                                        </div>
+                            </td>
+                            <td style="vertical-align: top; border: none; padding: 3px; overflow: hidden;">
+                                <div class="card-body product-info">
+                                    <h5 class="card-title">{{ product.productIdentifier }} {{ product.name }}</h5>
+                                    <div class="col-12" style="font-size: smaller;">
+                                        <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
+                                        <b>IWASKU:</b> {% for item in product.iwaskuList %}<span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">{{ item.iwasku }}</span>{% if not loop.last %}<span>| </span>{% endif %}{% endfor %}<br>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-auto d-none d-lg-block">
+                            </td>
+                            <td class="d-none d-md-table-cell" style="width: 320px; vertical-align: top; border: none; padding: 0;">
                                 <div class="product-gallery">
                                     {% for image in product.album %}
-                                        <img src="{{ image|replace({'<img src="': ''}) | split('"')[0] }}"
-                                             alt="Ürün görseli"
-                                             class="gallery-image"
-                                             loading="lazy"
-                                             onclick="openImageModal(this.src)">
+                                        {{ image|raw }}
                                     {% endfor %}
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination-container">
-                <div class="d-flex justify-content-center">
-                    <nav aria-label="Product pagination">
-                        <ul class="pagination">
-                            <!-- First Page -->
-                            <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                                <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}" aria-label="İlk sayfa">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                            </li>
-
-                            <!-- Previous Page -->
-                            <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                                <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Önceki sayfa">
-                                    <i class="fas fa-angle-left"></i>
-                                </a>
-                            </li>
-
-                            <!-- Page numbers -->
-                            {% set start = max(page - 2, 0) %}
-                            {% set end = min(page + 2, pageCount - 1) %}
-
-                            {% if end - start < 4 and pageCount > 5 %}
-                                {% if start == 0 %}
-                                    {% set end = min(4, pageCount - 1) %}
-                                {% else %}
-                                    {% set start = max(pageCount - 5, 0) %}
-                                {% endif %}
-                            {% endif %}
-
-                            {% for i in start..end %}
-                                <li class="page-item {% if i == page %}active{% endif %}">
-                                    <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
-                                </li>
-                            {% endfor %}
-
-                            <!-- Next Page -->
-                            <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                                <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Sonraki sayfa">
-                                    <i class="fas fa-angle-right"></i>
-                                </a>
-                            </li>
-
-                            <!-- Last Page -->
-                            <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                                <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}" aria-label="Son sayfa">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-            </div>
-        {% else %}
-            <!-- Empty state when no products -->
-            <div class="empty-state scale-in">
-                <div class="empty-state-icon">
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <h2 class="empty-state-title">Ürün bulunamadı</h2>
-                <p class="empty-state-description">
-                    Arama kriterlerinize uygun ürün bulunamadı. Lütfen farklı arama terimleri ile tekrar deneyin.
-                </p>
-                <button onclick="window.location.href='/catalog'" class="btn btn-primary">
-                    <i class="fas fa-sync-alt me-2"></i>Tüm Ürünleri Göster
-                </button>
-            </div>
-        {% endif %}
-    </div>
-</div>
+            {% endfor %}
+        </div>
 
-<!-- Modal for image preview -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img src="" id="modalImage" class="img-fluid rounded" style="max-height: 80vh">
-            </div>
+        <!-- Pagination -->
+        <div class="page-container">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}">&lt;&lt;</a>
+                    </li>
+
+                    <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}">&lt;</a>
+                    </li>
+
+                    {% set start = max(page - 2, 0) %}
+                    {% set end = min(page + 2, pageCount - 1) %}
+
+                    {% if end - start < 4 %}
+                        {% if start == 0 %}
+                            {% set end = min(4, pageCount - 1) %}
+                        {% else %}
+                            {% set start = max(pageCount - 5, 0) %}
+                        {% endif %}
+                    {% endif %}
+
+                    {% for i in start..end %}
+                        <li class="page-item {% if i == page %}active{% endif %}">
+                            <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
+                        </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}">&gt;</a>
+                    </li>
+
+                    <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}">&gt;&gt;</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
-</div>
 
-<script>
-    // Initialize variables
-    let currentQuery = '{{ query|e('js') }}';
-    let currentCategory = '{{ category|e('js') }}';
-    let imageModal;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    // Initialize on document ready
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeTooltips();
-        initializeEvents();
-        imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    <script>
+        $(document).ready(function() {
+            let currentQuery = '{{ query|e('js') }}';
+            let currentCategory = '{{ category|e('js') }}';
 
-        // Set form values based on current URL
-        setFormInitialValues();
+            if (currentQuery !== 'all') {
+                $('#search-box').val(currentQuery);
+            }
+            if (currentCategory !== 'all') {
+                $('#category-select').val(currentCategory);
+            }
+            $('#page-size-select').val('{{ pageSize }}');
 
-        // Add animation classes with delay
-        animateElements();
-    });
-
-    function initializeTooltips() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl, {
-                delay: { show: 300, hide: 100 }
+            $('#page-size-select').on('change', function() {
+                let selectedPageSize = $(this).val();
+                window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
             });
-        });
-    }
 
-    function setFormInitialValues() {
-        if (currentQuery && currentQuery !== 'all') {
-            document.getElementById('search-box').value = currentQuery;
-        }
+            $('#search-button').on('click', function() {
+                let searchQuery = $('#search-box').val().trim();
+                window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
+            });
 
-        if (currentCategory && currentCategory !== 'all') {
-            document.getElementById('category-select').value = currentCategory;
-        }
+            $('#search-box').on('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    let searchQuery = $(this).val().trim();
+                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
+                }
+            });
 
-        document.getElementById('page-size-select').value = '{{ pageSize }}';
-    }
+            $('#category-select').on('change', function() {
+                let selectedCategory = $(this).val();
+                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
+            });
 
-    function initializeEvents() {
-        // Page size change event
-        document.getElementById('page-size-select').addEventListener('change', function() {
-            let selectedPageSize = this.value;
-            window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
-        });
+            $(document).on('click', '.sku', function() {
+                let iwasku = $(this).data('iwasku');
 
-        // Search button click
-        document.getElementById('search-button').addEventListener('click', performSearch);
+                navigator.clipboard.writeText(iwasku).then(() => {
+                    showCopyNotification(iwasku);
+                }).catch(err => {
+                    console.error("Failed to copy: ", err);
+                });
+            });
 
-        // Search box enter key
-        document.getElementById('search-box').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                performSearch();
+            function showCopyNotification(iwasku) {
+                let notification = $('<div class="copy-notification">Copied: ' + iwasku + '</div>');
+                $('body').append(notification);
+                notification.css({
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    background: '#28a745',
+                    color: 'white',
+                    padding: '10px 15px',
+                    borderRadius: '5px',
+                    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+                    zIndex: 1000,
+                    opacity: 0
+                }).animate({ opacity: 1 }, 300);
+
+                setTimeout(() => {
+                    notification.fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                }, 2000);
             }
         });
 
-        // Category change
-        document.getElementById('category-select').addEventListener('change', function() {
-            let selectedCategory = this.value;
-            window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            document.querySelectorAll('.product-card').forEach(function(card) {
+                let productImage = card.querySelector('.product-main-image');
+                if (productImage) {
+                    productImage.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        card.classList.toggle('expanded');
+                    });
+                }
+            });
         });
-    }
+    </script>
 
-    function performSearch() {
-        let searchQuery = document.getElementById('search-box').value.trim();
-        window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
-    }
-
-    function toggleCardExpansion(element) {
-        const card = element.closest('.product-card');
-        card.classList.toggle('expanded');
-
-        if (card.classList.contains('expanded')) {
-            // When expanded, scroll to ensure the full card is visible
-            setTimeout(() => {
-                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-        }
-    }
-
-    function copySku(element) {
-        const sku = element.dataset.sku;
-
-        navigator.clipboard.writeText(sku)
-            .then(() => showCopyNotification(sku))
-            .catch(err => console.error("Kopyalama hatası:", err));
-
-        // Animate the clicked SKU
-        element.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-            element.style.transform = '';
-        }, 200);
-    }
-
-    function showCopyNotification(sku) {
-        // Remove any existing notification
-        const existingNotification = document.querySelector('.copy-notification');
-        if (existingNotification) {
-            existingNotification.remove();
-        }
-
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = 'copy-notification';
-        notification.innerHTML = `
-                <div class="notification-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <span>SKU kopyalandı: ${sku}</span>
-            `;
-
-        // Append and animate
-        document.body.appendChild(notification);
-
-        // Use GSAP for smoother animation
-        if (typeof gsap !== 'undefined') {
-            gsap.fromTo(notification,
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
-            );
-
-            setTimeout(() => {
-                gsap.to(notification, {
-                    opacity: 0,
-                    y: 10,
-                    duration: 0.3,
-                    ease: "power2.in",
-                    onComplete: () => notification.remove()
-                });
-            }, 2000);
-        } else {
-            // Fallback to basic CSS animations
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateY(0)';
-
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateY(10px)';
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
-        }
-    }
-
-    function openImageModal(imageSrc) {
-        const modalImage = document.getElementById('modalImage');
-        modalImage.src = imageSrc;
-        imageModal.show();
-    }
-
-    function animateElements() {
-        // Use GSAP if available for better animations
-        if (typeof gsap !== 'undefined') {
-            gsap.from(".logo-container", {
-                opacity: 0,
-                x: -20,
-                duration: 0.6,
-                ease: "power2.out"
-            });
-
-            gsap.from(".product-counter", {
-                opacity: 0,
-                x: 20,
-                duration: 0.6,
-                delay: 0.2,
-                ease: "power2.out"
-            });
-
-            gsap.from(".search-container", {
-                opacity: 0,
-                y: 20,
-                duration: 0.8,
-                delay: 0.3,
-                ease: "power2.out"
-            });
-
-            // Stagger product cards animation
-            gsap.from(".product-card", {
-                opacity: 0,
-                y: 30,
-                duration: 0.5,
-                stagger: 0.08,
-                ease: "power2.out",
-                delay: 0.5
-            });
-        }
-    }
-</script>
 </body>
 </html>
