@@ -174,7 +174,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        //$this->getItemRest("334936877779");
+        $this->getItemRest("335507916472");
         //$this->listingDetail("334936877779");
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
@@ -185,7 +185,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
 
         // control expiresIn
-        $this->refreshToAccessToken();
+        /*$this->refreshToAccessToken();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -248,7 +248,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
         } while ($startDate < $currentDate);
         $this->listings = json_decode(json_encode($this->listings), true);
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     public function getSellerList()
