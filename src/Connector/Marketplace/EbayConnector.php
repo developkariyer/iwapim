@@ -127,7 +127,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getItemXml()
     {
-        $this->refreshToAccessToken();
         $url = "https://api.ebay.com/ws/api.dll";
         $headers = [
             "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
@@ -154,9 +153,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
             $xmlContent = $response->getContent();
             $xmlObject = simplexml_load_string($xmlContent);
             $jsonResponse = json_encode($xmlObject);
-            $responseObject = json_decode($jsonResponse);
+            $responseObject = json_decode($jsonResponse,true);
             if ($responseObject->Ack === 'Failure') {
-                echo "Error: " . $responseObject->Errors[0]->ShortMessage;
+                echo "Error: " . $responseObject['Errors'][0]['ShortMessage'];
             }
             if (isset($responseObject->ItemArray->Item)) {
                 foreach ($responseObject->ItemArray->Item as $item) {
