@@ -127,7 +127,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
     public function getItemRest($itemId)
     {
-        $url = "https://api.ebay.com/buy/browse/v1/";
+        $url = "https://api.ebay.com/buy/browse/v1/item/" ;
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
