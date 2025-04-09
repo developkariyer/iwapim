@@ -28,33 +28,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
     {
         parent::__construct($marketplace);
         $this->sellerId = $this->marketplace->getTrendyolSellerId();
-       /* $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
-            'headers' => [
-                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-            ]
-        ]);
-        static::$apiUrl = [
-            'offers' => 'product/sellers/' . $sellerId . '/products?approved=true',
-            'orders' => 'order/sellers/' . $sellerId . '/orders',
-            'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
-            'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
-            'returns' => 'order/sellers/' . $sellerId . '/claims',
-        ];
-
-
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, "https://apigw.trendyol.com/integration/", [
-            'headers' => [
-                'Authorization' => 'Basic ' . $this->marketplace->getTrendyolToken(),
-            ]
-        ]);
-        $sellerId = $this->marketplace->getTrendyolSellerId();
-        static::$apiUrl = [
-            'offers' => 'product/sellers/' . $sellerId . '/products?approved=true',
-            'orders' => 'order/sellers/' . $sellerId . '/orders',
-            'inventory_price' => 'inventory/sellers/' . $sellerId . '/products/price-and-inventory',
-            'batch_requests' => 'product/sellers/' . $sellerId . '/products/batch-requests/',
-            'returns' => 'order/sellers/' . $sellerId . '/claims',
-        ];*/
     }
 
     /**
@@ -241,57 +214,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
 
         }
         echo "Orders downloaded\n";
-
-        /*do {
-            do {
-                $response = $this->httpClient->request('GET', static::$apiUrl['orders'], [
-                    'query' => [
-                        'page' => $page,
-                        'size' => $size,
-                        'startDate' => $startDate * 1000, 
-                        'endDate' => $endDate *1000
-                    ]
-                ]);
-                $statusCode = $response->getStatusCode();
-                if ($statusCode !== 200) {
-                    echo "Error: $statusCode\n";
-                    break;
-                }
-                try {
-                    $data = $response->toArray();
-                    $orders = $data['content'];
-                    foreach ($orders as $order) {
-                        $sqlInsertMarketplaceOrder = "
-                            INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) 
-                            VALUES (:marketplace_id, :order_id, :json) ON DUPLICATE KEY UPDATE json = VALUES(json)";
-                        Utility::executeSql($sqlInsertMarketplaceOrder, [
-                            'marketplace_id' => $this->marketplace->getId(),
-                            'order_id' => $order['orderNumber'],
-                            'json' => json_encode($order)
-                        ]);
-                    }
-                    $totalElements = $data['totalElements'];
-                    $totalPages = $data['totalPages'];
-                    $count = count($orders);
-                    echo "-----------------------------\n";
-                    echo "Total Elements: $totalElements\n";
-                    echo "Total Pages: $totalPages\n";
-                    echo "Current Page: $page\n";
-                    echo "Items on this page: $count\n";
-                    echo "Date Range: " . date('Y-m-d', $startDate) . " - " . date('Y-m-d', $endDate) . "\n";
-                    echo "-----------------------------\n";
-                } catch (\Exception $e) {
-                    echo "Error: " . $e->getMessage() . "\n";
-                }
-                $page++;
-                sleep(0.06);
-            } while ($page < $data['totalPages']);
-            $startDate = $endDate;
-            $endDate = min(strtotime('+2 weeks', $startDate), $now);
-            if ($startDate >= $now) {
-                break;
-            }
-        } while ($startDate < strtotime('now'));*/
     }
 
     private function getAttributes($listing): string
