@@ -84,7 +84,7 @@ class CacheImagesCommand extends AbstractCommand
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
                     continue;
                 }
-                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada'])) {
+                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada', 'Wallmart'])) {
                     echo " $variantType ";
                 } else {
                     continue;
@@ -107,6 +107,9 @@ class CacheImagesCommand extends AbstractCommand
                         break;
                     case 'Hepsiburada':
                         if ($input->getOption('hepsiburada') || $input->getOption('all')) self::processHepsiburada($variant);
+                        break;
+                    case 'Wallmart':
+                        if ($input->getOption('wallmart') || $input->getOption('all')) self::processWallmart($variant);
                         break;
                     default:
                         break;
@@ -143,6 +146,18 @@ class CacheImagesCommand extends AbstractCommand
             $image = preg_replace('#([^:])//+#', '$1/', $image);
             $image = str_replace(' ', '', $image);
             $listingImageList[] = static::processImage($image, static::$hepsiburadaFolder,"Hepsiburada_" . basename($image));
+        }
+        $listingImageList = array_unique($listingImageList);
+        $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
+    }
+
+    protected static function processWallmart(VariantProduct $variant): void
+    {
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $listingImageList = [];
+        foreach ($json['extra']['items']['images'] ?? [] as $image) {
+            $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Wallmart_".str_replace(["https:", "/", ".", "_", "jpeg"], '', $image['url']).".jpeg");
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
