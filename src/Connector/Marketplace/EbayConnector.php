@@ -221,7 +221,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
-        $this->getItemXml();
+        //$this->getItemXml();
 
         //$this->refreshToAccessToken();
         //$this->fetchItemAspects("EBAY_US");
