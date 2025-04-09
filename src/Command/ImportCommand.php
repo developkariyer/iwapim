@@ -43,10 +43,12 @@ class ImportCommand extends AbstractCommand
     private DataObjectListener $dataObjectListener;
     private NotificationService $notificationService;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(EventDispatcherInterface $eventDispatcher, DataObjectListener $dataObjectListener, NotificationService  $notificationService)
     {
         parent::__construct();
         $this->eventDispatcher = $eventDispatcher;
+        $this->dataObjectListener = $dataObjectListener;
+        $this->notificationService = $notificationService;
     }
 
     protected function configure(): void
@@ -142,7 +144,7 @@ class ImportCommand extends AbstractCommand
         $ozonFlag = $input->getOption('ozon');
         $allFlag = $input->getOption('all');
 
-        //$this->removeListeners();
+        $this->removeListeners();
 
         $notificationMessage = "Import report for ".date("Y-m-d H:i:s").":\n";
         $notificationSendFlag = false;
@@ -262,14 +264,14 @@ class ImportCommand extends AbstractCommand
                 echo "done.\n";
                 $notificationMessage .= "\n";
             }
-           /* if ($notificationSendFlag) {
+            if ($notificationSendFlag) {
                 $this->notificationService->sendToUser(2, 1, 'Import completed!', $notificationMessage);
             }
-            $this->addListeners();*/
+            $this->addListeners();
             return Command::SUCCESS;
         } catch (Exception|\Exception) {
-            /*$this->notificationService->sendToUser(2, 1, 'Import failed!', "An error occurred while importing listings. Here is where it stopped:\n$notificationMessage");
-            $this->addListeners();*/
+            $this->notificationService->sendToUser(2, 1, 'Import failed!', "An error occurred while importing listings. Here is where it stopped:\n$notificationMessage");
+            $this->addListeners();
             return Command::FAILURE;
         }
     }
