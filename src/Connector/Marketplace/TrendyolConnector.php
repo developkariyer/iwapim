@@ -18,8 +18,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TrendyolConnector extends MarketplaceConnectorAbstract
 {
-    private static array $apiUrl = [];
-
     public static string $marketplaceType = 'Trendyol';
 
     private string $sellerId;
