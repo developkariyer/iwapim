@@ -32,7 +32,6 @@ class CacheImagesCommand extends AbstractCommand
     static ?Folder $trendyolFolder;
     static ?Folder $bolcomFolder;
     static ?Folder $hepsiburadaFolder;
-
     static ?Folder $wallmartFolder;
 
     protected function configure(): void
@@ -44,6 +43,7 @@ class CacheImagesCommand extends AbstractCommand
             ->addOption('bolcom', null, InputOption::VALUE_NONE, 'If set, Shopify objects will be processed.')
             ->addOption('trendyol', null, InputOption::VALUE_NONE, 'If set, Trendyol objects will be processed.')
             ->addOption('hepsiburada', null, InputOption::VALUE_NONE, 'If set, Hepsiburada objects will be processed.')
+            ->addOption('wallmart', null, InputOption::VALUE_NONE, 'If set, Wallmart objects will be processed.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
@@ -59,6 +59,7 @@ class CacheImagesCommand extends AbstractCommand
         static::$trendyolFolder = Utility::checkSetAssetPath('Trendyol', static::$cacheFolder);
         static::$bolcomFolder = Utility::checkSetAssetPath('Bol.com', static::$cacheFolder);
         static::$hepsiburadaFolder = Utility::checkSetAssetPath('Hepsiburada', static::$cacheFolder);
+        static::$wallmartFolder = Utility::checkSetAssetPath('Wallmart', static::$cacheFolder);
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
