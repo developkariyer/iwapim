@@ -174,6 +174,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
+        $this->refreshToAccessToken();
         $this->getItemRest("335123681022");
         //$this->listingDetail("334921595917");
         //$this->getMyeBaySelling();
