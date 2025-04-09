@@ -1,879 +1,1028 @@
+twig
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="IWAPIM Profesyonel Ürün Kataloğu">
-    <title>IWAPIM Katalog</title>
+    <meta name="description" content="IWAPIM profesyonel ürün kataloğu">
+    <title>IWAPIM | Ürün Kataloğu</title>
+
+    <!-- Preload fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" as="style">
+
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js" defer></script>
 
     <style>
         :root {
-            /* Modern renk paleti */
-            --primary-color: #1D5B79; /* Koyu mavi */
-            --primary-light: #468B97; /* Orta mavi */
-            --primary-dark: #153B50; /* Daha koyu mavi */
-            --secondary-color: #EF6262; /* Yumuşak kırmızı */
-            --accent-color: #F3AA60; /* Yumuşak turuncu */
+            /* Core color palette - Modern blue to purple gradient scheme */
+            --primary-gradient-start: #4361ee;
+            --primary-gradient-end: #3a0ca3;
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
 
+            /* Surface colors */
             --surface-light: #ffffff;
-            --surface-light-alt: #F8F9FA; /* Çok açık gri */
-            --surface-medium: #EFF2F6; /* Açık gri-mavi */
+            --surface-medium: #f8f9ff;
+            --surface-dark: #e9ecf9;
 
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6C757D;
+            /* Text colors */
+            --text-primary: #1a1f36;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
             --text-light: #ffffff;
 
-            --success-color: #20C997;
-            --error-color: #FA5252;
-            --warning-color: #FD7E14;
-            --info-color: #4DABF7;
+            /* Status colors */
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
 
-            --border-color: #DEE2E6;
+            /* Border & Shadow */
+            --border-color: rgba(226, 232, 240, 0.7);
+            --shadow-sm: 0 2px 4px rgba(148, 163, 184, 0.05), 0 1px 2px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 4px 8px -2px rgba(148, 163, 184, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
+            --shadow-lg: 0 12px 24px -6px rgba(148, 163, 184, 0.15), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+            --shadow-hover: 0 20px 25px -5px rgba(148, 163, 184, 0.10), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
 
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-
+            /* Border radius */
             --radius-sm: 0.375rem;
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
             --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
 
-            --transition: all 0.2s ease-in-out;
+            /* Animation */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+            --transition-slow: 350ms ease;
+
+            /* Layout */
+            --header-height: 4.5rem;
+            --max-content-width: 1440px;
+            --card-height: 180px;
+        }
+
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--surface-medium);
-            font-family: 'Inter', sans-serif;
             color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Header Styles */
-        .header-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: var(--text-light);
-            padding: 1.75rem 0;
-            margin-bottom: 2.5rem;
-            box-shadow: var(--shadow-md);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        /* Typography enhancements */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
             letter-spacing: -0.02em;
         }
 
-        .logo i {
-            font-size: 1.75rem;
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            height: var(--header-height);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+            color: var(--text-light);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 2.5rem;
+            height: 2.5rem;
             background-color: rgba(255, 255, 255, 0.15);
-            width: 48px;
-            height: 48px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: var(--radius-md);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 1.4rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-normal);
+        }
+
+        .logo-icon:hover {
+            transform: rotate(5deg);
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         .product-counter {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-            padding: 0.6rem 1.25rem;
-            border-radius: var(--radius-xl);
-            font-weight: 500;
-            font-size: 0.9rem;
+            background-color: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-xl);
+            font-weight: 500;
+            font-size: 0.875rem;
         }
 
-        /* Search Container Styles */
+        /* Search controls */
         .search-container {
             background-color: var(--surface-light);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1.75rem;
+            margin: -2rem auto 2rem;
             box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+            max-width: calc(var(--max-content-width) - 3rem);
+        }
+
+        .control-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Input controls */
+        .input-container {
             position: relative;
         }
 
-        .search-container .input-group-text {
-            background-color: var(--surface-light);
-            border-color: var(--border-color);
-            color: var(--primary-light);
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
         }
 
         .form-control, .form-select {
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            font-size: 0.95rem;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 0.6rem 1rem;
+            background-color: var(--surface-light);
             color: var(--text-primary);
-            box-shadow: none;
-            transition: var(--transition);
-            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 0.25rem rgba(70, 139, 151, 0.25);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
             outline: none;
         }
 
         .btn {
-            padding: 0.6rem 1.25rem;
-            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
             border-radius: var(--radius-md);
-            transition: var(--transition);
-            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            transition: all var(--transition-normal);
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            color: var(--text-light);
-            box-shadow: 0 2px 6px rgba(29, 91, 121, 0.2);
+            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            border: none;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
         }
 
         .btn-primary:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(29, 91, 121, 0.3);
+            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.35);
+            background: linear-gradient(135deg, var(--primary-gradient-start), var(--secondary-color));
         }
 
         .btn-secondary {
-            background-color: var(--surface-light-alt);
-            border-color: var(--border-color);
-            color: var(--text-secondary);
+            background-color: var(--surface-dark);
+            color: var(--text-primary);
+            border: none;
         }
 
         .btn-secondary:hover {
-            background-color: #e9ecef;
-            border-color: #ced4da;
-            transform: translateY(-2px);
+            background-color: #dce1f5;
+            color: var(--secondary-color);
         }
 
-        /* Product Card Styles */
+        /* Product cards */
+        .catalog-container {
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+        }
+
         .product-card {
             position: relative;
             background-color: var(--surface-light);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            margin-bottom: 1.25rem;
             box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
             overflow: hidden;
-            transition: var(--transition);
-            height: 160px;
-        }
-
-        .product-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-3px);
-            border-color: #c9d4db;
+            transition: all var(--transition-normal);
+            border: 1px solid var(--border-color);
+            height: var(--card-height);
         }
 
         .product-card.expanded {
             height: auto;
+            box-shadow: var(--shadow-lg);
         }
 
-        .product-image-wrapper {
-            width: 160px;
-            height: 160px;
-            padding: 0.5rem;
+        .product-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px);
+        }
+
+        .product-image-container {
             overflow: hidden;
             position: relative;
-            background-color: var(--surface-light-alt);
+            width: 180px;
+            height: var(--card-height);
+        }
+
+        .product-image-badge {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-sm);
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all var(--transition-normal);
+        }
+
+        .product-card:hover .product-image-badge {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .product-main-image {
-            height: 100%;
-            width: 100%;
-            object-fit: contain;
-            border-radius: var(--radius-sm);
+            width: 180px;
+            height: var(--card-height);
+            object-fit: cover;
+            transition: transform 0.6s var(--transition-normal);
             cursor: pointer;
-            transition: transform 0.3s ease;
         }
 
         .product-card:hover .product-main-image {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
-        .product-info {
+        .product-content {
             padding: 1.25rem;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100%;
         }
 
         .product-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: var(--text-primary);
-            line-height: 1.4;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .product-details {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-        }
-
-        .product-details b {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .badge-container {
+        .product-specs {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            margin: 0.5rem 0 1rem;
         }
 
         .spec-badge {
-            background-color: var(--surface-light-alt);
+            background-color: var(--surface-dark);
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            padding: 0.3rem 0.7rem;
-            border-radius: 30px;
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            border: 1px solid var(--border-color);
+            transition: all var(--transition-normal);
+        }
+
+        .spec-badge:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
         }
 
         .spec-badge i {
-            color: var(--primary-light);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            color: var(--primary-color);
         }
 
         .sku-container {
             margin-top: auto;
             border-top: 1px solid var(--border-color);
             padding-top: 0.75rem;
-            margin-top: 0.75rem;
         }
 
         .sku-label {
             font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
+            margin-bottom: 0.25rem;
             display: flex;
             align-items: center;
             gap: 0.35rem;
         }
 
+        .sku-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
         .sku {
-            display: inline-flex;
-            align-items: center;
+            cursor: pointer;
             background-color: var(--surface-medium);
             color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 0.3rem 0.75rem;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
+            font-weight: 600;
             font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-normal);
         }
 
         .sku:hover {
             background-color: var(--primary-color);
-            color: var(--text-light);
+            color: white;
             transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-            border-color: var(--primary-color);
-        }
-
-        .sku i {
-            margin-right: 0.35rem;
-            font-size: 0.75rem;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.25);
         }
 
         .product-gallery {
+            padding: 1rem;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
             gap: 0.5rem;
-            padding: 0.75rem 1rem;
             border-left: 1px solid var(--border-color);
-            height: 100%;
-            align-content: center;
+            align-content: start;
         }
 
-        .product-gallery img {
-            width: 60px;
-            height: 60px;
+        .gallery-image {
+            width: 50px;
+            height: 50px;
             object-fit: cover;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
-            transition: var(--transition);
+            transition: all var(--transition-normal);
             cursor: pointer;
-            background-color: var(--surface-light);
         }
 
-        .product-gallery img:hover {
+        .gallery-image:hover {
             transform: scale(1.1) rotate(2deg);
-            border-color: var(--primary-light);
-            box-shadow: var(--shadow-sm);
-            z-index: 2;
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+            z-index: 5;
         }
 
-        /* Pagination Styles */
-        .page-container {
-            display: flex;
-            justify-content: center;
-            margin: 2.5rem 0;
+        /* Pagination */
+        .pagination-container {
+            margin: 2.5rem 0 3.5rem;
         }
 
         .pagination {
-            gap: 0.3rem;
+            display: flex;
+            gap: 0.35rem;
         }
 
-        .pagination .page-link {
-            border-radius: var(--radius-md);
-            color: var(--text-secondary);
-            background-color: var(--surface-light);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-            width: 2.5rem;
-            height: 2.5rem;
-            text-align: center;
-            font-weight: 500;
-            padding: 0;
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            color: var(--text-secondary);
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-sm);
         }
 
-        .pagination .page-link:hover {
-            background-color: var(--primary-light);
-            color: var(--text-light);
-            border-color: var(--primary-light);
-            z-index: 1;
-        }
-
-        .pagination .page-item.active .page-link {
+        .page-link:hover {
             background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            color: var(--text-light);
-            box-shadow: 0 2px 5px rgba(29, 91, 121, 0.3);
+            color: white;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
         }
 
-        .pagination .page-item.disabled .page-link {
-            color: #adb5bd;
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-            opacity: 0.75;
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
         }
 
-        /* Notification and Modal Styles */
+        .page-item.disabled .page-link {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Copy notification */
         .copy-notification {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(145deg, var(--success-color), #0ca678);
-            color: var(--text-light);
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--radius-md);
-            font-weight: 500;
-            box-shadow: var(--shadow-md);
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+            z-index: 1000;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            z-index: 1050;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(1rem);
         }
 
-        .copy-icon {
-            background-color: rgba(255, 255, 255, 0.2);
+        .notification-icon {
             width: 24px;
             height: 24px;
+            background-color: rgba(255, 255, 255, 0.25);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .image-modal {
-            z-index: 2000;
-            background-color: rgba(0, 0, 0, 0.85);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            align-items: center;
-            justify-content: center;
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--surface-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
         }
 
-        .image-modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-lg);
-            animation: modalFadeIn 0.3s ease;
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            opacity: 0.7;
         }
 
-        .image-modal-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: var(--text-light);
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: var(--transition);
+        .empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
 
-        .image-modal-close:hover {
-            opacity: 1;
-            transform: rotate(90deg);
+        .empty-state-description {
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0 auto 1.5rem;
         }
 
-        /* Animations */
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* Responsive Adjustments */
+        /* Responsive adjustments */
         @media (max-width: 992px) {
-            .logo {
-                font-size: 1.5rem;
-            }
-
-            .logo i {
-                width: 40px;
-                height: 40px;
-                font-size: 1.5rem;
-            }
-
             .search-container {
-                margin-top: -2rem;
-                padding: 1.25rem;
+                padding: 1.5rem;
+                margin-top: -1.5rem;
             }
 
             .product-gallery {
-                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                padding-top: 1rem;
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
             }
 
-            .product-gallery img {
-                width: 50px;
-                height: 50px;
+            .gallery-image {
+                width: 60px;
+                height: 60px;
             }
         }
 
         @media (max-width: 768px) {
-            .header-section {
-                padding: 1.25rem 0;
-                margin-bottom: 2rem;
-            }
-
-            .product-counter {
-                font-size: 0.8rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .search-container {
-                margin-top: -1rem;
+            .app-header {
+                height: auto;
+                padding: 1rem 0;
             }
 
             .product-card {
                 height: auto;
             }
 
-            .product-image-wrapper {
+            .product-image-container {
                 width: 120px;
                 height: 120px;
             }
 
-            .product-info {
-                padding: 1rem;
+            .product-main-image {
+                width: 120px;
+                height: 120px;
             }
 
-            .product-gallery {
-                border-left: none;
-                border-top: 1px solid var(--border-color);
-                padding: 0.75rem;
-            }
-
-            .pagination .page-link {
+            .page-link {
                 width: 2.25rem;
                 height: 2.25rem;
             }
         }
 
-        @media (max-width: 576px) {
-            .logo {
-                font-size: 1.25rem;
-            }
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
 
-            .logo i {
-                width: 36px;
-                height: 36px;
-                font-size: 1.25rem;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            .product-card {
-                border-radius: var(--radius-md);
-            }
+        .scale-in {
+            animation: scaleIn 0.3s ease forwards;
+        }
 
-            .product-image-wrapper {
-                width: 100px;
-                height: 100px;
-            }
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
 
-            .product-title {
-                font-size: 1rem;
-            }
+        .slide-in {
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-<!-- Header Section -->
-<div class="header-section">
-    <div class="container">
-        <div class="header-content">
-            <div class="logo">
-                <i class="fas fa-cubes"></i>
-                IWAPIM Katalog
+<!-- App Header -->
+<header class="app-header">
+    <div class="container-fluid px-4 h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-md-6">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <h1 class="logo-text mb-0">IWAPIM Katalog</h1>
+                </div>
             </div>
-            <div class="product-counter">
-                <i class="fas fa-layer-group me-2"></i>
-                {{ products|length }} / {{ totalProducts ?? 'Tüm' }} ürün
+            <div class="col-md-6 d-flex justify-content-end">
+                <div class="product-counter">
+                    <i class="fas fa-layer-group me-2"></i>
+                    <span>{{ products|length }} / {{ totalProducts ?? 'Tüm' }} ürün</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</header>
 
-<div class="container">
-    <!-- Search Controls -->
-    <div class="search-container">
+<!-- Search Container -->
+<div class="container-fluid px-4">
+    <div class="search-container scale-in">
         <div class="row g-3">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" id="search-box" class="form-control" placeholder="Ürün adı, kodu veya detaylarını arayın...">
-                    <button type="button" id="search-button" class="btn btn-primary">
-                        <i class="fas fa-search me-2 d-none d-sm-inline-block"></i>Ara
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/catalog'">
-                        <i class="fas fa-times me-2 d-none d-sm-inline-block"></i>Sıfırla
-                    </button>
+            <div class="col-lg-5">
+                <label class="control-label" for="search-box">Ürün arama</label>
+                <div class="input-container">
+                    <i class="fas fa-search input-icon"></i>
+                    <input
+                            type="text"
+                            id="search-box"
+                            class="form-control"
+                            placeholder="SKU, ürün adı veya barkod ile arama yapın..."
+                            autocomplete="off"
+                    >
                 </div>
             </div>
-            <div class="col-md-3 mb-3 mb-md-0">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-tag"></i>
-                    </span>
+            <div class="col-lg-3">
+                <label class="control-label" for="category-select">Kategori</label>
+                <div class="input-container">
+                    <i class="fas fa-tag input-icon"></i>
                     <select class="form-select" id="category-select">
-                        <option value="all" selected>Tüm Ürün Tipleri</option>
+                        <option value="all" selected>Tüm Kategoriler</option>
                         {% for type in productTypes %}
                             <option value="{{ type }}">{{ type }}</option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-list-ol"></i>
-                    </span>
+            <div class="col-lg-2">
+                <label class="control-label" for="page-size-select">Listeleme</label>
+                <div class="input-container">
+                    <i class="fas fa-list-ol input-icon"></i>
                     <select class="form-select" id="page-size-select">
-                        <option value="5">5 Ürün</option>
                         <option value="10">10 Ürün</option>
                         <option value="20">20 Ürün</option>
                         <option value="50">50 Ürün</option>
                         <option value="100">100 Ürün</option>
-                        <option value="200">200 Ürün</option>
                     </select>
+                </div>
+            </div>
+            <div class="col-lg-2 d-flex align-items-end">
+                <div class="d-grid gap-2 w-100">
+                    <button type="button" id="search-button" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Ara
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Product catalog container -->
-    <div id="catalog-container">
-        {% for product in products %}
-            <div class="product-card">
-                <div class="row g-0 h-100">
-                    <div class="col-auto">
-                        <div class="product-image-wrapper">
-                            <img src="{{ product.image }}" class="product-main-image" alt="{{ product.name }}" onclick="toggleCardExpand(this)">
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="product-info">
-                            <h5 class="product-title">{{ product.productIdentifier }} {{ product.name }}</h5>
-
-                            <div class="badge-container">
-                                {% if product.variationSizeList %}
-                                    <div class="spec-badge">
-                                        <i class="fas fa-ruler"></i> {{ product.variationSizeList }}
-                                    </div>
-                                {% endif %}
-                                {% if product.variationColorList %}
-                                    <div class="spec-badge">
-                                        <i class="fas fa-palette"></i> {{ product.variationColorList }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="sku-container">
-                                <div class="sku-label">
-                                    <i class="fas fa-barcode"></i> IWASKU Kodları
+    <!-- Catalog Container -->
+    <div class="catalog-container">
+        {% if products|length > 0 %}
+            <div id="product-list">
+                {% for product in products %}
+                    <div class="product-card fade-in" style="animation-delay: {{ loop.index0 * 0.05 }}s">
+                        <div class="row g-0 h-100">
+                            <div class="col-auto">
+                                <div class="product-image-container">
+                                    <div class="product-image-badge">{{ loop.index }}</div>
+                                    <img
+                                            src="{{ product.image }}"
+                                            class="product-main-image"
+                                            alt="{{ product.name }}"
+                                            loading="lazy"
+                                            onclick="toggleCardExpansion(this)"
+                                    >
                                 </div>
-                                <div>
-                                    {% for item in product.iwaskuList %}
-                                        <span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">
-                                            <i class="fas fa-hashtag"></i> {{ item.iwasku }}
-                                        </span>
+                            </div>
+                            <div class="col">
+                                <div class="product-content">
+                                    <h2 class="product-title">{{ product.productIdentifier }} {{ product.name }}</h2>
+
+                                    <!-- Product specifications badges -->
+                                    <div class="product-specs">
+                                        {% if product.variationSizeList %}
+                                            <span class="spec-badge">
+                                                    <i class="fas fa-ruler"></i>
+                                                    {{ product.variationSizeList }}
+                                                </span>
+                                        {% endif %}
+
+                                        {% if product.variationColorList %}
+                                            <span class="spec-badge">
+                                                    <i class="fas fa-palette"></i>
+                                                    {{ product.variationColorList }}
+                                                </span>
+                                        {% endif %}
+
+                                        {% if product.brand is defined and product.brand %}
+                                            <span class="spec-badge">
+                                                    <i class="fas fa-building"></i>
+                                                    {{ product.brand }}
+                                                </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- SKU information -->
+                                    <div class="sku-container">
+                                        <div class="sku-label">
+                                            <i class="fas fa-barcode"></i>
+                                            SKU Kodları
+                                        </div>
+                                        <div class="sku-list">
+                                            {% for item in product.iwaskuList %}
+                                                <span
+                                                        class="sku"
+                                                        data-sku="{{ item.iwasku }}"
+                                                        data-bs-toggle="tooltip"
+                                                        title="{{ item.tooltip }}"
+                                                        onclick="copySku(this)"
+                                                >
+                                                        {{ item.iwasku }}
+                                                    </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-auto d-none d-lg-block">
+                                <div class="product-gallery">
+                                    {% for image in product.album %}
+                                        <img src="{{ image|replace({'<img src="': ''}) | split('"')[0] }}"
+                                             alt="Ürün görseli"
+                                             class="gallery-image"
+                                             loading="lazy"
+                                             onclick="openImageModal(this.src)">
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-auto d-none d-md-block">
-                        <div class="product-gallery">
-                            {% for image in product.album %}
-                                {% set imgSrc = image|replace({'<img src="': ''}) | split('"')[0] %}
-                                <img src="{{ imgSrc }}" class="gallery-image" alt="Ürün görseli" onclick="openImageModal('{{ imgSrc }}')">
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="d-flex justify-content-center">
+                    <nav aria-label="Product pagination">
+                        <ul class="pagination">
+                            <!-- First Page -->
+                            <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                                <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}" aria-label="İlk sayfa">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+
+                            <!-- Previous Page -->
+                            <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                                <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Önceki sayfa">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+
+                            <!-- Page numbers -->
+                            {% set start = max(page - 2, 0) %}
+                            {% set end = min(page + 2, pageCount - 1) %}
+
+                            {% if end - start < 4 and pageCount > 5 %}
+                                {% if start == 0 %}
+                                    {% set end = min(4, pageCount - 1) %}
+                                {% else %}
+                                    {% set start = max(pageCount - 5, 0) %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in start..end %}
+                                <li class="page-item {% if i == page %}active{% endif %}">
+                                    <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
+                                </li>
                             {% endfor %}
-                        </div>
-                    </div>
+
+                            <!-- Next Page -->
+                            <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Sonraki sayfa">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+
+                            <!-- Last Page -->
+                            <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                                <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}" aria-label="Son sayfa">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
-        {% endfor %}
-    </div>
-
-    <!-- Pagination -->
-    <div class="page-container">
-        <nav aria-label="Ürün sayfalaması">
-            <ul class="pagination">
-                <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                    <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}" aria-label="İlk sayfa">
-                        <i class="fas fa-angle-double-left"></i>
-                    </a>
-                </li>
-
-                <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Önceki sayfa">
-                        <i class="fas fa-angle-left"></i>
-                    </a>
-                </li>
-
-                {% set start = max(page - 2, 0) %}
-                {% set end = min(page + 2, pageCount - 1) %}
-
-                {% if end - start < 4 %}
-                    {% if start == 0 %}
-                        {% set end = min(4, pageCount - 1) %}
-                    {% else %}
-                        {% set start = max(pageCount - 5, 0) %}
-                    {% endif %}
-                {% endif %}
-
-                {% for i in start..end %}
-                    <li class="page-item {% if i == page %}active{% endif %}">
-                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
-                    </li>
-                {% endfor %}
-
-                <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Sonraki sayfa">
-                        <i class="fas fa-angle-right"></i>
-                    </a>
-                </li>
-
-                <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                    <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}" aria-label="Son sayfa">
-                        <i class="fas fa-angle-double-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        {% else %}
+            <!-- Empty state when no products -->
+            <div class="empty-state scale-in">
+                <div class="empty-state-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h2 class="empty-state-title">Ürün bulunamadı</h2>
+                <p class="empty-state-description">
+                    Arama kriterlerinize uygun ürün bulunamadı. Lütfen farklı arama terimleri ile tekrar deneyin.
+                </p>
+                <button onclick="window.location.href='/catalog'" class="btn btn-primary">
+                    <i class="fas fa-sync-alt me-2"></i>Tüm Ürünleri Göster
+                </button>
+            </div>
+        {% endif %}
     </div>
 </div>
 
-<!-- Image Modal -->
-<div id="imageModal" class="image-modal">
-    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
-    <img class="image-modal-content" id="modalImage">
+<!-- Modal for image preview -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" id="modalImage" class="img-fluid rounded" style="max-height: 80vh">
+            </div>
+        </div>
+    </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     // Initialize variables
     let currentQuery = '{{ query|e('js') }}';
     let currentCategory = '{{ category|e('js') }}';
+    let imageModal;
 
-    // Wait for document to be ready
-    $(document).ready(function() {
-        // Set initial values based on URL
-        if (currentQuery !== 'all') {
-            $('#search-box').val(currentQuery);
-        }
-        if (currentCategory !== 'all') {
-            $('#category-select').val(currentCategory);
-        }
-        $('#page-size-select').val('{{ pageSize }}');
+    // Initialize on document ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTooltips();
+        initializeEvents();
+        imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
 
+        // Set form values based on current URL
+        setFormInitialValues();
+
+        // Add animation classes with delay
+        animateElements();
+    });
+
+    function initializeTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                delay: { show: 300, hide: 100 }
+            });
+        });
+    }
+
+    function setFormInitialValues() {
+        if (currentQuery && currentQuery !== 'all') {
+            document.getElementById('search-box').value = currentQuery;
+        }
+
+        if (currentCategory && currentCategory !== 'all') {
+            document.getElementById('category-select').value = currentCategory;
+        }
+
+        document.getElementById('page-size-select').value = '{{ pageSize }}';
+    }
+
+    function initializeEvents() {
         // Page size change event
-        $('#page-size-select').on('change', function() {
-            let selectedPageSize = $(this).val();
+        document.getElementById('page-size-select').addEventListener('change', function() {
+            let selectedPageSize = this.value;
             window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
         });
 
-        // Search button click event
-        $('#search-button').on('click', performSearch);
+        // Search button click
+        document.getElementById('search-button').addEventListener('click', performSearch);
 
-        // Search box enter key event
-        $('#search-box').on('keypress', function(event) {
+        // Search box enter key
+        document.getElementById('search-box').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 performSearch();
             }
         });
 
-        // Category change event
-        $('#category-select').on('change', function() {
-            let selectedCategory = $(this).val();
+        // Category change
+        document.getElementById('category-select').addEventListener('change', function() {
+            let selectedCategory = this.value;
             window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
         });
-
-        // SKU click event for copy
-        $(document).on('click', '.sku', function() {
-            let iwasku = $(this).data('iwasku');
-
-            navigator.clipboard.writeText(iwasku).then(() => {
-                showCopyNotification(iwasku);
-            }).catch(err => {
-                console.error("Kopyalama başarısız: ", err);
-            });
-        });
-
-        // Initialize tooltips
-        initTooltips();
-    });
+    }
 
     function performSearch() {
-        let searchQuery = $('#search-box').val().trim();
+        let searchQuery = document.getElementById('search-box').value.trim();
         window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
     }
 
-    function initTooltips() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl, {
-                delay: { show: 300, hide: 100 },
-                placement: 'top'
-            });
-        });
-    }
-
-    // Toggle card expansion
-    function toggleCardExpand(element) {
+    function toggleCardExpansion(element) {
         const card = element.closest('.product-card');
         card.classList.toggle('expanded');
+
+        if (card.classList.contains('expanded')) {
+            // When expanded, scroll to ensure the full card is visible
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
     }
 
-    // Show copy notification
-    function showCopyNotification(iwasku) {
-        // Remove existing notification
+    function copySku(element) {
+        const sku = element.dataset.sku;
+
+        navigator.clipboard.writeText(sku)
+            .then(() => showCopyNotification(sku))
+            .catch(err => console.error("Kopyalama hatası:", err));
+
+        // Animate the clicked SKU
+        element.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+            element.style.transform = '';
+        }, 200);
+    }
+
+    function showCopyNotification(sku) {
+        // Remove any existing notification
         const existingNotification = document.querySelector('.copy-notification');
         if (existingNotification) {
             existingNotification.remove();
         }
 
-        // Create new notification
+        // Create notification element
         const notification = document.createElement('div');
         notification.className = 'copy-notification';
         notification.innerHTML = `
-            <div class="copy-icon">
-                <i class="fas fa-check"></i>
-            </div>
-            <span>Kopyalandı: ${iwasku}</span>
-        `;
+                <div class="notification-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <span>SKU kopyalandı: ${sku}</span>
+            `;
 
+        // Append and animate
         document.body.appendChild(notification);
 
-        // Animate notification
-        setTimeout(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateY(0)';
-        }, 10);
-
-        // Hide notification after delay
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateY(20px)';
+        // Use GSAP for smoother animation
+        if (typeof gsap !== 'undefined') {
+            gsap.fromTo(notification,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
+            );
 
             setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 2000);
-    }
+                gsap.to(notification, {
+                    opacity: 0,
+                    y: 10,
+                    duration: 0.3,
+                    ease: "power2.in",
+                    onComplete: () => notification.remove()
+                });
+            }, 2000);
+        } else {
+            // Fallback to basic CSS animations
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateY(0)';
 
-    // Image modal functions
-    function openImageModal(src) {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-
-        modal.style.display = 'flex';
-        modalImg.src = src;
-    }
-
-    function closeImageModal() {
-        document.getElementById('imageModal').style.display = 'none';
-    }
-
-    // Close modal when clicking outside the image
-    document.getElementById('imageModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeImageModal();
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(10px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
-    });
+    }
 
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeImageModal();
+    function openImageModal(imageSrc) {
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = imageSrc;
+        imageModal.show();
+    }
+
+    function animateElements() {
+        // Use GSAP if available for better animations
+        if (typeof gsap !== 'undefined') {
+            gsap.from(".logo-container", {
+                opacity: 0,
+                x: -20,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+
+            gsap.from(".product-counter", {
+                opacity: 0,
+                x: 20,
+                duration: 0.6,
+                delay: 0.2,
+                ease: "power2.out"
+            });
+
+            gsap.from(".search-container", {
+                opacity: 0,
+                y: 20,
+                duration: 0.8,
+                delay: 0.3,
+                ease: "power2.out"
+            });
+
+            // Stagger product cards animation
+            gsap.from(".product-card", {
+                opacity: 0,
+                y: 30,
+                duration: 0.5,
+                stagger: 0.08,
+                ease: "power2.out",
+                delay: 0.5
+            });
         }
-    });
+    }
 </script>
 </body>
 </html>
