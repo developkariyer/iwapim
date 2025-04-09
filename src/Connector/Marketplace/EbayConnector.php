@@ -174,7 +174,6 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->refreshToAccessToken();
         $this->getItemRest("8111250768114");
         //$this->listingDetail("334921595917");
         //$this->getMyeBaySelling();
@@ -462,12 +461,15 @@ class EbayConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         //$this->refreshToAccessToken();
-        $url = "https://api.ebay.com/sell/inventory/v1/inventory_item";
+        $url = "https://api.ebay.com/sell/inventory/v1/offer";
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->marketplace->getEbayAccessToken(),
                     'Content-Type'  => 'application/json',
+                ],
+                'query' => [
+                    'sku' => 'AHM00208NGNK'
                 ]
             ]);
             print_r($response->getContent());
