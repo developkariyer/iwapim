@@ -172,10 +172,6 @@ class WallmartConnector extends MarketplaceConnectorAbstract
         $this->putListingsToCache();
     }
 
-    public function getEan($gtin)
-    {
-        return ltrim($gtin, '0');
-    }
     protected function getAttributes($listing): string
     {
         $attributeString = "";
