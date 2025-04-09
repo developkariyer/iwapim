@@ -125,7 +125,51 @@ class EbayConnector extends MarketplaceConnectorAbstract
         print_r($jsonResponse);
     }
 
-    public function getItemRest($itemId)
+    public function getItemXml()
+    {
+        $this->refreshToAccessToken();
+        $url = "https://api.ebay.com/ws/api.dll";
+        $headers = [
+            "X-EBAY-API-COMPATIBILITY-LEVEL: 1349",
+            "X-EBAY-API-CALL-NAME: GetItemRequest",
+            "X-EBAY-API-SITEID: 0",
+            "Content-Type: text/xml"
+        ];
+
+        $accessToken = $this->marketplace->getEbayAccessToken();
+        $xmlRequest = ' <?xml version="1.0" encoding="utf-8"?>
+            <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+              <RequesterCredentials>
+                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+              </RequesterCredentials>
+              <IncludeItemSpecifics> true </IncludeItemSpecifics>
+              <DetailLevel> ReturnAll </DetailLevel>
+            </GetItemRequest>
+        ';
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'headers' => $headers,
+                'body' => $xmlRequest
+            ]);
+            $xmlContent = $response->getContent();
+            $xmlObject = simplexml_load_string($xmlContent);
+            $jsonResponse = json_encode($xmlObject);
+            $responseObject = json_decode($jsonResponse);
+            if ($responseObject->Ack === 'Failure') {
+                echo "Error: " . $responseObject->Errors[0]->ShortMessage;
+            }
+            if (isset($responseObject->ItemArray->Item)) {
+                foreach ($responseObject->ItemArray->Item as $item) {
+                    $this->listings[] = $item;
+                }
+            }
+            print_r($jsonResponse);
+        } catch (\Exception $e) {
+            echo 'Hata: ' . $e->getMessage();
+        }
+    }
+
+    public function getItemRest($itemId) // This is a Limited Release(Limited Release) available only to select Partners.
     {
         $url = "https://api.ebay.com/buy/browse/v1/item/" . $itemId;
         try {
@@ -174,11 +218,12 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->getItemRest("335123681022");
+        //$this->getItemRest("335123681022");
         //$this->listingDetail("334921595917");
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
 
+        $this->getItemXml();
 
         //$this->refreshToAccessToken();
         //$this->fetchItemAspects("EBAY_US");
