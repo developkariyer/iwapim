@@ -469,7 +469,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
                     'Content-Type'  => 'application/json',
                 ],
                 'query' => [
-                    'sku' => 'AHM00208NGNK'
+                    'sku' => 'AHM00208NGNK',
+                    'marketplace_id' => 'EBAY_US'
                 ]
             ]);
             print_r($response->getContent());
