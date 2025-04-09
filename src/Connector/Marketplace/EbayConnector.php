@@ -139,10 +139,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
         $xmlRequest = ' <?xml version="1.0" encoding="utf-8"?>
             <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
               <RequesterCredentials>
-                    <eBayAuthToken>' . $accessToken . '</eBayAuthToken>
+                <eBayAuthToken>'. $accessToken . '</eBayAuthToken>
               </RequesterCredentials>
-              <IncludeItemSpecifics> true </IncludeItemSpecifics>
-              <DetailLevel> ReturnAll </DetailLevel>
+              <ItemID>335123681022</ItemID>
             </GetItemRequest>
         ';
         try {
