@@ -1,881 +1,269 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="IWAPIM profesyonel ürün kataloğu">
-    <title>IWAPIM | Ürün Kataloğu</title>
-
-    <!-- Preload fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" as="style">
-
-    <!-- Stylesheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> {/* Bootstrap sürümünü güncelledim */}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> {/* FontAwesome sürümünü güncelledim */}
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script> {/* jQuery sürümünü güncelledim */}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script> {/* Bootstrap JS sürümünü güncelledim */}
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> {/* GSAP sürümünü güncelledim */}
+    <title>IWAPIM Katalog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        :root {
-            /* Core color palette - Modern blue to purple gradient scheme */
-            --primary-gradient-start: #4361ee;
-            --primary-gradient-end: #3a0ca3;
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #7209b7;
-
-            /* Surface colors */
-            --surface-light: #ffffff;
-            --surface-medium: #f8f9ff; /* Hafif mavi tonlu arka plan */
-            --surface-dark: #eef2f9; /* Daha belirgin gri/mavi */
-
-            /* Text colors */
-            --text-primary: #1a1f36;
-            --text-secondary: #4a5568;
-            --text-muted: #718096;
-            --text-light: #ffffff;
-
-            /* Status colors */
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --info-color: #3b82f6;
-
-            /* Border & Shadow */
-            --border-color: rgba(214, 221, 235, 0.8); /* Biraz daha belirgin ama yumuşak */
-            --shadow-sm: 0 2px 4px rgba(148, 163, 184, 0.06);
-            --shadow-md: 0 4px 8px -1px rgba(148, 163, 184, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(148, 163, 184, 0.15), 0 4px 6px -2px rgba(15, 23, 42, 0.07);
-            --shadow-hover: 0 15px 25px -5px rgba(148, 163, 184, 0.18), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
-
-            /* Border radius */
-            --radius-sm: 0.25rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-            --radius-full: 9999px;
-
-            /* Animation */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 450ms cubic-bezier(0.4, 0, 0.2, 1);
-
-            /* Layout */
-            --header-height: 4.5rem;
-            --max-content-width: 1440px;
-            --card-min-height: 180px; /* Minimum yükseklik */
-        }
-
-        /* Base styles */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--surface-medium);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            background-color: #070e53;
         }
-
-        /* Typography enhancements */
-        h1, h2, h3, h4, h5, h6 { font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
-        h1 { font-size: 1.8rem; }
-        h2 { font-size: 1.25rem; } /* Kart başlığı için */
-        p { margin-bottom: 1rem; color: var(--text-secondary); }
-
-        /* Header */
-        .app-header {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            height: var(--header-height);
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: var(--shadow-md); color: var(--text-light);
-        }
-        .logo-container { display: flex; align-items: center; gap: 0.75rem; }
-        .logo-icon {
-            width: 2.8rem; height: 2.8rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-md);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; backdrop-filter: blur(8px);
-            transition: all var(--transition-normal);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-        .logo-icon:hover { transform: rotate(5deg) scale(1.05); background-color: rgba(255, 255, 255, 0.2); }
-        .logo-text { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; }
-        .product-counter {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px); padding: 0.6rem 1.2rem;
-            border-radius: var(--radius-full); font-weight: 500; font-size: 0.9rem;
-        }
-
-        /* Search controls */
-        .search-container {
-            background-color: var(--surface-light); border-radius: var(--radius-lg);
-            padding: 2rem; margin: -2rem auto 2.5rem; /* Alt boşluğu artırdım */
-            box-shadow: var(--shadow-lg); position: relative; z-index: 10;
-            max-width: calc(var(--max-content-width) - 4rem);
-            border: 1px solid var(--border-color);
-        }
-        .control-label {
-            font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem;
-            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;
-        }
-
-        /* Input controls */
-        .input-container { position: relative; }
-        .input-icon {
-            position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
-            color: var(--text-muted); font-size: 0.9rem; pointer-events: none;
-        }
-        .form-control, .form-select {
-            padding: 0.8rem 1rem 0.8rem 2.75rem; font-size: 0.95rem;
-            border: 1px solid var(--border-color); border-radius: var(--radius-md);
-            background-color: var(--surface-light); color: var(--text-primary);
-            box-shadow: none; /* İç gölgeyi kaldırdım */
-            transition: all var(--transition-normal);
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-            outline: none; background-color: var(--surface-light); /* Focus rengini koru */
-        }
-        .form-select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23718096' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 16px 12px; }
-
-        /* Button */
-        .btn {
-            padding: 0.8rem 1.5rem; font-weight: 600; border-radius: var(--radius-md);
-            letter-spacing: 0.02em; transition: all var(--transition-normal);
-            box-shadow: var(--shadow-sm);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            border: none; color: var(--text-light);
-            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        }
-        .btn-primary:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(67, 97, 238, 0.2); }
-        .btn-secondary {
-            background-color: var(--surface-dark); color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-        .btn-secondary:hover { background-color: #dce1f5; color: var(--secondary-color); border-color: #c8d0e7; }
-
-        /* Product cards */
-        .catalog-container { max-width: var(--max-content-width); margin: 0 auto; padding: 0 1rem; } /* Yan boşluk ekledim */
-        #product-list { display: grid; gap: 1.5rem; grid-template-columns: 1fr; } /* Grid yapısı */
-
         .product-card {
-            display: flex; /* Flexbox kullan */
-            background-color: var(--surface-light); border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md); /* Başlangıç gölgesi */
-            overflow: hidden; transition: all var(--transition-slow); /* Yavaş geçiş */
-            border: 1px solid var(--border-color);
-            min-height: var(--card-min-height); /* Min yükseklik */
-            position: relative; /* Genişleme için */
+            background-color: #f5f5f5;
+            height: 120px;
+            overflow: hidden;
+            margin-bottom: 1px;
+            box-shadow: none;
+            padding: 0;
         }
-        .product-card:hover {
-            box-shadow: var(--shadow-hover); /* Hover gölgesi */
-            transform: translateY(-5px); /* Hafif yukarı kalkma */
-            border-color: rgba(67, 97, 238, 0.3); /* Vurgu rengi */
-        }
-
-        /* Card structure */
-        .product-image-wrapper {
-            flex-shrink: 0; /* Resim küçülmesin */
-            width: 180px; /* Sabit genişlik */
-            position: relative;
-            cursor: pointer;
-            overflow: hidden; /* Zoom efekti için */
+        .product-card.expanded {
+            height: auto;
         }
         .product-main-image {
-            display: block; width: 100%; height: 100%;
-            object-fit: cover; transition: transform 0.5s var(--transition-slow);
+            cursor: pointer;
         }
-        .product-card:hover .product-main-image { transform: scale(1.05); } /* Hafif zoom */
-        .product-image-badge {
-            position: absolute; top: 0.75rem; left: 0.75rem;
-            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
-            color: white; font-size: 0.75rem; font-weight: 600;
-            padding: 0.25rem 0.6rem; border-radius: var(--radius-sm); z-index: 2;
+        .main-image {
+            height: 120px;
+            width: 100%;
+            object-fit: cover;
         }
-
-        .product-details {
-            flex-grow: 1; /* Kalan alanı doldur */
-            padding: 1.25rem 1.5rem; /* İç boşluk */
-            display: flex; flex-direction: column;
-        }
-
-        .product-title {
-            font-size: 1.15rem; font-weight: 600; margin-bottom: 0.6rem;
-            color: var(--text-primary); line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis;
-        }
-
-        .product-specs {
-            display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem;
-        }
-        .spec-badge {
-            background-color: var(--surface-dark); color: var(--text-secondary);
-            padding: 0.4rem 0.8rem; border-radius: var(--radius-full);
-            font-size: 0.75rem; font-weight: 500; /* Biraz daha ince */
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            transition: all var(--transition-fast); border: 1px solid transparent;
-        }
-        .spec-badge:hover {
-            background-color: rgba(67, 97, 238, 0.08); color: var(--primary-color);
-            border-color: rgba(67, 97, 238, 0.2);
-        }
-        .spec-badge i { font-size: 0.8rem; color: var(--primary-color); opacity: 0.7; }
-
-        .sku-container {
-            margin-top: auto; /* Altta kalmasını sağla */
-            padding-top: 0.8rem; border-top: 1px solid var(--border-color);
-        }
-        .sku-label {
-            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-            color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;
-            display: flex; align-items: center; gap: 0.4rem;
-        }
-        .sku-label i { font-size: 0.8rem; }
-        .sku-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .sku {
-            cursor: pointer; background-color: var(--surface-medium);
-            color: var(--text-secondary); font-weight: 500; /* Biraz daha ince */
-            font-size: 0.85rem; padding: 0.4rem 0.8rem;
-            border-radius: var(--radius-md); border: 1px solid var(--border-color);
-            transition: all var(--transition-fast);
-        }
-        .sku:hover {
-            background-color: var(--primary-color); color: white; border-color: var(--primary-color);
-            transform: translateY(-2px); box-shadow: 0 3px 8px rgba(67, 97, 238, 0.2);
-        }
-
-        /* Expanded Card & Gallery */
-        .product-gallery-wrapper {
-            flex-shrink: 0; /* Küçülmesin */
-            width: 100px; /* Galeri genişliği */
-            border-left: 1px solid var(--border-color);
-            overflow-y: auto; /* Çok fazla resim varsa kaydır */
-            max-height: var(--card-min-height); /* Başlangıçta kart yüksekliği kadar */
-            opacity: 0; /* Başlangıçta gizli */
-            transition: opacity var(--transition-normal) ease-in-out;
-            padding: 1rem 0.75rem;
-            background-color: var(--surface-medium); /* Hafif farklı arka plan */
-        }
-        .product-card.expanded .product-gallery-wrapper {
-            opacity: 1; /* Genişleyince göster */
-            max-height: 400px; /* Genişleyince maksimum yükseklik */
+        .product-info {
+            overflow: hidden;
+            flex-grow: 1;
+            text-overflow: ellipsis;
+            padding: 0;
         }
         .product-gallery {
-            display: grid; grid-template-columns: 1fr; /* Tek sütun */
-            gap: 0.75rem; align-content: start;
-        }
-        .gallery-image {
-            width: 100%; /* Wrapper'a sığdır */
-            aspect-ratio: 1 / 1; /* Kare yap */
-            object-fit: cover; border-radius: var(--radius-md);
-            border: 2px solid var(--border-color);
-            transition: all var(--transition-normal); cursor: pointer;
-            box-shadow: var(--shadow-sm);
-        }
-        .gallery-image:hover {
-            transform: scale(1.08) rotate(2deg);
-            box-shadow: var(--shadow-md); border-color: var(--primary-color); z-index: 5;
-        }
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 40px);
+            grid-gap: 0;
+            width: 320px;
 
-        /* Card Expansion - JS ile class ekleyip kaldıracağız */
-        /* .product-card.expanded { ... CSS içinde gallery görünürlüğü ayarlandı ... } */
-
-
-        /* Pagination */
-        .pagination-container { margin: 3rem 0 4rem; }
-        .pagination { display: flex; gap: 0.5rem; list-style: none; padding: 0; }
-        .page-item { }
-        .page-link {
-            display: flex; align-items: center; justify-content: center;
-            min-width: 2.75rem; height: 2.75rem; padding: 0 0.5rem;
-            border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem;
-            color: var(--text-secondary); background-color: var(--surface-light);
-            border: 1px solid var(--border-color); text-decoration: none;
-            transition: all var(--transition-fast); box-shadow: var(--shadow-sm);
+            border: none;
+            overflow: hidden;
+            flex-shrink: 0;
         }
-        .page-link:hover {
-            background-color: var(--primary-color); color: white;
-            border-color: var(--primary-color); box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+        .product-gallery img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border: none;
+            margin: 0;
+            padding: 0;
         }
-        .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            color: white; border: none;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+        .page-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
-        .page-item.disabled .page-link {
-            opacity: 0.6; pointer-events: none; background-color: var(--surface-dark);
-            box-shadow: none;
+        .row.g-0 {
+            margin: 0;
         }
-
-        /* Copy notification */
-        .copy-notification {
-            position: fixed; bottom: 2rem; right: 2rem;
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white; padding: 0.8rem 1.5rem; border-radius: var(--radius-lg);
-            box-shadow: 0 8px 20px -3px rgba(16, 185, 129, 0.3);
-            z-index: 1000; font-weight: 600; display: flex; align-items: center; gap: 0.75rem;
-            opacity: 0; transform: translateY(1rem) scale(0.95);
+        .sku {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            margin-right: 10px;
         }
-        .notification-icon {
-            width: 28px; height: 28px; background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center; padding: 4rem 2rem; background-color: var(--surface-light);
-            border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color); margin-top: 2rem;
-        }
-        .empty-state-icon {
-            font-size: 4rem; color: var(--primary-color); opacity: 0.5; margin-bottom: 1.5rem;
-            display: inline-block;
-        }
-        .empty-state-title { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary); }
-        .empty-state-description { color: var(--text-secondary); max-width: 450px; margin: 0 auto 2rem; font-size: 1rem; }
-
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .product-image-wrapper { width: 150px; }
-            .product-gallery-wrapper { display: none; } /* Tablettte galeriyi gizle */
-            #product-list { grid-template-columns: 1fr; } /* Tek sütun */
-            .product-card { flex-direction: row; } /* Kart içeriği yan yana */
-        }
-
-        @media (max-width: 768px) {
-            .app-header { height: auto; padding: 1rem 0; }
-            .logo-text { font-size: 1.4rem; }
-            .product-counter { font-size: 0.8rem; padding: 0.5rem 1rem; }
-            .search-container { margin: 1.5rem auto 2rem; padding: 1.5rem; max-width: calc(100% - 2rem); }
-            #product-list { gap: 1rem; }
-            .product-card { flex-direction: column; min-height: unset; } /* Kart içeriği alt alta */
-            .product-image-wrapper { width: 100%; height: 200px; } /* Resim tam genişlik */
-            .product-details { padding: 1rem; }
-            .product-title { font-size: 1.1rem; }
-            .page-link { min-width: 2.5rem; height: 2.5rem; font-size: 0.85rem; }
-            .pagination { gap: 0.3rem; }
-            .copy-notification { left: 1rem; right: 1rem; bottom: 1rem; }
-        }
-
-        @media (max-width: 576px) {
-            .control-label { font-size: 0.75rem; }
-            .form-control, .form-select { font-size: 0.9rem; padding: 0.7rem 1rem 0.7rem 2.5rem; }
-            .btn { padding: 0.7rem 1.2rem; font-size: 0.9rem; }
-            .product-image-wrapper { height: 180px; }
-        }
-
-
-        /* Animation classes (GSAP bunları kullanacak) */
-        /* GSAP doğrudan stilleri ayarladığı için özel class'lara gerek kalmayabilir */
-
     </style>
 </head>
 <body>
-<!-- App Header -->
-<header class="app-header">
-    <div class="container-fluid px-4 h-100">
-        <div class="row h-100 align-items-center">
-            <div class="col-sm-6"> {/* Daha küçük ekranlar için col-sm-6 */}
-                <div class="logo-container">
-                    <div class="logo-icon"><i class="fas fa-cubes"></i></div>
-                    <h1 class="logo-text mb-0">IWAPIM Katalog</h1>
-                </div>
-            </div>
-            <div class="col-sm-6 d-flex justify-content-end align-items-center"> {/* align-items-center eklendi */}
-                <div class="product-counter">
-                    <i class="fas fa-layer-group me-2"></i>
-                    <span>{{ products|length }} / {{ totalProducts ?? 'Tüm' }} ürün</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
 
-<!-- Search Container -->
-<div class="container-fluid px-lg-4 px-md-3 px-2"> {/* Responsive padding */}
-    <div class="search-container"> {/* Animasyon için class kaldırıldı, GSAP yönetecek */}
-        <div class="row g-3 align-items-end"> {/* Dikey hizalama için */}
-            <div class="col-lg-5 col-md-6">
-                <label class="control-label" for="search-box">Ürün Arama</label>
-                <div class="input-container">
-                    <i class="fas fa-search input-icon"></i>
-                    <input type="text" id="search-box" class="form-control" placeholder="SKU, ürün adı veya barkod..." autocomplete="off">
+    <div class="container-fluid">
+        <div class="row my-4 my-md-4">
+            <div class="col-md-6 mb-6 mb-md-0">
+                <div class="input-group">
+                    <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek arayın...">
+                    <button type="button" id="search-button" class="btn btn-primary">Ara</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/catalog'">Sıfırla</button>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <label class="control-label" for="category-select">Kategori</label>
-                <div class="input-container">
-                    <i class="fas fa-tag input-icon"></i>
-                    <select class="form-select" id="category-select">
-                        <option value="all" selected>Tüm Kategoriler</option>
-                        {% for type in productTypes %}
-                            <option value="{{ type }}">{{ type }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <select class="form-select" id="category-select">
+                    <option value="all" selected>Tüm Ürün Tipleri</option>
+                    {% for type in productTypes %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="control-label" for="page-size-select">Listeleme</label>
-                <div class="input-container">
-                    <i class="fas fa-list-ol input-icon"></i>
+            <div class="col-md-3">
+                <div class="d-flex justify-content-end">
                     <select class="form-select" id="page-size-select">
+                        <option value="5">5 Ürün</option>
                         <option value="10">10 Ürün</option>
-                        <option value="20" selected>20 Ürün</option> {/* Varsayılan 20 */}
+                        <option value="20">20 Ürün</option>
                         <option value="50">50 Ürün</option>
                         <option value="100">100 Ürün</option>
+                        <option value="200">200 Ürün</option>
                     </select>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-6">
-                <div class="d-grid"> {/* Butonun tam genişlikte olması için */}
-                    <button type="button" id="search-button" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i>Ara
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
 
-    <!-- Catalog Container -->
-    <div class="catalog-container">
-        {% if products|length > 0 %}
-            <div id="product-list">
-                {% for product in products %}
-                    {# product.album'un URL dizisi olduğunu varsayıyoruz #}
-                    <div class="product-card" data-product-id="{{ product.id ?? loop.index }}"> {# Animasyon için class kaldırıldı #}
-                        <div class="product-image-wrapper" onclick="toggleCardExpansion(this.closest('.product-card'))">
-                            <div class="product-image-badge">{{ loop.index + (page * pageSize) }}</div> {# Doğru sıra numarası için #}
-                            <img src="{{ product.image }}"
-                                 class="product-main-image"
-                                 alt="{{ product.name }}"
-                                 loading="lazy">
-                        </div>
-
-                        <div class="product-details">
-                            <h2 class="product-title">{{ product.productIdentifier }} {{ product.name }}</h2>
-
-                            <div class="product-specs">
-                                {% if product.variationSizeList %}
-                                    <span class="spec-badge"><i class="fas fa-ruler-combined"></i> {{ product.variationSizeList }}</span> {# Daha uygun ikon #}
-                                {% endif %}
-                                {% if product.variationColorList %}
-                                    <span class="spec-badge"><i class="fas fa-palette"></i> {{ product.variationColorList }}</span>
-                                {% endif %}
-                                {% if product.brand is defined and product.brand %}
-                                    <span class="spec-badge"><i class="fas fa-building"></i> {{ product.brand }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="sku-container">
-                                <div class="sku-label"><i class="fas fa-barcode"></i> SKU Kodları</div>
-                                <div class="sku-list">
-                                    {% for item in product.iwaskuList %}
-                                        <span class="sku"
-                                              data-sku="{{ item.iwasku }}"
-                                              data-bs-toggle="tooltip"
-                                              data-bs-placement="top" {# Tooltip yeri #}
-                                                  title="Kopyala: {{ item.tooltip|default(item.iwasku) }}" {# Daha açıklayıcı tooltip #}
-                                                  onclick="copySku(this)">
-                                                {{ item.iwasku }}
-                                            </span>
+        <!-- Product catalog container -->
+        <div id="catalog-container">
+            {% for product in products %}
+                <div class="card product-card">
+                    <table style="table-layout: fixed; width: 100%; height: 100%; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <tr>
+                            <td style="width: 150px; vertical-align: top; border: none; padding: 0;">
+                                <div style="height: 120px; width: 150px;">
+                                    <img src="{{ product.image }}" class="product-main-image" alt="Product Image" style="height: 100%; max-width: 150px; width: auto; display: block;">
+                                </div>
+                            </td>
+                            <td style="vertical-align: top; border: none; padding: 3px; overflow: hidden;">
+                                <div class="card-body product-info">
+                                    <h5 class="card-title">{{ product.productIdentifier }} {{ product.name }}</h5>
+                                    <div class="col-12" style="font-size: smaller;">
+                                        <b>Ebatlar:</b> {{ product.variationSizeList }} * <b>Renkler:</b> {{ product.variationColorList }}<br>
+                                        <b>IWASKU:</b> {% for item in product.iwaskuList %}<span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">{{ item.iwasku }}</span>{% if not loop.last %}<span>| </span>{% endif %}{% endfor %}<br>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell" style="width: 320px; vertical-align: top; border: none; padding: 0;">
+                                <div class="product-gallery">
+                                    {% for image in product.album %}
+                                        {{ image|raw }}
                                     {% endfor %}
                                 </div>
-                            </div>
-                        </div>
-
-                        {# Galeri (Masaüstünde gösterilir) - product.album bir URL dizisi olmalı #}
-                        <div class="product-gallery-wrapper d-none d-lg-block">
-                            <div class="product-gallery">
-                                {% if product.album is iterable %} {# Dizi olup olmadığını kontrol et #}
-                                    {% for imageUrl in product.album %}
-                                        <img src="{{ imageUrl }}"
-                                             alt="Ürün görseli {{ loop.index }}"
-                                             class="gallery-image"
-                                             loading="lazy"
-                                             onclick="event.stopPropagation(); openImageModal('{{ imageUrl }}')"> {# Kart genişlemesini tetikleme #}
-                                    {% endfor %}
-                                {% else %}
-                                    {# Albüm yoksa veya dizi değilse belki bir mesaj? #}
-                                    {# <small class="text-muted">Ek görsel yok.</small> #}
-                                {% endif %}
-                            </div>
-                        </div>
-
-                    </div>
-                {% endfor %}
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination-container">
-                <div class="d-flex justify-content-center">
-                    <nav aria-label="Product pagination">
-                        {# Sayfalama kodu aynı kalabilir, stiller güncellendi #}
-                        <ul class="pagination">
-                            <!-- First Page -->
-                            <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                                <a class="page-link" href="{{ page > 0 ? path('catalog_route', {'query': query, 'category': category, 'page': 0, 'pageSize': pageSize}) : '#' }}" aria-label="İlk sayfa">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                            </li>
-
-                            <!-- Previous Page -->
-                            <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                                <a class="page-link" href="{{ page > 0 ? path('catalog_route', {'query': query, 'category': category, 'page': page - 1, 'pageSize': pageSize}) : '#' }}" aria-label="Önceki sayfa">
-                                    <i class="fas fa-angle-left"></i>
-                                </a>
-                            </li>
-
-                            <!-- Page numbers -->
-                            {% set start = max(page - 2, 0) %}
-                            {% set end = min(page + 2, pageCount - 1) %}
-
-                            {% if pageCount > 5 %}
-                                {% if page > 3 %} {# Başlangıçta ... ekle #}
-                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                {% endif %}
-
-                                {# Dinamik sayfa aralığı ayarı #}
-                                {% if end - start < 4 %}
-                                    {% if start == 0 %}
-                                        {% set end = min(4, pageCount - 1) %}
-                                    {% elseif end == pageCount - 1 %}
-                                        {% set start = max(pageCount - 5, 0) %}
-                                    {% endif %}
-                                {% endif %}
-                            {% endif %}
-
-                            {% for i in start..end %}
-                                <li class="page-item {% if i == page %}active{% endif %}">
-                                    <a class="page-link" href="{{ path('catalog_route', {'query': query, 'category': category, 'page': i, 'pageSize': pageSize}) }}">{{ i + 1 }}</a>
-                                </li>
-                            {% endfor %}
-
-                            {% if pageCount > 5 and page < pageCount - 4 %} {# Sonda ... ekle #}
-                                <li class="page-item disabled"><span class="page-link">...</span></li>
-                            {% endif %}
-
-                            <!-- Next Page -->
-                            <li class="page-item {% if page >= pageCount - 1 %}disabled{% endif %}">
-                                <a class="page-link" href="{{ page < pageCount - 1 ? path('catalog_route', {'query': query, 'category': category, 'page': page + 1, 'pageSize': pageSize}) : '#' }}" aria-label="Sonraki sayfa">
-                                    <i class="fas fa-angle-right"></i>
-                                </a>
-                            </li>
-
-                            <!-- Last Page -->
-                            <li class="page-item {% if page >= pageCount - 1 %}disabled{% endif %}">
-                                <a class="page-link" href="{{ page < pageCount - 1 ? path('catalog_route', {'query': query, 'category': category, 'page': pageCount - 1, 'pageSize': pageSize}) : '#' }}" aria-label="Son sayfa">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-            </div>
+            {% endfor %}
+        </div>
 
-        {% else %}
-            <!-- Empty state when no products -->
-            <div class="empty-state"> {/* Animasyon için class kaldırıldı */}
-                <div class="empty-state-icon"><i class="fas fa-box-open"></i></div>
-                <h2 class="empty-state-title">Ürün Bulunamadı</h2>
-                <p class="empty-state-description">
-                    Aradığınız kriterlere uygun ürün bulunamadı. Filtreleri değiştirerek veya farklı anahtar kelimelerle tekrar deneyebilirsiniz.
-                </p>
-                {# 'catalog_route' adında bir route tanımladığınızı varsayıyorum #}
-                <a href="{{ path('catalog_route', {'query': 'all', 'category': 'all', 'page': 0, 'pageSize': 20}) }}" class="btn btn-primary">
-                    <i class="fas fa-sync-alt me-2"></i>Tüm Ürünleri Göster
-                </a>
-            </div>
-        {% endif %}
-    </div>
-</div>
+        <!-- Pagination -->
+        <div class="page-container">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}">&lt;&lt;</a>
+                    </li>
 
-<!-- Modal for image preview -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl"> {/* Daha büyük modal */}
-        <div class="modal-content bg-transparent border-0"> {/* Şeffaf arka plan */}
-            <div class="modal-header border-0 pb-0 position-absolute top-0 end-0" style="z-index: 1056;"> {/* Kapatma butonu üste */}
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-0 text-center"> {/* Kenar boşluksuz */}
-                <img src="" id="modalImage" class="img-fluid rounded" style="max-height: 90vh; object-fit: contain;"> {/* Boyut ve sığdırma ayarı */}
-            </div>
+                    <li class="page-item {% if page == 0 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}">&lt;</a>
+                    </li>
+
+                    {% set start = max(page - 2, 0) %}
+                    {% set end = min(page + 2, pageCount - 1) %}
+
+                    {% if end - start < 4 %}
+                        {% if start == 0 %}
+                            {% set end = min(4, pageCount - 1) %}
+                        {% else %}
+                            {% set start = max(pageCount - 5, 0) %}
+                        {% endif %}
+                    {% endif %}
+
+                    {% for i in start..end %}
+                        <li class="page-item {% if i == page %}active{% endif %}">
+                            <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
+                        </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}">&gt;</a>
+                    </li>
+
+                    <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
+                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}">&gt;&gt;</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
-</div>
 
-<script>
-    // Global variables (Assume these are set correctly by Twig)
-    const currentQuery = '{{ query|default('all')|e('js') }}';
-    const currentCategory = '{{ category|default('all')|e('js') }}';
-    const currentPage = {{ page|default(0)|e('js') }};
-    const currentPageSize = {{ pageSize|default(20)|e('js') }};
-    const totalPages = {{ pageCount|default(1)|e('js') }};
-    // Varsayılan route adını 'catalog_route' olarak kabul ediyorum. Değilse değiştirin.
-    const catalogBaseUrl = "{{ path('catalog_route', {'query': '__QUERY__', 'category': '__CAT__', 'page': '__PAGE__', 'pageSize': '__PAGESIZE__'}) }}";
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    let imageModalInstance;
+    <script>
+        $(document).ready(function() {
+            let currentQuery = '{{ query|e('js') }}';
+            let currentCategory = '{{ category|e('js') }}';
 
-    // Build URL helper function
-    function buildCatalogUrl(query = currentQuery, category = currentCategory, page = currentPage, pageSize = currentPageSize) {
-        let url = catalogBaseUrl;
-        url = url.replace('__QUERY__', encodeURIComponent(query === '' ? 'all' : query));
-        url = url.replace('__CAT__', encodeURIComponent(category));
-        url = url.replace('__PAGE__', page);
-        url = url.replace('__PAGESIZE__', pageSize);
-        // Eğer path fonksiyonu query parametrelerini handle etmiyorsa elle ekle:
-        // Örn: url += `?query=${encodeURIComponent(query)}&...`
-        return url;
-    }
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-        imageModalInstance = new bootstrap.Modal(document.getElementById('imageModal'));
-        initializeTooltips();
-        setFormInitialValues();
-        initializeEvents();
-        runEntryAnimations(); // GSAP animasyonlarını başlat
-    });
-
-    function initializeTooltips() {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
-            trigger: 'hover' // Sadece hover'da göster
-        }));
-    }
-
-    function setFormInitialValues() {
-        const searchBox = document.getElementById('search-box');
-        const categorySelect = document.getElementById('category-select');
-        const pageSizeSelect = document.getElementById('page-size-select');
-
-        if (searchBox && currentQuery !== 'all') {
-            searchBox.value = currentQuery;
-        }
-        if (categorySelect && currentCategory !== 'all') {
-            categorySelect.value = currentCategory;
-        }
-        if (pageSizeSelect) {
-            pageSizeSelect.value = currentPageSize;
-        }
-    }
-
-    function initializeEvents() {
-        const searchBox = document.getElementById('search-box');
-        const categorySelect = document.getElementById('category-select');
-        const pageSizeSelect = document.getElementById('page-size-select');
-        const searchButton = document.getElementById('search-button');
-
-        if (pageSizeSelect) {
-            pageSizeSelect.addEventListener('change', function() {
-                window.location.href = buildCatalogUrl(currentQuery, currentCategory, 0, this.value);
-            });
-        }
-
-        if (searchButton) {
-            searchButton.addEventListener('click', performSearch);
-        }
-
-        if (searchBox) {
-            searchBox.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Form submit'i engelle
-                    performSearch();
-                }
-            });
-        }
-
-        if (categorySelect) {
-            categorySelect.addEventListener('change', function() {
-                window.location.href = buildCatalogUrl(currentQuery, this.value, 0, currentPageSize);
-            });
-        }
-
-        // Dinamik olarak eklenen SKU'lar için olay delegasyonu (isteğe bağlı ama daha sağlam)
-        const productList = document.getElementById('product-list');
-        if (productList) {
-            productList.addEventListener('click', function(event) {
-                if (event.target.classList.contains('sku')) {
-                    copySku(event.target);
-                }
-                // İsteğe bağlı: Galeri resimleri için de delege edilebilir
-                // if (event.target.classList.contains('gallery-image')) {
-                //     event.stopPropagation();
-                //     openImageModal(event.target.src);
-                // }
-            });
-        }
-    }
-
-    function performSearch() {
-        const searchBox = document.getElementById('search-box');
-        let searchQuery = searchBox ? searchBox.value.trim() : 'all';
-        window.location.href = buildCatalogUrl(searchQuery, currentCategory, 0, currentPageSize);
-    }
-
-    function toggleCardExpansion(cardElement) {
-        if (!cardElement) return;
-        const galleryWrapper = cardElement.querySelector('.product-gallery-wrapper');
-
-        // GSAP ile animasyon (daha akıcı)
-        if (typeof gsap !== 'undefined') {
-            if (cardElement.classList.contains('expanded')) {
-                // Küçült
-                gsap.to(galleryWrapper, { duration: 0.4, opacity: 0, height: 0, ease: "power2.inOut", onComplete: () => {
-                        galleryWrapper.style.height = ''; // Height'ı temizle
-                    }});
-                cardElement.classList.remove('expanded');
-            } else {
-                // Genişlet
-                cardElement.classList.add('expanded');
-                // Yüksekliği otomatik hesapla ve animasyonla aç
-                gsap.fromTo(galleryWrapper,
-                    { height: 0, opacity: 0 },
-                    { duration: 0.5, height: "auto", opacity: 1, ease: "power2.out" }
-                );
-                // Kartın görünürlüğünü sağla (isteğe bağlı)
-                // setTimeout(() => {
-                //     cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                // }, 400);
+            if (currentQuery !== 'all') {
+                $('#search-box').val(currentQuery);
             }
-        } else {
-            // CSS transition fallback
-            cardElement.classList.toggle('expanded');
-        }
-    }
+            if (currentCategory !== 'all') {
+                $('#category-select').val(currentCategory);
+            }
+            $('#page-size-select').val('{{ pageSize }}');
 
-
-    function copySku(element) {
-        const sku = element.dataset.sku;
-        if (!sku) return;
-
-        navigator.clipboard.writeText(sku)
-            .then(() => {
-                showCopyNotification(sku);
-                // Animate clicked SKU with GSAP
-                if (typeof gsap !== 'undefined') {
-                    gsap.to(element, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1, ease: "power1.inOut" });
-                } else {
-                    element.style.transform = 'scale(0.9)';
-                    setTimeout(() => { element.style.transform = ''; }, 150);
-                }
-            })
-            .catch(err => {
-                console.error("Kopyalama başarısız:", err);
-                alert("Kopyalama başarısız oldu. Lütfen manuel olarak deneyin."); // Basit geri bildirim
+            $('#page-size-select').on('change', function() {
+                let selectedPageSize = $(this).val();
+                window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
             });
-    }
 
-    let notificationTimeout;
-    function showCopyNotification(sku) {
-        const existingNotification = document.querySelector('.copy-notification');
-        if (existingNotification) {
-            existingNotification.remove();
-            clearTimeout(notificationTimeout);
-        }
+            $('#search-button').on('click', function() {
+                let searchQuery = $('#search-box').val().trim();
+                window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
+            });
 
-        const notification = document.createElement('div');
-        notification.className = 'copy-notification';
-        notification.innerHTML = `
-                <div class="notification-icon"><i class="fas fa-check"></i></div>
-                <span>SKU Kopyalandı: <strong>${gsap.utils.escapeHTML(sku)}</strong></span> {# Güvenlik için escape #}
-            `;
-        document.body.appendChild(notification);
+            $('#search-box').on('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    let searchQuery = $(this).val().trim();
+                    window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
+                }
+            });
 
-        if (typeof gsap !== 'undefined') {
-            gsap.fromTo(notification,
-                { opacity: 0, y: 20, scale: 0.95 },
-                { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out" }
-            );
+            $('#category-select').on('change', function() {
+                let selectedCategory = $(this).val();
+                window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
+            });
 
-            notificationTimeout = setTimeout(() => {
-                gsap.to(notification, {
-                    opacity: 0, y: 10, scale: 0.95, duration: 0.3, ease: "power2.in",
-                    onComplete: () => notification.remove()
+            $(document).on('click', '.sku', function() {
+                let iwasku = $(this).data('iwasku');
+
+                navigator.clipboard.writeText(iwasku).then(() => {
+                    showCopyNotification(iwasku);
+                }).catch(err => {
+                    console.error("Failed to copy: ", err);
                 });
-            }, 2500); // Biraz daha uzun süre göster
-        } else {
-            // Fallback
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateY(0) scale(1)';
-            notificationTimeout = setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateY(10px) scale(0.95)';
-                setTimeout(() => notification.remove(), 300);
-            }, 2500);
-        }
-    }
+            });
 
-    function openImageModal(imageSrc) {
-        if (!imageModalInstance || !imageSrc) return;
-        const modalImage = document.getElementById('modalImage');
-        if(modalImage) {
-            modalImage.src = imageSrc; // Önce src'yi ayarla
-            imageModalInstance.show(); // Sonra modal'ı göster
-        }
-    }
+            function showCopyNotification(iwasku) {
+                let notification = $('<div class="copy-notification">Copied: ' + iwasku + '</div>');
+                $('body').append(notification);
+                notification.css({
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    background: '#28a745',
+                    color: 'white',
+                    padding: '10px 15px',
+                    borderRadius: '5px',
+                    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+                    zIndex: 1000,
+                    opacity: 0
+                }).animate({ opacity: 1 }, 300);
 
-    // GSAP Giriş Animasyonları
-    function runEntryAnimations() {
-        if (typeof gsap === 'undefined') {
-            console.warn("GSAP yüklenmedi, animasyonlar atlanıyor.");
-            // İsteğe bağlı: Basit CSS fade-in class'ları eklenebilir
-            document.querySelectorAll('.product-card, .search-container, .empty-state').forEach(el => el.style.opacity = 1);
-            return;
-        }
+                setTimeout(() => {
+                    notification.fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                }, 2000);
+            }
+        });
 
-        const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            document.querySelectorAll('.product-card').forEach(function(card) {
+                let productImage = card.querySelector('.product-main-image');
+                if (productImage) {
+                    productImage.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        card.classList.toggle('expanded');
+                    });
+                }
+            });
+        });
+    </script>
 
-        tl.from(".app-header .logo-container, .app-header .product-counter", {
-            opacity: 0,
-            y: -20,
-            duration: 0.6,
-            stagger: 0.1
-        })
-            .from(".search-container", {
-                opacity: 0,
-                y: 30,
-                scale: 0.98,
-                duration: 0.7,
-            }, "-=0.3") // Önceki animasyon bitmeden başla
-            .from(".product-card", {
-                opacity: 0,
-                y: 40,
-                duration: 0.5,
-                stagger: 0.07, // Kartları sırayla getir
-            }, "-=0.4") // Önceki animasyon bitmeden başla
-            .from(".pagination-container", {
-                opacity: 0,
-                y: 20,
-                duration: 0.5,
-            }, "<0.5") // Kartlar gelmeye başladıktan 0.5sn sonra
-            .from(".empty-state", { // Eğer varsa boş durumu animasyonu
-                opacity: 0,
-                scale: 0.9,
-                duration: 0.6
-            }, "-=0.5"); // Search container sonrası
-    }
-
-</script>
 </body>
 </html>
