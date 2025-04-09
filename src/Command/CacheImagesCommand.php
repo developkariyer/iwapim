@@ -33,6 +33,8 @@ class CacheImagesCommand extends AbstractCommand
     static ?Folder $bolcomFolder;
     static ?Folder $hepsiburadaFolder;
 
+    static ?Folder $wallmartFolder;
+
     protected function configure(): void
     {
         $this
