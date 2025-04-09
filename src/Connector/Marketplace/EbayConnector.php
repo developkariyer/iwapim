@@ -174,7 +174,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->getItemRest("335123681022");
+        $this->getItemRest("8111250768114");
         //$this->listingDetail("334921595917");
         //$this->getMyeBaySelling();
         //$this->getItemByLegacyId("334936877779");
