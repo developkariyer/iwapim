@@ -1,4 +1,3 @@
-twig
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -232,6 +231,7 @@ twig
         .catalog-container {
             max-width: var(--max-content-width);
             margin: 0 auto;
+            padding: 0 1rem;
         }
 
         .product-card {
@@ -243,7 +243,8 @@ twig
             overflow: hidden;
             transition: all var(--transition-normal);
             border: 1px solid var(--border-color);
-            height: var(--card-height);
+            height: auto;
+            min-height: var(--card-height);
         }
 
         .product-card.expanded {
@@ -261,6 +262,10 @@ twig
             position: relative;
             width: 180px;
             height: var(--card-height);
+            background-color: var(--surface-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .product-image-badge {
@@ -285,9 +290,11 @@ twig
         }
 
         .product-main-image {
-            width: 180px;
-            height: var(--card-height);
-            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            max-width: 180px;
+            max-height: var(--card-height);
+            object-fit: contain;
             transition: transform 0.6s var(--transition-normal);
             cursor: pointer;
         }
@@ -412,108 +419,86 @@ twig
             z-index: 5;
         }
 
-        /* Pagination */
-        .pagination-container {
-            margin: 2.5rem 0 3.5rem;
-        }
-
-        .pagination {
-            display: flex;
-            gap: 0.35rem;
-        }
-
-        .page-item {
-            list-style: none;
-        }
-
-        .page-link {
+        /* Image placeholder */
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            color: var(--text-secondary);
-            background-color: var(--surface-light);
-            border: 1px solid var(--border-color);
-            transition: all var(--transition-normal);
-            box-shadow: var(--shadow-sm);
+            background-color: var(--surface-medium);
+            color: var(--text-muted);
+            font-size: 2rem;
         }
 
-        .page-link:hover {
+        /* Image Modal Enhancements */
+        .modal-content {
+            border: none;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--surface-medium);
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(58, 12, 163, 0.05));
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        #modalImage {
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            max-height: 70vh;
+            object-fit: contain;
+            background-color: white;
+        }
+
+        .modal-image-loading {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+        }
+
+        .image-nav-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .image-nav-button {
+            background: var(--surface-medium);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all var(--transition-normal);
+        }
+
+        .image-nav-button:hover:not([disabled]) {
             background-color: var(--primary-color);
             color: white;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+            transform: scale(1.1);
         }
 
-        .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
-        }
-
-        .page-item.disabled .page-link {
+        .image-nav-button[disabled] {
             opacity: 0.5;
-            pointer-events: none;
-        }
-
-        /* Copy notification */
-        .copy-notification {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
-            z-index: 1000;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            opacity: 0;
-            transform: translateY(1rem);
-        }
-
-        .notification-icon {
-            width: 24px;
-            height: 24px;
-            background-color: rgba(255, 255, 255, 0.25);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            background-color: var(--surface-light);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            opacity: 0.7;
-        }
-
-        .empty-state-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state-description {
-            color: var(--text-secondary);
-            max-width: 400px;
-            margin: 0 auto 1.5rem;
+            cursor: not-allowed;
         }
 
         /* Responsive adjustments */
@@ -521,6 +506,7 @@ twig
             .search-container {
                 padding: 1.5rem;
                 margin-top: -1.5rem;
+                margin-bottom: 1.5rem;
             }
 
             .product-gallery {
@@ -537,28 +523,122 @@ twig
         }
 
         @media (max-width: 768px) {
+            :root {
+                --card-height: 150px;
+            }
+
             .app-header {
                 height: auto;
                 padding: 1rem 0;
             }
 
+            .logo-text {
+                font-size: 1.25rem;
+            }
+
+            .logo-icon {
+                width: 2rem;
+                height: 2rem;
+                font-size: 1.1rem;
+            }
+
             .product-card {
                 height: auto;
+                min-height: var(--card-height);
             }
 
             .product-image-container {
                 width: 120px;
-                height: 120px;
+                height: var(--card-height);
             }
 
             .product-main-image {
-                width: 120px;
-                height: 120px;
+                max-width: 120px;
+                max-height: var(--card-height);
+            }
+
+            .product-content {
+                padding: 1rem;
+            }
+
+            .search-container {
+                margin-top: -1rem;
+                padding: 1rem;
             }
 
             .page-link {
                 width: 2.25rem;
                 height: 2.25rem;
+            }
+
+            .sku-list {
+                gap: 0.35rem;
+            }
+
+            .sku {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            :root {
+                --card-height: 120px;
+            }
+
+            .product-image-container {
+                width: 100px;
+                height: var(--card-height);
+            }
+
+            .product-main-image {
+                max-width: 100px;
+            }
+
+            .product-title {
+                font-size: 0.95rem;
+                -webkit-line-clamp: 1;
+            }
+
+            .catalog-container {
+                padding: 0 0.5rem;
+            }
+
+            .product-specs {
+                margin: 0.35rem 0 0.75rem;
+            }
+
+            .spec-badge {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Skeleton loading animation */
+        .skeleton {
+            position: relative;
+            overflow: hidden;
+            background-color: var(--surface-dark);
+            border-radius: var(--radius-md);
+        }
+
+        .skeleton::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: skeletonLoading 1.5s infinite;
+        }
+
+        @keyframes skeletonLoading {
+            from {
+                left: -100%;
+            }
+            to {
+                left: 100%;
             }
         }
 
@@ -675,40 +755,47 @@ twig
                             <div class="col-auto">
                                 <div class="product-image-container">
                                     <div class="product-image-badge">{{ loop.index }}</div>
-                                    <img
-                                            src="{{ product.image }}"
-                                            class="product-main-image"
-                                            alt="{{ product.name }}"
-                                            loading="lazy"
-                                            onclick="toggleCardExpansion(this)"
-                                    >
+                                    {% if product.image is defined and product.image %}
+                                        <img
+                                                src="{{ product.image }}"
+                                                class="product-main-image"
+                                                alt="{{ product.name }}"
+                                                loading="lazy"
+                                                onclick="openImageModal(this.src, {{ loop.index0 }})"
+                                                onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%23f8f9ff\'/%3E%3Cpath d=\'M30,40 L70,40 L70,60 L30,60 Z\' fill=\'%23e9ecf9\'/%3E%3Ctext x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'10\' fill=\'%23718096\' text-anchor=\'middle\'%3EGörsel Yok%3C/text%3E%3C/svg%3E'; this.style.padding='10px';"
+                                        >
+                                    {% else %}
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="product-content">
-                                    <h2 class="product-title">{{ product.productIdentifier }} {{ product.name }}</h2>
+                                    <h2 class="product-title">{{ product.productIdentifier ?? '' }} {{ product.name }}</h2>
 
                                     <!-- Product specifications badges -->
                                     <div class="product-specs">
-                                        {% if product.variationSizeList %}
+                                        {% if product.variationSizeList is defined and product.variationSizeList %}
                                             <span class="spec-badge">
-                                                    <i class="fas fa-ruler"></i>
-                                                    {{ product.variationSizeList }}
-                                                </span>
+                                                <i class="fas fa-ruler"></i>
+                                                {{ product.variationSizeList }}
+                                            </span>
                                         {% endif %}
 
-                                        {% if product.variationColorList %}
+                                        {% if product.variationColorList is defined and product.variationColorList %}
                                             <span class="spec-badge">
-                                                    <i class="fas fa-palette"></i>
-                                                    {{ product.variationColorList }}
-                                                </span>
+                                                <i class="fas fa-palette"></i>
+                                                {{ product.variationColorList }}
+                                            </span>
                                         {% endif %}
 
                                         {% if product.brand is defined and product.brand %}
                                             <span class="spec-badge">
-                                                    <i class="fas fa-building"></i>
-                                                    {{ product.brand }}
-                                                </span>
+                                                <i class="fas fa-building"></i>
+                                                {{ product.brand }}
+                                            </span>
                                         {% endif %}
                                     </div>
 
@@ -719,32 +806,68 @@ twig
                                             SKU Kodları
                                         </div>
                                         <div class="sku-list">
-                                            {% for item in product.iwaskuList %}
-                                                <span
-                                                        class="sku"
-                                                        data-sku="{{ item.iwasku }}"
-                                                        data-bs-toggle="tooltip"
-                                                        title="{{ item.tooltip }}"
-                                                        onclick="copySku(this)"
-                                                >
+                                            {% if product.iwaskuList is defined and product.iwaskuList|length > 0 %}
+                                                {% for item in product.iwaskuList %}
+                                                    <span
+                                                            class="sku"
+                                                            data-sku="{{ item.iwasku }}"
+                                                            data-bs-toggle="tooltip"
+                                                            title="{{ item.tooltip|default('SKU: ' ~ item.iwasku) }}"
+                                                            onclick="copySku(this)"
+                                                    >
                                                         {{ item.iwasku }}
                                                     </span>
-                                            {% endfor %}
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="spec-badge">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    SKU bulunamadı
+                                                </span>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-auto d-none d-lg-block">
                                 <div class="product-gallery">
-                                    {% for image in product.album %}
-                                        <img src="{{ image|replace({'<img src="': ''}) | split('"')[0] }}"
-                                             alt="Ürün görseli"
-                                             class="gallery-image"
-                                             loading="lazy"
-                                             onclick="openImageModal(this.src)">
-                                    {% endfor %}
+                                    {% if product.album is defined and product.album|length > 0 %}
+                                        {% for image in product.album %}
+                                            {% set imageSrc = image|replace({'<img src="': ''}) | split('"')[0] %}
+                                            {% if imageSrc %}
+                                                <img src="{{ imageSrc }}"
+                                                     alt="Ürün görseli"
+                                                     class="gallery-image"
+                                                     loading="lazy"
+                                                     onclick="openImageModal('{{ imageSrc }}', {{ loop.index0 }}, {{ loop.parent.loop.index0 }})"
+                                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'%3E%3Crect width=\'50\' height=\'50\' fill=\'%23f8f9ff\'/%3E%3Cpath d=\'M15,20 L35,20 L35,30 L15,30 Z\' fill=\'%23e9ecf9\'/%3E%3Ctext x=\'25\' y=\'27\' font-family=\'Arial\' font-size=\'5\' fill=\'%23718096\' text-anchor=\'middle\'%3EGörsel Yok%3C/text%3E%3C/svg%3E';"
+                                                >
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Mobile gallery view (shown only on smaller screens) -->
+                        <div class="d-lg-none">
+                            {% if product.album is defined and product.album|length > 0 %}
+                                <div class="px-3 pb-3">
+                                    <div class="product-gallery">
+                                        {% for image in product.album %}
+                                            {% set imageSrc = image|replace({'<img src="': ''}) | split('"')[0] %}
+                                            {% if imageSrc %}
+                                                <img src="{{ imageSrc }}"
+                                                     alt="Ürün görseli"
+                                                     class="gallery-image"
+                                                     loading="lazy"
+                                                     onclick="openImageModal('{{ imageSrc }}', {{ loop.index0 }}, {{ loop.parent.loop.index0 }})"
+                                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'%3E%3Crect width=\'50\' height=\'50\' fill=\'%23f8f9ff\'/%3E%3Cpath d=\'M15,20 L35,20 L35,30 L15,30 Z\' fill=\'%23e9ecf9\'/%3E%3Ctext x=\'25\' y=\'27\' font-family=\'Arial\' font-size=\'5\' fill=\'%23718096\' text-anchor=\'middle\'%3EGörsel Yok%3C/text%3E%3C/svg%3E';"
+                                                >
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -826,11 +949,28 @@ twig
 <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
+            <div class="modal-header">
+                <h5 class="modal-title">Ürün Görseli</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <img src="" id="modalImage" class="img-fluid rounded" style="max-height: 80vh">
+                <div class="modal-image-loading" id="modalImageLoading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+                <img src="" id="modalImage" class="img-fluid rounded" style="max-height: 70vh; display: none;">
+            </div>
+            <div class="modal-footer">
+                <div class="image-nav-buttons">
+                    <button type="button" class="image-nav-button" id="prevImageBtn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="imageCounter" class="text-muted">1 / 1</span>
+                    <button type="button" class="image-nav-button" id="nextImageBtn" disabled>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -841,12 +981,16 @@ twig
     let currentQuery = '{{ query|e('js') }}';
     let currentCategory = '{{ category|e('js') }}';
     let imageModal;
+    let currentProductIndex = 0;
+    let currentImageIndex = 0;
+    let allProductImages = [];
 
     // Initialize on document ready
     document.addEventListener('DOMContentLoaded', function() {
         initializeTooltips();
         initializeEvents();
         imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        loadAllProductImages();
 
         // Set form values based on current URL
         setFormInitialValues();
@@ -854,6 +998,30 @@ twig
         // Add animation classes with delay
         animateElements();
     });
+
+    // Function to load all product images for gallery navigation
+    function loadAllProductImages() {
+        allProductImages = [];
+        const products = document.querySelectorAll('.product-card');
+
+        products.forEach((product, productIndex) => {
+            const images = [];
+            const mainImage = product.querySelector('.product-main-image');
+            const galleryImages = product.querySelectorAll('.gallery-image');
+
+            if (mainImage && mainImage.src) {
+                images.push(mainImage.src);
+            }
+
+            galleryImages.forEach(img => {
+                if (img.src && !images.includes(img.src)) {
+                    images.push(img.src);
+                }
+            });
+
+            allProductImages.push(images);
+        });
+    }
 
     function initializeTooltips() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -897,6 +1065,45 @@ twig
         document.getElementById('category-select').addEventListener('change', function() {
             let selectedCategory = this.value;
             window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
+        });
+
+        // Initialize image navigation
+        document.getElementById('prevImageBtn').addEventListener('click', showPreviousImage);
+        document.getElementById('nextImageBtn').addEventListener('click', showNextImage);
+
+        // Modal events
+        const modalEl = document.getElementById('imageModal');
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('modalImage').src = '';
+            document.getElementById('modalImage').style.display = 'none';
+            document.getElementById('modalImageLoading').style.display = 'flex';
+        });
+
+        // Handle modal keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (!document.getElementById('imageModal').classList.contains('show')) {
+                return;
+            }
+
+            if (event.key === 'ArrowLeft') {
+                showPreviousImage();
+            } else if (event.key === 'ArrowRight') {
+                showNextImage();
+            } else if (event.key === 'Escape') {
+                imageModal.hide();
+            }
+        });
+
+        // Handle image loading
+        document.getElementById('modalImage').addEventListener('load', function() {
+            document.getElementById('modalImageLoading').style.display = 'none';
+            this.style.display = 'block';
+        });
+
+        document.getElementById('modalImage').addEventListener('error', function() {
+            document.getElementById('modalImageLoading').style.display = 'none';
+            this.style.display = 'block';
+            this.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'200\' viewBox=\'0 0 300 200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%23f8f9ff\'/%3E%3Cpath d=\'M90,80 L210,80 L210,120 L90,120 Z\' fill=\'%23e9ecf9\'/%3E%3Ctext x=\'150\' y=\'105\' font-family=\'Arial\' font-size=\'14\' fill=\'%23718096\' text-anchor=\'middle\'%3EGörsel Yüklenemedi%3C/text%3E%3C/svg%3E';
         });
     }
 
@@ -980,10 +1187,57 @@ twig
         }
     }
 
-    function openImageModal(imageSrc) {
+    function openImageModal(imageSrc, imageIndex = 0, productIndex = 0) {
+        currentProductIndex = productIndex;
+        currentImageIndex = imageIndex;
+
         const modalImage = document.getElementById('modalImage');
+        modalImage.style.display = 'none';
+        document.getElementById('modalImageLoading').style.display = 'flex';
+
         modalImage.src = imageSrc;
+        updateImageNavigationControls();
         imageModal.show();
+    }
+
+    function showNextImage() {
+        if (currentImageIndex < allProductImages[currentProductIndex].length - 1) {
+            currentImageIndex++;
+            updateModalImage();
+        }
+    }
+
+    function showPreviousImage() {
+        if (currentImageIndex > 0) {
+            currentImageIndex--;
+            updateModalImage();
+        }
+    }
+
+    function updateModalImage() {
+        const modalImage = document.getElementById('modalImage');
+        modalImage.style.display = 'none';
+        document.getElementById('modalImageLoading').style.display = 'flex';
+
+        if (allProductImages[currentProductIndex] && allProductImages[currentProductIndex][currentImageIndex]) {
+            modalImage.src = allProductImages[currentProductIndex][currentImageIndex];
+        }
+
+        updateImageNavigationControls();
+    }
+
+    function updateImageNavigationControls() {
+        const prevBtn = document.getElementById('prevImageBtn');
+        const nextBtn = document.getElementById('nextImageBtn');
+        const counter = document.getElementById('imageCounter');
+
+        // Update counter
+        const total = allProductImages[currentProductIndex] ? allProductImages[currentProductIndex].length : 0;
+        counter.textContent = `${currentImageIndex + 1} / ${total}`;
+
+        // Update button states
+        prevBtn.disabled = currentImageIndex <= 0;
+        nextBtn.disabled = currentImageIndex >= total - 1;
     }
 
     function animateElements() {
