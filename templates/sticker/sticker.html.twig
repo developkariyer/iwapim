@@ -1,492 +1,1488 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IWAPIM Katalog</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% extends 'base.html.twig' %}
+{% block title %} Sticker {% endblock %}
+{% block navbaritems %}
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Etiket
+        </a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="displayNewGroupForm()">Yeni Grup</a></li>
+            <li><a class="dropdown-item" href="#" onclick="displayNewStickerForm()">Yeni Etiket</a></li>
+        </ul>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Gruplar
+        </a>
+        <ul class="dropdown-menu">
+            {% for group in groups %}
+                <li><a class="dropdown-item" href="#" onclick="selectGroup('{{ group.name }}', {{ group.id }})">{{ group.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endblock %}
+{% block header %}
+    <div class="d-flex" role="search">
+        <!--suppress HtmlFormInputWithoutLabel -->
+        <input type="text" disabled id="searchInput" placeholder="Ara..." class="form-control-sm mb-3">
+    </div>
+{% endblock %}
+{% block content %}
+<div class="container mt-2">
+    <div class="row d-none" id="newStickerForm">
+        <div class="new-sticker-group-section">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-gradient-primary-light py-3">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="bi bi-folder-plus me-2"></i>Yeni Etiket Grubu Oluştur
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" action="/sticker/add-sticker-group" class="sticker-group-form">
+                        <div class="mb-4">
+                            <label for="group_name" class="form-label">Grup İsmi</label>
+                            <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-collection"></i>
+                        </span>
+                                <input
+                                        type="text"
+                                        name="form_data"
+                                        id="group_name"
+                                        placeholder="Yeni grup ismini girin"
+                                        class="form-control form-control-lg border-start-0 ps-0"
+                                        required
+                                        autocomplete="off">
+                            </div>
+                            <small class="text-muted mt-1 d-block">
+                                <i class="bi bi-info-circle me-1"></i>Sadece harf, rakam, boşluk ve alt çizgi içerebilir (max 190 karakter)
+                            </small>
+                        </div>
 
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-lg me-2"></i>Grup Ekle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="new-sticker-section" id="newStickerProductForm">
+        <div class="card shadow-sm border-0 rounded-lg">
+            <div class="card-header bg-gradient-primary-light py-3">
+                <h5 class="card-title mb-0 text-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Yeni Etiket Oluştur
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="/sticker/add-sticker" class="sticker-form">
+                    <div class="mb-4">
+                        <label for="form_data" class="form-label">Ürün Kodu</label>
+                        <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-upc"></i>
+                        </span>
+                            <input
+                                    type="text"
+                                    name="form_data"
+                                    id="form_data"
+                                    placeholder="IWASKU veya ASIN kodunu girin"
+                                    class="form-control form-control-lg border-start-0 ps-0"
+                                    required
+                                    autocomplete="off">
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                            <i class="bi bi-info-circle me-1"></i>IWASKU veya ASIN formatında bir ürün kodu giriniz
+                        </small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="group_id" class="form-label">Ürün Grubu</label>
+                        <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-collection"></i>
+                        </span>
+                            <select
+                                    name="group_id"
+                                    id="group_id"
+                                    class="form-select form-select-lg border-start-0 ps-0"
+                                    required>
+                                <option value="" disabled selected>Etiket eklemek için bir grup seçin</option>
+                                {% for group in groups %}
+                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                {% else %}
+                                    <option value="" disabled>Etiket Grubu Bulunamadı</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-lg me-2"></i>Etiket Ekle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="" id="stickerList">
+        <div class="row mt-2">
+            <div class="col-12"><h5 id="groupTitle"></h5></div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12"  id="stickers-container" style="overflow-x: auto;">
+            </div>
+            <nav class="col-12" aria-label="Page navigation">
+                <ul id="pagination-container" class="pagination justify-content-center">
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block body_scripts %}
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let selectedGroupId = null;
+        let searchTerm = '';
+        let timeoutId;
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            searchTerm = this.value;
+            let charCount = searchTerm.length;
+            if (searchTerm.trim() === '' ) {
+                clearTimeout(timeoutId);
+                loadStickers(selectedGroupId, currentPage);
+            }
+            if (charCount > 2) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(function() {
+                    loadStickers(selectedGroupId, currentPage, searchTerm);
+                }, 250);
+            }
+        });
+
+        function displayNewGroupForm() {
+            document.getElementById('newStickerForm').classList.remove('d-none');
+            document.getElementById('stickerList').classList.add('d-none');
+            document.getElementById('newStickerProductForm').classList.add('d-none');
+            document.getElementById('searchInput').disabled = true;
+        }
+
+        function displayNewStickerForm() {
+            document.getElementById('newStickerProductForm').classList.remove('d-none');
+            document.getElementById('newStickerForm').classList.add('d-none');
+            document.getElementById('stickerList').classList.add('d-none');
+            document.getElementById('searchInput').disabled = true;
+        }
+
+        function loadStickers(groupId, page = 1,  searchTerm = '') {
+            const paginationContainer = document.getElementById('pagination-container');
+            highlightSelectedGroup(groupId);
+            selectedGroupId = groupId;
+            currentPage = page;
+            const container = document.getElementById('stickers-container');
+            container.innerHTML = '<p>Loading...</p>';
+            const searchParam = searchTerm !== '' ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+            let url = `/sticker/get-stickers/${groupId}?page=${page}&limit=10`;
+            if (searchParam) {
+                url += searchParam;
+            }
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch stickers. Status code: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        container.innerHTML = Object.keys(data.stickers).map(identifier => {
+                            const group = data.stickers[identifier];
+                            const mainSticker = group[0];
+                            return `
+                            <div class="sticker-card" id="sticker-${identifier}">
+                                <div class="sticker-item-wrapper">
+                                    <div class="sticker-primary-card">
+                                        <div class="accordion" id="accordion-${identifier}">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="heading-${identifier}">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapse-${identifier}"
+                                                        aria-expanded="false"
+                                                        aria-controls="collapse-${identifier}"
+                                                        onclick="loadDetails('${identifier}','${groupId}')">
+
+                                                        <div class="sticker-content">
+                                                            <div class="sticker-thumbnail">
+                                                                <div class="image-wrapper">
+                                                                    <img src="${mainSticker.image_link}"
+                                                                        alt="${mainSticker.product_name}"
+                                                                        onerror="this.src='/images/no-image.png';this.onerror='';">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="sticker-info">
+                                                                <div class="sticker-header">
+                                                                    <h3 class="sticker-identifier">${identifier}</h3>
+                                                                    <span class="sticker-category desktop-only">
+                                                                        <i class="bi bi-tag-fill"></i>
+                                                                        <span>${mainSticker.category}</span>
+                                                                    </span>
+                                                                </div>
+
+                                                                <p class="sticker-name">${mainSticker.product_name}</p>
+
+                                                                <span class="sticker-category mobile-only">
+                                                                    <i class="bi bi-tag-fill"></i>
+                                                                    <span>${mainSticker.category}</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="chevron-icon">
+                                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                </h2>
+
+                                                <div id="collapse-${identifier}"
+                                                    class="accordion-collapse collapse"
+                                                    aria-labelledby="heading-${identifier}"
+                                                    data-bs-parent="#accordion-${identifier}">
+                                                    <div class="accordion-body">
+                                                        <div id="details-content-${identifier}" class="details-container">
+                                                            <div class="loading-state">
+                                                                <div class="loading-spinner"></div>
+                                                                <span>Loading product details</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        }).join('');
+                        totalPages = data.pagination.total_pages;
+                        if (searchTerm !== '') {
+                            paginationContainer.style.visibility = 'hidden';
+                        } else {
+                            paginationContainer.style.visibility = 'visible';
+                            renderPagination();
+                        }
+                    } else {
+                        container.innerHTML = '<p>No stickers available for this group.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching stickers:', error);
+                    container.innerHTML = '<p>An error occurred while loading stickers.</p>';
+                });
+        }
+
+        function loadDetails(identifier, groupId) {
+            const detailsContainer = document.getElementById(`details-content-${identifier}`);
+            detailsContainer.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+            fetch(`/sticker/get-product-details/${identifier}/${groupId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const products = data.products;
+                        products.sort((a, b) => {
+                            return a.variationSize.localeCompare(b.variationSize, undefined, { numeric: true });
+                        });
+
+                        let detailsHtml = '';
+
+                        products.forEach(product => {
+                            const fnskusByAsin = {};
+
+                            if (product.sticker_fnsku && product.sticker_fnsku.length > 0) {
+                                product.sticker_fnsku.forEach(fnsku => {
+                                    const parts = fnsku.split('_');
+                                    const asin = parts[1];
+                                    const fnskuCode = parts[2];
+                                    const returnStatus = parts.includes('return') ? 'return' : 'notreturn';
+
+                                    if (!fnskusByAsin[asin]) {
+                                        fnskusByAsin[asin] = {
+                                            return: [],
+                                            notreturn: []
+                                        };
+                                    }
+
+                                    fnskusByAsin[asin][returnStatus].push({
+                                        fullCode: fnsku,
+                                        code: fnskuCode
+                                    });
+                                });
+                            }
+
+                            detailsHtml += `
+                                <div class="product-card mb-3">
+                                    <div class="card-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="product-title mb-0">
+                                                <span class="product-id">${product.productIdentifier}</span>
+                                                <span class="product-name">${product.name}</span>
+                                            </h5>
+                                            <div class="product-badges">
+                                                <span class="size-badge">${product.variationSize}</span>
+                                                ${product.variationColor ? `<span class="color-badge" style="background-color: ${getColorBackground(product.variationColor)};">${product.variationColor}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="product-metadata">
+                                            <div class="metadata-item">
+                                                <i class="bi bi-box-seam"></i>
+                                                <span>IWASKU: ${product.iwasku}</span>
+                                            </div>
+                                            <div class="product-actions">
+                                                <a href="${product.sticker_link_eu}" target="_blank" class="action-btn eu-link">
+                                                    <i class="bi bi-globe2"></i>
+                                                    <span>EU</span>
+                                                </a>
+                                                <a href="${product.sticker_link}" target="_blank" class="action-btn iwasku-link">
+                                                    <i class="bi bi-link-45deg"></i>
+                                                    <span>IWASKU</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                `;
+
+                            if (Object.keys(fnskusByAsin).length > 0) {
+                                detailsHtml += `
+                            <div class="accordion mt-2" id="asinAccordion-${product.iwasku}">
+                        `;
+
+                                Object.keys(fnskusByAsin).forEach((asin, index) => {
+                                    const asinId = `asin-${product.iwasku}-${asin}`;
+
+                                    detailsHtml += `
+        <div class="accordion-item asin-accordion-item">
+            <h2 class="accordion-header" id="heading-asin-${asinId}">
+                <button class="accordion-button asin-accordion-button ${index > 0 ? 'collapsed' : ''}" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#${asinId}"
+                    aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="${asinId}">
+                    <div class="asin-header">
+                        <div class="asin-identifier">
+                            <i class="bi bi-box me-2"></i>
+                            <span>ASIN:</span>
+                            <span class="asin-code">${asin}</span>
+                        </div>
+                        <div class="asin-chevron">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </h2>
+            <div id="${asinId}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}"
+                data-bs-parent="#asinAccordion-${product.iwasku}">
+                <div class="accordion-body asin-content">
+                    <ul class="nav nav-tabs fnsku-tabs" id="fnskuTabs-${asinId}" role="tablist">
+    `;
+
+                                    if (fnskusByAsin[asin].notreturn.length > 0) {
+                                        detailsHtml += `
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="notreturn-tab-${asinId}" data-bs-toggle="tab"
+                    data-bs-target="#notreturn-${asinId}" type="button" role="tab"
+                    aria-controls="notreturn-${asinId}" aria-selected="true">
+                    <i class="bi bi-tag me-1"></i> Fnsku's
+                </button>
+            </li>
+        `;
+                                    }
+
+                                    if (fnskusByAsin[asin].return.length > 0) {
+                                        detailsHtml += `
+            <li class="nav-item" role="presentation">
+                <button class="nav-link ${fnskusByAsin[asin].notreturn.length === 0 ? 'active' : ''}"
+                    id="return-tab-${asinId}" data-bs-toggle="tab"
+                    data-bs-target="#return-${asinId}" type="button" role="tab"
+                    aria-controls="return-${asinId}" aria-selected="${fnskusByAsin[asin].notreturn.length === 0 ? 'true' : 'false'}">
+                    <i class="bi bi-arrow-return-left me-1"></i> Return
+                </button>
+            </li>
+        `;
+                                    }
+
+                                    detailsHtml += `
+                    </ul>
+                    <div class="tab-content mt-2" id="fnskuTabContent-${asinId}">
+    `;
+
+                                    if (fnskusByAsin[asin].notreturn.length > 0) {
+                                        detailsHtml += `
+            <div class="tab-pane fade show active" id="notreturn-${asinId}"
+                role="tabpanel" aria-labelledby="notreturn-tab-${asinId}">
+                <div class="list-group">
+        `;
+
+                                        fnskusByAsin[asin].notreturn.forEach(fnsku => {
+                                            detailsHtml += `
+                <a href="${fnsku.fullCode}" target="_blank" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-upc me-2"></i>FNSKU: ${fnsku.code}</span>
+                        <span class="badge bg-primary rounded-pill">
+                            <i class="bi bi-printer me-1"></i> Print
+                        </span>
+                    </div>
+                </a>
+            `;
+                                        });
+
+                                        detailsHtml += `
+                </div>
+            </div>
+        `;
+                                    }
+
+                                    if (fnskusByAsin[asin].return.length > 0) {
+                                        detailsHtml += `
+            <div class="tab-pane fade ${fnskusByAsin[asin].notreturn.length === 0 ? 'show active' : ''}"
+                id="return-${asinId}" role="tabpanel" aria-labelledby="return-tab-${asinId}">
+                <div class="list-group">
+        `;
+
+                                        fnskusByAsin[asin].return.forEach(fnsku => {
+                                            detailsHtml += `
+                <a href="${fnsku.fullCode}" target="_blank" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-upc me-2"></i>FNSKU: ${fnsku.code}</span>
+                        <span class="badge bg-warning rounded-pill">
+                            <i class="bi bi-printer me-1"></i> Print Return
+                        </span>
+                    </div>
+                </a>
+            `;
+                                        });
+
+                                        detailsHtml += `
+                </div>
+            </div>
+        `;
+                                    }
+
+                                    detailsHtml += `
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+                                });
+
+                                detailsHtml += `
+                            </div>
+                        `;
+                            }
+
+                            detailsHtml += `
+                        </div>
+                    </div>
+                    `;
+                        });
+
+                        detailsContainer.innerHTML = detailsHtml;
+                    } else {
+                        detailsContainer.innerHTML = '<div class="alert alert-danger">Failed to load details.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading details:', error);
+                    detailsContainer.innerHTML = '<div class="alert alert-danger">Error loading details.</div>';
+                });
+        }
+
+
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination-container');
+            paginationContainer.innerHTML = '';
+            let paginationHTML = '';
+            paginationHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, 1)" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>`;
+
+            paginationHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage - 1})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>`;
+
+            const maxVisiblePages = 5;
+            const firstVisiblePage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            const lastVisiblePage = Math.min(totalPages, firstVisiblePage + maxVisiblePages - 1);
+
+            for (let page = firstVisiblePage; page <= lastVisiblePage; page++) {
+                paginationHTML += `
+                <li class="page-item ${page === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${page})">${page}</a>
+                </li>`;
+            }
+
+            paginationHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${currentPage + 1})" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>`;
+
+            paginationHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadStickers(selectedGroupId, ${totalPages})" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>`;
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function highlightSelectedGroup(groupId) {
+            const groupLinks = document.querySelectorAll('.list-group-item');
+            groupLinks.forEach(link => {
+                if (parseInt(link.dataset.groupId) === groupId) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'true');
+                } else {
+                    link.classList.remove('active');
+                    link.removeAttribute('aria-current');
+                }
+            });
+        }
+
+        function selectGroup(groupName, groupId) {
+            localStorage.setItem('group_id', groupId);
+            document.getElementById("groupTitle").innerHTML = groupName;
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').disabled = false;
+            document.getElementById('newStickerForm').classList.add('d-none');
+            document.getElementById('newStickerProductForm').classList.add('d-none');
+            document.getElementById('stickerList').classList.remove('d-none');
+            loadStickers(groupId, 1, searchTerm);
+        }
+        function getColorBackground(colorName) {
+            const colorMap = {
+                'black': '#000000',
+                'white': '#ffffff',
+                'red': '#dc2626',
+                'blue': '#2563eb',
+                'green': '#16a34a',
+                'yellow': '#eab308',
+                'purple': '#9333ea',
+                'pink': '#ec4899',
+                'orange': '#ea580c',
+                'gray': '#6b7280',
+                'brown': '#92400e',
+                'navy': '#1e3a8a',
+                'teal': '#0d9488',
+                'silver': '#94a3b8',
+                'gold': '#b45309',
+                'beige': '#d4c19e',
+                'cream': '#fef3c7',
+                'tan': '#d2b48c',
+                'coral': '#f87171',
+                'maroon': '#7f1d1d',
+                'mint': '#a7f3d0',
+                'olive': '#84cc16',
+                'wine': '#7f1d1d',
+                'khaki': '#d4cb92'
+            };
+            const defaultColor = 'var(--text-secondary)';
+            const color = colorName.toLowerCase();
+
+            if (colorMap[color]) return colorMap[color];
+
+            for (const [key, value] of Object.entries(colorMap)) {
+                if (color.includes(key)) return value;
+            }
+
+            return defaultColor;
+        }
+    </script>
     <style>
         :root {
             --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
-            --background-color: #f8fafc;
-            --card-bg: #ffffff;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
+            --text-tertiary: #94a3b8;
             --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
+            --card-bg: #ffffff;
+            --hover-bg: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --transition: all 0.2s ease;
         }
 
-        body {
-            background-color: var(--background-color);
-            font-family: 'Inter', system-ui, sans-serif;
-            color: var(--text-primary);
-            line-height: 1.5;
-        }
-
-        .header-section {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            color: white;
-            padding: 1rem 0;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-md);
-        }
-
-        .header-section h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .search-container {
-            background-color: var(--card-bg);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-        }
-
-        .form-control, .form-select, .btn {
-            border-radius: var(--radius-sm);
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
-            border-color: var(--accent-color);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            border: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .product-card {
-            background-color: var(--card-bg);
+        /* Sticker Card Design */
+        .sticker-card {
             margin-bottom: 1.25rem;
-            overflow: hidden;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            height: auto;
-            max-height: 160px;
         }
 
-        .product-card.expanded {
-            max-height: none;
-            box-shadow: var(--shadow-lg);
+        .sticker-item-wrapper {
+            position: relative;
+            transition: var(--transition);
         }
 
-        .product-card:hover {
+        .sticker-primary-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .sticker-item-wrapper:hover .sticker-primary-card {
+            box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
         }
 
-        .product-main-image {
-            cursor: pointer;
-            height: 160px;
-            width: 160px;
+        /* Accordion Styling */
+        .accordion-item {
+            border: none;
+        }
+
+        .accordion-button {
+            padding: 0;
+            background: transparent;
+            box-shadow: none !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .accordion-button:not(.collapsed) {
+            color: var(--text-primary);
+            background-color: var(--card-bg);
+        }
+
+        .accordion-button:focus {
+            border-color: transparent;
+            outline: 0;
+            box-shadow: none;
+        }
+
+        .accordion-button::after {
+            display: none;
+        }
+
+        .accordion-body {
+            padding: 0;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Sticker Content Layout */
+        .sticker-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 1.25rem;
+            position: relative;
+        }
+
+        /* Image Container */
+        .sticker-thumbnail {
+            flex-shrink: 0;
+            margin-right: 1.25rem;
+        }
+
+        .image-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: var(--radius-sm);
+            transition: transform 0.5s ease;
+        }
+
+        .sticker-item-wrapper:hover .image-wrapper img {
+            transform: scale(1.08);
+        }
+
+        /* Sticker Information */
+        .sticker-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sticker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .sticker-identifier {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin: 0;
+            line-height: 1.5;
+            position: relative;
+            display: inline-block;
+        }
+
+        .sticker-identifier::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .sticker-item-wrapper:hover .sticker-identifier::after {
+            width: 100%;
+        }
+
+        .sticker-name {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: var(--transition);
+            max-width: calc(100% - 30px);
+        }
+
+        .sticker-item-wrapper:hover .sticker-name {
+            color: var(--text-primary);
+        }
+
+        /* Category Styling */
+        .sticker-category {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            background-color: rgba(37, 99, 235, 0.08);
+            color: var(--primary-color);
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .sticker-category i {
+            font-size: 0.7rem;
+            margin-right: 0.35rem;
+        }
+
+        .sticker-item-wrapper:hover .sticker-category {
+            background-color: rgba(37, 99, 235, 0.12);
+        }
+
+        .desktop-only {
+            display: none;
+        }
+
+        .mobile-only {
+            display: inline-flex;
+            margin-top: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .desktop-only {
+                display: inline-flex;
+            }
+
+            .mobile-only {
+                display: none;
+            }
+        }
+
+        /* Chevron Icon */
+        .chevron-icon {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            margin-left: 1rem;
+            border-radius: 50%;
+            background-color: rgba(100, 116, 139, 0.1);
+            color: var(--text-tertiary);
+            transition: var(--transition);
+        }
+
+        .sticker-item-wrapper:hover .chevron-icon {
+            background-color: rgba(100, 116, 139, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .accordion-button:not(.collapsed) .chevron-icon {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .accordion-button:not(.collapsed) .chevron-icon svg {
+            transform: rotate(180deg);
+        }
+
+        .chevron-icon svg {
+            width: 20px;
+            height: 20px;
             transition: transform 0.3s ease;
         }
 
-        .product-main-image:hover {
-            transform: scale(1.05);
+        /* Details Container */
+        .details-container {
+            padding: 1.5rem;
         }
 
-        .card-body {
-            padding: 1rem;
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            color: var(--primary-color);
+            gap: 1rem;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spinner 0.8s linear infinite;
+        }
+
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 576px) {
+            .image-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+
+            .sticker-content {
+                padding: 1rem;
+            }
+
+            .sticker-thumbnail {
+                margin-right: 1rem;
+            }
+
+            .chevron-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .chevron-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .sticker-identifier {
+                font-size: 1rem;
+            }
+
+            .sticker-name {
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Product Details Styling */
+        .card {
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
         }
 
         .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
             color: var(--text-primary);
-            line-height: 1.3;
+            font-weight: 600;
         }
 
-        .product-info {
+        .card-text {
             color: var(--text-secondary);
-            font-size: 0.9rem;
         }
 
-        .product-info b {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .product-gallery {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem;
-            padding: 0.5rem;
-        }
-
-        .product-gallery img {
-            width: 45px;
-            height: 45px;
-            object-fit: cover;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s ease;
-        }
-
-        .product-gallery img:hover {
-            transform: scale(1.1);
-            border-color: var(--accent-color);
-        }
-
-        .sku {
-            cursor: pointer;
+        .btn-outline-primary {
+            border-color: var(--primary-color);
             color: var(--primary-color);
-            font-weight: 500;
-            transition: all 0.2s ease;
-            margin-right: 0.25rem;
         }
 
-        .sku:hover {
-            color: var(--secondary-color);
-            text-decoration: underline;
-        }
-
-        .pagination {
-            margin-top: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .page-link {
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 0.5rem 0.75rem;
-            min-width: 2.25rem;
-            text-align: center;
-        }
-
-        .page-item.active .page-link {
+        .btn-outline-primary:hover {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
 
-        .page-link:hover {
-            background-color: var(--accent-color);
-            color: white;
+        .btn-outline-secondary {
+            border-color: var(--text-tertiary);
+            color: var(--text-tertiary);
         }
 
-        .page-item.disabled .page-link {
-            color: var(--text-secondary);
-            opacity: 0.6;
+        .btn-outline-secondary:hover {
+            background-color: var(--text-tertiary);
+            border-color: var(--text-tertiary);
         }
 
-        .copy-notification {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background: linear-gradient(135deg, #10b981, #047857);
-            color: white;
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-md);
-            z-index: 1000;
+        /* List Group Styling */
+        .list-group-item {
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .list-group-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .list-group-item-action:focus, .list-group-item-action:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Badge Styling */
+        .badge {
             font-weight: 500;
-            opacity: 0;
+            padding: 0.35em 0.65em;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: var(--warning) !important;
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            border-bottom-color: var(--border-color);
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-tertiary);
+            border: none;
+            padding: 0.5rem 1rem;
+            transition: var(--transition);
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--text-secondary);
+            border-color: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: transparent;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .product-card {
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: var(--transition);
+            background-color: var(--card-bg);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .card-header {
+            background-color: rgba(241, 245, 249, 0.5);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
+        }
+
+        .card-content {
+            padding: 1.25rem;
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .product-specs {
+        .product-id {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .product-badges {
             display: flex;
+            gap: 0.5rem;
+        }
+
+        .size-badge, .color-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .size-badge {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .color-badge {
+            color: #fff;
+            text-shadow: 0 0 1px rgba(0,0,0,0.5);
+        }
+
+        .product-metadata {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
             gap: 0.75rem;
-            margin-top: 0.5rem;
         }
 
-        .spec-badge {
-            background-color: #f1f5f9;
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             color: var(--text-secondary);
-            padding: 0.25rem 0.75rem;
-            border-radius: 1.5rem;
-            font-size: 0.8rem;
-            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--text-tertiary);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.35rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid transparent;
         }
 
-        .spec-badge i {
-            color: var(--accent-color);
-            font-size: 0.75rem;
+        .eu-link {
+            background-color: rgba(37, 99, 235, 0.08);
+            color: var(--primary-color);
+            border-color: rgba(37, 99, 235, 0.2);
         }
 
-        @media (max-width: 768px) {
-            .product-card {
-                max-height: none;
+        .eu-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .iwasku-link {
+            background-color: rgba(100, 116, 139, 0.08);
+            color: var(--text-secondary);
+            border-color: rgba(100, 116, 139, 0.2);
+        }
+
+        .iwasku-link:hover {
+            background-color: var(--text-secondary);
+            color: white;
+        }
+
+        @media (max-width: 576px) {
+            .product-metadata {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
             }
 
-            .product-main-image {
-                height: 120px;
-                width: 120px;
+            .product-actions {
+                width: 100%;
             }
+
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+        /* ASIN Accordion Styling */
+        .asin-accordion-item {
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            background-color: var(--card-bg);
+            transition: var(--transition);
+        }
+
+        .asin-accordion-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .asin-accordion-item:hover {
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .asin-accordion-button {
+            padding: 0.75rem 1rem;
+            background-color: var(--card-bg);
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .asin-accordion-button:focus {
+            box-shadow: none;
+            z-index: 1;
+        }
+
+        .asin-accordion-button:not(.collapsed) {
+            color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+            box-shadow: none;
+        }
+
+        .asin-header {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asin-identifier {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .asin-code {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-left: 0.4rem;
+        }
+
+        .asin-chevron {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-button:not(.collapsed) .asin-chevron {
+            transform: rotate(180deg);
+            color: var(--primary-color);
+        }
+
+        .asin-content {
+            padding: 0.75rem 1rem;
+            background-color: rgba(241, 245, 249, 0.3);
+        }
+
+        /* FNSKU Tabs Styling */
+        .fnsku-tabs {
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+            position: relative;
+        }
+
+        .fnsku-tabs .nav-item {
+            margin-right: 0.25rem;
+            position: relative;
+        }
+
+        .fnsku-tabs .nav-link {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.875rem;
+            color: var(--text-secondary);
+            border: none;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            transition: var(--transition);
+            position: relative;
+            background-color: transparent;
+        }
+
+        .fnsku-tabs .nav-link:hover {
+            color: var(--primary-hover);
+            background-color: rgba(241, 245, 249, 0.8);
+        }
+
+        .fnsku-tabs .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 500;
+            background-color: transparent;
+        }
+
+        .fnsku-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        }
+
+        /* Tab Content */
+        .tab-content > .tab-pane {
+            padding-top: 1rem;
+        }
+
+        /* FNSKU List Group */
+        .list-group {
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .list-group-item:first-child {
+            border-top-left-radius: var(--radius-md);
+            border-top-right-radius: var(--radius-md);
+        }
+
+        .list-group-item:last-child {
+            border-bottom-left-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+        }
+
+        .list-group-item-action {
+            color: var(--text-secondary);
+        }
+
+        .list-group-item-action:hover {
+            color: var(--text-primary);
+            background-color: var(--hover-bg);
+            transform: translateY(-1px);
+        }
+
+        .list-group-item .badge {
+            transition: var(--transition);
+        }
+
+        .list-group-item-action:hover .badge.bg-primary {
+            background-color: var(--primary-hover) !important;
+        }
+
+        .list-group-item-action:hover .badge.bg-warning {
+            background-color: #f59e0b !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .asin-identifier {
+                font-size: 0.875rem;
+            }
+
+            .asin-accordion-button {
+                padding: 0.625rem 0.875rem;
+            }
+
+            .asin-content {
+                padding: 0.625rem 0.875rem;
+            }
+
+            .fnsku-tabs .nav-link {
+                padding: 0.375rem 0.625rem;
+                font-size: 0.8125rem;
+            }
+        }
+        .new-sticker-section {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bg-gradient-primary-light {
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1));
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .sticker-form .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .sticker-form .input-group-text {
+            color: var(--text-secondary);
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .sticker-form .form-control,
+        .sticker-form .form-select {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .sticker-form .form-control:focus,
+        .sticker-form .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.15);
+        }
+
+        .sticker-form .form-control:focus + .input-group-text,
+        .sticker-form .form-select:focus + .input-group-text {
+            border-color: var(--primary-color);
+        }
+
+        .sticker-form .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .sticker-form .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .sticker-form small.text-muted {
+            font-size: 0.85rem;
+        }
+
+        .new-sticker-section,
+        .new-sticker-group-section {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bg-gradient-primary-light {
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1));
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .card:hover {
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .sticker-form .form-label,
+        .sticker-group-form .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .sticker-form .input-group-text,
+        .sticker-group-form .input-group-text {
+            color: var(--text-secondary);
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .sticker-form .form-control,
+        .sticker-form .form-select,
+        .sticker-group-form .form-control {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .sticker-form .form-control:focus,
+        .sticker-form .form-select:focus,
+        .sticker-group-form .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.15);
+        }
+
+        .sticker-form .form-control:focus + .input-group-text,
+        .sticker-form .form-select:focus + .input-group-text,
+        .sticker-group-form .form-control:focus + .input-group-text {
+            border-color: var(--primary-color);
+        }
+
+        .sticker-form .btn-primary,
+        .sticker-group-form .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .sticker-form .btn-primary:hover,
+        .sticker-group-form .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .sticker-form small.text-muted,
+        .sticker-group-form small.text-muted {
+            font-size: 0.85rem;
         }
     </style>
-</head>
-<body>
-<!-- Header Section -->
-<div class="header-section">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <h1><i class="fas fa-cubes me-2"></i>IWAPIM Ürün Kataloğu</h1>
-            <div class="d-none d-md-block">
-                <span><i class="fas fa-th-list me-1"></i> {{ products|length }} / {{ totalProducts ?? 'Tüm' }} ürün gösteriliyor</span>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="container">
-    <!-- Search and Filters -->
-    <div class="search-container">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" id="search-box" class="form-control" placeholder="Ürün ile ilgili herhangi bir bilgi girerek arayın...">
-                    <button type="button" id="search-button" class="btn btn-primary">Ara</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/catalog'">Sıfırla</button>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                    <select class="form-select" id="category-select">
-                        <option value="all" selected>Tüm Ürün Tipleri</option>
-                        {% for type in productTypes %}
-                            <option value="{{ type }}">{{ type }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-list-ol"></i></span>
-                    <select class="form-select" id="page-size-select">
-                        <option value="5">5 Ürün</option>
-                        <option value="10">10 Ürün</option>
-                        <option value="20">20 Ürün</option>
-                        <option value="50">50 Ürün</option>
-                        <option value="100">100 Ürün</option>
-                        <option value="200">200 Ürün</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Product catalog container -->
-    <div id="catalog-container">
-        {% for product in products %}
-            <div class="product-card">
-                <div class="row g-0">
-                    <div class="col-auto p-2">
-                        <img src="{{ product.image }}" class="product-main-image" alt="Product Image">
-                    </div>
-                    <div class="col">
-                        <div class="card-body product-info">
-                            <h5 class="card-title">{{ product.productIdentifier }} {{ product.name }}</h5>
-
-                            <div class="product-specs">
-                                {% if product.variationSizeList %}
-                                    <span class="spec-badge"><i class="fas fa-ruler"></i> {{ product.variationSizeList }}</span>
-                                {% endif %}
-
-                                {% if product.variationColorList %}
-                                    <span class="spec-badge"><i class="fas fa-palette"></i> {{ product.variationColorList }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="mt-2">
-                                <div class="d-flex align-items-center">
-                                    <small class="text-muted me-2"><i class="fas fa-barcode"></i> IWASKU:</small>
-                                    <div>
-                                        {% for item in product.iwaskuList %}
-                                            <span class="sku" data-iwasku="{{ item.iwasku }}" data-bs-toggle="tooltip" title="{{ item.tooltip }}">
-                                                    {{ item.iwasku }}
-                                                </span>
-                                            {% if not loop.last %}<span class="text-muted">|</span>{% endif %}
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-auto d-none d-md-block border-start">
-                        <div class="product-gallery">
-                            {% for image in product.album %}
-                                {{ image|raw }}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-
-    <!-- Pagination -->
-    <div class="d-flex justify-content-center">
-        <nav aria-label="Product pagination">
-            <ul class="pagination">
-                <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                    <a class="page-link" href="/catalog/{{ query }}/{{ category }}/0/{{ pageSize }}" aria-label="First page">
-                        <i class="fas fa-angle-double-left"></i>
-                    </a>
-                </li>
-
-                <li class="page-item {% if page == 0 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page > 0 %}/catalog/{{ query }}/{{ category }}/{{ page - 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Previous page">
-                        <i class="fas fa-angle-left"></i>
-                    </a>
-                </li>
-
-                {% set start = max(page - 2, 0) %}
-                {% set end = min(page + 2, pageCount - 1) %}
-
-                {% if end - start < 4 %}
-                    {% if start == 0 %}
-                        {% set end = min(4, pageCount - 1) %}
-                    {% else %}
-                        {% set start = max(pageCount - 5, 0) %}
-                    {% endif %}
-                {% endif %}
-
-                {% for i in start..end %}
-                    <li class="page-item {% if i == page %}active{% endif %}">
-                        <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ i }}/{{ pageSize }}">{{ i + 1 }}</a>
-                    </li>
-                {% endfor %}
-
-                <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page < pageCount - 1 %}/catalog/{{ query }}/{{ category }}/{{ page + 1 }}/{{ pageSize }}{% else %}#{% endif %}" aria-label="Next page">
-                        <i class="fas fa-angle-right"></i>
-                    </a>
-                </li>
-
-                <li class="page-item {% if page == pageCount - 1 %}disabled{% endif %}">
-                    <a class="page-link" href="/catalog/{{ query }}/{{ category }}/{{ pageCount - 1 }}/{{ pageSize }}" aria-label="Last page">
-                        <i class="fas fa-angle-double-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        let currentQuery = '{{ query|e('js') }}';
-        let currentCategory = '{{ category|e('js') }}';
-
-        if (currentQuery !== 'all') {
-            $('#search-box').val(currentQuery);
-        }
-        if (currentCategory !== 'all') {
-            $('#category-select').val(currentCategory);
-        }
-        $('#page-size-select').val('{{ pageSize }}');
-
-        $('#page-size-select').on('change', function() {
-            let selectedPageSize = $(this).val();
-            window.location.href = `/catalog/${currentQuery}/${currentCategory}/0/${selectedPageSize}`;
-        });
-
-        $('#search-button').on('click', function() {
-            let searchQuery = $('#search-box').val().trim();
-            window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
-        });
-
-        $('#search-box').on('keypress', function(event) {
-            if (event.key === 'Enter') {
-                let searchQuery = $(this).val().trim();
-                window.location.href = `/catalog/${searchQuery === '' ? 'all' : searchQuery}/${currentCategory}/0/{{ pageSize }}`;
-            }
-        });
-
-        $('#category-select').on('change', function() {
-            let selectedCategory = $(this).val();
-            window.location.href = `/catalog/${currentQuery}/${selectedCategory}/0/{{ pageSize }}`;
-        });
-
-        $(document).on('click', '.sku', function() {
-            let iwasku = $(this).data('iwasku');
-
-            navigator.clipboard.writeText(iwasku).then(() => {
-                showCopyNotification(iwasku);
-            }).catch(err => {
-                console.error("Failed to copy: ", err);
-            });
-        });
-
-        function showCopyNotification(iwasku) {
-            let notification = $('<div class="copy-notification"><i class="fas fa-check-circle"></i> Kopyalandı: ' + iwasku + '</div>');
-            $('body').append(notification);
-            notification.animate({ opacity: 1 }, 300);
-
-            setTimeout(() => {
-                notification.fadeOut(500, function() {
-                    $(this).remove();
-                });
-            }, 2000);
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-
-        // Expand/collapse product cards on image click
-        document.querySelectorAll('.product-main-image').forEach(function(image) {
-            image.addEventListener('click', function() {
-                const card = this.closest('.product-card');
-                card.classList.toggle('expanded');
-            });
-        });
-    });
-</script>
-
-</body>
-</html>
+{% endblock %}
