@@ -116,7 +116,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     {
         try {
             $sqlLastUpdatedAt = "
-                SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.poDate')), '%Y-%m-%d')) as lastUpdatedAt
+                SELECT MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.poDate')), '%Y-%m-%d')) AS lastUpdatedAt
                 FROM iwa_marketplace_orders
                 WHERE marketplace_id = :marketplace_id;";
             $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
