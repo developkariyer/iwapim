@@ -116,21 +116,23 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     {
         try {
             $sqlLastUpdatedAt = "
-                SELECT 
-                    COALESCE(
-                        DATE_FORMAT(
-                            STR_TO_DATE(
-                                JSON_UNQUOTE(JSON_EXTRACT(json, '$.poDate')), 
-                                '%Y-%m-%d'
-                            ), 
-                            '%Y-%m-%dT00:00:00Z'
+                    SELECT DATE_FORMAT(
+                        GREATEST(
+                            IFNULL(
+                                MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.poDate')), '%Y-%m-%d')),
+                                STR_TO_DATE(:default_date, '%Y-%m-%dT%H:%i:%sZ')
+                            ),
+                            STR_TO_DATE(:default_date, '%Y-%m-%dT%H:%i:%sZ')
                         ),
-                        '2024-05-01T00:00:00Z'
+                        '%Y-%m-%dT00:00:00Z'
                     ) AS lastUpdatedAt
-                FROM iwa_marketplace_orders
-                WHERE marketplace_id = :marketplace_id;";
+                    FROM iwa_marketplace_orders
+                    WHERE marketplace_id = :marketplace_id;
+                ";
+
             $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
-                'marketplace_id' => $this->marketplace->getId()
+                'marketplace_id' => $this->marketplace->getId(),
+                'default_date' => '2024-05-01T00:00:00Z'
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
         } catch (\Exception $e) {
