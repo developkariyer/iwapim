@@ -64,7 +64,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        /*echo "Downloading Wayfair...\n";
+        echo "Downloading Wayfair...\n";
         $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
@@ -102,7 +102,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getStatusCode());
-        print_r($response->getContent());*/
+        print_r($response->getContent());
     }
 
     /**
