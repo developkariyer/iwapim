@@ -140,9 +140,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         echo "Last update: " . $lastUpdatedAt . '\n';
 
-       /* $this->prepareToken();
+        $this->prepareToken();
         $db = Db::get();
-        $fromDate = "2024-05-01T00:00:00Z";
         $limit = 200;
         do {
             $query = <<<GRAPHQL
@@ -150,7 +149,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 getDropshipPurchaseOrders(
                     limit: $limit,
                     sortOrder: ASC,
-                    fromDate: "$fromDate"
+                    fromDate: "$lastUpdatedAt"
                 ) {
                     poNumber,
                     poDate,
@@ -215,10 +214,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 $db->rollBack();
                 echo "Error: " . $e->getMessage() . "\n";
             }
-            echo "From date: $fromDate\n";
+            echo "From date: $lastUpdatedAt\n";
             echo "Orders downloaded: $ordersCount\n";
-            $fromDate = $lastDate;
-        }while($ordersCount === $limit);*/
+            $lastUpdatedAt = $lastDate;
+        }while($ordersCount === $limit);
     }
 
     public function downloadReturns(): void
