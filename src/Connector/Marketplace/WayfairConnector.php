@@ -64,7 +64,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        echo "Downloading Wayfair...\n";
+        /*echo "Downloading Wayfair...\n";
         $this->prepareToken();
         echo "Token is valid. Proceeding with download...\n";
         $query = <<<GRAPHQL
@@ -102,7 +102,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ]
         ]);
         print_r($response->getStatusCode());
-        print_r($response->getContent());
+        print_r($response->getContent());*/
     }
 
     /**
@@ -114,7 +114,22 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        $this->prepareToken();
+        try {
+            $sqlLastUpdatedAt = "
+                SELECT COALESCE(DATE_FORMAT(MAX(json_extract(json, '$.poDate')), '%Y-%m-%d')) as lastUpdatedAt
+                FROM iwa_marketplace_orders
+                WHERE marketplace_id = :marketplace_id;";
+            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
+                'marketplace_id' => $this->marketplace->getId()
+            ]);
+            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+        }
+        echo "Last update: " . $lastUpdatedAt . '\n';
+
+
+       /* $this->prepareToken();
         $db = Db::get();
         $fromDate = "2024-05-01T00:00:00Z";
         $limit = 200;
@@ -192,7 +207,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             echo "From date: $fromDate\n";
             echo "Orders downloaded: $ordersCount\n";
             $fromDate = $lastDate;
-        }while($ordersCount === $limit);
+        }while($ordersCount === $limit);*/
     }
 
     public function downloadReturns(): void
