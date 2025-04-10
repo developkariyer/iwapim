@@ -138,7 +138,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
         }
-        echo "Last update: " . $lastUpdatedAt . '\n';
+        echo "Last update: " . $lastUpdatedAt . "\n";
 
         $this->prepareToken();
         $db = Db::get();
