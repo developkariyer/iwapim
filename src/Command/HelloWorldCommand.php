@@ -28,9 +28,11 @@ class HelloWorldCommand extends AbstractCommand
         $variants = VariantProduct::findByField('id', 266418);
         $variant = $variants[0];
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
-        print_r($json);
-        foreach ($json['extra']['items']['images'] ?? [] as $image) {
-            echo $image['url'] . "\n";
+
+        foreach ($json['extra']['items'] ?? [] as $items) {
+            foreach ($items['images'] as $image) {
+                echo $image['url'] . "\n";
+            }
         }
 
        /* if ($product instanceof Product) {
