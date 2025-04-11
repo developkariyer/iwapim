@@ -220,10 +220,10 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         if (!empty($attributes)) {
             foreach ($attributes as $attribute) {
                 if ($attribute['attributeName'] === 'Renk') {
-                    $result .= $attribute['attributeValue'] . "_";
+                    $result .= $attribute['attributeValue'] . " ";
                 }
                 if ($attribute['attributeName'] === 'Beden') {
-                    $result .= $attribute['attributeValue'] . "_";
+                    $result .= $attribute['attributeValue'] . " ";
                 }
             }
         }
