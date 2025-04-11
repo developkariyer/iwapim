@@ -32,7 +32,7 @@ class HelloWorldCommand extends AbstractCommand
             $image = preg_replace('#(https?://)/*#', '$1', $image);
             $image = preg_replace('#([^:])//+#', '$1/', $image);
             $image = str_replace(' ', '', $image);
-            print_r($image);
+            echo $image . "\n";
         }
 
        /* if ($product instanceof Product) {
