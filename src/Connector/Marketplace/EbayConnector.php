@@ -223,8 +223,8 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
         //$this->getItemXml();
 
-        //$this->refreshToAccessToken();
-        //$this->fetchItemAspects("EBAY_US");
+        $this->refreshToAccessToken();
+        $this->fetchItemAspects("EBAY_US");
 
 
         // control expiresIn
