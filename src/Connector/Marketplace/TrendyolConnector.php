@@ -214,17 +214,20 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         echo "Orders downloaded\n";
     }
 
-    private function getAttributes($listing): string
+    private function getAttributes($attributes): string
     {
-        if (!empty($listing['attributes'])) {
-            $values = array_filter(array_map(function($value) {
-                return str_replace(' ', '', $value);
-            }, array_column($listing['attributes'], 'attributeValue')));
-            if (!empty($values)) {
-                return implode('-', $values);
+        $result = "";
+        if (!empty($attributes)) {
+            foreach ($attributes as $attribute) {
+                if ($attribute['attributeName'] === 'Renk') {
+                    $result .= $attribute['attributeValue'] . "_";
+                }
+                if ($attribute['attributeName'] === 'Beden') {
+                    $result .= $attribute['attributeValue'] . "_";
+                }
             }
         }
-        return '';
+        return $result;
     }
 
     private function getPublished($listing): bool
@@ -264,7 +267,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'salePrice' => $listing['salePrice'] ?? 0,
                     'saleCurrency' => $this->marketplace->getCurrency(),
                     'title' => $listing['title'] ?? '',
-                    'attributes' => $this->getAttributes($listing),
+                    'attributes' => $this->getAttributes($listing['attributes']),
                     'quantity' => $listing['quantity'] ?? 0,
                     'uniqueMarketplaceId' => $listing['id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
