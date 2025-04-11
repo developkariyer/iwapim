@@ -265,6 +265,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                     'saleCurrency' => $this->marketplace->getCurrency(),
                     'title' => $listing['title'] ?? '',
                     'attributes' => $this->getAttributes($listing),
+                    'quantity' => $listing['quantity'] ?? 0,
                     'uniqueMarketplaceId' => $listing['id'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $this->getPublished($listing),
