@@ -167,7 +167,7 @@ class CacheImagesCommand extends AbstractCommand
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
         $image = $json['image_url'];
-        $listingImageList[] = static::processImage($image, static::$hepsiburadaFolder,"Takealot_" . basename($image));
+        $listingImageList[] = static::processImage($image, static::$takealotFolder,"Takealot_" . basename($image));
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()} ";
