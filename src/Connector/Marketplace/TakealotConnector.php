@@ -168,6 +168,7 @@ class TakealotConnector extends MarketplaceConnectorAbstract
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['status'] === 'Buyable',
                     'sku' => $listing['sku'] ?? '',
+                    'ean' => $listing['barcode'] ?? ''
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
