@@ -29,8 +29,6 @@ class HelloWorldCommand extends AbstractCommand
         $variant = $variants[0];
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         foreach ($json['attributes']['images'] ?? [] as $image) {
-            $image = preg_replace('#(https?://)/*#', '$1', $image);
-            $image = preg_replace('#([^:])//+#', '$1/', $image);
             $image = str_replace(' ', '', $image);
             echo $image . "\n";
         }
