@@ -150,6 +150,7 @@ class VariantProduct extends Concrete
         $this->setTitle($variant['title'] ?? '');
         $this->setAttributes($variant['attributes'] ?? '');
         $this->setEan($variant['ean'] ?? '');
+        $this->setSellerSku($variant['sku'] ?? '');
         $this->setQuantity($variant['quantity'] ?? 0);
         $this->setUniqueMarketplaceId($variant['uniqueMarketplaceId'] ?? '');
         $this->setMarketplace($marketplace);
