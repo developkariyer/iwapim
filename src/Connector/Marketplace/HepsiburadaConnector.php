@@ -167,10 +167,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     'saleCurrency' => $this->marketplace->getCurrency(),
                     'title' =>  $listing['attributes']['productName']  ?? '',
                     'attributes' => $this->getAttributes($listing['attributes']['variantTypeAttributes']) ?? '',
+                    'quantity' => $listing['availableStock'] ?? 0,
                     'uniqueMarketplaceId' => $listing['hepsiburadaSku'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['isSalable'],
-                    'sku' => $listing['merchantSku'] ?? '',
+                    'sku' => $listing['merchantSku'] ?? ''
                 ],
                 importFlag: $importFlag,
                 updateFlag: $updateFlag,
