@@ -116,9 +116,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 variant: [
                     'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
                     'urlLink' =>  $this->getUrlLink($listing['link']) ?? '',
-                    'salePrice' => $listing['listPrice'] ?? 0,
+                    'salePrice' => $listing['salesPrice'] ?? 0,
                     'saleCurrency' =>  $this->marketplace->getCurrency(),
                     'title' => $listing['productName'] ?? '',
+                    'quantity' => $listing['stockQuantity'] ?? 0,
                     'attributes' => $listing['variantName']  ?? '',
                     'uniqueMarketplaceId' =>  $listing['productCode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
