@@ -25,8 +25,9 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $product = Product::findByField('iwasku', 'CA03300XW85K');
-        $product->checkStickerFnsku();
+        $variant = VariantProduct::findByField('id', 266586);
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        print_r($json);
 
        /* if ($product instanceof Product) {
             echo "Finded\n" ;
