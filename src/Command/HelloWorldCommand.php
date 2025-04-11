@@ -25,25 +25,6 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $variants = VariantProduct::findByField('id', 275462);
-        $variant = $variants[0];
-        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
-
-        foreach ($json['images'] ?? [] as $image) {
-                echo $image . "\n";
-        }
-
-       /* if ($product instanceof Product) {
-            echo "Finded\n" ;
-            $variantProducts =  $product->getListingItems();
-            foreach ($variantProducts as $variantProduct) {
-                if ($variantProduct instanceof VariantProduct) {
-                    if ($variantProduct->getFnsku() !== null) {
-                        echo $variantProduct->getFnsku() . "\n";
-                    }
-                }
-            }
-        }*/
         return Command::SUCCESS;
     }
 }
