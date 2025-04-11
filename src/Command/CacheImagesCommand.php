@@ -34,6 +34,7 @@ class CacheImagesCommand extends AbstractCommand
     static ?Folder $hepsiburadaFolder;
     static ?Folder $wallmartFolder;
     static ?Folder $ciceksepetiFolder;
+    static ?Folder $takealotFolder;
 
     protected function configure(): void
     {
@@ -46,6 +47,7 @@ class CacheImagesCommand extends AbstractCommand
             ->addOption('hepsiburada', null, InputOption::VALUE_NONE, 'If set, Hepsiburada objects will be processed.')
             ->addOption('wallmart', null, InputOption::VALUE_NONE, 'If set, Wallmart objects will be processed.')
             ->addOption('ciceksepeti', null, InputOption::VALUE_NONE, 'If set, Ciceksepeti objects will be processed.')
+            ->addOption('takealot', null, InputOption::VALUE_NONE, 'If set, Takealot objects will be processed.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
@@ -63,6 +65,7 @@ class CacheImagesCommand extends AbstractCommand
         static::$hepsiburadaFolder = Utility::checkSetAssetPath('Hepsiburada', static::$cacheFolder);
         static::$wallmartFolder = Utility::checkSetAssetPath('Wallmart', static::$cacheFolder);
         static::$ciceksepetiFolder = Utility::checkSetAssetPath('Ciceksepeti', static::$cacheFolder);
+        static::$takealotFolder = Utility::checkSetAssetPath('Takealot', static::$cacheFolder);
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
@@ -87,7 +90,7 @@ class CacheImagesCommand extends AbstractCommand
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
                     continue;
                 }
-                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada', 'Wallmart', 'Ciceksepeti'])) {
+                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada', 'Wallmart', 'Ciceksepeti', 'Takealot'])) {
                     echo " $variantType ";
                 } else {
                     continue;
@@ -116,6 +119,9 @@ class CacheImagesCommand extends AbstractCommand
                         break;
                     case 'Ciceksepeti':
                         if ($input->getOption('ciceksepeti') || $input->getOption('all')) self::processCiceksepeti($variant);
+                        break;
+                    case 'Takealot':
+                        if ($input->getOption('takealot') || $input->getOption('all')) self::processTakealot($variant);
                         break;
                     default:
                         break;
@@ -154,6 +160,18 @@ class CacheImagesCommand extends AbstractCommand
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()} ";
+    }
+
+    protected static function processTakealot(VariantProduct $variant): void
+    {
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $listingImageList = [];
+        $image = $json['image_url'];
+        $listingImageList[] = static::processImage($image, static::$hepsiburadaFolder,"Takealot_" . basename($image));
+        $listingImageList = array_unique($listingImageList);
+        $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
+
     }
 
     protected static function processCiceksepeti(VariantProduct $variant): void
