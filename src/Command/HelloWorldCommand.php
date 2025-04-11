@@ -25,7 +25,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $variants = VariantProduct::findByField('id', 266586);
+        $variants = VariantProduct::findByField('id', 266418);
         $variant = $variants[0];
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         foreach ($json['extra']['items']['images'] ?? [] as $image) {
