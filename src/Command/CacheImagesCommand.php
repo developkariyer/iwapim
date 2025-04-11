@@ -171,7 +171,6 @@ class CacheImagesCommand extends AbstractCommand
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
         echo "{$variant->getId()} ";
-
     }
 
     protected static function processCiceksepeti(VariantProduct $variant): void
