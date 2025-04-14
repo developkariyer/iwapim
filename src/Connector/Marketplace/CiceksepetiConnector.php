@@ -289,8 +289,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name, parent_id)
                     VALUES (:id, :category_name, :parent_id)
                     ON DUPLICATE KEY UPDATE
-                        category_name = VALUES(category_name),
-                        parent_id = VALUES(parent_id)";
+                       category_name = VALUES(category_name),
+                       parent_id = VALUES(parent_id)";
             Utility::executeSql($sql, ['id' => $id, 'category_name' => $currentPath, 'parent_id' => $parentCategoryId]);
 
             if (!empty($category['subCategories'])) {
@@ -301,11 +301,28 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function getCategoryAttributes($categoryId): void
     {
+        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, attribute_name, is_required, type)
+                         VALUES (:id, :attribute_name, :is_required, :type)
+                         ON DUPLICATE KEY UPDATE
+                            attribute_name = VALUES(attribute_name),
+                            is_required = VALUES(is_required),
+                            type = VALUES(type)";
+        $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (id, attribute_id, name)
+                              VALUES (:id, :attribute_id, :name)
+                              ON DUPLICATE KEY UPDATE
+                                attribute_id = VALUES(attribute_id),
+                                name = VALUES(name)";
         $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
-        //$isRequired = true | false;
-
-        print_r($response->getContent());
-
+        $responseArray = $response->toArray();
+        $attributeId = $responseArray['attributeId'];
+        $attributeName = $responseArray['attributeName'];
+        $isRequired = $responseArray['required'];
+        $type = $responseArray['type'];
+        $attributeValues = $responseArray['attributeValues'];
+        Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+        foreach ($attributeValues as $attributeValue) {
+            Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+        }
     }
 
     /**
