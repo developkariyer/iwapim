@@ -286,7 +286,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             $id = $category['id'];
             $parentCategoryId = $category['parentCategoryId'];
             echo "$currentPath (ID: $id | PARENTID: $parentCategoryId)\n";
-            $sql = "INSERT INTO iwa_ciceksepeti_categories ('id', 'category_name', 'parent_id')
+            $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name, parent_id)
                     VALUES (:id, :name, :parent_id)
                     ON DUPLICATE KEY UPDATE
                         id = VALUES(id),
