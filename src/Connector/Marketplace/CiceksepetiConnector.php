@@ -317,6 +317,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         foreach ($categoryIds as $categoryId) {
             echo "$categoryId\n";
+        }
+
+        /*foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
             $responseArray = $response->toArray();
             if (!isset($responseArray['attributeValues'])) {
@@ -331,11 +334,11 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "attributename: " . $attributeName . "\n";
             echo "isrequired: " . $isRequired . "\n";
             echo "type: " . $type . "\n";
-           /* Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+            Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
                 Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
-            }*/
-        }
+            }
+        }*/
     }
 
     /**
