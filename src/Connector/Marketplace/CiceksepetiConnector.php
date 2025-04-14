@@ -314,15 +314,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                               ON DUPLICATE KEY UPDATE
                                 attribute_id = VALUES(attribute_id),
                                 name = VALUES(name)";
-        
+
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
             $responseArray = $response->toArray();
-            $attributeId = $responseArray['attributeId'];
-            $attributeName = $responseArray['attributeName'];
-            $isRequired = $responseArray['required'];
-            $type = $responseArray['type'];
             $attributeValues = $responseArray['attributeValues'];
+            $attributeId = $attributeValues['attributeId'];
+            $attributeName = $attributeValues['attributeName'];
+            $isRequired = $attributeValues['required'];
+            $type = $attributeValues['type'];
             Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
                 Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
