@@ -312,13 +312,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (id, attribute_id, name)
                               VALUES (:id, :attribute_id, :name)
                               ON DUPLICATE KEY UPDATE
-                                attribute_id = VALUES(attribute_id),
-                                name = VALUES(name)";
+                                 attribute_id = VALUES(attribute_id),
+                                 name = VALUES(name)";
 
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
-            $responseArray = $response->toArray();
-            print_r($responseArray);
+            $responseArray = $response->getContent();
             if (!isset($responseArray['attributeValues'])) {
                 continue;
             }
