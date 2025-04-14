@@ -22,7 +22,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         'batchStatus' => "Products/batch-status/",
         'orders' => "Order/GetOrders/",
         'returns' => "Order/getcanceledorders/",
-        'categories' => "Categories"
+        'categories' => "Categories/"
     ];
 
     public static string $marketplaceType = 'Ciceksepeti';
@@ -227,7 +227,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        $this->downloadCategories();
+        //$this->downloadCategories();
+        $this->getCategoryAttributes(12521);
     }
 
     /**
@@ -268,6 +269,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $response = $this->httpClient->request('GET',static::$apiUrl['categories']);
         $this->putToCache('categories.json', $response->toArray());
+    }
+
+    public function getCategoryAttributes($categoryId): void
+    {
+        $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
+        print_r($response->getContent());
+
     }
 
     /**
