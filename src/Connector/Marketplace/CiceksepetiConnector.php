@@ -289,7 +289,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name, parent_id)
                     VALUES (:id, :name, :parent_id)
                     ON DUPLICATE KEY UPDATE
-                        id = VALUES(id),
                         category_name = VALUES(category_name),
                         parent_id = VALUES(parent_id)";
             Utility::executeSqlFile($sql, ['id' => $id, 'name' => $currentPath, 'parent_id' => $parentCategoryId]);
