@@ -303,15 +303,14 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $getCategoryIdsSql = "SELECT id FROM iwa_ciceksepeti_categories";
         $categoryIds = Utility::fetchFromSql($getCategoryIdsSql);
-        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, category_id, attribute_name, is_required, type)
-                         VALUES (:id, :category_id, :attribute_name, :is_required, :type)";
+        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)
+                         VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)";
 
-        $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (id, attribute_id, name)
-                              VALUES (:id, :attribute_id, :name)";
+        $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
+                              VALUES (:attribute_value_id, :attribute_id, :name)";
 
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
-            echo $response->getStatusCode() . "\n";
             $responseArray = $response->toArray();
             $categoryId = $responseArray['categoryId'];
             foreach ($responseArray['categoryAttributes'] as $attribute) {
@@ -325,9 +324,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 $type = $attribute['type'];
             }
 
-            Utility::executeSql($attributeSql, ['id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+            Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
-                Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+                Utility::executeSql($attributeValueSql, ['attribute_value_id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
             }
             echo ".";
         }
