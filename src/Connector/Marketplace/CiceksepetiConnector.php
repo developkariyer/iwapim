@@ -287,11 +287,11 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             $parentCategoryId = $category['parentCategoryId'];
             echo "$currentPath (ID: $id | PARENTID: $parentCategoryId)\n";
             $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name, parent_id)
-                    VALUES (:id, :name, :parent_id)
+                    VALUES (:id, :category_name, :parent_id)
                     ON DUPLICATE KEY UPDATE
                         category_name = VALUES(category_name),
                         parent_id = VALUES(parent_id)";
-            Utility::executeSql($sql, ['id' => $id, 'name' => $currentPath, 'parent_id' => $parentCategoryId]);
+            Utility::executeSql($sql, ['id' => $id, 'category_name' => $currentPath, 'parent_id' => $parentCategoryId]);
 
             if (!empty($category['subCategories'])) {
                 $this->processCategories($category['subCategories'], $currentPath);
