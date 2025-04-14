@@ -304,17 +304,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $getCategoryIdsSql = "SELECT id FROM iwa_ciceksepeti_categories";
         $categoryIds = Utility::fetchFromSql($getCategoryIdsSql);
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, category_id, attribute_name, is_required, type)
-                         VALUES (:id, :category_id, :attribute_name, :is_required, :type)
-                         ON DUPLICATE KEY UPDATE
-                            category_id = VALUES(category_id),
-                            attribute_name = VALUES(attribute_name),
-                            is_required = VALUES(is_required),
-                            type = VALUES(type)";
+                         VALUES (:id, :category_id, :attribute_name, :is_required, :type)";
+        
         $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (id, attribute_id, name)
-                              VALUES (:id, :attribute_id, :name)
-                              ON DUPLICATE KEY UPDATE
-                                 attribute_id = VALUES(attribute_id),
-                                 name = VALUES(name)";
+                              VALUES (:id, :attribute_id, :name)";
 
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
