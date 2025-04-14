@@ -306,8 +306,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)
                          VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)";
 
-        $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (id, attribute_id, name)
-                              VALUES (:id, :attribute_id, :name)";
+        $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
+                              VALUES (:attribute_value_id, :attribute_id, :name)";
 
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
@@ -326,7 +326,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
             Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
-                Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+                Utility::executeSql($attributeValueSql, ['attribute_value_id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
             }
             echo ".";
         }
