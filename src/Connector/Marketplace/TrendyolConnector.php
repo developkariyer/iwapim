@@ -48,6 +48,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
         $page = 0;
         do {
             $response = $this->httpClient->request($method, $url, $headersToApi);
+            print_r($response->getStatusCode());
             if ($response->getStatusCode() !== 200) {
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getContent();
             }
@@ -59,8 +60,6 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 $headersToApi['query']['page'] = $page;
             }
             echo ".";
-            echo "page: $page \n";
-            echo "totalPages: " . $newData['totalPages'] . "\n";
         } while($page <= $newData['totalPages']);
         return $data;
     }
