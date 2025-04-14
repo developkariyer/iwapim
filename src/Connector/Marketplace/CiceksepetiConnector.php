@@ -287,7 +287,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "$currentPath (ID: $id)\n";
 
             if (!empty($category['subCategories'])) {
-                processCategories($category['subCategories'], $currentPath);
+                $this->processCategories($category['subCategories'], $currentPath);
             }
         }
     }
