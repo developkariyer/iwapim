@@ -316,10 +316,11 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                                 name = VALUES(name)";
 
         foreach ($categoryIds as $categoryId) {
+            if ($categoryId == 0) {
+                continue;
+            }
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
             $responseArray = $response->toArray();
-            print_r($responseArray);
-            break;
             if (!isset($responseArray['attributeValues'])) {
                 continue;
             }
