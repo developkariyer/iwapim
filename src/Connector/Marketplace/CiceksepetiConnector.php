@@ -271,7 +271,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //$this->putToCache('categories.json', $response->toArray());
 
         $categories = $this->getFromCache('categories.json');
-        $this->processCategories($categories);
+        $this->processCategories($categories['categories']);
 
 
     }
