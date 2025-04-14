@@ -271,14 +271,25 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //$this->putToCache('categories.json', $response->toArray());
 
         $categories = $this->getFromCache('categories.json');
-        foreach ($categories['categories'] as $category) {
+        $this->processCategories($categories);
 
+
+    }
+
+    function processCategories($categories, $path = '') {
+        foreach ($categories as $category) {
+            if (!isset($category['id']) || !isset($category['name'])) {
+                continue;
+            }
+
+            $currentPath = $path ? $path . ' | ' . $category['name'] : $category['name'];
             $id = $category['id'];
-            $name = $category['name'];
-            echo "$id: $name\n";
+            echo "$currentPath (ID: $id)\n";
 
+            if (!empty($category['subCategories'])) {
+                processCategories($category['subCategories'], $currentPath);
+            }
         }
-
     }
 
     public function getCategoryAttributes($categoryId): void
