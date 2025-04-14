@@ -317,19 +317,20 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
-            $responseArray = $response->getContent();
-            if (!isset($responseArray['attributeValues'])) {
+            $responseArray = $response->toArray();
+            print_r($responseArray);
+            if (!isset($responseArray['categoryAttributes']['attributeValues'])) {
                 continue;
             }
-            $attributeValues = $responseArray['attributeValues'];
-            $attributeId = $responseArray['attributeId'];
-            $attributeName = $responseArray['attributeName'];
-            $isRequired = $responseArray['required'];
-            $type = $responseArray['type'];
+            $attributeValues = $responseArray['categoryAttributes']['attributeValues'];
+            $attributeId = $responseArray['categoryAttributes']['attributeId'];
+            $attributeName = $responseArray['categoryAttributes']['attributeName'];
+            $isRequired = $responseArray['categoryAttributes']['required'];
+            $type = $responseArray['categoryAttributes']['type'];
             echo "attrubuteid: " . $attributeId . "\n";
-//            echo "attributename: " . $attributeName . "\n";
-//            echo "isrequired: " . $isRequired . "\n";
-//            echo "type: " . $type . "\n";
+            echo "attributename: " . $attributeName . "\n";
+            echo "isrequired: " . $isRequired . "\n";
+            echo "type: " . $type . "\n";
             /*Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
                 Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
