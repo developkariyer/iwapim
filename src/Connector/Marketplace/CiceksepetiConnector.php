@@ -318,7 +318,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
             $responseArray = $response->toArray();
-            if (!isset($responseArray['categoryAttributes']['attributeValues'])) {
+            print_r($responseArray['categoryAttributes']);
+            /*if (!isset($responseArray['categoryAttributes']['attributeValues'])) {
                 continue;
             }
             $attributeValues = $responseArray['categoryAttributes']['attributeValues'];
@@ -329,7 +330,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "attrubuteid: " . $attributeId . "\n";
             echo "attributename: " . $attributeName . "\n";
             echo "isrequired: " . $isRequired . "\n";
-            echo "type: " . $type . "\n";
+            echo "type: " . $type . "\n";*/
             /*Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
                 Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
