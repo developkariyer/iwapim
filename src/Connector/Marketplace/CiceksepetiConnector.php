@@ -272,9 +272,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         $categories = $this->getFromCache('categories.json');
         foreach ($categories as $category) {
-            $id = $category['id'];
+            print_r($category);
+            /*$id = $category['id'];
             $name = $category['name'];
-            echo "$id: $name\n";
+            echo "$id: $name\n";*/
 
         }
 
