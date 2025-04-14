@@ -284,7 +284,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
             $currentPath = $path ? $path . ' | ' . $category['name'] : $category['name'];
             $id = $category['id'];
-            echo "$currentPath (ID: $id)\n";
+            $parentCategoryId = $category['parentCategoryId'];
+            echo "$currentPath (ID: $id | PARENTID: $parentCategoryId)\n";
 
             if (!empty($category['subCategories'])) {
                 $this->processCategories($category['subCategories'], $currentPath);
