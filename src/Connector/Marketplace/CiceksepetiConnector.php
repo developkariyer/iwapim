@@ -322,11 +322,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 $attributeName = $attribute['attributeName'];
                 $isRequired = $attribute['required'];
                 $type = $attribute['type'];
-            }
-
-            Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
-            foreach ($attributeValues as $attributeValue) {
-                Utility::executeSql($attributeValueSql, ['attribute_value_id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+                Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+                foreach ($attributeValues as $attributeValue) {
+                    Utility::executeSql($attributeValueSql, ['attribute_value_id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+                }
             }
             echo ".";
         }
