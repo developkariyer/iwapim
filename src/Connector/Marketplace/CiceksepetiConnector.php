@@ -318,19 +318,21 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
             $responseArray = $response->toArray();
-            print_r($responseArray['categoryAttributes']);
-            /*if (!isset($responseArray['categoryAttributes']['attributeValues'])) {
-                continue;
+            foreach ($responseArray['categoryAttributes'] as $attribute) {
+                if (!isset($attribute['attributeValues'])) {
+                    continue;
+                }
+                $attributeValues = $attribute['attributeValues'];
+                $attributeId = $attribute['attributeId'];
+                $attributeName = $attribute['attributeName'];
+                $isRequired = $attribute['required'];
+                $type = $attribute['type'];
+                echo "attrubuteid: " . $attributeId . "\n";
+                echo "attributename: " . $attributeName . "\n";
+                echo "isrequired: " . $isRequired . "\n";
+                echo "type: " . $type . "\n";
             }
-            $attributeValues = $responseArray['categoryAttributes']['attributeValues'];
-            $attributeId = $responseArray['categoryAttributes']['attributeId'];
-            $attributeName = $responseArray['categoryAttributes']['attributeName'];
-            $isRequired = $responseArray['categoryAttributes']['required'];
-            $type = $responseArray['categoryAttributes']['type'];
-            echo "attrubuteid: " . $attributeId . "\n";
-            echo "attributename: " . $attributeName . "\n";
-            echo "isrequired: " . $isRequired . "\n";
-            echo "type: " . $type . "\n";*/
+
             /*Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
                 Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
