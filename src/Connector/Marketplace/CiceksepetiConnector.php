@@ -303,9 +303,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $getCategoryIdsSql = "SELECT id FROM iwa_ciceksepeti_categories";
         $categoryIds = Utility::fetchFromSql($getCategoryIdsSql);
-        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, attribute_name, is_required, type)
-                         VALUES (:id, :attribute_name, :is_required, :type)
+        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, category_id, attribute_name, is_required, type)
+                         VALUES (:id, :category_id, :attribute_name, :is_required, :type)
                          ON DUPLICATE KEY UPDATE
+                            category_id = VALUES(category_id),
                             attribute_name = VALUES(attribute_name),
                             is_required = VALUES(is_required),
                             type = VALUES(type)";
@@ -318,6 +319,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
             $responseArray = $response->toArray();
+            $categoryId = $responseArray['categoryId'];
             foreach ($responseArray['categoryAttributes'] as $attribute) {
                 if (!isset($attribute['attributeValues'])) {
                     continue;
@@ -329,7 +331,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 $type = $attribute['type'];
             }
 
-            Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+            Utility::executeSql($attributeSql, ['id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
             foreach ($attributeValues as $attributeValue) {
                 Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
             }
