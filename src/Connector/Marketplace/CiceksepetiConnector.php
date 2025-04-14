@@ -299,8 +299,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         }
     }
 
-    public function getCategoryAttributes($categoryId): void
+    public function getCategoryAttributes(): void
     {
+        $getCategoryIdsSql = "SELECT id FROM iwa_ciceksepeti_categories";
+        $categoryIds = Utility::fetchFromSql($getCategoryIdsSql);
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, attribute_name, is_required, type)
                          VALUES (:id, :attribute_name, :is_required, :type)
                          ON DUPLICATE KEY UPDATE
@@ -312,16 +314,19 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                               ON DUPLICATE KEY UPDATE
                                 attribute_id = VALUES(attribute_id),
                                 name = VALUES(name)";
-        $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
-        $responseArray = $response->toArray();
-        $attributeId = $responseArray['attributeId'];
-        $attributeName = $responseArray['attributeName'];
-        $isRequired = $responseArray['required'];
-        $type = $responseArray['type'];
-        $attributeValues = $responseArray['attributeValues'];
-        Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
-        foreach ($attributeValues as $attributeValue) {
-            Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+        
+        foreach ($categoryIds as $categoryId) {
+            $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
+            $responseArray = $response->toArray();
+            $attributeId = $responseArray['attributeId'];
+            $attributeName = $responseArray['attributeName'];
+            $isRequired = $responseArray['required'];
+            $type = $responseArray['type'];
+            $attributeValues = $responseArray['attributeValues'];
+            Utility::executeSql($attributeSql, ['id' => $attributeId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+            foreach ($attributeValues as $attributeValue) {
+                Utility::executeSql($attributeValueSql, ['id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
+            }
         }
     }
 
