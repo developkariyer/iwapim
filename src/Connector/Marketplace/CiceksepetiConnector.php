@@ -291,7 +291,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     ON DUPLICATE KEY UPDATE
                         category_name = VALUES(category_name),
                         parent_id = VALUES(parent_id)";
-            Utility::executeSqlFile($sql, ['id' => $id, 'name' => $currentPath, 'parent_id' => $parentCategoryId]);
+            Utility::executeSql($sql, ['id' => $id, 'name' => $currentPath, 'parent_id' => $parentCategoryId]);
 
             if (!empty($category['subCategories'])) {
                 $this->processCategories($category['subCategories'], $currentPath);
