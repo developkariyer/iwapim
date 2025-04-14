@@ -267,7 +267,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadCategories(): void
     {
         $response = $this->httpClient->request('GET',static::$apiUrl['categories']);
-        $this->putToCache('categories.json', $response);
+        $this->putToCache('categories.json', $response->toArray());
     }
 
     /**
