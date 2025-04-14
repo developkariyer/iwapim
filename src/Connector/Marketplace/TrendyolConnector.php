@@ -59,6 +59,7 @@ class TrendyolConnector extends MarketplaceConnectorAbstract
                 $headersToApi['query']['page'] = $page;
             }
             echo ".";
+            print_r($response->getContent());
         } while($page <= $newData['totalPages']);
         return $data;
     }
