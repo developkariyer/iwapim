@@ -261,9 +261,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->putToCache('RETURNS.json', $allReturns);
     }
 
+    /**
+     * @throws RandomException
+     */
     public function downloadCategories(): void
     {
         $response = $this->httpClient->request('GET',static::$apiUrl['categories']);
+        $this->putToCache('categories.json', $response);
         print_r($response->getContent());
     }
 
