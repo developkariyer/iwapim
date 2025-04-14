@@ -305,7 +305,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $categoryIds = Utility::fetchFromSql($getCategoryIdsSql);
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (id, category_id, attribute_name, is_required, type)
                          VALUES (:id, :category_id, :attribute_name, :is_required, :type)";
-        
+
         $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (id, attribute_id, name)
                               VALUES (:id, :attribute_id, :name)";
 
