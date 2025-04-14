@@ -284,7 +284,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
             $currentPath = $path ? $path . ' | ' . $category['name'] : $category['name'];
             $id = $category['id'];
-            $parentCategoryId = $category['parentCategoryId'];
+            $parentCategoryId = $category['parentCategoryId'] ?? 0;
             echo "$currentPath (ID: $id | PARENTID: $parentCategoryId)\n";
             $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name, parent_id)
                     VALUES (:id, :category_name, :parent_id)
