@@ -30,7 +30,16 @@ class HelloWorldCommand extends AbstractCommand
         $productIdentifier = $mainProduct->getProductIdentifier();
         $variationProducts = $mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true);
         foreach ($variationProducts as $variationProduct) {
-            echo $variationProduct->getIwasku() . "\n" ;
+            if (!$variationProduct instanceof Product) {
+                continue;
+            }
+            $listingItems = $variationProduct->getListingItems();
+            foreach ($listingItems as $listingItem) {
+                if (!$listingItem instanceof VariantProduct) {
+                    continue;
+                }
+                echo $listingItem->getTitle() . "\n";
+            }
         }
 
 
