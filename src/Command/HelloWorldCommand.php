@@ -27,7 +27,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $mainProduct = Product::getById(238119);
         $productIdentifier = $mainProduct->getProductIdentifier();
-        print_r($mainProduct->getChildren());
+        print_r($mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true));
 
 
 
