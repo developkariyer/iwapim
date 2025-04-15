@@ -227,7 +227,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-       //$this->downloadCategories();
+        $this->downloadCategories();
         //$this->getCategoryAttributes();
     }
 
@@ -276,22 +276,24 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     }
 
-    function processCategories($categories, $path = '') {
+    function processCategories($categories, $path = '') // leaf category save
+    {
         foreach ($categories as $category) {
             if (!isset($category['id']) || !isset($category['name'])) {
                 continue;
             }
 
             $currentPath = $path ? $path . ' | ' . $category['name'] : $category['name'];
-            $id = $category['id'];
-            $parentCategoryId = $category['parentCategoryId'] ?? 0;
-            echo "$currentPath (ID: $id | PARENTID: $parentCategoryId)\n";
-            $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name, parent_id)
-                    VALUES (:id, :category_name, :parent_id)
+
+            if (empty($category['subCategories'])) {
+                $id = $category['id'];
+                echo "$currentPath (ID: $id)\n";
+                $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name)
+                    VALUES (:id, :category_name)
                     ON DUPLICATE KEY UPDATE
-                       category_name = VALUES(category_name),
-                       parent_id = VALUES(parent_id)";
-            Utility::executeSql($sql, ['id' => $id, 'category_name' => $currentPath, 'parent_id' => $parentCategoryId]);
+                        category_name = VALUES(category_name)";
+                Utility::executeSql($sql, ['id' => $id, 'category_name' => $currentPath]);
+            }
 
             if (!empty($category['subCategories'])) {
                 $this->processCategories($category['subCategories'], $currentPath);
@@ -309,6 +311,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
                               VALUES (:attribute_value_id, :attribute_id, :name)";
 
+        // $categoryId;
+        // BULK DATABASE INSERT
+        // Attribute value id
+        // Database Redesign
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
             $responseArray = $response->toArray();
