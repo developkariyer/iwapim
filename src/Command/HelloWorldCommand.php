@@ -51,7 +51,7 @@ class HelloWorldCommand extends AbstractCommand
                 }
                 echo $listingItem->getTitle() . "\n";
                 $imageGallery = $listingItem->getImageGallery();
-                print_r($imageGallery);
+                //image jsondan ayır http lazım.
             }
         }
 
