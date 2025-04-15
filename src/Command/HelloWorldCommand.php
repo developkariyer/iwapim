@@ -26,7 +26,11 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $mainProduct = Product::getById(238119);
-        echo $mainProduct->getProductIdentifier() . "\n";
+        $productIdentifier = $mainProduct->getProductIdentifier();
+        print_r($mainProduct->listVariations());
+
+
+
 
 
         return Command::SUCCESS;
