@@ -227,8 +227,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        $this->downloadCategories();
-        //$this->getCategoryAttributes();
+        //$this->downloadCategories();
+        $this->getCategoryAttributes();
     }
 
     /**
@@ -270,8 +270,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //$response = $this->httpClient->request('GET',static::$apiUrl['categories']);
         //$this->putToCache('categories.json', $response->toArray());
 
-        $categories = $this->getFromCache('categories.json');
-        $this->processCategories($categories['categories']);
+        //$categories = $this->getFromCache('categories.json');
+        //$this->processCategories($categories['categories']);
 
 
     }
@@ -315,6 +315,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         // BULK DATABASE INSERT
         // Attribute value id
         // Database Redesign
+        $categories = [];
         foreach ($categoryIds as $categoryId) {
             $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
             $responseArray = $response->toArray();
@@ -323,17 +324,21 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 if (!isset($attribute['attributeValues'])) {
                     continue;
                 }
-                $attributeValues = $attribute['attributeValues'];
-                $attributeId = $attribute['attributeId'];
-                $attributeName = $attribute['attributeName'];
-                $isRequired = $attribute['required'];
-                $type = $attribute['type'];
-                Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
+                $categories['categoryId'] = $categoryId;
+                $categories['attributeValues'] = $attribute['attributeValues'];
+                $categories['attributeId'] = $attribute['attributeId'];
+                $categories['attributeName'] = $attribute['attributeName'];
+                $categories['isRequired'] =  $attribute['required'];
+                $categories['type'] = $attribute['type'];
+                /*Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
                 foreach ($attributeValues as $attributeValue) {
                     Utility::executeSql($attributeValueSql, ['attribute_value_id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
-                }
+                }*/
             }
             echo ".";
+        }
+        foreach ($categories as $category) {
+            echo $category['categoryId'] . "\n";
         }
     }
 
