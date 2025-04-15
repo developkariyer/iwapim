@@ -28,7 +28,10 @@ class HelloWorldCommand extends AbstractCommand
     {
         $mainProduct = Product::getById(238119);
         $productIdentifier = $mainProduct->getProductIdentifier();
-        print_r($mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true));
+        $variationProducts = $mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true);
+        foreach ($variationProducts as $variationProduct) {
+            echo $variationProduct->getIwasku() . "\n" ;
+        }
 
 
 
