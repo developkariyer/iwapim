@@ -26,14 +26,25 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $mainProduct = Product::getById(238119);
+        $mainProduct = Product::getById(238119); //main product
         $productIdentifier = $mainProduct->getProductIdentifier();
-        $variationProducts = $mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true);
+        $variationProducts = $mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true); //variant products
         foreach ($variationProducts as $variationProduct) {
             if (!$variationProduct instanceof Product) {
                 continue;
             }
-            $listingItems = $variationProduct->getListingItems();
+            $listingItems = $variationProduct->getListingItems(); //listing items
+            if (empty($listingItems)) {
+                continue;
+            }
+            $iwasku = $variationProduct->getIwasku();
+            $variationSize = $variationProduct->getVariationSize();
+            $variationColor = $variationProduct->getVariationColor();
+            $eanGtin = $variationProduct->getEanGtin();
+            echo "iwasku: " . $iwasku . "\n";
+            echo "variationSize: " . $variationSize . "\n";
+            echo "variationColor: " . $variationColor . "\n";
+            echo "eanGtin: " . $eanGtin . "\n";
             foreach ($listingItems as $listingItem) {
                 if (!$listingItem instanceof VariantProduct) {
                     continue;
