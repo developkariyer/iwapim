@@ -302,18 +302,26 @@ class Utility
      */
     public static function executeSql(string $sql, array $params = []): void
     {
-        $db = Db::get();
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement($params);
+        try {
+            $db = Db::get();
+            $stmt = $db->prepare($sql);
+            $stmt->executeStatement($params);
+        } catch (\Exception $e) {
+            echo "Execute SQL Error: " . $sql . "\n" . $e->getMessage() . "\n";
+        }
     }
 
     /**
      * @throws Exception
      */
-    public static function fetchFromSql(string $sql, array $params = []): array
+    public static function fetchFromSql(string $sql, array $params = [])
     {
-        $db = Db::get();
-        return $db->fetchAllAssociative($sql, $params);
+        try {
+            $db = Db::get();
+            return $db->fetchAllAssociative($sql, $params);
+        } catch (\Exception $e) {
+            echo "Fetch From SQL Error: " . $sql . "\n" . $e->getMessage() . "\n";
+        }
     }
 
     /**
@@ -324,23 +332,31 @@ class Utility
         if (!file_exists($filePath)) {
             throw new Exception("SQL file not found.");
         }
-        $db = Db::get();
-        $sql = file_get_contents($filePath);
-        $stmt = $db->prepare($sql);
-        $stmt->executeStatement($params);
+        try {
+            $db = Db::get();
+            $sql = file_get_contents($filePath);
+            $stmt = $db->prepare($sql);
+            $stmt->executeStatement($params);
+        } catch (\Exception $e) {
+            echo "Execute SQL File Error: " . $filePath . "\n" . $e->getMessage() . "\n";
+        }
     }
 
     /**
      * @throws Exception
      */
-    public static function fetchFromSqlFile(string $filePath, array $params = []): array
+    public static function fetchFromSqlFile(string $filePath, array $params = [])
     {
         if (!file_exists($filePath)) {
             throw new Exception("SQL file not found.");
         }
-        $db = Db::get();
-        $sql = file_get_contents($filePath);
-        return $db->fetchAllAssociative($sql, $params);
+        try {
+            $db = Db::get();
+            $sql = file_get_contents($filePath);
+            return $db->fetchAllAssociative($sql, $params);
+        } catch (\Exception $e) {
+            echo "Fetch From SQL File Error: " . $filePath . "\n" . $e->getMessage() . "\n";
+        }
     }
 
 }
