@@ -329,9 +329,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             }
             $attributeValues = $attribute['attributeValues'];
             // Save Attributes
-            if ($attribute['attributeName'] === 'Marka') {
-                continue;
-            }
             Utility::executeSql($attributeSql, [
                 'attribute_id' => $attribute['attributeId'],
                 'category_id' => $categoryId,
