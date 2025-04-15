@@ -682,6 +682,11 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                 $lastImage = Utility::getCachedImage($img['preview']['image']['url'] ?? '');
             }
         }
+        $count = count($images);
+        if ($count >= 2) {
+            $secondLast = $images[$count - 2];
+            return Utility::getCachedImage($secondLast['preview']['image']['url'] ?? '');
+        }
         return $lastImage;
     }
 
