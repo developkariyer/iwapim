@@ -228,7 +228,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         //$this->downloadCategories();
-        $this->getCategoryAttributes();
+        $this->getCategoryAttributesAndSaveDatabase(13077);
     }
 
     /**
@@ -271,12 +271,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //$this->putToCache('categories.json', $response->toArray());
 
         //$categories = $this->getFromCache('categories.json');
-        //$this->processCategories($categories['categories']);
+        //$this->processCategoriesAndSaveDatabase($categories['categories']);
 
 
     }
 
-    function processCategories($categories, $path = '') // leaf category save
+    function processCategoriesAndSaveDatabase($categories, $path = '') // leaf category save
     {
         foreach ($categories as $category) {
             if (!isset($category['id']) || !isset($category['name'])) {
@@ -296,49 +296,54 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             }
 
             if (!empty($category['subCategories'])) {
-                $this->processCategories($category['subCategories'], $currentPath);
+                $this->processCategoriesAndSaveDatabase($category['subCategories'], $currentPath);
             }
         }
     }
 
-    public function getCategoryAttributes(): void
+    public function getCategoryAttributesAndSaveDatabase($categoryId): void
     {
-        $getCategoryIdsSql = "SELECT id FROM iwa_ciceksepeti_categories";
-        $categoryIds = Utility::fetchFromSql($getCategoryIdsSql);
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)
-                         VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)";
+                         VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)
+                         ON DUPLICATE KEY UPDATE
+                         attribute_name = VALUES(attribute_name),
+                         is_required = VALUES(is_required),
+                         type = VALUES(type)";
 
         $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
-                              VALUES (:attribute_value_id, :attribute_id, :name)";
+                              VALUES (:attribute_value_id, :attribute_id, :name)
+                              ON DUPLICATE KEY UPDATE
+                              name = VALUES(name)
+                              ";
 
-        // $categoryId;
-        // BULK DATABASE INSERT
-        // Attribute value id
-        // Database Redesign
-        $categories = [];
-        foreach ($categoryIds as $categoryId) {
-            $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId['id'] . '/attributes');
-            $responseArray = $response->toArray();
-            $categoryId = $responseArray['categoryId'];
-            foreach ($responseArray['categoryAttributes'] as $attribute) {
-                if (!isset($attribute['attributeValues'])) {
-                    continue;
-                }
-                $categories['categoryId'] = $categoryId;
-                $categories['attributeValues'] = $attribute['attributeValues'];
-                $categories['attributeId'] = $attribute['attributeId'];
-                $categories['attributeName'] = $attribute['attributeName'];
-                $categories['isRequired'] =  $attribute['required'];
-                $categories['type'] = $attribute['type'];
-                /*Utility::executeSql($attributeSql, ['attribute_id' => $attributeId, 'category_id' => $categoryId, 'attribute_name' => $attributeName, 'is_required' => $isRequired, 'type' => $type]);
-                foreach ($attributeValues as $attributeValue) {
-                    Utility::executeSql($attributeValueSql, ['attribute_value_id' => $attributeValue['id'], 'attribute_id' => $attributeId, 'name' => $attributeValue['name']]);
-                }*/
-            }
-            echo ".";
+        $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
+        if ($response->getStatusCode() !== 200) {
+            echo "Error: " . $response->getStatusCode();
         }
-        foreach ($categories as $category) {
-            echo $category['categoryId'] . "\n";
+
+        $responseArray = $response->toArray();
+        $categoryId = $responseArray['categoryId'];
+        foreach ($responseArray['categoryAttributes'] as $attribute) {
+            if (!isset($attribute['attributeValues'])) {
+                continue;
+            }
+            $attributeValues = $attribute['attributeValues'];
+            // Save Attributes
+            Utility::executeSql($attributeSql, [
+                'attribute_id' => $attribute['attributeId'],
+                'category_id' => $categoryId,
+                'attribute_name' => $attribute['attributeName'],
+                'is_required' => $attribute['required'],
+                'type' => $attribute['type']
+            ]);
+            foreach ($attributeValues as $attributeValue) {
+                // Save Attribute Values
+                Utility::executeSql($attributeValueSql, [
+                    'attribute_value_id' => $attributeValue['id'],
+                    'attribute_id' => $attribute['attributeId'],
+                    'name' => $attributeValue['name']
+                ]);
+            }
         }
     }
 
