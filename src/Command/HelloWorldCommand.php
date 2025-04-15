@@ -6,6 +6,7 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
+use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\Product;
