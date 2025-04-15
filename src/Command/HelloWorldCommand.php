@@ -45,11 +45,13 @@ class HelloWorldCommand extends AbstractCommand
             echo "variationSize: " . $variationSize . "\n";
             echo "variationColor: " . $variationColor . "\n";
             echo "eanGtin: " . $eanGtin . "\n";
-            foreach ($listingItems as $listingItem) {
+            foreach ($listingItems as $listingItem) { // 1 tane listing seçilmesi lazım
                 if (!$listingItem instanceof VariantProduct) {
                     continue;
                 }
                 echo $listingItem->getTitle() . "\n";
+                $imageGallery = $listingItem->getImageGallery();
+                print_r($imageGallery);
             }
         }
 
