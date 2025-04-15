@@ -228,7 +228,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         //$this->downloadCategories();
-        $this->getCategoryAttributesAndSaveDatabase(13077);
+        $this->getCategoryAttributesAndSaveDatabase(12691);
     }
 
     /**
