@@ -7,112 +7,155 @@
 
 {% endblock %}
 {% block content %}
-    <div class="container mt-4">
+    <div class="container-fluid mt-4">
         <h1 class="text-center mb-4">Çiçeksepeti Ürünleri</h1>
 
-        <!-- Kategori Seçim Alanı -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Kategoriler</h5>
-                    <div>
-                        <button id="select-all-categories" class="btn btn-sm btn-outline-secondary me-2">Tümünü Seç</button>
-                        <button id="clear-categories" class="btn btn-sm btn-outline-secondary">Temizle</button>
+        <div class="row">
+            <!-- Sol Taraf - Kategori Filtresi -->
+            <div class="col-12 col-lg-3 col-xl-2 mb-4">
+                <div class="card shadow-sm sticky-top" style="top: 15px; z-index: 10;">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Kategoriler</h5>
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#categoryCollapse" aria-expanded="true"
+                                    aria-controls="categoryCollapse">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div class="category-container">
-                    <div class="row">
-                        {% if grouped|length > 0 %}
-                            {% for categoryName, categoryData in grouped %}
-                                <div class="col-md-3 col-6 mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input category-checkbox" type="checkbox"
-                                               id="category-{{ loop.index }}" value="{{ categoryName }}"
-                                               {% if selectedCategory is defined and selectedCategory == categoryName %}checked{% endif %}>
-                                        <label class="form-check-label" for="category-{{ loop.index }}">
-                                            {{ categoryName }}
-                                            <span class="badge bg-secondary">{{ categoryData|length }}</span>
-                                        </label>
-                                    </div>
+                    <div class="collapse show" id="categoryCollapse">
+                        <div class="card-body p-0">
+                            <div class="category-actions p-2 bg-light border-bottom">
+                                <div class="d-flex justify-content-between">
+                                    <button id="select-all-categories" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-check-double"></i> Tümü
+                                    </button>
+                                    <button id="clear-categories" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Temizle
+                                    </button>
                                 </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="col-12 text-center text-muted">
-                                <p>Kategori bulunamadı</p>
                             </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                    <button id="filter-products" class="btn btn-primary">
-                        <i class="fas fa-filter me-1"></i> Filtrele
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seçili Kategori Bilgisi -->
-        <div id="selected-category-info" class="alert alert-info {% if selectedCategory is not defined %}d-none{% endif %} mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>Seçili Kategori:</strong> <span id="selected-category-name">{{ selectedCategory|default('') }}</span>
-                </div>
-                <button id="clear-filter" class="btn btn-sm btn-outline-dark">Filtreyi Temizle</button>
-            </div>
-        </div>
-
-        <!-- Ana ürün grupları -->
-        <div class="row g-4 product-groups" id="product-container">
-            {% set displayCount = 0 %}
-            {% if grouped|length > 0 %}
-                {% for categoryName, categoryData in grouped %}
-                    {% if selectedCategory is not defined or selectedCategory == categoryName %}
-                        {% for mainCode, products in categoryData %}
-                            {% set firstProduct = products|first %}
-                            {% set displayCount = displayCount + 1 %}
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 product-wrapper"
-                                 data-main-code="{{ mainCode }}"
-                                 data-category="{{ categoryName }}">
-                                <div class="product-group-card">
-                                    <div class="card h-100 shadow-sm">
-                                        <div class="category-badge">{{ categoryName }}</div>
-                                        <div class="card-img-container">
-                                            {% if firstProduct.images is defined and firstProduct.images|length > 0 %}
-                                                <img src="{{ firstProduct.images[0] }}" class="card-img-top" alt="{{ firstProduct.productName|default('Ürün') }}">
-                                            {% else %}
-                                                <div class="no-image">Resim yok</div>
-                                            {% endif %}
-                                            <div class="variant-count-badge">
-                                                {{ products|length }} varyasyon
+                            <div class="category-list">
+                                {% if grouped|length > 0 %}
+                                    {% for categoryName, categoryData in grouped %}
+                                        <div class="category-item">
+                                            <div class="form-check border-bottom py-2 px-3">
+                                                <input class="form-check-input category-checkbox" type="checkbox"
+                                                       id="category-{{ loop.index }}" value="{{ categoryName }}"
+                                                       {% if selectedCategory is defined and selectedCategory == categoryName %}checked{% endif %}>
+                                                <label class="form-check-label d-flex justify-content-between w-100"
+                                                       for="category-{{ loop.index }}">
+                                                    <span>{{ categoryName }}</span>
+                                                    <span class="badge bg-secondary rounded-pill ms-1">
+                                                        {{ categoryData|keys|length }}
+                                                    </span>
+                                                </label>
                                             </div>
                                         </div>
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ firstProduct.productName|default('İsimsiz Ürün') }}</h5>
-                                        </div>
-                                        <div class="card-footer bg-transparent border-0 text-center">
-                                            <button class="btn btn-sm btn-primary toggle-variants">Varyantları Göster</button>
-                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                        <p>Kategori bulunamadı</p>
                                     </div>
-                                </div>
+                                {% endif %}
                             </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-
-            {% if displayCount == 0 %}
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        {% if selectedCategory is defined %}
-                            Bu kategoride ürün bulunamadı.
-                        {% else %}
-                            Hiçbir ürün bulunamadı.
-                        {% endif %}
+                            <div class="card-footer p-2">
+                                <button id="filter-products" class="btn btn-primary btn-sm d-block w-100">
+                                    <i class="fas fa-filter me-1"></i> Filtrele
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            {% endif %}
+
+                {% if selectedCategory is defined and selectedCategory %}
+                    <div class="alert alert-info mt-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Seçili:</strong> {{ selectedCategory }}
+                        </div>
+                        <button id="clear-filter" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sağ Taraf - Ürünler -->
+            <div class="col-12 col-lg-9 col-xl-10">
+                <!-- Seçili Kategori Bilgisi (mobilde göster) -->
+                <div id="selected-category-info" class="alert alert-info d-lg-none {% if selectedCategory is not defined %}d-none{% endif %} mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Kategori:</strong> <span id="selected-category-name">{{ selectedCategory|default('') }}</span>
+                        </div>
+                        <button id="clear-filter-mobile" class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ana ürün grupları -->
+                <div class="row g-4 product-groups" id="product-container">
+                    {% set displayCount = 0 %}
+                    {% if grouped|length > 0 %}
+                        {% for categoryName, categoryData in grouped %}
+                            {% if selectedCategory is not defined or selectedCategory == categoryName %}
+                                {% for mainCode, products in categoryData %}
+                                    {% set firstProduct = products|first %}
+                                    {% set displayCount = displayCount + 1 %}
+                                    <div class="col-12 col-sm-6 col-md-4 col-xl-3 mb-4 product-wrapper"
+                                         data-main-code="{{ mainCode }}"
+                                         data-category="{{ categoryName }}">
+                                        <div class="product-group-card">
+                                            <div class="card h-100 shadow-sm">
+                                                <div class="category-badge">{{ categoryName }}</div>
+                                                <div class="card-img-container">
+                                                    {% if firstProduct.images is defined and firstProduct.images|length > 0 %}
+                                                        <img src="{{ firstProduct.images[0] }}" class="card-img-top" alt="{{ firstProduct.productName|default('Ürün') }}">
+                                                    {% else %}
+                                                        <div class="no-image">Resim yok</div>
+                                                    {% endif %}
+                                                    <div class="variant-count-badge">
+                                                        {{ products|length }} varyasyon
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ firstProduct.productName|default('İsimsiz Ürün') }}</h5>
+                                                </div>
+                                                <div class="card-footer bg-transparent border-0 text-center">
+                                                    <button class="btn btn-sm btn-primary toggle-variants">Varyantları Göster</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if displayCount == 0 %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                {% if selectedCategory is defined %}
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-search fa-2x mb-3"></i>
+                                        <h5>Bu kategoride ürün bulunamadı</h5>
+                                        <p>Farklı bir kategori seçin veya tüm ürünleri görüntüleyin</p>
+                                        <button id="view-all-products" class="btn btn-outline-primary mt-2">Tüm Ürünleri Göster</button>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-box-open fa-2x mb-3"></i>
+                                        <h5>Hiçbir ürün bulunamadı</h5>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -159,6 +202,42 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        .sticky-top {
+            position: sticky;
+            top: 15px;
+        }
+
+        .category-list {
+            max-height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .category-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .category-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .category-list::-webkit-scrollbar-thumb {
+            background-color: #bbb;
+            border-radius: 20px;
+        }
+
+        .category-item {
+            transition: background-color 0.2s;
+        }
+
+        .category-item:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .category-item .form-check-label {
+            cursor: pointer;
+        }
+
         .product-group-card {
             cursor: pointer;
             transition: all 0.3s ease;
@@ -222,14 +301,6 @@
             align-items: center;
             justify-content: center;
             color: #6c757d;
-        }
-
-        .category-container {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
         }
 
         /* Varyant listesi stilleri */
@@ -358,14 +429,22 @@
             background-color: #f8f9fa;
         }
 
+        /* Mobil iyileştirmeler */
+        @media (max-width: 991.98px) {
+            .sticky-top {
+                position: relative;
+                top: 0;
+            }
+
+            .category-list {
+                max-height: 300px;
+            }
+        }
+
         /* Responsive düzenlemeler */
         @media (max-width: 767px) {
             .card-img-container {
                 height: 160px;
-            }
-
-            .category-container {
-                max-height: 200px;
             }
         }
 
@@ -390,10 +469,12 @@
             // Kategori filtreleme işlemleri
             const filterProductsBtn = document.getElementById('filter-products');
             const clearFilterBtn = document.getElementById('clear-filter');
+            const clearFilterMobileBtn = document.getElementById('clear-filter-mobile');
             const selectAllBtn = document.getElementById('select-all-categories');
             const clearCategoriesBtn = document.getElementById('clear-categories');
             const selectedCategoryInfo = document.getElementById('selected-category-info');
             const selectedCategoryName = document.getElementById('selected-category-name');
+            const viewAllProductsBtn = document.getElementById('view-all-products');
 
             // Filtrele butonuna tıklandığında
             if (filterProductsBtn) {
@@ -417,12 +498,14 @@
                 });
             }
 
-            // Filtreyi temizle butonuna tıklandığında
-            if (clearFilterBtn) {
-                clearFilterBtn.addEventListener('click', function() {
-                    window.location.href = window.location.pathname;
-                });
-            }
+            // Filtreyi temizle butonlarına tıklandığında
+            [clearFilterBtn, clearFilterMobileBtn, viewAllProductsBtn].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        window.location.href = window.location.pathname;
+                    });
+                }
+            });
 
             // Tümünü seç butonuna tıklandığında
             if (selectAllBtn) {
@@ -475,6 +558,23 @@
                     noProductsMsg.closest('.col-12').remove();
                 }
             }
+
+            // Kategori checkboxlara tıklandığında anında filtreleme seçeneği
+            const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (categoryCheckboxes.length <= 5) { // Kategori sayısı az ise anında filtrele
+                        const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
+                            .map(cb => cb.value);
+
+                        if (selectedCategories.length === 1) {
+                            filterProductsBtn.click(); // Tek kategoride sayfa yenilenmesi için butona tıkla
+                        } else if (selectedCategories.length > 1) {
+                            filterProductsByCategories(selectedCategories); // Birden fazla seçimde client-side filtrele
+                        }
+                    }
+                });
+            });
 
             // Varyantları göster butonu tıklama olayı
             document.querySelectorAll('.toggle-variants').forEach(button => {
