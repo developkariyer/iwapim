@@ -200,29 +200,94 @@
             margin-bottom: 8px;
         }
 
+        /* Galeri önizlemeleri için yeni stiller */
         .gallery-preview {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             margin-top: 8px;
         }
 
-        .gallery-image {
+        .gallery-item {
+            position: relative;
             width: 80px;
             height: 80px;
-            object-fit: cover;
+            cursor: move;
             border-radius: 4px;
-            cursor: pointer;
+            overflow: hidden;
             border: 2px solid transparent;
             transition: all 0.2s;
         }
 
+        .gallery-item.drag-over {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
         .gallery-image.active {
+            border: 2px solid #0d6efd;
+        }
+
+        .gallery-actions {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            display: none;
+            z-index: 10;
+        }
+
+        .gallery-item:hover .gallery-actions {
+            display: block;
+        }
+
+        .delete-image {
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-image-container {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-image-container:hover {
             border-color: #0d6efd;
         }
 
-        .gallery-image:hover {
-            transform: scale(1.05);
+        .add-image-btn {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #6c757d;
+            font-size: 20px;
+        }
+
+        .add-image-btn:hover {
+            color: #0d6efd;
         }
 
         .status-badge {
@@ -380,13 +445,26 @@
                                                                     class="image-preview" alt="Ürün Görseli">
                                                             </div>
 
-                                                            <div class="gallery-preview">
+                                                            <div class="gallery-preview" id="gallery-container">
                                                                 {% if listing.images is defined %}
                                                                     {% for img in listing.images %}
-                                                                        <img src="{{ img }}" class="gallery-image {% if loop.first %}active{% endif %}"
-                                                                            data-index="{{ loop.index0 }}" alt="Görsel {{ loop.index }}">
+                                                                        <div class="gallery-item" draggable="true">
+                                                                            <img src="{{ img }}" class="gallery-image {% if loop.first %}active{% endif %}"
+                                                                                data-index="{{ loop.index0 }}" alt="Görsel {{ loop.index }}">
+                                                                            <div class="gallery-actions">
+                                                                                <button type="button" class="btn btn-sm btn-danger delete-image" title="Görseli Sil">
+                                                                                    <i class="fas fa-times"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
                                                                     {% endfor %}
                                                                 {% endif %}
+                                                                <div class="add-image-container">
+                                                                    <input type="file" id="image-upload" accept="image/*" multiple class="d-none">
+                                                                    <label for="image-upload" class="add-image-btn">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </label>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -499,27 +577,47 @@
                                                                 </div>
                                                             </div>
 
-                                                            {% if listing.attributes is defined and listing.attributes is iterable %}
+                                                            {% if listing.attributes is defined %}
                                                             <div class="mb-3">
                                                                 <label class="form-label">Özellikler</label>
                                                                 <div class="table-responsive">
                                                                     <table class="table table-sm table-bordered">
                                                                         <thead class="table-light">
                                                                             <tr>
-                                                                                <th>Özellik</th>
-                                                                                <th>Değer</th>
+                                                                                <th width="25%">Özellik</th>
+                                                                                <th width="30%">Değer</th>
+                                                                                <th width="25%">Tür</th>
+                                                                                <th width="20%">ID</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            {% for key, value in listing.attributes %}
+                                                                            {% if listing.attributes is iterable and listing.attributes is not empty %}
+                                                                                {% for attr in listing.attributes %}
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            <strong>{{ attr.parentName|default('') }}</strong>
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][parentName]" value="{{ attr.parentName|default('')|e('html_attr') }}">
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][parentId]" value="{{ attr.parentId|default('')|e('html_attr') }}">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            {{ attr.name|default('') }}
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][name]" value="{{ attr.name|default('')|e('html_attr') }}">
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][id]" value="{{ attr.id|default('')|e('html_attr') }}">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <span class="badge bg-light text-dark">{{ attr.type|default('') }}</span>
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][type]" value="{{ attr.type|default('')|e('html_attr') }}">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <small class="text-muted">{{ attr.id }}</small>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                {% endfor %}
+                                                                            {% else %}
                                                                                 <tr>
-                                                                                    <td>{{ key }}</td>
-                                                                                    <td>
-                                                                                        <input type="text" class="form-control form-control-sm"
-                                                                                            name="attributes[{{ key }}]" value="{{ value|e('html_attr') }}">
-                                                                                    </td>
+                                                                                    <td colspan="4" class="text-center">Özellik bilgisi bulunamadı</td>
                                                                                 </tr>
-                                                                            {% endfor %}
+                                                                            {% endif %}
                                                                         </tbody>
                                                                     </table>
                                                                 </div>
@@ -578,15 +676,22 @@
 
                             // Form verilerini topla
                             const formData = new FormData(this);
+
+                            // Görsel sıralamasını ekle
+                            const imageOrder = [];
+                            document.querySelectorAll('.gallery-image').forEach((img) => {
+                                if (img.src) {
+                                    imageOrder.push(img.src);
+                                }
+                            });
+                            formData.append('imageOrder', JSON.stringify(imageOrder));
+
                             const formObject = {};
                             for (let [key, value] of formData.entries()) {
                                 formObject[key] = value;
                             }
 
                             console.log('Form verileri:', formObject);
-
-                            // Burada API çağrısı yapılabilir
-                            // ...
 
                             // Başarılı mesajı göster
                             const submitBtn = this.querySelector('button[type="submit"]');
@@ -601,6 +706,148 @@
                                 submitBtn.classList.add('btn-primary');
                             }, 2000);
                         });
+
+                        // Resim yükleme işlemi
+                        const imageUploadInput = document.getElementById('image-upload');
+                        imageUploadInput?.addEventListener('change', function() {
+                            if (this.files && this.files.length > 0) {
+                                const galleryContainer = document.getElementById('gallery-container');
+                                const addImageContainer = document.querySelector('.add-image-container');
+
+                                Array.from(this.files).forEach(file => {
+                                    // Dosya boyutu ve türü kontrolü yapılabilir
+                                    if (file.type.startsWith('image/')) {
+                                        const reader = new FileReader();
+                                        reader.onload = function(e) {
+                                            const galleryItem = document.createElement('div');
+                                            galleryItem.className = 'gallery-item';
+                                            galleryItem.setAttribute('draggable', 'true');
+                                            galleryItem.innerHTML = `
+                                                <img src="${e.target.result}" class="gallery-image" alt="Yeni Görsel">
+                                                <div class="gallery-actions">
+                                                    <button type="button" class="btn btn-sm btn-danger delete-image" title="Görseli Sil">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            `;
+
+                                            // Yeni eklenen görseli silme olayı
+                                            const deleteBtn = galleryItem.querySelector('.delete-image');
+                                            deleteBtn.addEventListener('click', function(e) {
+                                                e.stopPropagation();
+                                                galleryItem.remove();
+
+                                                // Ana görsel güncellemesi
+                                                updateMainImageIfNeeded();
+                                            });
+
+                                            // Yeni eklenen görsele tıklama olayı
+                                            const newImg = galleryItem.querySelector('.gallery-image');
+                                            newImg.addEventListener('click', function() {
+                                                document.querySelectorAll('.gallery-image').forEach(i => i.classList.remove('active'));
+                                                this.classList.add('active');
+                                                document.getElementById('main-image-preview').src = this.src;
+                                            });
+
+                                            // Galeriye ekle (ekleme butonunun önüne)
+                                            galleryContainer.insertBefore(galleryItem, addImageContainer);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                });
+
+                                // Input'u temizle
+                                this.value = '';
+                            }
+                        });
+
+                        // Görsel silme işlemi
+                        document.querySelectorAll('.delete-image').forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const galleryItem = this.closest('.gallery-item');
+                                const isActive = galleryItem.querySelector('.gallery-image.active');
+                                galleryItem.remove();
+
+                                // Ana görsel güncellemesi
+                                if (isActive) {
+                                    updateMainImageIfNeeded();
+                                }
+                            });
+                        });
+
+                        function updateMainImageIfNeeded() {
+                            // Aktif görsel yoksa ilk görseli aktif yap
+                            const activeImg = document.querySelector('.gallery-image.active');
+                            if (!activeImg) {
+                                const firstImg = document.querySelector('.gallery-image');
+                                if (firstImg) {
+                                    firstImg.classList.add('active');
+                                    document.getElementById('main-image-preview').src = firstImg.src;
+                                } else {
+                                    // Hiç görsel kalmadıysa no-image göster
+                                    document.getElementById('main-image-preview').src = '';
+                                }
+                            }
+                        }
+
+                        // Sürükle bırak ile sıralama
+                        const galleryContainer = document.getElementById('gallery-container');
+                        let draggedItem = null;
+
+                        document.querySelectorAll('.gallery-item').forEach(item => {
+                            item.addEventListener('dragstart', handleDragStart);
+                            item.addEventListener('dragover', handleDragOver);
+                            item.addEventListener('dragenter', handleDragEnter);
+                            item.addEventListener('dragleave', handleDragLeave);
+                            item.addEventListener('drop', handleDrop);
+                            item.addEventListener('dragend', handleDragEnd);
+                        });
+
+                        function handleDragStart(e) {
+                            draggedItem = this;
+                            this.style.opacity = '0.4';
+                            e.dataTransfer.effectAllowed = 'move';
+                            e.dataTransfer.setData('text/html', this.innerHTML);
+                        }
+
+                        function handleDragOver(e) {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                        }
+
+                        function handleDragEnter(e) {
+                            this.classList.add('drag-over');
+                        }
+
+                        function handleDragLeave(e) {
+                            this.classList.remove('drag-over');
+                        }
+
+                        function handleDrop(e) {
+                            e.preventDefault();
+                            if (draggedItem !== this) {
+                                // Sürüklenen öğeyi hedef konuma ekle
+                                const targetElement = this;
+                                const parent = targetElement.parentNode;
+                                const targetNext = targetElement.nextElementSibling;
+
+                                if (targetNext === draggedItem) {
+                                    parent.insertBefore(draggedItem, targetElement);
+                                } else {
+                                    targetElement.parentNode.insertBefore(draggedItem, targetElement);
+                                }
+                            }
+                            this.classList.remove('drag-over');
+                            return false;
+                        }
+
+                        function handleDragEnd(e) {
+                            this.style.opacity = '1';
+                            document.querySelectorAll('.gallery-item').forEach(item => {
+                                item.classList.remove('drag-over');
+                            });
+                        }
                     }
                 }, 700);
             }
