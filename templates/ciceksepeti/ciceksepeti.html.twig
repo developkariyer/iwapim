@@ -318,8 +318,8 @@
                                                 {% endif %}
                                             </div>
                                             <div class="d-flex flex-column">
-                                                <span class="variant-item-name">${escapeHtml('{{ listing.productName|default('İsimsiz Ürün')|e('js') }}')}</span>
-                                                <small class="text-muted">{{ listing.productCode }}</small>
+                                                <span class="variant-item-name">{{ listing.productName|default('İsimsiz Ürün')|e('js') }}</span>
+                                                <small class="text-muted">{{ listing.productCode|default('') }}</small>
                                             </div>
                                         </a>
                                     `;
@@ -365,31 +365,10 @@
                     if ('{{ code }}' === mainCode) {
                         {% for listing in listings %}
                         if ({{ loop.index0 }} == variantIndex) {
-                            const variant = {
-                                link: '{{ listing.link|default('#')|e('js') }}',
-                                images: {{ listing.images|json_encode|raw }},
-                                barcode: '{{ listing.barcode|default('')|e('js') }}',
-                                variantIsActive: {{ listing.variantIsActive ? 'true' : 'false' }},
-                                listPrice: '{{ listing.listPrice|default('')|e('js') }}',
-                                stockCode: '{{ listing.stockCode|default('')|e('js') }}',
-                                attributes: {{ listing.attributes|json_encode|raw }},
-                                salesPrice: '{{ listing.salesPrice|default('')|e('js') }}',
-                                description: '{{ listing.description|default('')|e('js') }}',
-                                productCode: '{{ listing.productCode|default('')|e('js') }}',
-                                productName: '{{ listing.productName|default('İsimsiz Ürün')|e('js') }}',
-                                deliveryType: '{{ listing.deliveryType|default('')|e('js') }}',
-                                stockQuantity: '{{ listing.stockQuantity|default('')|e('js') }}',
-                                commissionRate: '{{ listing.commissionRate|default('')|e('js') }}',
-                                mainProductCode: '{{ listing.mainProductCode|default('')|e('js') }}',
-                                numberOfFavorites: '{{ listing.numberOfFavorites|default('')|e('js') }}',
-                                productIsActive: '{{ listing.productIsActive|default('')|e('js') }}',
-                                deliveryMessageType: '{{ listing.deliveryMessageType|default('')|e('js') }}'
-                            };
-
                             formHTML = `
                                             <form id="variant-edit-form" class="p-4">
                                                 <input type="hidden" name="variantIndex" value="${variantIndex}">
-                                                <input type="hidden" name="mainProductCode" value="${escapeHtml(variant.mainProductCode)}">
+                                                <input type="hidden" name="mainProductCode" value="{{ listing.mainProductCode|default('')|e('js') }}">
 
                                                 <div class="row">
                                                     <!-- Sol Kolon: Resim ve ürün adı -->
@@ -397,15 +376,17 @@
                                                         <div class="form-section">
                                                             <h6>Ürün Görselleri</h6>
                                                             <div class="text-center mb-3">
-                                                                <img id="main-image-preview" src="${variant.images && variant.images.length > 0 ? variant.images[0] : ''}"
+                                                                <img id="main-image-preview" src="{{ listing.images[0]|default('')|e('js') }}"
                                                                     class="image-preview" alt="Ürün Görseli">
                                                             </div>
 
                                                             <div class="gallery-preview">
-                                                                ${variant.images && variant.images.map((img, idx) => `
-                                                                    <img src="${img}" class="gallery-image ${idx === 0 ? 'active' : ''}"
-                                                                        data-index="${idx}" alt="Görsel ${idx+1}">
-                                                                `).join('')}
+                                                                {% if listing.images is defined %}
+                                                                    {% for img in listing.images %}
+                                                                        <img src="{{ img }}" class="gallery-image {% if loop.first %}active{% endif %}"
+                                                                            data-index="{{ loop.index0 }}" alt="Görsel {{ loop.index }}">
+                                                                    {% endfor %}
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -417,22 +398,22 @@
                                                             <div class="row">
                                                                 <div class="col-md-8 mb-3">
                                                                     <label for="productName" class="form-label">Ürün Adı</label>
-                                                                    <input type="text" class="form-control" id="productName" name="productName" value="${escapeHtml(variant.productName)}">
+                                                                    <input type="text" class="form-control" id="productName" name="productName" value="{{ listing.productName|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-4 mb-3">
                                                                     <label for="productCode" class="form-label">Ürün Kodu</label>
-                                                                    <input type="text" class="form-control" id="productCode" name="productCode" value="${escapeHtml(variant.productCode)}" readonly>
+                                                                    <input type="text" class="form-control" id="productCode" name="productCode" value="{{ listing.productCode|default('')|e('js') }}" readonly>
                                                                 </div>
 
                                                                 <div class="col-md-6 mb-3">
                                                                     <label for="barcode" class="form-label">Barkod</label>
-                                                                    <input type="text" class="form-control" id="barcode" name="barcode" value="${escapeHtml(variant.barcode)}">
+                                                                    <input type="text" class="form-control" id="barcode" name="barcode" value="{{ listing.barcode|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-6 mb-3">
                                                                     <label for="stockCode" class="form-label">Stok Kodu</label>
-                                                                    <input type="text" class="form-control" id="stockCode" name="stockCode" value="${escapeHtml(variant.stockCode)}">
+                                                                    <input type="text" class="form-control" id="stockCode" name="stockCode" value="{{ listing.stockCode|default('')|e('js') }}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -442,27 +423,27 @@
                                                             <div class="row">
                                                                 <div class="col-md-4 mb-3">
                                                                     <label for="listPrice" class="form-label">Liste Fiyatı</label>
-                                                                    <input type="text" class="form-control" id="listPrice" name="listPrice" value="${escapeHtml(variant.listPrice)}">
+                                                                    <input type="text" class="form-control" id="listPrice" name="listPrice" value="{{ listing.listPrice|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-4 mb-3">
                                                                     <label for="salesPrice" class="form-label">Satış Fiyatı</label>
-                                                                    <input type="text" class="form-control" id="salesPrice" name="salesPrice" value="${escapeHtml(variant.salesPrice)}">
+                                                                    <input type="text" class="form-control" id="salesPrice" name="salesPrice" value="{{ listing.salesPrice|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-4 mb-3">
                                                                     <label for="stockQuantity" class="form-label">Stok Miktarı</label>
-                                                                    <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" value="${escapeHtml(variant.stockQuantity)}">
+                                                                    <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" value="{{ listing.stockQuantity|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-4 mb-3">
                                                                     <label for="commissionRate" class="form-label">Komisyon Oranı (%)</label>
-                                                                    <input type="text" class="form-control" id="commissionRate" name="commissionRate" value="${escapeHtml(variant.commissionRate)}">
+                                                                    <input type="text" class="form-control" id="commissionRate" name="commissionRate" value="{{ listing.commissionRate|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-4 mb-3">
                                                                     <label for="numberOfFavorites" class="form-label">Favori Sayısı</label>
-                                                                    <input type="number" class="form-control" id="numberOfFavorites" name="numberOfFavorites" value="${escapeHtml(variant.numberOfFavorites)}" readonly>
+                                                                    <input type="number" class="form-control" id="numberOfFavorites" name="numberOfFavorites" value="{{ listing.numberOfFavorites|default('')|e('js') }}" readonly>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -473,23 +454,23 @@
                                                                 <div class="col-md-6 mb-3">
                                                                     <label class="form-label d-block">Varyant Durumu</label>
                                                                     <div class="form-check form-check-inline">
-                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveYes" value="1" ${variant.variantIsActive ? 'checked' : ''}>
+                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveYes" value="1" {% if listing.variantIsActive %}checked{% endif %}>
                                                                         <label class="form-check-label" for="variantIsActiveYes">Aktif</label>
                                                                     </div>
                                                                     <div class="form-check form-check-inline">
-                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveNo" value="0" ${!variant.variantIsActive ? 'checked' : ''}>
+                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveNo" value="0" {% if not listing.variantIsActive %}checked{% endif %}>
                                                                         <label class="form-check-label" for="variantIsActiveNo">Pasif</label>
                                                                     </div>
                                                                 </div>
 
                                                                 <div class="col-md-6 mb-3">
                                                                     <label for="deliveryType" class="form-label">Teslimat Tipi</label>
-                                                                    <input type="text" class="form-control" id="deliveryType" name="deliveryType" value="${escapeHtml(variant.deliveryType)}">
+                                                                    <input type="text" class="form-control" id="deliveryType" name="deliveryType" value="{{ listing.deliveryType|default('')|e('js') }}">
                                                                 </div>
 
                                                                 <div class="col-md-12 mb-3">
                                                                     <label for="deliveryMessageType" class="form-label">Teslimat Mesaj Tipi</label>
-                                                                    <input type="text" class="form-control" id="deliveryMessageType" name="deliveryMessageType" value="${escapeHtml(variant.deliveryMessageType)}">
+                                                                    <input type="text" class="form-control" id="deliveryMessageType" name="deliveryMessageType" value="{{ listing.deliveryMessageType|default('')|e('js') }}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -497,7 +478,7 @@
                                                         <div class="form-section">
                                                             <h6>Ürün Açıklaması</h6>
                                                             <div class="mb-3">
-                                                                <textarea class="form-control" id="description" name="description" rows="4">${escapeHtml(variant.description)}</textarea>
+                                                                <textarea class="form-control" id="description" name="description" rows="4">{{ listing.description|default('')|e('js') }}</textarea>
                                                             </div>
                                                         </div>
 
@@ -507,17 +488,18 @@
                                                                 <div class="col-12 mb-3">
                                                                     <label for="link" class="form-label">Ürün Linki</label>
                                                                     <div class="input-group">
-                                                                        <input type="text" class="form-control" id="link" name="link" value="${escapeHtml(variant.link)}" readonly>
+                                                                        <input type="text" class="form-control" id="link" name="link" value="{{ listing.link|default('')|e('js') }}" readonly>
                                                                         <button class="btn btn-outline-secondary" type="button" id="copyLink">
                                                                             <i class="fas fa-copy"></i>
                                                                         </button>
-                                                                        <a href="${escapeHtml(variant.link)}" target="_blank" class="btn btn-outline-primary">
+                                                                        <a href="{{ listing.link|default('#')|e('js') }}" target="_blank" class="btn btn-outline-primary">
                                                                             <i class="fas fa-external-link-alt"></i>
                                                                         </a>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
+                                                            {% if listing.attributes is defined and listing.attributes is iterable %}
                                                             <div class="mb-3">
                                                                 <label class="form-label">Özellikler</label>
                                                                 <div class="table-responsive">
@@ -529,19 +511,20 @@
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            ${variant.attributes && Object.entries(variant.attributes).map(([key, value]) => `
+                                                                            {% for key, value in listing.attributes %}
                                                                                 <tr>
-                                                                                    <td>${escapeHtml(key)}</td>
+                                                                                    <td>{{ key }}</td>
                                                                                     <td>
                                                                                         <input type="text" class="form-control form-control-sm"
-                                                                                            name="attributes[${escapeHtml(key)}]" value="${escapeHtml(value)}">
+                                                                                            name="attributes[{{ key }}]" value="{{ value|e('html_attr') }}">
                                                                                     </td>
                                                                                 </tr>
-                                                                            `).join('')}
+                                                                            {% endfor %}
                                                                         </tbody>
                                                                     </table>
                                                                 </div>
                                                             </div>
+                                                            {% endif %}
                                                         </div>
 
                                                         <div class="d-flex justify-content-between mt-4">
@@ -620,16 +603,6 @@
                         });
                     }
                 }, 700);
-            }
-
-            // HTML escape helper
-            function escapeHtml(unsafe) {
-                return unsafe
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
             }
         });
     </script>
