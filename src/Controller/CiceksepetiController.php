@@ -24,7 +24,7 @@ class CiceksepetiController extends FrontendController
     public function ciceksepetiMainPage(): Response
     {
         return $this->render('ciceksepeti/ciceksepeti.html.twig', [
-            'groupedListings' => $this->getCiceksepetiListings()
+            'grouped' => $this->getCiceksepetiListings()
         ]);
     }
 
