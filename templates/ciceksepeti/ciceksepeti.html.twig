@@ -7,20 +7,218 @@
 
 {% endblock %}
 {% block content %}
-    <h1>Ciceksepeti</h1>
-    <ul>
-        {% for listing in ciceksepetiListings %}
-            <li>{{ listing.link }}</li>
-        {% else %}
-            <li>Hiçbir liste bulunamadı.</li>
-        {% endfor %}
-    </ul>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Çiçeksepeti Ürünleri</h1>
+
+        <!-- Ana ürün grupları -->
+        <div class="row g-4 product-groups">
+            {% set groupedProducts = {} %}
+
+            {# Ürünleri mainProductCode'a göre gruplandır #}
+            {% for listing in ciceksepetiListings %}
+                {% set mainCode = listing.mainProductCode %}
+                {% if mainCode not in groupedProducts|keys %}
+                    {% set groupedProducts = groupedProducts|merge({(mainCode): []}) %}
+                {% endif %}
+                {% set groupedProducts = groupedProducts|merge({
+                    (mainCode): groupedProducts[mainCode]|merge([listing])
+                }) %}
+            {% endfor %}
+
+            {% if groupedProducts|length > 0 %}
+                {% for mainCode, products in groupedProducts %}
+                    {% set firstProduct = products|first %}
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <div class="product-group-card" data-main-code="{{ mainCode }}">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-img-container">
+                                    {% if firstProduct.images is defined and firstProduct.images|length > 0 %}
+                                        <img src="{{ firstProduct.images[0] }}" class="card-img-top" alt="{{ firstProduct.productName|default('Ürün') }}">
+                                    {% else %}
+                                        <div class="no-image">Resim yok</div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ firstProduct.productName|default('İsimsiz Ürün') }}</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">{{ products|length }} varyasyon</small>
+                                    </p>
+                                    <button class="btn btn-primary show-variants">Varyasyonları Göster</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">Hiçbir ürün bulunamadı.</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Ürün varyasyonları modalı -->
+        <div class="modal fade" id="variantsModal" tabindex="-1" aria-labelledby="variantsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="variantsModalLabel">Ürün Varyasyonları</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="variants-container row g-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .product-group-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .product-group-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-container {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-img-top {
+            transform: scale(1.1);
+        }
+
+        .no-image {
+            height: 100%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
+        .variant-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .variant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .variant-img-container {
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .variant-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Responsive düzenlemeler */
+        @media (max-width: 767px) {
+            .card-img-container {
+                height: 160px;
+            }
+
+            .variant-img-container {
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-img-container {
+                height: 180px;
+            }
+        }
+    </style>
+{% endblock %}
 
 {% block body_scripts %}
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const variantsModal = new bootstrap.Modal(document.getElementById('variantsModal'));
+            const variantsContainer = document.querySelector('.variants-container');
+            const modalTitle = document.getElementById('variantsModalLabel');
 
+            // Tüm ürün grubu kartlarına olay dinleyicileri ekle
+            document.querySelectorAll('.show-variants').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const card = this.closest('.product-group-card');
+                    const mainCode = card.dataset.mainCode;
+                    const productName = card.querySelector('.card-title').textContent;
+
+                    showVariants(mainCode, productName);
+                });
+            });
+
+            // Varyasyonları modal'da göster
+            function showVariants(mainCode, productName) {
+                modalTitle.textContent = `${productName} - Varyasyonlar`;
+                variantsContainer.innerHTML = '';
+
+                // AJAX ile varyasyonları al veya sayfadaki verileri filtrele
+                // Bu örnekte sayfadaki verileri kullanıyoruz
+                {% if ciceksepetiListings is defined %}
+                const variants = [];
+
+                {% for listing in ciceksepetiListings %}
+                if ('{{ listing.mainProductCode }}' === mainCode) {
+                    variants.push({
+                        productName: '{{ listing.productName|default('İsimsiz Ürün')|e('js') }}',
+                        image: {% if listing.images is defined and listing.images|length > 0 %}
+                            '{{ listing.images[0]|e('js') }}'
+                        {% else %}
+                        null
+                        {% endif %},
+                        link: '{{ listing.link|default('#')|e('js') }}'
+                        // Diğer bilgileri de ekleyebilirsiniz
+                    });
+                }
+                {% endfor %}
+
+                // Her varyasyon için kart oluştur
+                variants.forEach(variant => {
+                    const variantCard = document.createElement('div');
+                    variantCard.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+                    variantCard.innerHTML = `
+                        <div class="card variant-card h-100 shadow-sm">
+                            <div class="variant-img-container">
+                                ${variant.image ?
+                        `<img src="${variant.image}" class="variant-img" alt="${variant.productName}">` :
+                        `<div class="no-image">Resim yok</div>`}
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">${variant.productName}</h6>
+                                <a href="${variant.link}" class="btn btn-sm btn-outline-primary mt-2" target="_blank">Detay</a>
+                            </div>
+                        </div>
+                    `;
+                    variantsContainer.appendChild(variantCard);
+                });
+                {% endif %}
+
+                variantsModal.show();
+            }
+        });
     </script>
 
 {% endblock %}
