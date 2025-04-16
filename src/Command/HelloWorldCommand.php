@@ -57,8 +57,12 @@ class HelloWorldCommand extends AbstractCommand
                 'deliveryMessageType' => $apiData['deliveryMessageType'],
             ];
         }
-        print_r($ciceksepetiVariant);
-
+        $grouped = [];
+        foreach ($ciceksepetiVariant as $listing) {
+            $mainCode = $listing['mainProductCode'] ?? 'unknown';
+            $grouped[$mainCode][] = $listing;
+        }
+        print_r($grouped);
 
 
 
