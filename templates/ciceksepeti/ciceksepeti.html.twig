@@ -6,8 +6,6 @@
 {% block header %}
 
 {% endblock %}
-{% block title %}Çiçeksepeti Ürün Listesi{% endblock %}
-
 {% block content %}
     <div class="container mt-4">
         <h1 class="text-center mb-4">Çiçeksepeti Ürünleri</h1>
@@ -39,12 +37,13 @@
                                     {% else %}
                                         <div class="no-image">Resim yok</div>
                                     {% endif %}
-                                    <div class="variant-count-badge">
-                                        {{ products|length }} varyasyon
-                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title">{{ firstProduct.productName|default('İsimsiz Ürün') }}</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">{{ products|length }} varyasyon</small>
+                                    </p>
+                                    <button class="btn btn-primary show-variants">Varyasyonları Göster</button>
                                 </div>
                             </div>
                         </div>
@@ -57,222 +56,27 @@
             {% endif %}
         </div>
 
-        <!-- Ürün varyantları bölümü -->
-        <div id="variants-section" class="mt-5 d-none">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 id="variants-title">Ürün Varyantları</h3>
-                <button class="btn btn-outline-secondary btn-sm" id="close-variants">
-                    <i class="fas fa-times"></i> Kapat
-                </button>
+        <!-- Ürün varyasyonları modalı -->
+        <div class="modal fade" id="variantsModal" tabindex="-1" aria-labelledby="variantsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="variantsModalLabel">Ürün Varyasyonları</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="variants-container row g-3"></div>
+                    </div>
+                </div>
             </div>
-            <div class="row g-3" id="variants-container"></div>
         </div>
     </div>
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .product-group-card {
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            position: relative;
-        }
-
-        .product-group-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-group-card.active {
-            box-shadow: 0 0 0 3px #0d6efd, 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .card-img-container {
-            height: 200px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .card-img-top {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .card:hover .card-img-top {
-            transform: scale(1.1);
-        }
-
-        .variant-count-badge {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background-color: rgba(13, 110, 253, 0.8);
-            color: white;
-            padding: 4px 8px;
-            font-size: 12px;
-            border-radius: 8px 0 0 0;
-        }
-
-        .no-image {
-            height: 100%;
-            background-color: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-        }
-
-        .variant-card {
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            height: 100%;
-        }
-
-        .variant-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-
-        .variant-img-container {
-            height: 180px;
-            overflow: hidden;
-        }
-
-        .variant-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .variant-card:hover .variant-img {
-            transform: scale(1.1);
-        }
-
-        #variants-section {
-            scroll-margin-top: 20px;
-            transition: all 0.5s ease;
-        }
-
-        /* Responsive düzenlemeler */
-        @media (max-width: 767px) {
-            .card-img-container {
-                height: 160px;
-            }
-
-            .variant-img-container {
-                height: 140px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .card-img-container {
-                height: 180px;
-            }
-        }
-    </style>
-{% endblock %}
 
 {% block body_scripts %}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const variantsSection = document.getElementById('variants-section');
-            const variantsContainer = document.getElementById('variants-container');
-            const variantsTitle = document.getElementById('variants-title');
-            const closeVariantsBtn = document.getElementById('close-variants');
-            let activeCard = null;
 
-            // Tüm ürün grubu kartlarına olay dinleyicileri ekle
-            document.querySelectorAll('.product-group-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const mainCode = this.dataset.mainCode;
-                    const productName = this.querySelector('.card-title').textContent;
-
-                    // Önceki aktif kartı temizle
-                    if (activeCard) {
-                        activeCard.classList.remove('active');
-                    }
-
-                    // Bu kartı aktif olarak işaretle
-                    this.classList.add('active');
-                    activeCard = this;
-
-                    showVariants(mainCode, productName);
-                });
-            });
-
-            // Varyantları kapat düğmesi
-            closeVariantsBtn.addEventListener('click', function() {
-                variantsSection.classList.add('d-none');
-                if (activeCard) {
-                    activeCard.classList.remove('active');
-                    activeCard = null;
-                }
-            });
-
-            // Varyasyonları göster
-            function showVariants(mainCode, productName) {
-                variantsTitle.textContent = `${productName} - Varyantlar`;
-                variantsContainer.innerHTML = '';
-                variantsSection.classList.remove('d-none');
-
-                // AJAX ile varyasyonları al veya sayfadaki verileri filtrele
-                // Bu örnekte sayfadaki verileri kullanıyoruz
-                {% if ciceksepetiListings is defined %}
-                const variants = [];
-
-                {% for listing in ciceksepetiListings %}
-                if ('{{ listing.mainProductCode }}' === mainCode) {
-                    variants.push({
-                        productName: '{{ listing.productName|default('İsimsiz Ürün')|e('js') }}',
-                        image: {% if listing.images is defined and listing.images|length > 0 %}
-                            '{{ listing.images[0]|e('js') }}'
-                        {% else %}
-                        null
-                        {% endif %},
-                        link: '{{ listing.link|default('#')|e('js') }}'
-                        // Diğer bilgileri de ekleyebilirsiniz
-                    });
-                }
-                {% endfor %}
-
-                // Her varyasyon için kart oluştur
-                variants.forEach(variant => {
-                    const variantCard = document.createElement('div');
-                    variantCard.className = 'col-12 col-sm-6 col-md-4 col-lg-3 mb-4';
-                    variantCard.innerHTML = `
-                        <div class="card variant-card">
-                            <div class="variant-img-container">
-                                ${variant.image ?
-                        `<img src="${variant.image}" class="variant-img" alt="${variant.productName}">` :
-                        `<div class="no-image">Resim yok</div>`}
-                            </div>
-                            <div class="card-body">
-                                <h6 class="card-title">${variant.productName}</h6>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <a href="${variant.link}" class="btn btn-sm btn-primary" target="_blank">
-                                        Ürüne Git
-                                    </a>
-                                    <button class="btn btn-sm btn-outline-secondary add-to-cart">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    variantsContainer.appendChild(variantCard);
-                });
-                {% endif %}
-
-                // Varyantlar bölümüne kaydır
-                setTimeout(() => {
-                    variantsSection.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-            }
-        });
     </script>
+
 {% endblock %}
