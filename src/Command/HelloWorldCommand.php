@@ -35,19 +35,29 @@ class HelloWorldCommand extends AbstractCommand
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
             $ciceksepetiVariant[] = [
-                'link' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)['link'],
-                'images' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)['images'],
-                'barcode' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)['barcode'],
-                'variantIsActive' => json_decode($variantProduct->jsonRead('apiResponseJson'), true)['isActive'],
-                'listPrice' =>
-
+                'link' => $apiData['link'],
+                'images' => $apiData['images'],
+                'barcode' => $apiData['barcode'],
+                'variantIsActive' => $apiData['isActive'],
+                'listPrice' => $apiData['listPrice'],
+                'stockCode' => $apiData['stockCode'],
+                'attributes' => $apiData['attributes'],
+                'salesPrice' => $apiData['salesPrice'],
+                'description' => $apiData['description'],
+                'productCode' => $apiData['productCode'],
+                'productName' => $apiData['productName'],
+                'deliveryType' => $apiData['deliveryType'],
+                'stockQuantity' => $apiData['stockQuantity'],
+                'commissionRate' => $apiData['commissionRate'],
+                'mainProductCode' => $apiData['mainProductCode'],
+                'numberOfFavorites' => $apiData['numberOfFavorites'],
+                'productIsActive' => $apiData['productStatusType'],
+                'deliveryMessageType' => $apiData['deliveryMessageType'],
             ];
-
-
-
         }
-
+        print_r($ciceksepetiVariant);
 
 
 
