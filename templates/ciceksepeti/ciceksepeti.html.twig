@@ -8,6 +8,13 @@
 {% endblock %}
 {% block content %}
     <h1>Ciceksepeti</h1>
+    <ul>
+        {% for listing in ciceksepetiListings %}
+            <li>{{ listing.title }}</li>
+        {% else %}
+            <li>Hiçbir liste bulunamadı.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 
