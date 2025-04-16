@@ -23,8 +23,16 @@ class CiceksepetiController extends FrontendController
      */
     public function ciceksepetiMainPage(): Response
     {
+        $listings = $this->getCiceksepetiListings();
+
+        $grouped = [];
+        foreach ($listings as $listing) {
+            $mainCode = $listing['mainProductCode'] ?? 'unknown';
+            $grouped[$mainCode][] = $listing;
+        }
+
         return $this->render('ciceksepeti/ciceksepeti.html.twig', [
-            'ciceksepetiListings' => $this->getCiceksepetiListings()
+            'groupedListings' => $grouped
         ]);
     }
 
