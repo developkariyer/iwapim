@@ -6,6 +6,14 @@
 {% block header %}
 
 {% endblock %}
+{% extends 'base.html.twig' %}
+{% block title %} Çiçeksepeti Ürünler {% endblock %}
+{% block navbaritems %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
 {% block content %}
     <div class="container mt-4">
         <h1 class="text-center mb-4">Çiçeksepeti Ürünleri</h1>
@@ -36,20 +44,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Varyantlar bu ürünün altına yerleştirilecek -->
-                        <div class="variants-row d-none" id="variants-{{ mainCode }}">
-                            <div class="variants-container p-3 rounded">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="variant-title mb-0">Varyantlar</h5>
-                                    <button class="btn btn-sm btn-outline-secondary close-variants">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="variants-content">
-                                    <!-- Varyantlar buraya dinamik olarak eklenecek -->
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -57,6 +51,45 @@
                     <div class="alert alert-info">Hiçbir ürün bulunamadı.</div>
                 </div>
             {% endif %}
+        </div>
+    </div>
+
+    <!-- Tam ekran varyant formu modalı -->
+    <div class="modal fade" id="variantsModal" tabindex="-1" aria-labelledby="variantsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="variantsModalLabel">Ürün Varyantları</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <!-- Varyant listesi (sol panel) -->
+                            <div class="col-md-3 border-end bg-light p-0" style="height: calc(100vh - 120px); overflow-y: auto;">
+                                <div id="variants-list" class="list-group list-group-flush">
+                                    <!-- Varyant listesi dinamik olarak buraya eklenecek -->
+                                </div>
+                            </div>
+
+                            <!-- Varyant detayları ve form (sağ panel) -->
+                            <div class="col-md-9 p-0">
+                                <div id="variant-form-container" style="height: calc(100vh - 120px); overflow-y: auto;">
+                                    <div class="text-center p-5 h-100 d-flex align-items-center justify-content-center">
+                                        <div>
+                                            <i class="fas fa-arrow-left fa-2x text-muted"></i>
+                                            <p class="mt-3 text-muted">Düzenlemek için bir varyant seçin</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -117,82 +150,109 @@
             color: #6c757d;
         }
 
-        /* Varyantlar bölümü için stiller */
-        .variants-row {
-            grid-column: 1 / -1;
-            width: 100%;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
+        /* Varyant listesi stilleri */
+        .list-group-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
         }
 
-        .variants-container {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
+        .list-group-item:hover {
+            background-color: #f5f5f5;
         }
 
-        /* Varyant kartları için stiller */
-        .variant-card {
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            height: 100%;
-            margin-bottom: 15px;
+        .list-group-item.active {
+            background-color: #e9f0fd;
+            color: #0d6efd;
+            border-left: 3px solid #0d6efd;
         }
 
-        .variant-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-
-        .variant-img-container {
-            height: 160px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .variant-img {
-            width: 100%;
-            height: 100%;
+        .variant-item-image {
+            width: 40px;
+            height: 40px;
             object-fit: cover;
-            transition: transform 0.3s ease;
+            border-radius: 4px;
         }
 
-        .variant-card:hover .variant-img {
+        .variant-item-name {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        /* Form stilleri */
+        .form-section {
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+        }
+
+        .form-section h6 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .image-preview {
+            height: 240px;
+            width: 100%;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .gallery-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .gallery-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .gallery-image.active {
+            border-color: #0d6efd;
+        }
+
+        .gallery-image:hover {
             transform: scale(1.05);
         }
 
-        .discount-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: #dc3545;
-            color: white;
-            padding: 4px 8px;
+        .status-badge {
             font-size: 12px;
-            border-radius: 0 0 0 8px;
-            z-index: 1;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
 
-        /* Editing form styles */
-        .edit-form {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            margin-top: 15px;
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         /* Responsive düzenlemeler */
         @media (max-width: 767px) {
             .card-img-container {
                 height: 160px;
-            }
-
-            .variant-img-container {
-                height: 140px;
             }
         }
 
@@ -207,190 +267,378 @@
 {% block body_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const productContainer = document.getElementById('product-container');
+            // Modal'ı başlat
+            const variantsModal = new bootstrap.Modal(document.getElementById('variantsModal'));
+            const variantsList = document.getElementById('variants-list');
+            const variantFormContainer = document.getElementById('variant-form-container');
+            const modalTitle = document.getElementById('variantsModalLabel');
 
-            // Varyantları göster/gizle butonları için event listener
+            // Varyantları göster butonu tıklama olayı
             document.querySelectorAll('.toggle-variants').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.stopPropagation();
 
                     const productWrapper = this.closest('.product-wrapper');
                     const mainCode = productWrapper.dataset.mainCode;
-                    const variantsRow = document.getElementById(`variants-${mainCode}`);
                     const productName = productWrapper.querySelector('.card-title').textContent;
 
-                    // Diğer tüm açık varyant bölümlerini kapat
-                    document.querySelectorAll('.variants-row:not(.d-none)').forEach(row => {
-                        if (row !== variantsRow) {
-                            row.classList.add('d-none');
-                            const cardParent = row.previousElementSibling;
-                            if (cardParent) {
-                                cardParent.querySelector('.product-group-card').classList.remove('active');
-                                cardParent.querySelector('.toggle-variants').textContent = 'Varyantları Göster';
-                            }
-                        }
-                    });
+                    // Modal başlığını ayarla
+                    modalTitle.textContent = `${productName} - Varyantlar`;
 
-                    // Bu ürünün varyant bölümünü aç/kapat
-                    if (variantsRow.classList.contains('d-none')) {
-                        variantsRow.classList.remove('d-none');
-                        this.closest('.product-group-card').classList.add('active');
-                        this.textContent = 'Varyantları Gizle';
+                    // Varyant listesini temizle ve yükle
+                    variantsList.innerHTML = '<div class="text-center p-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2">Yükleniyor...</span></div>';
+                    variantFormContainer.innerHTML = `
+                        <div class="text-center p-5 h-100 d-flex align-items-center justify-content-center">
+                            <div>
+                                <i class="fas fa-arrow-left fa-2x text-muted"></i>
+                                <p class="mt-3 text-muted">Düzenlemek için bir varyant seçin</p>
+                            </div>
+                        </div>
+                    `;
 
-                        // Varyantları yükle
-                        loadVariants(mainCode, productName, variantsRow.querySelector('.variants-content'));
+                    // Veri hazırlama
+                    loadVariantsList(mainCode);
 
-                        // Sayfayı varyantların görüneceği yere kaydır
-                        setTimeout(() => {
-                            variantsRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }, 100);
-                    } else {
-                        variantsRow.classList.add('d-none');
-                        this.closest('.product-group-card').classList.remove('active');
-                        this.textContent = 'Varyantları Göster';
-                    }
+                    // Modal'ı göster
+                    variantsModal.show();
                 });
             });
 
-            // Close buttons for variants
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.close-variants')) {
-                    const variantsRow = e.target.closest('.variants-row');
-                    const productWrapper = e.target.closest('.product-wrapper');
-
-                    variantsRow.classList.add('d-none');
-                    productWrapper.querySelector('.product-group-card').classList.remove('active');
-                    productWrapper.querySelector('.toggle-variants').textContent = 'Varyantları Göster';
-                }
-            });
-
-            // Varyantları yükleme fonksiyonu
-            function loadVariants(mainCode, productName, container) {
-                container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div></div>';
-
-                // Varyant verilerini oluştur
-                let variantsHTML = '';
-
-                {% if groupedListings is defined %}
-                {% for code, listings in groupedListings %}
-                if ('{{ code }}' === mainCode) {
-                    // Varyant kartlarını oluştur
-                    variantsHTML += '<div class="row g-3">';
-
-                    {% for listing in listings %}
-                    variantsHTML += `
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="card variant-card">
-                                            <div class="variant-img-container">
-                                                {% if listing.discountPercentage is defined %}
-                                                    <div class="discount-badge">%{{ listing.discountPercentage }}</div>
-                                                {% endif %}
-                                                {% if listing.images is defined and listing.images|length > 0 %}
-                                                    <img src="{{ listing.images[0] }}" class="variant-img" alt="{{ listing.productName|default('Ürün')|e('js') }}">
-                                                {% else %}
-                                                    <div class="no-image">Resim yok</div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="card-body">
-                                                <h6 class="variant-name">{{ listing.productName|default('İsimsiz Ürün')|e('js') }}</h6>
-                                                {% if listing.price is defined %}
-                                                    <p class="price text-primary fw-bold">{{ listing.price }}</p>
-                                                {% endif %}
-
-                                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <a href="{{ listing.link|default('#')|e('js') }}" class="btn btn-sm btn-primary" target="_blank">
-                                                        Ürüne Git
-                                                    </a>
-                                                    <button class="btn btn-sm btn-outline-secondary edit-variant"
-                                                        data-variant-id="{{ loop.index }}">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                </div>
-
-                                                <div class="edit-form-container mt-3 d-none" id="edit-form-{{ loop.index }}">
-                                                    <form class="edit-variant-form">
-                                                        <div class="mb-2">
-                                                            <label class="form-label small">Ürün Adı</label>
-                                                            <input type="text" class="form-control form-control-sm"
-                                                                name="productName" value="{{ listing.productName|default('İsimsiz Ürün')|e('js') }}">
-                                                        </div>
-                                                        <div class="mb-2">
-                                                            <label class="form-label small">Fiyat</label>
-                                                            <input type="text" class="form-control form-control-sm"
-                                                                name="price" value="{{ listing.price|default('')|e('js') }}">
-                                                        </div>
-                                                        <div class="d-flex justify-content-between">
-                                                            <button type="submit" class="btn btn-sm btn-success">Kaydet</button>
-                                                            <button type="button" class="btn btn-sm btn-outline-secondary cancel-edit">İptal</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                    {% endfor %}
-
-                    variantsHTML += '</div>';
-                }
-                {% endfor %}
-                {% endif %}
-
-                // Eğer veri yoksa bilgi mesajı göster
-                if (variantsHTML === '') {
-                    variantsHTML = '<div class="alert alert-info">Bu ürün için varyant bulunamadı.</div>';
-                }
-
-                // Oluşturulan HTML'i container'a ekle
+            // Varyant listesini yükleme fonksiyonu
+            function loadVariantsList(mainCode) {
                 setTimeout(() => {
-                    container.innerHTML = variantsHTML;
+                    let listHTML = '';
 
-                    // Düzenleme formu işlevleri
-                    container.querySelectorAll('.edit-variant').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const variantId = this.dataset.variantId;
-                            const formContainer = document.getElementById(`edit-form-${variantId}`);
-                            formContainer.classList.toggle('d-none');
+                    {% if groupedListings is defined %}
+                    {% for code, listings in groupedListings %}
+                    if ('{{ code }}' === mainCode) {
+                        {% for listing in listings %}
+                        listHTML += `
+                                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3"
+                                           data-variant-index="{{ loop.index0 }}">
+                                            <div class="me-2">
+                                                {% if listing.images is defined and listing.images|length > 0 %}
+                                                    <img src="{{ listing.images[0] }}" class="variant-item-image" alt="">
+                                                {% else %}
+                                                    <div class="variant-item-image bg-light d-flex align-items-center justify-content-center text-muted">
+                                                        <i class="fas fa-image"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <span class="variant-item-name">${escapeHtml('{{ listing.productName|default('İsimsiz Ürün')|e('js') }}')}</span>
+                                                <small class="text-muted">{{ listing.productCode }}</small>
+                                            </div>
+                                        </a>
+                                    `;
+                        {% endfor %}
+                    }
+                    {% endfor %}
+                    {% endif %}
+
+                    if (listHTML === '') {
+                        variantsList.innerHTML = '<div class="p-3 text-center text-muted">Varyant bulunamadı</div>';
+                    } else {
+                        variantsList.innerHTML = listHTML;
+
+                        // Varyant listesi öğelerine tıklama olayı ekle
+                        document.querySelectorAll('.list-group-item').forEach(item => {
+                            item.addEventListener('click', function(e) {
+                                e.preventDefault();
+
+                                // Aktif sınıfını değiştir
+                                document.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
+                                this.classList.add('active');
+
+                                // Varyant indeksini al
+                                const variantIndex = this.dataset.variantIndex;
+
+                                // Varyant detay formunu yükle
+                                loadVariantForm(mainCode, variantIndex);
+                            });
                         });
-                    });
+                    }
+                }, 500);
+            }
 
-                    container.querySelectorAll('.cancel-edit').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            this.closest('.edit-form-container').classList.add('d-none');
+            // Varyant detay formunu yükleme fonksiyonu
+            function loadVariantForm(mainCode, variantIndex) {
+                variantFormContainer.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div><span class="ms-2">Form yükleniyor...</span></div>';
+
+                setTimeout(() => {
+                    let formHTML = '';
+
+                    {% if groupedListings is defined %}
+                    {% for code, listings in groupedListings %}
+                    if ('{{ code }}' === mainCode) {
+                        {% for listing in listings %}
+                        if ({{ loop.index0 }} == variantIndex) {
+                            const variant = {
+                                link: '{{ listing.link|default('#')|e('js') }}',
+                                images: {{ listing.images|json_encode|raw }},
+                                barcode: '{{ listing.barcode|default('')|e('js') }}',
+                                variantIsActive: {{ listing.variantIsActive ? 'true' : 'false' }},
+                                listPrice: '{{ listing.listPrice|default('')|e('js') }}',
+                                stockCode: '{{ listing.stockCode|default('')|e('js') }}',
+                                attributes: {{ listing.attributes|json_encode|raw }},
+                                salesPrice: '{{ listing.salesPrice|default('')|e('js') }}',
+                                description: '{{ listing.description|default('')|e('js') }}',
+                                productCode: '{{ listing.productCode|default('')|e('js') }}',
+                                productName: '{{ listing.productName|default('İsimsiz Ürün')|e('js') }}',
+                                deliveryType: '{{ listing.deliveryType|default('')|e('js') }}',
+                                stockQuantity: '{{ listing.stockQuantity|default('')|e('js') }}',
+                                commissionRate: '{{ listing.commissionRate|default('')|e('js') }}',
+                                mainProductCode: '{{ listing.mainProductCode|default('')|e('js') }}',
+                                numberOfFavorites: '{{ listing.numberOfFavorites|default('')|e('js') }}',
+                                productIsActive: '{{ listing.productIsActive|default('')|e('js') }}',
+                                deliveryMessageType: '{{ listing.deliveryMessageType|default('')|e('js') }}'
+                            };
+
+                            formHTML = `
+                                            <form id="variant-edit-form" class="p-4">
+                                                <input type="hidden" name="variantIndex" value="${variantIndex}">
+                                                <input type="hidden" name="mainProductCode" value="${escapeHtml(variant.mainProductCode)}">
+
+                                                <div class="row">
+                                                    <!-- Sol Kolon: Resim ve ürün adı -->
+                                                    <div class="col-md-4">
+                                                        <div class="form-section">
+                                                            <h6>Ürün Görselleri</h6>
+                                                            <div class="text-center mb-3">
+                                                                <img id="main-image-preview" src="${variant.images && variant.images.length > 0 ? variant.images[0] : ''}"
+                                                                    class="image-preview" alt="Ürün Görseli">
+                                                            </div>
+
+                                                            <div class="gallery-preview">
+                                                                ${variant.images && variant.images.map((img, idx) => `
+                                                                    <img src="${img}" class="gallery-image ${idx === 0 ? 'active' : ''}"
+                                                                        data-index="${idx}" alt="Görsel ${idx+1}">
+                                                                `).join('')}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Sağ kolon: Form Alanları -->
+                                                    <div class="col-md-8">
+                                                        <div class="form-section">
+                                                            <h6>Temel Bilgiler</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-8 mb-3">
+                                                                    <label for="productName" class="form-label">Ürün Adı</label>
+                                                                    <input type="text" class="form-control" id="productName" name="productName" value="${escapeHtml(variant.productName)}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="productCode" class="form-label">Ürün Kodu</label>
+                                                                    <input type="text" class="form-control" id="productCode" name="productCode" value="${escapeHtml(variant.productCode)}" readonly>
+                                                                </div>
+
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="barcode" class="form-label">Barkod</label>
+                                                                    <input type="text" class="form-control" id="barcode" name="barcode" value="${escapeHtml(variant.barcode)}">
+                                                                </div>
+
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="stockCode" class="form-label">Stok Kodu</label>
+                                                                    <input type="text" class="form-control" id="stockCode" name="stockCode" value="${escapeHtml(variant.stockCode)}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-section">
+                                                            <h6>Fiyat ve Stok</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="listPrice" class="form-label">Liste Fiyatı</label>
+                                                                    <input type="text" class="form-control" id="listPrice" name="listPrice" value="${escapeHtml(variant.listPrice)}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="salesPrice" class="form-label">Satış Fiyatı</label>
+                                                                    <input type="text" class="form-control" id="salesPrice" name="salesPrice" value="${escapeHtml(variant.salesPrice)}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="stockQuantity" class="form-label">Stok Miktarı</label>
+                                                                    <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" value="${escapeHtml(variant.stockQuantity)}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="commissionRate" class="form-label">Komisyon Oranı (%)</label>
+                                                                    <input type="text" class="form-control" id="commissionRate" name="commissionRate" value="${escapeHtml(variant.commissionRate)}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="numberOfFavorites" class="form-label">Favori Sayısı</label>
+                                                                    <input type="number" class="form-control" id="numberOfFavorites" name="numberOfFavorites" value="${escapeHtml(variant.numberOfFavorites)}" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-section">
+                                                            <h6>Durum ve Teslimat</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label class="form-label d-block">Varyant Durumu</label>
+                                                                    <div class="form-check form-check-inline">
+                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveYes" value="1" ${variant.variantIsActive ? 'checked' : ''}>
+                                                                        <label class="form-check-label" for="variantIsActiveYes">Aktif</label>
+                                                                    </div>
+                                                                    <div class="form-check form-check-inline">
+                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveNo" value="0" ${!variant.variantIsActive ? 'checked' : ''}>
+                                                                        <label class="form-check-label" for="variantIsActiveNo">Pasif</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="deliveryType" class="form-label">Teslimat Tipi</label>
+                                                                    <input type="text" class="form-control" id="deliveryType" name="deliveryType" value="${escapeHtml(variant.deliveryType)}">
+                                                                </div>
+
+                                                                <div class="col-md-12 mb-3">
+                                                                    <label for="deliveryMessageType" class="form-label">Teslimat Mesaj Tipi</label>
+                                                                    <input type="text" class="form-control" id="deliveryMessageType" name="deliveryMessageType" value="${escapeHtml(variant.deliveryMessageType)}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-section">
+                                                            <h6>Ürün Açıklaması</h6>
+                                                            <div class="mb-3">
+                                                                <textarea class="form-control" id="description" name="description" rows="4">${escapeHtml(variant.description)}</textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-section">
+                                                            <h6>Diğer Bilgiler</h6>
+                                                            <div class="row">
+                                                                <div class="col-12 mb-3">
+                                                                    <label for="link" class="form-label">Ürün Linki</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="link" name="link" value="${escapeHtml(variant.link)}" readonly>
+                                                                        <button class="btn btn-outline-secondary" type="button" id="copyLink">
+                                                                            <i class="fas fa-copy"></i>
+                                                                        </button>
+                                                                        <a href="${escapeHtml(variant.link)}" target="_blank" class="btn btn-outline-primary">
+                                                                            <i class="fas fa-external-link-alt"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Özellikler</label>
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-sm table-bordered">
+                                                                        <thead class="table-light">
+                                                                            <tr>
+                                                                                <th>Özellik</th>
+                                                                                <th>Değer</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            ${variant.attributes && Object.entries(variant.attributes).map(([key, value]) => `
+                                                                                <tr>
+                                                                                    <td>${escapeHtml(key)}</td>
+                                                                                    <td>
+                                                                                        <input type="text" class="form-control form-control-sm"
+                                                                                            name="attributes[${escapeHtml(key)}]" value="${escapeHtml(value)}">
+                                                                                    </td>
+                                                                                </tr>
+                                                                            `).join('')}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="d-flex justify-content-between mt-4">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                            <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        `;
+                        }
+                        {% endfor %}
+                    }
+                    {% endfor %}
+                    {% endif %}
+
+                    if (formHTML === '') {
+                        variantFormContainer.innerHTML = '<div class="text-center p-5 text-danger">Varyant bilgisi yüklenemedi</div>';
+                    } else {
+                        variantFormContainer.innerHTML = formHTML;
+
+                        // Galeri resimlerine tıklama olayı
+                        document.querySelectorAll('.gallery-image').forEach(img => {
+                            img.addEventListener('click', function() {
+                                // Aktif sınıfını değiştir
+                                document.querySelectorAll('.gallery-image').forEach(i => i.classList.remove('active'));
+                                this.classList.add('active');
+
+                                // Ana resmi güncelle
+                                document.getElementById('main-image-preview').src = this.src;
+                            });
                         });
-                    });
 
-                    container.querySelectorAll('.edit-variant-form').forEach(form => {
-                        form.addEventListener('submit', function(e) {
-                            e.preventDefault();
+                        // Link kopyalama olayı
+                        document.getElementById('copyLink')?.addEventListener('click', function() {
+                            const linkInput = document.getElementById('link');
+                            linkInput.select();
+                            document.execCommand('copy');
 
-                            // Burada form verilerini işleyebilirsiniz
-                            const formData = new FormData(this);
-                            const productName = formData.get('productName');
-                            const price = formData.get('price');
-
-                            // Form verilerini API'ye gönderme işlemi burada yapılabilir
-                            console.log('Güncelleme verileri:', { productName, price });
-
-                            // Form başarıyla gönderildi mesajı
-                            this.closest('.edit-form-container').classList.add('d-none');
-
-                            // Başarılı mesajını göster
-                            const successAlert = document.createElement('div');
-                            successAlert.className = 'alert alert-success mt-2 small py-2';
-                            successAlert.textContent = 'Güncelleme başarılı!';
-                            this.closest('.card-body').appendChild(successAlert);
-
-                            // 2 saniye sonra mesajı kaldır
+                            // Geri bildirim ver
+                            const originalText = this.innerHTML;
+                            this.innerHTML = '<i class="fas fa-check"></i>';
                             setTimeout(() => {
-                                successAlert.remove();
+                                this.innerHTML = originalText;
                             }, 2000);
                         });
-                    });
 
-                }, 500); // Yükleniyor animasyonunu göstermek için kısa bir gecikme
+                        // Form gönderimi olayı
+                        document.getElementById('variant-edit-form').addEventListener('submit', function(e) {
+                            e.preventDefault();
+
+                            // Form verilerini topla
+                            const formData = new FormData(this);
+                            const formObject = {};
+                            for (let [key, value] of formData.entries()) {
+                                formObject[key] = value;
+                            }
+
+                            console.log('Form verileri:', formObject);
+
+                            // Burada API çağrısı yapılabilir
+                            // ...
+
+                            // Başarılı mesajı göster
+                            const submitBtn = this.querySelector('button[type="submit"]');
+                            const originalText = submitBtn.textContent;
+                            submitBtn.innerHTML = '<i class="fas fa-check"></i> Kaydedildi';
+                            submitBtn.classList.remove('btn-primary');
+                            submitBtn.classList.add('btn-success');
+
+                            setTimeout(() => {
+                                submitBtn.textContent = originalText;
+                                submitBtn.classList.remove('btn-success');
+                                submitBtn.classList.add('btn-primary');
+                            }, 2000);
+                        });
+                    }
+                }, 700);
+            }
+
+            // HTML escape helper
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
             }
         });
     </script>
-
 {% endblock %}
