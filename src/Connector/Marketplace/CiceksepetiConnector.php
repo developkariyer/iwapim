@@ -440,7 +440,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->putToCache($filename, ['requeest'=>$body, 'response'=>$combinedData]);
     }
 
-    /*public function updateProduct(VariantProduct $listing, string $sku)
+    public function updateProduct(VariantProduct $listing, string $sku)
     {
         if (!$listing instanceof VariantProduct) {
             echo "Listing is not a VariantProduct\n";
@@ -517,7 +517,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $date = date('Y-m-d-H-i-s');
         $filename = "{$stockCode}-$date.json";  
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/UpdateSku', json_encode($response));
-    }*/
+    }
 
     /**
      * @throws TransportExceptionInterface

@@ -26,8 +26,9 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // youtube video : https://www.youtube.com/watch?v=LhNG8MujVf0
         $mainProduct = Product::getById(238119); //main product
-        $productIdentifier = $mainProduct->getProductIdentifier();
+        $productName = $mainProduct->getProductIdentifier();
         $variationProducts = $mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true); //variant products
         foreach ($variationProducts as $variationProduct) {
             if (!$variationProduct instanceof Product) {
