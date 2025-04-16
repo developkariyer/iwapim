@@ -7,155 +7,42 @@
 
 {% endblock %}
 {% block content %}
-    <div class="container-fluid mt-4">
+    <div class="container mt-4">
         <h1 class="text-center mb-4">Çiçeksepeti Ürünleri</h1>
 
-        <div class="row">
-            <!-- Sol Taraf - Kategori Filtresi -->
-            <div class="col-12 col-lg-3 col-xl-2 mb-4">
-                <div class="card shadow-sm sticky-top" style="top: 15px; z-index: 10;">
-                    <div class="card-header bg-primary text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Kategoriler</h5>
-                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#categoryCollapse" aria-expanded="true"
-                                    aria-controls="categoryCollapse">
-                                <i class="fas fa-filter"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="collapse show" id="categoryCollapse">
-                        <div class="card-body p-0">
-                            <div class="category-actions p-2 bg-light border-bottom">
-                                <div class="d-flex justify-content-between">
-                                    <button id="select-all-categories" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-check-double"></i> Tümü
-                                    </button>
-                                    <button id="clear-categories" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-times"></i> Temizle
-                                    </button>
+        <!-- Ana ürün grupları -->
+        <div class="row g-4 product-groups" id="product-container">
+            {% if groupedListings|length > 0 %}
+                {% for mainCode, products in groupedListings %}
+                    {% set firstProduct = products|first %}
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 product-wrapper" data-main-code="{{ mainCode }}">
+                        <div class="product-group-card">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-img-container">
+                                    {% if firstProduct.images is defined and firstProduct.images|length > 0 %}
+                                        <img src="{{ firstProduct.images[0] }}" class="card-img-top" alt="{{ firstProduct.productName|default('Ürün') }}">
+                                    {% else %}
+                                        <div class="no-image">Resim yok</div>
+                                    {% endif %}
+                                    <div class="variant-count-badge">
+                                        {{ products|length }} varyasyon
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ firstProduct.productName|default('İsimsiz Ürün') }}</h5>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <button class="btn btn-sm btn-primary toggle-variants">Varyantları Göster</button>
                                 </div>
                             </div>
-                            <div class="category-list">
-                                {% if grouped|length > 0 %}
-                                    {% for categoryName, categoryData in grouped %}
-                                        <div class="category-item">
-                                            <div class="form-check border-bottom py-2 px-3">
-                                                <input class="form-check-input category-checkbox" type="checkbox"
-                                                       id="category-{{ loop.index }}" value="{{ categoryName }}"
-                                                       {% if selectedCategory is defined and selectedCategory == categoryName %}checked{% endif %}>
-                                                <label class="form-check-label d-flex justify-content-between w-100"
-                                                       for="category-{{ loop.index }}">
-                                                    <span>{{ categoryName }}</span>
-                                                    <span class="badge bg-secondary rounded-pill ms-1">
-                                                        {{ categoryData|keys|length }}
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="text-center text-muted py-4">
-                                        <i class="fas fa-folder-open fa-2x mb-2"></i>
-                                        <p>Kategori bulunamadı</p>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="card-footer p-2">
-                                <button id="filter-products" class="btn btn-primary btn-sm d-block w-100">
-                                    <i class="fas fa-filter me-1"></i> Filtrele
-                                </button>
-                            </div>
                         </div>
                     </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">Hiçbir ürün bulunamadı.</div>
                 </div>
-
-                {% if selectedCategory is defined and selectedCategory %}
-                    <div class="alert alert-info mt-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>Seçili:</strong> {{ selectedCategory }}
-                        </div>
-                        <button id="clear-filter" class="btn btn-sm btn-outline-info">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                {% endif %}
-            </div>
-
-            <!-- Sağ Taraf - Ürünler -->
-            <div class="col-12 col-lg-9 col-xl-10">
-                <!-- Seçili Kategori Bilgisi (mobilde göster) -->
-                <div id="selected-category-info" class="alert alert-info d-lg-none {% if selectedCategory is not defined %}d-none{% endif %} mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>Kategori:</strong> <span id="selected-category-name">{{ selectedCategory|default('') }}</span>
-                        </div>
-                        <button id="clear-filter-mobile" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Ana ürün grupları -->
-                <div class="row g-4 product-groups" id="product-container">
-                    {% set displayCount = 0 %}
-                    {% if grouped|length > 0 %}
-                        {% for categoryName, categoryData in grouped %}
-                            {% if selectedCategory is not defined or selectedCategory == categoryName %}
-                                {% for mainCode, products in categoryData %}
-                                    {% set firstProduct = products|first %}
-                                    {% set displayCount = displayCount + 1 %}
-                                    <div class="col-12 col-sm-6 col-md-4 col-xl-3 mb-4 product-wrapper"
-                                         data-main-code="{{ mainCode }}"
-                                         data-category="{{ categoryName }}">
-                                        <div class="product-group-card">
-                                            <div class="card h-100 shadow-sm">
-                                                <div class="category-badge">{{ categoryName }}</div>
-                                                <div class="card-img-container">
-                                                    {% if firstProduct.images is defined and firstProduct.images|length > 0 %}
-                                                        <img src="{{ firstProduct.images[0] }}" class="card-img-top" alt="{{ firstProduct.productName|default('Ürün') }}">
-                                                    {% else %}
-                                                        <div class="no-image">Resim yok</div>
-                                                    {% endif %}
-                                                    <div class="variant-count-badge">
-                                                        {{ products|length }} varyasyon
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <h5 class="card-title">{{ firstProduct.productName|default('İsimsiz Ürün') }}</h5>
-                                                </div>
-                                                <div class="card-footer bg-transparent border-0 text-center">
-                                                    <button class="btn btn-sm btn-primary toggle-variants">Varyantları Göster</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if displayCount == 0 %}
-                        <div class="col-12">
-                            <div class="alert alert-info">
-                                {% if selectedCategory is defined %}
-                                    <div class="text-center py-4">
-                                        <i class="fas fa-search fa-2x mb-3"></i>
-                                        <h5>Bu kategoride ürün bulunamadı</h5>
-                                        <p>Farklı bir kategori seçin veya tüm ürünleri görüntüleyin</p>
-                                        <button id="view-all-products" class="btn btn-outline-primary mt-2">Tüm Ürünleri Göster</button>
-                                    </div>
-                                {% else %}
-                                    <div class="text-center py-4">
-                                        <i class="fas fa-box-open fa-2x mb-3"></i>
-                                        <h5>Hiçbir ürün bulunamadı</h5>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -202,42 +89,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .sticky-top {
-            position: sticky;
-            top: 15px;
-        }
-
-        .category-list {
-            max-height: 500px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-
-        .category-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .category-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .category-list::-webkit-scrollbar-thumb {
-            background-color: #bbb;
-            border-radius: 20px;
-        }
-
-        .category-item {
-            transition: background-color 0.2s;
-        }
-
-        .category-item:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        .category-item .form-check-label {
-            cursor: pointer;
-        }
-
         .product-group-card {
             cursor: pointer;
             transition: all 0.3s ease;
@@ -251,18 +102,6 @@
 
         .product-group-card.active {
             box-shadow: 0 0 0 3px #0d6efd, 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .category-badge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: rgba(52, 58, 64, 0.85);
-            color: white;
-            padding: 4px 8px;
-            font-size: 12px;
-            border-radius: 0 0 8px 0;
-            z-index: 2;
         }
 
         .card-img-container {
@@ -361,7 +200,7 @@
             margin-bottom: 8px;
         }
 
-        /* Galeri önizlemeleri için stiller */
+        /* Galeri önizlemeleri için yeni stiller */
         .gallery-preview {
             display: flex;
             flex-wrap: wrap;
@@ -420,25 +259,51 @@
             justify-content: center;
         }
 
-        /* URL ile resim ekleme alanı */
-        .add-image-url-form {
-            margin-top: 15px;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            background-color: #f8f9fa;
+        .add-image-container {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* Mobil iyileştirmeler */
-        @media (max-width: 991.98px) {
-            .sticky-top {
-                position: relative;
-                top: 0;
-            }
+        .add-image-container:hover {
+            border-color: #0d6efd;
+        }
 
-            .category-list {
-                max-height: 300px;
-            }
+        .add-image-btn {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #6c757d;
+            font-size: 20px;
+        }
+
+        .add-image-btn:hover {
+            color: #0d6efd;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         /* Responsive düzenlemeler */
@@ -464,117 +329,6 @@
             const variantsList = document.getElementById('variants-list');
             const variantFormContainer = document.getElementById('variant-form-container');
             const modalTitle = document.getElementById('variantsModalLabel');
-            let currentCategory = '{{ selectedCategory|default('') }}';
-
-            // Kategori filtreleme işlemleri
-            const filterProductsBtn = document.getElementById('filter-products');
-            const clearFilterBtn = document.getElementById('clear-filter');
-            const clearFilterMobileBtn = document.getElementById('clear-filter-mobile');
-            const selectAllBtn = document.getElementById('select-all-categories');
-            const clearCategoriesBtn = document.getElementById('clear-categories');
-            const selectedCategoryInfo = document.getElementById('selected-category-info');
-            const selectedCategoryName = document.getElementById('selected-category-name');
-            const viewAllProductsBtn = document.getElementById('view-all-products');
-
-            // Filtrele butonuna tıklandığında
-            if (filterProductsBtn) {
-                filterProductsBtn.addEventListener('click', function() {
-                    const checkedCategories = document.querySelectorAll('.category-checkbox:checked');
-
-                    if (checkedCategories.length === 0) {
-                        alert('Lütfen en az bir kategori seçin');
-                        return;
-                    }
-
-                    if (checkedCategories.length === 1) {
-                        // Tek kategori seçildi, sayfayı yeniden yükle
-                        const selectedCategoryVal = checkedCategories[0].value;
-                        window.location.href = window.location.pathname + '?category=' + encodeURIComponent(selectedCategoryVal);
-                    } else {
-                        // Birden fazla kategori seçildi, client-side filtreleme yap
-                        currentCategory = Array.from(checkedCategories).map(cb => cb.value);
-                        filterProductsByCategories(currentCategory);
-                    }
-                });
-            }
-
-            // Filtreyi temizle butonlarına tıklandığında
-            [clearFilterBtn, clearFilterMobileBtn, viewAllProductsBtn].forEach(btn => {
-                if (btn) {
-                    btn.addEventListener('click', function() {
-                        window.location.href = window.location.pathname;
-                    });
-                }
-            });
-
-            // Tümünü seç butonuna tıklandığında
-            if (selectAllBtn) {
-                selectAllBtn.addEventListener('click', function() {
-                    document.querySelectorAll('.category-checkbox').forEach(cb => {
-                        cb.checked = true;
-                    });
-                });
-            }
-
-            // Temizle butonuna tıklandığında
-            if (clearCategoriesBtn) {
-                clearCategoriesBtn.addEventListener('click', function() {
-                    document.querySelectorAll('.category-checkbox').forEach(cb => {
-                        cb.checked = false;
-                    });
-                });
-            }
-
-            // Client-side kategori filtreleme
-            function filterProductsByCategories(categories) {
-                const productWrappers = document.querySelectorAll('.product-wrapper');
-                let visibleCount = 0;
-
-                productWrappers.forEach(wrapper => {
-                    const categoryName = wrapper.dataset.category;
-
-                    if (categories.includes(categoryName)) {
-                        wrapper.classList.remove('d-none');
-                        visibleCount++;
-                    } else {
-                        wrapper.classList.add('d-none');
-                    }
-                });
-
-                // Seçili kategori bilgisini güncelle
-                selectedCategoryName.textContent = categories.join(', ');
-                selectedCategoryInfo.classList.remove('d-none');
-
-                // Hiç ürün gösterilmiyorsa bilgi mesajı göster
-                const noProductsMsg = document.querySelector('.col-12 .alert-info');
-                if (visibleCount === 0) {
-                    if (!noProductsMsg) {
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'col-12';
-                        alertDiv.innerHTML = '<div class="alert alert-info">Seçilen kategorilerde ürün bulunamadı.</div>';
-                        document.getElementById('product-container').appendChild(alertDiv);
-                    }
-                } else if (noProductsMsg) {
-                    noProductsMsg.closest('.col-12').remove();
-                }
-            }
-
-            // Kategori checkboxlara tıklandığında anında filtreleme seçeneği
-            const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
-            categoryCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (categoryCheckboxes.length <= 5) { // Kategori sayısı az ise anında filtrele
-                        const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
-                            .map(cb => cb.value);
-
-                        if (selectedCategories.length === 1) {
-                            filterProductsBtn.click(); // Tek kategoride sayfa yenilenmesi için butona tıkla
-                        } else if (selectedCategories.length > 1) {
-                            filterProductsByCategories(selectedCategories); // Birden fazla seçimde client-side filtrele
-                        }
-                    }
-                });
-            });
 
             // Varyantları göster butonu tıklama olayı
             document.querySelectorAll('.toggle-variants').forEach(button => {
@@ -583,11 +337,10 @@
 
                     const productWrapper = this.closest('.product-wrapper');
                     const mainCode = productWrapper.dataset.mainCode;
-                    const categoryName = productWrapper.dataset.category;
                     const productName = productWrapper.querySelector('.card-title').textContent;
 
                     // Modal başlığını ayarla
-                    modalTitle.textContent = `${productName} - Varyantlar (${categoryName})`;
+                    modalTitle.textContent = `${productName} - Varyantlar`;
 
                     // Varyant listesini temizle ve yükle
                     variantsList.innerHTML = '<div class="text-center p-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2">Yükleniyor...</span></div>';
@@ -601,7 +354,7 @@
                     `;
 
                     // Veri hazırlama
-                    loadVariantsList(categoryName, mainCode);
+                    loadVariantsList(mainCode);
 
                     // Modal'ı göster
                     variantsModal.show();
@@ -609,36 +362,32 @@
             });
 
             // Varyant listesini yükleme fonksiyonu
-            function loadVariantsList(categoryName, mainCode) {
+            function loadVariantsList(mainCode) {
                 setTimeout(() => {
                     let listHTML = '';
 
-                    {% if grouped is defined %}
-                    {% for catName, categoryData in grouped %}
-                    if ('{{ catName }}' === categoryName) {
-                        {% for code, listings in categoryData %}
-                        if ('{{ code }}' === mainCode) {
-                            {% for listing in listings %}
-                            listHTML += `
-                                <a href="#" class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3"
-                                   data-variant-index="{{ loop.index0 }}">
-                                    <div class="me-2">
-                                        {% if listing.images is defined and listing.images|length > 0 %}
-                                            <img src="{{ listing.images[0] }}" class="variant-item-image" alt="">
-                                        {% else %}
-                                            <div class="variant-item-image bg-light d-flex align-items-center justify-content-center text-muted">
-                                                <i class="fas fa-image"></i>
+                    {% if groupedListings is defined %}
+                    {% for code, listings in groupedListings %}
+                    if ('{{ code }}' === mainCode) {
+                        {% for listing in listings %}
+                        listHTML += `
+                                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3"
+                                           data-variant-index="{{ loop.index0 }}">
+                                            <div class="me-2">
+                                                {% if listing.images is defined and listing.images|length > 0 %}
+                                                    <img src="{{ listing.images[0] }}" class="variant-item-image" alt="">
+                                                {% else %}
+                                                    <div class="variant-item-image bg-light d-flex align-items-center justify-content-center text-muted">
+                                                        <i class="fas fa-image"></i>
+                                                    </div>
+                                                {% endif %}
                                             </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <span class="variant-item-name">{{ listing.productName|default('İsimsiz Ürün')|e('js') }}</span>
-                                        <small class="text-muted">{{ listing.productCode|default('') }}</small>
-                                    </div>
-                                </a>
-                            `;
-                            {% endfor %}
-                        }
+                                            <div class="d-flex flex-column">
+                                                <span class="variant-item-name">{{ listing.productName|default('İsimsiz Ürün')|e('js') }}</span>
+                                                <small class="text-muted">{{ listing.productCode|default('') }}</small>
+                                            </div>
+                                        </a>
+                                    `;
                         {% endfor %}
                     }
                     {% endfor %}
@@ -662,7 +411,7 @@
                                 const variantIndex = this.dataset.variantIndex;
 
                                 // Varyant detay formunu yükle
-                                loadVariantForm(categoryName, mainCode, variantIndex);
+                                loadVariantForm(mainCode, variantIndex);
                             });
                         });
                     }
@@ -670,244 +419,220 @@
             }
 
             // Varyant detay formunu yükleme fonksiyonu
-            function loadVariantForm(categoryName, mainCode, variantIndex) {
+            function loadVariantForm(mainCode, variantIndex) {
                 variantFormContainer.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div><span class="ms-2">Form yükleniyor...</span></div>';
 
                 setTimeout(() => {
                     let formHTML = '';
 
-                    {% if grouped is defined %}
-                    {% for catName, categoryData in grouped %}
-                    if ('{{ catName }}' === categoryName) {
-                        {% for code, listings in categoryData %}
-                        if ('{{ code }}' === mainCode) {
-                            {% for listing in listings %}
-                            if ({{ loop.index0 }} == variantIndex) {
-                                formHTML = `
-                                    <form id="variant-edit-form" class="p-4">
-                                        <input type="hidden" name="variantIndex" value="${variantIndex}">
-                                        <input type="hidden" name="mainProductCode" value="{{ listing.mainProductCode|default('')|e('js') }}">
-                                        <input type="hidden" name="categoryName" value="{{ catName|e('js') }}">
-                                        <input type="hidden" name="categoryId" value="{{ listing.categoryId|default('')|e('js') }}">
+                    {% if groupedListings is defined %}
+                    {% for code, listings in groupedListings %}
+                    if ('{{ code }}' === mainCode) {
+                        {% for listing in listings %}
+                        if ({{ loop.index0 }} == variantIndex) {
+                            formHTML = `
+                                            <form id="variant-edit-form" class="p-4">
+                                                <input type="hidden" name="variantIndex" value="${variantIndex}">
+                                                <input type="hidden" name="mainProductCode" value="{{ listing.mainProductCode|default('')|e('js') }}">
 
-                                        <div class="row">
-                                            <!-- Sol Kolon: Resim ve ürün adı -->
-                                            <div class="col-md-4">
-                                                <div class="form-section">
-                                                    <h6>Ürün Görselleri</h6>
-                                                    <div class="text-center mb-3">
-                                                        <img id="main-image-preview" src="{{ listing.images[0]|default('')|e('js') }}"
-                                                            class="image-preview" alt="Ürün Görseli">
+                                                <div class="row">
+                                                    <!-- Sol Kolon: Resim ve ürün adı -->
+                                                    <div class="col-md-4">
+                                                        <div class="form-section">
+                                                            <h6>Ürün Görselleri</h6>
+                                                            <div class="text-center mb-3">
+                                                                <img id="main-image-preview" src="{{ listing.images[0]|default('')|e('js') }}"
+                                                                    class="image-preview" alt="Ürün Görseli">
+                                                            </div>
+
+                                                            <div class="gallery-preview" id="gallery-container">
+                                                                {% if listing.images is defined %}
+                                                                    {% for img in listing.images %}
+                                                                        <div class="gallery-item" draggable="true">
+                                                                            <img src="{{ img }}" class="gallery-image {% if loop.first %}active{% endif %}"
+                                                                                data-index="{{ loop.index0 }}" alt="Görsel {{ loop.index }}">
+                                                                            <div class="gallery-actions">
+                                                                                <button type="button" class="btn btn-sm btn-danger delete-image" title="Görseli Sil">
+                                                                                    <i class="fas fa-times"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                                <div class="add-image-container">
+                                                                    <input type="file" id="image-upload" accept="image/*" multiple class="d-none">
+                                                                    <label for="image-upload" class="add-image-btn">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
-                                                    <div class="gallery-preview" id="gallery-container">
-                                                        {% if listing.images is defined %}
-                                                            {% for img in listing.images %}
-                                                                <div class="gallery-item" draggable="true">
-                                                                    <img src="{{ img }}" class="gallery-image {% if loop.first %}active{% endif %}"
-                                                                        data-index="{{ loop.index0 }}" alt="Görsel {{ loop.index }}">
-                                                                    <div class="gallery-actions">
-                                                                        <button type="button" class="btn btn-sm btn-danger delete-image" title="Görseli Sil">
-                                                                            <i class="fas fa-times"></i>
-                                                                        </button>
+                                                    <!-- Sağ kolon: Form Alanları -->
+                                                    <div class="col-md-8">
+                                                        <div class="form-section">
+                                                            <h6>Temel Bilgiler</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-8 mb-3">
+                                                                    <label for="productName" class="form-label">Ürün Adı</label>
+                                                                    <input type="text" class="form-control" id="productName" name="productName" value="{{ listing.productName|default('')|e('js') }}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="productCode" class="form-label">Ürün Kodu</label>
+                                                                    <input type="text" class="form-control" id="productCode" name="productCode" value="{{ listing.productCode|default('')|e('js') }}" readonly>
+                                                                </div>
+
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="barcode" class="form-label">Barkod</label>
+                                                                    <input type="text" class="form-control" id="barcode" name="barcode" value="{{ listing.barcode|default('')|e('js') }}">
+                                                                </div>
+
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="stockCode" class="form-label">Stok Kodu</label>
+                                                                    <input type="text" class="form-control" id="stockCode" name="stockCode" value="{{ listing.stockCode|default('')|e('js') }}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-section">
+                                                            <h6>Fiyat ve Stok</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="listPrice" class="form-label">Liste Fiyatı</label>
+                                                                    <input type="text" class="form-control" id="listPrice" name="listPrice" value="{{ listing.listPrice|default('')|e('js') }}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="salesPrice" class="form-label">Satış Fiyatı</label>
+                                                                    <input type="text" class="form-control" id="salesPrice" name="salesPrice" value="{{ listing.salesPrice|default('')|e('js') }}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="stockQuantity" class="form-label">Stok Miktarı</label>
+                                                                    <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" value="{{ listing.stockQuantity|default('')|e('js') }}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="commissionRate" class="form-label">Komisyon Oranı (%)</label>
+                                                                    <input type="text" class="form-control" id="commissionRate" name="commissionRate" value="{{ listing.commissionRate|default('')|e('js') }}">
+                                                                </div>
+
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="numberOfFavorites" class="form-label">Favori Sayısı</label>
+                                                                    <input type="number" class="form-control" id="numberOfFavorites" name="numberOfFavorites" value="{{ listing.numberOfFavorites|default('')|e('js') }}" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-section">
+                                                            <h6>Durum ve Teslimat</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label class="form-label d-block">Varyant Durumu</label>
+                                                                    <div class="form-check form-check-inline">
+                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveYes" value="1" {% if listing.variantIsActive %}checked{% endif %}>
+                                                                        <label class="form-check-label" for="variantIsActiveYes">Aktif</label>
+                                                                    </div>
+                                                                    <div class="form-check form-check-inline">
+                                                                        <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveNo" value="0" {% if not listing.variantIsActive %}checked{% endif %}>
+                                                                        <label class="form-check-label" for="variantIsActiveNo">Pasif</label>
                                                                     </div>
                                                                 </div>
-                                                            {% endfor %}
-                                                        {% endif %}
-                                                    </div>
 
-                                                    <div class="add-image-url-form mt-3">
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="url" class="form-control" id="image-url-input"
-                                                                   placeholder="https:// ile başlayan görsel URL'si girin"
-                                                                   pattern="https://.*">
-                                                            <button class="btn btn-primary" type="button" id="add-image-url-btn">
-                                                                Ekle
-                                                            </button>
-                                                        </div>
-                                                        <div class="form-text small text-muted">
-                                                            Sadece https:// ile başlayan görseller eklenebilir.
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="deliveryType" class="form-label">Teslimat Tipi</label>
+                                                                    <input type="text" class="form-control" id="deliveryType" name="deliveryType" value="{{ listing.deliveryType|default('')|e('js') }}">
+                                                                </div>
 
-                                            <!-- Sağ kolon: Form Alanları -->
-                                            <div class="col-md-8">
-                                                <div class="form-section">
-                                                    <h6>Kategori Bilgisi</h6>
-                                                    <div class="row">
-                                                        <div class="col-12 mb-3">
-                                                            <label class="form-label">Kategori</label>
-                                                            <input type="text" class="form-control" value="{{ catName }}" readonly>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-section">
-                                                    <h6>Temel Bilgiler</h6>
-                                                    <div class="row">
-                                                        <div class="col-md-8 mb-3">
-                                                            <label for="productName" class="form-label">Ürün Adı</label>
-                                                            <input type="text" class="form-control" id="productName" name="productName" value="{{ listing.productName|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="productCode" class="form-label">Ürün Kodu</label>
-                                                            <input type="text" class="form-control" id="productCode" name="productCode" value="{{ listing.productCode|default('')|e('js') }}" readonly>
-                                                        </div>
-
-                                                        <div class="col-md-6 mb-3">
-                                                            <label for="barcode" class="form-label">Barkod</label>
-                                                            <input type="text" class="form-control" id="barcode" name="barcode" value="{{ listing.barcode|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-6 mb-3">
-                                                            <label for="stockCode" class="form-label">Stok Kodu</label>
-                                                            <input type="text" class="form-control" id="stockCode" name="stockCode" value="{{ listing.stockCode|default('')|e('js') }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-section">
-                                                    <h6>Fiyat ve Stok</h6>
-                                                    <div class="row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="listPrice" class="form-label">Liste Fiyatı</label>
-                                                            <input type="text" class="form-control" id="listPrice" name="listPrice" value="{{ listing.listPrice|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="salesPrice" class="form-label">Satış Fiyatı</label>
-                                                            <input type="text" class="form-control" id="salesPrice" name="salesPrice" value="{{ listing.salesPrice|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="stockQuantity" class="form-label">Stok Miktarı</label>
-                                                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" value="{{ listing.stockQuantity|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="commissionRate" class="form-label">Komisyon Oranı (%)</label>
-                                                            <input type="text" class="form-control" id="commissionRate" name="commissionRate" value="{{ listing.commissionRate|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="numberOfFavorites" class="form-label">Favori Sayısı</label>
-                                                            <input type="number" class="form-control" id="numberOfFavorites" name="numberOfFavorites" value="{{ listing.numberOfFavorites|default('')|e('js') }}" readonly>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-section">
-                                                    <h6>Durum ve Teslimat</h6>
-                                                    <div class="row">
-                                                        <div class="col-md-6 mb-3">
-                                                            <label class="form-label d-block">Varyant Durumu</label>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveYes" value="1" {% if listing.variantIsActive %}checked{% endif %}>
-                                                                <label class="form-check-label" for="variantIsActiveYes">Aktif</label>
-                                                            </div>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio" name="variantIsActive" id="variantIsActiveNo" value="0" {% if not listing.variantIsActive %}checked{% endif %}>
-                                                                <label class="form-check-label" for="variantIsActiveNo">Pasif</label>
+                                                                <div class="col-md-12 mb-3">
+                                                                    <label for="deliveryMessageType" class="form-label">Teslimat Mesaj Tipi</label>
+                                                                    <input type="text" class="form-control" id="deliveryMessageType" name="deliveryMessageType" value="{{ listing.deliveryMessageType|default('')|e('js') }}">
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-md-6 mb-3">
-                                                            <label for="deliveryType" class="form-label">Teslimat Tipi</label>
-                                                            <input type="text" class="form-control" id="deliveryType" name="deliveryType" value="{{ listing.deliveryType|default('')|e('js') }}">
-                                                        </div>
-
-                                                        <div class="col-md-12 mb-3">
-                                                            <label for="deliveryMessageType" class="form-label">Teslimat Mesaj Tipi</label>
-                                                            <input type="text" class="form-control" id="deliveryMessageType" name="deliveryMessageType" value="{{ listing.deliveryMessageType|default('')|e('js') }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-section">
-                                                    <h6>Ürün Açıklaması</h6>
-                                                    <div class="mb-3">
-                                                        <textarea class="form-control" id="description" name="description" rows="4">{{ listing.description|default('')|e('js') }}</textarea>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-section">
-                                                    <h6>Diğer Bilgiler</h6>
-                                                    <div class="row">
-                                                        <div class="col-12 mb-3">
-                                                            <label for="link" class="form-label">Ürün Linki</label>
-                                                            <div class="input-group">
-                                                                <input type="text" class="form-control" id="link" name="link" value="{{ listing.link|default('')|e('js') }}" readonly>
-                                                                <button class="btn btn-outline-secondary" type="button" id="copyLink">
-                                                                    <i class="fas fa-copy"></i>
-                                                                </button>
-                                                                <a href="{{ listing.link|default('#')|e('js') }}" target="_blank" class="btn btn-outline-primary">
-                                                                    <i class="fas fa-external-link-alt"></i>
-                                                                </a>
+                                                        <div class="form-section">
+                                                            <h6>Ürün Açıklaması</h6>
+                                                            <div class="mb-3">
+                                                                <textarea class="form-control" id="description" name="description" rows="4">{{ listing.description|default('')|e('js') }}</textarea>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    {% if listing.attributes is defined %}
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Özellikler</label>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-sm table-bordered">
-                                                                <thead class="table-light">
-                                                                    <tr>
-                                                                        <th width="25%">Özellik</th>
-                                                                        <th width="30%">Değer</th>
-                                                                        <th width="25%">Tür</th>
-                                                                        <th width="20%">ID</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {% if listing.attributes is iterable and listing.attributes is not empty %}
-                                                                        {% for attr in listing.attributes %}
+                                                        <div class="form-section">
+                                                            <h6>Diğer Bilgiler</h6>
+                                                            <div class="row">
+                                                                <div class="col-12 mb-3">
+                                                                    <label for="link" class="form-label">Ürün Linki</label>
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control" id="link" name="link" value="{{ listing.link|default('')|e('js') }}" readonly>
+                                                                        <button class="btn btn-outline-secondary" type="button" id="copyLink">
+                                                                            <i class="fas fa-copy"></i>
+                                                                        </button>
+                                                                        <a href="{{ listing.link|default('#')|e('js') }}" target="_blank" class="btn btn-outline-primary">
+                                                                            <i class="fas fa-external-link-alt"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {% if listing.attributes is defined %}
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Özellikler</label>
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-sm table-bordered">
+                                                                        <thead class="table-light">
                                                                             <tr>
-                                                                                <td>
-                                                                                    <strong>{{ attr.parentName|default('') }}</strong>
-                                                                                    <input type="hidden" name="attributes[{{ loop.index0 }}][parentName]" value="{{ attr.parentName|default('')|e('html_attr') }}">
-                                                                                    <input type="hidden" name="attributes[{{ loop.index0 }}][parentId]" value="{{ attr.parentId|default('')|e('html_attr') }}">
-                                                                                </td>
-                                                                                <td>
-                                                                                    {{ attr.name|default('') }}
-                                                                                    <input type="hidden" name="attributes[{{ loop.index0 }}][name]" value="{{ attr.name|default('')|e('html_attr') }}">
-                                                                                    <input type="hidden" name="attributes[{{ loop.index0 }}][id]" value="{{ attr.id|default('')|e('html_attr') }}">
-                                                                                </td>
-                                                                                <td>
-                                                                                    <span class="badge bg-light text-dark">{{ attr.type|default('') }}</span>
-                                                                                    <input type="hidden" name="attributes[{{ loop.index0 }}][type]" value="{{ attr.type|default('')|e('html_attr') }}">
-                                                                                </td>
-                                                                                <td>
-                                                                                    <small class="text-muted">{{ attr.id }}</small>
-                                                                                </td>
+                                                                                <th width="25%">Özellik</th>
+                                                                                <th width="30%">Değer</th>
+                                                                                <th width="25%">Tür</th>
+                                                                                <th width="20%">ID</th>
                                                                             </tr>
-                                                                        {% endfor %}
-                                                                    {% else %}
-                                                                        <tr>
-                                                                            <td colspan="4" class="text-center">Özellik bilgisi bulunamadı</td>
-                                                                        </tr>
-                                                                    {% endif %}
-                                                                </tbody>
-                                                            </table>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {% if listing.attributes is iterable and listing.attributes is not empty %}
+                                                                                {% for attr in listing.attributes %}
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            <strong>{{ attr.parentName|default('') }}</strong>
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][parentName]" value="{{ attr.parentName|default('')|e('html_attr') }}">
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][parentId]" value="{{ attr.parentId|default('')|e('html_attr') }}">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            {{ attr.name|default('') }}
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][name]" value="{{ attr.name|default('')|e('html_attr') }}">
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][id]" value="{{ attr.id|default('')|e('html_attr') }}">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <span class="badge bg-light text-dark">{{ attr.type|default('') }}</span>
+                                                                                            <input type="hidden" name="attributes[{{ loop.index0 }}][type]" value="{{ attr.type|default('')|e('html_attr') }}">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <small class="text-muted">{{ attr.id }}</small>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                {% endfor %}
+                                                                            {% else %}
+                                                                                <tr>
+                                                                                    <td colspan="4" class="text-center">Özellik bilgisi bulunamadı</td>
+                                                                                </tr>
+                                                                            {% endif %}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div class="d-flex justify-content-between mt-4">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                            <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
                                                         </div>
                                                     </div>
-                                                    {% endif %}
                                                 </div>
-
-                                                <div class="d-flex justify-content-between mt-4">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                                                    <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                `;
-                            }
-                            {% endfor %}
+                                            </form>
+                                        `;
                         }
                         {% endfor %}
                     }
@@ -982,87 +707,59 @@
                             }, 2000);
                         });
 
-                        // URL ile resim ekleme
-                        const addImageUrlBtn = document.getElementById('add-image-url-btn');
-                        const imageUrlInput = document.getElementById('image-url-input');
-
-                        if (addImageUrlBtn && imageUrlInput) {
-                            addImageUrlBtn.addEventListener('click', function() {
-                                const imageUrl = imageUrlInput.value.trim();
-
-                                if (!imageUrl) {
-                                    alert('Lütfen bir görsel URL\'si girin');
-                                    return;
-                                }
-
-                                if (!imageUrl.startsWith('https://')) {
-                                    alert('Sadece https:// ile başlayan görseller eklenebilir');
-                                    return;
-                                }
-
-                                // Görsel eklensin
+                        // Resim yükleme işlemi
+                        const imageUploadInput = document.getElementById('image-upload');
+                        imageUploadInput?.addEventListener('change', function() {
+                            if (this.files && this.files.length > 0) {
                                 const galleryContainer = document.getElementById('gallery-container');
+                                const addImageContainer = document.querySelector('.add-image-container');
 
-                                // Yeni görsel öğesi oluştur
-                                const galleryItem = document.createElement('div');
-                                galleryItem.className = 'gallery-item';
-                                galleryItem.setAttribute('draggable', 'true');
-                                galleryItem.innerHTML = `
-                                    <img src="${imageUrl}" class="gallery-image" alt="Yeni Görsel">
-                                    <div class="gallery-actions">
-                                        <button type="button" class="btn btn-sm btn-danger delete-image" title="Görseli Sil">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                `;
+                                Array.from(this.files).forEach(file => {
+                                    // Dosya boyutu ve türü kontrolü yapılabilir
+                                    if (file.type.startsWith('image/')) {
+                                        const reader = new FileReader();
+                                        reader.onload = function(e) {
+                                            const galleryItem = document.createElement('div');
+                                            galleryItem.className = 'gallery-item';
+                                            galleryItem.setAttribute('draggable', 'true');
+                                            galleryItem.innerHTML = `
+                                                <img src="${e.target.result}" class="gallery-image" alt="Yeni Görsel">
+                                                <div class="gallery-actions">
+                                                    <button type="button" class="btn btn-sm btn-danger delete-image" title="Görseli Sil">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            `;
 
-                                // Yeni eklenen görseli silme olayı
-                                const deleteBtn = galleryItem.querySelector('.delete-image');
-                                deleteBtn.addEventListener('click', function(e) {
-                                    e.stopPropagation();
-                                    galleryItem.remove();
+                                            // Yeni eklenen görseli silme olayı
+                                            const deleteBtn = galleryItem.querySelector('.delete-image');
+                                            deleteBtn.addEventListener('click', function(e) {
+                                                e.stopPropagation();
+                                                galleryItem.remove();
 
-                                    // Ana görsel güncellemesi
-                                    updateMainImageIfNeeded();
+                                                // Ana görsel güncellemesi
+                                                updateMainImageIfNeeded();
+                                            });
+
+                                            // Yeni eklenen görsele tıklama olayı
+                                            const newImg = galleryItem.querySelector('.gallery-image');
+                                            newImg.addEventListener('click', function() {
+                                                document.querySelectorAll('.gallery-image').forEach(i => i.classList.remove('active'));
+                                                this.classList.add('active');
+                                                document.getElementById('main-image-preview').src = this.src;
+                                            });
+
+                                            // Galeriye ekle (ekleme butonunun önüne)
+                                            galleryContainer.insertBefore(galleryItem, addImageContainer);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
                                 });
-
-                                // Yeni eklenen görsele tıklama olayı
-                                const newImg = galleryItem.querySelector('.gallery-image');
-                                newImg.addEventListener('click', function() {
-                                    document.querySelectorAll('.gallery-image').forEach(i => i.classList.remove('active'));
-                                    this.classList.add('active');
-                                    document.getElementById('main-image-preview').src = this.src;
-                                });
-
-                                // Sürükle-bırak olayları ekle
-                                galleryItem.addEventListener('dragstart', handleDragStart);
-                                galleryItem.addEventListener('dragover', handleDragOver);
-                                galleryItem.addEventListener('dragenter', handleDragEnter);
-                                galleryItem.addEventListener('dragleave', handleDragLeave);
-                                galleryItem.addEventListener('drop', handleDrop);
-                                galleryItem.addEventListener('dragend', handleDragEnd);
-
-                                // Galeriye ekle
-                                galleryContainer.appendChild(galleryItem);
 
                                 // Input'u temizle
-                                imageUrlInput.value = '';
-
-                                // İlk görselse aktif et
-                                if (document.querySelectorAll('.gallery-image').length === 1) {
-                                    newImg.classList.add('active');
-                                    document.getElementById('main-image-preview').src = imageUrl;
-                                }
-                            });
-
-                            // Enter tuşuna basıldığında da resim eklensin
-                            imageUrlInput.addEventListener('keypress', function(e) {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    addImageUrlBtn.click();
-                                }
-                            });
-                        }
+                                this.value = '';
+                            }
+                        });
 
                         // Görsel silme işlemi
                         document.querySelectorAll('.delete-image').forEach(button => {
