@@ -30,12 +30,14 @@ class HelloWorldCommand extends AbstractCommand
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         $ciceksepetiVariant = [];
+        $categoryIdList = [];
         foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
             $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
             $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
             $ciceksepetiVariant[] = [
                 'link' => $apiData['link'],
                 'images' => $apiData['images'],
@@ -55,17 +57,30 @@ class HelloWorldCommand extends AbstractCommand
                 'numberOfFavorites' => $apiData['numberOfFavorites'],
                 'productIsActive' => $apiData['productStatusType'],
                 'deliveryMessageType' => $apiData['deliveryMessageType'],
+                'categoryId' => $apiData['categoryId']
             ];
         }
+        $categoryIdList = array_unique($categoryIdList);
+        $categoryIdString = implode(',', array_map('intval', $categoryIdList));
+
+        $sqlCategory = "SELECT id, category_name FROM iwa_ciceksepeti_categories WHERE id IN ($categoryIdString)";
+        $categories = Utility::fetchFromSql($sqlCategory);
+
+        $categoryMap = [];
+        foreach ($categories as $cat) {
+            $categoryMap[$cat['id']] = $cat['category_name'];
+        }
+
         $grouped = [];
         foreach ($ciceksepetiVariant as $listing) {
+            $categoryId = $listing['categoryId'];
             $mainCode = $listing['mainProductCode'] ?? 'unknown';
-            $grouped[$mainCode][] = $listing;
+            $categoryName = $categoryMap[$categoryId] ?? 'Bilinmeyen Kategori';
+
+            $grouped[$categoryName][$mainCode][] = $listing;
         }
+
         print_r($grouped);
-
-
-
 
 
 
