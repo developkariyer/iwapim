@@ -10,6 +10,7 @@ use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\Product;
+use Pimcore\Model\DataObject\VariantProduct\Listing;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -26,8 +27,20 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        print_r($ciceksepetiVariantIds);
+
+
+
+
+
+
+
+
+
         // youtube video : https://www.youtube.com/watch?v=LhNG8MujVf0
-        $mainProduct = Product::getById(238119); //main product
+        /*$mainProduct = Product::getById(238119); //main product
         $productName = $mainProduct->getProductIdentifier();
         $variationProducts = $mainProduct->getChildren([AbstractObject::OBJECT_TYPE_OBJECT], true); //variant products
         foreach ($variationProducts as $variationProduct) {
@@ -54,7 +67,7 @@ class HelloWorldCommand extends AbstractCommand
                 $imageGallery = $listingItem->getImageGallery();
                 //image jsondan ayır http lazım.
             }
-        }
+        }*/
 
 
 
