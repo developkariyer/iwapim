@@ -30,7 +30,7 @@ class HelloWorldCommand extends AbstractCommand
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
-            $variantProduct = VariantProduct::getById($ciceksepetiVariantId);
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
