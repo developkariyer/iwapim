@@ -29,7 +29,14 @@ class HelloWorldCommand extends AbstractCommand
     {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
-        print_r($ciceksepetiVariantIds);
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            echo $variantProduct->getTitle() . "\n";
+
+        }
 
 
 
