@@ -23,16 +23,8 @@ class CiceksepetiController extends FrontendController
      */
     public function ciceksepetiMainPage(): Response
     {
-        $listings = $this->getCiceksepetiListings();
-
-        $grouped = [];
-        foreach ($listings as $listing) {
-            $mainCode = $listing['mainProductCode'] ?? 'unknown';
-            $grouped[$mainCode][] = $listing;
-        }
-
         return $this->render('ciceksepeti/ciceksepeti.html.twig', [
-            'groupedListings' => $grouped
+            'groupedListings' => $this->getCiceksepetiListings()
         ]);
     }
 
@@ -41,12 +33,14 @@ class CiceksepetiController extends FrontendController
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         $ciceksepetiVariant = [];
+        $categoryIdList = [];
         foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
             $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
             $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
             $ciceksepetiVariant[] = [
                 'link' => $apiData['link'],
                 'images' => $apiData['images'],
@@ -66,9 +60,29 @@ class CiceksepetiController extends FrontendController
                 'numberOfFavorites' => $apiData['numberOfFavorites'],
                 'productIsActive' => $apiData['productStatusType'],
                 'deliveryMessageType' => $apiData['deliveryMessageType'],
+                'categoryId' => $apiData['categoryId']
             ];
         }
-        return $ciceksepetiVariant;
+        $categoryIdList = array_unique($categoryIdList);
+        $categoryIdString = implode(',', array_map('intval', $categoryIdList));
+
+        $sqlCategory = "SELECT id, category_name FROM iwa_ciceksepeti_categories WHERE id IN ($categoryIdString)";
+        $categories = Utility::fetchFromSql($sqlCategory);
+
+        $categoryMap = [];
+        foreach ($categories as $cat) {
+            $categoryMap[$cat['id']] = $cat['category_name'];
+        }
+
+        $grouped = [];
+        foreach ($ciceksepetiVariant as $listing) {
+            $categoryId = $listing['categoryId'];
+            $mainCode = $listing['mainProductCode'] ?? 'unknown';
+            $categoryName = $categoryMap[$categoryId] ?? 'Bilinmeyen Kategori';
+
+            $grouped[$categoryName][$mainCode][] = $listing;
+        }
+        return $grouped;
     }
 
 }
