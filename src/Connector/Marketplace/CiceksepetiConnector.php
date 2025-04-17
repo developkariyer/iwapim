@@ -287,7 +287,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
             if (empty($category['subCategories'])) {
                 $id = $category['id'];
-                echo "$currentPath (ID: $id)\n";
+                //echo "$currentPath (ID: $id)\n";
                 $sql = "INSERT INTO iwa_ciceksepeti_categories (id, category_name)
                     VALUES (:id, :category_name)
                     ON DUPLICATE KEY UPDATE
