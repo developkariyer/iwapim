@@ -108,10 +108,10 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
-     * @throws RandomException
-     * @throws \Exception
+     * @Route("/ciceksepeti/category/update", name="update_category", methods={"POST"})
+     * @return Response
      */
-    public function getCiceksepetiListingCategoriesUpdate()
+    public function getCiceksepetiListingCategoriesUpdate(): Response
     {
         // update category
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
@@ -122,6 +122,8 @@ class CiceksepetiController extends FrontendController
         foreach ($categoryIdList as $categoryId) {
             $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
         }
+        $this->addFlash('success', 'ÇiçekSepeti kategorileri başarıyla güncellendi.');
+        return $this->redirectToRoute('ciceksepeti_main_page');
     }
 
     public function getCiceksepetiListingCategoriesIdList(): array
