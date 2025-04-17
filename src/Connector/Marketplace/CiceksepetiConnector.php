@@ -227,8 +227,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        //$this->downloadCategories();
-        $this->getCategoryAttributesAndSaveDatabase(15056);
+        $this->downloadCategories();
+        //$this->getCategoryAttributesAndSaveDatabase(15056);
     }
 
     /**
@@ -267,16 +267,16 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      */
     public function downloadCategories(): void
     {
-        //$response = $this->httpClient->request('GET',static::$apiUrl['categories']);
-        //$this->putToCache('categories.json', $response->toArray());
-
-        //$categories = $this->getFromCache('categories.json');
-        //$this->processCategoriesAndSaveDatabase($categories['categories']);
-
-
+        $categories = $this->getFromCache('categories.json');
+        if (!$categories) {
+            $response = $this->httpClient->request('GET',static::$apiUrl['categories']);
+            $this->putToCache('categories.json', $response->toArray());
+            $categories = $this->getFromCache('categories.json');
+        }
+        $this->processCategoriesAndSaveDatabase($categories['categories']);
     }
 
-    function processCategoriesAndSaveDatabase($categories, $path = '') // leaf category save
+    public function processCategoriesAndSaveDatabase($categories, $path = '') // leaf category save
     {
         foreach ($categories as $category) {
             if (!isset($category['id']) || !isset($category['name'])) {
@@ -310,12 +310,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                          is_required = VALUES(is_required),
                          type = VALUES(type)";
 
-        $attributeValueSql = "INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
-                              VALUES (:attribute_value_id, :attribute_id, :name)
-                              ON DUPLICATE KEY UPDATE
-                              name = VALUES(name)
-                              ";
-
         $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
         if ($response->getStatusCode() !== 200) {
             echo "Error: " . $response->getStatusCode();
@@ -323,11 +317,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         $responseArray = $response->toArray();
         $categoryId = $responseArray['categoryId'];
+        $attributeValueRows = [];
         foreach ($responseArray['categoryAttributes'] as $attribute) {
             if (!isset($attribute['attributeValues'])) {
                 continue;
             }
             $attributeValues = $attribute['attributeValues'];
+            if ($attribute['attributeName'] == 'Marka') {
+                continue;
+            }
             // Save Attributes
             Utility::executeSql($attributeSql, [
                 'attribute_id' => $attribute['attributeId'],
@@ -336,14 +334,28 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'is_required' => $attribute['required'],
                 'type' => $attribute['type']
             ]);
-            foreach ($attributeValues as $attributeValue) {
-                // Save Attribute Values
-                Utility::executeSql($attributeValueSql, [
+            foreach ($attribute['attributeValues'] as $attributeValue) {
+                $attributeValueRows[] = [
                     'attribute_value_id' => $attributeValue['id'],
                     'attribute_id' => $attribute['attributeId'],
                     'name' => $attributeValue['name']
-                ]);
+                ];
             }
+        }
+        if (!empty($attributeValueRows)) {
+            $placeholders = [];
+            $bindings = [];
+            foreach ($attributeValueRows as $row) {
+                $placeholders[] = '(?, ?, ?)';
+                $bindings = array_merge($bindings, $row);
+            }
+
+            $attributeValueSql = "
+                INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
+                VALUES " . implode(', ', $placeholders) . "
+                ON DUPLICATE KEY UPDATE name = VALUES(name)";
+
+            Utility::executeSql($attributeValueSql, $bindings);
         }
     }
 

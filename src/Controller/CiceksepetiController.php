@@ -1,6 +1,8 @@
 <?php
 namespace App\Controller;
 
+use App\Connector\Marketplace\CiceksepetiConnector;
+use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
@@ -104,6 +106,12 @@ class CiceksepetiController extends FrontendController
         }
         $categoryIdList = array_unique($categoryIdList);
         print_r($categoryIdList);
+    }
+
+    public function checkAndUpdateCategories()
+    {
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $ciceksepetiConnector->downloadCategories();
 
     }
 
