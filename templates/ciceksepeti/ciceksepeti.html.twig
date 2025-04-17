@@ -7,68 +7,242 @@
 
 {% endblock %}
 {% block content %}
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
-    {% endfor %}
-    <div class="container-fluid">
+    <div class="container-fluid mt-4">
+        <h1 class="text-center mb-4">Çiçeksepeti Ürünleri</h1>
+
+        <!-- Başarılı mesajlar -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
         <div class="row">
+            <!-- Sol Kenar Çubuğu - Kategori Listesi -->
             <div class="col-md-3 col-12 mb-3">
-                <h2>Ciceksepeti Kategorileri</h2>
-                <form method="post" action="{{ path('update_category') }}">
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Güncelle</button>
-                </form>
-                <div class="list-group">
-                    {% for category in categories %}
-                        <a href="{{ path('ciceksepeti_main') }}?category={{ category.id }}"
-                           class="list-group-item list-group-item-action {% if selectedCategoryId == category.id %}active{% endif %}">
-                            {{ category.name }}
-                        </a>
-                    {% endfor %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Çiçeksepeti Kategorileri</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Kategori güncelleme butonu -->
+                        <div class="p-3 border-bottom">
+                            <form method="post" action="{{ path('update_category') }}">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-sync-alt me-2"></i> Kategorileri Güncelle
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Kategori listesi -->
+                        <div class="list-group list-group-flush">
+                            <a href="{{ path('ciceksepeti_main_page') }}"
+                               class="list-group-item list-group-item-action {% if app.request.get('category') is null %}active{% endif %}">
+                                Tüm Kategoriler
+                            </a>
+                            {% for category in categories %}
+                                <a href="{{ path('ciceksepeti_main_page', {'category': category.id}) }}"
+                                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if app.request.get('category') == category.id %}active{% endif %}"
+                                   data-id="{{ category.id }}">
+                                    <span>{{ category.name }}</span>
+                                    {% if category.count is defined %}
+                                        <span class="badge bg-primary rounded-pill">{{ category.count }}</span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-9 col-12">
-                {% if grouped is not empty %}
-                    {% for mainCode, variants in grouped %}
-                        {% set mainVariant = variants[0] %}
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h5>{{ mainVariant.productName }}</h5>
-                                <p><strong>Ürün Kodu:</strong> {{ mainCode }}</p>
-                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ loop.index }}">
-                                    Varyantları Göster
-                                </button>
 
-                                <div class="collapse mt-2" id="v-{{ loop.index }}">
-                                    <ul class="list-group">
-                                        {% for variant in variants %}
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                {{ variant.stockCode }} — {{ variant.salesPrice }}₺
-                                                {% if variant.variantIsActive %}
-                                                    <span class="badge bg-success">Aktif</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">Pasif</span>
-                                                {% endif %}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
+            <!-- Sağ Ana İçerik - Ürünler ve Varyantlar -->
+            <div class="col-md-9 col-12">
+                {% if app.request.get('category') %}
+                    <div class="alert alert-info mb-4">
+                        <strong>Kategori:</strong>
+                        {% for category in categories %}
+                            {% if category.id == app.request.get('category') %}
+                                {{ category.name }}
+                            {% endif %}
+                        {% endfor %}
+                        <a href="{{ path('ciceksepeti_main_page') }}" class="btn btn-sm btn-outline-secondary float-end">
+                            <i class="fas fa-times"></i> Filtreyi Temizle
+                        </a>
+                    </div>
+                {% endif %}
+
+                {% if grouped|length > 0 %}
+                    <div class="row" id="productList">
+                        {% for mainCode, listings in grouped %}
+                            {% set firstProduct = listings|first %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card product-card h-100">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0 text-truncate">{{ firstProduct.productName|default('Ürün ' ~ mainCode) }}</h5>
+                                        <small class="text-muted">Ana Kod: {{ mainCode }}</small>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <!-- Ürün görseli -->
+                                        <div class="p-2 text-center product-image-container">
+                                            {% if firstProduct.images is defined and firstProduct.images|length > 0 %}
+                                                <img src="{{ firstProduct.images[0] }}" class="img-fluid product-image" alt="{{ firstProduct.productName }}">
+                                            {% else %}
+                                                <div class="no-image p-5 bg-light text-center">
+                                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                                    <p class="mt-2 mb-0">Görsel yok</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Varyant sayısı -->
+                                        <div class="variant-count p-2 bg-light border-top border-bottom">
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-cubes me-1"></i> {{ listings|length }} varyant
+                                            </span>
+                                        </div>
+
+                                        <!-- Varyant listesi (kapalı başlıyor) -->
+                                        <div class="variants-container border-bottom d-none" data-main-code="{{ mainCode }}">
+                                            <div class="list-group list-group-flush">
+                                                {% for variant in listings %}
+                                                    <div class="list-group-item p-2">
+                                                        <div class="row g-0">
+                                                            <div class="col-3">
+                                                                {% if variant.images is defined and variant.images|length > 0 %}
+                                                                    <img src="{{ variant.images[0] }}" class="img-fluid variant-image" alt="{{ variant.productName }}">
+                                                                {% else %}
+                                                                    <div class="variant-no-image text-center">
+                                                                        <i class="fas fa-image text-muted"></i>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="col-9">
+                                                                <div class="ps-2">
+                                                                    <h6 class="mb-1 text-truncate">{{ variant.productName|default('İsimsiz Varyant') }}</h6>
+                                                                    <small class="d-block text-muted">Ürün Kodu: {{ variant.productCode|default('-') }}</small>
+                                                                    <small class="d-block text-muted">Stok: {{ variant.stockQuantity|default(0) }}</small>
+                                                                    <div class="mt-1">
+                                                                        <span class="badge bg-primary">{{ variant.salesPrice|default('-') }} TL</span>
+                                                                        {% if variant.variantIsActive %}
+                                                                            <span class="badge bg-success">Aktif</span>
+                                                                        {% else %}
+                                                                            <span class="badge bg-danger">Pasif</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <button class="btn btn-sm btn-outline-primary toggle-variants" data-main-code="{{ mainCode }}">
+                                            <i class="fas fa-chevron-down toggle-icon"></i> Varyantları Göster
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% else %}
-                    <p>Lütfen bir kategori seçin.</p>
+                    <div class="alert alert-warning">
+                        <div class="text-center py-4">
+                            <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                            {% if app.request.get('category') %}
+                                <h4>Bu kategoride ürün bulunamadı</h4>
+                                <p class="mb-3">Başka bir kategori seçmeyi deneyebilir veya tüm ürünleri görüntüleyebilirsiniz.</p>
+                                <a href="{{ path('ciceksepeti_main_page') }}" class="btn btn-primary">
+                                    Tüm Ürünleri Göster
+                                </a>
+                            {% else %}
+                                <h4>Hiç ürün bulunamadı</h4>
+                                <p>Lütfen daha sonra tekrar deneyin veya sistem yöneticinize başvurun.</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 {% endif %}
             </div>
-
         </div>
     </div>
-
 {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .product-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
 
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-image-container {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .variant-image {
+            width: 100%;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .variant-no-image {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .variant-count {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .no-image {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            padding: 20px;
+        }
+
+        .variants-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock %}
 {% block body_scripts %}
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButtons = document.querySelectorAll('.toggle-variants');
+
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const mainCode = this.getAttribute('data-main-code');
+                    const variantsContainer = document.querySelector(`.variants-container[data-main-code="${mainCode}"]`);
+                    const icon = this.querySelector('.toggle-icon');
+
+                    if (variantsContainer.classList.contains('d-none')) {
+                        variantsContainer.classList.remove('d-none');
+                        this.innerHTML = '<i class="fas fa-chevron-up toggle-icon"></i> Varyantları Gizle';
+                    } else {
+                        variantsContainer.classList.add('d-none');
+                        this.innerHTML = '<i class="fas fa-chevron-down toggle-icon"></i> Varyantları Göster';
+                    }
+                });
+            });
+        });
     </script>
 
 {% endblock %}
