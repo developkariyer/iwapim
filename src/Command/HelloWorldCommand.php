@@ -32,7 +32,7 @@ class HelloWorldCommand extends AbstractCommand
 
         $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
         $updatedAt = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 15056]);
-        print_r($$updatedAt);
+        print_r($updatedAt);
         /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->downloadCategories();
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
