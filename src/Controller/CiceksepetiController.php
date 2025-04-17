@@ -24,13 +24,17 @@ class CiceksepetiController extends FrontendController
      * @Route("/ciceksepeti", name="ciceksepeti_main_page")
      * @return Response
      */
-    public function ciceksepetiMainPage(): Response
+    public function ciceksepetiMainPage(Request $request, $category = null): Response
     {
         /*return $this->render('ciceksepeti/ciceksepeti.html.twig', [
             'grouped' => $this->getCiceksepetiListings()
         ]);*/
+        if ($category) {
+            $grouped = $this->getCiceksepetiListingByCategory($category);
+        }
         return $this->render('ciceksepeti/ciceksepeti.html.twig',[
-            'categories' => $this->getCiceksepetiListingCategories()
+            'categories' => $this->getCiceksepetiListingCategories(),
+            'grouped' => $grouped
         ]);
     }
 
