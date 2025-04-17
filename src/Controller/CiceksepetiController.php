@@ -26,12 +26,15 @@ class CiceksepetiController extends FrontendController
      */
     public function ciceksepetiMainPage(): Response
     {
-        return $this->render('ciceksepeti/ciceksepeti.html.twig', [
+        /*return $this->render('ciceksepeti/ciceksepeti.html.twig', [
             'grouped' => $this->getCiceksepetiListings()
+        ]);*/
+        return $this->render('ciceksepeti/ciceksepeti.html.twig',[
+            'categories' => $this->getCiceksepetiListingCategories()
         ]);
     }
 
-    public function getCiceksepetiListings(): array
+    /*public function getCiceksepetiListings(): array
     {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
@@ -86,9 +89,7 @@ class CiceksepetiController extends FrontendController
             $grouped[$categoryName][$mainCode][] = $listing;
         }
         return $grouped;
-    }
-
-    // Exist Categories
+    }*/
 
     public function getCiceksepetiListingCategories()
     {
