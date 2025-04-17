@@ -325,6 +325,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
         if ($response->getStatusCode() !== 200) {
             echo "Error: " . $response->getStatusCode();
+            return;
         }
 
         $responseArray = $response->toArray();
