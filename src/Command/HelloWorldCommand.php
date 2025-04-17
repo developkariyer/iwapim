@@ -48,6 +48,7 @@ class HelloWorldCommand extends AbstractCommand
         $categoryIdList = array_unique($categoryIdList);
         foreach ($categoryIdList as $categoryId) {
             $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
+            echo ".\n";
         }
 
 
