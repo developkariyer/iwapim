@@ -21,7 +21,7 @@ use Pimcore\Model\Asset;
 class CiceksepetiController extends FrontendController
 {
     /**
-     * @Route("/ciceksepeti", name="ciceksepeti_main_page")
+     * @Route("/ciceksepeti/{category}", name="ciceksepeti_main_page", defaults={"category"=null})
      * @return Response
      */
     public function ciceksepetiMainPage(Request $request, $category = null): Response
