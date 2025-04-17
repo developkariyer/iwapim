@@ -7,6 +7,7 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Db;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -88,8 +89,16 @@ class CiceksepetiController extends FrontendController
     }
 
     // Exist Categories
+
+    /**
+     * @throws RandomException
+     * @throws \Exception
+     */
     public function getCiceksepetiListingCategories()
     {
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $ciceksepetiConnector->downloadCategories();
+
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
@@ -105,15 +114,14 @@ class CiceksepetiController extends FrontendController
             $categoryIdList[] = $apiData['categoryId'];
         }
         $categoryIdList = array_unique($categoryIdList);
+        // update category
+        foreach ($categoryIdList as $categoryId) {
+            $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
+        }
         print_r($categoryIdList);
     }
 
-    public function checkAndUpdateCategories()
-    {
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->downloadCategories();
 
-    }
 
     public function getCiceksepetiListingByCategory($categoryId)
     {

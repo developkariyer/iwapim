@@ -342,6 +342,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 ];
             }
         }
+        // BULK UPDATE
         if (!empty($attributeValueRows)) {
             $placeholders = [];
             $bindings = [];

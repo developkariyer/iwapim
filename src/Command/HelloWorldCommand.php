@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Connector\Marketplace\CiceksepetiConnector;
+use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
@@ -27,6 +29,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $ciceksepetiConnector->downloadCategories();
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
@@ -42,7 +46,10 @@ class HelloWorldCommand extends AbstractCommand
             $categoryIdList[] = $apiData['categoryId'];
         }
         $categoryIdList = array_unique($categoryIdList);
-        print_r($categoryIdList);
+        foreach ($categoryIdList as $categoryId) {
+            $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
+        }
+
 
 
         /*$sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
