@@ -96,6 +96,7 @@ class CiceksepetiController extends FrontendController
      */
     public function getCiceksepetiListingCategories()
     {
+        // update category
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->downloadCategories();
 
@@ -114,10 +115,11 @@ class CiceksepetiController extends FrontendController
             $categoryIdList[] = $apiData['categoryId'];
         }
         $categoryIdList = array_unique($categoryIdList);
-        // update category
+        // update category attributes
         foreach ($categoryIdList as $categoryId) {
             $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
         }
+        // ATTRİBUTE İÇİNDE UPDATE KONTROL ET 1 GÜNLÜK Y  DA SAATLİK OLAİBLİR
         print_r($categoryIdList);
     }
 

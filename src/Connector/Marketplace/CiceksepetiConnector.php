@@ -303,6 +303,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function getCategoryAttributesAndSaveDatabase($categoryId): void
     {
+        $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
+        $updatedAt = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => $categoryId]);
+
+
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)
                          VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)
                          ON DUPLICATE KEY UPDATE
@@ -322,7 +326,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             if (!isset($attribute['attributeValues'])) {
                 continue;
             }
-            $attributeValues = $attribute['attributeValues'];
             if ($attribute['attributeName'] == 'Marka') {
                 continue;
             }

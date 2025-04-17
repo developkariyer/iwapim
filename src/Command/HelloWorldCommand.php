@@ -29,7 +29,11 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+
+        $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
+        $updatedAt = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 15056]);
+        print_r($$updatedAt);
+        /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->downloadCategories();
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
@@ -49,8 +53,7 @@ class HelloWorldCommand extends AbstractCommand
         foreach ($categoryIdList as $categoryId) {
             $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
             echo ".\n";
-        }
-
+        }*/
 
 
         /*$sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
