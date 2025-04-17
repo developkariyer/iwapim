@@ -305,8 +305,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
         $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => $categoryId]);
-        $updatedAt = $result[0]['updated_at'];
-
+        if ($result && isset($result[0]['updated_at'])) {
+            $updatedAtTimestamp = strtotime($result[0]['updated_at']);
+            $nowTimestamp = time();
+            $diffInSeconds = $nowTimestamp - $updatedAtTimestamp;
+            $diffInDays = $diffInSeconds / (60 * 60 * 24);
+            if ($diffInDays < 1) {
+                return;
+            }
+        }
 
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)
                          VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)

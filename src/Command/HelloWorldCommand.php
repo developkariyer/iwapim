@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
     {
 
         $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
-        $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 15056]);
+        $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 1512312056]);
         print_r($result[0]['updated_at']);
         if ($result && isset($result[0]['updated_at'])) {
             $updatedAtTimestamp = strtotime($result[0]['updated_at']);
