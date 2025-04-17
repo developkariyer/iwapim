@@ -165,7 +165,48 @@
                 {% endif %}
             </div>
         </div>
+        <div class="modal fade" id="variantDetailModal" tabindex="-1" aria-labelledby="variantDetailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="variantDetailModalLabel">Varyant Detayları</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <!-- Varyant listesi (sol panel) -->
+                                <div class="col-md-3 border-end" style="max-height: calc(80vh - 120px); overflow-y: auto;">
+                                    <div id="variant-list" class="list-group list-group-flush">
+                                        <!-- Varyantlar dinamik olarak buraya yüklenecek -->
+                                        <div class="text-center p-3">
+                                            <div class="spinner-border spinner-border-sm text-primary"></div>
+                                            <span class="ms-2">Yükleniyor...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Varyant form (sağ panel) -->
+                                <div class="col-md-9">
+                                    <div id="variant-form-container" style="max-height: calc(80vh - 120px); overflow-y: auto;">
+                                        <!-- Form içeriği dinamik olarak buraya yüklenecek -->
+                                        <div class="text-center p-5">
+                                            <i class="fas fa-arrow-left fa-2x mb-3 text-muted"></i>
+                                            <p>Düzenlemek için listeden bir varyant seçin</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
