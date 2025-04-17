@@ -304,7 +304,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function getCategoryAttributesAndSaveDatabase($categoryId): void
     {
         $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
-        $updatedAt = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => $categoryId]);
+        $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => $categoryId]);
+        $updatedAt = $result[0]['updated_at'];
 
 
         $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)

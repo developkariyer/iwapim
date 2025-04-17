@@ -31,8 +31,26 @@ class HelloWorldCommand extends AbstractCommand
     {
 
         $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
-        $updatedAt = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 15056]);
-        print_r($updatedAt[0]['updated_at']);
+        $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 15056]);
+        print_r($result[0]['updated_at']);
+        if ($result && isset($result[0]['updated_at'])) {
+            $updatedAtTimestamp = strtotime($result[0]['updated_at']);
+            $nowTimestamp = time();
+
+            $diffInSeconds = $nowTimestamp - $updatedAtTimestamp;
+            $diffInDays = $diffInSeconds / (60 * 60 * 24);
+
+            if ($diffInDays >= 1) {
+                // 1 günden eski → işlem yapılmalı
+                echo "Kategori güncel değil, işlem yapılacak.";
+            } else {
+                // Güncel
+                echo "Kategori zaten güncel.";
+            }
+        } else {
+            // Kayıt yok → işlem yapılmalı
+            echo "Kategori daha önce işlenmemiş, işlem yapılacak.";
+        }
         /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->downloadCategories();
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
