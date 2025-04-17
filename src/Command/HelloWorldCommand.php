@@ -41,6 +41,7 @@ class HelloWorldCommand extends AbstractCommand
             $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
             $categoryIdList[] = $apiData['categoryId'];
         }
+        $categoryIdList = array_unique($categoryIdList);
         print_r($categoryIdList);
 
 
