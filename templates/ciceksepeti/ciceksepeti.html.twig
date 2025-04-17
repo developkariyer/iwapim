@@ -21,13 +21,45 @@
                 </form>
                 <div class="list-group">
                     {% for category in categories %}
-                        <a href="#"
-                           class="list-group-item list-group-item-action category-link"
-                           data-id="{{ category.id }}">
+                        <a href="{{ path('ciceksepeti_main') }}?category={{ category.id }}"
+                           class="list-group-item list-group-item-action {% if selectedCategoryId == category.id %}active{% endif %}">
                             {{ category.name }}
                         </a>
                     {% endfor %}
                 </div>
+            </div>
+            <div class="col-md-9 col-12">
+                {% if grouped is not empty %}
+                    {% for mainCode, variants in grouped %}
+                        {% set mainVariant = variants[0] %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5>{{ mainVariant.productName }}</h5>
+                                <p><strong>Ürün Kodu:</strong> {{ mainCode }}</p>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ loop.index }}">
+                                    Varyantları Göster
+                                </button>
+
+                                <div class="collapse mt-2" id="v-{{ loop.index }}">
+                                    <ul class="list-group">
+                                        {% for variant in variants %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ variant.stockCode }} — {{ variant.salesPrice }}₺
+                                                {% if variant.variantIsActive %}
+                                                    <span class="badge bg-success">Aktif</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Pasif</span>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Lütfen bir kategori seçin.</p>
+                {% endif %}
             </div>
 
         </div>
