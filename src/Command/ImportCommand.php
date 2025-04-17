@@ -269,7 +269,7 @@ class ImportCommand extends AbstractCommand
             }
             $this->addListeners();
             return Command::SUCCESS;
-        } catch (Exception|\Exception) {
+        } catch (\Exception) {
             $this->notificationService->sendToUser(2, 1, 'Import failed!', "An error occurred while importing listings. Here is where it stopped:\n$notificationMessage");
             $this->addListeners();
             return Command::FAILURE;
