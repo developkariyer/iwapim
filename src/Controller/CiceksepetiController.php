@@ -85,4 +85,37 @@ class CiceksepetiController extends FrontendController
         return $grouped;
     }
 
+    // Exist Categories
+    public function getCiceksepetiListingCategories()
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
+        }
+        print_r($categoryIdList);
+
+    }
+
+    public function getCiceksepetiListingByCategory($categoryId)
+    {
+
+
+    }
+
+    public function getCiceksepetiAllCategories()
+    {
+        $sql = "SELECT id, category_name FROM iwa_ciceksepeti_categories";
+
+    }
+
 }

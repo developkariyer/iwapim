@@ -29,6 +29,23 @@ class HelloWorldCommand extends AbstractCommand
     {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
+        }
+        print_r($categoryIdList);
+
+
+        /*$sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         $ciceksepetiVariant = [];
         $categoryIdList = [];
         foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
@@ -80,7 +97,7 @@ class HelloWorldCommand extends AbstractCommand
             $grouped[$categoryName][$mainCode][] = $listing;
         }
 
-        print_r($grouped);
+        print_r($grouped);*/
 
 
 
