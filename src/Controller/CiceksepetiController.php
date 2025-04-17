@@ -90,16 +90,41 @@ class CiceksepetiController extends FrontendController
 
     // Exist Categories
 
+    public function getCiceksepetiListingCategories()
+    {
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        $categoryIdString = implode(',', array_map('intval', $categoryIdList));
+        $sqlCategory = "SELECT id, category_name FROM iwa_ciceksepeti_categories WHERE id IN ($categoryIdString)";
+        $categories = Utility::fetchFromSql($sqlCategory);
+        $result = [];
+        foreach ($categories as $cat) {
+            $result[] = [
+                'id' => $cat['id'],
+                'name' => $cat['category_name']
+            ];
+        }
+        return $result;
+    }
+
     /**
      * @throws RandomException
      * @throws \Exception
      */
-    public function getCiceksepetiListingCategories()
+    public function getCiceksepetiListingCategoriesUpdate()
     {
         // update category
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->downloadCategories();
 
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        // update category attributes
+        foreach ($categoryIdList as $categoryId) {
+            $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
+        }
+    }
+
+    public function getCiceksepetiListingCategoriesIdList(): array
+    {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
         $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
         if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
@@ -114,27 +139,51 @@ class CiceksepetiController extends FrontendController
             $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
             $categoryIdList[] = $apiData['categoryId'];
         }
-        $categoryIdList = array_unique($categoryIdList);
-        // update category attributes
-        foreach ($categoryIdList as $categoryId) {
-            $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
-        }
-        // ATTRİBUTE İÇİNDE UPDATE KONTROL ET 1 GÜNLÜK Y  DA SAATLİK OLAİBLİR
-        print_r($categoryIdList);
+        return array_unique($categoryIdList);
     }
-
-
 
     public function getCiceksepetiListingByCategory($categoryId)
     {
-
-
-    }
-
-    public function getCiceksepetiAllCategories()
-    {
-        $sql = "SELECT id, category_name FROM iwa_ciceksepeti_categories";
-
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        $ciceksepetiVariant = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            if ($apiData['categoryId'] != $categoryId) {
+                continue;
+            }
+            $ciceksepetiVariant[] = [
+                'link' => $apiData['link'],
+                'images' => $apiData['images'],
+                'barcode' => $apiData['barcode'],
+                'variantIsActive' => $apiData['isActive'],
+                'listPrice' => $apiData['listPrice'],
+                'stockCode' => $apiData['stockCode'],
+                'attributes' => $apiData['attributes'],
+                'salesPrice' => $apiData['salesPrice'],
+                'description' => $apiData['description'],
+                'productCode' => $apiData['productCode'],
+                'productName' => $apiData['productName'],
+                'deliveryType' => $apiData['deliveryType'],
+                'stockQuantity' => $apiData['stockQuantity'],
+                'commissionRate' => $apiData['commissionRate'],
+                'mainProductCode' => $apiData['mainProductCode'],
+                'numberOfFavorites' => $apiData['numberOfFavorites'],
+                'productIsActive' => $apiData['productStatusType'],
+                'deliveryMessageType' => $apiData['deliveryMessageType'],
+                'categoryId' => $apiData['categoryId']
+            ];
+        }
+        $grouped = [];
+        foreach ($ciceksepetiVariant as $listing) {
+            $mainCode = $listing['mainProductCode'] ?? 'unknown';
+            $grouped[$mainCode][] = $listing;
+        }
+        return $grouped;
     }
 
 }
