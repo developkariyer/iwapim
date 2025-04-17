@@ -336,9 +336,9 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             ]);
             foreach ($attribute['attributeValues'] as $attributeValue) {
                 $attributeValueRows[] = [
-                    'attribute_value_id' => $attributeValue['id'],
-                    'attribute_id' => $attribute['attributeId'],
-                    'name' => $attributeValue['name']
+                    $attributeValue['id'],
+                    $attribute['attributeId'],
+                    $attributeValue['name']
                 ];
             }
         }
