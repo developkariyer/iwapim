@@ -15,11 +15,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 col-12 mb-3">
+                <h2>Ciceksepeti Kategorileri</h2>
                 <form method="post" action="{{ path('update_category') }}">
                     <button type="submit" class="btn btn-primary w-100 mb-3">Güncelle</button>
                 </form>
                 <div class="list-group">
-                    <h2>Ciceksepeti Kategorileri</h2>
                     {% for category in categories %}
                         <a href="#"
                            class="list-group-item list-group-item-action category-link"
