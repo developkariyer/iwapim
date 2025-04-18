@@ -285,7 +285,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Attributes</label>
-                                <textarea name="attributes" id="formAttributes" class="form-control" rows="10">{{ variant.attributes|json_encode(constant('JSON_PRETTY_PRINT')) }}</textarea>
+                                <textarea name="attributes" id="formAttributes" class="form-control" rows="10"></textarea>
                             </div>
                             <div class="col-12 mt-4">
                                 <label>Görseller</label>
@@ -526,6 +526,11 @@
             });
         });
 
+        document.addEventListener("DOMContentLoaded", function () {
+            const attributes = {{ variant.attributes|json_encode|raw }};
+            const formatted = JSON.stringify(attributes, null, 4);
+            document.getElementById("formAttributes").value = formatted;
+        });
     </script>
 
 {% endblock %}
