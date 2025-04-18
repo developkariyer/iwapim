@@ -140,7 +140,7 @@
                                                                             data-product-stock-code="{{ variant.stockCode }}"
                                                                             data-barcode="{{ variant.barcode }}"
                                                                             data-stock="{{ variant.stockQuantity }}"
-                                                                            data-attributes="{{ variant.attributes }}"
+                                                                            data-attributes="{{ variant.attributes|json_encode|e('html_attr') }}"
                                                                             data-delivery-type="{{ variant.deliveryType }}"
                                                                             data-delivery-message-type="{{ variant.deliveryMessageType }}"
                                                                             data-commission-rate="{{ variant.commissionRate }}"
