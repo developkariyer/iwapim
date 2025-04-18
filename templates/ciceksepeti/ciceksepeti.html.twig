@@ -132,69 +132,70 @@
                                                                     <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editModal{{ loop.index }}">
                                                                         Düzenle
                                                                     </button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal fade" id="editModal{{ loop.index }}" tabindex="-1" aria-labelledby="editModalLabel{{ loop.index }}" aria-hidden="true">
-                                                                <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title" id="editModalLabel{{ loop.index }}">Varyant Düzenle: {{ variant.productName }}</h5>
-                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                                                                        </div>
-                                                                        <div class="modal-body">
-                                                                            <form method="post" action="/variant/update">
-                                                                                <input type="hidden" name="mainProductCode" value="{{ variant.mainProductCode }}">
-
-                                                                                <div class="row g-3">
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Ürün Adı</label>
-                                                                                        <input type="text" name="productName" value="{{ variant.productName }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Ürün Kodu</label>
-                                                                                        <input type="text" name="productCode" value="{{ variant.productCode }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Barkod</label>
-                                                                                        <input type="text" name="barcode" value="{{ variant.barcode }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Stok Miktarı</label>
-                                                                                        <input type="number" name="stockQuantity" value="{{ variant.stockQuantity }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Satış Fiyatı</label>
-                                                                                        <input type="text" name="salesPrice" value="{{ variant.salesPrice }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Liste Fiyatı</label>
-                                                                                        <input type="text" name="listPrice" value="{{ variant.listPrice }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-12">
-                                                                                        <label>Açıklama</label>
-                                                                                        <textarea name="description" class="form-control" rows="3">{{ variant.description }}</textarea>
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Kategori ID</label>
-                                                                                        <input type="text" name="categoryId" value="{{ variant.categoryId }}" class="form-control">
-                                                                                    </div>
-                                                                                    <div class="col-md-6">
-                                                                                        <label>Aktif mi?</label>
-                                                                                        <select name="variantIsActive" class="form-control">
-                                                                                            <option value="1" {% if variant.variantIsActive %}selected{% endif %}>Evet</option>
-                                                                                            <option value="0" {% if not variant.variantIsActive %}selected{% endif %}>Hayır</option>
-                                                                                        </select>
-                                                                                    </div>
+                                                                    <div class="modal fade" id="editModal{{ loop.index }}" tabindex="-1" aria-labelledby="editModalLabel{{ loop.index }}" aria-hidden="true">
+                                                                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title" id="editModalLabel{{ loop.index }}">Varyant Düzenle: {{ variant.productName }}</h5>
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
                                                                                 </div>
+                                                                                <div class="modal-body">
+                                                                                    <form method="post" action="/variant/update">
+                                                                                        <input type="hidden" name="mainProductCode" value="{{ variant.mainProductCode }}">
 
-                                                                                <div class="mt-4 text-end">
-                                                                                    <button type="submit" class="btn btn-success">Kaydet</button>
+                                                                                        <div class="row g-3">
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Ürün Adı</label>
+                                                                                                <input type="text" name="productName" value="{{ variant.productName }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Ürün Kodu</label>
+                                                                                                <input type="text" name="productCode" value="{{ variant.productCode }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Barkod</label>
+                                                                                                <input type="text" name="barcode" value="{{ variant.barcode }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Stok Miktarı</label>
+                                                                                                <input type="number" name="stockQuantity" value="{{ variant.stockQuantity }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Satış Fiyatı</label>
+                                                                                                <input type="text" name="salesPrice" value="{{ variant.salesPrice }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Liste Fiyatı</label>
+                                                                                                <input type="text" name="listPrice" value="{{ variant.listPrice }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-12">
+                                                                                                <label>Açıklama</label>
+                                                                                                <textarea name="description" class="form-control" rows="3">{{ variant.description }}</textarea>
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Kategori ID</label>
+                                                                                                <input type="text" name="categoryId" value="{{ variant.categoryId }}" class="form-control">
+                                                                                            </div>
+                                                                                            <div class="col-md-6">
+                                                                                                <label>Aktif mi?</label>
+                                                                                                <select name="variantIsActive" class="form-control">
+                                                                                                    <option value="1" {% if variant.variantIsActive %}selected{% endif %}>Evet</option>
+                                                                                                    <option value="0" {% if not variant.variantIsActive %}selected{% endif %}>Hayır</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                        <div class="mt-4 text-end">
+                                                                                            <button type="submit" class="btn btn-success">Kaydet</button>
+                                                                                        </div>
+                                                                                    </form>
                                                                                 </div>
-                                                                            </form>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 {% endfor %}
