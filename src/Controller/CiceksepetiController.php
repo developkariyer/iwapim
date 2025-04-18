@@ -170,7 +170,7 @@ class CiceksepetiController extends FrontendController
                 'variantIsActive' => $apiData['isActive'],
                 'listPrice' => $apiData['listPrice'],
                 'stockCode' => $apiData['stockCode'],
-                'attributes' => json_encode($apiData['attributes']),
+                'attributes' => $apiData['attributes'],
                 'salesPrice' => $apiData['salesPrice'],
                 'description' => $apiData['description'],
                 'productCode' => $apiData['productCode'],

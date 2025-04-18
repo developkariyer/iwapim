@@ -527,11 +527,15 @@
         });
 
         document.addEventListener("DOMContentLoaded", function () {
-            const jsonData = '{{ variant.attributes|json_encode|e("html_attr") }}';
-            const formattedJson = JSON.stringify(JSON.parse(jsonData), null, 4);
+            let jsonData = '{{ variant.attributes|json_encode|e("html_attr") }}';
 
+            if (!jsonData.trim().startsWith('{')) {
+                jsonData = '{"attributes": ' + jsonData + '}';
+            }
+            const formattedJson = JSON.stringify(JSON.parse(jsonData), null, 4);
             document.getElementById('formAttributes').value = formattedJson;
         });
+
     </script>
 
 {% endblock %}
