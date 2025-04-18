@@ -109,7 +109,7 @@
                                                         <div class="row g-0">
                                                             <div class="col-3">
                                                                 {% if variant.images is defined and variant.images|length > 0 %}
-                                                                    <img src="{{ variant.images[0] }}" class="img-fluid variant-image" alt="{{ variant.productName }}">
+                                                                    <a href="{{ variant.link }}"><img src="{{ variant.images[0] }}" class="img-fluid variant-image" alt="{{ variant.productName }}"></a>
                                                                 {% else %}
                                                                     <div class="variant-no-image text-center">
                                                                         <i class="fas fa-image text-muted"></i>
@@ -121,6 +121,7 @@
                                                                     <h6 class="mb-1 text-truncate">{{ variant.productName|default('İsimsiz Varyant') }}</h6>
                                                                     <small class="d-block text-muted">Ürün Kodu: {{ variant.productCode|default('-') }}</small>
                                                                     <small class="d-block text-muted">Stok: {{ variant.stockQuantity|default(0) }}</small>
+                                                                    <small class="d-block text-muted">Favori: {{ variant.numberOfFavorites|default(0) }}</small>
                                                                     <div class="mt-1">
                                                                         <span class="badge bg-primary">{{ variant.salesPrice|default('-') }} TL</span>
                                                                         {% if variant.variantIsActive %}
@@ -133,6 +134,7 @@
                                                                             class="btn btn-sm btn-outline-primary mt-2 open-edit-modal"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#editModal"
+                                                                            data-product-link="{{ variant.link }}"
                                                                             data-product-name="{{ variant.productName }}"
                                                                             data-product-code="{{ variant.productCode }}"
                                                                             data-barcode="{{ variant.barcode }}"
