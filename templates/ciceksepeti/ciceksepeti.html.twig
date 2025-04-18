@@ -261,7 +261,28 @@
                                     <option value="19">Hediye Kargo 1-10 İş Günü</option>
                                 </select>
                             </div>
-
+                            <div class="col-12">
+                                <label>Açıklama</label>
+                                <textarea name="description" id="formDescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Kategori ID</label>
+                                <input type="text" name="categoryId" id="formCategoryId" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Listing Aktif mi?</label>
+                                <select name="productIsActive" id="formProductActive" class="form-control">
+                                    <option value="1">Evet</option>
+                                    <option value="0">Hayır</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Variant Aktif mi?</label>
+                                <select name="variantIsActive" id="formVariantActive" class="form-control">
+                                    <option value="1">Evet</option>
+                                    <option value="0">Hayır</option>
+                                </select>
+                            </div>
                             <div class="col-12 mt-4">
                                 <label>Görseller</label>
                                 <div id="imageGallery" class="d-flex flex-wrap gap-2 border p-2 rounded bg-light">
@@ -286,6 +307,20 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        .modal-dialog-scrollable .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            flex: 1 1 auto;
+        }
         .product-card {
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
