@@ -237,7 +237,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Komisyon Oranı</label>
-                                <input type="number" name="commissionRate" id="formComission" class="form-control">
+                                <input type="text" name="commissionRate" id="formCommissionRate" class="form-control">
                             </div>
 
                             <div class="col-md-6">
@@ -434,7 +434,7 @@
                     document.getElementById("formProductActive").value = this.dataset.productIsActive || '0';
                     document.getElementById("formMainProductCode").value = this.dataset.mainProductCode || '';
                     document.getElementById("formStockCode").value = this.dataset.productStockCode || '';
-                    document.getElementById("formComission").value = this.dataset.commissionRate || '0';
+                    document.getElementById("formCommissionRate").value = this.dataset.commissionRate || '0';
                     document.getElementById("formDeliveryType").value = this.dataset.deliveryType || '1';
                     document.getElementById("formDeliveryMessageType").value = this.dataset.deliveryMessageType || '1';
                 });
