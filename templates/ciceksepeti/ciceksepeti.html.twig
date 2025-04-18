@@ -196,7 +196,7 @@
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
-                <form method="post" action="/variant/update">
+                <form id="variantForm" method="post" action="/variant/update">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editModalLabel">Varyant Düzenle</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
@@ -517,7 +517,7 @@
             });
         });
 
-        document.querySelector('form').addEventListener('submit', function(event) {
+        document.getElementById('variantForm').addEventListener('submit', function(event) {
             event.preventDefault();
             let formData = new FormData(event.target);
 
