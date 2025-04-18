@@ -517,6 +517,24 @@
             });
         });
 
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData(event.target);
+
+            fetch('/variant/update', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Formdan gelen veriler:', data);
+                    alert('Form başarıyla gönderildi. Veriler F12 konsolunda görüntülenebilir.');
+                })
+                .catch(error => {
+                    console.error('Bir hata oluştu:', error);
+                });
+        });
     </script>
 
 {% endblock %}

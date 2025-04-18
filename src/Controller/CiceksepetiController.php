@@ -38,6 +38,56 @@ class CiceksepetiController extends FrontendController
         ]);
     }
 
+    /**
+     * @Route("/variant/update", name="variant_update", methods={"POST"})
+     */
+    public function updateVariant(Request $request): Response
+    {
+        $productName = $request->request->get('productName');
+        $mainProductCode = $request->request->get('mainProductCode');
+        $stockCode = $request->request->get('stockCode');
+        $barcode = $request->request->get('barcode');
+        $productCode = $request->request->get('productCode');
+        $salesPrice = $request->request->get('salesPrice');
+        $listPrice = $request->request->get('listPrice');
+        $stockQuantity = $request->request->get('stockQuantity');
+        $commissionRate = $request->request->get('commissionRate');
+        $deliveryType = $request->request->get('deliveryType');
+        $deliveryMessageType = $request->request->get('deliveryMessageType');
+        $description = $request->request->get('description');
+        $productIsActive = $request->request->get('productIsActive');
+        $variantIsActive = $request->request->get('variantIsActive');
+        $categoryId = $request->request->get('categoryId');
+        $attributes = $request->request->get('attributes');
+        $images = $request->request->get('images');
+        $responseData = [
+            'productName' => $productName,
+            'mainProductCode' => $mainProductCode,
+            'stockCode' => $stockCode,
+            'barcode' => $barcode,
+            'productCode' => $productCode,
+            'salesPrice' => $salesPrice,
+            'listPrice' => $listPrice,
+            'stockQuantity' => $stockQuantity,
+            'commissionRate' => $commissionRate,
+            'deliveryType' => $deliveryType,
+            'deliveryMessageType' => $deliveryMessageType,
+            'description' => $description,
+            'productIsActive' => $productIsActive,
+            'variantIsActive' => $variantIsActive,
+            'categoryId' => $categoryId,
+            'attributes' => $attributes,
+            'images' => $images
+        ];
+
+        return new Response(
+            json_encode($responseData),
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/json']
+        );
+
+    }
+
     /*public function getCiceksepetiListings(): array
     {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
