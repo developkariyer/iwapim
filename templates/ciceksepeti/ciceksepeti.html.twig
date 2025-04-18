@@ -255,7 +255,9 @@
     </div>
     <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content bg-dark">
+            <div class="modal-content bg-dark text-white position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Kapat"></button>
+
                 <div class="modal-body text-center p-0">
                     <img id="imagePreviewContent" src="" class="img-fluid rounded" alt="Preview">
                 </div>
@@ -266,6 +268,9 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        #imagePreviewModal .modal-content {
+            background-color: #000;
+        }
         .product-card {
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
