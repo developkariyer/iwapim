@@ -285,7 +285,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Attributes</label>
-                                <input type="text" name="attributes" id="formAttributes" class="form-control">
+                                <textarea name="attributes" id="formAttributes" class="form-control" rows="5"></textarea>
                             </div>
                             <div class="col-12 mt-4">
                                 <label>Görseller</label>
@@ -441,7 +441,14 @@
                     document.getElementById("formCommissionRate").value = this.dataset.commissionRate || '0';
                     document.getElementById("formDeliveryType").value = this.dataset.deliveryType || '1';
                     document.getElementById("formDeliveryMessageType").value = this.dataset.deliveryMessageType || '1';
-                    document.getElementById("formAttributes").value = this.dataset.attributes || ''
+                    const attributes = this.dataset.attributes;
+                    try {
+                        const parsed = JSON.parse(attributes);
+                        const formatted = JSON.stringify(parsed, null, 4);
+                        document.getElementById("formAttributes").value = formatted;
+                    } catch (e) {
+                        document.getElementById("formAttributes").value = attributes;
+                    }
                 });
             });
         });
