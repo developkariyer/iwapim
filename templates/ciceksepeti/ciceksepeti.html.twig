@@ -253,24 +253,11 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content bg-dark text-white position-relative">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Kapat"></button>
 
-                <div class="modal-body text-center p-0">
-                    <img id="imagePreviewContent" src="" class="img-fluid rounded" alt="Preview">
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        #imagePreviewModal .modal-content {
-            background-color: #000;
-        }
         .product-card {
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -345,6 +332,19 @@
             height: 20px;
             cursor: pointer;
         }
+        .image-zoomed {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            max-width: 90%;
+            max-height: 90%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            border: 5px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.7);
+            background-color: #fff;
+            cursor: zoom-out;
+        }
     </style>
 {% endblock %}
 {% block body_scripts %}
@@ -397,9 +397,18 @@
 
                 const img = document.createElement("img");
                 img.src = url;
-                img.setAttribute("data-bs-toggle", "modal");
-                img.setAttribute("data-bs-target", "#imagePreviewModal");
                 img.style.cursor = "zoom-in";
+
+                img.addEventListener("click", () => {
+                    if (img.classList.contains("image-zoomed")) {
+                        img.classList.remove("image-zoomed");
+                        document.body.style.overflow = "auto";
+                    } else {
+                        document.querySelectorAll(".image-zoomed").forEach(el => el.classList.remove("image-zoomed"));
+                        img.classList.add("image-zoomed");
+                        document.body.style.overflow = "hidden";
+                    }
+                });
 
                 img.addEventListener("click", () => {
                     document.getElementById("imagePreviewContent").src = url;
