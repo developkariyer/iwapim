@@ -129,9 +129,23 @@
                                                                             <span class="badge bg-danger">Pasif</span>
                                                                         {% endif %}
                                                                     </div>
-                                                                    <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editModal{{ loop.index }}">
+                                                                    <button
+                                                                            class="btn btn-sm btn-outline-primary mt-2 open-edit-modal"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#editModal"
+                                                                            data-product-name="{{ variant.productName }}"
+                                                                            data-product-code="{{ variant.productCode }}"
+                                                                            data-barcode="{{ variant.barcode }}"
+                                                                            data-stock="{{ variant.stockQuantity }}"
+                                                                            data-sales-price="{{ variant.salesPrice }}"
+                                                                            data-list-price="{{ variant.listPrice }}"
+                                                                            data-description="{{ variant.description }}"
+                                                                            data-category-id="{{ variant.categoryId }}"
+                                                                            data-active="{{ variant.variantIsActive ? '1' : '0' }}"
+                                                                    >
                                                                         Düzenle
                                                                     </button>
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -166,6 +180,64 @@
                         </div>
                     </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <form method="post" action="/variant/update">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Varyant Düzenle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label>Ürün Adı</label>
+                                <input type="text" name="productName" id="formProductName" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Ürün Kodu</label>
+                                <input type="text" name="productCode" id="formProductCode" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Barkod</label>
+                                <input type="text" name="barcode" id="formBarcode" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Stok Miktarı</label>
+                                <input type="number" name="stockQuantity" id="formStock" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Satış Fiyatı</label>
+                                <input type="text" name="salesPrice" id="formSalesPrice" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Liste Fiyatı</label>
+                                <input type="text" name="listPrice" id="formListPrice" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label>Açıklama</label>
+                                <textarea name="description" id="formDescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Kategori ID</label>
+                                <input type="text" name="categoryId" id="formCategoryId" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Aktif mi?</label>
+                                <select name="variantIsActive" id="formActive" class="form-control">
+                                    <option value="1">Evet</option>
+                                    <option value="0">Hayır</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Kaydet</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -243,6 +315,21 @@
                         variantsContainer.classList.add('d-none');
                         this.innerHTML = '<i class="fas fa-chevron-down toggle-icon"></i> Varyantları Göster';
                     }
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".open-edit-modal").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    document.getElementById("formProductName").value = this.dataset.productName || '';
+                    document.getElementById("formProductCode").value = this.dataset.productCode || '';
+                    document.getElementById("formBarcode").value = this.dataset.barcode || '';
+                    document.getElementById("formStock").value = this.dataset.stock || '';
+                    document.getElementById("formSalesPrice").value = this.dataset.salesPrice || '';
+                    document.getElementById("formListPrice").value = this.dataset.listPrice || '';
+                    document.getElementById("formDescription").value = this.dataset.description || '';
+                    document.getElementById("formCategoryId").value = this.dataset.categoryId || '';
+                    document.getElementById("formActive").value = this.dataset.active || '0';
                 });
             });
         });
