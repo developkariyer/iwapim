@@ -242,24 +242,12 @@
 
                             <div class="col-md-6">
                                 <label>Teslimat Tipi</label>
-                                <select name="deliveryType" id="formDeliveryType" class="form-control" disabled>
-                                    <option value="1">Servis Aracı İle Gönderim</option>
-                                    <option value="2">Kargo İle Gönderim</option>
-                                    <option value="3">Kargo + Servis Aracı İle Gönderim</option>
-                                </select>
+                                <input type="text" name="deliveryType" id="formDeliveryType" class="form-control" readonly>
                             </div>
+
                             <div class="col-md-6">
                                 <label>Teslimat Aralığı</label>
-                                <select name="deliveryMessageType" id="formDeliveryMessageType" class="form-control" disabled>
-                                    <option value="1">Çiçek Servis</option>
-                                    <option value="4">Hediye Kargo Aynı Gün</option>
-                                    <option value="5">Hediye Kargo 1-3 İş Günü</option>
-                                    <option value="6">Hediye Kargo 1-5 İş Günü</option>
-                                    <option value="7">Hediye Kargo 1-7 İş Günü</option>
-                                    <option value="13">Hediye Kargo 3-5 İş Günü</option>
-                                    <option value="18">Hediye Kargo 1-2 İş Günü</option>
-                                    <option value="19">Hediye Kargo 1-10 İş Günü</option>
-                                </select>
+                                <input type="text" name="deliveryMessageType" id="formDeliveryMessageType" class="form-control" readonly>
                             </div>
                             <div class="col-12">
                                 <label>Açıklama</label>
@@ -532,6 +520,15 @@
                 }
                 updateImageGallery();
             });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const data = {
+                deliveryType: "Kargo İle Gönderim",
+                deliveryMessageType: "Hediye Kargo Aynı Gün"
+            };
+            document.getElementById('formDeliveryType').value = data.deliveryType;
+            document.getElementById('formDeliveryMessageType').value = data.deliveryMessageType;
         });
 
     </script>
