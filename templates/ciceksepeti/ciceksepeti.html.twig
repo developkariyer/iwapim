@@ -253,6 +253,15 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-body text-center p-0">
+                    <img id="imagePreviewContent" src="" class="img-fluid rounded" alt="Preview">
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
@@ -383,6 +392,13 @@
 
                 const img = document.createElement("img");
                 img.src = url;
+                img.setAttribute("data-bs-toggle", "modal");
+                img.setAttribute("data-bs-target", "#imagePreviewModal");
+                img.style.cursor = "zoom-in";
+
+                img.addEventListener("click", () => {
+                    document.getElementById("imagePreviewContent").src = url;
+                });
 
                 const removeBtn = document.createElement("button");
                 removeBtn.className = "remove-btn";
