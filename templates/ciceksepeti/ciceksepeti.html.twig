@@ -371,6 +371,8 @@
         });
         let currentImages = [];
 
+        let sortableInstance;
+
         function updateImageGallery() {
             const gallery = document.getElementById("imageGallery");
             gallery.innerHTML = "";
@@ -382,6 +384,12 @@
 
                 const img = document.createElement("img");
                 img.src = url;
+                img.setAttribute("data-bs-toggle", "modal");
+                img.setAttribute("data-bs-target", "#imagePreviewModal");
+                img.style.cursor = "zoom-in";
+                img.addEventListener("click", () => {
+                    document.getElementById("imagePreviewContent").src = url;
+                });
 
                 const removeBtn = document.createElement("button");
                 removeBtn.className = "remove-btn";
@@ -396,14 +404,18 @@
                 gallery.appendChild(item);
             });
 
-            // Galeriyi sıralama için güncelle
-            Sortable.create(gallery, {
+            // Eski sortable varsa yok et
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+
+            // Yeni sortable başlat
+            sortableInstance = Sortable.create(gallery, {
                 animation: 150,
-                onEnd: function (evt) {
+                onEnd: function () {
                     const newOrder = [];
-                    gallery.querySelectorAll(".image-item").forEach(item => {
-                        const src = item.querySelector("img").src;
-                        newOrder.push(src);
+                    gallery.querySelectorAll(".image-item img").forEach(img => {
+                        newOrder.push(img.src);
                     });
                     currentImages = newOrder;
                     document.getElementById("imagesInput").value = JSON.stringify(currentImages);
@@ -435,6 +447,7 @@
                 updateImageGallery();
             });
         });
+
     </script>
 
 {% endblock %}
