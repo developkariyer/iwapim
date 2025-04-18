@@ -255,17 +255,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Listing Aktif mi?</label>
-                                <select name="productIsActive" id="formProductActive" class="form-control" disabled>
-                                    <option value="1">Evet</option>
-                                    <option value="0">Hayır</option>
-                                </select>
+                                <input type="text" name="productIsActive" id="formProductActive" class="form-control" readonly>
                             </div>
+
                             <div class="col-md-6">
                                 <label>Variant Aktif mi?</label>
-                                <select name="variantIsActive" id="formVariantActive" class="form-control">
-                                    <option value="1">Evet</option>
-                                    <option value="0">Hayır</option>
-                                </select>
+                                <input type="text" name="variantIsActive" id="formVariantActive" class="form-control" >
                             </div>
                             <div class="col-md-6">
                                 <label>Kategori ID</label>
@@ -520,15 +515,6 @@
                 }
                 updateImageGallery();
             });
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const data = {
-                deliveryType: "Kargo İle Gönderim",
-                deliveryMessageType: "Hediye Kargo Aynı Gün"
-            };
-            document.getElementById('formDeliveryType').value = data.deliveryType;
-            document.getElementById('formDeliveryMessageType').value = data.deliveryMessageType;
         });
 
     </script>
