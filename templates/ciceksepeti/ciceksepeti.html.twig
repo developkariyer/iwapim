@@ -260,7 +260,7 @@
 
                             <div class="col-md-6">
                                 <label>Variant Aktif mi?</label>
-                                <input type="number" name="variantIsActive" id="formVariantActive" class="form-control" min="0" max="1" value="1">
+                                <input type="text" name="variantIsActive" id="formVariantActive" class="form-control" >
                             </div>
                             <div class="col-md-6">
                                 <label>Kategori ID</label>
@@ -516,7 +516,6 @@
                 updateImageGallery();
             });
         });
-
 
         document.querySelector('form').addEventListener('submit', function(event) {
             event.preventDefault();
