@@ -129,8 +129,10 @@
                                                                             <span class="badge bg-danger">Pasif</span>
                                                                         {% endif %}
                                                                     </div>
-                                                                    <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editModal{{ loop.index }}">
-                                                                        Düzenle
+                                                                    <button class="btn btn-sm btn-outline-primary mt-2 edit-variant-btn"
+                                                                            data-variant="{{ variant|json_encode()|e('html_attr') }}"
+                                                                            data-bs-toggle="modal" data-bs-target="#variantEditModal">
+                                                                        <i class="fas fa-edit me-1"></i> Düzenle
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -169,190 +171,151 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="editModal{{ loop.index }}" tabindex="-1" aria-labelledby="editModalLabel{{ loop.index }}" aria-hidden="true">
+    <!-- Varyant Düzenleme Modal -->
+    <div class="modal fade" id="variantEditModal" tabindex="-1" aria-labelledby="variantEditModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="editModalLabel{{ loop.index }}">
-                        <i class="fas fa-edit me-2"></i> Varyant Düzenle: {{ variant.productName|default('İsimsiz Varyant') }}
+                    <h5 class="modal-title" id="variantEditModalLabel">
+                        <i class="fas fa-edit me-2"></i> Varyant Düzenle
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
                 </div>
                 <div class="modal-body p-0">
-                    <form method="post" action="/variant/update" id="variantForm{{ loop.index }}">
-                        <input type="hidden" name="mainProductCode" value="{{ variant.mainProductCode }}">
-                        <input type="hidden" name="productCode" value="{{ variant.productCode }}">
-                        <input type="hidden" name="openModalId" value="editModal{{ loop.index }}">
+                    <div id="modalLoadingSpinner" class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-3">Varyant bilgileri yükleniyor...</p>
+                    </div>
+                    <div id="modalContent" class="d-none">
+                        <form method="post" action="{{ path('update_variant') }}" id="variantEditForm">
+                            <input type="hidden" id="editMainProductCode" name="mainProductCode" value="">
+                            <input type="hidden" id="editProductCode" name="productCode" value="">
 
-                        <div class="container-fluid">
-                            <div class="row g-0">
-                                <!-- Sol sütun - Resimler -->
-                                <div class="col-md-4 border-end">
-                                    <div class="p-3 bg-light border-bottom">
-                                        <h6 class="mb-1">Ürün Görselleri</h6>
-                                        <small class="text-muted">Ana ürün kodu: {{ variant.mainProductCode }}</small>
-                                    </div>
-                                    <div class="p-3">
-                                        <!-- Ana görsel önizleme -->
-                                        <div class="text-center mb-3">
-                                            {% if variant.images is defined and variant.images|length > 0 %}
-                                                <img src="{{ variant.images[0] }}" class="img-fluid main-image-preview border"
-                                                     style="max-height: 220px; object-fit: contain;" alt="{{ variant.productName }}">
-                                            {% else %}
-                                                <div class="no-image-preview bg-light p-5 text-center mb-3">
-                                                    <i class="fas fa-image fa-3x text-muted"></i>
-                                                    <p class="mt-2">Görsel bulunmuyor</p>
-                                                </div>
-                                            {% endif %}
+                            <div class="container-fluid">
+                                <div class="row g-0">
+                                    <!-- Sol sütun - Resimler -->
+                                    <div class="col-md-4 border-end">
+                                        <div class="p-3 bg-light border-bottom">
+                                            <h6 class="mb-1">Ürün Görselleri</h6>
+                                            <small class="text-muted">Ana ürün kodu: <span id="displayMainCode"></span></small>
                                         </div>
-
-                                        <!-- Görsel galerisi -->
-                                        <div class="gallery-container">
-                                            <div class="d-flex flex-wrap gallery-images-{{ loop.index }}">
-                                                {% if variant.images is defined %}
-                                                    {% for img in variant.images %}
-                                                        <div class="gallery-item me-2 mb-2 position-relative" data-url="{{ img }}">
-                                                            <img src="{{ img }}" class="img-thumbnail gallery-image"
-                                                                 style="width: 60px; height: 60px; object-fit: contain; cursor: pointer;"
-                                                                 alt="Görsel {{loop.index}}"
-                                                                 onclick="selectImage(this, {{ loop.parent.loop.index }})">
-                                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"
-                                                                    style="width: 18px; height: 18px; font-size: 10px; line-height: 1;"
-                                                                    onclick="removeImage(this, {{ loop.parent.loop.index }})">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                            <input type="hidden" name="images[]" value="{{ img }}">
-                                                        </div>
-                                                    {% endfor %}
-                                                {% endif %}
+                                        <div class="p-3">
+                                            <!-- Ana görsel önizleme -->
+                                            <div class="text-center mb-3">
+                                                <img id="mainImagePreview" src="" class="img-fluid border"
+                                                     style="max-height: 220px; object-fit: contain;" alt="Ana görsel">
                                             </div>
 
-                                            <!-- Yeni görsel ekleme -->
-                                            <div class="mt-3">
-                                                <div class="input-group input-group-sm">
-                                                    <input type="url" class="form-control" id="imageUrl{{ loop.index }}"
-                                                           placeholder="https://ornek.com/resim.jpg">
-                                                    <button type="button" class="btn btn-outline-primary"
-                                                            onclick="addImageUrl({{ loop.index }})">
-                                                        <i class="fas fa-plus"></i> Ekle
-                                                    </button>
+                                            <!-- Görsel galerisi -->
+                                            <div class="gallery-container">
+                                                <div class="d-flex flex-wrap" id="galleryContainer">
+                                                    <!-- Resimler JS ile eklenecek -->
                                                 </div>
-                                                <small class="text-muted">Sadece https:// ile başlayan URL'ler eklenebilir.</small>
+
+                                                <!-- Yeni görsel ekleme -->
+                                                <div class="mt-3">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="url" class="form-control" id="imageUrlInput"
+                                                               placeholder="https://ornek.com/resim.jpg">
+                                                        <button type="button" class="btn btn-outline-primary" id="addImageBtn">
+                                                            <i class="fas fa-plus"></i> Ekle
+                                                        </button>
+                                                    </div>
+                                                    <small class="text-muted">Sadece https:// ile başlayan URL'ler eklenebilir.</small>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- Sağ sütun - Form alanları -->
-                                <div class="col-md-8">
-                                    <div class="p-3">
-                                        <div class="row g-3">
-                                            <div class="col-md-8">
-                                                <label class="form-label">Ürün Adı</label>
-                                                <input type="text" name="productName" value="{{ variant.productName }}" class="form-control">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Ürün Kodu</label>
-                                                <input type="text" name="productCode" value="{{ variant.productCode }}" class="form-control" readonly>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label">Barkod</label>
-                                                <input type="text" name="barcode" value="{{ variant.barcode }}" class="form-control">
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label">Kategori ID</label>
-                                                <input type="text" name="categoryId" value="{{ variant.categoryId }}" class="form-control">
-                                            </div>
-
-                                            <div class="col-12">
-                                                <hr class="my-2">
-                                                <h6>Fiyat ve Stok Bilgileri</h6>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <label class="form-label">Satış Fiyatı</label>
-                                                <div class="input-group">
-                                                    <input type="text" name="salesPrice" value="{{ variant.salesPrice }}" class="form-control">
-                                                    <span class="input-group-text">TL</span>
+                                    <!-- Sağ sütun - Form alanları -->
+                                    <div class="col-md-8">
+                                        <div class="p-3">
+                                            <div class="row g-3">
+                                                <div class="col-md-8">
+                                                    <label class="form-label">Ürün Adı</label>
+                                                    <input type="text" name="productName" id="editProductName" class="form-control">
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <label class="form-label">Liste Fiyatı</label>
-                                                <div class="input-group">
-                                                    <input type="text" name="listPrice" value="{{ variant.listPrice }}" class="form-control">
-                                                    <span class="input-group-text">TL</span>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Ürün Kodu</label>
+                                                    <input type="text" id="displayProductCode" class="form-control" readonly>
                                                 </div>
-                                            </div>
 
-                                            <div class="col-md-4">
-                                                <label class="form-label">Stok Miktarı</label>
-                                                <input type="number" name="stockQuantity" value="{{ variant.stockQuantity }}" class="form-control">
-                                            </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Barkod</label>
+                                                    <input type="text" name="barcode" id="editBarcode" class="form-control">
+                                                </div>
 
-                                            <div class="col-12">
-                                                <hr class="my-2">
-                                                <h6>Durum ve Açıklama</h6>
-                                            </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Kategori ID</label>
+                                                    <input type="text" name="categoryId" id="editCategoryId" class="form-control">
+                                                </div>
 
-                                            <div class="col-md-6">
-                                                <label class="form-label">Aktif Durumu</label>
-                                                <select name="variantIsActive" class="form-select">
-                                                    <option value="1" {% if variant.variantIsActive %}selected{% endif %}>Aktif</option>
-                                                    <option value="0" {% if not variant.variantIsActive %}selected{% endif %}>Pasif</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label">Desen/Renk</label>
-                                                <input type="text" name="pattern" value="{{ variant.pattern|default('') }}" class="form-control">
-                                            </div>
-
-                                            <div class="col-12">
-                                                <label class="form-label">Açıklama</label>
-                                                <textarea name="description" class="form-control" rows="3">{{ variant.description }}</textarea>
-                                            </div>
-
-                                            {% if variant.attributes is defined and variant.attributes is not empty %}
                                                 <div class="col-12">
                                                     <hr class="my-2">
-                                                    <h6>Ürün Özellikleri</h6>
+                                                    <h6>Fiyat ve Stok Bilgileri</h6>
+                                                </div>
 
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm table-bordered">
-                                                            <thead class="table-light">
-                                                            <tr>
-                                                                <th>Özellik</th>
-                                                                <th>Değer</th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            {% for attr in variant.attributes %}
-                                                                <tr>
-                                                                    <td class="fw-bold">{{ attr.parentName|default('') }}</td>
-                                                                    <td>{{ attr.name|default('') }}</td>
-                                                                </tr>
-                                                            {% endfor %}
-                                                            </tbody>
-                                                        </table>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Satış Fiyatı</label>
+                                                    <div class="input-group">
+                                                        <input type="text" name="salesPrice" id="editSalesPrice" class="form-control">
+                                                        <span class="input-group-text">TL</span>
                                                     </div>
                                                 </div>
-                                            {% endif %}
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Liste Fiyatı</label>
+                                                    <div class="input-group">
+                                                        <input type="text" name="listPrice" id="editListPrice" class="form-control">
+                                                        <span class="input-group-text">TL</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Stok Miktarı</label>
+                                                    <input type="number" name="stockQuantity" id="editStockQuantity" class="form-control">
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <hr class="my-2">
+                                                    <h6>Durum ve Açıklama</h6>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Aktif Durumu</label>
+                                                    <select name="variantIsActive" id="editIsActive" class="form-select">
+                                                        <option value="1">Aktif</option>
+                                                        <option value="0">Pasif</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Desen/Renk</label>
+                                                    <input type="text" name="pattern" id="editPattern" class="form-control">
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label">Açıklama</label>
+                                                    <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
+                                                </div>
+
+                                                <div class="col-12" id="attributesContainer">
+                                                    <!-- Özellikler dinamik olarak eklenecek -->
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save me-1"></i> Değişiklikleri Kaydet
-                            </button>
-                        </div>
-                    </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-1"></i> Değişiklikleri Kaydet
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -437,8 +400,8 @@
 {% block body_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Varyant göster/gizle düğmeleri
             const toggleButtons = document.querySelectorAll('.toggle-variants');
-
             toggleButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const mainCode = this.getAttribute('data-main-code');
@@ -454,94 +417,254 @@
                     }
                 });
             });
-        });
-        // Mevcut script bloğunu koruyun ve bu fonksiyonları ekleyin
-        function selectImage(img, modalIndex) {
-            // Aynı galeriden tüm resimlerdeki aktif sınıfı kaldır
-            document.querySelectorAll('.gallery-image').forEach(i => {
-                i.classList.remove('active-image');
+
+            // Modal ve form işlemleri
+            const variantEditModal = document.getElementById('variantEditModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalSpinner = document.getElementById('modalLoadingSpinner');
+            const galleryContainer = document.getElementById('galleryContainer');
+
+            // Varyant düzenleme düğmesine tıklama
+            document.querySelectorAll('.edit-variant-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Yükleniyor göstergesini göster, içeriği gizle
+                    modalSpinner.classList.remove('d-none');
+                    modalContent.classList.add('d-none');
+
+                    // Varyant verilerini al
+                    const variant = JSON.parse(this.getAttribute('data-variant'));
+
+                    // Spinner'ı gizle ve içeriği göster
+                    setTimeout(() => {
+                        modalSpinner.classList.add('d-none');
+                        modalContent.classList.remove('d-none');
+
+                        // Form elemanlarına verileri doldur
+                        document.getElementById('variantEditModalLabel').textContent = 'Varyant Düzenle: ' + variant.productName;
+                        document.getElementById('editMainProductCode').value = variant.mainProductCode;
+                        document.getElementById('editProductCode').value = variant.productCode;
+                        document.getElementById('displayMainCode').textContent = variant.mainProductCode;
+                        document.getElementById('editProductName').value = variant.productName;
+                        document.getElementById('displayProductCode').value = variant.productCode;
+                        document.getElementById('editBarcode').value = variant.barcode || '';
+                        document.getElementById('editCategoryId').value = variant.categoryId || '';
+                        document.getElementById('editSalesPrice').value = variant.salesPrice || '';
+                        document.getElementById('editListPrice').value = variant.listPrice || '';
+                        document.getElementById('editStockQuantity').value = variant.stockQuantity || 0;
+                        document.getElementById('editIsActive').value = variant.variantIsActive ? '1' : '0';
+                        document.getElementById('editPattern').value = variant.pattern || '';
+                        document.getElementById('editDescription').value = variant.description || '';
+
+                        // Resim galerisi
+                        galleryContainer.innerHTML = '';
+                        if (variant.images && variant.images.length > 0) {
+                            // Ana resmi göster
+                            document.getElementById('mainImagePreview').src = variant.images[0];
+
+                            // Tüm resimleri galeri olarak ekle
+                            variant.images.forEach((img, index) => {
+                                const isActive = index === 0;
+                                const galleryItem = document.createElement('div');
+                                galleryItem.className = 'gallery-item me-2 mb-2 position-relative';
+                                galleryItem.setAttribute('data-url', img);
+
+                                galleryItem.innerHTML = `
+                            <img src="${img}" class="img-thumbnail gallery-image ${isActive ? 'active-image' : ''}"
+                                 style="width: 60px; height: 60px; object-fit: contain; cursor: pointer;"
+                                 alt="Görsel ${index+1}">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"
+                                    style="width: 18px; height: 18px; font-size: 10px; line-height: 1;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <input type="hidden" name="images[]" value="${img}">
+                        `;
+
+                                galleryContainer.appendChild(galleryItem);
+
+                                // Resme tıklama olayı ekle
+                                galleryItem.querySelector('img').addEventListener('click', function() {
+                                    document.querySelectorAll('.gallery-image').forEach(i => {
+                                        i.classList.remove('active-image');
+                                    });
+                                    this.classList.add('active-image');
+                                    document.getElementById('mainImagePreview').src = this.src;
+                                });
+
+                                // Silme düğmesine tıklama olayı ekle
+                                galleryItem.querySelector('.btn-danger').addEventListener('click', function() {
+                                    if (confirm('Bu görseli silmek istediğinize emin misiniz?')) {
+                                        const img = galleryItem.querySelector('img');
+                                        const isActive = img.classList.contains('active-image');
+
+                                        galleryItem.remove();
+
+                                        // Eğer aktif resim silindiyse ve başka resim varsa, ilk resmi aktif yap
+                                        if (isActive && galleryContainer.querySelectorAll('.gallery-item').length > 0) {
+                                            const firstImg = galleryContainer.querySelector('.gallery-image');
+                                            firstImg.classList.add('active-image');
+                                            document.getElementById('mainImagePreview').src = firstImg.src;
+                                        } else if (galleryContainer.querySelectorAll('.gallery-item').length === 0) {
+                                            document.getElementById('mainImagePreview').src = '';
+                                        }
+                                    }
+                                });
+                            });
+                        } else {
+                            document.getElementById('mainImagePreview').src = '';
+                        }
+
+                        // Özellikler tablosu
+                        const attributesContainer = document.getElementById('attributesContainer');
+                        attributesContainer.innerHTML = '';
+
+                        if (variant.attributes && variant.attributes.length > 0) {
+                            let attributesHTML = `
+                        <hr class="my-2">
+                        <h6>Ürün Özellikleri</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Özellik</th>
+                                    <th>Değer</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                            variant.attributes.forEach(attr => {
+                                attributesHTML += `
+                            <tr>
+                                <td class="fw-bold">${attr.parentName || ''}</td>
+                                <td>${attr.name || ''}</td>
+                            </tr>
+                        `;
+                            });
+
+                            attributesHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+                            attributesContainer.innerHTML = attributesHTML;
+                        }
+                    }, 500);
+                });
             });
 
-            // Tıklanan resme aktif sınıfı ekle
-            img.classList.add('active-image');
+            // Yeni resim ekleme işlemi
+            document.getElementById('addImageBtn').addEventListener('click', function() {
+                const url = document.getElementById('imageUrlInput').value.trim();
 
-            // Ana resim önizlemesini güncelle
-            const modalElement = document.getElementById('editModal' + modalIndex);
-            const mainPreview = modalElement.querySelector('.main-image-preview');
-            if (mainPreview) {
-                mainPreview.src = img.src;
-            }
-        }
+                if (!url) {
+                    alert('Lütfen bir URL girin');
+                    return;
+                }
 
-        function removeImage(button, modalIndex) {
-            if (confirm('Bu görseli silmek istediğinize emin misiniz?')) {
-                const galleryItem = button.closest('.gallery-item');
-                const img = galleryItem.querySelector('img');
+                if (!url.startsWith('https://')) {
+                    alert('Sadece https:// ile başlayan URL\'ler eklenebilir');
+                    return;
+                }
 
-                // Eğer silinen resim aktifse, ilk resmi aktif yap
-                if (img.classList.contains('active-image')) {
-                    const firstImage = document.querySelector('.gallery-images-' + modalIndex + ' img:first-child');
-                    if (firstImage) {
-                        firstImage.classList.add('active-image');
-                        const mainPreview = document.querySelector('#editModal' + modalIndex + ' .main-image-preview');
-                        if (mainPreview) mainPreview.src = firstImage.src;
+                // Resmin yüklenebildiğinden emin olmak için test et
+                const testImage = new Image();
+                testImage.onload = function() {
+                    const isFirstImage = galleryContainer.querySelectorAll('.gallery-item').length === 0;
+
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item me-2 mb-2 position-relative';
+                    galleryItem.setAttribute('data-url', url);
+
+                    galleryItem.innerHTML = `
+                <img src="${url}" class="img-thumbnail gallery-image ${isFirstImage ? 'active-image' : ''}"
+                     style="width: 60px; height: 60px; object-fit: contain; cursor: pointer;"
+                     alt="Yeni Görsel">
+                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"
+                        style="width: 18px; height: 18px; font-size: 10px; line-height: 1;">
+                    <i class="fas fa-times"></i>
+                </button>
+                <input type="hidden" name="images[]" value="${url}">
+            `;
+
+                    galleryContainer.appendChild(galleryItem);
+
+                    // Resme tıklama olayı ekle
+                    galleryItem.querySelector('img').addEventListener('click', function() {
+                        document.querySelectorAll('.gallery-image').forEach(i => {
+                            i.classList.remove('active-image');
+                        });
+                        this.classList.add('active-image');
+                        document.getElementById('mainImagePreview').src = this.src;
+                    });
+
+                    // Silme düğmesine tıklama olayı ekle
+                    galleryItem.querySelector('.btn-danger').addEventListener('click', function() {
+                        if (confirm('Bu görseli silmek istediğinize emin misiniz?')) {
+                            const img = galleryItem.querySelector('img');
+                            const isActive = img.classList.contains('active-image');
+
+                            galleryItem.remove();
+
+                            if (isActive && galleryContainer.querySelectorAll('.gallery-item').length > 0) {
+                                const firstImg = galleryContainer.querySelector('.gallery-image');
+                                firstImg.classList.add('active-image');
+                                document.getElementById('mainImagePreview').src = firstImg.src;
+                            } else if (galleryContainer.querySelectorAll('.gallery-item').length === 0) {
+                                document.getElementById('mainImagePreview').src = '';
+                            }
+                        }
+                    });
+
+                    // İlk resimse ana resmi güncelle
+                    if (isFirstImage) {
+                        document.getElementById('mainImagePreview').src = url;
                     }
-                }
 
-                // Resmi kaldır
-                galleryItem.remove();
-            }
-        }
+                    // Input'u temizle
+                    document.getElementById('imageUrlInput').value = '';
+                };
 
-        function addImageUrl(modalIndex) {
-            const urlInput = document.getElementById('imageUrl' + modalIndex);
-            const url = urlInput.value.trim();
+                testImage.onerror = function() {
+                    alert('Görsel yüklenemedi. Lütfen geçerli bir görsel URL\'si girin.');
+                };
 
-            if (!url) {
-                alert('Lütfen bir URL girin');
-                return;
-            }
+                testImage.src = url;
+            });
 
-            if (!url.startsWith('https://')) {
-                alert('Sadece https:// ile başlayan URL\'ler eklenebilir');
-                return;
-            }
+            // Form gönderimi
+            document.getElementById('variantEditForm').addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            // Resmin yüklenebildiğinden emin olmak için test et
-            const testImage = new Image();
-            testImage.onload = function() {
-                const galleryContainer = document.querySelector('.gallery-images-' + modalIndex);
-                const isFirstImage = galleryContainer.querySelectorAll('.gallery-item').length === 0;
+                // Form verilerini topla
+                const formData = new FormData(this);
 
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item me-2 mb-2 position-relative';
-                galleryItem.setAttribute('data-url', url);
+                // Resim listesi
+                const images = [];
+                document.querySelectorAll('#galleryContainer .gallery-item').forEach(item => {
+                    images.push(item.getAttribute('data-url'));
+                });
+                formData.append('imageList', JSON.stringify(images));
 
-                galleryItem.innerHTML = `
-            <img src="${url}" class="img-thumbnail gallery-image ${isFirstImage ? 'active-image' : ''}"
-                 style="width: 60px; height: 60px; object-fit: contain; cursor: pointer;"
-                 alt="Eklenen Görsel" onclick="selectImage(this, ${modalIndex})">
-            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"
-                    style="width: 18px; height: 18px; font-size: 10px; line-height: 1;"
-                    onclick="removeImage(this, ${modalIndex})">
-                <i class="fas fa-times"></i>
-            </button>
-            <input type="hidden" name="images[]" value="${url}">
-        `;
-                galleryContainer.appendChild(galleryItem);
-                if (isFirstImage) {
-                    const mainPreview = document.querySelector('#editModal' + modalIndex + ' .main-image-preview');
-                    if (mainPreview) mainPreview.src = url;
-                }
-                urlInput.value = '';
-            };
-
-            testImage.onerror = function() {
-                alert('Görsel yüklenemedi. Lütfen geçerli bir görsel URL\'si girin.');
-            };
-
-            testImage.src = url;
-        }
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Varyant başarıyla güncellendi');
+                            window.location.reload(); // Sayfayı yenile
+                        } else {
+                            alert('Hata: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Hata:', error);
+                        alert('İşlem sırasında bir hata oluştu.');
+                    });
+            });
+        });
     </script>
 
 {% endblock %}
