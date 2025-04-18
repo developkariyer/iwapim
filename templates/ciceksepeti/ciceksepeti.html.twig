@@ -136,68 +136,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="modal fade" id="editModal{{ loop.index }}" tabindex="-1" aria-labelledby="editModalLabel{{ loop.index }}" aria-hidden="true">
-                                                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="editModalLabel{{ loop.index }}">Varyant Düzenle: {{ variant.productName }}</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <form method="post" action="/variant/update">
-                                                                        <input type="hidden" name="mainProductCode" value="{{ variant.mainProductCode }}">
-                                                                        <input type="hidden" name="openModalId" value="editModal{{ loop.index }}">
-
-                                                                        <div class="row g-3">
-                                                                            <div class="col-md-6">
-                                                                                <label>Ürün Adı</label>
-                                                                                <input type="text" name="productName" value="{{ variant.productName }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Ürün Kodu</label>
-                                                                                <input type="text" name="productCode" value="{{ variant.productCode }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Barkod</label>
-                                                                                <input type="text" name="barcode" value="{{ variant.barcode }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Stok Miktarı</label>
-                                                                                <input type="number" name="stockQuantity" value="{{ variant.stockQuantity }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Satış Fiyatı</label>
-                                                                                <input type="text" name="salesPrice" value="{{ variant.salesPrice }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Liste Fiyatı</label>
-                                                                                <input type="text" name="listPrice" value="{{ variant.listPrice }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-12">
-                                                                                <label>Açıklama</label>
-                                                                                <textarea name="description" class="form-control" rows="3">{{ variant.description }}</textarea>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Kategori ID</label>
-                                                                                <input type="text" name="categoryId" value="{{ variant.categoryId }}" class="form-control">
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label>Aktif mi?</label>
-                                                                                <select name="variantIsActive" class="form-control">
-                                                                                    <option value="1" {% if variant.variantIsActive %}selected{% endif %}>Evet</option>
-                                                                                    <option value="0" {% if not variant.variantIsActive %}selected{% endif %}>Hayır</option>
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="mt-4 text-end">
-                                                                            <button type="submit" class="btn btn-success">Kaydet</button>
-                                                                        </div>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -231,10 +169,219 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="editModal{{ loop.index }}" tabindex="-1" aria-labelledby="editModalLabel{{ loop.index }}" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editModalLabel{{ loop.index }}">
+                        <i class="fas fa-edit me-2"></i> Varyant Düzenle: {{ variant.productName|default('İsimsiz Varyant') }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <form method="post" action="/variant/update" id="variantForm{{ loop.index }}">
+                        <input type="hidden" name="mainProductCode" value="{{ variant.mainProductCode }}">
+                        <input type="hidden" name="productCode" value="{{ variant.productCode }}">
+                        <input type="hidden" name="openModalId" value="editModal{{ loop.index }}">
+
+                        <div class="container-fluid">
+                            <div class="row g-0">
+                                <!-- Sol sütun - Resimler -->
+                                <div class="col-md-4 border-end">
+                                    <div class="p-3 bg-light border-bottom">
+                                        <h6 class="mb-1">Ürün Görselleri</h6>
+                                        <small class="text-muted">Ana ürün kodu: {{ variant.mainProductCode }}</small>
+                                    </div>
+                                    <div class="p-3">
+                                        <!-- Ana görsel önizleme -->
+                                        <div class="text-center mb-3">
+                                            {% if variant.images is defined and variant.images|length > 0 %}
+                                                <img src="{{ variant.images[0] }}" class="img-fluid main-image-preview border"
+                                                     style="max-height: 220px; object-fit: contain;" alt="{{ variant.productName }}">
+                                            {% else %}
+                                                <div class="no-image-preview bg-light p-5 text-center mb-3">
+                                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                                    <p class="mt-2">Görsel bulunmuyor</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Görsel galerisi -->
+                                        <div class="gallery-container">
+                                            <div class="d-flex flex-wrap gallery-images-{{ loop.index }}">
+                                                {% if variant.images is defined %}
+                                                    {% for img in variant.images %}
+                                                        <div class="gallery-item me-2 mb-2 position-relative" data-url="{{ img }}">
+                                                            <img src="{{ img }}" class="img-thumbnail gallery-image"
+                                                                 style="width: 60px; height: 60px; object-fit: contain; cursor: pointer;"
+                                                                 alt="Görsel {{loop.index}}"
+                                                                 onclick="selectImage(this, {{ loop.parent.loop.index }})">
+                                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"
+                                                                    style="width: 18px; height: 18px; font-size: 10px; line-height: 1;"
+                                                                    onclick="removeImage(this, {{ loop.parent.loop.index }})">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                            <input type="hidden" name="images[]" value="{{ img }}">
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Yeni görsel ekleme -->
+                                            <div class="mt-3">
+                                                <div class="input-group input-group-sm">
+                                                    <input type="url" class="form-control" id="imageUrl{{ loop.index }}"
+                                                           placeholder="https://ornek.com/resim.jpg">
+                                                    <button type="button" class="btn btn-outline-primary"
+                                                            onclick="addImageUrl({{ loop.index }})">
+                                                        <i class="fas fa-plus"></i> Ekle
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">Sadece https:// ile başlayan URL'ler eklenebilir.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sağ sütun - Form alanları -->
+                                <div class="col-md-8">
+                                    <div class="p-3">
+                                        <div class="row g-3">
+                                            <div class="col-md-8">
+                                                <label class="form-label">Ürün Adı</label>
+                                                <input type="text" name="productName" value="{{ variant.productName }}" class="form-control">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Ürün Kodu</label>
+                                                <input type="text" name="productCode" value="{{ variant.productCode }}" class="form-control" readonly>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Barkod</label>
+                                                <input type="text" name="barcode" value="{{ variant.barcode }}" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Kategori ID</label>
+                                                <input type="text" name="categoryId" value="{{ variant.categoryId }}" class="form-control">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <hr class="my-2">
+                                                <h6>Fiyat ve Stok Bilgileri</h6>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Satış Fiyatı</label>
+                                                <div class="input-group">
+                                                    <input type="text" name="salesPrice" value="{{ variant.salesPrice }}" class="form-control">
+                                                    <span class="input-group-text">TL</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Liste Fiyatı</label>
+                                                <div class="input-group">
+                                                    <input type="text" name="listPrice" value="{{ variant.listPrice }}" class="form-control">
+                                                    <span class="input-group-text">TL</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Stok Miktarı</label>
+                                                <input type="number" name="stockQuantity" value="{{ variant.stockQuantity }}" class="form-control">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <hr class="my-2">
+                                                <h6>Durum ve Açıklama</h6>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Aktif Durumu</label>
+                                                <select name="variantIsActive" class="form-select">
+                                                    <option value="1" {% if variant.variantIsActive %}selected{% endif %}>Aktif</option>
+                                                    <option value="0" {% if not variant.variantIsActive %}selected{% endif %}>Pasif</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Desen/Renk</label>
+                                                <input type="text" name="pattern" value="{{ variant.pattern|default('') }}" class="form-control">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <label class="form-label">Açıklama</label>
+                                                <textarea name="description" class="form-control" rows="3">{{ variant.description }}</textarea>
+                                            </div>
+
+                                            {% if variant.attributes is defined and variant.attributes is not empty %}
+                                                <div class="col-12">
+                                                    <hr class="my-2">
+                                                    <h6>Ürün Özellikleri</h6>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-bordered">
+                                                            <thead class="table-light">
+                                                            <tr>
+                                                                <th>Özellik</th>
+                                                                <th>Değer</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for attr in variant.attributes %}
+                                                                <tr>
+                                                                    <td class="fw-bold">{{ attr.parentName|default('') }}</td>
+                                                                    <td>{{ attr.name|default('') }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i> Değişiklikleri Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        .gallery-item .btn-danger {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .gallery-item:hover .btn-danger {
+            opacity: 1;
+        }
+
+        .active-image {
+            border: 2px solid #0d6efd !important;
+        }
+
+        .gallery-container {
+            border-top: 1px solid #dee2e6;
+            padding-top: 1rem;
+        }
+
+        .modal-body {
+            padding: 0 !important;
+        }
         .product-card {
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -308,6 +455,93 @@
                 });
             });
         });
+        // Mevcut script bloğunu koruyun ve bu fonksiyonları ekleyin
+        function selectImage(img, modalIndex) {
+            // Aynı galeriden tüm resimlerdeki aktif sınıfı kaldır
+            document.querySelectorAll('.gallery-image').forEach(i => {
+                i.classList.remove('active-image');
+            });
+
+            // Tıklanan resme aktif sınıfı ekle
+            img.classList.add('active-image');
+
+            // Ana resim önizlemesini güncelle
+            const modalElement = document.getElementById('editModal' + modalIndex);
+            const mainPreview = modalElement.querySelector('.main-image-preview');
+            if (mainPreview) {
+                mainPreview.src = img.src;
+            }
+        }
+
+        function removeImage(button, modalIndex) {
+            if (confirm('Bu görseli silmek istediğinize emin misiniz?')) {
+                const galleryItem = button.closest('.gallery-item');
+                const img = galleryItem.querySelector('img');
+
+                // Eğer silinen resim aktifse, ilk resmi aktif yap
+                if (img.classList.contains('active-image')) {
+                    const firstImage = document.querySelector('.gallery-images-' + modalIndex + ' img:first-child');
+                    if (firstImage) {
+                        firstImage.classList.add('active-image');
+                        const mainPreview = document.querySelector('#editModal' + modalIndex + ' .main-image-preview');
+                        if (mainPreview) mainPreview.src = firstImage.src;
+                    }
+                }
+
+                // Resmi kaldır
+                galleryItem.remove();
+            }
+        }
+
+        function addImageUrl(modalIndex) {
+            const urlInput = document.getElementById('imageUrl' + modalIndex);
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                alert('Lütfen bir URL girin');
+                return;
+            }
+
+            if (!url.startsWith('https://')) {
+                alert('Sadece https:// ile başlayan URL\'ler eklenebilir');
+                return;
+            }
+
+            // Resmin yüklenebildiğinden emin olmak için test et
+            const testImage = new Image();
+            testImage.onload = function() {
+                const galleryContainer = document.querySelector('.gallery-images-' + modalIndex);
+                const isFirstImage = galleryContainer.querySelectorAll('.gallery-item').length === 0;
+
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item me-2 mb-2 position-relative';
+                galleryItem.setAttribute('data-url', url);
+
+                galleryItem.innerHTML = `
+            <img src="${url}" class="img-thumbnail gallery-image ${isFirstImage ? 'active-image' : ''}"
+                 style="width: 60px; height: 60px; object-fit: contain; cursor: pointer;"
+                 alt="Eklenen Görsel" onclick="selectImage(this, ${modalIndex})">
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"
+                    style="width: 18px; height: 18px; font-size: 10px; line-height: 1;"
+                    onclick="removeImage(this, ${modalIndex})">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="images[]" value="${url}">
+        `;
+                galleryContainer.appendChild(galleryItem);
+                if (isFirstImage) {
+                    const mainPreview = document.querySelector('#editModal' + modalIndex + ' .main-image-preview');
+                    if (mainPreview) mainPreview.src = url;
+                }
+                urlInput.value = '';
+            };
+
+            testImage.onerror = function() {
+                alert('Görsel yüklenemedi. Lütfen geçerli bir görsel URL\'si girin.');
+            };
+
+            testImage.src = url;
+        }
     </script>
 
 {% endblock %}
