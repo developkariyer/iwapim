@@ -142,6 +142,7 @@
                                                                             data-description="{{ variant.description }}"
                                                                             data-category-id="{{ variant.categoryId }}"
                                                                             data-active="{{ variant.variantIsActive ? '1' : '0' }}"
+                                                                            data-images="{{ variant.images|json_encode|e('html_attr') }}"
                                                                     >
                                                                         Düzenle
                                                                     </button>
@@ -232,6 +233,17 @@
                                     <option value="0">Hayır</option>
                                 </select>
                             </div>
+                            <div class="col-12 mt-4">
+                                <label>Görseller</label>
+                                <div id="imageGallery" class="d-flex flex-wrap gap-2 border p-2 rounded bg-light">
+                                    <!-- JS ile eklenecek -->
+                                </div>
+                                <div class="input-group mt-2">
+                                    <input type="url" class="form-control" id="newImageUrl" placeholder="Yeni görsel URL'si (https://...)">
+                                    <button type="button" class="btn btn-outline-secondary" id="addImageBtn">Ekle</button>
+                                </div>
+                                <input type="hidden" name="images[]" id="imagesInput">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -295,6 +307,30 @@
             max-height: 300px;
             overflow-y: auto;
         }
+        #imageGallery .image-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        #imageGallery .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: .25rem;
+        }
+        #imageGallery .remove-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
     </style>
 {% endblock %}
 {% block body_scripts %}
@@ -331,6 +367,72 @@
                     document.getElementById("formCategoryId").value = this.dataset.categoryId || '';
                     document.getElementById("formActive").value = this.dataset.active || '0';
                 });
+            });
+        });
+        let currentImages = [];
+
+        function updateImageGallery() {
+            const gallery = document.getElementById("imageGallery");
+            gallery.innerHTML = "";
+
+            currentImages.forEach((url, index) => {
+                const item = document.createElement("div");
+                item.className = "image-item";
+                item.setAttribute("data-index", index);
+
+                const img = document.createElement("img");
+                img.src = url;
+
+                const removeBtn = document.createElement("button");
+                removeBtn.className = "remove-btn";
+                removeBtn.innerHTML = "&times;";
+                removeBtn.addEventListener("click", () => {
+                    currentImages.splice(index, 1);
+                    updateImageGallery();
+                });
+
+                item.appendChild(img);
+                item.appendChild(removeBtn);
+                gallery.appendChild(item);
+            });
+
+            // Galeriyi sıralama için güncelle
+            Sortable.create(gallery, {
+                animation: 150,
+                onEnd: function (evt) {
+                    const newOrder = [];
+                    gallery.querySelectorAll(".image-item").forEach(item => {
+                        const src = item.querySelector("img").src;
+                        newOrder.push(src);
+                    });
+                    currentImages = newOrder;
+                    document.getElementById("imagesInput").value = JSON.stringify(currentImages);
+                }
+            });
+
+            document.getElementById("imagesInput").value = JSON.stringify(currentImages);
+        }
+
+        document.getElementById("addImageBtn").addEventListener("click", () => {
+            const newUrl = document.getElementById("newImageUrl").value.trim();
+            if (newUrl.startsWith("https://")) {
+                currentImages.push(newUrl);
+                updateImageGallery();
+                document.getElementById("newImageUrl").value = "";
+            } else {
+                alert("Lütfen geçerli bir HTTPS URL girin.");
+            }
+        });
+
+        document.querySelectorAll(".open-edit-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const rawImages = btn.dataset.images;
+                try {
+                    currentImages = JSON.parse(rawImages);
+                } catch {
+                    currentImages = rawImages ? [rawImages] : [];
+                }
+                updateImageGallery();
             });
         });
     </script>
