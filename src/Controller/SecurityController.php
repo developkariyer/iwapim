@@ -13,7 +13,6 @@ class SecurityController extends AbstractController
     {
 
         if ($this->getUser()) {
-            dd($this->getUser());
             return $this->redirectToRoute('default_homepage');
         }
 
