@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[IsGranted('ROLE_STICKERMANAGER or ROLE_PIMCORE_ADMIN')]
+#[IsGranted('ROLE_STICKERMANAGER')]
 class StickerController extends FrontendController
 {
     protected function getGroupList(): array
