@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Uygulama erişim logları için Event Subscriber
+ * Frontend Access Log Event Subscriber
  */
 class AccessLoggerListener implements EventSubscriberInterface
 {
@@ -46,7 +46,7 @@ class AccessLoggerListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => ['onKernelController', 0], // Öncelik düzeyi 0
+            KernelEvents::CONTROLLER => ['onKernelController', 0],
         ];
     }
 
@@ -62,21 +62,17 @@ class AccessLoggerListener implements EventSubscriberInterface
             $request = $event->getRequest();
             $routeName = $request->attributes->get('_route');
 
-            // Dahil edilmeyecek rotaları atla
             if ($routeName && in_array($routeName, self::EXCLUDED_ROUTES, true)) {
                 return;
             }
 
-            // Controller bilgilerini al
             $controllerInfo = $this->getControllerInfo($event->getController());
             if (!$controllerInfo) {
                 return;
             }
 
-            // Kullanıcı bilgilerini güvenli bir şekilde al
             $userInfo = $this->getUserInfo();
 
-            // Request bilgilerini al
             $requestInfo = [
                 'ip_address' => $request->getClientIp() ?: 'unknown',
                 'method' => $request->getMethod(),
@@ -87,7 +83,6 @@ class AccessLoggerListener implements EventSubscriberInterface
                 'user_agent' => $request->headers->get('User-Agent'),
             ];
 
-            // Log mesajını oluştur
             $logMessage = sprintf(
                 'ACCESS: %s %s -> %s::%s',
                 $requestInfo['method'],
@@ -96,12 +91,10 @@ class AccessLoggerListener implements EventSubscriberInterface
                 $controllerInfo['method']
             );
 
-            // Log context bilgilerini birleştir ve logla
             $logContext = array_merge($userInfo, $requestInfo, $controllerInfo);
             $this->logger->info($logMessage, $logContext);
 
         } catch (\Throwable $e) {
-            // Loglama işleminde hata oluşursa, hatayı logla ama uygulamayı etkileme
             $this->logger->error('AccessLogger hata: ' . $e->getMessage(), [
                 'exception' => get_class($e),
                 'file' => $e->getFile(),
