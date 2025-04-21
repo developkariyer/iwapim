@@ -42,17 +42,7 @@
             </div>
         </div>
     </nav>
-    <div class="user-info">
-        {% if app.user %}
 
-            <span>Hoşgeldin, {{ app.user.getUserIdentifier() | default('Kullanıcı') }}!</span>
-            <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
-        {% else %}
-            <p>Kullanıcı giriş yapmamış.</p>
-            {# Giriş yapmamışsa app.user'ın ne olduğunu görmek için: #}
-            <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
-        {% endif %}
-    </div>
 </header>
 <main class="container mt-4">
     {% for type, messages in app.flashes %}
@@ -64,6 +54,15 @@
         {% endfor %}
     {% endfor %}
     {% block content %}
+        <div class="user-info">
+            {% if app.user %}
+                <span>Hoşgeldin, {{ app.user.getUserIdentifier() | default('Kullanıcı') }}!</span>
+                <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
+            {% else %}
+                <p>Kullanıcı giriş yapmamış.</p>
+                <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
+            {% endif %}
+        </div>
         <!-- Content will be injected here -->
     {% endblock %}
 </main>
