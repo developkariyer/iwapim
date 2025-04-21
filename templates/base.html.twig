@@ -44,10 +44,10 @@
     </nav>
     <div class="user-info">
         {% if app.user %}
-            {{ dump(app.user) }}
+            {{ dump(app.user.getUsername()) }}
             {{ app._username }}
             {{ app.user._username }}
-            <span>Hoşgeldin, {{ app.user.username | default('Kullanıcı') }}!</span>
+            <span>Hoşgeldin, {{ app.user.getUsername() | default('Kullanıcı') }}!</span>
             <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
         {% else %}
             <p>Kullanıcı giriş yapmamış.</p>
