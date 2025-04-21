@@ -1,7 +1,70 @@
-{% block title %}Sayfa Bulunamadı{% endblock %}
+{# templates/bundles/TwigBundle/Exception/error403.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Erişim Engellendi{% endblock %}
 
 {% block body %}
-    <h1>404 - Sayfa Bulunamadı</h1>
-    <p>Üzgünüz, aradığınız sayfa mevcut değil.</p>
-    <a href="{{ path('default_homepage') }}">Anasayfaya Dön</a>
+    <div class="error-page-container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+        <div class="text-center">
+            <div class="mb-4">
+                <i class="fas fa-lock text-danger" style="font-size: 5rem;"></i>
+            </div>
+
+            <h1 class="display-4 mb-3">403 - Erişim Engellendi</h1>
+
+            <div class="card border-danger mb-4" style="max-width: 600px;">
+                <div class="card-body text-danger">
+                    <p class="card-text">Bu sayfaya erişim için gereken izinlere sahip değilsiniz.</p>
+                </div>
+            </div>
+
+            <p class="text-muted mb-4">
+                Eğer bu bir hata olduğunu düşünüyorsanız, lütfen sistem yöneticinizle iletişime geçin veya anasayfaya dönün.
+            </p>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ path('default_homepage') }}" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i> Anasayfaya Dön
+                </a>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Önceki Sayfaya Dön
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if app.debug %}
+        <div class="container mt-5">
+            <div class="alert alert-warning">
+                <h4 class="alert-heading">Geliştirici Bilgisi</h4>
+                <p>Şu anda debug modundasınız. Bu mesaj sadece geliştirme ortamında görünür.</p>
+                <hr>
+                <p class="mb-0">Route: {{ app.request.attributes.get('_route') }}</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .error-page-container {
+            background-color: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .fa-lock {
+                animation: pulse 2s infinite;
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
 {% endblock %}
