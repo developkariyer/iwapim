@@ -16,8 +16,9 @@ use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\Asset;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+#[IsGranted('ROLE_PIMCORE_ADMIN')]
 class CiceksepetiController extends FrontendController
 {
     /**
