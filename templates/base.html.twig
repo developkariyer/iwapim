@@ -32,6 +32,7 @@
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ path('ozon_menu') }}">Ozon Listing</a></li>
                             <li><a class="dropdown-item" href="{{ path('sticker_main_page') }}">Etiket</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_frontend_logout') }}">Çıkış Yap</a></li>
                         </ul>
                     </li>
                     {% block navbaritems %}
@@ -57,7 +58,6 @@
         <div class="user-info">
             {% if app.user %}
                 <span>Hoşgeldin, {{ app.user.getUserIdentifier() | default('Kullanıcı') }}!</span>
-                <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
             {% else %}
                 <p>Kullanıcı giriş yapmamış.</p>
                 <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
