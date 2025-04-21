@@ -36,4 +36,10 @@ class SecurityController extends AbstractController
     {
         throw new \LogicException('Bu action asla çalıştırılmamalı, security sistemi tarafından yakalanır.');
     }
+
+    #[Route('/favicon.ico', name: 'favicon')]
+    public function favicon(): Response
+    {
+        return $this->redirectToRoute('default_homepage');
+    }
 }
