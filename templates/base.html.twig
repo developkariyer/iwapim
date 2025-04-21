@@ -44,8 +44,7 @@
     </nav>
     <div class="user-info">
         {% if app.user %}
-            {# Kullanıcı nesnesinin içeriğini görmek için: #}
-            {{ dump(app.user) }}
+
 
             <span>Hoşgeldin, {{ app.user.username | default('Kullanıcı') }}!</span>
             <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
@@ -74,6 +73,6 @@
     {% block footer %}
     {% endblock %}
 </footer>
-{% block body_scripts %}{% endblock %}
+{% block body_scripts %} console.log("Giriş yapan kullanıcı:", currentUser);{% endblock %}
 </body>
 </html>

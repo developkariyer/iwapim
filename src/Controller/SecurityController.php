@@ -11,9 +11,10 @@ class SecurityController extends AbstractController
     #[Route('/loginIwapim', name: 'app_frontend_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-
         if ($this->getUser()) {
-            return $this->redirectToRoute('default_homepage');
+            return $this->redirectToRoute('default_homepage',[
+                'currentUser' => $this->getUser()
+            ]);
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
