@@ -73,6 +73,9 @@
     {% block footer %}
     {% endblock %}
 </footer>
-{% block body_scripts %}{% endblock %}
+{% block body_scripts %}<script>
+    const currentUser = {{ app.user ? app.user|json_encode|raw : 'null' }};
+    console.log("Aktif Kullanıcı:", currentUser);
+</script>{% endblock %}
 </body>
 </html>
