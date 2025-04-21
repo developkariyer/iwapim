@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pimcore\Model\DataObject\Marketplace;
 use Pimcore\Model\DataObject\ListingTemplate;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Class OzonController
