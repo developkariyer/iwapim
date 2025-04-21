@@ -53,10 +53,7 @@
         {% endfor %}
     {% endfor %}
     {% block content %}
-        {% if app.user %}
-        <span style="margin-right: 15px;">Hoşgeldin, {{ app.user.username | default('Kullanıcı') }}!</span>
-        <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
-        {% else %}
+        <!-- Content will be injected here -->
     {% endblock %}
 </main>
 <footer class="bg-light text-center m-3">
