@@ -44,13 +44,14 @@
     </nav>
     <div class="user-info">
         {% if app.user %}
-            {{ dump(app.user.getUsername()) }}
-            {{ app._username }}
-            {{ app.user._username }}
-            <span>Hoşgeldin, {{ app.user.getUsername() | default('Kullanıcı') }}!</span>
+            {# Kullanıcı nesnesinin içeriğini görmek için: #}
+            {{ dump(app.user) }}
+
+            <span>Hoşgeldin, {{ app.user.username | default('Kullanıcı') }}!</span>
             <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
         {% else %}
             <p>Kullanıcı giriş yapmamış.</p>
+            {# Giriş yapmamışsa app.user'ın ne olduğunu görmek için: #}
             {{ dump(app.user) }}
             <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
         {% endif %}
@@ -73,9 +74,6 @@
     {% block footer %}
     {% endblock %}
 </footer>
-{% block body_scripts %}<script>
-    const currentUser = {{ app.user ? app.user|json_encode|raw : 'null' }};
-    console.log("Aktif Kullanıcı:", currentUser);
-</script>{% endblock %}
+{% block body_scripts %}{% endblock %}
 </body>
 </html>
