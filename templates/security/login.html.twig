@@ -1,0 +1,46 @@
+{# templates/security/login.html.twig #}
+
+{# Projenizin ana layout dosyasını (genellikle base.html.twig) extend edin.
+   Eğer farklı bir isme sahipse veya yoksa, bu satırı düzenleyin veya kaldırın. #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Giriş Yap{% endblock %}
+
+{% block body %}
+    <form method="post" action="{{ path('app_frontend_login_check') }}">
+
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="mb-3">
+                Zaten <strong>{{ app.user.username | default('Kullanıcı') }}</strong> olarak giriş yaptınız.
+                <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
+            </div>
+        {% else %}
+            <h1 class="h3 mb-3 fw-normal">Lütfen Giriş Yapın</h1>
+
+            <div class="form-floating mb-3">
+                <input type="text" value="{{ last_username }}" name="_username" id="floatingInput" class="form-control" placeholder="Kullanıcı Adı" autocomplete="username" required autofocus>
+                <label for="floatingInput">Kullanıcı Adı</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" name="_password" id="floatingPassword" class="form-control" placeholder="Şifre" autocomplete="current-password" required>
+                <label for="floatingPassword">Şifre</label>
+            </div>
+
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button class="w-100 btn btn-lg btn-primary" type="submit">
+                Giriş Yap
+            </button>
+
+
+        {% endif %}
+    </form>
+{% endblock %}
