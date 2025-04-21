@@ -17,7 +17,7 @@
 
         {% if app.user %}
             <div class="mb-3">
-                Zaten <strong>{{ $lastUsername | default('Kullanıcı') }}</strong> olarak giriş yaptınız.
+                Zaten <strong>{{ last_user_name | default('Kullanıcı') }}</strong> olarak giriş yaptınız.
                 <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
             </div>
         {% else %}
