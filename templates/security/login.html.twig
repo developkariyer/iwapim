@@ -16,6 +16,8 @@
         {% endif %}
 
         {% if app.user %}
+            {{ dump(app.user) }}
+
             <div class="mb-3">
                 Zaten <strong>{{ app.user.getUsername() | default('Kullanıcı') }}</strong> olarak giriş yaptınız.
                 <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
