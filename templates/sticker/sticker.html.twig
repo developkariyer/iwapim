@@ -71,9 +71,28 @@
             </form>
         </div>
     </div>
-    <div class="d-flex" role="search">
-        <!--suppress HtmlFormInputWithoutLabel -->
-        <input type="text" disabled id="searchInput" placeholder="Ara..." class="form-control-sm mb-3">
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-6">
+            <h5 id="groupTitle" class="mb-0"></h5>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex justify-content-end" role="search">
+                <div class="input-group input-group-sm" style="max-width: 250px;">
+                <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                    <input
+                            type="text"
+                            disabled
+                            id="searchInput"
+                            placeholder="Ürün ara..."
+                            class="form-control form-control-sm border-start-0"
+                            aria-label="Ara"
+                            style="border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;"
+                    >
+                </div>
+            </div>
+        </div>
     </div>
     <div class="" id="stickerList">
         <div class="row mt-2">
