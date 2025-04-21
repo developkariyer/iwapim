@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sayfa Bulunamadı{% endblock %}
+
+{% block body %}
+    <h1>404 - Sayfa Bulunamadı</h1>
+    <p>Üzgünüz, aradığınız sayfa mevcut değil.</p>
+    <a href="{{ path('default_homepage') }}">Anasayfaya Dön</a>
+{% endblock %}
