@@ -45,8 +45,7 @@
     <div class="user-info">
         {% if app.user %}
 
-
-            <span>Hoşgeldin, {{ app.user.getUsername() | default('Kullanıcı') }}!</span>
+            <span>Hoşgeldin, {{ app.user.getUserIdentifier() | default('Kullanıcı') }}!</span>
             <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
         {% else %}
             <p>Kullanıcı giriş yapmamış.</p>
