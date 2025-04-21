@@ -44,9 +44,13 @@
     </nav>
     <div class="user-info">
         {% if app.user %}
+            {{ dump(app.user) }}
+
             <span>Hoşgeldin, {{ app.user.username | default('Kullanıcı') }}!</span>
             <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
         {% else %}
+            <p>Kullanıcı giriş yapmamış.</p>
+            {{ dump(app.user) }}
             <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
         {% endif %}
     </div>
