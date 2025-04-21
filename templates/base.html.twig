@@ -42,6 +42,14 @@
             </div>
         </div>
     </nav>
+    <div class="user-info">
+        {% if app.user %}
+            <span>Hoşgeldin, {{ app.user.username | default('Kullanıcı') }}!</span>
+            <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
+        {% else %}
+            <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
+        {% endif %}
+    </div>
 </header>
 <main class="container mt-4">
     {% for type, messages in app.flashes %}
