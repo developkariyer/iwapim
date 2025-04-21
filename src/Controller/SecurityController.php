@@ -13,7 +13,9 @@ class SecurityController extends AbstractController
     {
 
         if ($this->getUser()) {
-            return $this->redirectToRoute('default_homepage');
+            $user = $this->getUser();
+            $username = $user->getUsername();
+            return $this->redirectToRoute('default_homepage', ['username' => $username]);
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
