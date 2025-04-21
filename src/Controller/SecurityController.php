@@ -3,8 +3,8 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route; // ÖNEMLİ: Bu satırı ekleyin
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils; // ÖNEMLİ: Bu satırı ekleyin
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
@@ -13,9 +13,7 @@ class SecurityController extends AbstractController
     {
 
         if ($this->getUser()) {
-            $user = $this->getUser();
-            $username = $user->getUsername();
-            return $this->redirectToRoute('default_homepage', ['username' => $username]);
+            return $this->redirectToRoute('default_homepage');
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();

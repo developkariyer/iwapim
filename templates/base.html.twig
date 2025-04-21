@@ -46,12 +46,11 @@
         {% if app.user %}
 
 
-            <span>Hoşgeldin, {{ username }}!</span>
+            <span>Hoşgeldin, {{ app.user.getUsername() | default('Kullanıcı') }}!</span>
             <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
         {% else %}
             <p>Kullanıcı giriş yapmamış.</p>
             {# Giriş yapmamışsa app.user'ın ne olduğunu görmek için: #}
-            {{ dump(app.user) }}
             <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
         {% endif %}
     </div>
