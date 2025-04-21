@@ -1,163 +1,42 @@
-{# templates/security/login.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Giriş Yap | IWAPIM{% endblock %}
+{% block title %}Giriş Yap{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-        }
+{% block content %}
+    <form method="post" action="{{ path('app_frontend_login_check') }}">
 
-        .login-card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
-            overflow: hidden;
-        }
-
-        .login-header {
-            text-align: center;
-            padding: 2rem 1rem;
-            background-color: #3498db;
-            color: white;
-            margin-bottom: 0;
-        }
-
-        .login-form {
-            padding: 2rem;
-        }
-
-        .login-form .form-floating {
-            margin-bottom: 1.5rem;
-        }
-
-        .btn-login {
-            padding: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            background-color: #3498db;
-            border-color: #3498db;
-            box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
-            transition: all 0.2s;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, .1), 0 3px 6px rgba(0, 0, 0, .08);
-            background-color: #2980b9;
-            border-color: #2980b9;
-        }
-
-        .app-logo {
-            width: 80px;
-            height: auto;
-            margin-bottom: 1rem;
-        }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 2rem;
-            color: #8898aa;
-            font-size: 0.9rem;
-        }
-
-        .form-floating > label {
-            color: #8898aa;
-        }
-
-        .form-control:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-        }
-
-        .brand-name {
-            letter-spacing: 1px;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .alert-danger {
-            border-left: 4px solid #e74c3c;
-        }
-    </style>
-{% endblock %}
-
-{% block body %}
-    <div class="login-container">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-5 col-md-7">
-                    <div class="login-card card">
-                        {% if app.user %}
-                            <div class="login-header">
-                                <i class="fas fa-user-check fa-3x mb-3"></i>
-                                <h2>Giriş Yapıldı</h2>
-                            </div>
-                            <div class="login-form text-center">
-                                <p class="mb-4">
-                                    Zaten <strong>{{ app.user.getUserIdentifier() | default('Kullanıcı') }}</strong> olarak giriş yapmış durumdasınız.
-                                </p>
-                                <div class="d-grid gap-2">
-                                    <a href="{{ path('default_homepage') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-home me-2"></i> Anasayfaya Dön
-                                    </a>
-                                    <a href="{{ path('app_frontend_logout') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
-                                    </a>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="login-header">
-                                <img src="{{ asset('assets/images/logo.png') }}" alt="IWAPIM Logo" class="app-logo" onerror="this.src='https://via.placeholder.com/80?text=IWAPIM'; this.onerror='';">
-                                <h4 class="brand-name">IWAPIM</h4>
-                                <p class="mb-0">Ürün Yönetim Sistemi</p>
-                            </div>
-                            <div class="login-form">
-                                {% if error %}
-                                    <div class="alert alert-danger d-flex align-items-center" role="alert">
-                                        <i class="fas fa-exclamation-circle me-2"></i>
-                                        <div>
-                                            {{ error.messageKey|trans(error.messageData, 'security') }}
-                                        </div>
-                                    </div>
-                                {% endif %}
-
-                                <form method="post" action="{{ path('app_frontend_login_check') }}">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" value="{{ last_username }}" name="_username" id="floatingInput"
-                                               class="form-control" placeholder="Kullanıcı Adı" autocomplete="username" required autofocus>
-                                        <label for="floatingInput"><i class="fas fa-user me-2"></i>Kullanıcı Adı</label>
-                                    </div>
-
-                                    <div class="form-floating mb-4">
-                                        <input type="password" name="_password" id="floatingPassword"
-                                               class="form-control" placeholder="Şifre" autocomplete="current-password" required>
-                                        <label for="floatingPassword"><i class="fas fa-lock me-2"></i>Şifre</label>
-                                    </div>
-
-                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                                    <div class="d-grid">
-                                        <button class="btn btn-primary btn-login" type="submit">
-                                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
-                                        </button>
-                                    </div>
-                                </form>
-
-                                <div class="login-footer">
-                                    <p>© {{ "now"|date("Y") }} IWAPIM - Tüm hakları saklıdır</p>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
             </div>
-        </div>
-    </div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="mb-3">
+                Zaten <strong>{{ app.user.getUserIdentifier() | default('Kullanıcı') }}</strong> olarak giriş yaptınız.
+                <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
+            </div>
+        {% else %}
+            <h1 class="h3 mb-3 fw-normal">Lütfen Giriş Yapın</h1>
+            <h5 class="h3 mb-3 fw-normal">IWAPIM Kullanıcı Adı Şifre</h5>
+            <div class="form-floating mb-3">
+                <input type="text" value="{{ last_username }}" name="_username" id="floatingInput" class="form-control" placeholder="Kullanıcı Adı" autocomplete="username" required autofocus>
+                <label for="floatingInput">Kullanıcı Adı</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" name="_password" id="floatingPassword" class="form-control" placeholder="Şifre" autocomplete="current-password" required>
+                <label for="floatingPassword">Şifre</label>
+            </div>
+
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button class="w-100 btn btn-lg btn-primary" type="submit">
+                Giriş Yap
+            </button>
+
+
+        {% endif %}
+    </form>
 {% endblock %}
