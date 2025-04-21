@@ -1,6 +1,6 @@
 {# base.html.twig #}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,148 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4481eb;
+            --secondary-color: #04befe;
+            --accent-color: #3b82f6;
+            --light-color: #f5f7fa;
+            --dark-color: #1e293b;
+        }
+
+        body {
+            background-color: #f5f8fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header & Navigation */
+        .navbar {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.7rem 1rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .dropdown-item {
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* Alerts */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Footer */
+        footer {
+            background-color: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        /* User Info */
+        .user-info {
+            padding: 1rem;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Select2 Customization */
+        .select2-container--default .select2-selection--single {
+            border-radius: 6px;
+            height: 38px;
+            border-color: #dee2e6;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+        }
+    </style>
     {% block stylesheets %}{% endblock %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -17,62 +159,118 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ path('default_homepage') }}">IWAPIM Frontend</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ path('default_homepage') }}">
+                <i class="fas fa-cube me-2"></i>
+                <span>IWAPIM</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Uygulamalar
+                            <i class="fas fa-th-large me-1"></i> Uygulamalar
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ path('catalog') }}">Katalog</a></li>
+                            <li><a class="dropdown-item" href="{{ path('catalog') }}"><i class="fas fa-book me-2"></i>Katalog</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ path('ozon_menu') }}">Ozon Listing</a></li>
-                            <li><a class="dropdown-item" href="{{ path('sticker_main_page') }}">Etiket</a></li>
-                            <li><a class="dropdown-item" href="{{ path('ciceksepeti_main_page') }}">Ciceksepeti</a></li>
-                            <li><a class="dropdown-item" href="{{ path('app_frontend_logout') }}">Çıkış Yap</a></li>
+                            <li><a class="dropdown-item" href="{{ path('ozon_menu') }}"><i class="fas fa-list me-2"></i>Ozon Listing</a></li>
+                            <li><a class="dropdown-item" href="{{ path('sticker_main_page') }}"><i class="fas fa-tags me-2"></i>Etiket</a></li>
+                            <li><a class="dropdown-item" href="{{ path('ciceksepeti_main_page') }}"><i class="fas fa-shopping-basket me-2"></i>Ciceksepeti</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ path('app_frontend_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
                         </ul>
                     </li>
                     {% block navbaritems %}
                     {% endblock %}
                 </ul>
+
+                {% if app.user %}
+                    <div class="d-flex align-items-center">
+                        <span class="text-white me-3">
+                            <i class="fas fa-user-circle me-1"></i> {{ app.user.getUserIdentifier() | default('Kullanıcı') }}
+                        </span>
+                        <a href="{{ path('app_frontend_logout') }}" class="btn btn-sm btn-light">
+                            <i class="fas fa-sign-out-alt me-1"></i> Çıkış
+                        </a>
+                    </div>
+                {% endif %}
+
                 {% block header %}
                 {% endblock %}
             </div>
         </div>
     </nav>
-
 </header>
-<main class="container mt-4">
-    {% for type, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+
+<main>
+    <div class="container">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type }} alert-dismissible fade show mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        {% if type == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                        {% elseif type == 'danger' or type == 'error' %}
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                        {% elseif type == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle me-2"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    {% block content %}
-        <div class="user-info">
-            {% if app.user %}
-                <span>Hoşgeldin, {{ app.user.getUserIdentifier() | default('Kullanıcı') }}!</span>
-            {% else %}
-                <p>Kullanıcı giriş yapmamış.</p>
-                <a href="{{ path('app_frontend_login') }}">Giriş Yap</a>
+
+        {% block content %}
+            {% if not app.user %}
+                <div class="user-info d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h4 class="mb-2">Hoş Geldiniz</h4>
+                        <p class="mb-0 text-muted">Lütfen sisteme giriş yapın.</p>
+                    </div>
+                    <a href="{{ path('app_frontend_login') }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i> Giriş Yap
+                    </a>
+                </div>
             {% endif %}
-        </div>
-        <!-- Content will be injected here -->
-    {% endblock %}
+            <!-- Content will be injected here -->
+        {% endblock %}
+    </div>
 </main>
-<footer class="bg-light text-center m-3">
-    {% block footer %}
-    {% endblock %}
+
+<footer class="bg-white text-center">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                <small>&copy; {{ "now"|date("Y") }} IWAPIM - Tüm hakları saklıdır</small>
+            </div>
+            <div>
+                {% block footer %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
 </footer>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 Elements
+        $('.select2').select2();
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    });
+</script>
 {% block body_scripts %}{% endblock %}
 </body>
 </html>
