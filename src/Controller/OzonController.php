@@ -26,6 +26,7 @@ use Pimcore\Model\DataObject\ListingTemplate;
  * This controller class is used to manage Ozon Listing tasks. It displays
  * @package App\Controller
  */
+#[IsGranted('ROLE_PIMCORE_ADMIN')]
 class OzonController extends FrontendController
 {
     private string $sqlTaskProducts = "SELECT
