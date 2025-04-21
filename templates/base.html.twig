@@ -1,498 +1,153 @@
-{# base.html.twig - Grafik tasarımcı gözüyle modern yenileme #}
+{# base.html.twig #}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}IWAPIM{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Modern renk paleti */
-            --primary-color: #5D5FEF;
-            --primary-light: #7A7CF8;
-            --primary-dark: #4B4AEF;
-            --secondary-color: #64748B;
-            --secondary-light: #94A3B8;
-            --secondary-dark: #475569;
-            --accent-color: #F59E0B;
-            --accent-light: #FBBF24;
-            --accent-dark: #D97706;
-            --success-color: #10B981;
-            --danger-color: #EF4444;
-            --warning-color: #F59E0B;
-            --info-color: #3B82F6;
-
-            /* Nötr renkler */
-            --neutral-50: #F9FAFB;
-            --neutral-100: #F3F4F6;
-            --neutral-200: #E5E7EB;
-            --neutral-300: #D1D5DB;
-            --neutral-400: #9CA3AF;
-            --neutral-500: #6B7280;
-            --neutral-600: #4B5563;
-            --neutral-700: #374151;
-            --neutral-800: #1F2937;
-            --neutral-900: #111827;
-
-            /* Tip elementler */
-            --border-radius-sm: 0.25rem;
-            --border-radius: 0.5rem;
-            --border-radius-lg: 0.75rem;
-            --border-radius-xl: 1rem;
-            --box-shadow-sm: 0px 2px 8px rgba(0, 0, 0, 0.05);
-            --box-shadow: 0px 4px 16px rgba(17, 24, 39, 0.08);
-            --box-shadow-lg: 0px 8px 24px rgba(17, 24, 39, 0.12);
-            --transition: all 0.2s ease;
+            --primary-color: #4481eb;
+            --secondary-color: #04befe;
+            --accent-color: #3b82f6;
+            --light-color: #f5f7fa;
+            --dark-color: #1e293b;
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--neutral-50);
-            color: var(--neutral-800);
+            background-color: #f5f8fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            line-height: 1.6;
-            font-weight: 400;
-        }
-
-        /* Tipografi */
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 600;
-            line-height: 1.3;
-            color: var(--neutral-900);
         }
 
         /* Header & Navigation */
         .navbar {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
-            box-shadow: var(--box-shadow);
-            padding: 0.7rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.7rem 1rem;
         }
 
         .navbar-brand {
             font-weight: 700;
             color: white !important;
             letter-spacing: 0.5px;
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .brand-icon {
-            background: rgba(255, 255, 255, 0.2);
-            height: 38px;
-            width: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--border-radius);
-            margin-right: 0.75rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(5px);
         }
 
         .nav-link {
             color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
             padding: 0.5rem 1rem;
-            transition: var(--transition);
-            margin: 0 0.15rem;
-            border-radius: var(--border-radius);
-            position: relative;
+            transition: all 0.2s;
         }
 
         .nav-link:hover {
             color: white !important;
-            background-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
-        }
-
-        .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            font-weight: 600;
-        }
-
-        .nav-link.active:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 15px;
-            height: 3px;
-            background-color: white;
-            border-radius: 3px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
         }
 
         .dropdown-menu {
             border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow-lg);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            padding: 0.75rem 0;
-            margin-top: 0.75rem;
-            border: 1px solid var(--neutral-200);
-            animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .dropdown-item {
-            padding: 0.6rem 1.5rem;
-            transition: var(--transition);
-            color: var(--neutral-700);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s;
         }
 
         .dropdown-item:hover {
-            background-color: var(--neutral-100);
+            background-color: rgba(59, 130, 246, 0.1);
             color: var(--primary-color);
-            transform: translateX(3px);
-        }
-
-        .dropdown-item i {
-            color: var(--neutral-500);
-            transition: var(--transition);
-            margin-right: 0.75rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        .dropdown-item:hover i {
-            color: var(--primary-color);
-        }
-
-        .dropdown-divider {
-            margin: 0.5rem 1rem;
-            border-top: 1px solid var(--neutral-200);
         }
 
         /* Main Content */
         main {
             flex: 1;
-            padding-top: 2.5rem;
-            padding-bottom: 2.5rem;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
 
         .container {
-            max-width: 1280px;
+            max-width: 1200px;
         }
 
         /* Cards */
         .card {
             border: none;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
             overflow: hidden;
-            background-color: white;
-            border: 1px solid var(--neutral-200);
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--box-shadow-lg);
-            border-color: var(--neutral-300);
-        }
-
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid var(--neutral-200);
-            padding: 1.25rem 1.5rem;
-            font-weight: 600;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .card-footer {
-            background-color: var(--neutral-50);
-            border-top: 1px solid var(--neutral-200);
-            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         /* Buttons */
         .btn {
-            border-radius: var(--border-radius);
+            border-radius: 6px;
             font-weight: 500;
-            padding: 0.6rem 1.25rem;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            letter-spacing: 0.3px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
         }
 
         .btn-primary {
-            background: var(--primary-color);
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
             border: none;
-            box-shadow: 0 2px 4px rgba(93, 95, 239, 0.3);
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 5px 12px rgba(93, 95, 239, 0.4);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.35);
             transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: var(--neutral-700);
-            border: none;
-            color: white;
-            box-shadow: 0 2px 4px rgba(71, 85, 105, 0.25);
-        }
-
-        .btn-secondary:hover {
-            background: var(--neutral-800);
-            color: white;
-            box-shadow: 0 5px 12px rgba(71, 85, 105, 0.35);
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            border: none;
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger-color);
-            border: none;
-            color: white;
-        }
-
-        .btn-light {
-            background: white;
-            border: 1px solid var(--neutral-300);
-            color: var(--neutral-700);
-        }
-
-        .btn-light:hover {
-            background: var(--neutral-100);
-            border-color: var(--neutral-400);
-            color: var(--neutral-900);
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.875rem;
-        }
-
-        .btn-lg {
-            padding: 0.75rem 1.5rem;
-            font-size: 1.125rem;
         }
 
         /* Alerts */
         .alert {
             border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow-sm);
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            border-left: 4px solid transparent;
-        }
-
-        .alert-success {
-            background-color: rgba(16, 185, 129, 0.1);
-            border-left-color: var(--success-color);
-            color: #065F46;
-        }
-
-        .alert-danger {
-            background-color: rgba(239, 68, 68, 0.1);
-            border-left-color: var(--danger-color);
-            color: #B91C1C;
-        }
-
-        .alert-warning {
-            background-color: rgba(245, 158, 11, 0.1);
-            border-left-color: var(--warning-color);
-            color: #92400E;
-        }
-
-        .alert-info {
-            background-color: rgba(59, 130, 246, 0.1);
-            border-left-color: var(--info-color);
-            color: #1E40AF;
-        }
-
-        .alert i {
-            margin-right: 0.75rem;
-            font-size: 1.25rem;
-        }
-
-        /* Form Elements */
-        .form-control, .form-select {
-            border: 1px solid var(--neutral-300);
-            border-radius: var(--border-radius);
-            padding: 0.6rem 0.75rem;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(122, 124, 248, 0.2);
-        }
-
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--neutral-700);
-        }
-
-        .form-text {
-            color: var(--neutral-500);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
         /* Footer */
         footer {
             background-color: white;
-            border-top: 1px solid var(--neutral-200);
-            padding: 1.75rem 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
             margin-top: auto;
-            color: var(--neutral-600);
         }
 
         /* User Info */
         .user-info {
-            padding: 1.5rem;
-            border-radius: var(--border-radius-lg);
+            padding: 1rem;
+            border-radius: 10px;
             background-color: white;
-            box-shadow: var(--box-shadow);
-            margin-bottom: 2rem;
-            border: 1px solid var(--neutral-200);
-        }
-
-        /* Tables */
-        .table {
-            width: 100%;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 1.5rem;
-            color: var(--neutral-700);
-            vertical-align: middle;
-            border-color: var(--neutral-200);
-        }
-
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: var(--neutral-50);
-        }
-
-        .table th {
-            font-weight: 600;
-            color: var(--neutral-800);
-            background-color: var(--neutral-100);
-            border-bottom: 2px solid var(--neutral-300);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.75rem;
         }
 
         /* Select2 Customization */
         .select2-container--default .select2-selection--single {
-            border-radius: var(--border-radius);
-            height: 40px;
-            border-color: var(--neutral-300);
-            display: flex;
-            align-items: center;
+            border-radius: 6px;
+            height: 38px;
+            border-color: #dee2e6;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: normal;
-            padding-left: 0.75rem;
-            color: var(--neutral-800);
+            line-height: 36px;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 38px;
-        }
-
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        /* User status */
-        .user-status {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0.75rem;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: var(--border-radius);
-            margin-left: 0.75rem;
-            transition: var(--transition);
-        }
-
-        .user-status:hover {
-            background-color: rgba(255, 255, 255, 0.25);
-        }
-
-        .user-status .avatar {
-            height: 32px;
-            width: 32px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
-            font-size: 1rem;
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .user-status .info {
-            line-height: 1.2;
-        }
-
-        .user-status .name {
-            font-weight: 600;
-            color: white;
-            font-size: 0.875rem;
-        }
-
-        .user-status .role {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.75);
-        }
-
-        /* Badge */
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.35em 0.65em;
-            font-weight: 600;
-            border-radius: var(--border-radius-sm);
-        }
-
-        /* Shadows and effects for elements */
-        .shadow-sm {
-            box-shadow: var(--box-shadow-sm) !important;
-        }
-
-        .shadow {
-            box-shadow: var(--box-shadow) !important;
-        }
-
-        .shadow-lg {
-            box-shadow: var(--box-shadow-lg) !important;
+            height: 36px;
         }
     </style>
     {% block stylesheets %}{% endblock %}
@@ -506,10 +161,8 @@
 <header>
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="{{ path('default_homepage') }}">
-                <div class="brand-icon">
-                    <i class="fas fa-layer-group"></i>
-                </div>
+            <a class="navbar-brand d-flex align-items-center" href="{{ path('default_homepage') }}">
+                <i class="fas fa-cube me-2"></i>
                 <span>IWAPIM</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -520,16 +173,16 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-th me-1"></i> Uygulamalar
+                            <i class="fas fa-th-large me-1"></i> Uygulamalar
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ path('catalog') }}"><i class="fas fa-book"></i>Katalog</a></li>
+                            <li><a class="dropdown-item" href="{{ path('catalog') }}"><i class="fas fa-book me-2"></i>Katalog</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ path('ozon_menu') }}"><i class="fas fa-list"></i>Ozon Listing</a></li>
-                            <li><a class="dropdown-item" href="{{ path('sticker_main_page') }}"><i class="fas fa-tags"></i>Etiket</a></li>
-                            <li><a class="dropdown-item" href="{{ path('ciceksepeti_main_page') }}"><i class="fas fa-shopping-basket"></i>Ciceksepeti</a></li>
+                            <li><a class="dropdown-item" href="{{ path('ozon_menu') }}"><i class="fas fa-list me-2"></i>Ozon Listing</a></li>
+                            <li><a class="dropdown-item" href="{{ path('sticker_main_page') }}"><i class="fas fa-tags me-2"></i>Etiket</a></li>
+                            <li><a class="dropdown-item" href="{{ path('ciceksepeti_main_page') }}"><i class="fas fa-shopping-basket me-2"></i>Ciceksepeti</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ path('app_frontend_logout') }}"><i class="fas fa-sign-out-alt"></i>Çıkış Yap</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_frontend_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
                         </ul>
                     </li>
                     {% block navbaritems %}
@@ -537,18 +190,14 @@
                 </ul>
 
                 {% if app.user %}
-                    <div class="user-status">
-                        <div class="avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="info">
-                            <div class="name">{{ app.user.getUserIdentifier() | default('Kullanıcı') }}</div>
-                            <div class="role">Yönetici</div>
-                        </div>
+                    <div class="d-flex align-items-center">
+                        <span class="text-white me-3">
+                            <i class="fas fa-user-circle me-1"></i> {{ app.user.getUserIdentifier() | default('Kullanıcı') }}
+                        </span>
+                        <a href="{{ path('app_frontend_logout') }}" class="btn btn-sm btn-light">
+                            <i class="fas fa-sign-out-alt me-1"></i> Çıkış
+                        </a>
                     </div>
-                    <a href="{{ path('app_frontend_logout') }}" class="btn btn-sm btn-light ms-2">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
                 {% endif %}
 
                 {% block header %}
@@ -563,16 +212,18 @@
         {% for type, messages in app.flashes %}
             {% for message in messages %}
                 <div class="alert alert-{{ type }} alert-dismissible fade show mb-4" role="alert">
-                    {% if type == 'success' %}
-                        <i class="fas fa-check-circle"></i>
-                    {% elseif type == 'danger' or type == 'error' %}
-                        <i class="fas fa-exclamation-circle"></i>
-                    {% elseif type == 'warning' %}
-                        <i class="fas fa-exclamation-triangle"></i>
-                    {% else %}
-                        <i class="fas fa-info-circle"></i>
-                    {% endif %}
-                    <div>{{ message }}</div>
+                    <div class="d-flex align-items-center">
+                        {% if type == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                        {% elseif type == 'danger' or type == 'error' %}
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                        {% elseif type == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle me-2"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
@@ -586,7 +237,7 @@
                         <p class="mb-0 text-muted">Lütfen sisteme giriş yapın.</p>
                     </div>
                     <a href="{{ path('app_frontend_login') }}" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                        <i class="fas fa-sign-in-alt me-2"></i> Giriş Yap
                     </a>
                 </div>
             {% endif %}
@@ -595,11 +246,11 @@
     </div>
 </main>
 
-<footer>
+<footer class="bg-white text-center">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div class="text-muted">
-                <i class="fas fa-copyright me-1"></i> {{ "now"|date("Y") }} <strong>IWAPIM</strong> - Tüm hakları saklıdır
+                <small>&copy; {{ "now"|date("Y") }} IWAPIM - Tüm hakları saklıdır</small>
             </div>
             <div>
                 {% block footer %}
@@ -612,33 +263,12 @@
 <script>
     $(document).ready(function() {
         // Initialize Select2 Elements
-        $('.select2').select2({
-            theme: 'classic',
-            width: '100%'
-        });
+        $('.select2').select2();
 
         // Auto-hide alerts after 5 seconds
         setTimeout(function() {
             $('.alert').alert('close');
         }, 5000);
-
-        // Current page highlight in navbar
-        const currentPath = window.location.pathname;
-        $('a.nav-link').each(function() {
-            const href = $(this).attr('href');
-            if (href === currentPath) {
-                $(this).addClass('active');
-            }
-        });
-
-        // Add shadow on scroll
-        $(window).scroll(function() {
-            if ($(this).scrollTop() > 10) {
-                $('.navbar').css('box-shadow', '0 4px 20px rgba(0,0,0,0.1)');
-            } else {
-                $('.navbar').css('box-shadow', '0 2px 10px rgba(0,0,0,0.1)');
-            }
-        });
     });
 </script>
 {% block body_scripts %}{% endblock %}
