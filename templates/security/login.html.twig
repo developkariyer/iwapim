@@ -1,42 +1,120 @@
+{# templates/security/login.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Giriş Yap{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .login-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            padding: 2rem 0;
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .login-header {
+            text-align: center;
+            padding: 2rem;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .btn-login {
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, .1), 0 3px 6px rgba(0, 0, 0, .08);
+        }
+
+        .login-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .login-subtitle {
+            opacity: 0.8;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-floating > .form-control:focus ~ label {
+            color: #3b82f6;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <form method="post" action="{{ path('app_frontend_login_check') }}">
-
-        {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error.messageKey|trans(error.messageData, 'security') }}
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h4 class="login-brand">IWAPIM</h4>
+                <p class="login-subtitle">Ürün Yönetim Sistemi</p>
             </div>
-        {% endif %}
+            <div class="login-body">
+                <form method="post" action="{{ path('app_frontend_login_check') }}">
+                    {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
 
-        {% if app.user %}
-            <div class="mb-3">
-                Zaten <strong>{{ app.user.getUserIdentifier() | default('Kullanıcı') }}</strong> olarak giriş yaptınız.
-                <a href="{{ path('app_frontend_logout') }}">Çıkış Yap</a>
+                    {% if app.user %}
+                        <div class="alert alert-info mb-4">
+                            <p class="mb-2">Zaten <strong>{{ app.user.getUserIdentifier() | default('Kullanıcı') }}</strong> olarak giriş yaptınız.</p>
+                            <a href="{{ path('app_frontend_logout') }}" class="btn btn-sm btn-outline-primary">Çıkış Yap</a>
+                        </div>
+                    {% else %}
+                        <h5 class="text-center mb-4">Lütfen Giriş Yapın</h5>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" value="{{ last_username }}" name="_username" id="floatingInput" class="form-control" placeholder="Kullanıcı Adı" autocomplete="username" required autofocus>
+                            <label for="floatingInput">Kullanıcı Adı</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" name="_password" id="floatingPassword" class="form-control" placeholder="Şifre" autocomplete="current-password" required>
+                            <label for="floatingPassword">Şifre</label>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-login" type="submit">
+                                Giriş Yap
+                            </button>
+                        </div>
+                    {% endif %}
+                </form>
             </div>
-        {% else %}
-            <h1 class="h3 mb-3 fw-normal">Lütfen Giriş Yapın</h1>
-            <h5 class="h3 mb-3 fw-normal">IWAPIM Kullanıcı Adı Şifre</h5>
-            <div class="form-floating mb-3">
-                <input type="text" value="{{ last_username }}" name="_username" id="floatingInput" class="form-control" placeholder="Kullanıcı Adı" autocomplete="username" required autofocus>
-                <label for="floatingInput">Kullanıcı Adı</label>
-            </div>
-
-            <div class="form-floating mb-3">
-                <input type="password" name="_password" id="floatingPassword" class="form-control" placeholder="Şifre" autocomplete="current-password" required>
-                <label for="floatingPassword">Şifre</label>
-            </div>
-
-
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-            <button class="w-100 btn btn-lg btn-primary" type="submit">
-                Giriş Yap
-            </button>
-
-
-        {% endif %}
-    </form>
+        </div>
+    </div>
 {% endblock %}
