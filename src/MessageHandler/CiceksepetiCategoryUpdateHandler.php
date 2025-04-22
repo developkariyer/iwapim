@@ -12,7 +12,7 @@ class CiceksepetiCategoryUpdateHandler
 {
     public function __construct()
     {
-        $this->ciceksepetiConnector = new CiceksepetiConnector();
+        $this->ciceksepetiConnector = new CiceksepetiConnector(265384);
     }
 
     public function __invoke(CiceksepetiCategoryUpdateMessage $message)
