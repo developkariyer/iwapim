@@ -128,7 +128,7 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
-     * @Route("/ciceksepeti/category/update", name="update_category", methods={"POST"})
+     * @Route("/ciceksepeti/category/update", name="update_category", methods={"GET","POST"})
      * @return Response
      */
     public function getCiceksepetiListingCategoriesUpdate(MessageBusInterface $bus): Response
