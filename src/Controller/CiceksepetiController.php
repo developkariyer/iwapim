@@ -11,7 +11,7 @@ use Random\RandomException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use App\Message\CiceksepetiCategoryUpdateMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product;
