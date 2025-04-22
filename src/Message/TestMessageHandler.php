@@ -1,7 +1,6 @@
 <?php
-namespace App\Command;
+namespace App\Message;
 
-use App\Command\TestMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

@@ -2,23 +2,17 @@
 
 namespace App\Command;
 
-use App\Connector\Marketplace\CiceksepetiConnector;
-use App\Model\DataObject\Marketplace;
-use App\Model\DataObject\VariantProduct;
-use App\Utils\Utility;
+use App\Message\TestMessage;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
-use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
-use Pimcore\Model\DataObject\Product;
-use Pimcore\Model\DataObject\VariantProduct\Listing;
+use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pimcore\Model\DataObject\GroupProduct;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(
