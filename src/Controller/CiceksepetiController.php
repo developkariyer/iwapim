@@ -136,7 +136,7 @@ class CiceksepetiController extends FrontendController
         $marketplaceId = 265384;
 
         $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
-        $bus->dispatch($message, ['async' => true]);
+        $bus->dispatch($message);
 
         $this->addFlash('success', 'ÇiçekSepeti kategorileri güncelleme işlemi kuyruğa alındı.');
 
