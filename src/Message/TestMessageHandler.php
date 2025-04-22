@@ -2,9 +2,9 @@
 namespace App\Message;
 
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 #[AsMessageHandler]
-class TestMessageHandler
+class TestMessageHandler implements MessageHandlerInterface
 {
     public function __invoke(TestMessage $message)
     {
