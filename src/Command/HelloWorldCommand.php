@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $marketplaceId = 265384;
         $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
-        //$this->bus->dispatch($message);
+        $this->bus->dispatch($message);
         //$this->bus->dispatch(new TestMessage("Selam, bu kuyruğa gitti!"));
         echo "Mesaj kuyruğa atıldı.";
 
