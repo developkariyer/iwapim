@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use Symfony\Component\Messenger\MessageBusInterface;
 use Pimcore\Controller\FrontendController;
 use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\DataObject\Data\Link;
@@ -130,18 +131,15 @@ class CiceksepetiController extends FrontendController
      * @Route("/ciceksepeti/category/update", name="update_category", methods={"POST"})
      * @return Response
      */
-    public function getCiceksepetiListingCategoriesUpdate(): Response
+    public function getCiceksepetiListingCategoriesUpdate(MessageBusInterface $bus): Response
     {
-        // update category
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->downloadCategories();
+        $marketplaceId = 265384;
 
-        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-        // update category attributes
-        foreach ($categoryIdList as $categoryId) {
-            $ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
-        }
-        $this->addFlash('success', 'ÇiçekSepeti kategorileri başarıyla güncellendi.');
+        $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
+        $bus->dispatch($message, ['async' => true]);
+
+        $this->addFlash('success', 'ÇiçekSepeti kategorileri güncelleme işlemi kuyruğa alındı.');
+
         return $this->redirectToRoute('ciceksepeti_main_page');
     }
 
