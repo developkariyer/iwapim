@@ -19,6 +19,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Pimcore\Model\DataObject\GroupProduct;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(
     name: 'app:hello-world',
@@ -26,11 +27,17 @@ use Pimcore\Model\DataObject\GroupProduct;
 )]
 class HelloWorldCommand extends AbstractCommand
 {
+    public function __construct(private MessageBusInterface $bus)
+    {
+        parent::__construct();
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->bus->dispatch(new TestMessage("Selam, bu kuyruğa gitti!"));
+        echo "Mesaj kuyruğa atıldı.";
 
-        $categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
+        /*$categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
         $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 1512312056]);
         if ($result && isset($result[0]['updated_at'])) {
             $updatedAtTimestamp = strtotime($result[0]['updated_at']);
@@ -49,7 +56,7 @@ class HelloWorldCommand extends AbstractCommand
         } else {
             // Kayıt yok → işlem yapılmalı
             echo "Kategori daha önce işlenmemiş, işlem yapılacak.";
-        }
+        }*/
         /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->downloadCategories();
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
