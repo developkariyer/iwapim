@@ -19,14 +19,15 @@ class CiceksepetiCategoryUpdateHandler
     {
         $marketplaceId = $message->getMarketplaceId();
         $this->ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById($marketplaceId));
-
+        echo "Ciceksepeti Connector Created\n";
         $this->ciceksepetiConnector->downloadCategories();
-
+        echo "Ciceksepeti Downloaded Categories\n";
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-
+        echo "Ciceksepeti Category List Updated\n";
         foreach ($categoryIdList as $categoryId) {
             $this->ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
         }
+        echo "Ciceksepeti Category Attributes Updated\n";
     }
 
     public function getCiceksepetiListingCategoriesIdList(): array
