@@ -133,15 +133,12 @@ class CiceksepetiController extends FrontendController
      */
     public function getCiceksepetiListingCategoriesUpdate(MessageBusInterface $bus): Response
     {
-        try {
         $marketplaceId = 265384;
         $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
         $bus->dispatch($message);
 
         $this->addFlash('success', 'ÇiçekSepeti kategorileri güncelleme işlemi kuyruğa alındı.');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Hata: ' . $e->getMessage());
-        }
+
         return $this->redirectToRoute('ciceksepeti_main_page');
     }
 
