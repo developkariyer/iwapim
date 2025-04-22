@@ -10,11 +10,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 class CiceksepetiCategoryUpdateHandler
 {
-    private CiceksepetiConnector $ciceksepetiConnector;
-
-    public function __construct(CiceksepetiConnector $ciceksepetiConnector)
+    public function __construct()
     {
-        $this->ciceksepetiConnector = $ciceksepetiConnector;
+        $this->ciceksepetiConnector = new CiceksepetiConnector();
     }
 
     public function __invoke(CiceksepetiCategoryUpdateMessage $message)
