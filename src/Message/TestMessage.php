@@ -4,5 +4,10 @@ namespace App\Message;
 
 class TestMessage
 {
-    public function __construct(public string $content) {}
+    public $content;
+
+    public function __construct(string $content)
+    {
+        $this->content = $content;
+    }
 }
