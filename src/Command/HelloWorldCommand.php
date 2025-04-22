@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
     name: 'app:hello-world',
     description: 'Outputs Hello, World!'
 )]
-class HelloWorldCommand extends Command
+class HelloWorldCommand extends AbstractCommand
 {
     public function __construct(private MessageBusInterface $bus)
     {
