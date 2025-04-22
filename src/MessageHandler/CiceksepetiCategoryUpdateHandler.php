@@ -1,11 +1,11 @@
 <?php
 namespace App\MessageHandler;
 
+use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use App\Connector\Marketplace\CiceksepetiConnector;
 
 #[AsMessageHandler]
 class CiceksepetiCategoryUpdateHandler
