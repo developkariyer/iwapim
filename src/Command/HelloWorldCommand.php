@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Message\TestMessage;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
@@ -28,7 +29,11 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->bus->dispatch(new TestMessage("Selam, bu kuyruğa gitti!"));
+        $marketplaceId = 265384;
+
+        $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
+        $this->bus->dispatch($message, ['async' => true]);
+        //$this->bus->dispatch(new TestMessage("Selam, bu kuyruğa gitti!"));
         echo "Mesaj kuyruğa atıldı.";
 
         /*$categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
