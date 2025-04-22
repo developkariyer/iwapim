@@ -3,6 +3,7 @@ namespace App\MessageHandler;
 
 use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Message\CiceksepetiCategoryUpdateMessage;
+use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -12,14 +13,13 @@ class CiceksepetiCategoryUpdateHandler
 {
     public function __construct()
     {
-        $this->ciceksepetiConnector = new CiceksepetiConnector(265384);
     }
 
     public function __invoke(CiceksepetiCategoryUpdateMessage $message)
     {
         $marketplaceId = $message->getMarketplaceId();
+        $this->ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById($marketplaceId));
 
-        $this->ciceksepetiConnector->setMarketplace(Marketplace::getById($marketplaceId));
         $this->ciceksepetiConnector->downloadCategories();
 
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
