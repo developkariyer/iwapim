@@ -5,7 +5,7 @@ use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use App\Connector\CiceksepetiConnector;
+use App\Connector\Marketplace\CiceksepetiConnector;
 
 #[AsMessageHandler]
 class CiceksepetiCategoryUpdateHandler
