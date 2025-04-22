@@ -131,14 +131,14 @@ class CiceksepetiController extends FrontendController
      * @Route("/ciceksepeti/category/update", name="update_category", methods={"GET","POST"})
      * @return Response
      */
-    public function getCiceksepetiListingCategoriesUpdate(): Response
+    public function getCiceksepetiListingCategoriesUpdate(MessageBusInterface $bus): Response
     {
         $marketplaceId = 265384;
 
         $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
-        //$bus->dispatch($message, ['async' => true]);
+        $bus->dispatch($message, ['async' => true]);
 
-       // $this->addFlash('success', 'ÇiçekSepeti kategorileri güncelleme işlemi kuyruğa alındı.');
+        $this->addFlash('success', 'ÇiçekSepeti kategorileri güncelleme işlemi kuyruğa alındı.');
 
         return $this->redirectToRoute('ciceksepeti_main_page');
     }
