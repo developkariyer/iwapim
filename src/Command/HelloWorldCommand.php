@@ -39,7 +39,7 @@ class HelloWorldCommand extends AbstractCommand
             [1,2,3],
             [],
             0,
-            'live'
+            'test'
         );
         $stamps = [new TransportNamesStamp(['trendyol'])];
         $this->bus->dispatch($trendyolMessage, $stamps);

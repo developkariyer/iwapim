@@ -5,7 +5,7 @@ namespace App\MessageHandler;
 use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'trendyol.bus')]
 class TrendyolListingHandler
 {
     public function __invoke(ProductListingMessage $message)
