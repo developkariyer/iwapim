@@ -156,6 +156,7 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
+        echo $response->getStatusCode() . "\n";
         if ($response->getStatusCode() !== 200) {
             echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
             return null;
