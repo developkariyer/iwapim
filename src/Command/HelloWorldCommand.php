@@ -59,6 +59,20 @@ class HelloWorldCommand extends AbstractCommand
         $this->bus->dispatch($hepsiburadaMessage, $stamps);
         echo "Istek HEPSIBURADA kuyruğuna gönderildi.\n";
 
+        $hepsiburadaMessage2 = new ProductListingMessage(
+            'unlist',
+            123221145,
+            12223,
+            'hepsiburadaUser2',
+            [1,2],
+            [],
+            0,
+            'live'
+        );
+        $stamps = [new TransportNamesStamp(['hepsiburada'])];
+        $this->bus->dispatch($hepsiburadaMessage2, $stamps);
+        echo "Istek HEPSIBURADA2 kuyruğuna gönderildi.\n";
+
         $ciceksepetiMessage = new ProductListingMessage(
             'update_price',
             555555,
