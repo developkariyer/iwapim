@@ -15,6 +15,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use App\Message\ProductListingMessage;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 #[AsCommand(
     name: 'app:hello-world',
@@ -29,12 +31,48 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $marketplaceId = 265384;
+        $trendyolMessage = new ProductListingMessage(
+            'list',
+            12345,
+            123,
+            'user1',
+            [1,2,3],
+            [],
+            0,
+            'live'
+        );
+        $stamps = [new TransportNamesStamp(['trendyol'])];
+        $this->bus->dispatch($trendyolMessage, $stamps);
+        $this->addFlash('info', 'Stok güncelleme isteği TRENDYOL kuyruğuna gönderildi.');
+
+        //$ciceksepetiMessage = new ProductListingMessage();
+        //$hepsiburadaMessage = new ProductListingMessage();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*$marketplaceId = 265384;
         $message = new CiceksepetiCategoryUpdateMessage($marketplaceId);
         $this->bus->dispatch($message);
         //$this->bus->dispatch(new TestMessage("Selam, bu kuyruğa gitti!"));
-        echo "Mesaj kuyruğa atıldı.";
-
+        echo "Mesaj kuyruğa atıldı.";*/
         /*$categoryUpdateCheckSql = "SELECT updated_at FROM `iwa_ciceksepeti_category_attributes` WHERE category_id = :category_id limit 1";
         $result = Utility::fetchFromSql($categoryUpdateCheckSql, ['category_id' => 1512312056]);
         if ($result && isset($result[0]['updated_at'])) {
