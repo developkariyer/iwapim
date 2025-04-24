@@ -191,15 +191,14 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (count($row) === count($headers)) {
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
-                $ean = '8684089409095';
                 echo "($index/$totalCount) Downloading $ean ";
                 $this->listings[$ean] = $rowData;
-                //$this->listings[$ean]['catalog'] = $this->downloadExtra(static::$apiUrl['catalogProductsUrl'], 'GET', $ean);
-                //$this->listings[$ean]['assets'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/assets", ['usage' => 'IMAGE']);
+                $this->listings[$ean]['catalog'] = $this->downloadExtra(static::$apiUrl['catalogProductsUrl'], 'GET', $ean);
+                $this->listings[$ean]['assets'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/assets", ['usage' => 'IMAGE']);
                 $this->listings[$ean]['placement'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/placement") ?? '';
                 $this->listings[$ean]['commission'] = $this->downloadExtra(static::$apiUrl['commissionUrl'], 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
-                //$this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/product-ids");
-                //$this->putToCache("EAN_{$ean}.json", $this->listings[$ean]);
+                $this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/product-ids");
+                $this->putToCache("EAN_{$ean}.json", $this->listings[$ean]);
                 echo "OK\n";
                 break;
             }
