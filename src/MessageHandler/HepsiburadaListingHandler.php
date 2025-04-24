@@ -10,6 +10,7 @@ class HepsiburadaListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
+        sleep(5);
         $messageData = [
             'traceId' => $message->getTraceId(),
             'actionType' => $message->getActionType(),
