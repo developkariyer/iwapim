@@ -161,7 +161,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             return null;
         }
         echo "{$apiEndPoint}{$parameter} ";
-        usleep(300000);
+        usleep(500000);
         return json_decode($response->getContent(), true);
     }
 
