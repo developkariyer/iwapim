@@ -155,23 +155,20 @@ class BolConnector extends MarketplaceConnectorAbstract
     protected function downloadExtra($apiEndPoint, $type, $parameter, $query = [])
     {
         echo "Downloading $apiEndPoint\n";
-        echo "Downloading $type $parameter\n";
-
         $this->prepareToken();
         try {
             $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
-            echo $response->getContent();
+            if ($response->getStatusCode() !== 200) {
+                echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
+                return null;
+            }
+            echo "{$apiEndPoint}{$parameter} ";
+            usleep(200000);
+            return json_decode($response->getContent(), true);
         } catch (\Exception $e) {
-            echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
+            echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$e->getMessage()}\n";
             return null;
         }
-        if ($response->getStatusCode() !== 200) {
-            echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
-            return null;
-        }
-        echo "{$apiEndPoint}{$parameter} ";
-        usleep(200000);
-        return json_decode($response->getContent(), true);
     }
 
     /**
@@ -200,7 +197,7 @@ class BolConnector extends MarketplaceConnectorAbstract
                 //$this->listings[$ean]['catalog'] = $this->downloadExtra(static::$apiUrl['catalogProductsUrl'], 'GET', $ean);
                 //$this->listings[$ean]['assets'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/assets", ['usage' => 'IMAGE']);
                 $this->listings[$ean]['placement'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/placement") ?? '';
-                //$this->listings[$ean]['commission'] = $this->downloadExtra(static::$apiUrl['commissionUrl'], 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
+                $this->listings[$ean]['commission'] = $this->downloadExtra(static::$apiUrl['commissionUrl'], 'GET', $ean, ['condition' => 'NEW', 'unit-price' => $rowData['bundlePricesPrice']]);
                 //$this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/product-ids");
                 //$this->putToCache("EAN_{$ean}.json", $this->listings[$ean]);
                 echo "OK\n";
