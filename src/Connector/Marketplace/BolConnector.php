@@ -156,7 +156,6 @@ class BolConnector extends MarketplaceConnectorAbstract
     {
         $this->prepareToken();
         $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
-        echo $response->getContent();
         if ($response->getStatusCode() !== 200) {
             echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
             return null;
@@ -261,15 +260,17 @@ class BolConnector extends MarketplaceConnectorAbstract
      * @throws TransportExceptionInterface|ServerExceptionInterface|RedirectionExceptionInterface|ClientExceptionInterface|RandomException
      */
     public function download(bool $forceDownload = false): void
-    {   
-        if (!$forceDownload && $this->getListingsFromCache()) {
+    {
+        $response = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "8684089409095/assets", ['usage' => 'IMAGE']);
+        print_r($response->getContent());
+        /*if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
         $this->getListings(
             $this->downloadOfferReport($forceDownload)
         );
-        $this->putListingsToCache();
+        $this->putListingsToCache();*/
     }
 
     /**
