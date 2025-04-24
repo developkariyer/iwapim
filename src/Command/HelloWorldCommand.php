@@ -43,7 +43,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['trendyol'])];
         $this->bus->dispatch($trendyolMessage, $stamps);
-        $this->addFlash('info', 'Stok güncelleme isteği TRENDYOL kuyruğuna gönderildi.');
+        echo 'Stok güncelleme isteği TRENDYOL kuyruğuna gönderildi.';
 
         //$ciceksepetiMessage = new ProductListingMessage();
         //$hepsiburadaMessage = new ProductListingMessage();
