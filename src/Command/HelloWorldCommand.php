@@ -43,7 +43,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['trendyol'])];
         $this->bus->dispatch($trendyolMessage, $stamps);
-        echo 'Istek TRENDYOL kuyruğuna gönderildi.';
+        echo "\nIstek TRENDYOL kuyruğuna gönderildi.\n";
 
         $hepsiburadaMessage = new ProductListingMessage(
             'unlist',
@@ -57,7 +57,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['hepsiburada'])];
         $this->bus->dispatch($hepsiburadaMessage, $stamps);
-        echo 'Istek HEPSIBURADA kuyruğuna gönderildi.';
+        echo "Istek HEPSIBURADA kuyruğuna gönderildi.\n";
 
         $ciceksepetiMessage = new ProductListingMessage(
             'update_price',
@@ -71,7 +71,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo 'Istek CICEKSEPETI kuyruğuna gönderildi.';
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
 
 
