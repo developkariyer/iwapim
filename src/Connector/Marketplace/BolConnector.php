@@ -155,11 +155,8 @@ class BolConnector extends MarketplaceConnectorAbstract
     protected function downloadExtra($apiEndPoint, $type, $parameter, $query = [])
     {
         $this->prepareToken();
-        try {
-            $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
-        } catch (\Exception $e) {
-            throw new \Exception('Failed to get offer report from Bol.com: '.$e->getMessage());
-        }
+        $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
+        echo $response->getContent();
         if ($response->getStatusCode() !== 200) {
             echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
             return null;
