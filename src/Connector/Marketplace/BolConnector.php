@@ -161,7 +161,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             return null;
         }
         echo "{$apiEndPoint}{$parameter} ";
-        usleep(500000);
+        usleep(200000);
         return json_decode($response->getContent(), true);
     }
 
@@ -185,9 +185,6 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (count($row) === count($headers)) {
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
-                if ($ean == "8684089409095") {
-                    continue;
-                }
                 echo "($index/$totalCount) Downloading $ean ";
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadExtra(static::$apiUrl['catalogProductsUrl'], 'GET', $ean);
