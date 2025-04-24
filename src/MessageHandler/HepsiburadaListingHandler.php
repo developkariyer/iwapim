@@ -5,7 +5,7 @@ namespace App\MessageHandler;
 use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(fromTransport: 'hepsiburada')]
 class HepsiburadaListingHandler
 {
     public function __invoke(ProductListingMessage $message)
