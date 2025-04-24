@@ -10,6 +10,22 @@ class TrendyolListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
-        echo "Trendyol Mesaj işlendi: " . $message . "\n";
+        $messageData = [
+            'traceId' => $message->getTraceId(),
+            'actionType' => $message->getActionType(),
+            'productId' => $message->getProductId(),
+            'marketplaceId' => $message->getMarketplaceId(),
+            'userId' => $message->getUserName(),
+            'variantIds' => $message->getVariantIds(),
+            'payload' => $message->getPayload(),
+            'priority' => $message->getPriority(),
+            'targetAccountKey' => $message->getTargetAccountKey(),
+            'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ISO8601),
+        ];
+
+        $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        echo "Trendyol Mesaj İşlendi (JSON):\n";
+        echo $jsonOutput . "\n";
+
     }
 }
