@@ -154,7 +154,7 @@ class BolConnector extends MarketplaceConnectorAbstract
      */
     protected function downloadExtra($apiEndPoint, $type, $parameter, $query = [])
     {
-        echo "Downloading $apiEndPoint\n";
+        echo "Downloading $apiEndPoint ";
         $this->prepareToken();
         try {
             $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
