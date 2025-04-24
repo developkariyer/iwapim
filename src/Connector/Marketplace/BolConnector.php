@@ -200,7 +200,6 @@ class BolConnector extends MarketplaceConnectorAbstract
                 $this->listings[$ean]['product-ids'] = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "$ean/product-ids");
                 $this->putToCache("EAN_{$ean}.json", $this->listings[$ean]);
                 echo "OK\n";
-                break;
             }
         }
     }
