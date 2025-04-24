@@ -185,7 +185,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (count($row) === count($headers)) {
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
-                if ($ean === 8684089409095) {
+                if ($ean == "8684089409095") {
                     continue;
                 }
                 echo "($index/$totalCount) Downloading $ean ";
