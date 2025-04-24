@@ -185,6 +185,9 @@ class BolConnector extends MarketplaceConnectorAbstract
             if (count($row) === count($headers)) {
                 $rowData = array_combine($headers, $row);
                 $ean = $rowData['ean'];
+                if ($ean === 8684089409095) {
+                    continue;
+                }
                 echo "($index/$totalCount) Downloading $ean ";
                 $this->listings[$ean] = $rowData;
                 $this->listings[$ean]['catalog'] = $this->downloadExtra(static::$apiUrl['catalogProductsUrl'], 'GET', $ean);
