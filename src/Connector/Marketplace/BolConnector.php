@@ -162,7 +162,8 @@ class BolConnector extends MarketplaceConnectorAbstract
             $response = $this->httpClient->request($type, $apiEndPoint . $parameter, ['query' => $query]);
             echo $response->getContent();
         } catch (\Exception $e) {
-            echo 'Hata: ' . $e->getMessage();
+            echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
+            return null;
         }
         if ($response->getStatusCode() !== 200) {
             echo "Failed to {$type} {$apiEndPoint}{$parameter}: {$response->getContent()}\n";
