@@ -161,7 +161,7 @@ class BolConnector extends MarketplaceConnectorAbstract
             return null;
         }
         echo "{$apiEndPoint}{$parameter} ";
-        usleep(200000);
+        usleep(300000);
         return json_decode($response->getContent(), true);
     }
 
@@ -261,16 +261,14 @@ class BolConnector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $response = $this->downloadExtra(static::$apiUrl['productsUrl'], 'GET', "8684089409095/assets", ['usage' => 'IMAGE']);
-        print_r($response);
-        /*if (!$forceDownload && $this->getListingsFromCache()) {
+        if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
         }
         $this->getListings(
             $this->downloadOfferReport($forceDownload)
         );
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     /**
