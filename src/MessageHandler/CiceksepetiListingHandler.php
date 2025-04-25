@@ -36,7 +36,7 @@ class CiceksepetiListingHandler
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['size'] = $size;
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['color'] = $color;
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ean'] = $ean;
-                $listingItems = $variantProduct->getListingItems();
+                /*$listingItems = $variantProduct->getListingItems();
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
                         $title = $listingItem->getTitle();
@@ -62,7 +62,7 @@ class CiceksepetiListingHandler
                             $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
                         }
                     }
-                }
+                }*/
             }
         }
         print_r(json_encode($data));
