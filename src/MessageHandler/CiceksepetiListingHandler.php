@@ -20,9 +20,9 @@ class CiceksepetiListingHandler
         if ($product instanceof Product) {
             $productIdentifier = $product->getProductIdentifier();
             $productCategory = $product->getProductCategory();
-            $data[$marketplaceName][$productIdentifier][] = $productCategory;
+            $data[$marketplaceName][$productIdentifier]['category'] = $productCategory;
             $productName = $product->getName();
-            $data[$marketplaceName][$productIdentifier][] = $productName;
+            $data[$marketplaceName][$productIdentifier]['name'] = $productName;
         }
         foreach ($variantIds as $variantId) {
             echo $variantId . "\n";
@@ -32,9 +32,9 @@ class CiceksepetiListingHandler
                 $size = $variantProduct->getVariationSize();
                 $color = $variantProduct->getVariationColor();
                 $ean = $variantProduct->getEanGtin();
-                $data[$marketplaceName][$productIdentifier][$iwasku][] = $size;
-                $data[$marketplaceName][$productIdentifier][$iwasku][] = $color;
-                $data[$marketplaceName][$productIdentifier][$iwasku][] = $ean;
+                $data[$marketplaceName][$productIdentifier][$iwasku]['size'] = $size;
+                $data[$marketplaceName][$productIdentifier][$iwasku]['color'] = $color;
+                $data[$marketplaceName][$productIdentifier][$iwasku]['ean'] = $ean;
             }
         }
         print_r($data);
