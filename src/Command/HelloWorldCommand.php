@@ -36,7 +36,9 @@ class HelloWorldCommand extends AbstractCommand
 
         foreach ($gallery as $hotspotImage) {
             $image = $hotspotImage->getImage();
-            echo "Path: " . $image->getPath() . "\n";
+            $imageUrl = $image->getFullPath();
+            $host = \Pimcore\Tool::getHostUrl();
+            echo "Full URL: " . $host . $imageUrl . "\n";
         }
         /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
