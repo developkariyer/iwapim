@@ -32,7 +32,10 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $variantProduct = VariantProduct::getById(175325);
-        print_r($variantProduct->getImageGallery());
+        $gallery = $variantProduct->getImageGallery();
+        foreach ($gallery as $image) {
+            echo "Path: " . $image->getPath() . "\n";
+        }
         /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
 
