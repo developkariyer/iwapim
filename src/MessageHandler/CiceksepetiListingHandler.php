@@ -40,13 +40,27 @@ class CiceksepetiListingHandler
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
                         $title = $listingItem->getTitle();
-                        $imageGallery = $listingItem->getImageGallery();
                         $urlLink = $listingItem->getUrlLink();
                         $salePrice = $listingItem->getSalePrice();
                         $currency = $listingItem->getSaleCurrency();
                         $marketplaceType = $variantProduct->getMarketplace()->getKey();
                         $apiJson = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
+
+                        $imageGallery = $listingItem->getImageGallery();
+                        foreach ($imageGallery as $hotspotImage) {
+                            $image = $hotspotImage->getImage();
+                            $imageUrl = $image->getFullPath();
+                            $host = \Pimcore\Tool::getHostUrl();
+                            $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
+                        }
                     }
                 }
             }
