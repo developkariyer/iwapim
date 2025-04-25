@@ -12,6 +12,7 @@ class CiceksepetiListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
+        $data = [];
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         $marketplaceName = $marketplace->getMarketplaceType();
         $product = Product::getById($message->getProductId());
@@ -19,12 +20,10 @@ class CiceksepetiListingHandler
         if ($product instanceof Product) {
             $productIdentifier = $product->getProductIdentifier();
             $productCategory = $product->getProductCategory();
+            $data[$marketplaceName][$productIdentifier][] = $productCategory;
             $productName = $product->getName();
+            $data[$marketplaceName][$productIdentifier][] = $productName;
         }
-        echo $marketplaceName . "\n";
-        echo $productIdentifier . "\n";
-        echo $productCategory . "\n";
-        echo $productName . "\n";
         foreach ($variantIds as $variantId) {
             echo $variantId . "\n";
             $variantProduct = Product::getById($variantId);
@@ -33,14 +32,12 @@ class CiceksepetiListingHandler
                 $size = $variantProduct->getVariationSize();
                 $color = $variantProduct->getVariationColor();
                 $ean = $variantProduct->getEanGtin();
-                echo $iwasku . "\n";
-                echo $size . "\n";
-                echo $color . "\n";
-                echo $ean . "\n";
+                $data[$marketplaceName][$productIdentifier][$iwasku][] = $size;
+                $data[$marketplaceName][$productIdentifier][$iwasku][] = $color;
+                $data[$marketplaceName][$productIdentifier][$iwasku][] = $ean;
             }
-
         }
-
+        print_r($data);
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
