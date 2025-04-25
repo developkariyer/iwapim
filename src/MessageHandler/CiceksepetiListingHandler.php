@@ -5,6 +5,7 @@ namespace App\MessageHandler;
 use App\Message\ProductListingMessage;
 use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
+use App\Model\DataObject\VariantProduct;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
@@ -35,6 +36,19 @@ class CiceksepetiListingHandler
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['size'] = $size;
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['color'] = $color;
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ean'] = $ean;
+                $listingItems = $variantProduct->getListingItems();
+                foreach ($listingItems as $listingItem) {
+                    if ($listingItem instanceof VariantProduct) {
+                        $title = $listingItem->getTitle();
+                        $imageGallery = $listingItem->getImageGallery();
+                        $urlLink = $listingItem->getUrlLink();
+                        $salePrice = $listingItem->getSalePrice();
+                        $currency = $listingItem->getSaleCurrency();
+                        $marketplaceType = $listingItem->getMarketplace()->getMarketplaceKey();
+                        $apiJson = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+                        $parentApiJson = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+                    }
+                }
             }
         }
         print_r($data);
