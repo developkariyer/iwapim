@@ -27,8 +27,8 @@ class CiceksepetiListingHandler
         echo $productName . "\n";
         foreach ($variantIds as $variantId) {
             echo $variantId . "\n";
-            $variantProduct = VariantProduct::getById($variantId);
-            if ($variantProduct instanceof VariantProduct) {
+            $variantProduct = Product::getById($variantId);
+            if ($variantProduct instanceof Product) {
                 $iwasku = $variantProduct->getIwasku();
                 $size = $variantProduct->getVariationSize();
                 $color = $variantProduct->variationColor();
