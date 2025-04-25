@@ -33,8 +33,10 @@ class HelloWorldCommand extends AbstractCommand
     {
         $variantProduct = VariantProduct::getById(175325);
         $gallery = $variantProduct->getImageGallery();
-        foreach ($gallery as $image) {
-            echo "Path: " . $image->getPath() . "\n";
+
+        foreach ($gallery as $hotspotImage) {
+            $image = $hotspotImage->getImage();
+            echo "Path: " . $image->getFullPath() . "\n";
         }
         /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
