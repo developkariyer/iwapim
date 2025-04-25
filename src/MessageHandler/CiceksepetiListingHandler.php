@@ -5,7 +5,6 @@ namespace App\MessageHandler;
 use App\Message\ProductListingMessage;
 use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
-use App\Model\DataObject\VariantProduct;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
@@ -28,7 +27,7 @@ class CiceksepetiListingHandler
         echo $productName . "\n";
         foreach ($variantIds as $variantId) {
             echo $variantId . "\n";
-            $variantProduct = VariantProduct::findOneByField('iwasku', 'IJ015000KZNF');
+            $variantProduct = VariantProduct::getById($variantId);
             print_r($variantProduct);
             if ($variantProduct instanceof VariantProduct) {
                 $iwasku = $variantProduct->getIwasku();
