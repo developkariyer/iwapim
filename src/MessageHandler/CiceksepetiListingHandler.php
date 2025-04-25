@@ -36,7 +36,7 @@ class CiceksepetiListingHandler
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['size'] = $size;
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['color'] = $color;
                 $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ean'] = $ean;
-                /*$listingItems = $variantProduct->getListingItems();
+                $listingItems = $variantProduct->getListingItems();
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
                         $title = $listingItem->getTitle();
@@ -46,8 +46,14 @@ class CiceksepetiListingHandler
                         $marketplaceType = $listingItem->getMarketplace()->getKey();
                         $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
+                        echo "Title: $title\n";
+                        echo "URL: $urlLink\n";
+                        echo "Sale Price: $salePrice\n";
+                        echo "Currency: $currency\n";
+                        echo "Marketplace Type: $marketplaceType\n";
+                        
 
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
+                        /*$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
                         $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
                         $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
                         $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
@@ -60,12 +66,12 @@ class CiceksepetiListingHandler
                             $imageUrl = $image->getFullPath();
                             $host = \Pimcore\Tool::getHostUrl();
                             $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
-                        }
+                        }*/
                     }
-                }*/
+                }
             }
         }
-        print_r(json_encode($data));
+        //print_r(json_encode($data));
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
