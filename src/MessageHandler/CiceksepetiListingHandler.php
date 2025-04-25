@@ -46,12 +46,12 @@ class CiceksepetiListingHandler
                         $marketplaceType = $listingItem->getMarketplace()->getKey();
                         $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
+                        print_r($urlLink);
 
-
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
                         //$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
                         //$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
 
@@ -66,7 +66,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        print_r(json_encode($data));
+        //print_r(json_encode($data));
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
