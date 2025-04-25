@@ -31,7 +31,7 @@ class CiceksepetiListingHandler
             if ($variantProduct instanceof Product) {
                 $iwasku = $variantProduct->getIwasku();
                 $size = $variantProduct->getVariationSize();
-                $color = $variantProduct->variationColor();
+                $color = $variantProduct->getVariationColor();
                 $ean = $variantProduct->getEanGtin();
                 echo $iwasku . "\n";
                 echo $size . "\n";
