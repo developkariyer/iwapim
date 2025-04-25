@@ -3,8 +3,8 @@ namespace App\MessageHandler;
 use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(fromTransport: 'trendyol')]
-class TrendyolListingHandler
+#[AsMessageHandler(fromTransport: 'ebay')]
+class EbayListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
@@ -22,7 +22,7 @@ class TrendyolListingHandler
         ];
 
         $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        echo "Trendyol Mesaj İşlendi (JSON):\n";
+        echo "Ebay Mesaj İşlendi (JSON):\n";
         echo $jsonOutput . "\n";
 
     }
