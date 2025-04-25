@@ -36,7 +36,7 @@ class HelloWorldCommand extends AbstractCommand
 
         foreach ($gallery as $hotspotImage) {
             $image = $hotspotImage->getImage();
-            echo "Path: " . $image->getFullPath() . "\n";
+            echo "Path: " . $image->getPath() . "\n";
         }
         /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
