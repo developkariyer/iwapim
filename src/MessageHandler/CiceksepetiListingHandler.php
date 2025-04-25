@@ -3,6 +3,8 @@ namespace App\MessageHandler;
 
 
 use App\Message\ProductListingMessage;
+use App\Model\DataObject\Marketplace;
+use App\Model\DataObject\Product;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
@@ -10,7 +12,20 @@ class CiceksepetiListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
-        $messageData = [
+        $marketplace = Marketplace::getById($message->getMarketplaceId());
+        $marketplaceName = $marketplace->getMarketplaceType();
+        $product = Product::getById($message->getProductId());
+        if ($product instanceof Product) {
+            $productIdentifier = $product->getProductIdentifier();
+            $productCategory = $product->getProductCategory();
+            $productName = $product->getName();
+        }
+        echo $marketplaceName . "\n";
+        echo $productIdentifier . "\n";
+        echo $productCategory . "\n";
+        echo $productName . "\n";
+
+        /*$messageData = [
             'traceId' => $message->getTraceId(),
             'actionType' => $message->getActionType(),
             'productId' => $message->getProductId(),
@@ -23,9 +38,9 @@ class CiceksepetiListingHandler
             'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ISO8601),
         ];
 
-        $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
         echo "Ciceksepeti Mesaj İşlendi (JSON):\n";
-        echo $jsonOutput . "\n";
+       // echo $jsonOutput . "\n";
 
     }
 }
