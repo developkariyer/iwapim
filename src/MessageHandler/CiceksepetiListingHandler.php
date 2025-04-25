@@ -28,7 +28,7 @@ class CiceksepetiListingHandler
         echo $productName . "\n";
         foreach ($variantIds as $variantId) {
             echo $variantId . "\n";
-            $variantProduct = VariantProduct::findOneByField('id', $variantId);
+            $variantProduct = VariantProduct::findOneByField('iwasku', 'IJ015000KZNF');
             print_r($variantProduct);
             if ($variantProduct instanceof VariantProduct) {
                 $iwasku = $variantProduct->getIwasku();
