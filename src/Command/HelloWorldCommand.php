@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
-
+use Pimcore\Model\DataObject\VariantProduct;
 #[AsCommand(
     name: 'app:hello-world',
     description: 'Outputs Hello, World!'
