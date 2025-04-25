@@ -31,21 +31,30 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $trendyolMessage = new ProductListingMessage(
+        $productId = 238133;
+        $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
+
+        $ciceksepetiMessage = new ProductListingMessage(
             'list',
-            12345,
-            123,
-            'trendyolUser',
-            [1,2,3],
+            $productId,
+            265384,
+            'ciceksepetiUser',
+            $variantIds,
             [],
-            0,
+            1,
             'test'
         );
-        $stamps = [new TransportNamesStamp(['trendyol'])];
-        $this->bus->dispatch($trendyolMessage, $stamps);
-        echo "\nIstek TRENDYOL kuyruğuna gönderildi.\n";
+        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+        $this->bus->dispatch($ciceksepetiMessage, $stamps);
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
-        $hepsiburadaMessage = new ProductListingMessage(
+
+
+
+
+
+
+        /*$hepsiburadaMessage = new ProductListingMessage(
             'unlist',
             123221145,
             12223,
@@ -73,6 +82,22 @@ class HelloWorldCommand extends AbstractCommand
         $this->bus->dispatch($hepsiburadaMessage2, $stamps);
         echo "Istek HEPSIBURADA2 kuyruğuna gönderildi.\n";
 
+
+        $trendyolMessage = new ProductListingMessage(
+            'list',
+            12345,
+            123,
+            'trendyolUser',
+            [1,2,3],
+            [],
+            0,
+            'test'
+        );
+        $stamps = [new TransportNamesStamp(['trendyol'])];
+        $this->bus->dispatch($trendyolMessage, $stamps);
+        echo "\nIstek TRENDYOL kuyruğuna gönderildi.\n";
+
+
         $ciceksepetiMessage = new ProductListingMessage(
             'update_price',
             555555,
@@ -85,7 +110,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
 
 
 
