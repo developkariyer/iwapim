@@ -65,7 +65,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        print_r($data);
+        print_r(json_encode($data));
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
