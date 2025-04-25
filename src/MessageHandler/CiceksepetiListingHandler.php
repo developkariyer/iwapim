@@ -46,21 +46,16 @@ class CiceksepetiListingHandler
                         $marketplaceType = $listingItem->getMarketplace()->getKey();
                         $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
-                        echo "Title: $title\n";
-                        echo "URL: $urlLink\n";
-                        echo "Sale Price: $salePrice\n";
-                        echo "Currency: $currency\n";
-                        echo "Marketplace Type: $marketplaceType\n";
-                        
 
-                        /*$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
+
+                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
                         $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
                         $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
                         $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
-                        $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
+                        //$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
+                        //$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
 
-                        $imageGallery = $listingItem->getImageGallery();
+                       /* $imageGallery = $listingItem->getImageGallery();
                         foreach ($imageGallery as $hotspotImage) {
                             $image = $hotspotImage->getImage();
                             $imageUrl = $image->getFullPath();
@@ -71,7 +66,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        //print_r(json_encode($data));
+        print_r(json_encode($data));
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
