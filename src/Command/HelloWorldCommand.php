@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Message\TestMessage;
+use App\Model\DataObject\VariantProduct;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
@@ -17,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
-use Pimcore\Model\DataObject\VariantProduct;
 #[AsCommand(
     name: 'app:hello-world',
     description: 'Outputs Hello, World!'
