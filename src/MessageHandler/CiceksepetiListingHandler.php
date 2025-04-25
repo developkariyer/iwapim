@@ -32,9 +32,9 @@ class CiceksepetiListingHandler
                 $size = $variantProduct->getVariationSize();
                 $color = $variantProduct->getVariationColor();
                 $ean = $variantProduct->getEanGtin();
-                $data[$marketplaceName][$productIdentifier][$iwasku]['size'] = $size;
-                $data[$marketplaceName][$productIdentifier][$iwasku]['color'] = $color;
-                $data[$marketplaceName][$productIdentifier][$iwasku]['ean'] = $ean;
+                $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['size'] = $size;
+                $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['color'] = $color;
+                $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ean'] = $ean;
             }
         }
         print_r($data);
