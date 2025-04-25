@@ -5,6 +5,7 @@ namespace App\MessageHandler;
 use App\Message\ProductListingMessage;
 use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
+use App\Model\DataObject\VariantProduct;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
@@ -15,6 +16,7 @@ class CiceksepetiListingHandler
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         $marketplaceName = $marketplace->getMarketplaceType();
         $product = Product::getById($message->getProductId());
+        $variantIds = $message->getVariantIds();
         if ($product instanceof Product) {
             $productIdentifier = $product->getProductIdentifier();
             $productCategory = $product->getProductCategory();
@@ -24,6 +26,22 @@ class CiceksepetiListingHandler
         echo $productIdentifier . "\n";
         echo $productCategory . "\n";
         echo $productName . "\n";
+        foreach ($variantIds as $variantId) {
+            echo $variantId . "\n";
+            $variantProduct = VariantProduct::getById($variantId);
+            if ($variantProduct instanceof VariantProduct) {
+                $iwasku = $variantProduct->getIwasku();
+                $size = $variantProduct->getVariationSize();
+                $color = $variantProduct->variationColor();
+                $ean = $variantProduct->getEanGtin();
+                echo $iwasku . "\n";
+                echo $size . "\n";
+                echo $color . "\n";
+                echo $ean . "\n";
+            }
+
+        }
+
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
