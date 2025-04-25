@@ -31,7 +31,9 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $productId = 238133;
+        $variantProduct = VariantProduct::getById(240434);
+        echo $variantProduct->getIwasku() . "\n";
+       /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
 
         $ciceksepetiMessage = new ProductListingMessage(
@@ -46,7 +48,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
 
 
 
