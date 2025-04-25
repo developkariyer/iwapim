@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $variantProduct = VariantProduct::getById(240434);
+        $variantProduct = VariantProduct::getById(240434)[0];
         echo $variantProduct->getIwasku() . "\n";
        /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
