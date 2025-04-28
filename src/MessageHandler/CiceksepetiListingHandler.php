@@ -19,7 +19,7 @@ class CiceksepetiListingHandler
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
         $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $categoryInfo = $this->categoryAttributeInfo();
+        //$categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             
@@ -52,7 +52,6 @@ class CiceksepetiListingHandler
             Her skuya ait farklı olacak örnek response {"sku1: data1"}, {"sku2: data2"}
             Çıktıyı json formatta ver her sku farklı olacak şekilde.
             İşte veri: $jsonString
-            Category ve attribute Verisi: $categoryInfo
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
