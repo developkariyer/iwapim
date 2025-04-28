@@ -31,7 +31,7 @@ class CiceksepetiListingHandler
                 "stockCode": "Stok kodu",
                 "description": "Ürün açıklaması",
                 "images": ["resim1", "resim2"],
-                "price": "100 TL",
+                "price": "100",
                 "categoryId": 1234,
                 "renk": "Renk bilgisi",
                 "ebat": "Ebat bilgisi"
