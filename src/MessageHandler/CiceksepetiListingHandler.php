@@ -34,6 +34,7 @@ class CiceksepetiListingHandler
             stockCode: (ürün sku bilgisi gönderidiğim verideki skus altındaki veriler)
             description: açıklama örnek listinglere bakarak türkçe çiceksepetine uygun açıklama oluştur.
             images: örnek listingler içinden images altındaki resimlerden en fazla 5 tane olacak şekilde al dizi olacak.
+            price: fiyatı örnek listingleri kullanarak TL cinsinden belirle.
             
             Her skuya ait farklı olacak örnek response {"sku1: data1"}, {"sku2: data2"}
             Çıktıyı json formatta ver her sku farklı olacak şekilde.
