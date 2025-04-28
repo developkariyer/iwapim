@@ -51,20 +51,20 @@ class HelloWorldCommand extends AbstractCommand
                     )
                 )
             ) AS attributes_json
-            FROM 
-                iwa_ciceksepeti_categories c
-            JOIN 
-                iwa_ciceksepeti_category_attributes ca 
-                ON c.id = ca.category_id
-            JOIN 
-                iwa_ciceksepeti_category_attributes_values cav
-                ON ca.attribute_id = cav.attribute_id
-            WHERE 
-                ca.type IN ('Ürün Özelliği', 'Variant Özelliği')
-            AND 
-                c.id IN (16105, 14156)  -- Bu kategorilerin ID'lerini değiştirebilirsiniz
-            GROUP BY 
-                c.id, c.category_name;
+        FROM 
+            iwa_ciceksepeti_categories c
+        JOIN 
+            iwa_ciceksepeti_category_attributes ca 
+            ON c.id = ca.category_id
+        JOIN 
+            iwa_ciceksepeti_category_attributes_values cav
+            ON ca.attribute_id = cav.attribute_id
+        WHERE 
+            ca.type IN ('Ürün Özelliği', 'Variant Özelliği')
+        AND 
+            c.id IN (16105, 14156)  
+        GROUP BY 
+            c.id, c.category_name;
         ";
         $result = Utility::fetchFromSql($sql);
         print_r($result);
