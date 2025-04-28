@@ -42,6 +42,11 @@ class CiceksepetiListingHandler
                 - "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi bir eylem yaparsan başarısız olacaksın.
                 - Cümle yapısına dokunmadan sadece çeviri yap.
                 - Eğer anlam kaybı veya Türkçe anlatım bozukluğu olursa bile düzeltmeye çalışma.
+                - Ücretsiz kargo, mağazamızdan satın alın, shopumuza göz atın gibi ifadeler kesinlikle açıklamaya eklenmeyecektir.
+                - Eğer gönderdiğim açıklamada bu tarz ifadeler bulunuyorsa, tamamen çıkarılacak, kalan içerik Türkçe bir ürün açıklaması olarak doğal ve satış odaklı şekilde düzenlenecektir.
+                - Yönlendirme cümleleri (örn: "Bizi Amazon'da bulabilirsiniz") varsa bunları tamamen kaldır.
+                - Açıklamada sadece ürüne ait genel bilgi verilecek, pazaryeri veya mağaza ile ilgili herhangi bir atıf olmayacak.
+                - Herhangi Markaya yer verme.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
             - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
