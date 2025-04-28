@@ -50,9 +50,7 @@ class CiceksepetiListingHandler
 
             -**renk**: renk bilgisi verideki sku altında color fieldı
             -**ebat**: ebat bilgisi verideki sku altında size fieldı
-            Her SKU'ya ait farklı olacak şekilde, örnek response şu şekilde olabilir:
-                {"sku1": { "productName": "Product", "category": "Category", "price": "100 TL" }}
-                {"sku2": { "productName": "Product", "category": "Category", "price": "150 TL" }}
+            
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
             Kategori Verisi: $categories
