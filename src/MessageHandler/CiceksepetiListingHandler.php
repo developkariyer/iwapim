@@ -16,8 +16,9 @@ class CiceksepetiListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
+        print_r($this->getCiceksepetiListingCategoriesIdList());
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
-        $data = $this->getListingInfoJson($message);
+        /*$data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
@@ -44,7 +45,9 @@ class CiceksepetiListingHandler
             İşte veri: $jsonString
         EOD;
         $result = $this->getGeminiApi($promt);
-        print_r($result);
+        print_r($result);*/
+
+
         /*$messageData = [
             'traceId' => $message->getTraceId(),
             'actionType' => $message->getActionType(),
