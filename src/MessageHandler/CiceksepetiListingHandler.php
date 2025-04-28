@@ -76,47 +76,16 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
         $result = $this->getGeminiApi($promt);
-        try {
-            $rawText = $result['candidates'][0]['content']['parts'][0]['text'];
-            echo "Raw text from API: " . substr($rawText, 0, 100) . "...\n";
-            if (preg_match('/\{[\s\S]*\}/m', $rawText, $matches)) {
-                $jsonText = $matches[0];
-            } else {
-                $jsonText = $rawText;
-            }
+        print_r($result);
+        $text = $result['candidates'][0]['content']['parts'][0]['text'];
+        $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
+        $text = str_replace(['```json', '```'], '', $text);
+        $data = json_decode($text, true);
 
-            $jsonText = preg_replace('/[\x00-\x1F\x7F]/u', '', $jsonText);
-            $jsonText = str_replace(['```json', '```'], '', $jsonText);
-            $jsonText = trim($jsonText);
-
-            echo "JSON text after cleaning: " . substr($jsonText, 0, 100) . "...\n";
-
-            if (!str_ends_with($jsonText, '}')) {
-                $open = substr_count($jsonText, '{');
-                $close = substr_count($jsonText, '}');
-                if ($open > $close) {
-                    $jsonText .= str_repeat('}', $open - $close);
-                    echo "Added " . ($open - $close) . " missing closing brackets\n";
-                }
-            }
-
-            $data = @json_decode($jsonText, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception('JSON parsing hatası: ' . json_last_error_msg() .
-                    "\nİlk 200 karakter: " . substr($jsonText, 0, 200));
-            }
-
-            if (empty($data)) {
-                throw new \Exception('JSON başarıyla ayrıştırıldı ancak boş veri döndü');
-            }
-
-            $this->checkData($data);
-
-        } catch (\Exception $e) {
-            echo "Hata oluştu: " . $e->getMessage() . "\n";
-            throw $e;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('JSON parsing hatası: ' . json_last_error_msg());
         }
+        $this->checkData($data);
 
 
 
