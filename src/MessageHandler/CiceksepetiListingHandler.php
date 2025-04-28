@@ -251,7 +251,7 @@ class CiceksepetiListingHandler
         return array_unique($categoryIdList);
     }
 
-    public function getCiceksepetiCategoriesDetails(): array
+    public function getCiceksepetiCategoriesDetails()
     {
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
 
