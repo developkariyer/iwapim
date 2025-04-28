@@ -43,7 +43,6 @@ class HelloWorldCommand extends AbstractCommand
                         'attribute_type', ca.type,
                         'is_required', ca.is_required,
                         'attribute_values', 
-                        -- Atribut değerlerini alt sorgu ile alıyoruz
                         (
                             SELECT JSON_ARRAYAGG(
                                 JSON_OBJECT(
