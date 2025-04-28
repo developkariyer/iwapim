@@ -31,7 +31,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $geminiApiKey = getenv('GEMINI_API_KEY');
+        $geminiApiKey = $_ENV['GEMINI_API_KEY'];
         echo "Gemini api key: " . $geminiApiKey . "\n";
         /*$productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
