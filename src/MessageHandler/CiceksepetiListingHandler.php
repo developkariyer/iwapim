@@ -94,7 +94,7 @@ class CiceksepetiListingHandler
 
     public function checkData($data)
     {
-        
+
 
     }
 
