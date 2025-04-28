@@ -9,16 +9,18 @@ use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\HttpClient\HttpClient;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
 class CiceksepetiListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
-        $this->categoryAttributeUpdate($message->getMarketplaceId());
-        $data = $this->getListingInfoJson($message);
-        print_r($data);
-
+        //$this->categoryAttributeUpdate($message->getMarketplaceId());
+        //$data = $this->getListingInfoJson($message);
+        //print_r($data);
+        $result = $this->getGeminiApi("Ciceksepeti pazaryeri listing bilgilerini anlat");
+        print_r($result);
         /*$messageData = [
             'traceId' => $message->getTraceId(),
             'actionType' => $message->getActionType(),
@@ -33,8 +35,36 @@ class CiceksepetiListingHandler
         ];
 
         $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
-        echo "Ciceksepeti Mesaj İşlendi (JSON):\n";
+        echo "Ciceksepeti Mesaj İşlendi (JSON)\n";
        // echo $jsonOutput . "\n";
+    }
+
+    public function getGeminiApi(string $message): ?array
+    {
+        $geminiApiKey = getenv('GEMINI_API_KEY');
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $geminiApiKey;
+
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('POST', $url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $message]
+                        ]
+                    ]
+                ]
+            ],
+        ]);
+
+        if ($response->getStatusCode() === 200) {
+            return $response->toArray();
+        }
+
+        return null;
     }
 
     public function getListingInfoJson($message)
