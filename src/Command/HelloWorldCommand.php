@@ -52,8 +52,8 @@ class HelloWorldCommand extends AbstractCommand
 
     public function categoryAttributeInfo()
     {
-        $categoryAttributeSql = "select * from iwa_ciceksepeti_category_attributes where category_id = :categoryId";
-        $categoryAttributeValueSql = "select * from iwa_ciceksepeti_category_attributes_values where attribute_id = :attributeId";
+        $categoryAttributeSql = "select category_id,attribute_name, attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and (type = 'Ürün Özelliği' or type = 'Variant Özelliği')";
+        $categoryAttributeValueSql = "select attribute_value_id, attribute_id, name from iwa_ciceksepeti_category_attributes_values where attribute_id = :attributeId";
         $categoryInfo = [];
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
         foreach ($categoryIdList as $categoryId) {
