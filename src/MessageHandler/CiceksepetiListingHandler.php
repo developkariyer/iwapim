@@ -52,13 +52,13 @@ class CiceksepetiListingHandler
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
 
-                       /* $imageGallery = $listingItem->getImageGallery();
+                        $imageGallery = $listingItem->getImageGallery();
                         foreach ($imageGallery as $hotspotImage) {
                             $image = $hotspotImage->getImage();
                             $imageUrl = $image->getFullPath();
                             $host = \Pimcore\Tool::getHostUrl();
                             $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
-                        }*/
+                        }
                     }
                 }
             }
