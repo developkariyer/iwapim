@@ -17,9 +17,29 @@ class CiceksepetiListingHandler
     public function __invoke(ProductListingMessage $message)
     {
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
-        //$data = $this->getListingInfoJson($message);
-        //print_r($data);
-        $result = $this->getGeminiApi("Ciceksepeti pazaryeri listing bilgilerini anlat");
+        $data = $this->getListingInfoJson($message);
+        $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $promt = <<<EOD
+            Sen bir CicekSepeti Marketplace uzmanısın.
+            
+            Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.  
+            Bu JSON'da bazı alanlar eksik veya hatalı olabilir.  
+            Gönderdiğim veride ana ürün kodu altında sku lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında variant oluşturacak size ve color bilgisi yer almaktadır.
+            ListingItems alanında bu ürüne ait farklı pazaryerlerine yapılmış listingler yer alır. Bunlara benzer ciceksepeti özgün hale getireceğiz.
+            Çiceksepeti para birimi TL 'dir.
+            
+            Gönderdiğim veriye göre çıkarılması gereken ve Ciceksepeti listing formatında istenen alanlar skus dizisi altındaki tüm skulara ayrı olacak şekilde:
+            productName: (gönderilen verideki title alanlarıdır bunlardan Türkçe olanı çiceksepetine uygun olarak güncelle.)
+            mainProductCode: (gönderilen verideki Ciceksepeti altındaki field genelde 3 haneli ve sayı içeriyor ör: ABC-12)
+            stockCode: (ürün sku bilgisi gönderidiğim verideki skus altındaki veriler)
+            description: açıklama örnek listinglere bakarak türkçe çiceksepetine uygun açıklama oluştur.
+            images: örnek listingler içinden images altındaki resimlerden en fazla 5 tane olacak şekilde al dizi olacak.
+            
+            Her skuya ait farklı olacak örnek response {"sku1: data1"}, {"sku2: data2"}
+            Çıktıyı json formatta ver her sku farklı olacak şekilde.
+            İşte veri: $jsonString
+        EOD;
+        $result = $this->getGeminiApi($promt);
         print_r($result);
         /*$messageData = [
             'traceId' => $message->getTraceId(),
@@ -60,12 +80,10 @@ class CiceksepetiListingHandler
                 ]
             ],
         ]);
-        print_r($response->getContent());
         echo "Gemini yanit alindi\n";
         if ($response->getStatusCode() === 200) {
             return $response->toArray();
         }
-
         return null;
     }
 
