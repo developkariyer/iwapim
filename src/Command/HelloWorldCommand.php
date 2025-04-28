@@ -33,34 +33,39 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sql = "SELECT 
-                c.id AS category_id,
-                c.category_name,
-                JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'attribute_name', ca.attribute_name,
-                        'attribute_type', ca.type,
-                        'is_required', ca.is_required,
-                        'attribute_values', 
-                        (
-                            SELECT JSON_ARRAYAGG(cav.name) 
-                            FROM iwa_ciceksepeti_category_attributes_values cav
-                            WHERE cav.attribute_id = ca.attribute_id
+            c.id AS category_id,
+            c.category_name,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'attribute_id', ca.attribute_id,
+                    'attribute_name', ca.attribute_name,
+                    'attribute_type', ca.type,
+                    'is_required', ca.is_required,
+                    'attribute_values', 
+                    (
+                        SELECT JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'attribute_value_id', cav.attribute_value_id,
+                                'attribute_value', cav.name
+                            )
                         )
+                        FROM iwa_ciceksepeti_category_attributes_values cav
+                        WHERE cav.attribute_id = ca.attribute_id
                     )
-                ) AS attributes_json
-            FROM 
-                iwa_ciceksepeti_categories c
-            JOIN 
-                iwa_ciceksepeti_category_attributes ca 
-            ON 
-                c.id = ca.category_id
-            WHERE 
-                ca.type IN ('Ürün Özelliği', 'Variant Özelliği')
-            AND 
-                c.id IN (16105, 14156)  
-            GROUP BY 
-                c.id, c.category_name;
-            ";
+                )
+            ) AS attributes_json
+        FROM 
+            iwa_ciceksepeti_categories c
+        JOIN 
+            iwa_ciceksepeti_category_attributes ca 
+        ON 
+            c.id = ca.category_id
+        WHERE 
+            ca.type IN ('Ürün Özelliği', 'Variant Özelliği')
+        AND 
+            c.id IN (16105, 14156)  
+        GROUP BY 
+            c.id, c.category_name;";
         $result = Utility::fetchFromSql($sql);
         print_r($result);
 
