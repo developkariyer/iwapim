@@ -146,11 +146,6 @@ class CiceksepetiListingHandler
 
     }
 
-    public function getAttributeId($categoryId)
-    {
-        $attributeSql = "select "
-
-    }
 
     public function getGeminiApi(string $message): ?array
     {
