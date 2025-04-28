@@ -57,7 +57,7 @@ class CiceksepetiListingHandler
                             $image = $hotspotImage->getImage();
                             $imageUrl = $image->getFullPath();
                             $host = \Pimcore\Tool::getHostUrl();
-                            $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
+                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
                         }
                     }
                 }
