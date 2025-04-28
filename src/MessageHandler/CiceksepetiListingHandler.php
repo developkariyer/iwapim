@@ -19,7 +19,6 @@ class CiceksepetiListingHandler
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
         $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
         
@@ -58,11 +57,8 @@ class CiceksepetiListingHandler
             {"sku1": { "productName": "Product", "category": "Category", "price": "100 TL" }}
             {"sku2": { "productName": "Product", "category": "Category", "price": "150 TL" }}
             ```
-            
-        
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
-            Category veri: $categoryInfo
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
@@ -108,7 +104,6 @@ class CiceksepetiListingHandler
             ],
         ]);
         echo "Gemini yanit alindi\n";
-        print_r($response->getContent());
         if ($response->getStatusCode() === 200) {
             return $response->toArray();
         }
