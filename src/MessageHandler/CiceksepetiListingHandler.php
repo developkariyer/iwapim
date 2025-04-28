@@ -33,14 +33,13 @@ class CiceksepetiListingHandler
                 $size = $variantProduct->getVariationSize();
                 $color = $variantProduct->getVariationColor();
                 $ean = $variantProduct->getEanGtin();
-                $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['size'] = $size;
-                $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['color'] = $color;
-                $data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ean'] = $ean;
+                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['size'] = $size;
+                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['color'] = $color;
+                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ean'] = $ean;
                 $listingItems = $variantProduct->getListingItems();
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
                         $title = $listingItem->getTitle();
-                        $urlLink = $listingItem->getUrlLink();
                         $salePrice = $listingItem->getSalePrice();
                         $currency = $listingItem->getSaleCurrency();
                         $marketplaceType = $listingItem->getMarketplace()->getKey();
@@ -48,11 +47,10 @@ class CiceksepetiListingHandler
                         $parentApiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
 
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
-                        //$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
-                        //$data[$marketplaceName][$productIdentifier]['sku'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
 
                        /* $imageGallery = $listingItem->getImageGallery();
                         foreach ($imageGallery as $hotspotImage) {
