@@ -16,7 +16,30 @@ class CiceksepetiListingHandler
     public function __invoke(ProductListingMessage $message)
     {
         $this->categoryAttributeUpdate($message->getMarketplaceId());
-        /*$data = [];
+        $data = $this->getListingInfoJson($message);
+        print_r($data);
+
+        /*$messageData = [
+            'traceId' => $message->getTraceId(),
+            'actionType' => $message->getActionType(),
+            'productId' => $message->getProductId(),
+            'marketplaceId' => $message->getMarketplaceId(),
+            'userId' => $message->getUserName(),
+            'variantIds' => $message->getVariantIds(),
+            'payload' => $message->getPayload(),
+            'priority' => $message->getPriority(),
+            'targetAccountKey' => $message->getTargetAccountKey(),
+            'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ISO8601),
+        ];
+
+        $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
+        echo "Ciceksepeti Mesaj İşlendi (JSON):\n";
+       // echo $jsonOutput . "\n";
+    }
+
+    public function getListingInfoJson($message)
+    {
+        $data = [];
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         $marketplaceName = $marketplace->getMarketplaceType();
         $product = Product::getById($message->getProductId());
@@ -66,24 +89,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        print_r(json_encode($data));*/
-
-        /*$messageData = [
-            'traceId' => $message->getTraceId(),
-            'actionType' => $message->getActionType(),
-            'productId' => $message->getProductId(),
-            'marketplaceId' => $message->getMarketplaceId(),
-            'userId' => $message->getUserName(),
-            'variantIds' => $message->getVariantIds(),
-            'payload' => $message->getPayload(),
-            'priority' => $message->getPriority(),
-            'targetAccountKey' => $message->getTargetAccountKey(),
-            'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ISO8601),
-        ];
-
-        $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
-        echo "Ciceksepeti Mesaj İşlendi (JSON):\n";
-       // echo $jsonOutput . "\n";
+        return json_encode($data);
     }
 
     public function categoryAttributeUpdate($marketplaceId)
