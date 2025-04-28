@@ -44,7 +44,7 @@ class CiceksepetiListingHandler
                         $currency = $listingItem->getSaleCurrency();
                         $marketplaceType = $listingItem->getMarketplace()->getKey();
                         $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
-                        $parentApiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
+                        $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
 
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
