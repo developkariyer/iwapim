@@ -46,7 +46,7 @@ class CiceksepetiListingHandler
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
             - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
-            -**category**: Kategori verisinden en uygun kategoriyi bul name ve id olarak kaydet.
+            -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
             -**renk**: renk bilgisi verideki sku altında color fieldı
             -**ebat**: ebat bilgisi verideki sku altında size fieldı
@@ -90,6 +90,12 @@ class CiceksepetiListingHandler
         $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
         echo "Ciceksepeti Mesaj İşlendi (JSON)\n";
        // echo $jsonOutput . "\n";
+    }
+
+    public function checkData($data)
+    {
+        
+
     }
 
     public function getGeminiApi(string $message): ?array
