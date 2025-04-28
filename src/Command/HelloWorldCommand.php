@@ -7,6 +7,7 @@ use App\Message\TestMessage;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
+use phpseclib3\File\ASN1\Maps\AttributeValue;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
@@ -30,46 +31,46 @@ class HelloWorldCommand extends AbstractCommand
         parent::__construct();
     }
 
+    public function getCiceksepetiListingCategoriesIdList(): array
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
+        }
+        return array_unique($categoryIdList);
+    }
+
+    public function categoryAttributeInfo()
+    {
+        $categoryAttributeSql = "select * from iwa_ciceksepeti_category_attributes where category_id = :categoryId";
+        $categoryAttributeValueSql = "select * from iwa_ciceksepeti_category_attributes_values where attribute_id = :attributeId";
+        $categoryInfo = [];
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        foreach ($categoryIdList as $categoryId) {
+                $attributes = Utility::fetchFromSql($categoryAttributeSql, ['categoryId' => $categoryId]);
+                $categoryInfo[$categoryId] = $attributes;
+                foreach ($attributes as $attribute) {
+                    $attributeId = $attribute['attribute_id'];
+                    $attributeValue = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
+                    $categoryInfo[$categoryId][$attributeId] = $attributeValue;
+                }
+        }
+        print_r(json_encode($categoryInfo));
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $sql = "
-            SELECT 
-                c.id AS category_id,
-                c.category_name,
-                JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'attribute_id', ca.attribute_id,
-                        'attribute_name', ca.attribute_name,
-                        'attribute_type', ca.type,
-                        'is_required', ca.is_required,
-                        'attribute_values', 
-                        (
-                            SELECT JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    'attribute_value_id', cav.attribute_value_id,
-                                    'attribute_value', cav.name
-                                )
-                            )
-                            FROM iwa_ciceksepeti_category_attributes_values cav
-                            WHERE cav.attribute_id = ca.attribute_id
-                        )
-                    )
-                ) AS attributes_json
-            FROM 
-                iwa_ciceksepeti_categories c
-            JOIN 
-                iwa_ciceksepeti_category_attributes ca 
-                ON c.id = ca.category_id
-            WHERE 
-                ca.type IN ('Ürün Özelliği', 'Variant Özelliği')
-            AND 
-                c.id IN (16105, 14156) 
-            GROUP BY 
-                c.id, c.category_name;
-        ";
-        $result = Utility::fetchFromSql($sql);
-        print_r($result);
-        /*$productId = 238133;
+        $productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
 
         $ciceksepetiMessage = new ProductListingMessage(
@@ -84,7 +85,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
 
 
