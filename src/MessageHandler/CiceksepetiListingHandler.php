@@ -34,8 +34,9 @@ class CiceksepetiListingHandler
             - productName: Gönderilen verideki **title** alanlarıdır. Bu başlıklardan Türkçe olanlarını, ÇiçekSepeti'ne uygun şekilde güncelle. Bu alan her sku için aynı olacak.
             - mainProductCode: Gönderilen verideki ÇiçekSepeti altındaki field genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her sku için aynı olacak.
             - stockCode: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir.
-            - description: Amacın, eksik olan ürün açıklaması (description) alanı için, ÇiçekSepeti'nde yayınlanan örnek listinglere benzer, müşteri odaklı, Türkçe ve satış artırıcı açıklamalar 
-            üretmek. Çiçeksepeti SEO' ya dikkat ederek. Eğer ürün hakkında yeterli bilgi yoksa, benzer ürünlerden tahmin yap ve özgün bir açıklama yaz. 
+            - description: Gönderdiğim json verideki ürüne ait açıklamaları kullan çiçeksepeti özgün olarak. Her sku için aynı description olacak. Size ve color bilgileri açıklamada hepsini kapsaycak şekilde olsun
+            ürüne ait genel bilgiler olacak.
+            Çiçeksepeti SEO' ya dikkat ederek. Eğer ürün hakkında yeterli bilgi yoksa, benzer ürünlerden tahmin yap ve özgün bir açıklama yaz. 
             Çıktıyı sadece açıklama metni olarak ver, başka yorum ekleme.
             - images: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde al, dizi olarak ver. Her skuda farlkı resim olacak yeterli resim yoksa ekleme.
             - price: Fiyatı örnek listingleri kullanarak TL cinsinden belirle. TL cinsinden fiyat varsa direk bunu kullan. Farklı para birimlerinden varsa bunları TL cinsinden hesapla ve TL cinsinden fiyat belirle 
