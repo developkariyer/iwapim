@@ -76,6 +76,7 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
         $result = $this->getGeminiApi($promt);
+        print_r($result);
         $text = $result['candidates'][0]['content']['parts'][0]['text'];
         $text = str_replace(['```json', '```'], '', $text);
         $data = json_decode($text, true);
