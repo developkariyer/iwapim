@@ -19,40 +19,35 @@ class CiceksepetiListingHandler
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
         $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $categoryInfo = $this->categoryAttributeInfo();
+        //$categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
-            
             Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.  
             Bu JSON'da bazı alanlar eksik veya hatalı olabilir.  
-            Gönderdiğim veride ana ürün kodu altında sku lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında variant oluşturacak size ve color bilgisi yer almaktadır.
-            ListingItems alanında bu ürüne ait farklı pazaryerlerine yapılmış listingler yer alır. Bunlara benzer ciceksepeti özgün hale getireceğiz.
-            Çiceksepeti para birimi TL 'dir.
+            Gönderdiğim veride ana ürün kodu altında sku'lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında "size" ve "color" bilgisi yer alacaktır.
+            ListingItems alanında bu ürüne ait farklı pazaryerlerine yapılmış listingler yer alır. Bunlara benzer ÇiçekSepeti özgün hale getireceğiz.
+            ÇiçekSepeti para birimi TL'dir.
+                
+            **Uyarı**: Lütfen yalnızca gönderdiğim **JSON verisini** kullanarak işlem yapınız ve dışarı çıkmayınız. Verilen verinin dışında başka veri kullanımı yapılmamalıdır.
             
-            Gönderdiğim veriye göre çıkarılması gereken ve Ciceksepeti listing formatında istenen alanlar skus dizisi altındaki tüm skulara ayrı olacak şekilde:
-            productName: (gönderilen verideki title alanlarıdır bunlardan Türkçe olanı çiceksepetine uygun olarak güncelle.)
-            mainProductCode: (gönderilen verideki Ciceksepeti altındaki field genelde 3 haneli ve sayı içeriyor ör: ABC-12)
-            stockCode: (ürün sku bilgisi gönderidiğim verideki skus altındaki veriler)
-            description: Amacın, eksik olan ürün açıklaması (description) alanı için,  
-                            ÇiçekSepeti'nde yayınlanan örnek listinglere benzer,  
-                            müşteri odaklı, Türkçe ve satış artırıcı açıklamalar üretmektir. Eğer ürün hakkında yeterli bilgi yoksa, benzer ürünlerden tahmin yap ve özgün bir açıklama yaz.
-                            Çıktıyı sadece açıklama metni olarak ver, başka yorum ekleme.
-            images: örnek listingler içinden images altındaki resimlerden en fazla 5 tane olacak şekilde al dizi olacak.
-            price: fiyatı örnek listingleri kullanarak TL cinsinden belirle.
-            categoryid, categoryName: en uygun category name ve id belirle category verisinie göre
-            attributes: belirlennen categorye ait attribute name attribute id ve attribute value idleri belirle çok dışarı taşmadan genellikle size ve renke uygun variant oluşuacak.
-                        attributes json şekilnde olsun. örnek "Attributes": [
-                            {
-                              "id": 2000353,
-                              "ValueId": 2010800,
-                              attributteName:a,
-                              attributeValueName: b 
-                              "TextLength": 0
-                            },
-            Her skuya ait farklı olacak örnek response {"sku1: data1"}, {"sku2: data2"}
-            Çıktıyı json formatta ver her sku farklı olacak şekilde.
-            İşte veri: $jsonString
-            Kategori Bilgisi: $categoryInfo
+            Gönderdiğim veriye göre çıkarılması gereken ve ÇiçekSepeti listing formatında istenen alanlar skus dizisi altındaki tüm skulara ayrı olacak şekilde:
+            - productName: Gönderilen verideki **title** alanlarıdır. Bu başlıklardan Türkçe olanlarını, ÇiçekSepeti'ne uygun şekilde güncelle. Bu alan her sku için aynı olacak.
+            - mainProductCode: Gönderilen verideki ÇiçekSepeti altındaki field genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her sku için aynı olacak.
+            - stockCode: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir.
+            - description: Amacın, eksik olan ürün açıklaması (description) alanı için, ÇiçekSepeti'nde yayınlanan örnek listinglere benzer, müşteri odaklı, Türkçe ve satış artırıcı açıklamalar 
+            üretmek. Çiçeksepeti SEO' ya dikkat ederek. Eğer ürün hakkında yeterli bilgi yoksa, benzer ürünlerden tahmin yap ve özgün bir açıklama yaz. 
+            Çıktıyı sadece açıklama metni olarak ver, başka yorum ekleme.
+            - images: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde al, dizi olarak ver. Her skuda farlkı resim olacak yeterli resim yoksa ekleme.
+            - price: Fiyatı örnek listingleri kullanarak TL cinsinden belirle. TL cinsinden fiyat varsa direk bunu kullan. Farklı para birimlerinden varsa bunları TL cinsinden hesapla ve TL cinsinden fiyat belirle 
+            size bilgisini varsa dikkate al. size büyüdükçe fiyat artar.
+            - categoryid, categoryName: En uygun category name ve id'yi belirle, kategori verisinie göre.
+            
+             Her SKU'ya ait farklı olacak şekilde, örnek response şu şekilde olabilir: 
+            ```json
+            {"sku1": { "productName": "Product", "category": "Category", "price": "100 TL" }}
+            {"sku2": { "productName": "Product", "category": "Category", "price": "150 TL" }}
+            ```
+            Listeleme için kullanman gereken veri (Bu veri dışına çıkma): $jsonString
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
