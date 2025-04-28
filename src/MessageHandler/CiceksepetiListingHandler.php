@@ -19,7 +19,7 @@ class CiceksepetiListingHandler
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
         $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        //$categoryInfo = $this->categoryAttributeInfo();
+        $categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
         
@@ -48,14 +48,21 @@ class CiceksepetiListingHandler
             - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
             - **categoryid, categoryName**: En uygun **category name** ve **id** belirlenecek, kategori verisinize göre.
             
+            Öncelikle aşağıda belirteceğim  Category veri sinden uygun kategori seç ve renk beden attributelerini kullan bunlara uygun valueleri seç. Her sku için aynı kategori farklı beden  veya renk olacak.
+            attributes ürün altında  bir json olarak gelsin örnek
+              ```json
+                  {"categoryName:aabv, catagoryid: 121", "attributeid:11", "attributeName: abc", "attributevalue:121", "attriburtevalueid:21312"}
+              ```
             Her SKU'ya ait farklı olacak şekilde, örnek response şu şekilde olabilir:
             ```json
             {"sku1": { "productName": "Product", "category": "Category", "price": "100 TL" }}
             {"sku2": { "productName": "Product", "category": "Category", "price": "150 TL" }}
             ```
+            
         
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
+            Category veri: $categoryInfo
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
@@ -183,7 +190,7 @@ class CiceksepetiListingHandler
             SELECT category_id, attribute_name, attribute_id 
             FROM iwa_ciceksepeti_category_attributes 
             WHERE category_id = :categoryId 
-            AND (type = 'Ürün Özelliği' OR type = 'Variant Özelliği')
+            AND type = 'Variant Özelliği'
         ";
 
         $categoryAttributeValueSql = "
