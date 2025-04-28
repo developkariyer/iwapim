@@ -18,6 +18,7 @@ class CiceksepetiListingHandler
     {
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
         $data = $this->getListingInfoJson($message);
+        $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
@@ -45,9 +46,7 @@ class CiceksepetiListingHandler
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
             - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
-            - **categoryid, categoryName**: En uygun **category name** ve **id** belirlenecek, kategori verisinize göre.
-            
-            Öncelikle aşağıda belirteceğim  Category veri sinden uygun kategori seç ve renk beden attributelerini kullan bunlara uygun valueleri seç. Her sku için aynı kategori farklı beden  veya renk olacak.
+            -**category**: Kategori verisinden en uygun kategoriyi bul name ve id olarak kaydet.
             attributes ürün altında  bir json olarak gelsin örnek
               ```json
                   {"categoryName:aabv, catagoryid: 121", "attributeid:11", "attributeName: abc", "attributevalue:121", "attriburtevalueid:21312"}
@@ -59,6 +58,7 @@ class CiceksepetiListingHandler
             ```
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
+            Kategori Verisi: $categories
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
@@ -250,6 +250,21 @@ class CiceksepetiListingHandler
             $categoryIdList[] = $apiData['categoryId'];
         }
         return array_unique($categoryIdList);
+    }
+
+    public function getCiceksepetiCategoriesDetails(): array
+    {
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+
+        if (empty($categoryIdList)) {
+            return [];
+        }
+
+        $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
+        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE category_id IN ($inClause)";
+        $categories = Utility::fetchFromSql($sql, $categoryIdList);
+
+        return $categories;
     }
 
 }
