@@ -263,7 +263,7 @@ class CiceksepetiListingHandler
         $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
         $categories = Utility::fetchFromSql($sql, $categoryIdList);
 
-        return $categories;
+        return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
 }
