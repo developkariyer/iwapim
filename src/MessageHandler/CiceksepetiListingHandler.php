@@ -59,7 +59,7 @@ class CiceksepetiListingHandler
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
-       
+
 
 
         /*$messageData = [
