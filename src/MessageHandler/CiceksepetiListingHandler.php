@@ -20,7 +20,7 @@ class CiceksepetiListingHandler
         $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $promt = <<<EOD
-            Sen bir CicekSepeti Marketplace uzmanısın.
+            Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             
             Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.  
             Bu JSON'da bazı alanlar eksik veya hatalı olabilir.  
@@ -32,7 +32,10 @@ class CiceksepetiListingHandler
             productName: (gönderilen verideki title alanlarıdır bunlardan Türkçe olanı çiceksepetine uygun olarak güncelle.)
             mainProductCode: (gönderilen verideki Ciceksepeti altındaki field genelde 3 haneli ve sayı içeriyor ör: ABC-12)
             stockCode: (ürün sku bilgisi gönderidiğim verideki skus altındaki veriler)
-            description: açıklama örnek listinglere bakarak türkçe çiceksepetine uygun açıklama oluştur.
+            description: Amacın, eksik olan ürün açıklaması (description) alanı için,  
+                            ÇiçekSepeti'nde yayınlanan örnek listinglere benzer,  
+                            müşteri odaklı, Türkçe ve satış artırıcı açıklamalar üretmektir. Eğer ürün hakkında yeterli bilgi yoksa, benzer ürünlerden tahmin yap ve özgün bir açıklama yaz.
+                            Çıktıyı sadece açıklama metni olarak ver, başka yorum ekleme.
             images: örnek listingler içinden images altındaki resimlerden en fazla 5 tane olacak şekilde al dizi olacak.
             price: fiyatı örnek listingleri kullanarak TL cinsinden belirle.
             
