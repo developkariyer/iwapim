@@ -143,6 +143,7 @@ class CiceksepetiListingHandler
             }
             $product['Attributes'] = $attributes;
         }
+        print_r($data);
 
     }
 
