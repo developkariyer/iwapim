@@ -66,7 +66,6 @@ class HelloWorldCommand extends AbstractCommand
                 c.id IN (16105, 14156) 
             GROUP BY 
                 c.id, c.category_name;
-
         ";
         $result = Utility::fetchFromSql($sql);
         print_r($result);
