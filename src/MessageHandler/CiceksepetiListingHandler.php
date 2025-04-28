@@ -60,19 +60,17 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
         $result = $this->getGeminiApi($promt);
-        print_r($result);
-       /* $jsonText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $jsonText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
         $jsonText = trim($jsonText);
         $jsonText = str_replace(['```json', '```'], '', $jsonText);
         $jsonText = trim($jsonText);
-
+        $jsonText = preg_replace('/[\x00-\x1F\x7F]/u', '', $jsonText);
         $data = json_decode($jsonText, true);
-
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('JSON parsing hatası: ' . json_last_error_msg());
         }
 
-        print_r($data);*/
+        print_r($data);
 
 
         /*$messageData = [
