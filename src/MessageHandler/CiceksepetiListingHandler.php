@@ -46,7 +46,6 @@ class CiceksepetiListingHandler
                         $marketplaceType = $listingItem->getMarketplace()->getKey();
                         $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
-                        print_r($urlLink);
 
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['url'] = $urlLink;
@@ -66,7 +65,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        //print_r(json_encode($data));
+        print_r(json_encode($data));
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
