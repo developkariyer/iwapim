@@ -16,10 +16,10 @@ class CiceksepetiListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
-        print_r($this->getCiceksepetiListingCategoriesIdList());
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
-        /*$data = $this->getListingInfoJson($message);
+        $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             
@@ -39,13 +39,23 @@ class CiceksepetiListingHandler
                             Çıktıyı sadece açıklama metni olarak ver, başka yorum ekleme.
             images: örnek listingler içinden images altındaki resimlerden en fazla 5 tane olacak şekilde al dizi olacak.
             price: fiyatı örnek listingleri kullanarak TL cinsinden belirle.
-            
+            categoryid, categoryName: en uygun category name ve id belirle category verisinie göre
+            attributes: belirlennen categorye ait attribute name attribute id ve attribute value idleri belirle çok dışarı taşmadan genellikle size ve renke uygun variant oluşuacak.
+                        attributes json şekilnde olsun. örnek "Attributes": [
+                            {
+                              "id": 2000353,
+                              "ValueId": 2010800,
+                              attributteName:a,
+                              attributeValueName: b 
+                              "TextLength": 0
+                            },
             Her skuya ait farklı olacak örnek response {"sku1: data1"}, {"sku2: data2"}
             Çıktıyı json formatta ver her sku farklı olacak şekilde.
             İşte veri: $jsonString
+            Category ve attribute Verisi: $categoryInfo
         EOD;
         $result = $this->getGeminiApi($promt);
-        print_r($result);*/
+        print_r($result);
 
 
         /*$messageData = [
@@ -161,6 +171,24 @@ class CiceksepetiListingHandler
             $this->ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
         }
         echo "Ciceksepeti Category Attributes Updated\n";
+    }
+
+    public function categoryAttributeInfo()
+    {
+        $categoryAttributeSql = "select category_id,attribute_name, attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and (type = 'Ürün Özelliği' or type = 'Variant Özelliği')";
+        $categoryAttributeValueSql = "select attribute_value_id, attribute_id, name from iwa_ciceksepeti_category_attributes_values where attribute_id = :attributeId";
+        $categoryInfo = [];
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        foreach ($categoryIdList as $categoryId) {
+            $attributes = Utility::fetchFromSql($categoryAttributeSql, ['categoryId' => $categoryId]);
+            $categoryInfo[$categoryId] = $attributes;
+            foreach ($attributes as $attribute) {
+                $attributeId = $attribute['attribute_id'];
+                $attributeValue = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
+                $categoryInfo[$categoryId][$attributeId] = $attributeValue;
+            }
+        }
+        return json_encode($categoryInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     public function getCiceksepetiListingCategoriesIdList(): array

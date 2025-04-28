@@ -50,28 +50,11 @@ class HelloWorldCommand extends AbstractCommand
         return array_unique($categoryIdList);
     }
 
-    public function categoryAttributeInfo()
-    {
-        $categoryAttributeSql = "select category_id,attribute_name, attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and (type = 'Ürün Özelliği' or type = 'Variant Özelliği')";
-        $categoryAttributeValueSql = "select attribute_value_id, attribute_id, name from iwa_ciceksepeti_category_attributes_values where attribute_id = :attributeId";
-        $categoryInfo = [];
-        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-        foreach ($categoryIdList as $categoryId) {
-                $attributes = Utility::fetchFromSql($categoryAttributeSql, ['categoryId' => $categoryId]);
-                $categoryInfo[$categoryId] = $attributes;
-                foreach ($attributes as $attribute) {
-                    $attributeId = $attribute['attribute_id'];
-                    $attributeValue = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
-                    $categoryInfo[$categoryId][$attributeId] = $attributeValue;
-                }
-        }
-        print_r(json_encode($categoryInfo));
-    }
+
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->categoryAttributeInfo();
-        /*$productId = 238133;
+        $productId = 238133;
         $variantIds = [240430, 240431, 240433, 240434, 240436, 240437];
 
         $ciceksepetiMessage = new ProductListingMessage(
@@ -86,7 +69,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
 
 
