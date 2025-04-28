@@ -112,21 +112,21 @@ class CiceksepetiListingHandler
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
             $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
-            $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, [':categoryId' => $categoryId]);
+            $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult['attribute_id'];
             $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
                                                                    (attribute_name= 'Ebat' or attribute_name= 'Boyut' ) limit 1";
-            $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, [':categoryId' => $categoryId]);
+            $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult['attribute_id'];
 
             $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
             $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
-                ':attribute_id' => $attributeColorId,
-                ':name' => $product['renk']
+                'attribute_id' => $attributeColorId,
+                'name' => $product['renk']
             ]);
             $attributeSizeValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
-                ':attribute_id' => $attributeSizeId,
-                ':name' => $product['ebat']
+                'attribute_id' => $attributeSizeId,
+                'name' => $product['ebat']
             ]);
 
             $attributes = [];
