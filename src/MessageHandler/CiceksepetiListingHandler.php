@@ -198,28 +198,44 @@ class CiceksepetiListingHandler
             FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attributeId
         ";
-
         $categoryInfo = [];
+        $attributesGlobal = [];
+        $attributeValuesGlobal = [];
+
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+
         foreach ($categoryIdList as $categoryId) {
             $attributes = Utility::fetchFromSql($categoryAttributeSql, ['categoryId' => $categoryId]);
+
             $categoryInfo[$categoryId] = [
                 'category_id' => $categoryId,
-                'attributes' => [],
+                'attribute_ids' => [],
             ];
 
             foreach ($attributes as $attribute) {
                 $attributeId = $attribute['attribute_id'];
-                $attributeValues = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
 
-                $categoryInfo[$categoryId]['attributes'][] = [
-                    'attribute_name' => $attribute['attribute_name'],
-                    'attribute_id' => $attributeId,
-                    'attribute_values' => $attributeValues,
-                ];
+                if (!isset($attributesGlobal[$attributeId])) {
+                    $attributesGlobal[$attributeId] = [
+                        'attribute_id' => $attributeId,
+                        'attribute_name' => $attribute['attribute_name'],
+                    ];
+
+                    $attributeValues = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
+                    $attributeValuesGlobal[$attributeId] = $attributeValues;
+                }
+
+                $categoryInfo[$categoryId]['attribute_ids'][] = $attributeId;
             }
         }
-        return json_encode($categoryInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        $finalResult = [
+            'categories' => array_values($categoryInfo),
+            'attributes' => array_values($attributesGlobal),
+            'attribute_values' => $attributeValuesGlobal
+        ];
+
+        return json_encode($finalResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     public function getCiceksepetiListingCategoriesIdList(): array
