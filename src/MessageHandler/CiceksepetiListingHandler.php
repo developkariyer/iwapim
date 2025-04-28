@@ -22,33 +22,33 @@ class CiceksepetiListingHandler
         //$categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
+        
             Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.  
             Bu JSON'da bazı alanlar eksik veya hatalı olabilir.  
             Gönderdiğim veride ana ürün kodu altında sku'lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında "size" ve "color" bilgisi yer alacaktır.
             ListingItems alanında bu ürüne ait farklı pazaryerlerine yapılmış listingler yer alır. Bunlara benzer ÇiçekSepeti özgün hale getireceğiz.
             ÇiçekSepeti para birimi TL'dir.
-                
+            
             **Uyarı**: Lütfen yalnızca gönderdiğim **JSON verisini** kullanarak işlem yapınız ve dışarı çıkmayınız. Verilen verinin dışında başka veri kullanımı yapılmamalıdır.
             
             Gönderdiğim veriye göre çıkarılması gereken ve ÇiçekSepeti listing formatında istenen alanlar skus dizisi altındaki tüm skulara ayrı olacak şekilde:
-            - productName: Gönderilen verideki **title** alanlarıdır. Bu başlıklardan Türkçe olanlarını, ÇiçekSepeti'ne uygun şekilde güncelle. Bu alan her sku için aynı olacak.
-            - mainProductCode: Gönderilen verideki ÇiçekSepeti altındaki field genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her sku için aynı olacak.
-            - stockCode: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir.
-            - description: Gönderdiğim json verideki ürüne ait açıklamaları kullan çiçeksepeti özgün olarak. Her sku için aynı description olacak. Size ve color bilgileri açıklamada hepsini kapsaycak şekilde olsun
-            ürüne ait genel bilgiler olacak.
-            Çiçeksepeti SEO' ya dikkat ederek. Eğer ürün hakkında yeterli bilgi yoksa, benzer ürünlerden tahmin yap ve özgün bir açıklama yaz. 
-            Çıktıyı sadece açıklama metni olarak ver, başka yorum ekleme.
-            - images: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde al, dizi olarak ver. Her skuda farlkı resim olacak yeterli resim yoksa ekleme.
-            - price: Fiyatı örnek listingleri kullanarak TL cinsinden belirle. TL cinsinden fiyat varsa direk bunu kullan. Farklı para birimlerinden varsa bunları TL cinsinden hesapla ve TL cinsinden fiyat belirle 
-            size bilgisini varsa dikkate al. size büyüdükçe fiyat artar.
-            - categoryid, categoryName: En uygun category name ve id'yi belirle, kategori verisinie göre.
+            - **productName**: Gönderilen verideki **title** alanlarından alınır. Bu başlıklardan Türkçe olanları, ÇiçekSepeti'ne uygun şekilde güncellenmelidir. Bu alan her SKU için aynı olacak.
+            - **mainProductCode**: Gönderilen verideki ÇiçekSepeti altındaki **field** genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her SKU için aynı olacak.
+            - **stockCode**: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir. Bu her SKU'ya özel olacak.
+            - **description**: Gönderdiğim JSON verisindeki ürüne ait açıklamalar kullanılacak ve ÇiçekSepeti SEO'ya uygun özgün bir açıklama yazılacak. Bu açıklama **her SKU için aynı** olacak. 
+              Açıklamada ürünün **size** ve **color** bilgileri de yer alacak şekilde genel bilgi verilecek. Eğer eksik bilgi varsa, benzer ürünlerden tahmin yaparak açıklama oluşturulacak. 
+            - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
+            - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
+            - **categoryid, categoryName**: En uygun **category name** ve **id** belirlenecek, kategori verisinize göre.
             
-             Her SKU'ya ait farklı olacak şekilde, örnek response şu şekilde olabilir: 
+            Her SKU'ya ait farklı olacak şekilde, örnek response şu şekilde olabilir:
             ```json
             {"sku1": { "productName": "Product", "category": "Category", "price": "100 TL" }}
             {"sku2": { "productName": "Product", "category": "Category", "price": "150 TL" }}
             ```
-            Listeleme için kullanman gereken veri (Bu veri dışına çıkma): $jsonString
+        
+            **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
+            İşte veri: $jsonString
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
