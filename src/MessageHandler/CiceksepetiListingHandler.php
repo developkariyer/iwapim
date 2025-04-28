@@ -47,10 +47,9 @@ class CiceksepetiListingHandler
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
             - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
             -**category**: Kategori verisinden en uygun kategoriyi bul name ve id olarak kaydet.
-            attributes ürün altında  bir json olarak gelsin örnek
-              ```json
-                  {"categoryName:aabv, catagoryid: 121", "attributeid:11", "attributeName: abc", "attributevalue:121", "attriburtevalueid:21312"}
-              ```
+
+            -**renk**: renk bilgisi verideki sku altında color fieldı
+            -**ebat/boyut**: ebat/boyut bilgisi verideki sku altında size fieldı
             Her SKU'ya ait farklı olacak şekilde, örnek response şu şekilde olabilir:
             ```json
             {"sku1": { "productName": "Product", "category": "Category", "price": "100 TL" }}
