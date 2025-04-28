@@ -260,7 +260,7 @@ class CiceksepetiListingHandler
         }
 
         $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
-        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE category_id IN ($inClause)";
+        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
         $categories = Utility::fetchFromSql($sql, $categoryIdList);
 
         return $categories;
