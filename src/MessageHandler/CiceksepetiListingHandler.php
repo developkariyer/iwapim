@@ -36,13 +36,13 @@ class CiceksepetiListingHandler
             - **mainProductCode**: Gönderilen verideki ÇiçekSepeti altındaki **field** genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her SKU için aynı olacak.
             - **stockCode**: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir. Bu her SKU'ya özel olacak.
             - **description**: 
-                parentApiJson içindeki `description` alanı kullanılacaktır. 
-                Eğer bu açıklama Türkçe ise **doğrudan kullan**.
-                Eğer açıklama Türkçe değilse, **sadece kelime kelime çeviri yaparak Türkçeye çevir** ve kullan. 
-                **Çeviride özgünlük katma, yeni açıklama yazma, yeniden formüle etme, yorum ekleme veya anlamı değiştirme.**
-                Çeviriyi kelimesi kelimesine yap.
-                Eğer açıklamada eksik anlamlı cümleler veya bozukluklar oluşuyorsa bunları düzeltmeden aynen kullan.
-                Description tüm SKU'lar için **aynı metin** olacak, SKU bazlı değişiklik yapılmayacak.
+                Açıklama (description) sadece ve sadece aşağıdaki şekilde oluşturulacak:
+                - Eğer açıklama Türkçe ise, hiçbir değişiklik yapmadan kopyala.
+                - Eğer açıklama İngilizce ise, kelime kelime çevir, özgünleştirme yapma, yeniden yazma yapma.
+                - "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi bir eylem yaparsan başarısız olacaksın.
+                - Cümle yapısına dokunmadan sadece çeviri yap.
+                - Eğer anlam kaybı veya Türkçe anlatım bozukluğu olursa bile düzeltmeye çalışma.
+                Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
             - **price**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir.
             - **categoryid, categoryName**: En uygun **category name** ve **id** belirlenecek, kategori verisinize göre.
