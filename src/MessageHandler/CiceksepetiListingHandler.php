@@ -22,7 +22,27 @@ class CiceksepetiListingHandler
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
-        
+            **Çıkış formatı**:  
+            Sadece aşağıdaki gibi bir JSON döndür:
+            {
+              "SKU1": {
+                "productName": "Ürün adı",
+                "mainProductCode": "Ana ürün kodu",
+                "stockCode": "Stok kodu",
+                "description": "Ürün açıklaması",
+                "images": ["resim1", "resim2"],
+                "price": "100 TL",
+                "categoryId": 1234,
+                "renk": "Renk bilgisi",
+                "ebat": "Ebat bilgisi"
+              },
+              "SKU2": {
+                ...
+              }
+            }
+            
+            Hiçbir açıklama, kod bloğu, yorum ekleme.  
+            Sadece geçerli, düzgün bir JSON üret.
             Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.  
             Bu JSON'da bazı alanlar eksik veya hatalı olabilir.  
             Gönderdiğim veride ana ürün kodu altında sku'lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında "size" ve "color" bilgisi yer alacaktır.
