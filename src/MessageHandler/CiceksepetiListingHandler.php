@@ -68,7 +68,7 @@ class CiceksepetiListingHandler
             - **salesPrice**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir. Sadece değeri yaz.
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
-            -**renk**: renk bilgisi verideki sku altında color fieldı
+            -**renk**: renk bilgisi verideki sku altında color fieldı türkçe ye çevir
             -**ebat**: ebat bilgisi verideki sku altında size fieldı
             
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
@@ -83,7 +83,7 @@ class CiceksepetiListingHandler
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('JSON parsing hatası: ' . json_last_error_msg());
         }
-        print_r($data);
+        $this->checkData($data);
 
 
 
@@ -107,7 +107,48 @@ class CiceksepetiListingHandler
 
     public function checkData($data)
     {
+        foreach ($data as $sku => &$product) {
+            $categoryId = $product['categoryId'];
+            $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
+            $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, $categoryId);
+            $attributeColorId = $attributeColorSqlResult['attribute_id'];
+            $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
+                                                                   (attribute_name= 'Ebat' or attribute_name= 'Boyut' ) limit 1";
+            $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, $categoryId);
+            $attributeSizeId = $attributeSizeSqlResult['attribute_id'];
 
+            $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
+            $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
+                ':attribute_id' => $attributeColorId,
+                ':name' => $product['renk']
+            ]);
+            $attributeSizeValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
+                ':attribute_id' => $attributeSizeId,
+                ':name' => $product['ebat']
+            ]);
+
+            $attributes = [];
+            if ($attributeColorValueSqlResult) {
+                $attributes[] = [
+                    'id' => $attributeColorId,
+                    'ValueId' => $attributeColorValueSqlResult['attribute_value_id']
+                ];
+            }
+
+            if ($attributeSizeValueSqlResult) {
+                $attributes[] = [
+                    'id' => $attributeSizeId,
+                    'ValueId' => $attributeSizeValueSqlResult['attribute_value_id']
+                ];
+            }
+            $product['Attributes'] = $attributes;
+        }
+
+    }
+
+    public function getAttributeId($categoryId)
+    {
+        $attributeSql = "select "
 
     }
 
