@@ -45,6 +45,7 @@ class CiceksepetiListingHandler
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $geminiApiKey;
 
         $httpClient = HttpClient::create();
+        echo "Gemini istek gonderildi.\n";
         $response = $httpClient->request('POST', $url, [
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -59,7 +60,7 @@ class CiceksepetiListingHandler
                 ]
             ],
         ]);
-
+        echo "Gemini yanit alindi\n";
         if ($response->getStatusCode() === 200) {
             return $response->toArray();
         }
