@@ -2,10 +2,12 @@
 namespace App\MessageHandler;
 
 
+use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Message\ProductListingMessage;
 use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
+use App\Utils\Utility;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
@@ -13,7 +15,8 @@ class CiceksepetiListingHandler
 {
     public function __invoke(ProductListingMessage $message)
     {
-        $data = [];
+        $this->categoryAttributeUpdate($message->getMarketplaceId());
+        /*$data = [];
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         $marketplaceName = $marketplace->getMarketplaceType();
         $product = Product::getById($message->getProductId());
@@ -63,7 +66,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        print_r(json_encode($data));
+        print_r(json_encode($data));*/
 
         /*$messageData = [
             'traceId' => $message->getTraceId(),
@@ -81,6 +84,39 @@ class CiceksepetiListingHandler
         $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
         echo "Ciceksepeti Mesaj İşlendi (JSON):\n";
        // echo $jsonOutput . "\n";
-
     }
+
+    public function categoryAttributeUpdate($marketplaceId)
+    {
+        $this->ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById($marketplaceId));
+        echo "Ciceksepeti Connector Created\n";
+        $this->ciceksepetiConnector->downloadCategories();
+        echo "Ciceksepeti Downloaded Categories\n";
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        echo "Ciceksepeti Category List Updated\n";
+        foreach ($categoryIdList as $categoryId) {
+            $this->ciceksepetiConnector->getCategoryAttributesAndSaveDatabase($categoryId);
+        }
+        echo "Ciceksepeti Category Attributes Updated\n";
+    }
+
+    public function getCiceksepetiListingCategoriesIdList(): array
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
+        }
+        return array_unique($categoryIdList);
+    }
+
 }
