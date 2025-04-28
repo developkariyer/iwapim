@@ -19,7 +19,7 @@ class CiceksepetiListingHandler
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
         $data = $this->getListingInfoJson($message);
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        //$categoryInfo = $this->categoryAttributeInfo();
+        $categoryInfo = $this->categoryAttributeInfo();
         $promt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             
@@ -52,6 +52,7 @@ class CiceksepetiListingHandler
             Her skuya ait farklı olacak örnek response {"sku1: data1"}, {"sku2: data2"}
             Çıktıyı json formatta ver her sku farklı olacak şekilde.
             İşte veri: $jsonString
+            Kategori Bilgisi: $categoryInfo
         EOD;
         $result = $this->getGeminiApi($promt);
         print_r($result);
@@ -175,17 +176,37 @@ class CiceksepetiListingHandler
 
     public function categoryAttributeInfo()
     {
-        $categoryAttributeSql = "select category_id,attribute_name, attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and (type = 'Ürün Özelliği' or type = 'Variant Özelliği')";
-        $categoryAttributeValueSql = "select attribute_value_id, attribute_id, name from iwa_ciceksepeti_category_attributes_values where attribute_id = :attributeId";
+        $categoryAttributeSql = "
+            SELECT category_id, attribute_name, attribute_id 
+            FROM iwa_ciceksepeti_category_attributes 
+            WHERE category_id = :categoryId 
+            AND (type = 'Ürün Özelliği' OR type = 'Variant Özelliği')
+        ";
+
+        $categoryAttributeValueSql = "
+            SELECT attribute_value_id, attribute_id, name 
+            FROM iwa_ciceksepeti_category_attributes_values 
+            WHERE attribute_id = :attributeId
+        ";
+
         $categoryInfo = [];
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
         foreach ($categoryIdList as $categoryId) {
             $attributes = Utility::fetchFromSql($categoryAttributeSql, ['categoryId' => $categoryId]);
-            $categoryInfo[$categoryId] = $attributes;
+            $categoryInfo[$categoryId] = [
+                'category_id' => $categoryId,
+                'attributes' => [],
+            ];
+
             foreach ($attributes as $attribute) {
                 $attributeId = $attribute['attribute_id'];
-                $attributeValue = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
-                $categoryInfo[$categoryId][$attributeId] = $attributeValue;
+                $attributeValues = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
+
+                $categoryInfo[$categoryId]['attributes'][] = [
+                    'attribute_name' => $attribute['attribute_name'],
+                    'attribute_id' => $attributeId,
+                    'attribute_values' => $attributeValues,
+                ];
             }
         }
         return json_encode($categoryInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
