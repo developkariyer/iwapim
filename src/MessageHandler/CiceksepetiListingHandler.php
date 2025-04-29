@@ -75,10 +75,10 @@ class CiceksepetiListingHandler
                 'stockCode' => $product['stockCode'],
                 'categoryId' => $product['categoryId'],
                 'description' => $product['description'],
-                'deliveryMessageType' => 18,
+                'deliveryMessageType' => 5,
                 'deliveryType' => 2,
                 'stockQuantity' => 5,
-                'salesPrice' => (float) $product['price'],
+                'salesPrice' => 2500.0,
                 'images' => array_slice($httpsImages, 0, 5),
                 'Attributes' => $product['Attributes'],
             ];
