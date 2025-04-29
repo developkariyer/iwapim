@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AccessLoggerListener implements EventSubscriberInterface
 {
-    /** @var array Loglanmaması gereken rotalar */
+    /** @var array */
     private const EXCLUDED_ROUTES = [
         '_wdt',
         '_profiler',
@@ -29,8 +29,8 @@ class AccessLoggerListener implements EventSubscriberInterface
     private Security $security;
 
     /**
-     * @param LoggerInterface $accessLogger Monolog Logger servisi
-     * @param Security $security Security servisi
+     * @param LoggerInterface $accessLogger Monolog Logger service
+     * @param Security $security Security service
      */
     public function __construct(LoggerInterface $accessLogger, Security $security)
     {
@@ -39,8 +39,6 @@ class AccessLoggerListener implements EventSubscriberInterface
     }
 
     /**
-     * Abone olunan olayları tanımlar
-     *
      * @return array
      */
     public static function getSubscribedEvents(): array
@@ -51,9 +49,7 @@ class AccessLoggerListener implements EventSubscriberInterface
     }
 
     /**
-     * Controller çağrıldığında erişim bilgilerini loglar
-     *
-     * @param ControllerEvent $event Controller olayı
+     * @param ControllerEvent $event
      * @return void
      */
     public function onKernelController(ControllerEvent $event): void
@@ -104,10 +100,8 @@ class AccessLoggerListener implements EventSubscriberInterface
     }
 
     /**
-     * Controller nesnesinden sınıf ve metod bilgilerini çıkarır
-     *
-     * @param mixed $controller Controller nesnesi
-     * @return array|null Sınıf ve metod bilgileri ya da null
+     * @param mixed $controller
+     * @return array|null
      */
     private function getControllerInfo(mixed $controller): ?array
     {
@@ -131,9 +125,7 @@ class AccessLoggerListener implements EventSubscriberInterface
     }
 
     /**
-     * Güvenli bir şekilde kullanıcı bilgilerini toplar
-     *
-     * @return array Kullanıcı bilgileri
+     * @return array
      */
     private function getUserInfo(): array
     {
@@ -169,10 +161,8 @@ class AccessLoggerListener implements EventSubscriberInterface
     }
 
     /**
-     * Query parametrelerinden hassas bilgileri temizler
-     *
-     * @param array $queryParams Query parametreleri
-     * @return array Temizlenmiş query parametreleri
+     * @param array $queryParams
+     * @return array
      */
     private function sanitizeQueryParams(array $queryParams): array
     {
@@ -188,11 +178,9 @@ class AccessLoggerListener implements EventSubscriberInterface
     }
 
     /**
-     * String içinde hassas veri içeren anahtar kelime kontrolü
-     *
-     * @param string $key Kontrol edilecek anahtar
-     * @param array $sensitiveWords Hassas kelimeler listesi
-     * @return bool Hassas veri içeriyor mu
+     * @param string $key
+     * @param array $sensitiveWords
+     * @return bool
      */
     private function containsSensitiveData(string $key, array $sensitiveWords): bool
     {
