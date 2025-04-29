@@ -20,7 +20,7 @@ class CiceksepetiListingHandler
         $data = $this->getListingInfoJson($message);
         $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $promt = <<<EOD
+        $prompt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             **Çıkış formatı**:  
             Sadece aşağıdaki gibi bir JSON döndür:
@@ -75,7 +75,7 @@ class CiceksepetiListingHandler
             İşte veri: $jsonString
             Kategori Verisi: $categories
         EOD;
-        $result = $this->getGeminiApi($promt);
+        $result = $this->getGeminiApi($prompt);
         print_r($result);
         $text = $result['candidates'][0]['content']['parts'][0]['text'];
         $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
