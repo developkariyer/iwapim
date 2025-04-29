@@ -76,7 +76,7 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
         $result = $this->getGeminiApi($promt);
-        print_r($result);
+        //print_r($result);
         $text = $result['candidates'][0]['content']['parts'][0]['text'];
         $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
         $text = str_replace(['```json', '```'], '', $text);
@@ -111,7 +111,8 @@ class CiceksepetiListingHandler
     {
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
-            $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
+            echo "Category ID: $categoryId\n";
+            /*$attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult['attribute_id'];
             $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
@@ -143,9 +144,9 @@ class CiceksepetiListingHandler
                     'ValueId' => $attributeSizeValueSqlResult['attribute_value_id']
                 ];
             }
-            $product['Attributes'] = $attributes;
+            $product['Attributes'] = $attributes;*/
         }
-        print_r($data);
+        //print_r($data);
 
     }
 
