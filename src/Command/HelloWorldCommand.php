@@ -56,8 +56,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        echo Utility::convertCurrency(50, "TRY", "TRY",  date('Y-m-d')) . "\n" ;
-        /*$productId = 238133;
+        $productId = 238133;
         $variantIds = [240430, 240431];
 
         $ciceksepetiMessage = new ProductListingMessage(
@@ -72,7 +71,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
 
 
