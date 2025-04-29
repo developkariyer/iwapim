@@ -468,7 +468,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function createListing($data)
     {
-        $response = $this->httpClient->request('POST', static::$apiUrl['Products'], ['body' => $data]);
+        $response = $this->httpClient->request('POST', static::$apiUrl['offers'], ['body' => $data]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";

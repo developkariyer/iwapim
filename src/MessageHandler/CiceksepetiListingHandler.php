@@ -26,6 +26,7 @@ class CiceksepetiListingHandler
     {
         $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
+        echo "pim getting listing info \n";
         $messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($jsonString, $categories),
@@ -40,14 +41,20 @@ class CiceksepetiListingHandler
     private function processListingData($jsonString, $categories)
     {
         $prompt = $this->generateListingPrompt($jsonString, $categories);
+        echo "created prompt\n";
         $result = GeminiConnector::chat($prompt);
+        echo "gemini connector result\n";
         $text = $this->parseResponse($result);
         $data = $this->validateJson($text);
+        echo "parsed and validating response \n";
 
         $data = $this->fillAttributeData($data);
+        echo "filled attributes \n";
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        echo "formatted data\n";
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->createListing($formattedData);
+        echo "created connector listing api \n";
 
 
         //return $data;
