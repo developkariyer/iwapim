@@ -75,7 +75,7 @@ class CiceksepetiListingHandler
                 'stockCode' => $product['stockCode'],
                 'categoryId' => $product['categoryId'],
                 'description' => $product['description'],
-                'deliveryMessageType' => 7,
+                'deliveryMessageType' => 18,
                 'deliveryType' => 2,
                 'stockQuantity' => 5,
                 'salesPrice' => (float) $product['price'],
