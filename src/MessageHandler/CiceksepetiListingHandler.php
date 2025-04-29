@@ -44,8 +44,33 @@ class CiceksepetiListingHandler
         $text = $this->parseResponse($result);
         $data = $this->validateJson($text);
 
-        $this->checkData($data);
+        $data = $this->fillAttributeData($data);
+        $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+
         //return $data;
+    }
+
+    private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
+    {
+        $formattedData = [];
+
+        foreach ($data as $sku => $product) {
+
+            $formattedData['products'][] = [
+                'productName' => $product['productName'],
+                'mainProductCode' => $product['mainProductCode'],
+                'stockCode' => $product['stockCode'],
+                'categoryId' => $product['categoryId'],
+                'description' => $product['description'],
+                'deliveryMessageType' => 7,
+                'deliveryType' => 2,
+                'stockQuantity' => 5,
+                'salesPrice' => (float) $product['price'],
+                'images' => array_slice($product['images'] ?? [], 0, 5),
+                'Attributes' => $product['Attributes'],
+            ];
+        }
+        print_r($formattedData);
     }
 
     private function parseResponse($result)
@@ -128,7 +153,7 @@ class CiceksepetiListingHandler
         EOD;
     }
 
-    public function checkData($data)
+    public function fillAttributeData($data)
     {
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
@@ -140,7 +165,6 @@ class CiceksepetiListingHandler
                                                                    (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'];
-
 
             $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
             $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
@@ -168,7 +192,7 @@ class CiceksepetiListingHandler
             }
             $product['Attributes'] = $attributes;
         }
-        print_r($data);
+        return $data;
     }
 
     public function categoryAttributeUpdate($marketplaceId)
