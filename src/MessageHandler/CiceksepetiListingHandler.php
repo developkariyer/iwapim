@@ -148,6 +148,7 @@ class CiceksepetiListingHandler
                 - Cümle yapısına dokunmadan sadece çeviri yap.
                 - Eğer anlam kaybı veya Türkçe anlatım bozukluğu olursa bile düzeltmeye çalışma.
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
+                - Kendin açıklama uydurma.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
             - **salesPrice**: 
