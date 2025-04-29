@@ -11,17 +11,25 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\HttpClient\HttpClient;
+use App\MessageHandler\ListingHelperService;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
 class CiceksepetiListingHandler
 {
+
+    public function __construct(ListingHelperService $listingHelperService)
+    {
+        $this->listingHelper = $listingHelperService;
+    }
+
     public function __invoke(ProductListingMessage $message)
     {
         //$this->categoryAttributeUpdate($message->getMarketplaceId());
-        $data = $this->getListingInfoJson($message);
+        //$data = $this->getListingInfoJson($message);
         $categories = $this->getCiceksepetiCategoriesDetails();
-        $jsonString = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $prompt = <<<EOD
+        $jsonString = $this->listingHelper->getPimListingsInfo($message);
+        print_r($jsonString);
+        /*$prompt = <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             **Çıkış formatı**:  
             Sadece aşağıdaki gibi bir JSON döndür:
@@ -87,7 +95,7 @@ class CiceksepetiListingHandler
         }
         $this->checkData($data);
 
-        echo "Ciceksepeti Mesaj İşlendi (JSON)\n";
+        echo "Ciceksepeti Mesaj İşlendi (JSON)\n";*/
        // echo $jsonOutput . "\n";
     }
 
@@ -187,7 +195,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        return json_encode($data);
+        json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     public function categoryAttributeUpdate($marketplaceId)
