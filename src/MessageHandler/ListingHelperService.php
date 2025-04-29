@@ -40,22 +40,23 @@ class ListingHelperService
                         $title = $listingItem->getTitle();
                         $salePrice = $listingItem->getSalePrice();
                         $currency = $listingItem->getSaleCurrency();
-                        $marketplaceType = $listingItem->getMarketplace()->getKey();
+                        $marketplaceKey = $listingItem->getMarketplace()->getKey();
+                        $marketplaceType = $listingItem->getMarketplaceType();
                         $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
 
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['title'] = $title;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['salePrice'] = $salePrice;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['currency'] = $currency;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['apiJson'] = $apiJson;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['parentApiJson'] = $parentApiJson;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['title'] = $title;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['salePrice'] = $salePrice;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['currency'] = $currency;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['apiJson'] = $apiJson;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['parentApiJson'] = $parentApiJson;
 
                         $imageGallery = $listingItem->getImageGallery();
                         foreach ($imageGallery as $hotspotImage) {
                             $image = $hotspotImage->getImage();
                             $imageUrl = $image->getFullPath();
                             $host = \Pimcore\Tool::getHostUrl();
-                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceType]['images'][] = $host . $imageUrl ;
+                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['images'][] = $host . $imageUrl ;
                         }
                     }
                 }
