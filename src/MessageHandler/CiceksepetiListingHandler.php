@@ -45,7 +45,10 @@ class CiceksepetiListingHandler
         $data = $this->validateJson($text);
 
         $data = $this->fillAttributeData($data);
-        $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $ciceksepetiConnector->createListing($formattedData);
+
 
         //return $data;
     }
@@ -55,6 +58,9 @@ class CiceksepetiListingHandler
         $formattedData = [];
 
         foreach ($data as $sku => $product) {
+            $httpsImages = array_map(function($image) {
+                return preg_replace('/^http:/', 'https:', $image);
+            }, $product['images'] ?? []);
 
             $formattedData['products'][] = [
                 'productName' => $product['productName'],
@@ -66,11 +72,11 @@ class CiceksepetiListingHandler
                 'deliveryType' => 2,
                 'stockQuantity' => 5,
                 'salesPrice' => (float) $product['price'],
-                'images' => array_slice($product['images'] ?? [], 0, 5),
+                'images' => array_slice($httpsImages, 0, 5),
                 'Attributes' => $product['Attributes'],
             ];
         }
-        print_r($formattedData);
+        return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     private function parseResponse($result)

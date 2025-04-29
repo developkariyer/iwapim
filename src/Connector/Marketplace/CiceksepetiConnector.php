@@ -33,7 +33,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function __construct($marketplace)
     {
         parent::__construct($marketplace);
-        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://apis.ciceksepeti.com/api/v1/', [
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://sandbox-apis.ciceksepeti.com/api/v1/', [
             'headers' => [
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey(),
                 'Content-Type' => 'application/json'
@@ -466,7 +466,23 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->putToCache($filename, ['requeest'=>$body, 'response'=>$combinedData]);
     }
 
-    public function updateProduct(VariantProduct $listing, string $sku)
+    public function createListing($data)
+    {
+        $response = $this->httpClient->request('POST', static::$apiUrl['Products'], ['body' => $data]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+        }
+        echo $response->getContent() . "\n";
+        $data = $response->toArray();
+        $combinedData = [
+            'inventory' => $data,
+            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+        ];
+        print_r($combinedData);
+    }
+
+    /*public function updateProduct(VariantProduct $listing, string $sku)
     {
         if (!$listing instanceof VariantProduct) {
             echo "Listing is not a VariantProduct\n";
@@ -543,7 +559,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $date = date('Y-m-d-H-i-s');
         $filename = "{$stockCode}-$date.json";  
         Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/UpdateSku', json_encode($response));
-    }
+    }*/
 
     /**
      * @throws TransportExceptionInterface
