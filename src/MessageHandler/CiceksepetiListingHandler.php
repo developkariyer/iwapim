@@ -112,7 +112,11 @@ class CiceksepetiListingHandler
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
-            - **salesPrice**: Öncelikle currency fieldına bak eğer TRY, TL cinsinden değilse bunu TL ye çevir fiyat salePrice fieldında yer alır. Eğer TL ise direk kullan sadece değeri getir. TL çevirmeden getirme çeviremez isen null yaz
+            - **salesPrice**: 
+                 "currency" alanına bak.
+               - Eğer para birimi TRY/TL değilse, "salePrice" değerini TL'ye çevir. Döviz kuru bilgisine sahipsen kullan.
+               - Eğer para birimi zaten TRY veya TL ise, olduğu gibi kullan.
+
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
             -**renk**: renk bilgisi verideki sku altında color fieldı Türkçe ye çevir
