@@ -42,14 +42,15 @@ class ListingHelperService
                         $currency = $listingItem->getSaleCurrency();
                         $marketplaceKey = $listingItem->getMarketplace()->getKey();
                         $marketplaceType = $listingItem->getMarketplaceType();
-                        $apiJson = json_decode($listingItem->jsonRead('apiResponseJson'), true);
                         $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
 
+                        $shopifyExtraData = $this->extractJson($marketplaceType, $parentApiJson);
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['title'] = $title;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['salePrice'] = $salePrice;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['currency'] = $currency;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['apiJson'] = $apiJson;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['parentApiJson'] = $parentApiJson;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['description'] = $shopifyExtraData['description'] ?? '';
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['seo'] = $shopifyExtraData['seo'] ?? '';
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['tags'] = $shopifyExtraData['tags'] ?? [];
 
                         $imageGallery = $listingItem->getImageGallery();
                         foreach ($imageGallery as $hotspotImage) {
@@ -63,6 +64,18 @@ class ListingHelperService
             }
         }
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function extractJson($marketplaceType, $parentApiJson)
+    {
+        return match ($marketplaceType) {
+            'Shopify' => [
+                'description' => $parentApiJson['descriptionHtml'] ?? '',
+                'seo' => $parentApiJson['seo']['description'] ?? '',
+                'tags' => $parentApiJson['tags'] ?? '',
+            ],
+            default => []
+        };
     }
 
 }
