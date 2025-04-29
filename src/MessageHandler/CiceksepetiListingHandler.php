@@ -2,6 +2,7 @@
 namespace App\MessageHandler;
 
 
+use App\Connector\Gemini\GeminiConnector;
 use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Message\ProductListingMessage;
 use App\Model\DataObject\Marketplace;
@@ -75,7 +76,7 @@ class CiceksepetiListingHandler
             İşte veri: $jsonString
             Kategori Verisi: $categories
         EOD;
-        $result = $this->getGeminiApi($prompt);
+        $result = GeminiConnector::chat($prompt);
         $text = $result['candidates'][0]['content']['parts'][0]['text'];
         $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
         $text = str_replace(['```json', '```'], '', $text);
@@ -94,16 +95,15 @@ class CiceksepetiListingHandler
     {
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
-            echo "Category ID: $categoryId\n";
             $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult[0]['attribute_id'];
-            echo "Attribute Color ID: $attributeColorId\n";
+
             $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
                                                                    (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'];
-            echo "Attribute Size ID: $attributeSizeId\n";
+
 
             $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
             $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
@@ -133,35 +133,6 @@ class CiceksepetiListingHandler
         }
         print_r($data);
 
-    }
-
-
-    public function getGeminiApi(string $message): ?array
-    {
-        $geminiApiKey = $_ENV['GEMINI_API_KEY'];
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=" . $geminiApiKey;
-
-        $httpClient = HttpClient::create();
-        echo "Gemini istek gonderildi.\n";
-        $response = $httpClient->request('POST', $url, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $message]
-                        ]
-                    ]
-                ]
-            ],
-        ]);
-        echo "Gemini yanit alindi\n";
-        if ($response->getStatusCode() === 200) {
-            return $response->toArray();
-        }
-        return null;
     }
 
     public function getListingInfoJson($message)
