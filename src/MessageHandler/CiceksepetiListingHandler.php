@@ -120,7 +120,7 @@ class CiceksepetiListingHandler
                                                                    (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult['attribute_id'];
-            echo "Attribute Size ID: $attributeSizeId\n";
+            echo "Attribute Size ID: $attributeSizeSqlResult\n";
 
             $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
             $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
