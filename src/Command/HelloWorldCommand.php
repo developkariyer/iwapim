@@ -56,27 +56,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $geminiApiKey = $_ENV['GEMINI_API_KEY'];
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=" . $geminiApiKey;
-
-        $httpClient = HttpClient::create();
-        echo "Gemini istek gonderildi.\n";
-        $response = $httpClient->request('POST', $url, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => 'ciceksepeti pazaryeri bilgisi ver']
-                        ]
-                    ]
-                ]
-            ],
-        ]);
-        print_r($response->getContent());
-        /*$productId = 238133;
+        $productId = 238133;
         $variantIds = [240430, 240431];
 
         $ciceksepetiMessage = new ProductListingMessage(
@@ -91,7 +71,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
 
 

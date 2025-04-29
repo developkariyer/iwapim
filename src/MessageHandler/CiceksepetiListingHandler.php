@@ -156,7 +156,7 @@ class CiceksepetiListingHandler
     public function getGeminiApi(string $message): ?array
     {
         $geminiApiKey = $_ENV['GEMINI_API_KEY'];
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $geminiApiKey;
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=" . $geminiApiKey;
 
         $httpClient = HttpClient::create();
         echo "Gemini istek gonderildi.\n";
