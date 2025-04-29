@@ -68,7 +68,7 @@ class CiceksepetiListingHandler
             - **salesPrice**: Fiyat, örnek listingleri kullanarak TL cinsinden belirlenecek. Eğer TL cinsinden fiyat varsa, doğrudan bu fiyat kullanılacak. Eğer farklı bir para biriminden (örneğin USD) varsa, TL'ye dönüştürülüp kullanılacak. Ayrıca, **size** bilgisi varsa fiyat büyüklüğüne göre artış gösterebilir. Sadece değeri yaz.
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
-            -**renk**: renk bilgisi verideki sku altında color fieldı türkçe ye çevir
+            -**renk**: renk bilgisi verideki sku altında color fieldı Türkçe ye çevir
             -**ebat**: ebat bilgisi verideki sku altında size fieldı
             
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
@@ -112,13 +112,15 @@ class CiceksepetiListingHandler
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
             echo "Category ID: $categoryId\n";
-            /*$attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
+            $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult['attribute_id'];
+            echo "Attribute Color ID: $attributeColorId\n";
             $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
-                                                                   (attribute_name= 'Ebat' or attribute_name= 'Boyut' ) limit 1";
+                                                                   (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult['attribute_id'];
+            echo "Attribute Size ID: $attributeSizeId\n";
 
             $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
             $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
@@ -144,9 +146,9 @@ class CiceksepetiListingHandler
                     'ValueId' => $attributeSizeValueSqlResult['attribute_value_id']
                 ];
             }
-            $product['Attributes'] = $attributes;*/
+            $product['Attributes'] = $attributes;
         }
-        //print_r($data);
+        print_r($data);
 
     }
 
