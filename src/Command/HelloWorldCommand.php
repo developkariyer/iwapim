@@ -56,11 +56,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
-                                                                   (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
-        $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => 16001]);
-        print_r($attributeSizeSqlResult[0]['attribute_id']);
-        /*$productId = 238133;
+        $productId = 238133;
         $variantIds = [240430, 240431];
 
         $ciceksepetiMessage = new ProductListingMessage(
@@ -75,7 +71,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
 
 

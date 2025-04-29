@@ -76,7 +76,6 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
         $result = $this->getGeminiApi($prompt);
-        print_r($result);
         $text = $result['candidates'][0]['content']['parts'][0]['text'];
         $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
         $text = str_replace(['```json', '```'], '', $text);
@@ -87,22 +86,6 @@ class CiceksepetiListingHandler
         }
         $this->checkData($data);
 
-
-
-        /*$messageData = [
-            'traceId' => $message->getTraceId(),
-            'actionType' => $message->getActionType(),
-            'productId' => $message->getProductId(),
-            'marketplaceId' => $message->getMarketplaceId(),
-            'userId' => $message->getUserName(),
-            'variantIds' => $message->getVariantIds(),
-            'payload' => $message->getPayload(),
-            'priority' => $message->getPriority(),
-            'targetAccountKey' => $message->getTargetAccountKey(),
-            'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ISO8601),
-        ];
-
-        $jsonOutput = json_encode($messageData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
         echo "Ciceksepeti Mesaj İşlendi (JSON)\n";
        // echo $jsonOutput . "\n";
     }
@@ -114,12 +97,12 @@ class CiceksepetiListingHandler
             echo "Category ID: $categoryId\n";
             $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
-            $attributeColorId = $attributeColorSqlResult['attribute_id'];
+            $attributeColorId = $attributeColorSqlResult[0]['attribute_id'];
             echo "Attribute Color ID: $attributeColorId\n";
             $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
                                                                    (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
-            $attributeSizeId = $attributeSizeSqlResult['attribute_id'];
+            $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'];
             echo "Attribute Size ID: $attributeSizeId\n";
 
             $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
@@ -136,14 +119,14 @@ class CiceksepetiListingHandler
             if ($attributeColorValueSqlResult) {
                 $attributes[] = [
                     'id' => $attributeColorId,
-                    'ValueId' => $attributeColorValueSqlResult['attribute_value_id']
+                    'ValueId' => $attributeColorValueSqlResult[0]['attribute_value_id']
                 ];
             }
 
             if ($attributeSizeValueSqlResult) {
                 $attributes[] = [
                     'id' => $attributeSizeId,
-                    'ValueId' => $attributeSizeValueSqlResult['attribute_value_id']
+                    'ValueId' => $attributeSizeValueSqlResult[0]['attribute_value_id']
                 ];
             }
             $product['Attributes'] = $attributes;
@@ -174,8 +157,6 @@ class CiceksepetiListingHandler
                 ]
             ],
         ]);
-        print_r($response->getContent());
-        echo $response->getStatusCode() . "\n";
         echo "Gemini yanit alindi\n";
         if ($response->getStatusCode() === 200) {
             return $response->toArray();
