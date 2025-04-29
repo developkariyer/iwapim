@@ -6,6 +6,7 @@ use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use App\Message\ProductListingMessage;
+use App\Utils\Utility;
 
 class ListingHelperService
 {
@@ -42,10 +43,11 @@ class ListingHelperService
                         $currency = $listingItem->getSaleCurrency();
                         $marketplaceKey = $listingItem->getMarketplace()->getKey();
                         $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
+                        $convertedPrice = $this->convertPrice($marketplaceName, $currency ,$salePrice);
 
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['title'] = $title;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['salePrice'] = $salePrice;
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['currency'] = $currency;
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['salePrice'] = $convertedPrice;
+                        //$data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['currency'] = $currency;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['description'] = $parentApiJson['descriptionHtml'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['seo'] = $parentApiJson['seo']['description'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['tags'] = $parentApiJson['tags'] ?? '';
@@ -62,6 +64,24 @@ class ListingHelperService
             }
         }
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function convertPrice($marketplaceName, $currency, $salePrice)
+    {
+        return match ($marketplaceName) {
+            'Ciceksepeti' => $this->getCiceksepetiAmount($currency, $salePrice, "TRY")
+        };
+    }
+
+    private function getCiceksepetiAmount($currency, $salePrice, $toCurrency)
+    {
+        if ($salePrice <= 0 ) {
+            return;
+        }
+
+        if ($currency == "US DOLLAR" || $currency == "USD") {
+            return Utility::convertCurrency($salePrice, $currency, $toCurrency, date('Y-m-d'));
+        }
     }
 
 }
