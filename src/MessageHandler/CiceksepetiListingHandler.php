@@ -24,12 +24,50 @@ class CiceksepetiListingHandler
 
     public function __invoke(ProductListingMessage $message)
     {
-        //$this->categoryAttributeUpdate($message->getMarketplaceId());
-        //$data = $this->getListingInfoJson($message);
         $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        print_r($jsonString);
-        /*$prompt = <<<EOD
+        $messageType = $message->getActionType();
+        match ($messageType) {
+            'list' => $this->processListingData($jsonString, $categories),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+        };
+
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function processListingData($jsonString, $categories)
+    {
+        $prompt = $this->generateListingPrompt($jsonString, $categories);
+        $result = GeminiConnector::chat($prompt);
+        $text = $this->parseResponse($result);
+        $data = $this->validateJson($text);
+
+        $this->checkData($data);
+        //return $data;
+    }
+
+    private function parseResponse($result)
+    {
+        $text = $result['candidates'][0]['content']['parts'][0]['text'];
+        $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
+        $text = str_replace(['```json', '```'], '', $text);
+        return $text;
+    }
+
+    private function validateJson($text)
+    {
+        $data = json_decode($text, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('JSON parsing error: ' . json_last_error_msg());
+        }
+        return $data;
+    }
+
+    private function generateListingPrompt($jsonString, $categories)
+    {
+        return <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
             **Çıkış formatı**:  
             Sadece aşağıdaki gibi bir JSON döndür:
@@ -84,19 +122,6 @@ class CiceksepetiListingHandler
             İşte veri: $jsonString
             Kategori Verisi: $categories
         EOD;
-        $result = GeminiConnector::chat($prompt);
-        $text = $result['candidates'][0]['content']['parts'][0]['text'];
-        $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
-        $text = str_replace(['```json', '```'], '', $text);
-        $data = json_decode($text, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('JSON parsing hatası: ' . json_last_error_msg());
-        }
-        $this->checkData($data);
-
-        echo "Ciceksepeti Mesaj İşlendi (JSON)\n";*/
-       // echo $jsonOutput . "\n";
     }
 
     public function checkData($data)
@@ -140,7 +165,6 @@ class CiceksepetiListingHandler
             $product['Attributes'] = $attributes;
         }
         print_r($data);
-
     }
 
     public function categoryAttributeUpdate($marketplaceId)
