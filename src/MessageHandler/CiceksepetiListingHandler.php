@@ -157,60 +157,6 @@ class CiceksepetiListingHandler
         echo "Ciceksepeti Category Attributes Updated\n";
     }
 
-    public function categoryAttributeInfo()
-    {
-        $categoryAttributeSql = "
-            SELECT category_id, attribute_name, attribute_id 
-            FROM iwa_ciceksepeti_category_attributes 
-            WHERE category_id = :categoryId 
-            AND type = 'Variant Özelliği'
-        ";
-
-        $categoryAttributeValueSql = "
-            SELECT attribute_value_id, attribute_id, name 
-            FROM iwa_ciceksepeti_category_attributes_values 
-            WHERE attribute_id = :attributeId
-        ";
-        $categoryInfo = [];
-        $attributesGlobal = [];
-        $attributeValuesGlobal = [];
-
-        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-
-        foreach ($categoryIdList as $categoryId) {
-            $attributes = Utility::fetchFromSql($categoryAttributeSql, ['categoryId' => $categoryId]);
-
-            $categoryInfo[$categoryId] = [
-                'category_id' => $categoryId,
-                'attribute_ids' => [],
-            ];
-
-            foreach ($attributes as $attribute) {
-                $attributeId = $attribute['attribute_id'];
-
-                if (!isset($attributesGlobal[$attributeId])) {
-                    $attributesGlobal[$attributeId] = [
-                        'attribute_id' => $attributeId,
-                        'attribute_name' => $attribute['attribute_name'],
-                    ];
-
-                    $attributeValues = Utility::fetchFromSql($categoryAttributeValueSql, ['attributeId' => $attributeId]);
-                    $attributeValuesGlobal[$attributeId] = $attributeValues;
-                }
-
-                $categoryInfo[$categoryId]['attribute_ids'][] = $attributeId;
-            }
-        }
-
-        $finalResult = [
-            'categories' => array_values($categoryInfo),
-            'attributes' => array_values($attributesGlobal),
-            'attribute_values' => $attributeValuesGlobal
-        ];
-
-        return json_encode($finalResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    }
-
     public function getCiceksepetiListingCategoriesIdList(): array
     {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
