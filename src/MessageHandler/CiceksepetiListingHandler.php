@@ -174,6 +174,8 @@ class CiceksepetiListingHandler
                 ]
             ],
         ]);
+        print_r($response->getContent());
+        echo $response->getStatusCode() . "\n";
         echo "Gemini yanit alindi\n";
         if ($response->getStatusCode() === 200) {
             return $response->toArray();
