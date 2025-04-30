@@ -10,7 +10,7 @@ class GeminiConnector
 
     //gemini-2.0-flash
     //gemini-2.5-flash-preview-04-17
-    public static function chat($message, $model='gemini-2.0-flash')
+    public static function chat($message, $model='gemini-2.5-flash-preview-04-17')
     {
         try {
             $geminiApiKey = $_ENV['GEMINI_API_KEY'];
