@@ -34,45 +34,37 @@ class GeminiConnector
             $response = $httpClient->request('POST', $url, [
                 'headers' => ['Content-Type' => 'application/json'],
                 'json' => [
-                    'contents' => [[
-                        'parts' => [['text' => $message]]
-                    ]],
+                    'contents' => [[ 'parts' => [['text' => $message]]]],
                     'generationConfig' => [
-                        'responseMimeType' => 'application/json',
+                        'responseMimeType' => 'application/json',   
                         'temperature'      => 0.0,
-
                         'responseSchema'   => [
-                            'type'            => 'object',
-                            'properties'      => [
-                            ],
-                            'patternProperties'=> [
-                                '^[A-Za-z0-9_-]+$' => [
-                                    'type'       => 'object',
-                                    'properties' => [
-                                        'productName'     => ['type'=>'string','nullable'=>false],
-                                        'mainProductCode' => ['type'=>'string','nullable'=>false],
-                                        'stockCode'       => ['type'=>'string','nullable'=>false],
-                                        'description'     => ['type'=>'string','nullable'=>true],
-                                        'images'          => [
-                                            'type'=>'array',
-                                            'minItems'=>0,
-                                            'maxItems'=>5,
-                                            'items'=>['type'=>'string','pattern'=>'^https?://'],
-                                            'nullable'=>false
-                                        ],
-                                        'salesPrice'      => ['type'=>'number','nullable'=>false],
-                                        'categoryId'      => ['type'=>'integer','nullable'=>false],
-                                        'renk'            => ['type'=>'string','nullable'=>true],
-                                        'ebat'            => ['type'=>'string','nullable'=>true],
+                            'type'  => 'ARRAY',
+                            'items' => [
+                                'type'       => 'OBJECT',
+                                'properties' => [
+                                    'productName'     => ['type'=>'STRING'],
+                                    'mainProductCode' => ['type'=>'STRING'],
+                                    'stockCode'       => ['type'=>'STRING'],
+                                    'description'     => ['type'=>'STRING'],
+                                    'images'          => [
+                                        'type'     => 'ARRAY',
+                                        'minItems' => 0,
+                                        'maxItems' => 5,
+                                        'items'    => ['type'=>'STRING']
                                     ],
-                                    'required'=>[
-                                        'productName','mainProductCode','stockCode',
-                                        'description','images','salesPrice','categoryId','renk','ebat'
-                                    ]
+                                    'salesPrice'      => ['type'=>'NUMBER'],
+                                    'categoryId'      => ['type'=>'INTEGER'],
+                                    'renk'            => ['type'=>'STRING'],
+                                    'ebat'            => ['type'=>'STRING'],
+                                ],
+                                'required'=>[
+                                    'productName','mainProductCode','stockCode',
+                                    'description','images','salesPrice','categoryId','renk','ebat'
                                 ]
                             ]
-                        ],
-                    ],
+                        ]
+                    ]
                 ],
             ]);
 
