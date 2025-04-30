@@ -63,7 +63,7 @@ class HelloWorldCommand extends AbstractCommand
 
         // CA-41
         $productId = 154770;
-        $variantIds = [155464, 155434];
+        $variantIds = [155464, 155462, 155468, 155466, 155434, 155432, 155437, 155435];
 
         $ciceksepetiMessage = new ProductListingMessage(
             'list',
