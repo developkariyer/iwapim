@@ -44,6 +44,7 @@ class CiceksepetiListingHandler
         $prompt = $this->generateListingPrompt($jsonString, $categories);
         echo "created prompt\n";
         $result = GeminiConnector::chat($prompt);
+        print_r($result);
         echo "gemini connector result\n";
         $data = $this->parseAndValidateResponse($result);
         echo "parsed and validating response \n";
