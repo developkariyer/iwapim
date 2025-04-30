@@ -51,9 +51,9 @@ class CiceksepetiListingHandler
         $data = $this->fillAttributeData($data);
         echo "filled attributes \n";
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        echo "formatted data\n";
         print_r($formattedData);
-       /* echo "formatted data\n";
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->createListing($formattedData);
         echo "created connector listing api \n";*/
 
@@ -67,28 +67,7 @@ class CiceksepetiListingHandler
 
         foreach ($data as $sku => $product) {
             $httpsImages = array_map(function($image) {
-                $image = preg_replace('/^http:/', 'https:', $image);
-                $image = str_replace(' ', '%20', $image);
-                $imageContent = file_get_contents($image);
-                if ($imageContent === false) {
-                    return $image;
-                }
-
-                $tempFile = tempnam(sys_get_temp_dir(), 'image_');
-                file_put_contents($tempFile, $imageContent);
-
-                $imageSize = getimagesize($tempFile);
-                if ($imageSize) {
-                    $newWidth = 1300;
-                    $newHeight = 1430;
-
-                    $resizedImagePath = $this->resizeImage($tempFile, $newWidth, $newHeight);
-                    $newImageUrl = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/Resized' . basename($resizedImagePath);
-                } else {
-                    $newImageUrl = $image;
-                }
-                unlink($tempFile);
-                return $newImageUrl;
+                return preg_replace('/^http:/', 'https:', $image);
             }, $product['images'] ?? []);
 
             $formattedData['products'][] = [
@@ -99,53 +78,13 @@ class CiceksepetiListingHandler
                 'description' => $product['description'],
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
-                'stockQuantity' => 10,
-                'salesPrice' => 10000.0,
+                'stockQuantity' => 0,
+                'salesPrice' => 3000.0,
                 'images' => array_slice($httpsImages, 0, 5),
                 'Attributes' => $product['Attributes'],
             ];
         }
         return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    }
-
-    function resizeImage($imagePath, $width, $height) {
-        $imageType = exif_imagetype($imagePath);
-
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                $sourceImage = imagecreatefromjpeg($imagePath);
-                break;
-            case IMAGETYPE_PNG:
-                $sourceImage = imagecreatefrompng($imagePath);
-                break;
-            case IMAGETYPE_GIF:
-                $sourceImage = imagecreatefromgif($imagePath);
-                break;
-            default:
-                return $imagePath;
-        }
-
-        $resizedImage = imagecreatetruecolor($width, $height);
-
-        imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $width, $height, imagesx($sourceImage), imagesy($sourceImage));
-
-        $newImagePath = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/Resized' . uniqid() . '.jpg';
-
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $newImagePath);
-                break;
-            case IMAGETYPE_PNG:
-                imagepng($resizedImage, $newImagePath);
-                break;
-            case IMAGETYPE_GIF:
-                imagegif($resizedImage, $newImagePath);
-                break;
-        }
-
-        imagedestroy($sourceImage);
-        imagedestroy($resizedImage);
-        return $newImagePath;
     }
 
     private function parseResponse($result)
