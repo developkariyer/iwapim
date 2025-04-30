@@ -44,10 +44,10 @@ class CiceksepetiListingHandler
         echo "created prompt\n";
         $result = GeminiConnector::chat($prompt);
         echo "gemini connector result\n";
-        print_r($result);
-        //$text = $this->parseResponse($result);
-        //$data = $this->validateJson($text);
-        //echo "parsed and validating response \n";
+        //$text = $this->parseAndValidateResponse($result);
+        $data = $this->parseAndValidateResponse($result);
+        echo "parsed and validating response \n";
+        print_r($data);
 
 
         /*$data = $this->fillAttributeData($data);
@@ -89,21 +89,12 @@ class CiceksepetiListingHandler
         return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
-    private function parseResponse($result)
+    private function parseAndValidateResponse($result)
     {
-        $text = $result['candidates'][0]['content']['parts'][0]['text'];
-        $text = preg_replace('/[\x00-\x1F\x7F]/', '', $text);
-        $text = str_replace(['```json', '```'], '', $text);
-        return $text;
-    }
-
-    private function validateJson($text)
-    {
-        $data = json_decode($text, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('JSON parsing error: ' . json_last_error_msg());
-        }
-        return $data;
+        $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $json = preg_replace('/[\x00-\x1F\x7F]/u', '', $json);
+        $data = json_decode($json, true);
+        return (json_last_error() === JSON_ERROR_NONE) ? $data : null;
     }
 
     private function generateListingPrompt($jsonString, $categories)

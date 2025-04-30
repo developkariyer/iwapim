@@ -16,21 +16,6 @@ class GeminiConnector
             $geminiApiKey = $_ENV['GEMINI_API_KEY'];
             $httpClient = HttpClient::create();
             $url = "https://generativelanguage.googleapis.com/v1beta/models/" . $model . ":generateContent?key=" . $geminiApiKey;
-            /*$response = $httpClient->request('POST', $url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $message]
-                            ]
-                        ]
-                    ]
-                ],
-            ]);*/
-
             $response = $httpClient->request('POST', $url, [
                 'headers' => ['Content-Type' => 'application/json'],
                 'json' => [
@@ -72,8 +57,6 @@ class GeminiConnector
                     ]
                 ],
             ]);
-
-
 
             if ($response->getStatusCode() === 200) {
                 return $response->toArray();
