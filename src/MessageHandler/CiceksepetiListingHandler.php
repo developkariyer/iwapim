@@ -46,6 +46,7 @@ class CiceksepetiListingHandler
         echo "gemini connector result\n";
         $data = $this->parseAndValidateResponse($result);
         echo "parsed and validating response \n";
+        print_r($data);
 
         $data = $this->fillAttributeData($data);
         echo "filled attributes \n";
