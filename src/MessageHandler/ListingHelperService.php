@@ -37,6 +37,9 @@ class ListingHelperService
                 $listingItems = $variantProduct->getListingItems();
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
+                        $listingMarketplaceType = $listingItem->getMarketplace()->getMarketplaceType();
+                        if ($listingMarketplaceType != "Shopify")
+                            continue;
                         $title = $listingItem->getTitle();
                         $salePrice = $listingItem->getSalePrice();
                         $currency = $listingItem->getSaleCurrency();
