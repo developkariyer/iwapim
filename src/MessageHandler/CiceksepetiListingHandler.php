@@ -26,12 +26,13 @@ class CiceksepetiListingHandler
     {
         $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        echo "pim getting listing info \n";
+        print_r($jsonString);
+        /*echo "pim getting listing info \n";
         $messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        };*/
 
     }
 

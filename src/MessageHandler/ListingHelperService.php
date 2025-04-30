@@ -55,7 +55,11 @@ class ListingHelperService
                             $image = $hotspotImage->getImage();
                             $imageUrl = $image->getFullPath();
                             $host = \Pimcore\Tool::getHostUrl();
-                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['images'][] = $host . $imageUrl ;
+                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['images'][] = [
+                                'url' => $host . $imageUrl,
+                                'width' => $image->getWidth(),
+                                'height' => $image->getHeight(),
+                            ];
                         }
                     }
                 }
