@@ -44,15 +44,17 @@ class CiceksepetiListingHandler
         echo "created prompt\n";
         $result = GeminiConnector::chat($prompt);
         echo "gemini connector result\n";
-        $text = $this->parseResponse($result);
-        $data = $this->validateJson($text);
-        echo "parsed and validating response \n";
+        print_r($result);
+        //$text = $this->parseResponse($result);
+        //$data = $this->validateJson($text);
+        //echo "parsed and validating response \n";
 
-        $data = $this->fillAttributeData($data);
+
+        /*$data = $this->fillAttributeData($data);
         echo "filled attributes \n";
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        echo "formatted data\n";
-        print_r($formattedData);
+        echo "formatted data\n";*/
+
         /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->createListing($formattedData);
         echo "created connector listing api \n";*/
