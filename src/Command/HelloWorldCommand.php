@@ -57,7 +57,7 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $productId = 238133;
-        $variantIds = [240430, 240431];
+        $variantIds = [240430, 240431, 240433, 240434, 240436, 240437, 240439, 240440, 240442, 240443];
 
         $ciceksepetiMessage = new ProductListingMessage(
             'list',
