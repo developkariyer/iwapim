@@ -51,10 +51,10 @@ class CiceksepetiListingHandler
         $data = $this->fillAttributeData($data);
         echo "filled attributes \n";
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        echo "formatted data\n";
+       /* echo "formatted data\n";
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->createListing($formattedData);
-        echo "created connector listing api \n";
+        echo "created connector listing api \n";*/
 
 
         //return $data;
