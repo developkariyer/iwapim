@@ -81,7 +81,7 @@ class CiceksepetiListingHandler
                     $newHeight = 1430;
 
                     $resizedImagePath = resizeImage($tempFile, $newWidth, $newHeight);
-                    $newImageUrl = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/' . basename($resizedImagePath);
+                    $newImageUrl = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/Resized' . basename($resizedImagePath);
                 } else {
                     $newImageUrl = $image;
                 }
@@ -127,7 +127,7 @@ class CiceksepetiListingHandler
 
         imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $width, $height, imagesx($sourceImage), imagesy($sourceImage));
 
-        $newImagePath = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/' . uniqid() . '.jpg';
+        $newImagePath = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/Resized' . uniqid() . '.jpg';
 
         switch ($imageType) {
             case IMAGETYPE_JPEG:
