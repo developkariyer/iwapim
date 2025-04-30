@@ -52,10 +52,9 @@ class CiceksepetiListingHandler
         echo "filled attributes \n";
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         echo "formatted data\n";
-        print_r($formattedData);
-        /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->createListing($formattedData);
-        echo "created connector listing api \n";*/
+        echo "created connector listing api \n";
 
 
         //return $data;
@@ -78,8 +77,8 @@ class CiceksepetiListingHandler
                 'description' => $product['description'],
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
-                'stockQuantity' => 0,
-                'salesPrice' => 3000.0,
+                'stockQuantity' => 10,
+                'salesPrice' => 10000.0,
                 'images' => array_slice($httpsImages, 0, 5),
                 'Attributes' => $product['Attributes'],
             ];
