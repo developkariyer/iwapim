@@ -67,7 +67,7 @@ class CiceksepetiListingHandler
 
         foreach ($data as $sku => $product) {
             $httpsImages = array_map(function($image) {
-                $image = preg_replace('/^http:/', 'https:', $image); 
+                $image = preg_replace('/^http:/', 'https:', $image);
                 $image = str_replace(' ', '%20', $image);
                 $imageContent = file_get_contents($image);
                 if ($imageContent === false) {
