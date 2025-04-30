@@ -44,11 +44,9 @@ class CiceksepetiListingHandler
         $prompt = $this->generateListingPrompt($jsonString, $categories);
         echo "created prompt\n";
         $result = GeminiConnector::chat($prompt);
-        print_r($result);
         echo "gemini connector result\n";
         $data = $this->parseAndValidateResponse($result);
         echo "parsed and validating response \n";
-        print_r($data);
 
         $data = $this->fillAttributeData($data);
         echo "filled attributes \n";
@@ -161,7 +159,7 @@ class CiceksepetiListingHandler
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
             -**renk**: renk bilgisi verideki sku altında color fieldı Türkçe ye çevir
-            -**ebat**: ebat bilgisi verideki sku altında size fieldı
+            -**ebat**: ebat bilgisi verideki sku altında size fieldı cm olarak al (örn: 250cm) yanında boyut belirten S-M-XL gibi durum varsa bunu alma.
             
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
