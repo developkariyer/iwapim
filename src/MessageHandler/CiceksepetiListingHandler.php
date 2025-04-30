@@ -26,13 +26,12 @@ class CiceksepetiListingHandler
     {
         $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        print_r($jsonString);
-        /*echo "pim getting listing info \n";
+        echo "pim getting listing info \n";
         $messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };*/
+        };
 
     }
 
@@ -152,8 +151,13 @@ class CiceksepetiListingHandler
                 - Eğer anlam kaybı veya Türkçe anlatım bozukluğu olursa bile düzeltmeye çalışma.
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
-            - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Aynı resimleri ekleme.
-                    Her sku için farklı resim.
+            - **images**: 
+                - Her SKU için en fazla 5 adet olacak şekilde örnek listinglerdeki images altından alınacaktır.s
+                - Resimler dizi (array) formatında verilecektir.
+                - Yalnızca en az 500x500 ve en fazla 2000x2000 piksel boyutlarındaki görseller dahil edilecektir.
+                - Bu boyut aralığı dışında kalan görseller filtrelenecektir.
+                - Her SKU için farklı görseller sağlanmalıdır.
+                                    
             - **salesPrice**: 
                  "currency" alanına bak.
                - Eğer para birimi TRY/TL değilse, "salePrice" değerini TL'ye çevir. Döviz kuru bilgisine sahipsen kullan.
