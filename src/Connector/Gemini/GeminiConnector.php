@@ -43,7 +43,6 @@ class GeminiConnector
                         'stopSequences'    => ["\n\n"],
                         'presencePenalty'  => 0.0,
                         'frequencyPenalty' => 0.0,
-                        'nullOnViolation'  => true,
                         'responseSchema'   => [
                             'type'  => 'ARRAY',
                             'items' => [
