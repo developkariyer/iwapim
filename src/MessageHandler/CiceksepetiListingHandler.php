@@ -152,11 +152,12 @@ class CiceksepetiListingHandler
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: 
-                - Her SKU için en fazla 5 adet olacak şekilde örnek listinglerdeki images altından alınacaktır.s
+                - Her SKU için en fazla 5 adet olacak şekilde, o SKU'ya ait `ListingItems` içindeki `images` listesinden alınacaktır.
+                - Eğer aynı resimler geliyorsa diğerinde kullanma. 5 olmak zorunda değil.
+                - Diğer SKU'larla aynı görseller kullanılmamalıdır; her SKU için kendi görselleri değerlendirilmelidir.
                 - Resimler dizi (array) formatında verilecektir.
-                - Yalnızca en az 500x500 ve en fazla 2000x2000 piksel boyutlarındaki görseller dahil edilecektir.
+                - Yalnızca **en az 500x500** ve **en fazla 2000x2000** piksel boyutlarındaki görseller dahil edilecektir.
                 - Bu boyut aralığı dışında kalan görseller filtrelenecektir.
-                - Her SKU için farklı görseller sağlanmalıdır.
                                     
             - **salesPrice**: 
                  "currency" alanına bak.
