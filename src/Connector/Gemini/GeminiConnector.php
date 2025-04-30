@@ -36,7 +36,7 @@ class GeminiConnector
                 'json' => [
                     'contents' => [[ 'parts' => [['text' => $message]]]],
                     'generationConfig' => [
-                        'responseMimeType' => 'application/json',   
+                        'responseMimeType' => 'application/json',
                         'temperature'      => 0.0,
                         'responseSchema'   => [
                             'type'  => 'ARRAY',
