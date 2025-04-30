@@ -27,6 +27,7 @@ class CiceksepetiListingHandler
         $categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
+        print_r($jsonString);
         $messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($jsonString, $categories),
