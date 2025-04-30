@@ -38,6 +38,12 @@ class GeminiConnector
                     'generationConfig' => [
                         'responseMimeType' => 'application/json',
                         'temperature'      => 0.0,
+                        'topP'             => 1.0,
+                        'candidateCount'   => 1,
+                        'stopSequences'    => ["\n\n"],
+                        'presencePenalty'  => 0.0,
+                        'frequencyPenalty' => 0.0,
+                        'nullOnViolation'  => true,
                         'responseSchema'   => [
                             'type'  => 'ARRAY',
                             'items' => [
