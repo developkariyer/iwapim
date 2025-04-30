@@ -52,9 +52,9 @@ class CiceksepetiListingHandler
         echo "filled attributes \n";
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         echo "formatted data\n";
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->createListing($formattedData);
-        echo "created connector listing api \n";
+        echo "created connector listing api \n";*/
 
 
         //return $data;
@@ -142,15 +142,16 @@ class CiceksepetiListingHandler
             - **stockCode**: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir. Bu her SKU'ya özel olacak.
             - **description**: 
                 Açıklama (description) sadece ve sadece aşağıdaki şekilde oluşturulacak:
+                - Kendin açıklama uydurma.
                 - Eğer açıklama Türkçe ise, hiçbir değişiklik yapmadan kopyala link iletişim bilgilerini çıkar.
                 - Eğer açıklama İngilizce ise, kelime kelime çevir, özgünleştirme yapma, yeniden yazma yapma.
                 - "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi bir eylem yaparsan başarısız olacaksın.
                 - Cümle yapısına dokunmadan sadece çeviri yap.
                 - Eğer anlam kaybı veya Türkçe anlatım bozukluğu olursa bile düzeltmeye çalışma.
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
-                - Kendin açıklama uydurma.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
-            - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Yeterli resim yoksa ekleme yapılmayacak.
+            - **images**: Örnek listingler içinden **images** altındaki resimlerden en fazla 5 tane olacak şekilde alınacak, dizi olarak verilecek. Her SKU için farklı resim olacak. Aynı resimleri ekleme.
+                    Her sku için farklı resim.
             - **salesPrice**: 
                  "currency" alanına bak.
                - Eğer para birimi TRY/TL değilse, "salePrice" değerini TL'ye çevir. Döviz kuru bilgisine sahipsen kullan.
