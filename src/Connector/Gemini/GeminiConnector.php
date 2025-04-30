@@ -32,52 +32,50 @@ class GeminiConnector
             ]);*/
 
             $response = $httpClient->request('POST', $url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                ],
+                'headers' => ['Content-Type' => 'application/json'],
                 'json' => [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $message]
-                            ]
-                        ]
-                    ],
+                    'contents' => [[
+                        'parts' => [['text' => $message]]
+                    ]],
                     'generationConfig' => [
+                        'responseMimeType' => 'application/json',
                         'temperature'      => 0.0,
-                        'topP'             => 1.0,
-                        'candidateCount'   => 1,
-                        'stopSequences'    => ["\n\n"],
-                        'presencePenalty'  => 0.0,
-                        'frequencyPenalty' => 0.0,
-                        'responseSchema'   => json_encode([
-                            'type' => 'object',
-                            'patternProperties' => [
+
+                        'responseSchema'   => [
+                            'type'            => 'object',
+                            'properties'      => [
+                            ],
+                            'patternProperties'=> [
                                 '^[A-Za-z0-9_-]+$' => [
-                                    'type' => 'object',
+                                    'type'       => 'object',
                                     'properties' => [
-                                        'productName'    => ['type'=>'string'],
-                                        'mainProductCode'=> ['type'=>'string'],
-                                        'stockCode'      => ['type'=>'string'],
-                                        'description'    => ['type'=>'string'],
-                                        'images'         => [
+                                        'productName'     => ['type'=>'string','nullable'=>false],
+                                        'mainProductCode' => ['type'=>'string','nullable'=>false],
+                                        'stockCode'       => ['type'=>'string','nullable'=>false],
+                                        'description'     => ['type'=>'string','nullable'=>true],
+                                        'images'          => [
                                             'type'=>'array',
+                                            'minItems'=>0,
                                             'maxItems'=>5,
-                                            'items'=>['type'=>'string','pattern'=>'^http?://']
+                                            'items'=>['type'=>'string','pattern'=>'^https?://'],
+                                            'nullable'=>false
                                         ],
-                                        'salesPrice'     => ['type'=>'number'],
-                                        'categoryId'     => ['type'=>'integer'],
-                                        'renk'           => ['type'=>'string'],
-                                        'ebat'           => ['type'=>'string']
+                                        'salesPrice'      => ['type'=>'number','nullable'=>false],
+                                        'categoryId'      => ['type'=>'integer','nullable'=>false],
+                                        'renk'            => ['type'=>'string','nullable'=>true],
+                                        'ebat'            => ['type'=>'string','nullable'=>true],
                                     ],
-                                    'required'=>['productName','mainProductCode','stockCode','description','images','salesPrice','categoryId','renk','ebat']
+                                    'required'=>[
+                                        'productName','mainProductCode','stockCode',
+                                        'description','images','salesPrice','categoryId','renk','ebat'
+                                    ]
                                 ]
                             ]
-                        ]),
-                        'nullOnViolation'  => true
-                    ]
+                        ],
+                    ],
                 ],
             ]);
+
 
 
             if ($response->getStatusCode() === 200) {
