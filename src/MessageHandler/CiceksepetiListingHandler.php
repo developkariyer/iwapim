@@ -82,7 +82,7 @@ class CiceksepetiListingHandler
                     $newWidth = 1300;
                     $newHeight = 1430;
 
-                    $resizedImagePath = resizeImage($tempFile, $newWidth, $newHeight);
+                    $resizedImagePath = $this->resizeImage($tempFile, $newWidth, $newHeight);
                     $newImageUrl = 'https://mesa.iwa.web.tr/Image Cache/Ciceksepeti/Resized' . basename($resizedImagePath);
                 } else {
                     $newImageUrl = $image;
@@ -133,13 +133,13 @@ class CiceksepetiListingHandler
 
         switch ($imageType) {
             case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $_SERVER['DOCUMENT_ROOT'] . $newImagePath);
+                imagejpeg($resizedImage, $newImagePath);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $_SERVER['DOCUMENT_ROOT'] . $newImagePath);
+                imagepng($resizedImage, $newImagePath);
                 break;
             case IMAGETYPE_GIF:
-                imagegif($resizedImage, $_SERVER['DOCUMENT_ROOT'] . $newImagePath);
+                imagegif($resizedImage, $newImagePath);
                 break;
         }
 
