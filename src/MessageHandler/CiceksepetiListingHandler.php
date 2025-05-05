@@ -39,8 +39,8 @@ class CiceksepetiListingHandler
             'current_stage' => 'start',
             'status' => 'processing',
             'error_message' => '',
-            'started_at' => time(),
-            'updated_at' => time(),
+            'started_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
             'complated_at' => null,
             'action_type' => $message->getActionType(),
         ]);
