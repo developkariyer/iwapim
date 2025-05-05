@@ -14,7 +14,7 @@ class ListingHelperService
     public function saveMessage($message)
     {
         $sql = 'INSERT INTO iwa_product_listing_message (trace_id, action_type, product_id, marketplace_id, user_name, variant_ids, payload, priority, target_account_key)
-                VALUES (:trace_id, :action_type, :product_id, :marketplace_id, :user_name, :variant_ids, :payload, :prority, :target_account_key)';
+                VALUES (:trace_id, :action_type, :product_id, :marketplace_id, :user_name, :variant_ids, :payload, :priority, :target_account_key)';
         Utility::executeSql($sql, [
             'trace_id' => $message->getTraceId(),
             'action_type' => $message->getActionType(),
