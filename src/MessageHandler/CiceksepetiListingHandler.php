@@ -25,7 +25,7 @@ class CiceksepetiListingHandler
     public function __invoke(ProductListingMessage $message)
     {
         $this->listingHelper->saveMessage($message);
-        $traceId = $message->getTraceId();
+        /*$traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->listingHelper->saveState(
@@ -47,7 +47,7 @@ class CiceksepetiListingHandler
         match ($messageType) {
             'list' => $this->processListingData($traceId, $jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        };*/
 
     }
 
