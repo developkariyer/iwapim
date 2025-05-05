@@ -24,10 +24,12 @@ class CiceksepetiListingHandler
 
     public function __invoke(ProductListingMessage $message)
     {
+        $this->listingHelper->saveMessage($message);
+        $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->listingHelper->saveState(
-            $message->getTraceId(),
+            $traceId,
             'Fetch Categories',
             'Processing',
             ''
@@ -35,7 +37,7 @@ class CiceksepetiListingHandler
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
         $this->listingHelper->saveState(
-            $message->getTraceId(),
+            $traceId,
             'Get Pim Listings Info',
             'Processing',
             ''
@@ -43,7 +45,7 @@ class CiceksepetiListingHandler
 
         $messageType = $message->getActionType();
         match ($messageType) {
-            'list' => $this->processListingData($message->getTraceId(), $jsonString, $categories),
+            'list' => $this->processListingData($traceId, $jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
         };
 
@@ -52,7 +54,7 @@ class CiceksepetiListingHandler
     /**
      * @throws \Exception
      */
-    private function processListingData($message, $jsonString, $categories)
+    private function processListingData($traceId, $jsonString, $categories)
     {
         $prompt = $this->generateListingPrompt($jsonString, $categories);
         echo "created prompt\n";
@@ -60,7 +62,7 @@ class CiceksepetiListingHandler
         $result = GeminiConnector::chat($prompt);
         echo "gemini connector result\n";
         $this->listingHelper->saveState(
-            $message->getTraceId(),
+            $traceId,
             'Gemini Chat',
             'Processing',
             ''
@@ -69,7 +71,7 @@ class CiceksepetiListingHandler
         $data = $this->parseAndValidateResponse($result);
         echo "parsed and validating response \n";
         $this->listingHelper->saveState(
-            $message->getTraceId(),
+            $traceId,
             'Gemini Parse And Validating Response',
             'Processing',
             ''
@@ -78,7 +80,7 @@ class CiceksepetiListingHandler
         $data = $this->fillAttributeData($data);
         echo "filled attributes \n";
         $this->listingHelper->saveState(
-            $message->getTraceId(),
+            $traceId,
             'Filled Attributes',
             'Processing',
             ''
@@ -88,7 +90,7 @@ class CiceksepetiListingHandler
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         echo "formatted data\n";
         $this->listingHelper->saveState(
-            $message->getTraceId(),
+            $traceId,
             'Fill Missing Data And Formatted',
             'Processing-',
             ''

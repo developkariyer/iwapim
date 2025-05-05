@@ -11,6 +11,23 @@ use App\Utils\Utility;
 class ListingHelperService
 {
 
+    public function saveMessage($message)
+    {
+        $sql = 'INSERT INTO iwa_product_listing_message (trace_id, action_type, product_id, marketplace_id, user_name, variant_ids, payload, priority, target_account_key)
+                VALUES (:trace_id, :action_type, :product_id, :marketplace_id, :user_name, :variant_ids, :payload, :prority, :target_account_key)';
+        Utility::executeSql($sql, [
+            'trace_id' => $message->getTraceId(),
+            'action_type' => $message->getActionType(),
+            'product_id' => $message->getProductId(),
+            'marketplace_id' => $message->getMarketplaceId(),
+            'user_name' => $message->getUserName(),
+            'variant_ids' => json_encode($message->getVariantIds(), false),
+            'payload' => json_encode($message->getPayload(), false),
+            'priority' => $message->getPriority(),
+            'target_account_key' => $message->getTargetAccountKey(),
+        ]);
+    }
+
     public function saveState($trace_id, $current_stage, $status, $error_message)
     {
         $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, current_stage, status, error_message)
