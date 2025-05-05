@@ -47,8 +47,17 @@ class CiceksepetiListingHandler
 
 
         print_r($message);
-        /*$categories = $this->getCiceksepetiCategoriesDetails();
-        $jsonString = $this->listingHelper->getPimListingsInfo($message);
+        $categories = $this->getCiceksepetiCategoriesDetails();
+        Utility::executeSql($sql, [
+            'trace_id' => $message->getTraceId(),
+            'user_name' => $message->getUsername(),
+            'current_stage' => 'categories',
+            'status' => 'processing',
+            'error_message' => '',
+            'updated_at' => date('Y-m-d H:i:s'),
+            'action_type' => $message->getActionType(),
+        ]);
+        /*$jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
         print_r($jsonString);
         $messageType = $message->getActionType();
