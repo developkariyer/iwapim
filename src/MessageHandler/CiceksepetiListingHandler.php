@@ -24,7 +24,8 @@ class CiceksepetiListingHandler
 
     public function __invoke(ProductListingMessage $message)
     {
-        $categories = $this->getCiceksepetiCategoriesDetails();
+        print_r(json_encode($message));
+        /*$categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
         print_r($jsonString);
@@ -32,7 +33,7 @@ class CiceksepetiListingHandler
         match ($messageType) {
             'list' => $this->processListingData($jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        };*/
 
     }
 
