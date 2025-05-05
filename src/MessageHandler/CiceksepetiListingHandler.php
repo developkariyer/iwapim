@@ -32,7 +32,7 @@ class CiceksepetiListingHandler
             'Fetch Categories',
             'Processing',
             '',
-            time(),
+            date('Y-m-d H:i:s'),
             null,
             $message->getActionType()
         );
