@@ -6,9 +6,33 @@ use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use App\Message\ProductListingMessage;
+use App\Utils\Utility;
 
 class ListingHelperService
 {
+
+    public function saveState($trace_id, $user_name, $current_stage, $status, $error_message, $started_at, $complated_at, $action_type)
+    {
+        $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, user_name, current_stage, status, error_message, started_at, complated_at, action_type)
+                VALUES (:trace_id, :user_name, :current_stage, :status, :error_message, :started_at, :complated_at, :action_type )
+                ON DUPLICATE KEY UPDATE
+                    current_stage = VALUES(current_stage),
+                    status = VALUES(status),
+                    error_message = VALUES(error_message),
+                    complated_at = VALUES(complated_at)';
+
+        Utility::executeSql($sql, [
+            'trace_id' => $trace_id,
+            'user_name' => $user_name,
+            'current_stage' => $current_stage,
+            'status' => $status,
+            'error_message' => $error_message,
+            'started_at' => $started_at,
+            'complated_at' => $complated_at,
+            'action_type' => $action_type
+        ]);
+    }
+
     public function getPimListingsInfo(ProductListingMessage $message): false|string
     {
         $data = [];

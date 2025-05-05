@@ -25,40 +25,17 @@ class CiceksepetiListingHandler
     public function __invoke(ProductListingMessage $message)
     {
         echo "Ciceksepeti Listing Handler\n";
-        $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, user_name, current_stage, status, error_message, started_at, updated_at, complated_at, action_type)
-                VALUES (:trace_id, :user_name, :current_stage, :status, :error_message, :started_at, :updated_at, :complated_at, :action_type )
-                ON DUPLICATE KEY UPDATE
-                    current_stage = :current_stage,
-                    status = :status,
-                    error_message = :error_message,
-                    updated_at = :updated_at,
-                    complated_at = :complated_at';
-        Utility::executeSql($sql, [
-            'trace_id' => $message->getTraceId(),
-            'user_name' => $message->getUsername(),
-            'current_stage' => 'start',
-            'status' => 'processing',
-            'error_message' => '',
-            'started_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-            'complated_at' => null,
-            'action_type' => $message->getActionType(),
-        ]);
-
-
-        print_r($message);
         $categories = $this->getCiceksepetiCategoriesDetails();
-        Utility::executeSql($sql, [
-            'trace_id' => $message->getTraceId(),
-            'user_name' => $message->getUsername(),
-            'current_stage' => 'categories',
-            'status' => 'processing',
-            'error_message' => '',
-            'started_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-            'complated_at' => null,
-            'action_type' => $message->getActionType(),
-        ]);
+        $this->listingHelper->saveState(
+            $message->getTraceId(),
+            $message->getUserName(),
+            'Fetch Categories',
+            'Processing',
+            '',
+            time(),
+            null,
+            $message->getActionType()
+        );
         /*$jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
         print_r($jsonString);
