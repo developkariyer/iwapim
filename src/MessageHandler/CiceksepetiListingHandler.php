@@ -25,7 +25,7 @@ class CiceksepetiListingHandler
     public function __invoke(ProductListingMessage $message)
     {
         echo "Ciceksepeti Listing Handler\n";
-        print_r(json_encode($message));
+        print_r($message);
         /*$categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
