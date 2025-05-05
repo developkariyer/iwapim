@@ -37,7 +37,6 @@ class CiceksepetiListingHandler
             $message->getActionType()
         );
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        sleep(5);
         echo "pim getting listing info \n";
         $this->listingHelper->saveState(
             $message->getTraceId(),
@@ -50,30 +49,75 @@ class CiceksepetiListingHandler
             $message->getActionType()
         );
 
-        /*$messageType = $message->getActionType();
+        $messageType = $message->getActionType();
         match ($messageType) {
-            'list' => $this->processListingData($jsonString, $categories),
+            'list' => $this->processListingData($message, $jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };*/
+        };
 
     }
 
     /**
      * @throws \Exception
      */
-    private function processListingData($jsonString, $categories)
+    private function processListingData($message, $jsonString, $categories)
     {
         $prompt = $this->generateListingPrompt($jsonString, $categories);
         echo "created prompt\n";
+
         $result = GeminiConnector::chat($prompt);
         echo "gemini connector result\n";
+        $this->listingHelper->saveState(
+            $message->getTraceId(),
+            $message->getUserName(),
+            'Gemini Chat',
+            'Processing',
+            '',
+            date('Y-m-d H:i:s'),
+            null,
+            $message->getActionType()
+        );
+
         $data = $this->parseAndValidateResponse($result);
         echo "parsed and validating response \n";
+        $this->listingHelper->saveState(
+            $message->getTraceId(),
+            $message->getUserName(),
+            'Gemini Parse And Validating Response',
+            'Processing',
+            '',
+            date('Y-m-d H:i:s'),
+            null,
+            $message->getActionType()
+        );
 
         $data = $this->fillAttributeData($data);
         echo "filled attributes \n";
+        $this->listingHelper->saveState(
+            $message->getTraceId(),
+            $message->getUserName(),
+            'Filled Attributes',
+            'Processing',
+            '',
+            date('Y-m-d H:i:s'),
+            null,
+            $message->getActionType()
+        );
+
+
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         echo "formatted data\n";
+        $this->listingHelper->saveState(
+            $message->getTraceId(),
+            $message->getUserName(),
+            'Fill Missing Data And Formatted',
+            'Processing-',
+            '',
+            date('Y-m-d H:i:s'),
+            null,
+            $message->getActionType()
+        );
+
         print_r($formattedData);
 
         /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
