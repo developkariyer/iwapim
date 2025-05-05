@@ -25,6 +25,27 @@ class CiceksepetiListingHandler
     public function __invoke(ProductListingMessage $message)
     {
         echo "Ciceksepeti Listing Handler\n";
+        $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, user_name, current_stage, status, error_message, started_at, updated_at, complated_at, action_type)
+                VALUES (:trace_id, :user_name, :current_stage, :status, :error_message, :started_at, :updated_at, :complated_at, :action_type )
+                ON DUPLICATE KEY UPDATE
+                    current_stage = :current_stage,
+                    status = :status,
+                    error_message = :error_message,
+                    updated_at = :updated_at,
+                    complated_at = :complated_at';
+        Utility::executeSql($sql, [
+            'trace_id' => $message->getTraceId(),
+            'user_name' => $message->getUsername(),
+            'current_stage' => 'start',
+            'status' => 'processing',
+            'error_message' => '',
+            'started_at' => time(),
+            'updated_at' => time(),
+            'complated_at' => null,
+            'action_type' => $message->getActionType(),
+        ]);
+
+
         print_r($message);
         /*$categories = $this->getCiceksepetiCategoriesDetails();
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
