@@ -27,20 +27,35 @@ class CiceksepetiListingHandler
         $this->listingHelper->saveMessage($message);
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
-        $categories = $this->getCiceksepetiCategoriesDetails();
+        try {
+            $categories = $this->getCiceksepetiCategoriesDetails();
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
             'Fetch Categories',
-            'Processing',
-            ''
+            $status,
+            $errorMessage,
         );
-        $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        echo "pim getting listing info \n";
+
+        try {
+            $jsonString = $this->listingHelper->getPimListingsInfo($message);
+            echo "pim getting listing info \n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
             'Get Pim Listings Info',
-            'Processing',
-            ''
+            $status,
+            $errorMessage,
         );
 
         $messageType = $message->getActionType();
@@ -56,44 +71,71 @@ class CiceksepetiListingHandler
      */
     private function processListingData($traceId, $jsonString, $categories)
     {
-        $prompt = $this->generateListingPrompt($jsonString, $categories);
-        echo "created prompt\n";
-
-        $result = GeminiConnector::chat($prompt);
-        echo "gemini connector result\n";
+        try {
+            $prompt = $this->generateListingPrompt($jsonString, $categories);
+            echo "created prompt\n";
+            $result = GeminiConnector::chat($prompt);
+            echo "gemini connector result\n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
             'Gemini Chat',
-            'Processing',
-            ''
+            $status,
+            $errorMessage,
         );
 
-        $data = $this->parseAndValidateResponse($result);
-        echo "parsed and validating response \n";
+
+        try {
+            $data = $this->parseAndValidateResponse($result);
+            echo "parsed and validating response \n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
             'Gemini Parse And Validating Response',
-            'Processing',
-            ''
+            $status,
+            $errorMessage,
         );
 
-        $data = $this->fillAttributeData($data);
-        echo "filled attributes \n";
+        try {
+            $data = $this->fillAttributeData($data);
+            echo "filled attributes \n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
             'Filled Attributes',
-            'Processing',
-            ''
+            $status,
+            $errorMessage,
         );
 
-
-        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        echo "formatted data\n";
+        try {
+            $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+            echo "formatted data\n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
             'Filled Missing Data And Formatted',
-            'Processing-',
-            ''
+            $status,
+            $errorMessage
         );
 
         print_r($formattedData);
