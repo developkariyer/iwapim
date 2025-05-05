@@ -11,25 +11,20 @@ use App\Utils\Utility;
 class ListingHelperService
 {
 
-    public function saveState($trace_id, $user_name, $current_stage, $status, $error_message, $started_at, $complated_at, $action_type)
+    public function saveState($trace_id, $current_stage, $status, $error_message)
     {
-        $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, user_name, current_stage, status, error_message, started_at, complated_at, action_type)
-                VALUES (:trace_id, :user_name, :current_stage, :status, :error_message, :started_at, :complated_at, :action_type )
+        $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, current_stage, status, error_message)
+                VALUES (:trace_id, :current_stage, :status, :error_message)
                 ON DUPLICATE KEY UPDATE
                     current_stage = VALUES(current_stage),
                     status = VALUES(status),
-                    error_message = VALUES(error_message),
-                    complated_at = VALUES(complated_at)';
+                    error_message = VALUES(error_message)';
 
         Utility::executeSql($sql, [
             'trace_id' => $trace_id,
-            'user_name' => $user_name,
             'current_stage' => $current_stage,
             'status' => $status,
-            'error_message' => $error_message,
-            'started_at' => $started_at,
-            'complated_at' => $complated_at,
-            'action_type' => $action_type
+            'error_message' => $error_message
         ]);
     }
 
