@@ -36,10 +36,20 @@ class CiceksepetiListingHandler
             null,
             $message->getActionType()
         );
-        /*$jsonString = $this->listingHelper->getPimListingsInfo($message);
+        $jsonString = $this->listingHelper->getPimListingsInfo($message);
         echo "pim getting listing info \n";
-        print_r($jsonString);
-        $messageType = $message->getActionType();
+        $this->listingHelper->saveState(
+            $message->getTraceId(),
+            $message->getUserName(),
+            'Get Pim Listings Info',
+            'Processing',
+            '',
+            date('Y-m-d H:i:s'),
+            null,
+            $message->getActionType()
+        );
+
+        /*$messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
