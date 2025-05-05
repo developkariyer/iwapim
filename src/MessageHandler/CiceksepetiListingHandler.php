@@ -37,6 +37,7 @@ class CiceksepetiListingHandler
             $message->getActionType()
         );
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
+        sleep(5);
         echo "pim getting listing info \n";
         $this->listingHelper->saveState(
             $message->getTraceId(),
