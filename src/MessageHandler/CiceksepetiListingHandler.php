@@ -54,7 +54,9 @@ class CiceksepetiListingHandler
             'current_stage' => 'categories',
             'status' => 'processing',
             'error_message' => '',
+            'started_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
+            'complated_at' => null,
             'action_type' => $message->getActionType(),
         ]);
         /*$jsonString = $this->listingHelper->getPimListingsInfo($message);
