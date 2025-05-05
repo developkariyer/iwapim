@@ -91,7 +91,7 @@ class CiceksepetiListingHandler
         echo "formatted data\n";
         $this->listingHelper->saveState(
             $traceId,
-            'Fill Missing Data And Formatted',
+            'Filled Missing Data And Formatted',
             'Processing-',
             ''
         );
