@@ -76,13 +76,14 @@ class CiceksepetiController extends FrontendController
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'CA-001A']);
         if (!is_array($product) || empty($product)) {
-            print_r("Not found product!"); //return not found
+            return $this->json(['success' => false, 'message' => 'Ürün bulunamadı']);
         }
 
         $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => 'CA-001A']);
         if (!is_array($variants) || empty($variants)) {
-            print_r("Not found variants!"); //return not found
+            return $this->json(['success' => false, 'message' => 'Variant bulunamadı']);
         }
+
 
         $productData = [
           'id' => $product[0]['oo_id'],
