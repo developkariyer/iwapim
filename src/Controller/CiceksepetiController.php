@@ -98,23 +98,8 @@ class CiceksepetiController extends FrontendController
                 'variationColor' => $variant['variationColor']
             ];
         }
-
-
-
-
-
-
-
-
-        $productData = [
-            'id' => $product->getId(),
-            'name' => $product->getName() ?? 'İsimsiz Ürün',
-            'productIdentifier' => $product->getProductIdentifier(),
-            'iwasku' => $product->getIwasku(),
-            'productCategory' => $product->getProductCategory() ?? '-',
-            //'variants' => $product->getListingItems()
-        ];
-
+        $productData['variants'] = $variantData;
+        
         return $this->json([
             'success' => true,
             'product' => $productData
