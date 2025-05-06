@@ -736,10 +736,17 @@
                     return;
                 }
 
+                // DOM elementlerini doğru ID'ler ile seçin
                 const searchResults = document.getElementById('searchResults');
-                const searchingMessage = document.getElementById('modal-searchingMessage');
-                const noResultsMessage = document.getElementById('modal-noResultsMessage');
-                const productDetails = document.getElementById('modal-productDetails');
+                const searchingMessage = document.getElementById('modal-searchingMessage'); // ID değişti
+                const noResultsMessage = document.getElementById('modal-noResultsMessage'); // ID değişti
+                const productDetails = document.getElementById('modal-productDetails'); // ID değişti
+
+                // Her element için ayrı ayrı console çıktısı ekleyin
+                console.log('searchResults:', searchResults);
+                console.log('searchingMessage:', searchingMessage);
+                console.log('noResultsMessage:', noResultsMessage);
+                console.log('productDetails:', productDetails);
 
                 if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
                     console.error('Ürün arama için gereken DOM öğeleri bulunamadı:', {
@@ -752,56 +759,42 @@
                     return;
                 }
 
+                // DOM yükleme sürecini debug edin
+                console.log('DOM elementleri bulundu, aramaya devam ediliyor...');
+                console.log('Ürün kodu:', productCode);
+
+                // UI güncellemesi
                 searchResults.classList.remove('d-none');
                 searchingMessage.classList.remove('d-none');
                 noResultsMessage.classList.add('d-none');
                 productDetails.classList.add('d-none');
 
-                // API isteği
+                // API isteği ve devamı...
+                console.log(`/api/products/search?identifier=${encodeURIComponent(productCode)} adresine istek gönderiliyor...`);
+
                 fetch(`/api/products/search?identifier=${encodeURIComponent(productCode)}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('API yanıt durumu:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('API yanıtı:', data);
+
                         // Arama sonuçlarını göster
-                        console.log(data)
                         searchingMessage.classList.add('d-none');
 
                         if (data.success && data.product) {
-                            // Ürün bulundu, bilgileri sakla
-                            selectedProduct = data.product;
+                            console.log('Ürün bulundu:', data.product);
 
-                            // UI'ı güncelle
-                            document.getElementById('foundProductName').textContent = data.product.name || 'İsimsiz Ürün';
-                            document.getElementById('foundProductId').textContent = data.product.id || '-';
-                            document.getElementById('foundProductCategory').textContent = data.product.productCategory || '-';
-
-                            // Varyant sayısını kontrol et ve göster
-                            const variantCount = data.product.variants ? data.product.variants.length : 0;
-                            document.getElementById('foundProductIwasku').textContent =
-                                variantCount > 0 ? data.product.variants[0].iwasku || '-' : '-';
-
-                            // Detayları ve devam butonunu göster
-                            productDetails.classList.remove('d-none');
-                            const continueBtn = document.getElementById('continueToVariantsBtn');
-                            if (continueBtn) {
-                                continueBtn.classList.remove('d-none');
-                            }
+                            // Kod devam edecek...
                         } else {
-                            // Ürün bulunamadı
-                            noResultsMessage.classList.remove('d-none');
-                            const continueBtn = document.getElementById('continueToVariantsBtn');
-                            if (continueBtn) {
-                                continueBtn.classList.add('d-none');
-                            }
+                            console.log('Ürün bulunamadı');
+                            // Kod devam edecek...
                         }
                     })
                     .catch(error => {
-                        console.error('Ürün arama hatası:', error);
-                        searchingMessage.classList.add('d-none');
-                        noResultsMessage.classList.remove('d-none');
-                        const continueBtn = document.getElementById('continueToVariantsBtn');
-                        if (continueBtn) {
-                            continueBtn.classList.add('d-none');
-                        }
+                        console.error('Ürün arama hatası detayları:', error);
+                        // Kod devam edecek...
                     });
             }
 
