@@ -12,6 +12,7 @@ use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\AbstractObject;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -56,16 +57,20 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
+        $product = Product::getByProductIdentifier('CA-001A');
+        echo $product->getName() . "\n";
+
         // IJ
-        $productId = 238133;
-        $variantIds = [240430, 240431, 240433, 240434];
+       // $productId = 238133;
+        //$variantIds = [240430, 240431, 240433, 240434];
         //240439, 240440, 240442, 240443
 
         // CA-41
         //$productId = 154770;
         //$variantIds = [155464, 155462, 155468, 155466, 155434, 155432, 155437, 155435];
 
-        $ciceksepetiMessage = new ProductListingMessage(
+        /*$ciceksepetiMessage = new ProductListingMessage(
             'list',
             $productId,
             265384,
@@ -77,7 +82,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
 
 
 

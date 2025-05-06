@@ -19,6 +19,7 @@ use Pimcore\Model\DataObject\Data\Link;
 use Pimcore\Model\Asset;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+
 #[IsGranted('ROLE_PIMCORE_ADMIN')]
 class CiceksepetiController extends FrontendController
 {
@@ -52,6 +53,44 @@ class CiceksepetiController extends FrontendController
             ['Content-Type' => 'application/json']
         );
 
+    }
+
+    /**
+     * @Route("/api/products/search", name="api_product_search", methods={"GET"})
+     */
+    public function searchProduct(Request $request): JsonResponse
+    {
+        $identifier = $request->query->get('identifier');
+
+        if (empty($identifier)) {
+            return $this->json(['success' => false, 'message' => 'Ürün kodu belirtilmedi'], 400);
+        }
+
+        try {
+            $product = Product::getByProductIdentifier($identifier);
+            $variantData = $product->getListingItems();
+
+
+            $productData = [
+                'id' => $product->getId(),
+                'name' => $product->getName() ?? 'İsimsiz Ürün',
+                'productIdentifier' => $product->getProductIdentifier(),
+                'iwasku' => $product->getIwasku(),
+                'productCategory' => $product->getProductCategory() ?? '-',
+                //'variants' => $product->getListingItems()
+            ];
+
+            return $this->json([
+                'success' => true,
+                'product' => $productData
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Ürün arama sırasında hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /*public function getCiceksepetiListings(): array
