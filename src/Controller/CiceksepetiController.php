@@ -84,6 +84,22 @@ class CiceksepetiController extends FrontendController
             print_r("Not found variants!"); //return not found
         }
 
+        $productData = [
+          'id' => $product[0]['oo_id'],
+          'name' => $product[0]['name'],
+          'productCategory' => $product[0]['productCategory']
+        ];
+        $variantData = [];
+        foreach ($variants as $variant) {
+            $variantData[] = [
+                'id' => $variant['oo_id'],
+                'iwasku' => $variant['iwasku'],
+                'variationSize' => $variant['variationSize'],
+                'variationColor' => $variant['variationColor']
+            ];
+        }
+
+
 
 
 
