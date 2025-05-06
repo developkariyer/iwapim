@@ -59,7 +59,7 @@ class HelloWorldCommand extends AbstractCommand
     {
 
         $product = Product::getByProductIdentifier('CA-001A');
-        echo $product->getName() . "\n";
+        print_r($product);
 
         // IJ
        // $productId = 238133;
