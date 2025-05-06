@@ -551,6 +551,30 @@
         let selectedVariants = [];
 
         document.addEventListener('DOMContentLoaded', function() {
+            const searchProductBtn = document.getElementById('searchProductBtn');
+            const productIdentifierInput = document.getElementById('productIdentifier');
+            const selectProductBtn = document.getElementById('selectProductBtn');
+            const continueToVariantsBtn = document.getElementById('continueToVariantsBtn');
+
+            // Element kontrolü
+            if (searchProductBtn) {
+                searchProductBtn.addEventListener('click', function() {
+                    searchProduct();
+                });
+            } else {
+                console.error('searchProductBtn bulunamadı');
+            }
+
+            if (productIdentifierInput) {
+                productIdentifierInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchProduct();
+                    }
+                });
+            } else {
+                console.error('productIdentifier input bulunamadı');
+            }
             // Ürün arama butonuna tıklama
             document.getElementById('searchProductBtn').addEventListener('click', function() {
                 searchProduct();
@@ -572,11 +596,16 @@
                     return;
                 }
 
-                // Arama alanlarını göster/gizle
                 const searchResults = document.getElementById('searchResults');
                 const searchingMessage = document.getElementById('searchingMessage');
                 const noResultsMessage = document.getElementById('noResultsMessage');
                 const productDetails = document.getElementById('productDetails');
+
+                if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
+                    console.error('Ürün arama için gerekli DOM elementleri bulunamadı');
+                    alert('Sayfa yapısında bir sorun var. Lütfen sayfayı yenileyin.');
+                    return;
+                }
 
                 searchResults.classList.remove('d-none');
                 searchingMessage.classList.remove('d-none');
