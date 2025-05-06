@@ -501,7 +501,10 @@
                 const searchingMessage = document.getElementById('searchingMessage');
                 const noResultsMessage = document.getElementById('noResultsMessage');
                 const productDetails = document.getElementById('productDetails');
-
+                if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
+                    alert('Arayüzde eksik alan var. Lütfen sayfayı yenileyin.');
+                    return;
+                }
                 // Arama başlatıldı
                 searchResults.classList.remove('d-none');
                 searchingMessage.classList.remove('d-none');
