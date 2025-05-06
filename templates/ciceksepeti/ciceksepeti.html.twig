@@ -312,9 +312,9 @@
                     <div class="search-step">
                         <h6 class="border-bottom pb-2 mb-3">Adım 1: Ürün Kodu Arama</h6>
                         <div class="form-group mb-3">
-                            <label for="productIdentifier" class="form-label">Ürün Kodu</label>
+                            <label for="productIdentifier" class="form-label">Ürün Kodu (IM-XXX)</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="productIdentifier" placeholder="Ürün kodunu girin (örn: CA-001A)">
+                                <input type="text" class="form-control" id="productIdentifier" placeholder="IM-123 gibi ürün kodu girin">
                                 <button class="btn btn-outline-primary" type="button" id="searchProductBtn">
                                     <i class="fas fa-search"></i> Ara
                                 </button>
@@ -339,20 +339,23 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
+                                        <div class="col-md-4 text-center">
+                                            <img id="foundProductImage" src="" alt="Ürün Görseli" class="img-fluid product-image mb-2" style="max-height: 150px;">
+                                        </div>
                                         <div class="col-md-8">
-                                            <table class="table table-sm">
+                                            <table class="table table-sm table-borderless">
                                                 <tbody>
                                                 <tr>
-                                                    <th>Ürün ID:</th>
+                                                    <th>Ürün Kodu:</th>
                                                     <td id="foundProductId"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>IWASKU:</th>
+                                                    <td id="foundProductIwasku"></td>
                                                 </tr>
                                                 <tr>
                                                     <th>Kategori:</th>
                                                     <td id="foundProductCategory"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Varyant Sayısı:</th>
-                                                    <td id="foundProductVariantCount"></td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -376,9 +379,11 @@
                                     <thead class="table-light">
                                     <tr>
                                         <th style="width: 40px;"><input type="checkbox" id="selectAllVariants"></th>
+                                        <th style="width: 60px;">Görsel</th>
+                                        <th>Varyant</th>
                                         <th>IWASKU</th>
-                                        <th>Beden</th>
                                         <th>Renk</th>
+                                        <th>Ebat</th>
                                         <th style="width: 120px;">Stok</th>
                                         <th style="width: 120px;">Fiyat (₺)</th>
                                     </tr>
@@ -437,7 +442,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="checkIdentifier" class="form-label">Ürün Kodu</label>
+                        <label for="checkIdentifier" class="form-label">Ürün Kodu veya IWASKU</label>
                         <input type="text" class="form-control" id="checkIdentifier" placeholder="Kontrol etmek istediğiniz ürün kodunu girin">
                     </div>
                 </div>
@@ -545,253 +550,6 @@
 {% block body_scripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
-        // LISTING
-        // Ürün Arama İşlemleri
-        let selectedProduct = null;
-        let selectedVariants = [];
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchProductBtn = document.getElementById('searchProductBtn');
-            const productIdentifierInput = document.getElementById('productIdentifier');
-            const selectProductBtn = document.getElementById('selectProductBtn');
-            const continueToVariantsBtn = document.getElementById('continueToVariantsBtn');
-
-            // Element kontrolü
-            if (searchProductBtn) {
-                searchProductBtn.addEventListener('click', function() {
-                    searchProduct();
-                });
-            } else {
-                console.error('searchProductBtn bulunamadı');
-            }
-
-            if (productIdentifierInput) {
-                productIdentifierInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        searchProduct();
-                    }
-                });
-            } else {
-                console.error('productIdentifier input bulunamadı');
-            }
-            // Ürün arama butonuna tıklama
-            document.getElementById('searchProductBtn').addEventListener('click', function() {
-                searchProduct();
-            });
-
-            // Enter tuşuna basıldığında da arama yapabilmek için
-            document.getElementById('productIdentifier').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    searchProduct();
-                }
-            });
-
-            // Ürün arama fonksiyonu
-            function searchProduct() {
-                const productCode = document.getElementById('productIdentifier').value.trim();
-                if (!productCode) {
-                    alert('Lütfen bir ürün kodu girin');
-                    return;
-                }
-
-                const searchResults = document.getElementById('searchResults');
-                const searchingMessage = document.getElementById('searchingMessage');
-                const noResultsMessage = document.getElementById('noResultsMessage');
-                const productDetails = document.getElementById('productDetails');
-
-                if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
-                    console.error('Ürün arama için gerekli DOM elementleri bulunamadı');
-                    alert('Sayfa yapısında bir sorun var. Lütfen sayfayı yenileyin.');
-                    return;
-                }
-
-                searchResults.classList.remove('d-none');
-                searchingMessage.classList.remove('d-none');
-                noResultsMessage.classList.add('d-none');
-                productDetails.classList.add('d-none');
-
-                // AJAX isteği gönder
-                fetch(`/api/products/search?identifier=${encodeURIComponent(productCode)}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Sunucu hatası: ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Arama sonuçlarını göster
-                        searchingMessage.classList.add('d-none');
-
-                        if (data.success && data.product) {
-                            // Ürün bilgilerini global değişkene kaydet
-                            selectedProduct = data.product;
-
-                            // Ürün bulundu, detayları doldur
-                            document.getElementById('foundProductName').textContent = data.product.name || 'İsimsiz Ürün';
-                            document.getElementById('foundProductId').textContent = data.product.id || '-';
-                            document.getElementById('foundProductCategory').textContent = data.product.productCategory || '-';
-
-                            // Varyant sayısını göster
-                            const variantCount = data.product.variants ? data.product.variants.length : 0;
-                            document.getElementById('foundProductVariantCount').textContent = variantCount;
-
-                            // Ürün detaylarını ve varyantlara geçiş butonunu göster
-                            productDetails.classList.remove('d-none');
-                            document.getElementById('continueToVariantsBtn').classList.remove('d-none');
-                        } else {
-                            // Ürün bulunamadı
-                            noResultsMessage.classList.remove('d-none');
-                            document.getElementById('continueToVariantsBtn').classList.add('d-none');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ürün arama hatası:', error);
-                        searchingMessage.classList.add('d-none');
-                        noResultsMessage.classList.remove('d-none');
-                        document.getElementById('continueToVariantsBtn').classList.add('d-none');
-                    });
-            }
-
-            // Diğer butonlar için işlevler
-            document.getElementById('selectProductBtn').addEventListener('click', function() {
-                if (selectedProduct) {
-                    showVariantsStep();
-                }
-            });
-
-            document.getElementById('continueToVariantsBtn').addEventListener('click', function() {
-                if (selectedProduct) {
-                    showVariantsStep();
-                }
-            });
-
-            function showVariantsStep() {
-                // Adımları değiştir
-                document.querySelector('.search-step').classList.add('d-none');
-                document.querySelector('.variants-step').classList.remove('d-none');
-
-                // Butonları güncelle
-                document.getElementById('continueToVariantsBtn').classList.add('d-none');
-                document.getElementById('backToProductBtn').classList.remove('d-none');
-                document.getElementById('continueToCategoryBtn').classList.remove('d-none');
-
-                // Varyantları listele
-                renderVariants(selectedProduct.variants);
-            }
-
-            function renderVariants(variants) {
-                const variantsList = document.getElementById('variantsList');
-                const noVariantsMessage = document.getElementById('noVariantsMessage');
-
-                // Varyant listesini temizle
-                variantsList.innerHTML = '';
-
-                if (variants && variants.length > 0) {
-                    // Varyantları listele
-                    variants.forEach((variant, index) => {
-                        const row = document.createElement('tr');
-
-                        row.innerHTML = `
-                    <td><input type="checkbox" class="variant-checkbox" value="${variant.id}" id="variant_${variant.id}"></td>
-                    <td>${variant.iwasku || '-'}</td>
-                    <td>${variant.variationSize || '-'}</td>
-                    <td>${variant.variationColor || '-'}</td>
-                    <td><input type="number" class="form-control form-control-sm" id="stock_${variant.id}" value="10" min="0"></td>
-                    <td><input type="number" class="form-control form-control-sm" id="price_${variant.id}" value="0" min="0" step="0.01"></td>
-                `;
-
-                        variantsList.appendChild(row);
-                    });
-
-                    noVariantsMessage.classList.add('d-none');
-                } else {
-                    // Varyant bulunamadı mesajı
-                    noVariantsMessage.classList.remove('d-none');
-                }
-            }
-
-            // Tüm varyantları seç/kaldır
-            document.getElementById('selectAllVariants').addEventListener('change', function() {
-                const isChecked = this.checked;
-                document.querySelectorAll('.variant-checkbox').forEach(checkbox => {
-                    checkbox.checked = isChecked;
-                });
-            });
-
-            // Diğer butonlar
-            document.getElementById('backToProductBtn').addEventListener('click', function() {
-                // Adımları değiştir
-                document.querySelector('.search-step').classList.remove('d-none');
-                document.querySelector('.variants-step').classList.add('d-none');
-                document.querySelector('.category-step').classList.add('d-none');
-
-                // Butonları güncelle
-                document.getElementById('continueToVariantsBtn').classList.remove('d-none');
-                document.getElementById('backToProductBtn').classList.add('d-none');
-                document.getElementById('continueToCategoryBtn').classList.add('d-none');
-                document.getElementById('backToVariantsBtn').classList.add('d-none');
-                document.getElementById('createListingBtn').classList.add('d-none');
-            });
-
-            document.getElementById('continueToCategoryBtn').addEventListener('click', function() {
-                // Varyant seçimi kontrolü
-                const selectedCheckboxes = document.querySelectorAll('.variant-checkbox:checked');
-                if (selectedCheckboxes.length === 0) {
-                    alert('Lütfen en az bir varyant seçin');
-                    return;
-                }
-
-                // Seçilen varyantları kaydet
-                selectedVariants = [];
-                selectedCheckboxes.forEach(checkbox => {
-                    selectedVariants.push({
-                        id: checkbox.value,
-                        price: document.getElementById(`price_${checkbox.value}`).value,
-                        stock: document.getElementById(`stock_${checkbox.value}`).value
-                    });
-                });
-
-                document.querySelector('.variants-step').classList.add('d-none');
-                document.querySelector('.category-step').classList.remove('d-none');
-
-                document.getElementById('continueToCategoryBtn').classList.add('d-none');
-                document.getElementById('backToProductBtn').classList.add('d-none');
-                document.getElementById('backToVariantsBtn').classList.remove('d-none');
-                document.getElementById('createListingBtn').classList.remove('d-none');
-            });
-
-            document.getElementById('backToVariantsBtn').addEventListener('click', function() {
-                document.querySelector('.variants-step').classList.remove('d-none');
-                document.querySelector('.category-step').classList.add('d-none');
-
-                document.getElementById('continueToCategoryBtn').classList.remove('d-none');
-                document.getElementById('backToProductBtn').classList.remove('d-none');
-                document.getElementById('backToVariantsBtn').classList.add('d-none');
-                document.getElementById('createListingBtn').classList.add('d-none');
-            });
-
-            $('#newListingModal').on('hidden.bs.modal', function () {
-                document.getElementById('productIdentifier').value = '';
-                document.getElementById('searchResults').classList.add('d-none');
-
-                document.querySelector('.search-step').classList.remove('d-none');
-                document.querySelector('.variants-step').classList.add('d-none');
-                document.querySelector('.category-step').classList.add('d-none');
-
-                document.getElementById('continueToVariantsBtn').classList.add('d-none');
-                document.getElementById('backToProductBtn').classList.add('d-none');
-                document.getElementById('continueToCategoryBtn').classList.add('d-none');
-                document.getElementById('backToVariantsBtn').classList.add('d-none');
-                document.getElementById('createListingBtn').classList.add('d-none');
-
-                selectedProduct = null;
-                selectedVariants = [];
-            });
-        });
-        // LISTING
-
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButtons = document.querySelectorAll('.toggle-variants');
 
