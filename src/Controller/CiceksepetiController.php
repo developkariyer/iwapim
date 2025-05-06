@@ -66,31 +66,34 @@ class CiceksepetiController extends FrontendController
             return $this->json(['success' => false, 'message' => 'Ürün kodu belirtilmedi'], 400);
         }
 
-        try {
-            $product = Product::getByProductIdentifier($identifier);
-            $variantData = $product->getListingItems();
+        $productSql = '
+        SELECT oo_id, name, productCategory from object_query_product
+        WHERE productIdentifier = :productIdentifier AND productLevel = 0
+        LIMIT 1';
+        $variantSql = '
+        SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
+        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
+
+        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'CA-001A']);
 
 
-            $productData = [
-                'id' => $product->getId(),
-                'name' => $product->getName() ?? 'İsimsiz Ürün',
-                'productIdentifier' => $product->getProductIdentifier(),
-                'iwasku' => $product->getIwasku(),
-                'productCategory' => $product->getProductCategory() ?? '-',
-                //'variants' => $product->getListingItems()
-            ];
 
-            return $this->json([
-                'success' => true,
-                'product' => $productData
-            ]);
 
-        } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Ürün arama sırasında hata oluştu: ' . $e->getMessage()
-            ], 500);
-        }
+
+        $productData = [
+            'id' => $product->getId(),
+            'name' => $product->getName() ?? 'İsimsiz Ürün',
+            'productIdentifier' => $product->getProductIdentifier(),
+            'iwasku' => $product->getIwasku(),
+            'productCategory' => $product->getProductCategory() ?? '-',
+            //'variants' => $product->getListingItems()
+        ];
+
+        return $this->json([
+            'success' => true,
+            'product' => $productData
+        ]);
+
     }
 
     /*public function getCiceksepetiListings(): array

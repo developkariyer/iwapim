@@ -65,7 +65,7 @@ class HelloWorldCommand extends AbstractCommand
             SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
             WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
-        $product = Utility::fetchFromSql($variantSql, ['productIdentifier' => 'CA-001A']);
+        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'a']);
         print_r($product);
 
         // IJ
