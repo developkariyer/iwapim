@@ -58,16 +58,16 @@
             <!-- Sağ Ana İçerik - Ürünler ve Varyantlar -->
             <div class="col-md-9 col-12">
                 <div class="row mb-3">
-                        <div class="col-6">
-                            <button type="button" class="btn btn-primary w-100" id="newListingBtn" data-bs-toggle="modal" data-bs-target="#newListingModal">
-                                <i class="fas fa-plus-circle me-2"></i>Yeni Listing
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-primary w-100" id="checkListingBtn" data-bs-toggle="modal" data-bs-target="#checkListingModal">
-                                <i class="fas fa-search me-2"></i>Listing Kontrol
-                            </button>
-                        </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary w-100" id="newListingBtn" data-bs-toggle="modal" data-bs-target="#newListingModal">
+                            <i class="fas fa-plus-circle me-2"></i>Yeni Listing
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary w-100" id="checkListingBtn" data-bs-toggle="modal" data-bs-target="#checkListingModal">
+                            <i class="fas fa-search me-2"></i>Listing Kontrol
+                        </button>
+                    </div>
                 </div>
                 {% if app.request.get('category') %}
                     <div class="alert alert-info mb-4">
@@ -302,77 +302,6 @@
         </div>
     </div>
 
-    <div class="modal fade" id="newListingModal" tabindex="-1" aria-labelledby="newListingModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="newListingModalLabel">Ürün Ara</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Arama Formu -->
-                    <div class="mb-3">
-                        <label for="productIdentifier" class="form-label">Ürün Kodu</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="productIdentifier" placeholder="Ürün kodunu girin">
-                            <button class="btn btn-outline-primary" type="button" id="searchProductBtn">
-                                <i class="fas fa-search"></i> Ara
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Arama Sonuçları -->
-                    <div id="searchResults" class="mt-3 d-none">
-                        <!-- Aranıyor Mesajı -->
-                        <div class="alert alert-info" id="searchingMessage">
-                            <div class="d-flex align-items-center">
-                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                                <span>Ürün aranıyor, lütfen bekleyin...</span>
-                            </div>
-                        </div>
-
-                        <!-- Sonuç Bulunamadı Mesajı -->
-                        <div id="noResultsMessage" class="alert alert-warning d-none">
-                            <i class="fas fa-exclamation-triangle me-2"></i> Ürün bulunamadı. Lütfen farklı bir ürün kodu deneyin.
-                        </div>
-
-                        <!-- Ürün Detayları -->
-                        <div id="productDetails" class="card d-none">
-                            <div class="card-header">
-                                <h5 id="productName" class="mb-0">Ürün Adı</h5>
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Kategori:</strong> <span id="productCategory">-</span></p>
-                                <hr>
-                                <h6>Varyantlar</h6>
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-sm table-bordered">
-                                        <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 50px;">Seç</th>
-                                            <th>ID</th>
-                                            <th>IWASKU</th>
-                                            <th>Renk</th>
-                                            <th>Ebat</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody id="variantsList">
-                                        <!-- Varyantlar burada listelenir -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-success" id="selectVariantsBtn" disabled>Seçili Varyantları Ekle</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
@@ -470,162 +399,6 @@
 {% block body_scripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mevcut kodların devamı...
-
-            // Ürün arama işlevi
-            let selectedProduct = null;
-            let selectedVariants = [];
-
-            // Arama butonuna tıklama
-            document.getElementById('searchProductBtn').addEventListener('click', searchProduct);
-
-            // Enter tuşu ile arama
-            document.getElementById('productIdentifier').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    searchProduct();
-                }
-            });
-
-            // Ürün arama fonksiyonu
-            function searchProduct() {
-                const productCode = document.getElementById('productIdentifier').value.trim();
-                if (!productCode) {
-                    alert('Lütfen bir ürün kodu girin');
-                    return;
-                }
-
-                // UI elementleri
-                const searchResults = document.getElementById('searchResults');
-                const searchingMessage = document.getElementById('searchingMessage');
-                const noResultsMessage = document.getElementById('noResultsMessage');
-                const productDetails = document.getElementById('productDetails');
-                if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
-                    alert('Arayüzde eksik alan var. Lütfen sayfayı yenileyin.');
-                    return;
-                }
-                // Arama başlatıldı
-                searchResults.classList.remove('d-none');
-                searchingMessage.classList.remove('d-none');
-                noResultsMessage.classList.add('d-none');
-                productDetails.classList.add('d-none');
-
-                // Arama isteği
-                fetch(`/api/products/search?identifier=${encodeURIComponent(productCode)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('API yanıtı:', data);
-                        searchingMessage.classList.add('d-none');
-
-                        if (data.success && data.product) {
-                            // Ürün bulundu
-                            selectedProduct = data.product;
-
-                            // Ürün bilgilerini göster
-                            document.getElementById('productName').textContent = data.product.name || 'İsimsiz Ürün';
-                            document.getElementById('productCategory').textContent = data.product.productCategory || '-';
-
-                            // Varyantları listele
-                            renderVariants(data.product.variants);
-
-                            // Ürün detaylarını göster
-                            productDetails.classList.remove('d-none');
-                        } else {
-                            // Ürün bulunamadı
-                            noResultsMessage.classList.remove('d-none');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Arama hatası:', error);
-                        searchingMessage.classList.add('d-none');
-                        noResultsMessage.classList.remove('d-none');
-                    });
-            }
-
-            // Varyantları listele
-            function renderVariants(variants) {
-                const variantsList = document.getElementById('variantsList');
-                variantsList.innerHTML = '';
-
-                if (variants && variants.length > 0) {
-                    variants.forEach((variant, index) => {
-                        const row = document.createElement('tr');
-
-                        row.innerHTML = `
-                    <td class="text-center">
-                        <input type="checkbox" class="variant-checkbox" data-index="${index}" id="variant-${variant.id}">
-                    </td>
-                    <td>${variant.id}</td>
-                    <td>${variant.iwasku || '-'}</td>
-                    <td>${variant.variationColor || '-'}</td>
-                    <td>${variant.variationSize || '-'}</td>
-                `;
-
-                        variantsList.appendChild(row);
-                    });
-
-                    // Checkbox'lara event listener ekle
-                    document.querySelectorAll('.variant-checkbox').forEach(checkbox => {
-                        checkbox.addEventListener('change', updateSelectedVariants);
-                    });
-                } else {
-                    variantsList.innerHTML = '<tr><td colspan="5" class="text-center">Varyant bulunamadı</td></tr>';
-                }
-            }
-
-            // Seçilen varyantları güncelle
-            function updateSelectedVariants() {
-                selectedVariants = [];
-
-                document.querySelectorAll('.variant-checkbox:checked').forEach(checkbox => {
-                    const index = parseInt(checkbox.getAttribute('data-index'));
-                    if (selectedProduct && selectedProduct.variants && selectedProduct.variants[index]) {
-                        selectedVariants.push(selectedProduct.variants[index]);
-                    }
-                });
-
-                // Ekle butonunu güncelle
-                const selectBtn = document.getElementById('selectVariantsBtn');
-                selectBtn.disabled = selectedVariants.length === 0;
-            }
-
-            // Seçilen varyantları ekle
-            document.getElementById('selectVariantsBtn').addEventListener('click', function() {
-                if (selectedVariants.length === 0) {
-                    alert('Lütfen en az bir varyant seçin');
-                    return;
-                }
-
-                console.log('Seçilen ürün:', selectedProduct);
-                console.log('Seçilen varyantlar:', selectedVariants);
-
-                // Burada seçilen varyantlarla yapmak istediğiniz işlemi gerçekleştirin
-                // Örneğin: API'ye gönderme, sepete ekleme vb.
-
-                // İşlem bittikten sonra modal'ı kapat
-                const modal = bootstrap.Modal.getInstance(document.getElementById('newListingModal'));
-                modal.hide();
-
-                // Başarı mesajı göster
-                alert('Seçilen varyantlar başarıyla eklendi!');
-
-                // Formu sıfırla
-                document.getElementById('productIdentifier').value = '';
-                document.getElementById('searchResults').classList.add('d-none');
-                selectedProduct = null;
-                selectedVariants = [];
-            });
-
-            // Modal kapandığında formu sıfırla
-            document.getElementById('newListingModal').addEventListener('hidden.bs.modal', function() {
-                document.getElementById('productIdentifier').value = '';
-                document.getElementById('searchResults').classList.add('d-none');
-                document.getElementById('selectVariantsBtn').disabled = true;
-                selectedProduct = null;
-                selectedVariants = [];
-            });
-        });
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButtons = document.querySelectorAll('.toggle-variants');
 
