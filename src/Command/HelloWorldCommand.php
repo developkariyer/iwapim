@@ -57,8 +57,15 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $productSql = '
+            SELECT oo_id, name, productCategory from object_query_product
+            WHERE productIdentifier = :productIdentifier AND productLevel = 0
+            LIMIT 1';
+        $variantSql = '
+            SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
+            WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
-        $product = Product::getByProductIdentifier('CA-001A');
+        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'CA-001A']);
         print_r($product);
 
         // IJ
