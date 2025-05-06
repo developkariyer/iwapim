@@ -140,8 +140,25 @@ class CiceksepetiListingHandler
 
         print_r($formattedData);
 
+
+        /*try {
+            $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+            $result = $ciceksepetiConnector->createListing($formattedData);
+            echo "created connector listing api \n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
+         $this->listingHelper->saveState(
+            $traceId,
+            'Listing Api',
+            $status,
+            $errorMessage
+        ); */
         /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->createListing($formattedData);
+        $result = $ciceksepetiConnector->createListing($formattedData);
         echo "created connector listing api \n";*/
 
 

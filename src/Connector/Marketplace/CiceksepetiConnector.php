@@ -476,12 +476,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
         }
         echo $response->getContent() . "\n";
-        $data = $response->toArray();
+        $responseData = $response->toArray();
         $combinedData = [
-            'inventory' => $data,
-            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+            'inventory' => $responseData,
+            'batchRequestResult' => $this->getBatchRequestResult($responseData['batchId'])
         ];
         print_r($combinedData);
+        $filename = "CREATE_LISTING_{$responseData['batchId']}.json";
+        $this->putToCache($filename, ['request'=>$data, 'response'=>$combinedData]);
+        return $combinedData;
     }
 
     /*public function updateProduct(VariantProduct $listing, string $sku)
