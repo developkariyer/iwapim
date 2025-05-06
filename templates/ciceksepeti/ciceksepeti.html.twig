@@ -762,6 +762,7 @@
                     .then(response => response.json())
                     .then(data => {
                         // Arama sonuçlarını göster
+                        console.log(data)
                         searchingMessage.classList.add('d-none');
 
                         if (data.success && data.product) {
