@@ -74,12 +74,12 @@ class CiceksepetiController extends FrontendController
         SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
         WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
-        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'CA-001A']);
+        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $identifier]);
         if (!is_array($product) || empty($product)) {
             return $this->json(['success' => false, 'message' => 'Ürün bulunamadı']);
         }
 
-        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => 'CA-001A']);
+        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $identifier]);
         if (!is_array($variants) || empty($variants)) {
             return $this->json(['success' => false, 'message' => 'Variant bulunamadı']);
         }
