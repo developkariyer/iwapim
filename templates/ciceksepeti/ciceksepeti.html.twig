@@ -322,7 +322,7 @@
                             <div class="form-text">Pimcore'da kayıtlı ürün kodunu girin.</div>
                         </div>
                         <div id="searchResults" class="mt-3 d-none">
-                            <div class="alert alert-info" id="searchingMessage">
+                            <div class="alert alert-info" id="modal-searchingMessage">
                                 <div class="d-flex align-items-center">
                                     <div class="spinner-border spinner-border-sm me-2" role="status">
                                         <span class="visually-hidden">Aranıyor...</span>
@@ -330,10 +330,10 @@
                                     <span>Ürün aranıyor, lütfen bekleyin...</span>
                                 </div>
                             </div>
-                            <div id="noResultsMessage" class="alert alert-warning d-none">
+                            <div id="modal-noResultsMessage" class="alert alert-warning d-none">
                                 <i class="fas fa-exclamation-triangle me-2"></i> Sonuç bulunamadı. Lütfen farklı bir ürün kodu deneyin.
                             </div>
-                            <div id="productDetails" class="card d-none mb-3">
+                            <div id="modal-productDetails" class="card d-none mb-3">
                                 <div class="card-header bg-light">
                                     <h6 class="mb-0" id="foundProductName">Ürün Adı</h6>
                                 </div>
@@ -457,6 +457,18 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        #searchResults {
+            position: relative;
+            min-height: 100px;
+        }
+
+        #searchResults .alert {
+            margin-bottom: 1rem;
+        }
+
+        #productDetails .card-body {
+            padding: 1rem;
+        }
         .modal-dialog-scrollable .modal-body {
             max-height: 70vh;
             overflow-y: auto;
@@ -724,16 +736,10 @@
                     return;
                 }
 
-                const modal = document.getElementById('newListingModal');
-                if (modal && !modal.classList.contains('show')) {
-                    const bsModal = new bootstrap.Modal(modal);
-                    bsModal.show();
-                }
-
-                const searchResults = document.querySelector('#newListingModal #searchResults');
-                const searchingMessage = document.querySelector('#newListingModal #searchingMessage');
-                const noResultsMessage = document.querySelector('#newListingModal #noResultsMessage');
-                const productDetails = document.querySelector('#newListingModal #productDetails');
+                const searchResults = document.getElementById('searchResults');
+                const searchingMessage = document.getElementById('modal-searchingMessage');
+                const noResultsMessage = document.getElementById('modal-noResultsMessage');
+                const productDetails = document.getElementById('modal-productDetails');
 
                 if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
                     console.error('Ürün arama için gereken DOM öğeleri bulunamadı:', {
