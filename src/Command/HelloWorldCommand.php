@@ -66,6 +66,9 @@ class HelloWorldCommand extends AbstractCommand
             WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'a']);
+        if (!is_array($product) || empty($product)) {
+            print_r("Not found product!");
+        }
         print_r($product);
 
         // IJ
