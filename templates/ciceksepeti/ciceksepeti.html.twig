@@ -57,12 +57,18 @@
 
             <!-- Sağ Ana İçerik - Ürünler ve Varyantlar -->
             <div class="col-md-9 col-12">
-                <button type="submit" class="btn btn-primary w-50">
-                    Yeni Listing
-                </button>
-                <button type="submit" class="btn btn-primary w-50">
-                    Listing Kontrol
-                </button>
+                <div class="row">
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Yeni Listing
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Listing Kontrol
+                        </button>
+                    </div>
+                </div>
                 {% if app.request.get('category') %}
                     <div class="alert alert-info mb-4">
                         <strong>Kategori:</strong>
