@@ -57,8 +57,12 @@
 
             <!-- Sağ Ana İçerik - Ürünler ve Varyantlar -->
             <div class="col-md-9 col-12">
-                <button class="btn btn-success">Yeni Listing</button>
-                <button class="btn btn-success">Listing Kontrol</button>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-sync-alt me-2"></i> Yeni Listing
+                </button>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-sync-alt me-2"></i> Listing Kontrol
+                </button>
                 {% if app.request.get('category') %}
                     <div class="alert alert-info mb-4">
                         <strong>Kategori:</strong>
