@@ -718,25 +718,34 @@
 
             // Ürün arama fonksiyonu
             function searchProduct() {
-                const productCode = document.getElementById('productIdentifier').value.trim();
+                const productCode = document.getElementById('productIdentifier')?.value.trim();
                 if (!productCode) {
                     alert('Lütfen bir ürün kodu girin');
                     return;
                 }
 
-                // UI öğelerini doğrula ve güncelle
-                const searchResults = document.getElementById('searchResults');
-                const searchingMessage = document.getElementById('searchingMessage');
-                const noResultsMessage = document.getElementById('noResultsMessage');
-                const productDetails = document.getElementById('productDetails');
+                const modal = document.getElementById('newListingModal');
+                if (modal && !modal.classList.contains('show')) {
+                    const bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+                }
 
-                // Hata durumlarını kontrol et
+                const searchResults = document.querySelector('#newListingModal #searchResults');
+                const searchingMessage = document.querySelector('#newListingModal #searchingMessage');
+                const noResultsMessage = document.querySelector('#newListingModal #noResultsMessage');
+                const productDetails = document.querySelector('#newListingModal #productDetails');
+
                 if (!searchResults || !searchingMessage || !noResultsMessage || !productDetails) {
-                    console.error('Ürün arama için gereken DOM öğeleri bulunamadı.');
+                    console.error('Ürün arama için gereken DOM öğeleri bulunamadı:', {
+                        searchResults: !!searchResults,
+                        searchingMessage: !!searchingMessage,
+                        noResultsMessage: !!noResultsMessage,
+                        productDetails: !!productDetails
+                    });
+                    alert('Sayfa yapısında bir sorun oluştu. Lütfen sayfayı yenileyin ve tekrar deneyin.');
                     return;
                 }
 
-                // Arama yapılıyor durumunu göster
                 searchResults.classList.remove('d-none');
                 searchingMessage.classList.remove('d-none');
                 noResultsMessage.classList.add('d-none');
