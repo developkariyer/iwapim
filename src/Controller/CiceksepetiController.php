@@ -99,7 +99,7 @@ class CiceksepetiController extends FrontendController
             ];
         }
         $productData['variants'] = $variantData;
-        
+
         return $this->json([
             'success' => true,
             'product' => $productData
