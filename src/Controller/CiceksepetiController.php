@@ -75,6 +75,16 @@ class CiceksepetiController extends FrontendController
         WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => 'CA-001A']);
+        if (!is_array($product) || empty($product)) {
+            print_r("Not found product!"); //return not found
+        }
+
+        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => 'CA-001A']);
+        if (!is_array($variants) || empty($variants)) {
+            print_r("Not found variants!"); //return not found
+        }
+
+
 
 
 
