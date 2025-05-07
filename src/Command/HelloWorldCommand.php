@@ -68,6 +68,8 @@ class HelloWorldCommand extends AbstractCommand
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $identifier]);
 
+        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $identifier]);
+
         $productData = [
             'id' => $product[0]['oo_id'],
             'name' => $product[0]['name'],
@@ -83,6 +85,7 @@ class HelloWorldCommand extends AbstractCommand
             ];
         }
         $productData['variants'] = $variantData;
+
         print_r($productData);
 
         // IJ
