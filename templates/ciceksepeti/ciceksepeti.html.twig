@@ -562,10 +562,16 @@
                 document.getElementById('errorContainer').classList.add('d-none');
                 document.getElementById('productContainer').classList.add('d-none');
 
+                console.log("Ürün aranıyor:", identifier); // Debug için
+
                 // API isteği gönder
                 fetch(`/api/products/search?identifier=${encodeURIComponent(identifier)}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log("API yanıtı:", response); // Debug için
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log("API sonucu:", data); // Debug için
                         document.getElementById('loadingContainer').classList.add('d-none');
 
                         if (data.success && data.product) {
@@ -582,19 +588,19 @@
                                 data.product.variants.forEach(function(variant) {
                                     const row = document.createElement('tr');
                                     row.innerHTML = `
-                                <td>
-                                    <div class="form-check">
-                                        <input class="form-check-input variant-checkbox" type="checkbox"
-                                               data-id="${variant.id}"
-                                               data-iwasku="${variant.iwasku || ''}"
-                                               id="variant-${variant.id}">
-                                    </div>
-                                </td>
-                                <td>${variant.id}</td>
-                                <td>${variant.iwasku || '-'}</td>
-                                <td>${variant.variationColor || '-'}</td>
-                                <td>${variant.variationSize || '-'}</td>
-                            `;
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input variant-checkbox" type="checkbox"
+                                           data-id="${variant.id}"
+                                           data-iwasku="${variant.iwasku || ''}"
+                                           id="variant-${variant.id}">
+                                </div>
+                            </td>
+                            <td>${variant.id}</td>
+                            <td>${variant.iwasku || '-'}</td>
+                            <td>${variant.variationColor || '-'}</td>
+                            <td>${variant.variationSize || '-'}</td>
+                        `;
                                     variantsList.appendChild(row);
                                 });
 
