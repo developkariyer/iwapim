@@ -56,7 +56,7 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
-     * @Route("/api/products/search/{identifier}", name="api_product_search", methods={"GET"})
+     * @Route("/ciceksepeti/api/product/{identifier}", name="ciceksepeti_product_search", methods={"GET"})
      */
     public function searchProduct(string $identifier): JsonResponse
     {

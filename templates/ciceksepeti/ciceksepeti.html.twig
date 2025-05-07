@@ -565,7 +565,7 @@
                 console.log("Ürün aranıyor:", identifier); // Debug için
 
                 // API isteği gönder - URL parametresi kullanarak
-                fetch(`/api/products/search/${encodeURIComponent(identifier)}`)
+                fetch(`/ciceksepeti/api/product/${encodeURIComponent(identifier)}`)
                     .then(response => {
                         console.log("API yanıtı:", response);
                         if (!response.ok) {
