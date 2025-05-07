@@ -56,6 +56,69 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
+     * @Route("/create-ciceksepeti-listing", name="create_ciceksepeti_listing", methods={"POST"})
+     */
+    public function createListing(Request $request): Response
+    {
+        try {
+            // JSON verisini al
+            $content = $request->getContent();
+            $data = json_decode($content, true);
+
+            if (!$data) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Geçersiz JSON verisi'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Gerekli alanların kontrolü
+            if (empty($data['productId']) || empty($data['categoryId']) || empty($data['variants'])) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Eksik veri alanları: productId, categoryId ve en az bir varyant gerekli'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Varyant verilerinin kontrolü
+            foreach ($data['variants'] as $variant) {
+                if (empty($variant['id']) || empty($variant['stock']) || empty($variant['price'])) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Her varyant için id, stok ve fiyat bilgileri gereklidir'
+                    ], Response::HTTP_BAD_REQUEST);
+                }
+            }
+
+            $responseData = [
+                'success' => true,
+                'message' => 'Listing bilgileri başarıyla alındı',
+                'timestamp' => new \DateTime(),
+                'requestData' => $data,
+                'summary' => [
+                    'productName' => $data['productName'],
+                    'productId' => $data['productId'],
+                    'categoryId' => $data['categoryId'],
+                    'variantCount' => count($data['variants']),
+                    'totalStock' => array_sum(array_column($data['variants'], 'stock')),
+                    'priceRange' => [
+                        'min' => min(array_column($data['variants'], 'price')),
+                        'max' => max(array_column($data['variants'], 'price'))
+                    ]
+                ]
+            ];
+
+            return $this->json($responseData);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'İşlem sırasında bir hata oluştu: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * @Route("/api/products/search/{identifier}", name="api_product_search", methods={"GET"})
      */
     public function searchProduct(string $identifier): Response

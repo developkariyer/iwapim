@@ -1066,6 +1066,108 @@
                 }, 3000);
             }
 
+            function showListingResult(data) {
+                // Mevcut bir sonuç modalı varsa kaldır
+                let existingModal = document.getElementById('listingResultModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Yeni sonuç modalı oluştur
+                const modalHtml = `
+    <div class="modal fade" id="listingResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Listing Başarıyla Oluşturuldu</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-success mb-4">
+                        <i class="fas fa-check-circle me-2"></i> ${data.message}
+                    </div>
+
+                    <h6 class="fw-bold mb-3">Ürün Özeti</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Ürün Adı:</span> <span class="fw-bold">${data.summary.productName}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Ürün ID:</span> <span>${data.summary.productId}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Kategori ID:</span> <span>${data.summary.categoryId}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Varyant Sayısı:</span> <span class="badge bg-primary">${data.summary.variantCount}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Toplam Stok:</span> <span class="badge bg-info">${data.summary.totalStock}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Fiyat Aralığı:</span> <span>${data.summary.priceRange.min} TL - ${data.summary.priceRange.max} TL</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3">Varyant Detayları</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>IWASKU</th>
+                                    <th>Renk</th>
+                                    <th>Ebat</th>
+                                    <th>Stok</th>
+                                    <th>Fiyat (TL)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.requestData.variants.map(variant => `
+                                    <tr>
+                                        <td>${variant.id}</td>
+                                        <td>${variant.iwasku || '-'}</td>
+                                        <td>${variant.color || '-'}</td>
+                                        <td>${variant.size || '-'}</td>
+                                        <td>${variant.stock}</td>
+                                        <td>${variant.price}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <a href="/ciceksepeti" class="btn btn-primary">Listeye Dön</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+
+                // Modal'ı DOM'a ekle
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                // Modal'ı göster
+                const resultModal = new bootstrap.Modal(document.getElementById('listingResultModal'));
+                resultModal.show();
+
+                // Ana listing modal'ı kapat
+                const listingModal = bootstrap.Modal.getInstance(document.getElementById('newListingModal'));
+                if (listingModal) {
+                    listingModal.hide();
+                }
+            }
+
             /**
              * Listing Oluştur Butonu Durumu Güncelleme
              * Seçim ve kategori durumuna göre butonun aktif/pasif olmasını kontrol eder
@@ -1101,7 +1203,7 @@
                 createButton.disabled = true;
                 createButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
 
-                // Seçili varyantları topla - her biri için stok ve fiyat değerlerini de al
+                // Seçili varyantları topla
                 const variants = [];
                 selectedRows.forEach(function(checkbox) {
                     const row = checkbox.closest('tr');
@@ -1139,19 +1241,21 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        // Butonu eski haline getir
+                        createButton.disabled = false;
+                        createButton.innerHTML = originalButtonText;
+
                         if (data.success) {
-                            alert('Listing başarıyla oluşturuldu!');
-                            location.reload(); // Sayfayı yenile
+                            // Sonuçları detaylı göstermek için yeni bir modal açalım
+                            showListingResult(data);
                         } else {
                             alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu'));
-                            // Butonu eski haline getir
-                            createButton.disabled = false;
-                            createButton.innerHTML = originalButtonText;
                         }
                     })
                     .catch(error => {
                         console.error('Listing oluşturma hatası:', error);
                         alert('Bağlantı hatası oluştu');
+
                         // Butonu eski haline getir
                         createButton.disabled = false;
                         createButton.innerHTML = originalButtonText;
