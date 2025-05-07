@@ -58,14 +58,28 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $productSql = '
-            SELECT oo_id, name, productCategory from object_query_product
-            WHERE productIdentifier = :productIdentifier AND productLevel = 0
-            LIMIT 1';
+        SELECT oo_id, name, productCategory from object_query_product
+        WHERE productIdentifier = :productIdentifier AND productLevel = 0
+        LIMIT 1';
         $variantSql = '
-            SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
-            WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
+        SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
+        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
-        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => 'CA-001A']);
+        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $identifier]);
+        if (!is_array($product) || empty($product)) {
+            return $this->json(['success' => false, 'message' => 'Ürün bulunamadı']);
+        }
+
+        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $identifier]);
+        if (!is_array($variants) || empty($variants)) {
+            return $this->json(['success' => false, 'message' => 'Variant bulunamadı']);
+        }
+
+        $productData = [
+            'id' => $product[0]['oo_id'],
+            'name' => $product[0]['name'],
+            'productCategory' => $product[0]['productCategory']
+        ];
         $variantData = [];
         foreach ($variants as $variant) {
             $variantData[] = [
@@ -75,7 +89,8 @@ class HelloWorldCommand extends AbstractCommand
                 'variationColor' => $variant['variationColor']
             ];
         }
-        print_r($variantData);
+        $productData['variants'] = $variantData;
+        print_r($productData);
 
         // IJ
        // $productId = 238133;
