@@ -504,7 +504,7 @@
                         return response.json();
                     })
                     .then(data => {
-                        loadingSpinner.classList.add('d-none');
+                        if (loadingSpinner) loadingSpinner.classList.add('d-none');
 
                         if (data.success && data.product) {
                             const productNameEl = document.getElementById('productName');
@@ -520,50 +520,66 @@
                                 variantsTableBody.innerHTML = '';
 
                                 if (data.product.variants && data.product.variants.length > 0) {
+                                    // Varyantları döngüye al ve her birini tabloya ekle
                                     data.product.variants.forEach(variant => {
                                         const row = document.createElement('tr');
                                         row.innerHTML = `
-                                            <td>${variant.id}</td>
-                                            <td>${variant.iwasku || '-'}</td>
-                                            <td>${variant.variationColor || '-'}</td>
-                                            <td>${variant.variationSize || '-'}</td>
-                                        `;
+                                <td>${variant.id}</td>
+                                <td>${variant.iwasku || '-'}</td>
+                                <td>${variant.variationColor || '-'}</td>
+                                <td>${variant.variationSize || '-'}</td>
+                            `;
                                         variantsTableBody.appendChild(row);
                                     });
+
+                                    // Varyant sayısını göster
+                                    console.log(`${data.product.variants.length} varyant bulundu.`);
                                 } else {
                                     variantsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
                                 }
                             }
 
-                            const productInfo = document.getElementById('productInfo');
+                            // Ürün bilgilerini göster
                             if (productInfo) productInfo.classList.remove('d-none');
                         } else {
-                            errorMessage.textContent = data.message || 'Ürün bulunamadı.';
-                            errorMessage.classList.remove('d-none');
+                            // Hata mesajı göster
+                            if (errorMessage) {
+                                errorMessage.textContent = data.message || 'Ürün bulunamadı.';
+                                errorMessage.classList.remove('d-none');
+                            }
                         }
                     })
                     .catch(error => {
                         console.error('API Hatası:', error);
-                        loadingSpinner.classList.add('d-none');
-                        errorMessage.textContent = 'API isteği sırasında bir hata oluştu: ' + error.message;
-                        errorMessage.classList.remove('d-none');
+                        if (loadingSpinner) loadingSpinner.classList.add('d-none');
+                        if (errorMessage) {
+                            errorMessage.textContent = 'API isteği sırasında bir hata oluştu: ' + error.message;
+                            errorMessage.classList.remove('d-none');
+                        }
                     });
             }
+            let isModalFirstOpen = true;
             document.getElementById('newListingBtn').addEventListener('click', function() {
-                // Mevcut kod
                 const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
 
-                // Formu sıfırla
-                document.getElementById('productIdentifier').value = '';
-                const resultsContainer = document.getElementById('searchResultsContainer');
-                const errorMessage = document.getElementById('errorMessage');
-                const productInfo = document.getElementById('productInfo');
+                if (isModalFirstOpen) {
+                    document.getElementById('productIdentifier').value = '';
+                    const resultsContainer = document.getElementById('searchResultsContainer');
+                    const errorMessage = document.getElementById('errorMessage');
+                    const productInfo = document.getElementById('productInfo');
 
-                if (resultsContainer) resultsContainer.classList.add('d-none');
-                if (errorMessage) errorMessage.classList.add('d-none');
-                if (productInfo) productInfo.classList.add('d-none');
+                    if (resultsContainer) resultsContainer.classList.add('d-none');
+                    if (errorMessage) errorMessage.classList.add('d-none');
+                    if (productInfo) productInfo.classList.add('d-none');
+
+                    isModalFirstOpen = false;
+                }
 
                 modal.show();
+            });
+
+            document.getElementById('newListingModal').addEventListener('hidden.bs.modal', function () {
+                isModalFirstOpen = true;
             });
         });
 
