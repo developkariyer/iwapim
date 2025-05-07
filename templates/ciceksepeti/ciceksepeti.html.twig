@@ -301,7 +301,123 @@
             </div>
         </div>
     </div>
+    <!-- Yeni Listing Modal -->
+    <div class="modal fade" id="newListingModal" tabindex="-1" aria-labelledby="newListingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="newListingModalLabel">Yeni Listing Oluştur</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Arama Formu -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">1. Ürün Ara</h6>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="productIdentifier" class="form-label">Ürün Kodu (PIM)</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="productIdentifier" placeholder="IM-123">
+                                        <button class="btn btn-primary" type="button" id="searchBtn">
+                                            <i class="fas fa-search"></i> Ara
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Pimcore'da kayıtlı ürün kodunu girin.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Arama Sonuçları -->
+                    <div id="searchResults" class="d-none">
+                        <!-- Yükleniyor -->
+                        <div id="loadingContainer" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <p class="mt-2">Ürün aranıyor, lütfen bekleyin...</p>
+                        </div>
+
+                        <!-- Hata Mesajı -->
+                        <div id="errorContainer" class="alert alert-danger d-none">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="errorMessage">Ürün bulunamadı.</span>
+                        </div>
+
+                        <!-- Ürün Bilgileri -->
+                        <div id="productContainer" class="d-none">
+                            <h6 class="mb-3">2. Ürün Bilgileri</h6>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 id="productName" class="card-title">Ürün Adı</h5>
+                                    <p class="mb-1"><strong>ID:</strong> <span id="productId"></span></p>
+                                    <p><strong>Kategori:</strong> <span id="productCategory"></span></p>
+                                </div>
+                            </div>
+
+                            <!-- Varyant Listesi -->
+                            <h6 class="mb-3">3. Varyant Seçimi</h6>
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 50px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="selectAllVariants">
+                                                    </div>
+                                                </th>
+                                                <th>Variant ID</th>
+                                                <th>IWASKU</th>
+                                                <th>Renk</th>
+                                                <th>Ebat</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="variantsList">
+                                            <!-- Varyantlar burada listelenecek -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Listing Bilgileri -->
+                            <h6 class="mb-3 mt-4">4. Listing Detayları</h6>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="listingStock" class="form-label">Stok Miktarı</label>
+                                            <input type="number" class="form-control" id="listingStock" min="1" value="10">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="listingPrice" class="form-label">Satış Fiyatı (TL)</label>
+                                            <input type="number" class="form-control" id="listingPrice" min="0.01" step="0.01" value="100">
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="categorySelect" class="form-label">Çiçeksepeti Kategorisi</label>
+                                            <select class="form-select" id="categorySelect">
+                                                <option value="">Kategori Seçin</option>
+                                                {% for category in categories %}
+                                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-success" id="createListingBtn" disabled>Listing Oluştur</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
@@ -400,6 +516,184 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
+
+        // Yeni Listing Modal işlemleri
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal açma butonu
+            document.getElementById('newListingBtn').addEventListener('click', function() {
+                const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
+                modal.show();
+            });
+
+            // Arama butonu
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                searchProduct();
+            });
+
+            // Enter ile arama
+            document.getElementById('productIdentifier').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchProduct();
+                }
+            });
+
+            // Tüm varyantları seç/kaldır
+            document.getElementById('selectAllVariants').addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                });
+                updateCreateButton();
+            });
+
+            // Arama fonksiyonu
+            function searchProduct() {
+                const identifier = document.getElementById('productIdentifier').value.trim();
+
+                if (!identifier) {
+                    alert('Lütfen bir ürün kodu girin');
+                    return;
+                }
+
+                // UI'ı hazırla
+                document.getElementById('searchResults').classList.remove('d-none');
+                document.getElementById('loadingContainer').classList.remove('d-none');
+                document.getElementById('errorContainer').classList.add('d-none');
+                document.getElementById('productContainer').classList.add('d-none');
+
+                // API isteği gönder
+                fetch(`/api/products/search?identifier=${encodeURIComponent(identifier)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('loadingContainer').classList.add('d-none');
+
+                        if (data.success && data.product) {
+                            // Ürün bilgilerini göster
+                            document.getElementById('productName').textContent = data.product.name || 'İsimsiz Ürün';
+                            document.getElementById('productId').textContent = data.product.id || '-';
+                            document.getElementById('productCategory').textContent = data.product.productCategory || '-';
+
+                            // Varyantları listele
+                            const variantsList = document.getElementById('variantsList');
+                            variantsList.innerHTML = '';
+
+                            if (data.product.variants && data.product.variants.length > 0) {
+                                data.product.variants.forEach(function(variant) {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input variant-checkbox" type="checkbox"
+                                               data-id="${variant.id}"
+                                               data-iwasku="${variant.iwasku || ''}"
+                                               id="variant-${variant.id}">
+                                    </div>
+                                </td>
+                                <td>${variant.id}</td>
+                                <td>${variant.iwasku || '-'}</td>
+                                <td>${variant.variationColor || '-'}</td>
+                                <td>${variant.variationSize || '-'}</td>
+                            `;
+                                    variantsList.appendChild(row);
+                                });
+
+                                // Varyant checkbox'larına event listener ekle
+                                document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                                    checkbox.addEventListener('change', updateCreateButton);
+                                });
+                            } else {
+                                variantsList.innerHTML = '<tr><td colspan="5" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
+                            }
+
+                            document.getElementById('productContainer').classList.remove('d-none');
+                        } else {
+                            // Hata mesajını göster
+                            document.getElementById('errorMessage').textContent = data.message || 'Ürün bulunamadı.';
+                            document.getElementById('errorContainer').classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('API Hatası:', error);
+                        document.getElementById('loadingContainer').classList.add('d-none');
+                        document.getElementById('errorMessage').textContent = 'Bağlantı hatası oluştu.';
+                        document.getElementById('errorContainer').classList.remove('d-none');
+                    });
+            }
+
+            // Oluştur butonunu güncelle
+            function updateCreateButton() {
+                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked');
+                const categorySelected = document.getElementById('categorySelect').value !== '';
+
+                document.getElementById('createListingBtn').disabled = selectedVariants.length === 0 || !categorySelected;
+            }
+
+            // Kategori seçimi değişince butonu güncelle
+            document.getElementById('categorySelect').addEventListener('change', updateCreateButton);
+
+            // Listing oluştur butonu
+            document.getElementById('createListingBtn').addEventListener('click', function() {
+                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked');
+                const categoryId = document.getElementById('categorySelect').value;
+                const stock = document.getElementById('listingStock').value;
+                const price = document.getElementById('listingPrice').value;
+
+                if (selectedVariants.length === 0) {
+                    alert('Lütfen en az bir varyant seçin');
+                    return;
+                }
+
+                if (!categoryId) {
+                    alert('Lütfen bir kategori seçin');
+                    return;
+                }
+
+                // Seçili varyantları hazırla
+                const variants = [];
+                selectedVariants.forEach(function(checkbox) {
+                    variants.push({
+                        id: checkbox.getAttribute('data-id'),
+                        iwasku: checkbox.getAttribute('data-iwasku')
+                    });
+                });
+
+                // Form verisini hazırla
+                const formData = {
+                    categoryId: categoryId,
+                    stock: stock,
+                    price: price,
+                    variants: variants,
+                    productId: document.getElementById('productId').textContent
+                };
+
+                // API isteği gönder
+                fetch('/create-ciceksepeti-listing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Listing başarıyla oluşturuldu!');
+                            location.reload(); // Sayfayı yenile
+                        } else {
+                            alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('API Hatası:', error);
+                        alert('Bağlantı hatası oluştu.');
+                    });
+            });
+        });
+
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButtons = document.querySelectorAll('.toggle-variants');
 
