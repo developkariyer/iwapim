@@ -309,6 +309,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Arama Formu -->
                     <div class="mb-3">
                         <label for="productIdentifier" class="form-label">Ürün Kodu (PIM)</label>
                         <div class="input-group">
@@ -340,6 +341,36 @@
                                 <div><strong>Kategori:</strong> <span id="productCategory"></span></div>
                             </div>
 
+                            <!-- Listing kategorisi ve toplu ayarlar -->
+                            <div id="listingOptionsContainer" class="mb-4">
+                                <h5 class="mb-3">Listing Bilgileri</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="categorySelect" class="form-label">Çiçeksepeti Kategorisi</label>
+                                        <select class="form-select" id="categorySelect">
+                                            <option value="">Kategori Seçin</option>
+                                            {% for category in categories %}
+                                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Toplu Stok Ayarla</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="bulkStock" value="10" min="1">
+                                            <button class="btn btn-outline-secondary" type="button" id="applyBulkStock">Uygula</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Toplu Fiyat Ayarla</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="bulkPrice" value="100" min="0.01" step="0.01">
+                                            <button class="btn btn-outline-secondary" type="button" id="applyBulkPrice">Uygula</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <h5 class="mt-4 mb-3">Varyantlar</h5>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover">
@@ -354,32 +385,12 @@
                                         <th>IWASKU</th>
                                         <th>Renk</th>
                                         <th>Ebat</th>
+                                        <th>Stok</th>
+                                        <th>Fiyat (TL)</th>
                                     </tr>
                                     </thead>
                                     <tbody id="variantsTableBody"></tbody>
                                 </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="listingOptionsContainer" class="mt-4 d-none">
-                        <h5 class="mb-3">Listing Bilgileri</h5>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="stockQuantity" class="form-label">Stok Miktarı</label>
-                                <input type="number" class="form-control" id="stockQuantity" value="10" min="1">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="salesPrice" class="form-label">Satış Fiyatı (TL)</label>
-                                <input type="number" class="form-control" id="salesPrice" value="100" min="0.01" step="0.01">
-                            </div>
-                            <div class="col-12">
-                                <label for="categorySelect" class="form-label">Kategori</label>
-                                <select class="form-select" id="categorySelect">
-                                    <option value="">Kategori Seçin</option>
-                                    {% for category in categories %}
-                                        <option value="{{ category.id }}">{{ category.name }}</option>
-                                    {% endfor %}
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -526,10 +537,9 @@
             document.getElementById('createListingBtn').disabled = !(selectedVariants.length > 0 && selectedCategory);
         }
 
-        // Listing oluşturma butonu
         document.getElementById('createListingBtn').addEventListener('click', function() {
-            const selectedVariants = document.querySelectorAll('.variant-checkbox:checked');
-            if (selectedVariants.length === 0) {
+            const selectedRows = document.querySelectorAll('.variant-checkbox:checked');
+            if (selectedRows.length === 0) {
                 alert('Lütfen en az bir varyant seçin');
                 return;
             }
@@ -540,17 +550,20 @@
                 return;
             }
 
-            const stockQuantity = document.getElementById('stockQuantity').value;
-            const salesPrice = document.getElementById('salesPrice').value;
-
-            // Seçili varyantları topla
+            // Seçili varyantları topla - her biri için stok ve fiyat değerlerini de al
             const variants = [];
-            selectedVariants.forEach(function(checkbox) {
+            selectedRows.forEach(function(checkbox) {
+                const row = checkbox.closest('tr');
+                const stockInput = row.querySelector('.variant-stock');
+                const priceInput = row.querySelector('.variant-price');
+
                 variants.push({
                     id: checkbox.value,
                     iwasku: checkbox.getAttribute('data-iwasku'),
                     color: checkbox.getAttribute('data-color'),
-                    size: checkbox.getAttribute('data-size')
+                    size: checkbox.getAttribute('data-size'),
+                    stock: stockInput ? stockInput.value : 0,
+                    price: priceInput ? priceInput.value : 0
                 });
             });
 
@@ -559,8 +572,6 @@
                 productId: document.getElementById('productId').textContent,
                 productName: document.getElementById('productName').textContent,
                 categoryId: categoryId,
-                stockQuantity: stockQuantity,
-                salesPrice: salesPrice,
                 variants: variants
             };
 
@@ -588,6 +599,28 @@
                     alert('Bağlantı hatası oluştu');
                 });
         });
+
+        // Toplu stok ve fiyat ayarlama butonları
+        document.getElementById('applyBulkStock').addEventListener('click', function() {
+            const bulkStock = document.getElementById('bulkStock').value;
+            document.querySelectorAll('.variant-checkbox:checked').forEach(function(checkbox) {
+                const row = checkbox.closest('tr');
+                const stockInput = row.querySelector('.variant-stock');
+                if (stockInput) stockInput.value = bulkStock;
+            });
+        });
+
+        document.getElementById('applyBulkPrice').addEventListener('click', function() {
+            const bulkPrice = document.getElementById('bulkPrice').value;
+            document.querySelectorAll('.variant-checkbox:checked').forEach(function(checkbox) {
+                const row = checkbox.closest('tr');
+                const priceInput = row.querySelector('.variant-price');
+                if (priceInput) priceInput.value = bulkPrice;
+            });
+        });
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('newListingBtn').addEventListener('click', function() {
                 const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
@@ -657,19 +690,27 @@
                                data-iwasku="${variant.iwasku || ''}"
                                data-color="${variant.variationColor || ''}"
                                data-size="${variant.variationSize || ''}">
-                                        </div>
-                                    </td>
-                                    <td>${variant.id}</td>
-                                    <td>${variant.iwasku || '-'}</td>
-                                    <td>${variant.variationColor || '-'}</td>
-                                    <td>${variant.variationSize || '-'}</td>
-                                `;
+                    </div>
+                </td>
+                <td>${variant.id}</td>
+                <td>${variant.iwasku || '-'}</td>
+                <td>${variant.variationColor || '-'}</td>
+                <td>${variant.variationSize || '-'}</td>
+                <td>
+                    <input type="number" class="form-control form-control-sm variant-stock"
+                           min="1" value="10" style="width: 80px;">
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm variant-price"
+                           min="0.01" step="0.01" value="100" style="width: 100px;">
+                </td>
+            `;
                                         variantsTableBody.appendChild(row);
                                     });
 
                                     console.log(`${data.product.variants.length} varyant bulundu.`);
                                 } else {
-                                    variantsTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
+                                    variantsTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
                                 }
                             }
 
