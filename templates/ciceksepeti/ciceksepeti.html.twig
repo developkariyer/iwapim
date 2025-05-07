@@ -491,10 +491,10 @@
                 const errorMessage = document.getElementById('errorMessage');
                 const productInfo = document.getElementById('productInfo');
 
-                resultsContainer.classList.remove('d-none');
-                loadingSpinner.classList.remove('d-none');
-                errorMessage.classList.add('d-none');
-                productInfo.classList.add('d-none');
+                if (resultsContainer) resultsContainer.classList.remove('d-none');
+                if (loadingSpinner) loadingSpinner.classList.remove('d-none');
+                if (errorMessage) errorMessage.classList.add('d-none');
+                if (productInfo) productInfo.classList.add('d-none');
 
                 fetch(`/api/products/search/${encodeURIComponent(identifier)}`)
                     .then(response => {
