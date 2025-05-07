@@ -60,10 +60,11 @@ class CiceksepetiController extends FrontendController
      */
     public function searchProduct(string $identifier): JsonResponse
     {
+        error_log('=== API ÇAĞRISI BAŞLATILDI: /api/products/search/' . $identifier . ' ===');
         if (empty($identifier)) {
             return $this->json(['success' => false, 'message' => 'Ürün kodu belirtilmedi'], 400);
         }
-
+        error_log('SQL sorgusu çalıştırılıyor...');
         $productSql = '
         SELECT oo_id, name, productCategory from object_query_product
         WHERE productIdentifier = :productIdentifier AND productLevel = 0
@@ -71,12 +72,14 @@ class CiceksepetiController extends FrontendController
         $variantSql = '
         SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
         WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
-
+        error_log('Ana ürün SQL: ' . $productSql);
+        error_log('Varyant SQL: ' . $variantSql);
+        error_log('Aranan identifier: ' . $identifier);
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $identifier]);
         if (!is_array($product) || empty($product)) {
             return $this->json(['success' => false, 'message' => 'Ürün bulunamadı']);
         }
-
+        error_log('Ana ürün sorgu sonucu: ' . json_encode($product));
         $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $identifier]);
         if (!is_array($variants) || empty($variants)) {
             return $this->json(['success' => false, 'message' => 'Variant bulunamadı']);
