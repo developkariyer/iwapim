@@ -56,6 +56,19 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
+     * @Route("/ciceksepeti/new-listing", name="ciceksepeti_new_listing")
+     */
+    public function newListing(): Response
+    {
+        // Kategorileri getirin
+        $categories = $this->getCategories();
+
+        return $this->render('ciceksepeti/new_listing.html.twig', [
+            'categories' => $categories
+        ]);
+    }
+
+    /**
      * @Route("/api/products/search", name="api_product_search", methods={"GET"})
      */
     public function searchProduct(Request $request): JsonResponse

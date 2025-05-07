@@ -1,0 +1,271 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Yeni Listing Oluştur{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="mb-3">Yeni Listing Oluştur</h1>
+                <a href="{{ path('ciceksepeti_main_page') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Ürün Listesine Dön
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">1. Ürün Ara</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="searchForm" method="GET">
+                            <div class="mb-3">
+                                <label for="identifier" class="form-label">Ürün Kodu (PIM)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="identifier" name="identifier" placeholder="IM-123">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search"></i> Ara
+                                    </button>
+                                </div>
+                                <div class="form-text">Pimcore'da kayıtlı ürün kodunu girin.</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4 d-none" id="productCard">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Bulunan Ürün</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 id="productName">Ürün Adı</h5>
+                        <p class="mb-1"><strong>ID:</strong> <span id="productId"></span></p>
+                        <p class="mb-1"><strong>Kategori:</strong> <span id="productCategory"></span></p>
+                        <p><strong>Varyant Sayısı:</strong> <span id="variantCount"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">2. Varyantları Seç</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="loadingMessage" class="p-3 d-none">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm me-2" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <span>Ürün bilgileri yükleniyor...</span>
+                            </div>
+                        </div>
+
+                        <div id="errorMessage" class="alert alert-warning m-3 d-none">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="errorText">Ürün bulunamadı.</span>
+                        </div>
+
+                        <div id="variantsTable" class="table-responsive d-none">
+                            <form id="variantForm" method="POST" action="{{ path('create_ciceksepeti_listing') }}">
+                                <input type="hidden" name="productId" id="formProductId">
+
+                                <table class="table table-hover table-bordered mb-0">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                                <label class="form-check-label" for="selectAll"></label>
+                                            </div>
+                                        </th>
+                                        <th>ID</th>
+                                        <th>IWASKU</th>
+                                        <th>Renk</th>
+                                        <th>Ebat</th>
+                                        <th style="width: 100px;">Stok</th>
+                                        <th style="width: 120px;">Fiyat (₺)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="variantsList">
+                                    <!-- Varyantlar burada listelenecek -->
+                                    </tbody>
+                                </table>
+
+                                <div class="p-3 border-top">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="categorySelect" class="form-label">Çiçeksepeti Kategorisi</label>
+                                            <select class="form-select" id="categorySelect" name="categoryId" required>
+                                                <option value="">Kategori Seçin</option>
+                                                {% for category in categories %}
+                                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-success w-100" id="submitBtn" disabled>
+                                                <i class="fas fa-plus-circle me-2"></i>Listing Oluştur
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #variantsTable {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block body_scripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const productCard = document.getElementById('productCard');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const variantsTable = document.getElementById('variantsTable');
+            const variantsList = document.getElementById('variantsList');
+            const submitBtn = document.getElementById('submitBtn');
+            const formProductId = document.getElementById('formProductId');
+
+            // URL'den identifier parametresini kontrol et
+            const urlParams = new URLSearchParams(window.location.search);
+            const identifierParam = urlParams.get('identifier');
+
+            if (identifierParam) {
+                document.getElementById('identifier').value = identifierParam;
+                searchProduct(identifierParam);
+            }
+
+            // Form submit olayını yakala
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const identifier = document.getElementById('identifier').value.trim();
+                if (!identifier) {
+                    alert('Lütfen bir ürün kodu girin');
+                    return;
+                }
+
+                searchProduct(identifier);
+            });
+
+            // Tüm checkbox'ları seç/kaldır
+            document.getElementById('selectAll').addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.querySelectorAll('.variant-checkbox').forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+                updateSubmitButton();
+            });
+
+            // Ürün arama fonksiyonu
+            function searchProduct(identifier) {
+                // UI'ı hazırla
+                productCard.classList.add('d-none');
+                loadingMessage.classList.remove('d-none');
+                errorMessage.classList.add('d-none');
+                variantsTable.classList.add('d-none');
+                variantsList.innerHTML = '';
+
+                // API isteği
+                fetch(`/api/products/search?identifier=${encodeURIComponent(identifier)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingMessage.classList.add('d-none');
+
+                        if (data.success && data.product) {
+                            // Ürün bilgilerini göster
+                            document.getElementById('productName').textContent = data.product.name || 'İsimsiz Ürün';
+                            document.getElementById('productId').textContent = data.product.id || '-';
+                            document.getElementById('productCategory').textContent = data.product.productCategory || '-';
+                            document.getElementById('variantCount').textContent = data.product.variants ? data.product.variants.length : 0;
+                            formProductId.value = data.product.id;
+
+                            // Ürün kartını göster
+                            productCard.classList.remove('d-none');
+
+                            // Varyantları listele
+                            if (data.product.variants && data.product.variants.length > 0) {
+                                renderVariants(data.product.variants);
+                                variantsTable.classList.remove('d-none');
+                            } else {
+                                errorText.textContent = 'Bu ürüne ait varyant bulunamadı.';
+                                errorMessage.classList.remove('d-none');
+                            }
+                        } else {
+                            // Hata mesajını göster
+                            errorText.textContent = data.message || 'Ürün bulunamadı.';
+                            errorMessage.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Arama hatası:', error);
+                        loadingMessage.classList.add('d-none');
+                        errorText.textContent = 'Ürün arama sırasında bir hata oluştu.';
+                        errorMessage.classList.remove('d-none');
+                    });
+            }
+
+            // Varyantları listele
+            function renderVariants(variants) {
+                variantsList.innerHTML = '';
+
+                variants.forEach((variant, index) => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input variant-checkbox" type="checkbox" name="variants[]"
+                                       value="${variant.id}" id="variant${variant.id}">
+                                <label class="form-check-label" for="variant${variant.id}"></label>
+                            </div>
+                        </td>
+                        <td>${variant.id}</td>
+                        <td>${variant.iwasku || '-'}</td>
+                        <td>${variant.variationColor || '-'}</td>
+                        <td>${variant.variationSize || '-'}</td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm" name="stock[${variant.id}]"
+                                   value="10" min="0" required>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm" name="price[${variant.id}]"
+                                   value="100" min="0" step="0.01" required>
+                        </td>
+                    `;
+
+                    variantsList.appendChild(row);
+                });
+
+                // Checkbox olaylarını ekle
+                document.querySelectorAll('.variant-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', updateSubmitButton);
+                });
+            }
+
+            // Submit butonunu güncelle
+            function updateSubmitButton() {
+                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked');
+                submitBtn.disabled = selectedVariants.length === 0;
+            }
+        });
+    </script>
+{% endblock %}
