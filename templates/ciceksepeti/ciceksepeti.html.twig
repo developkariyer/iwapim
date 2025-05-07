@@ -520,6 +520,18 @@
                                 variantsTableBody.innerHTML = '';
 
                                 if (data.product.variants && data.product.variants.length > 0) {
+                                    data.product.variants.forEach(variant => {
+                                        const row = document.createElement('tr');
+                                        row.innerHTML = `
+                                            <td>${variant.id}</td>
+                                            <td>${variant.iwasku || '-'}</td>
+                                            <td>${variant.variationColor || '-'}</td>
+                                            <td>${variant.variationSize || '-'}</td>
+                                        `;
+                                        variantsTableBody.appendChild(row);
+                                    });
+                                } else {
+                                    variantsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
                                 }
                             }
 
@@ -537,6 +549,22 @@
                         errorMessage.classList.remove('d-none');
                     });
             }
+            document.getElementById('newListingBtn').addEventListener('click', function() {
+                // Mevcut kod
+                const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
+
+                // Formu sıfırla
+                document.getElementById('productIdentifier').value = '';
+                const resultsContainer = document.getElementById('searchResultsContainer');
+                const errorMessage = document.getElementById('errorMessage');
+                const productInfo = document.getElementById('productInfo');
+
+                if (resultsContainer) resultsContainer.classList.add('d-none');
+                if (errorMessage) errorMessage.classList.add('d-none');
+                if (productInfo) productInfo.classList.add('d-none');
+
+                modal.show();
+            });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
