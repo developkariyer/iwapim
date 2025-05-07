@@ -1,20 +1,636 @@
 {% extends 'base.html.twig' %}
-{% block title %} Çiçeksepeti {% endblock %}
+{% block title %} Otomatik Listing {% endblock %}
 {% block navbaritems %}{% endblock %}
 {% block header %}{% endblock %}
 
 {% block content %}
+    <div class="container-fluid mt-4">
+        <h1 class="text-center mb-4">Otomatik Listing Oluşturma</h1>
 
+        <!-- Başarılı mesajlar -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Ürün Ara</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" id="productIdentifier" class="form-control" placeholder="Ürün Kodu (PIM Identifier) Girin" aria-label="Ürün Kodu">
+                            <button class="btn btn-primary" type="button" id="searchBtn">
+                                <i class="fas fa-search me-1"></i> Ara
+                            </button>
+                        </div>
+                        <small class="text-muted">Ürün kodu kullanarak sistem üzerindeki varyantları arayabilirsiniz (Örn: CA-001A)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sonuçlar ve Form Bölümü -->
+        <div class="row" id="resultsContainer" style="display: none;">
+            <!-- Yükleniyor göstergesi -->
+            <div class="col-12" id="loadingSpinner">
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="ms-3 mb-0">Arama sonuçları yükleniyor...</p>
+                </div>
+            </div>
+
+            <!-- Hata mesajı -->
+            <div class="col-12" id="errorMessage" style="display: none;">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorText">Bir hata oluştu.</span>
+                </div>
+            </div>
+
+            <!-- Arama Sonuçları ve Form -->
+            <div class="col-12" id="productForm" style="display: none;">
+                <form id="autoListingForm">
+                    <!-- Ürün Bilgileri -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Ürün Bilgileri</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p><strong>Ürün Adı:</strong> <span id="productName">-</span></p>
+                                    <input type="hidden" id="productId" name="productId">
+                                </div>
+                                <div class="col-md-4">
+                                    <p><strong>Ürün Kodu:</strong> <span id="productIdentifierDisplay">-</span></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p><strong>Kategori:</strong> <span id="productCategory">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Varyant Seçimi -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Varyant Seçimi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="mb-0">Listinglenecek Varyantları Seçin</h6>
+                                        <small class="text-muted">Her varyant için stok ve fiyat bilgilerini ayarlayabilirsiniz</small>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-secondary" id="selectAllVariantsBtn">
+                                            <i class="fas fa-check-square me-1"></i> Tümünü Seç
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" id="deselectAllVariantsBtn">
+                                            <i class="fas fa-square me-1"></i> Seçimi Kaldır
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Toplu fiyat ve stok ayarı -->
+                                <div class="row mb-3 p-2 bg-light border rounded">
+                                    <div class="col-md-6 col-lg-3 mb-2 mb-lg-0">
+                                        <label class="form-label small mb-1">Toplu Stok Ayarla</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control" id="bulkStock" value="10" min="1">
+                                            <button class="btn btn-outline-primary" type="button" id="applyBulkStock">
+                                                <i class="fas fa-check"></i> Uygula
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <label class="form-label small mb-1">Toplu Fiyat Ayarla (TL)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control" id="bulkPrice" value="100" min="0.01" step="0.01">
+                                            <button class="btn btn-outline-primary" type="button" id="applyBulkPrice">
+                                                <i class="fas fa-check"></i> Uygula
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Varyant tablosu -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 40px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="selectAllVariants">
+                                                </div>
+                                            </th>
+                                            <th>IWASKU</th>
+                                            <th>Renk</th>
+                                            <th>Ebat</th>
+                                            <th style="width: 100px;">Stok</th>
+                                            <th style="width: 120px;">Fiyat (TL)</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="variantsTableBody">
+                                        <!-- Varyantlar JavaScript ile buraya eklenecek -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-2 d-flex justify-content-between align-items-center">
+                                    <small class="text-muted" id="selectionInfo">0 varyant seçildi</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pazaryeri Seçimi -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Pazaryeri Seçimi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="marketplaceSelect" class="form-label">Ürünleri Listelemek İstediğiniz Pazaryerlerini Seçin</label>
+                                <select class="form-select" id="marketplaceSelect" multiple size="3" required>
+                                    <option value="ciceksepeti">Çiçeksepeti</option>
+                                    <option value="trendyol">Trendyol</option>
+                                    <option value="hepsiburada">Hepsiburada</option>
+                                    <option value="n11">N11</option>
+                                    <option value="amazon">Amazon</option>
+                                </select>
+                                <small class="form-text text-muted">Ctrl tuşu ile birden fazla seçim yapabilirsiniz.</small>
+                            </div>
+
+                            <!-- Marketplace-specific fields will be dynamically added here -->
+                            <div id="marketplaceFields">
+                                <!-- Dynamic content will be added by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Gönderimi -->
+                    <div class="d-flex justify-content-between mb-5">
+                        <button type="button" class="btn btn-secondary" id="resetFormBtn">
+                            <i class="fas fa-times me-1"></i> Formu Sıfırla
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitFormBtn" disabled>
+                            <i class="fas fa-cloud-upload-alt me-1"></i> Listing İşlemini Başlat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        /* Form stileri */
+        .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 0.75rem 1.25rem;
+        }
+
+        /* Tablo stilleri */
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        /* Seçili satır vurgusu */
+        tr.selected-row {
+            background-color: rgba(0,123,255,0.1);
+        }
+
+        /* Resposive düzenlemeler */
+        @media (max-width: 767.98px) {
+            .table-responsive {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .btn-group {
+                display: flex;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .btn-group .btn {
+                flex: 1;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
     </style>
 {% endblock %}
 
 {% block body_scripts %}
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM element references
+            const productIdentifierInput = document.getElementById('productIdentifier');
+            const searchBtn = document.getElementById('searchBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const productForm = document.getElementById('productForm');
+            const productNameEl = document.getElementById('productName');
+            const productIdEl = document.getElementById('productId');
+            const productIdentifierDisplay = document.getElementById('productIdentifierDisplay');
+            const productCategoryEl = document.getElementById('productCategory');
+            const variantsTableBody = document.getElementById('variantsTableBody');
+            const selectionInfo = document.getElementById('selectionInfo');
+            const selectAllVariants = document.getElementById('selectAllVariants');
+            const selectAllVariantsBtn = document.getElementById('selectAllVariantsBtn');
+            const deselectAllVariantsBtn = document.getElementById('deselectAllVariantsBtn');
+            const bulkStock = document.getElementById('bulkStock');
+            const bulkPrice = document.getElementById('bulkPrice');
+            const applyBulkStock = document.getElementById('applyBulkStock');
+            const applyBulkPrice = document.getElementById('applyBulkPrice');
+            const marketplaceSelect = document.getElementById('marketplaceSelect');
+            const marketplaceFields = document.getElementById('marketplaceFields');
+            const submitFormBtn = document.getElementById('submitFormBtn');
+            const resetFormBtn = document.getElementById('resetFormBtn');
+            const autoListingForm = document.getElementById('autoListingForm');
 
+            // Event listeners
+            searchBtn.addEventListener('click', searchProduct);
+            productIdentifierInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchProduct();
+                }
+            });
+
+            selectAllVariants.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.variant-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                    toggleRowSelection(checkbox);
+                });
+                updateSelectionCounter();
+                updateSubmitButton();
+            });
+
+            selectAllVariantsBtn.addEventListener('click', function() {
+                selectAllVariants.checked = true;
+                const event = new Event('change');
+                selectAllVariants.dispatchEvent(event);
+            });
+
+            deselectAllVariantsBtn.addEventListener('click', function() {
+                selectAllVariants.checked = false;
+                const event = new Event('change');
+                selectAllVariants.dispatchEvent(event);
+            });
+
+            applyBulkStock.addEventListener('click', function() {
+                const stockValue = bulkStock.value;
+                const selectedCheckboxes = document.querySelectorAll('.variant-checkbox:checked');
+                selectedCheckboxes.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const stockInput = row.querySelector('.variant-stock');
+                    if (stockInput) stockInput.value = stockValue;
+                });
+            });
+
+            applyBulkPrice.addEventListener('click', function() {
+                const priceValue = bulkPrice.value;
+                const selectedCheckboxes = document.querySelectorAll('.variant-checkbox:checked');
+                selectedCheckboxes.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const priceInput = row.querySelector('.variant-price');
+                    if (priceInput) priceInput.value = priceValue;
+                });
+            });
+
+            marketplaceSelect.addEventListener('change', function() {
+                updateMarketplaceFields();
+                updateSubmitButton();
+            });
+
+            resetFormBtn.addEventListener('click', function() {
+                resetForm();
+            });
+
+            autoListingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm();
+            });
+
+            // Functions
+            function searchProduct() {
+                const identifier = productIdentifierInput.value.trim();
+
+                if (!identifier) {
+                    alert('Lütfen bir ürün kodu girin');
+                    return;
+                }
+
+                // UI sıfırlama ve yükleniyor göstergesi
+                resetResultsUI();
+                resultsContainer.style.display = 'block';
+                loadingSpinner.style.display = 'block';
+
+                // API isteği
+                fetch(`/api/products/search/${encodeURIComponent(identifier)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        loadingSpinner.style.display = 'none';
+
+                        if (data.success && data.product) {
+                            displayProductInfo(data.product);
+                            productForm.style.display = 'block';
+                        } else {
+                            showError(data.message || 'Ürün bulunamadı');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('API Error:', error);
+                        loadingSpinner.style.display = 'none';
+                        showError(`İstek sırasında bir hata oluştu: ${error.message}`);
+                    });
+            }
+
+            function resetResultsUI() {
+                errorMessage.style.display = 'none';
+                productForm.style.display = 'none';
+                variantsTableBody.innerHTML = '';
+                productIdEl.value = '';
+                productNameEl.textContent = '-';
+                productIdentifierDisplay.textContent = '-';
+                productCategoryEl.textContent = '-';
+            }
+
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+
+            function displayProductInfo(product) {
+                // Ürün bilgilerini doldur
+                productIdEl.value = product.id || '';
+                productNameEl.textContent = product.name || 'İsimsiz Ürün';
+                productIdentifierDisplay.textContent = productIdentifierInput.value.trim();
+                productCategoryEl.textContent = product.productCategory || '-';
+
+                // Varyantları tabloya ekle
+                if (product.variants && Array.isArray(product.variants)) {
+                    variantsTableBody.innerHTML = '';
+
+                    product.variants.forEach(variant => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input variant-checkbox" type="checkbox"
+                                           value="${variant.id || ''}"
+                                           data-iwasku="${variant.iwasku || ''}"
+                                           data-color="${variant.variationColor || ''}"
+                                           data-size="${variant.variationSize || ''}">
+                                </div>
+                            </td>
+                            <td>${variant.iwasku || '-'}</td>
+                            <td>${variant.variationColor || '-'}</td>
+                            <td>${variant.variationSize || '-'}</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm variant-stock"
+                                       min="1" value="10" name="variants[${variant.id}][stock]">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm variant-price"
+                                       min="0.01" step="0.01" value="100" name="variants[${variant.id}][price]">
+                            </td>
+                        `;
+                        variantsTableBody.appendChild(row);
+
+                        // Varyant checkbox olayını dinle
+                        const checkbox = row.querySelector('.variant-checkbox');
+                        checkbox.addEventListener('change', function() {
+                            toggleRowSelection(this);
+                            updateSelectionCounter();
+                            updateSubmitButton();
+                        });
+                    });
+                }
+
+                // Sayaçları güncelle
+                updateSelectionCounter();
+            }
+
+            function toggleRowSelection(checkbox) {
+                const row = checkbox.closest('tr');
+                if (checkbox.checked) {
+                    row.classList.add('selected-row');
+                } else {
+                    row.classList.remove('selected-row');
+                }
+            }
+
+            function updateSelectionCounter() {
+                const selectedCount = document.querySelectorAll('.variant-checkbox:checked').length;
+                const totalCount = document.querySelectorAll('.variant-checkbox').length;
+
+                if (selectionInfo) {
+                    selectionInfo.textContent = `${selectedCount} / ${totalCount} varyant seçildi`;
+                }
+
+                // "Tümünü seç" checkbox'ını güncelle
+                if (selectAllVariants) {
+                    selectAllVariants.checked = selectedCount === totalCount && totalCount > 0;
+                    selectAllVariants.indeterminate = selectedCount > 0 && selectedCount < totalCount;
+                }
+            }
+
+            function updateMarketplaceFields() {
+                marketplaceFields.innerHTML = '';
+
+                const selectedMarketplaces = Array.from(marketplaceSelect.selectedOptions).map(option => option.value);
+
+                if (selectedMarketplaces.includes('ciceksepeti')) {
+                    addCiceksepetiFields();
+                }
+
+                if (selectedMarketplaces.includes('trendyol')) {
+                    addTrendyolFields();
+                }
+
+                // Diğer pazaryerleri için benzer fonksiyonlar eklenebilir
+            }
+
+            function addCiceksepetiFields() {
+                const fieldset = document.createElement('fieldset');
+                fieldset.className = 'border p-3 mb-3 rounded';
+                fieldset.innerHTML = `
+                    <legend class="w-auto px-2 fs-5 text-primary">Çiçeksepeti Ayarları</legend>
+                    <div class="mb-3">
+                        <label for="ciceksepeti_category" class="form-label">Kategori</label>
+                        <select class="form-select marketplace-field" id="ciceksepeti_category" name="marketplace_fields[ciceksepeti][category]" required>
+                            <option value="">Kategori Seçin</option>
+                            <option value="1">Ev Tekstili</option>
+                            <option value="2">Dekorasyon</option>
+                            <option value="3">Mutfak</option>
+                        </select>
+                    </div>
+                `;
+                marketplaceFields.appendChild(fieldset);
+
+                // Kategori değişimini dinle
+                const categorySelect = fieldset.querySelector('#ciceksepeti_category');
+                categorySelect.addEventListener('change', updateSubmitButton);
+            }
+
+            function addTrendyolFields() {
+                const fieldset = document.createElement('fieldset');
+                fieldset.className = 'border p-3 mb-3 rounded';
+                fieldset.innerHTML = `
+                    <legend class="w-auto px-2 fs-5 text-warning">Trendyol Ayarları</legend>
+                    <div class="mb-3">
+                        <label for="trendyol_category" class="form-label">Kategori</label>
+                        <select class="form-select marketplace-field" id="trendyol_category" name="marketplace_fields[trendyol][category]" required>
+                            <option value="">Kategori Seçin</option>
+                            <option value="1">Ev & Yaşam</option>
+                            <option value="2">Mobilya</option>
+                            <option value="3">Dekorasyon</option>
+                        </select>
+                    </div>
+                `;
+                marketplaceFields.appendChild(fieldset);
+
+                // Kategori değişimini dinle
+                const categorySelect = fieldset.querySelector('#trendyol_category');
+                categorySelect.addEventListener('change', updateSubmitButton);
+            }
+
+            function updateSubmitButton() {
+                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked').length;
+                const selectedMarketplaces = marketplaceSelect.selectedOptions.length;
+
+                // Marketplace alanlarını kontrol et
+                let marketplaceFieldsValid = true;
+                const requiredFields = document.querySelectorAll('.marketplace-field[required]');
+                requiredFields.forEach(field => {
+                    if (!field.value) {
+                        marketplaceFieldsValid = false;
+                    }
+                });
+
+                // Buton durumunu güncelle
+                submitFormBtn.disabled = !(selectedVariants > 0 && selectedMarketplaces > 0 && marketplaceFieldsValid);
+            }
+
+            function resetForm() {
+                productIdentifierInput.value = '';
+                resetResultsUI();
+                resultsContainer.style.display = 'none';
+                marketplaceSelect.selectedIndex = -1;
+                marketplaceFields.innerHTML = '';
+                submitFormBtn.disabled = true;
+            }
+
+            function submitForm() {
+                // "Gönderiliyor" durumuna geç
+                const originalBtnText = submitFormBtn.innerHTML;
+                submitFormBtn.disabled = true;
+                submitFormBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
+
+                // Form verilerini topla
+                const formData = new FormData(autoListingForm);
+                const productId = productIdEl.value;
+                const selectedMarketplaces = Array.from(marketplaceSelect.selectedOptions).map(option => option.value);
+
+                // Varyant verilerini topla
+                const selectedVariants = [];
+                document.querySelectorAll('.variant-checkbox:checked').forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const variantId = checkbox.value;
+                    const stockInput = row.querySelector('.variant-stock');
+                    const priceInput = row.querySelector('.variant-price');
+
+                    selectedVariants.push({
+                        id: variantId,
+                        iwasku: checkbox.getAttribute('data-iwasku') || '',
+                        color: checkbox.getAttribute('data-color') || '',
+                        size: checkbox.getAttribute('data-size') || '',
+                        stock: stockInput?.value || 0,
+                        price: priceInput?.value || 0
+                    });
+                });
+
+                // API request data
+                const requestData = {
+                    productId: productId,
+                    productName: productNameEl.textContent,
+                    productIdentifier: productIdentifierDisplay.textContent,
+                    productCategory: productCategoryEl.textContent,
+                    selectedMarketplaces: selectedMarketplaces,
+                    variants: selectedVariants,
+                    marketplaceFields: {}
+                };
+
+                // Pazaryeri özel alanlarını ekle
+                selectedMarketplaces.forEach(marketplace => {
+                    const fields = document.querySelectorAll(`[name^="marketplace_fields[${marketplace}]"]`);
+                    if (!requestData.marketplaceFields[marketplace]) {
+                        requestData.marketplaceFields[marketplace] = {};
+                    }
+
+                    fields.forEach(field => {
+                        const fieldName = field.name.match(/\[([^\]]+)\]$/)[1];
+                        requestData.marketplaceFields[marketplace][fieldName] = field.value;
+                    });
+                });
+
+                // Form verilerini gönder
+                fetch('/create-marketplace-listing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Başarılı yanıt
+                        if (data.success) {
+                            alert('Listing işlemi başarıyla başlatıldı!');
+                            resetForm();
+                        } else {
+                            // Hata durumunda
+                            alert(`Hata: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Form submission error:', error);
+                        alert(`Bir hata oluştu: ${error.message}`);
+                    })
+                    .finally(() => {
+                        // Her durumda buton metnini geri yükle
+                        submitFormBtn.innerHTML = originalBtnText;
+                        submitFormBtn.disabled = false;
+                    });
+            }
+        });
     </script>
 {% endblock %}
