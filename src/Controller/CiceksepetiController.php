@@ -84,7 +84,6 @@ class CiceksepetiController extends FrontendController
             return $this->json(['success' => false, 'message' => 'Variant bulunamadı']);
         }
 
-
         $productData = [
           'id' => $product[0]['oo_id'],
           'name' => $product[0]['name'],
@@ -105,7 +104,6 @@ class CiceksepetiController extends FrontendController
             'success' => true,
             'product' => $productData
         ]);
-
     }
 
     /*public function getCiceksepetiListings(): array
