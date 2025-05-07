@@ -301,7 +301,68 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="newListingModal" tabindex="-1" aria-labelledby="newListingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="newListingModalLabel">Yeni Listing Oluştur</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="productIdentifier" class="form-label">Ürün Kodu (PIM)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="productIdentifier" placeholder="Örn: CA-001A">
+                            <button class="btn btn-primary" type="button" id="searchBtn">
+                                <i class="fas fa-search"></i> Ara
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Aramak istediğiniz ana ürün kodunu girin.</small>
+                    </div>
 
+                    <div id="searchResultsContainer" class="mt-4 d-none">
+                        <!-- Yükleniyor animasyonu -->
+                        <div id="loadingSpinner" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <p class="mt-2">Sonuçlar yükleniyor...</p>
+                        </div>
+
+                        <!-- Hata mesajı -->
+                        <div id="errorMessage" class="alert alert-danger d-none"></div>
+
+                        <!-- Ürün bilgileri -->
+                        <div id="productInfo" class="d-none">
+                            <div class="alert alert-success mb-3">
+                                <h5 id="productName" class="mb-1">Ürün Adı</h5>
+                                <div><strong>Ürün ID:</strong> <span id="productId"></span></div>
+                                <div><strong>Kategori:</strong> <span id="productCategory"></span></div>
+                            </div>
+
+                            <h5 class="mt-4 mb-3">Varyantlar</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>IWASKU</th>
+                                        <th>Renk</th>
+                                        <th>Ebat</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="variantsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
@@ -400,7 +461,88 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('newListingBtn').addEventListener('click', function() {
+                const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
+                modal.show();
+            });
 
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                searchProduct();
+            });
+
+            document.getElementById('productIdentifier').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchProduct();
+                }
+            });
+
+            function searchProduct() {
+                const identifier = document.getElementById('productIdentifier').value.trim();
+
+                if (!identifier) {
+                    alert('Lütfen bir ürün kodu girin');
+                    return;
+                }
+
+                const resultsContainer = document.getElementById('searchResultsContainer');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                const errorMessage = document.getElementById('errorMessage');
+                const productInfo = document.getElementById('productInfo');
+
+                resultsContainer.classList.remove('d-none');
+                loadingSpinner.classList.remove('d-none');
+                errorMessage.classList.add('d-none');
+                productInfo.classList.add('d-none');
+
+                fetch(`/api/products/search/${encodeURIComponent(identifier)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP hata! Durum: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        loadingSpinner.classList.add('d-none');
+
+                        if (data.success && data.product) {
+                            document.getElementById('productName').textContent = data.product.name || 'İsimsiz Ürün';
+                            document.getElementById('productId').textContent = data.product.id || '';
+                            document.getElementById('productCategory').textContent = data.product.productCategory || '';
+
+                            const variantsTableBody = document.getElementById('variantsTableBody');
+                            variantsTableBody.innerHTML = '';
+
+                            if (data.product.variants && data.product.variants.length > 0) {
+                                data.product.variants.forEach(variant => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                <td>${variant.id}</td>
+                                <td>${variant.iwasku || '-'}</td>
+                                <td>${variant.variationColor || '-'}</td>
+                                <td>${variant.variationSize || '-'}</td>
+                            `;
+                                    variantsTableBody.appendChild(row);
+                                });
+                            } else {
+                                variantsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
+                            }
+
+                            productInfo.classList.remove('d-none');
+                        } else {
+                            errorMessage.textContent = data.message || 'Ürün bulunamadı.';
+                            errorMessage.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('API Hatası:', error);
+                        loadingSpinner.classList.add('d-none');
+                        errorMessage.textContent = 'API isteği sırasında bir hata oluştu: ' + error.message;
+                        errorMessage.classList.remove('d-none');
+                    });
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButtons = document.querySelectorAll('.toggle-variants');
