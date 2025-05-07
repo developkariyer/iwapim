@@ -68,15 +68,6 @@
                             <i class="fas fa-search me-2"></i>Listing Kontrol
                         </button>
                     </div>
-                    <div id="listingFormWrapper" style="display: none;" class="mt-3">
-                        <form id="listingForm">
-                            <div class="mb-2">
-                                <input type="text" id="productIdentifier" class="form-control" placeholder="Ürün Kodu Girin">
-                            </div>
-                            <div id="searchResult" class="mt-3"></div>
-                            <!-- Sonuçlar buraya gelecek -->
-                        </form>
-                    </div>
                 </div>
                 {% if app.request.get('category') %}
                     <div class="alert alert-info mb-4">
@@ -409,43 +400,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
-        document.getElementById('newListingBtn').addEventListener('click', function() {
-            document.getElementById('listingFormWrapper').style.display = 'block';
-        });
-
-        document.getElementById('productIdentifier').addEventListener('blur', function() {
-            const identifier = this.value.trim();
-            if (!identifier) return;
-
-            fetch(`/api/products/search?identifier=${encodeURIComponent(identifier)}`)
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('searchResult');
-                    container.innerHTML = '';
-
-                    if (!data.success) {
-                        container.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-                        return;
-                    }
-
-                    const product = data.product;
-                    let html = `<h5>${product.name}</h5><p>Kategori: ${product.productCategory}</p>`;
-                    html += '<label>Varyant Seçin:</label><div class="form-check">';
-
-                    product.variants.forEach((variant, i) => {
-                        html += `
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="variantId" id="variant${i}" value="${variant.id}">
-                        <label class="form-check-label" for="variant${i}">
-                            ${variant.iwasku} - ${variant.variationSize || ''} ${variant.variationColor || ''}
-                        </label>
-                    </div>`;
-                    });
-
-                    html += '</div>';
-                    container.innerHTML = html;
-                });
-        });
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButtons = document.querySelectorAll('.toggle-variants');
 
