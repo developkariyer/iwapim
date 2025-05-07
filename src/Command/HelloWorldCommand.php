@@ -57,36 +57,6 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $identifier = "CA-001A";
-        $productSql = '
-        SELECT oo_id, name, productCategory from object_query_product
-        WHERE productIdentifier = :productIdentifier AND productLevel = 0
-        LIMIT 1';
-        $variantSql = '
-        SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
-        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
-
-        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $identifier]);
-
-        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $identifier]);
-
-        $productData = [
-            'id' => $product[0]['oo_id'],
-            'name' => $product[0]['name'],
-            'productCategory' => $product[0]['productCategory']
-        ];
-        $variantData = [];
-        foreach ($variants as $variant) {
-            $variantData[] = [
-                'id' => $variant['oo_id'],
-                'iwasku' => $variant['iwasku'],
-                'variationSize' => $variant['variationSize'],
-                'variationColor' => $variant['variationColor']
-            ];
-        }
-        $productData['variants'] = $variantData;
-
-        print_r($productData);
 
         // IJ
        // $productId = 238133;
