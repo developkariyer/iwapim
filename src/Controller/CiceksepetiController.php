@@ -56,12 +56,10 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
-     * @Route("/api/products/search", name="api_product_search", methods={"GET"})
+     * @Route("/api/products/search/{identifier}", name="api_product_search", methods={"GET"})
      */
-    public function searchProduct(Request $request): JsonResponse
+    public function searchProduct(string $identifier): JsonResponse
     {
-        $identifier = $request->query->get('identifier');
-
         if (empty($identifier)) {
             return $this->json(['success' => false, 'message' => 'Ürün kodu belirtilmedi'], 400);
         }

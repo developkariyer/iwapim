@@ -564,14 +564,17 @@
 
                 console.log("Ürün aranıyor:", identifier); // Debug için
 
-                // API isteği gönder
-                fetch(`/api/products/search?identifier=${encodeURIComponent(identifier)}`)
+                // API isteği gönder - URL parametresi kullanarak
+                fetch(`/api/products/search/${encodeURIComponent(identifier)}`)
                     .then(response => {
-                        console.log("API yanıtı:", response); // Debug için
+                        console.log("API yanıtı:", response);
+                        if (!response.ok) {
+                            throw new Error(`HTTP hata! durum: ${response.status}`);
+                        }
                         return response.json();
                     })
                     .then(data => {
-                        console.log("API sonucu:", data); // Debug için
+                        console.log("API sonucu:", data);
                         document.getElementById('loadingContainer').classList.add('d-none');
 
                         if (data.success && data.product) {
@@ -622,7 +625,7 @@
                     .catch(error => {
                         console.error('API Hatası:', error);
                         document.getElementById('loadingContainer').classList.add('d-none');
-                        document.getElementById('errorMessage').textContent = 'Bağlantı hatası oluştu.';
+                        document.getElementById('errorMessage').textContent = 'API isteği sırasında bir hata oluştu: ' + error.message;
                         document.getElementById('errorContainer').classList.remove('d-none');
                     });
             }
