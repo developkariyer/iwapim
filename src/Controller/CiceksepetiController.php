@@ -68,7 +68,7 @@ class CiceksepetiController extends FrontendController
                     ['Content-Type' => 'application/json']
                 );
             }
-            
+
             $testData = [
                 'success' => true,
                 'product' => [
