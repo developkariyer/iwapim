@@ -1066,6 +1066,110 @@
                 }, 3000);
             }
 
+
+            /**
+             * Listing Oluştur Butonu Durumu Güncelleme
+             * Seçim ve kategori durumuna göre butonun aktif/pasif olmasını kontrol eder
+             */
+            function updateCreateButton() {
+                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked').length;
+                const selectedCategory = document.getElementById('categorySelect').value;
+
+                // Butonu aktifleştir/deaktifleştir
+                document.getElementById('createListingBtn').disabled = !(selectedVariants > 0 && selectedCategory);
+            }
+
+            /**
+             * Listing Oluşturma İşlemi
+             * Seçilen varyantlar, kategori ve fiyat/stok bilgilerini API'ye gönderir
+             */
+            // Listing oluşturma butonuna tıklanınca
+            document.getElementById('createListingBtn').addEventListener('click', function() {
+                const selectedRows = document.querySelectorAll('.variant-checkbox:checked');
+                if (selectedRows.length === 0) {
+                    alert('Lütfen en az bir varyant seçin');
+                    return;
+                }
+
+                const categoryId = document.getElementById('categorySelect').value;
+                if (!categoryId) {
+                    alert('Lütfen bir kategori seçin');
+                    return;
+                }
+
+                // Butonu devre dışı bırak ve işlem göstergesi ekle
+                const createButton = this;
+                const originalButtonText = createButton.innerHTML;
+                createButton.disabled = true;
+                createButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
+
+                // Seçili varyantları topla
+                const variants = [];
+                selectedRows.forEach(function(checkbox) {
+                    const row = checkbox.closest('tr');
+                    const stockInput = row.querySelector('.variant-stock');
+                    const priceInput = row.querySelector('.variant-price');
+
+                    variants.push({
+                        id: checkbox.value,
+                        iwasku: checkbox.getAttribute('data-iwasku') || '',
+                        color: checkbox.getAttribute('data-color') || '',
+                        size: checkbox.getAttribute('data-size') || '',
+                        stock: stockInput ? stockInput.value : 0,
+                        price: priceInput ? priceInput.value : 0
+                    });
+                });
+
+                // Form verisini hazırla - null kontrolü ekleyelim
+                const productIdElement = document.getElementById('productId');
+                const productNameElement = document.getElementById('productName');
+                const productCategoryElement = document.getElementById('productCategory');
+
+                const formData = {
+                    productId: productIdElement ? productIdElement.textContent : '',
+                    productName: productNameElement ? productNameElement.textContent : '',
+                    productCategory: productCategoryElement ? productCategoryElement.textContent : '',
+                    categoryId: categoryId,
+                    variants: variants
+                };
+
+                console.log('Gönderilecek veri:', formData);
+
+                // API isteği gönder
+                fetch('/create-ciceksepeti-listing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Butonu eski haline getir
+                        createButton.disabled = false;
+                        createButton.innerHTML = originalButtonText;
+
+                        if (data.success) {
+                            // Başarı durumunda sonuçları göster
+                            showListingResult(data);
+                        } else {
+                            alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Listing oluşturma hatası:', error);
+                        alert('Bağlantı hatası oluştu');
+
+                        // Butonu eski haline getir
+                        createButton.disabled = false;
+                        createButton.innerHTML = originalButtonText;
+                    });
+            });
+
+            /**
+             * Listing sonuçlarını gösterecek fonksiyon
+             * API'den gelen yanıtı detaylı bir şekilde kullanıcıya gösterir
+             */
             function showListingResult(data) {
                 // Mevcut bir sonuç modalı varsa kaldır
                 let existingModal = document.getElementById('listingResultModal');
@@ -1092,13 +1196,13 @@
                         <div class="col-md-6">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between">
-                                    <span>Ürün Adı:</span> <span class="fw-bold">${data.summary.productName}</span>
+                                    <span>Ürün Adı:</span> <span class="fw-bold">${data.summary.productName || 'Belirtilmemiş'}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
-                                    <span>Ürün ID:</span> <span>${data.summary.productId}</span>
+                                    <span>Ürün ID:</span> <span>${data.summary.productId || 'Belirtilmemiş'}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
-                                    <span>Kategori ID:</span> <span>${data.summary.categoryId}</span>
+                                    <span>Kategori ID:</span> <span>${data.summary.categoryId || 'Belirtilmemiş'}</span>
                                 </li>
                             </ul>
                         </div>
@@ -1133,12 +1237,12 @@
                             <tbody>
                                 ${data.requestData.variants.map(variant => `
                                     <tr>
-                                        <td>${variant.id}</td>
+                                        <td>${variant.id || ''}</td>
                                         <td>${variant.iwasku || '-'}</td>
                                         <td>${variant.color || '-'}</td>
                                         <td>${variant.size || '-'}</td>
-                                        <td>${variant.stock}</td>
-                                        <td>${variant.price}</td>
+                                        <td>${variant.stock || '0'}</td>
+                                        <td>${variant.price || '0'}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -1167,100 +1271,6 @@
                     listingModal.hide();
                 }
             }
-
-            /**
-             * Listing Oluştur Butonu Durumu Güncelleme
-             * Seçim ve kategori durumuna göre butonun aktif/pasif olmasını kontrol eder
-             */
-            function updateCreateButton() {
-                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked').length;
-                const selectedCategory = document.getElementById('categorySelect').value;
-
-                // Butonu aktifleştir/deaktifleştir
-                document.getElementById('createListingBtn').disabled = !(selectedVariants > 0 && selectedCategory);
-            }
-
-            /**
-             * Listing Oluşturma İşlemi
-             * Seçilen varyantlar, kategori ve fiyat/stok bilgilerini API'ye gönderir
-             */
-            document.getElementById('createListingBtn').addEventListener('click', function() {
-                const selectedRows = document.querySelectorAll('.variant-checkbox:checked');
-                if (selectedRows.length === 0) {
-                    alert('Lütfen en az bir varyant seçin');
-                    return;
-                }
-
-                const categoryId = document.getElementById('categorySelect').value;
-                if (!categoryId) {
-                    alert('Lütfen bir kategori seçin');
-                    return;
-                }
-
-                // Butonu devre dışı bırak ve işlem göstergesi ekle
-                const createButton = this;
-                const originalButtonText = createButton.innerHTML;
-                createButton.disabled = true;
-                createButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
-
-                // Seçili varyantları topla
-                const variants = [];
-                selectedRows.forEach(function(checkbox) {
-                    const row = checkbox.closest('tr');
-                    const stockInput = row.querySelector('.variant-stock');
-                    const priceInput = row.querySelector('.variant-price');
-
-                    variants.push({
-                        id: checkbox.value,
-                        iwasku: checkbox.getAttribute('data-iwasku'),
-                        color: checkbox.getAttribute('data-color'),
-                        size: checkbox.getAttribute('data-size'),
-                        stock: stockInput ? stockInput.value : 0,
-                        price: priceInput ? priceInput.value : 0
-                    });
-                });
-
-                // Form verisini hazırla
-                const formData = {
-                    productId: document.getElementById('productId').textContent,
-                    productName: document.getElementById('productName').textContent,
-                    productCategory: document.getElementById('productCategory').textContent,
-                    categoryId: categoryId,
-                    variants: variants
-                };
-
-                console.log('Gönderilecek veri:', formData);
-
-                // API isteği gönder
-                fetch('/create-ciceksepeti-listing', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Butonu eski haline getir
-                        createButton.disabled = false;
-                        createButton.innerHTML = originalButtonText;
-
-                        if (data.success) {
-                            // Sonuçları detaylı göstermek için yeni bir modal açalım
-                            showListingResult(data);
-                        } else {
-                            alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Listing oluşturma hatası:', error);
-                        alert('Bağlantı hatası oluştu');
-
-                        // Butonu eski haline getir
-                        createButton.disabled = false;
-                        createButton.innerHTML = originalButtonText;
-                    });
-            });
         });
     </script>
 {% endblock %}
