@@ -60,7 +60,45 @@ class CiceksepetiController extends FrontendController
      */
     public function searchProduct(string $identifier): JsonResponse
     {
-        error_log('=== API ÇAĞRISI BAŞLATILDI: /api/products/search/' . $identifier . ' ===');
+        try {
+            // Basit bir yanıt döndürelim - test için
+            $product = [
+                'id' => '123',
+                'name' => 'Test Ürün: ' . $identifier,
+                'productCategory' => 'Test Kategori'
+            ];
+
+            $variants = [
+                [
+                    'id' => '1',
+                    'iwasku' => 'TEST-1',
+                    'variationColor' => 'Kırmızı',
+                    'variationSize' => 'M'
+                ],
+                [
+                    'id' => '2',
+                    'iwasku' => 'TEST-2',
+                    'variationColor' => 'Mavi',
+                    'variationSize' => 'L'
+                ]
+            ];
+
+            return $this->json([
+                'success' => true,
+                'product' => [
+                    'id' => $product['id'],
+                    'name' => $product['name'],
+                    'productCategory' => $product['productCategory'],
+                    'variants' => $variants
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+        /*error_log('=== API ÇAĞRISI BAŞLATILDI: /api/products/search/' . $identifier . ' ===');
         if (empty($identifier)) {
             return $this->json(['success' => false, 'message' => 'Ürün kodu belirtilmedi'], 400);
         }
@@ -104,7 +142,7 @@ class CiceksepetiController extends FrontendController
         return $this->json([
             'success' => true,
             'product' => $productData
-        ]);
+        ]);*/
     }
 
     /*public function getCiceksepetiListings(): array
