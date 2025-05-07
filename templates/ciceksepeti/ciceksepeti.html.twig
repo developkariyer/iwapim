@@ -68,6 +68,15 @@
                             <i class="fas fa-search me-2"></i>Listing Kontrol
                         </button>
                     </div>
+                    <div id="listingFormWrapper" style="display: none;" class="mt-3">
+                        <form id="listingForm">
+                            <div class="mb-2">
+                                <input type="text" id="productIdentifier" class="form-control" placeholder="Ürün Kodu Girin">
+                            </div>
+                            <div id="searchResult" class="mt-3"></div>
+                            <!-- Sonuçlar buraya gelecek -->
+                        </form>
+                    </div>
                 </div>
                 {% if app.request.get('category') %}
                     <div class="alert alert-info mb-4">
@@ -301,15 +310,7 @@
             </div>
         </div>
     </div>
-    <div id="listingFormWrapper" style="display: none;" class="mt-3">
-        <form id="listingForm">
-            <div class="mb-2">
-                <input type="text" id="productIdentifier" class="form-control" placeholder="Ürün Kodu Girin">
-            </div>
-            <div id="searchResult" class="mt-3"></div>
-            <!-- Sonuçlar buraya gelecek -->
-        </form>
-    </div>
+
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
