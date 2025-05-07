@@ -507,29 +507,24 @@
                         loadingSpinner.classList.add('d-none');
 
                         if (data.success && data.product) {
-                            document.getElementById('productName').textContent = data.product.name || 'İsimsiz Ürün';
-                            document.getElementById('productId').textContent = data.product.id || '';
-                            document.getElementById('productCategory').textContent = data.product.productCategory || '';
-
+                            const productNameEl = document.getElementById('productName');
+                            const productIdEl = document.getElementById('productId');
+                            const productCategoryEl = document.getElementById('productCategory');
                             const variantsTableBody = document.getElementById('variantsTableBody');
-                            variantsTableBody.innerHTML = '';
 
-                            if (data.product.variants && data.product.variants.length > 0) {
-                                data.product.variants.forEach(variant => {
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                <td>${variant.id}</td>
-                                <td>${variant.iwasku || '-'}</td>
-                                <td>${variant.variationColor || '-'}</td>
-                                <td>${variant.variationSize || '-'}</td>
-                            `;
-                                    variantsTableBody.appendChild(row);
-                                });
-                            } else {
-                                variantsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
+                            if (productNameEl) productNameEl.textContent = data.product.name || 'İsimsiz Ürün';
+                            if (productIdEl) productIdEl.textContent = data.product.id || '';
+                            if (productCategoryEl) productCategoryEl.textContent = data.product.productCategory || '';
+
+                            if (variantsTableBody) {
+                                variantsTableBody.innerHTML = '';
+
+                                if (data.product.variants && data.product.variants.length > 0) {
+                                }
                             }
 
-                            productInfo.classList.remove('d-none');
+                            const productInfo = document.getElementById('productInfo');
+                            if (productInfo) productInfo.classList.remove('d-none');
                         } else {
                             errorMessage.textContent = data.message || 'Ürün bulunamadı.';
                             errorMessage.classList.remove('d-none');
