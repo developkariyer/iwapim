@@ -269,6 +269,15 @@
             const resetFormBtn = document.getElementById('resetFormBtn');
             const autoListingForm = document.getElementById('autoListingForm');
 
+            // State variables
+            let selectedMarketplaces = [];
+            let marketplaceCategories = {
+                // Çiçeksepeti için sunucu tarafından gelen kategorileri kullan
+                ciceksepeti: {{ ciceksepeticCategories|json_encode|raw }}
+            };
+            let variantData = [];
+            let variantAttributes = {}; // Her pazaryeri ve varyant için attribute'ları saklayacak nesne
+
             // Event listeners
             searchBtn.addEventListener('click', searchProduct);
             productIdentifierInput.addEventListener('keypress', function(e) {
@@ -321,13 +330,12 @@
             });
 
             marketplaceSelect.addEventListener('change', function() {
+                selectedMarketplaces = Array.from(this.selectedOptions).map(option => option.value);
                 updateMarketplaceFields();
                 updateSubmitButton();
             });
 
-            resetFormBtn.addEventListener('click', function() {
-                resetForm();
-            });
+            resetFormBtn.addEventListener('click', resetForm);
 
             autoListingForm.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -381,6 +389,10 @@
                 productNameEl.textContent = '-';
                 productIdentifierDisplay.textContent = '-';
                 productCategoryEl.textContent = '-';
+                marketplaceSelect.selectedIndex = -1;
+                selectedMarketplaces = [];
+                marketplaceFields.innerHTML = '';
+                submitFormBtn.disabled = true;
             }
 
             function showError(message) {
@@ -389,6 +401,9 @@
             }
 
             function displayProductInfo(product) {
+                // Store variant data for later use
+                variantData = product.variants || [];
+
                 // Ürün bilgilerini doldur
                 productIdEl.value = product.id || '';
                 productNameEl.textContent = product.name || 'İsimsiz Ürün';
@@ -396,10 +411,10 @@
                 productCategoryEl.textContent = product.productCategory || '-';
 
                 // Varyantları tabloya ekle
-                if (product.variants && Array.isArray(product.variants)) {
-                    variantsTableBody.innerHTML = '';
+                variantsTableBody.innerHTML = '';
 
-                    product.variants.forEach(variant => {
+                if (variantData.length > 0) {
+                    variantData.forEach(variant => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>
@@ -431,6 +446,16 @@
                             toggleRowSelection(this);
                             updateSelectionCounter();
                             updateSubmitButton();
+
+                            // Varyant seçildiğinde ve pazaryerleri de seçiliyse, ilgili attribute'ları güncelle
+                            if (this.checked && selectedMarketplaces.length > 0) {
+                                selectedMarketplaces.forEach(marketplace => {
+                                    const categorySelect = document.getElementById(`${marketplace}_category`);
+                                    if (categorySelect && categorySelect.value) {
+                                        loadAttributesForCategory(marketplace, categorySelect.value);
+                                    }
+                                });
+                            }
                         });
                     });
                 }
@@ -452,115 +477,519 @@
                 const selectedCount = document.querySelectorAll('.variant-checkbox:checked').length;
                 const totalCount = document.querySelectorAll('.variant-checkbox').length;
 
-                if (selectionInfo) {
-                    selectionInfo.textContent = `${selectedCount} / ${totalCount} varyant seçildi`;
-                }
+                selectionInfo.textContent = `${selectedCount} / ${totalCount} varyant seçildi`;
 
                 // "Tümünü seç" checkbox'ını güncelle
-                if (selectAllVariants) {
-                    selectAllVariants.checked = selectedCount === totalCount && totalCount > 0;
-                    selectAllVariants.indeterminate = selectedCount > 0 && selectedCount < totalCount;
-                }
+                selectAllVariants.checked = selectedCount === totalCount && totalCount > 0;
+                selectAllVariants.indeterminate = selectedCount > 0 && selectedCount < totalCount;
             }
 
             function updateMarketplaceFields() {
                 marketplaceFields.innerHTML = '';
 
-                const selectedMarketplaces = Array.from(marketplaceSelect.selectedOptions).map(option => option.value);
+                if (selectedMarketplaces.length === 0) return;
 
-                if (selectedMarketplaces.includes('ciceksepeti')) {
-                    addCiceksepetiFields();
-                }
+                // Seçili pazaryeri kutularını oluştur
+                selectedMarketplaces.forEach(marketplace => {
+                    const fieldset = document.createElement('fieldset');
+                    fieldset.className = 'border p-3 mt-4 rounded';
 
-                if (selectedMarketplaces.includes('trendyol')) {
-                    addTrendyolFields();
-                }
+                    let title, bgColor;
+                    switch (marketplace) {
+                        case 'ciceksepeti':
+                            title = 'Çiçeksepeti Ayarları';
+                            bgColor = 'primary';
+                            break;
+                        case 'trendyol':
+                            title = 'Trendyol Ayarları';
+                            bgColor = 'warning';
+                            break;
+                        case 'hepsiburada':
+                            title = 'Hepsiburada Ayarları';
+                            bgColor = 'danger';
+                            break;
+                        case 'n11':
+                            title = 'N11 Ayarları';
+                            bgColor = 'success';
+                            break;
+                        case 'amazon':
+                            title = 'Amazon Ayarları';
+                            bgColor = 'dark';
+                            break;
+                        default:
+                            title = `${marketplace.charAt(0).toUpperCase() + marketplace.slice(1)} Ayarları`;
+                            bgColor = 'secondary';
+                    }
 
-                // Diğer pazaryerleri için benzer fonksiyonlar eklenebilir
+                    fieldset.innerHTML = `
+                        <legend class="w-auto px-2 fs-5 text-${bgColor}">
+                            <i class="fas fa-store me-1"></i> ${title}
+                        </legend>
+
+                        <div class="mb-3">
+                            <label for="${marketplace}_category" class="form-label">Kategori</label>
+                            <select class="form-select marketplace-category"
+                                    id="${marketplace}_category"
+                                    name="marketplaceFields[${marketplace}][category]"
+                                    data-marketplace="${marketplace}"
+                                    required>
+                                <option value="">Kategori Seçin</option>
+                            </select>
+                        </div>
+
+                        <div id="${marketplace}_attributes_container" class="marketplace-attributes-container mt-4">
+                            <!-- Kategori seçildiğinde attribute'lar burada gösterilecek -->
+                        </div>
+                    `;
+
+                    marketplaceFields.appendChild(fieldset);
+
+                    // Kategori seçimini doldur
+                    populateCategorySelect(marketplace);
+
+                    // Kategori değişim olayını dinle
+                    const categorySelect = fieldset.querySelector(`.marketplace-category`);
+                    categorySelect.addEventListener('change', function() {
+                        const marketplace = this.getAttribute('data-marketplace');
+                        const categoryId = this.value;
+
+                        if (categoryId) {
+                            loadAttributesForCategory(marketplace, categoryId);
+                        } else {
+                            // Kategori seçilmediğinde attribute alanlarını temizle
+                            document.getElementById(`${marketplace}_attributes_container`).innerHTML = '';
+                        }
+
+                        updateSubmitButton();
+                    });
+                });
             }
 
-            function addCiceksepetiFields() {
-                const fieldset = document.createElement('fieldset');
-                fieldset.className = 'border p-3 mb-3 rounded';
-                fieldset.innerHTML = `
-                    <legend class="w-auto px-2 fs-5 text-primary">Çiçeksepeti Ayarları</legend>
-                    <div class="mb-3">
-                        <label for="ciceksepeti_category" class="form-label">Kategori</label>
-                        <select class="form-select marketplace-field" id="ciceksepeti_category" name="marketplace_fields[ciceksepeti][category]" required>
-                            <option value="">Kategori Seçin</option>
-                            <option value="1">Ev Tekstili</option>
-                            <option value="2">Dekorasyon</option>
-                            <option value="3">Mutfak</option>
-                        </select>
-                    </div>
-                `;
-                marketplaceFields.appendChild(fieldset);
+            function populateCategorySelect(marketplace) {
+                const categorySelect = document.getElementById(`${marketplace}_category`);
 
-                // Kategori değişimini dinle
-                const categorySelect = fieldset.querySelector('#ciceksepeti_category');
-                categorySelect.addEventListener('change', updateSubmitButton);
+                if (!categorySelect) return;
+
+                // Mevcut kategorileri temizle
+                categorySelect.innerHTML = '<option value="">Kategori Seçin</option>';
+
+                // Pazaryerine göre kategorileri doldur
+                if (marketplace === 'ciceksepeti' && marketplaceCategories.ciceksepeti) {
+                    // Çiçeksepeti için controller'dan gelen kategorileri kullan
+                    marketplaceCategories.ciceksepeti.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        categorySelect.appendChild(option);
+                    });
+                } else {
+                    // Diğer pazaryerleri için API'den kategorileri yükle
+                    categorySelect.innerHTML = '<option value="">Kategoriler yükleniyor...</option>';
+                    categorySelect.disabled = true;
+
+                    // API'den ilgili pazaryeri için kategorileri al
+                    fetch(`/api/categories/${marketplace}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            categorySelect.innerHTML = '<option value="">Kategori Seçin</option>';
+
+                            if (data.categories && Array.isArray(data.categories)) {
+                                data.categories.forEach(category => {
+                                    const option = document.createElement('option');
+                                    option.value = category.id;
+                                    option.textContent = category.name;
+                                    categorySelect.appendChild(option);
+                                });
+
+                                // Kategorileri kaydet
+                                marketplaceCategories[marketplace] = data.categories;
+                            }
+
+                            categorySelect.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error(`Kategori yükleme hatası (${marketplace}):`, error);
+                            categorySelect.innerHTML = '<option value="">Kategoriler yüklenemedi</option>';
+                            categorySelect.disabled = false;
+                        });
+                }
             }
 
-            function addTrendyolFields() {
-                const fieldset = document.createElement('fieldset');
-                fieldset.className = 'border p-3 mb-3 rounded';
-                fieldset.innerHTML = `
-                    <legend class="w-auto px-2 fs-5 text-warning">Trendyol Ayarları</legend>
-                    <div class="mb-3">
-                        <label for="trendyol_category" class="form-label">Kategori</label>
-                        <select class="form-select marketplace-field" id="trendyol_category" name="marketplace_fields[trendyol][category]" required>
-                            <option value="">Kategori Seçin</option>
-                            <option value="1">Ev & Yaşam</option>
-                            <option value="2">Mobilya</option>
-                            <option value="3">Dekorasyon</option>
-                        </select>
+            function loadAttributesForCategory(marketplace, categoryId) {
+                const attributesContainer = document.getElementById(`${marketplace}_attributes_container`);
+
+                if (!attributesContainer) return;
+
+                // Seçili varyantları al
+                const selectedVariants = getSelectedVariants();
+
+                if (selectedVariants.length === 0) {
+                    attributesContainer.innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Lütfen önce en az bir varyant seçin
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Attribute yükleme göstergesi
+                attributesContainer.innerHTML = `
+                    <div class="d-flex justify-content-center my-3">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        <p class="mb-0">Kategori özellikleri yükleniyor...</p>
                     </div>
                 `;
-                marketplaceFields.appendChild(fieldset);
 
-                // Kategori değişimini dinle
-                const categorySelect = fieldset.querySelector('#trendyol_category');
-                categorySelect.addEventListener('change', updateSubmitButton);
+                // Pazaryeri ve kategori için attribute'ları al
+                fetch(`/api/marketplace/${marketplace}/category/${categoryId}/attributes`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            throw new Error(data.message || 'Özellikler alınamadı');
+                        }
+
+                        // Her varyant için form oluştur
+                        createAttributeForms(marketplace, categoryId, selectedVariants, data.attributes || []);
+                    })
+                    .catch(error => {
+                        console.error('Attribute yükleme hatası:', error);
+
+                        // Hata durumunda manuel giriş alanları göster
+                        attributesContainer.innerHTML = `
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Bu kategori için önceden tanımlanmış özellikler bulunamadı. Lütfen gerekli özellikleri manuel olarak girin.
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="mb-3">Varyant Özellikleri</h6>
+                            </div>
+                        `;
+
+                        // Seçili varyantlar için manuel giriş formları
+                        createManualAttributeForms(marketplace, categoryId, selectedVariants);
+                    });
+            }
+
+            function createAttributeForms(marketplace, categoryId, variants, attributes) {
+                const attributesContainer = document.getElementById(`${marketplace}_attributes_container`);
+
+                if (!attributesContainer || !attributes || attributes.length === 0) {
+                    // Özellik yoksa manuel giriş formları göster
+                    createManualAttributeForms(marketplace, categoryId, variants);
+                    return;
+                }
+
+                attributesContainer.innerHTML = `
+                    <h6 class="mb-3">Kategori Özellikleri</h6>
+                    <p class="text-muted small mb-3">Bu kategori için pazaryeri tarafından istenen özellikler aşağıdadır. Seçtiğiniz her varyant için bu özellikleri doldurun.</p>
+                `;
+
+                // Her varyant için bir kart oluştur
+                variants.forEach(variant => {
+                    const variantCard = document.createElement('div');
+                    variantCard.className = 'card mb-3';
+
+                    let variantFormContent = `
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                ${variant.iwasku || 'Varyant'}
+                                <span class="ms-2 badge bg-secondary">
+                                    ${variant.color || '-'} / ${variant.size || '-'}
+                                </span>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                    `;
+
+                    // Her özellik için bir form alanı oluştur
+                    attributes.forEach(attr => {
+                        variantFormContent += `
+                            <div class="col-md-6">
+                                <label class="form-label">${attr.name}${attr.required ? ' *' : ''}</label>
+                        `;
+
+                        if (attr.type === 'select' && attr.options) {
+                            // Select dropdown
+                            variantFormContent += `
+                                <select class="form-select form-select-sm attribute-field"
+                                        name="marketplaceFields[${marketplace}][variants][${variant.id}][${attr.id}]"
+                                        ${attr.required ? 'required' : ''}>
+                                    <option value="">Seçin</option>
+                            `;
+
+                            attr.options.forEach(option => {
+                                // Renk veya ebat ile eşleşiyorsa otomatik seç
+                                let selected = '';
+
+                                if (attr.name.toLowerCase() === 'renk' && option.toLowerCase() === variant.color.toLowerCase()) {
+                                    selected = 'selected';
+                                } else if ((attr.name.toLowerCase() === 'ebat' || attr.name.toLowerCase() === 'boyut') &&
+                                    option.toLowerCase() === variant.size.toLowerCase()) {
+                                    selected = 'selected';
+                                }
+
+                                variantFormContent += `<option value="${option}" ${selected}>${option}</option>`;
+                            });
+
+                            variantFormContent += `</select>`;
+                        } else {
+                            // Text input
+                            // Renk veya ebat ile eşleşiyorsa otomatik doldur
+                            let value = '';
+
+                            if (attr.name.toLowerCase() === 'renk') {
+                                value = variant.color;
+                            } else if (attr.name.toLowerCase() === 'ebat' || attr.name.toLowerCase() === 'boyut') {
+                                value = variant.size;
+                            }
+
+                            variantFormContent += `
+                                <input type="${attr.type === 'number' ? 'number' : 'text'}"
+                                       class="form-control form-control-sm attribute-field"
+                                       name="marketplaceFields[${marketplace}][variants][${variant.id}][${attr.id}]"
+                                       value="${value}"
+                                       ${attr.required ? 'required' : ''}>
+                            `;
+                        }
+
+                        variantFormContent += `</div>`;
+                    });
+
+                    variantFormContent += `
+                            </div>
+                        </div>
+                    `;
+
+                    variantCard.innerHTML = variantFormContent;
+                    attributesContainer.appendChild(variantCard);
+                });
+
+                // Form alanları değişikliklerini dinle
+                document.querySelectorAll('.attribute-field').forEach(field => {
+                    field.addEventListener('change', updateSubmitButton);
+                });
+
+                updateSubmitButton();
+            }
+
+            function createManualAttributeForms(marketplace, categoryId, variants) {
+                const attributesContainer = document.getElementById(`${marketplace}_attributes_container`);
+
+                if (!attributesContainer) return;
+
+                // Container içeriğini sıfırla
+                if (!attributesContainer.querySelector('.alert')) {
+                    attributesContainer.innerHTML = `
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Önceden tanımlanmış özellikler bulunamadı. Lütfen gerekli özellikleri manuel olarak girin.
+                        </div>
+                    `;
+                }
+
+                // Temel özellikler - her varyant için manuel giriş
+                const basicAttrs = [
+                    { id: 'name', name: 'Ürün Adı', type: 'text', required: true },
+                    { id: 'description', name: 'Açıklama', type: 'textarea', required: true },
+                    { id: 'brand', name: 'Marka', type: 'text', required: true },
+                    { id: 'warranty', name: 'Garanti Süresi (Ay)', type: 'number', required: false }
+                ];
+
+                // Her varyant için form oluştur
+                const variantsContainer = document.createElement('div');
+                variantsContainer.className = 'variant-attributes-container';
+
+                variants.forEach(variant => {
+                    const variantCard = document.createElement('div');
+                    variantCard.className = 'card mb-3';
+
+                    let variantFormContent = `
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                ${variant.iwasku || 'Varyant'}
+                                <span class="ms-2 badge bg-secondary">
+                                    ${variant.color || '-'} / ${variant.size || '-'}
+                                </span>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                    `;
+
+                    // Her özellik için bir form alanı oluştur
+                    basicAttrs.forEach(attr => {
+                        variantFormContent += `
+                            <div class="col-md-6">
+                                <label class="form-label">${attr.name}${attr.required ? ' *' : ''}</label>
+                        `;
+
+                        if (attr.type === 'textarea') {
+                            variantFormContent += `
+                                <textarea class="form-control form-control-sm attribute-field"
+                                          name="marketplaceFields[${marketplace}][variants][${variant.id}][${attr.id}]"
+                                          rows="3"
+                                          ${attr.required ? 'required' : ''}></textarea>
+                            `;
+                        } else {
+                            variantFormContent += `
+                                <input type="${attr.type}"
+                                       class="form-control form-control-sm attribute-field"
+                                       name="marketplaceFields[${marketplace}][variants][${variant.id}][${attr.id}]"
+                                       ${attr.required ? 'required' : ''}>
+                            `;
+                        }
+
+                        variantFormContent += `</div>`;
+                    });
+
+                    // Özel özellik ekleme butonu
+                    variantFormContent += `
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-sm btn-outline-primary add-custom-attribute-btn"
+                                        data-marketplace="${marketplace}"
+                                        data-variant="${variant.id}">
+                                    <i class="fas fa-plus me-1"></i> Özel Özellik Ekle
+                                </button>
+                                <div class="custom-attributes-container-${variant.id} mt-2">
+                                    <!-- Özel özellikler buraya eklenecek -->
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    variantCard.innerHTML = variantFormContent;
+                    variantsContainer.appendChild(variantCard);
+                });
+
+                attributesContainer.appendChild(variantsContainer);
+
+                // Özel özellik ekleme butonlarını dinle
+                document.querySelectorAll('.add-custom-attribute-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const marketplace = this.getAttribute('data-marketplace');
+                        const variantId = this.getAttribute('data-variant');
+                        addCustomAttributeField(marketplace, variantId);
+                    });
+                });
+
+                // Form alanları değişikliklerini dinle
+                document.querySelectorAll('.attribute-field').forEach(field => {
+                    field.addEventListener('change', updateSubmitButton);
+                });
+
+                updateSubmitButton();
+            }
+
+            function addCustomAttributeField(marketplace, variantId) {
+                const container = document.querySelector(`.custom-attributes-container-${variantId}`);
+
+                if (!container) return;
+
+                const customAttrRow = document.createElement('div');
+                customAttrRow.className = 'row g-2 mt-2 custom-attribute-row';
+
+                // Unique ID oluştur
+                const attrId = 'custom_' + Date.now();
+
+                customAttrRow.innerHTML = `
+                    <div class="col-5">
+                        <input type="text" class="form-control form-control-sm"
+                               placeholder="Özellik Adı"
+                               name="marketplaceFields[${marketplace}][variants][${variantId}][custom_names][]" required>
+                    </div>
+                    <div class="col-5">
+                        <input type="text" class="form-control form-control-sm attribute-field"
+                               placeholder="Değer"
+                               name="marketplaceFields[${marketplace}][variants][${variantId}][custom_values][]" required>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-custom-attr-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(customAttrRow);
+
+                // Silme butonunu dinle
+                const removeBtn = customAttrRow.querySelector('.remove-custom-attr-btn');
+                removeBtn.addEventListener('click', function() {
+                    customAttrRow.remove();
+                    updateSubmitButton();
+                });
+
+                // Form alanı değişikliğini dinle
+                const attributeField = customAttrRow.querySelector('.attribute-field');
+                attributeField.addEventListener('change', updateSubmitButton);
+
+                updateSubmitButton();
+            }
+
+            function getSelectedVariants() {
+                const selectedVariants = [];
+                const checkboxes = document.querySelectorAll('.variant-checkbox:checked');
+
+                checkboxes.forEach(checkbox => {
+                    selectedVariants.push({
+                        id: checkbox.value,
+                        iwasku: checkbox.getAttribute('data-iwasku') || '',
+                        color: checkbox.getAttribute('data-color') || '',
+                        size: checkbox.getAttribute('data-size') || ''
+                    });
+                });
+
+                return selectedVariants;
             }
 
             function updateSubmitButton() {
                 const selectedVariants = document.querySelectorAll('.variant-checkbox:checked').length;
-                const selectedMarketplaces = marketplaceSelect.selectedOptions.length;
+                const selectedMarketplacesCount = selectedMarketplaces.length;
+                let allCategoriesSelected = true;
+                let allRequiredFieldsFilled = true;
 
-                // Marketplace alanlarını kontrol et
-                let marketplaceFieldsValid = true;
-                const requiredFields = document.querySelectorAll('.marketplace-field[required]');
+                // Tüm pazaryerleri için kategori seçilmiş mi kontrol et
+                selectedMarketplaces.forEach(marketplace => {
+                    const categorySelect = document.getElementById(`${marketplace}_category`);
+                    if (categorySelect && !categorySelect.value) {
+                        allCategoriesSelected = false;
+                    }
+                });
+
+                // Tüm zorunlu alanlar doldurulmuş mu kontrol et
+                const requiredFields = document.querySelectorAll('.attribute-field[required]');
                 requiredFields.forEach(field => {
                     if (!field.value) {
-                        marketplaceFieldsValid = false;
+                        allRequiredFieldsFilled = false;
                     }
                 });
 
                 // Buton durumunu güncelle
-                submitFormBtn.disabled = !(selectedVariants > 0 && selectedMarketplaces > 0 && marketplaceFieldsValid);
+                submitFormBtn.disabled = !(
+                    selectedVariants > 0 &&
+                    selectedMarketplacesCount > 0 &&
+                    allCategoriesSelected &&
+                    allRequiredFieldsFilled
+                );
             }
 
             function resetForm() {
                 productIdentifierInput.value = '';
                 resetResultsUI();
                 resultsContainer.style.display = 'none';
-                marketplaceSelect.selectedIndex = -1;
-                marketplaceFields.innerHTML = '';
-                submitFormBtn.disabled = true;
+                variantData = [];
+                variantAttributes = {};
             }
 
             function submitForm() {
-                // "Gönderiliyor" durumuna geç
-                const originalBtnText = submitFormBtn.innerHTML;
-                submitFormBtn.disabled = true;
-                submitFormBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
-
                 // Form verilerini topla
                 const formData = new FormData(autoListingForm);
                 const productId = productIdEl.value;
-                const selectedMarketplaces = Array.from(marketplaceSelect.selectedOptions).map(option => option.value);
 
-                // Varyant verilerini topla
+                // Seçili varyantları topla
                 const selectedVariants = [];
                 document.querySelectorAll('.variant-checkbox:checked').forEach(checkbox => {
                     const row = checkbox.closest('tr');
@@ -589,20 +1018,64 @@
                     marketplaceFields: {}
                 };
 
-                // Pazaryeri özel alanlarını ekle
+                // Pazaryeri özel alanlarını ve attribute verilerini ekle
                 selectedMarketplaces.forEach(marketplace => {
-                    const fields = document.querySelectorAll(`[name^="marketplace_fields[${marketplace}]"]`);
-                    if (!requestData.marketplaceFields[marketplace]) {
-                        requestData.marketplaceFields[marketplace] = {};
-                    }
+                    const categorySelect = document.getElementById(`${marketplace}_category`);
 
-                    fields.forEach(field => {
-                        const fieldName = field.name.match(/\[([^\]]+)\]$/)[1];
-                        requestData.marketplaceFields[marketplace][fieldName] = field.value;
-                    });
+                    if (categorySelect) {
+                        requestData.marketplaceFields[marketplace] = {
+                            category: categorySelect.value,
+                            variants: {}
+                        };
+
+                        // Her varyant için attribute verilerini ekle
+                        selectedVariants.forEach(variant => {
+                            requestData.marketplaceFields[marketplace].variants[variant.id] = {};
+
+                            // Standart attribute'ları topla
+                            const attributeFields = document.querySelectorAll(
+                                `[name^="marketplaceFields[${marketplace}][variants][${variant.id}]"]:not([name*="custom_"])`
+                            );
+
+                            attributeFields.forEach(field => {
+                                // Attribute ID'sini adından çıkar
+                                const matches = field.name.match(/\[([^\]]+)\]$/);
+                                if (matches && matches[1]) {
+                                    const attrId = matches[1];
+                                    requestData.marketplaceFields[marketplace].variants[variant.id][attrId] = field.value;
+                                }
+                            });
+
+                            // Özel attribute'ları topla
+                            const customNames = document.querySelectorAll(
+                                `[name="marketplaceFields[${marketplace}][variants][${variant.id}][custom_names][]"]`
+                            );
+                            const customValues = document.querySelectorAll(
+                                `[name="marketplaceFields[${marketplace}][variants][${variant.id}][custom_values][]"]`
+                            );
+
+                            if (customNames.length > 0 && customNames.length === customValues.length) {
+                                requestData.marketplaceFields[marketplace].variants[variant.id].custom_attributes = [];
+
+                                for (let i = 0; i < customNames.length; i++) {
+                                    requestData.marketplaceFields[marketplace].variants[variant.id].custom_attributes.push({
+                                        name: customNames[i].value,
+                                        value: customValues[i].value
+                                    });
+                                }
+                            }
+                        });
+                    }
                 });
 
-                // Form verilerini gönder
+                // Yükleniyor durumu
+                const originalBtnText = submitFormBtn.innerHTML;
+                submitFormBtn.disabled = true;
+                submitFormBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
+
+                console.log('Form verisi:', requestData);
+
+                // Form verilerini API'ye gönder
                 fetch('/create-marketplace-listing', {
                     method: 'POST',
                     headers: {
@@ -612,23 +1085,22 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        // Başarılı yanıt
                         if (data.success) {
+                            // Başarılı yanıt, sayfayı yenile ve başarı mesajı göster
                             alert('Listing işlemi başarıyla başlatıldı!');
-                            resetForm();
+                            window.location.href = window.location.pathname + '?success=true';
                         } else {
                             // Hata durumunda
-                            alert(`Hata: ${data.message}`);
+                            alert(`Hata: ${data.message || 'Bir sorun oluştu'}`);
+                            submitFormBtn.disabled = false;
+                            submitFormBtn.innerHTML = originalBtnText;
                         }
                     })
                     .catch(error => {
                         console.error('Form submission error:', error);
                         alert(`Bir hata oluştu: ${error.message}`);
-                    })
-                    .finally(() => {
-                        // Her durumda buton metnini geri yükle
-                        submitFormBtn.innerHTML = originalBtnText;
                         submitFormBtn.disabled = false;
+                        submitFormBtn.innerHTML = originalBtnText;
                     });
             }
         });
