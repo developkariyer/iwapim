@@ -60,12 +60,9 @@ class CiceksepetiController extends FrontendController
      */
     public function newListing(): Response
     {
-        // Kategorileri getirin
-        $categories = $this->getCategories();
 
-        return $this->render('ciceksepeti/new_listing.html.twig', [
-            'categories' => $categories
-        ]);
+
+        return $this->render('ciceksepeti/new_listing.html.twig');
     }
 
     /**
