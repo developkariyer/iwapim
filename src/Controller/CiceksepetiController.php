@@ -60,57 +60,7 @@ class CiceksepetiController extends FrontendController
      */
     public function searchProduct(string $identifier): Response
     {
-        try {
-            if (empty($identifier)) {
-                return new Response(
-                    json_encode(['success' => false, 'message' => 'Ürün kodu belirtilmedi']),
-                    Response::HTTP_BAD_REQUEST,
-                    ['Content-Type' => 'application/json']
-                );
-            }
-
-            $testData = [
-                'success' => true,
-                'product' => [
-                    'id' => '12345',
-                    'name' => 'Test Ürün: ' . $identifier,
-                    'productCategory' => 'Test Kategori',
-                    'variants' => [
-                        [
-                            'id' => '1001',
-                            'iwasku' => 'TST-001',
-                            'variationSize' => 'M',
-                            'variationColor' => 'Kırmızı'
-                        ],
-                        [
-                            'id' => '1002',
-                            'iwasku' => 'TST-002',
-                            'variationSize' => 'L',
-                            'variationColor' => 'Mavi'
-                        ],
-                        [
-                            'id' => '1003',
-                            'iwasku' => 'TST-003',
-                            'variationSize' => 'XL',
-                            'variationColor' => 'Siyah'
-                        ]
-                    ]
-                ]
-            ];
-
-            return new Response(
-                json_encode($testData),
-                Response::HTTP_OK,
-                ['Content-Type' => 'application/json']
-            );
-        } catch (\Exception $e) {
-            return new Response(
-                json_encode(['success' => false, 'message' => 'Hata: ' . $e->getMessage()]),
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-                ['Content-Type' => 'application/json']
-            );
-        }
-        /*if (empty($identifier)) {
+        if (empty($identifier)) {
             return $this->json(['success' => false, 'message' => 'Ürün kodu belirtilmedi'], 400);
         }
 
@@ -151,7 +101,7 @@ class CiceksepetiController extends FrontendController
         return $this->json([
             'success' => true,
             'product' => $productData
-        ]);*/
+        ]);
     }
 
     /*public function getCiceksepetiListings(): array
