@@ -396,7 +396,7 @@
 
                                 <!-- Varyant listesi tablosu -->
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-sm">
+                                    <table class="table table-bordered table-hover table-sm small">
                                         <thead class="table-light">
                                         <tr>
                                             <th style="width: 40px;">
@@ -552,6 +552,36 @@
             padding: 10px;
             border-radius: 4px;
             border: 1px solid #dee2e6;
+        }
+        .table-responsive {
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Mobil cihazlarda tablo sütunlarının düzgün görüntülenmesi için */
+        @media (max-width: 768px) {
+            #variantsTableBody td {
+                white-space: nowrap;
+                min-width: 70px;
+            }
+
+            /* Stok ve fiyat input alanları için daha küçük genişlik */
+            .variant-stock, .variant-price {
+                width: 60px !important;
+            }
+
+            /* Tablo header'ları daha küçük */
+            .table-sm th {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Modal boyutu büyük ekranlarda daha geniş olsun */
+        @media (min-width: 992px) {
+            .modal-lg {
+                max-width: 900px;
+            }
         }
     </style>
 {% endblock %}
