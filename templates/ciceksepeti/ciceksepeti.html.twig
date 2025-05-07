@@ -205,6 +205,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Düzenleme Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -301,6 +303,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Yeni Listing Modal - Geliştirilmiş Versiyon -->
     <div class="modal fade" id="newListingModal" tabindex="-1" aria-labelledby="newListingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -341,71 +345,102 @@
                                 <div><strong>Kategori:</strong> <span id="productCategory"></span></div>
                             </div>
 
-                            <!-- Listing kategorisi ve toplu ayarlar -->
-                            <div id="listingOptionsContainer" class="mb-4">
-                                <h5 class="mb-3">Listing Bilgileri</h5>
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label for="categorySelect" class="form-label">Çiçeksepeti Kategorisi</label>
-                                        <select class="form-select" id="categorySelect">
-                                            <option value="">Kategori Seçin</option>
-                                            {% for category in categories %}
-                                                <option value="{{ category.id }}">{{ category.name }}</option>
-                                            {% endfor %}
-                                        </select>
+                            <!-- Listing kategorisi seçimi -->
+                            <div class="mb-4">
+                                <label for="categorySelect" class="form-label">Çiçeksepeti Kategorisi</label>
+                                <select class="form-select" id="categorySelect">
+                                    <option value="">Kategori Seçin</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Varyantlar ve varyant seçimi -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0">Varyantlar</h5>
+
+                                    <!-- Toplu işlemler -->
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="selectAllVariantsBtn">
+                                            <i class="fas fa-check-square me-1"></i> Tümünü Seç
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllVariantsBtn">
+                                            <i class="fas fa-square me-1"></i> Seçimi Kaldır
+                                        </button>
                                     </div>
+                                </div>
+
+                                <!-- Toplu stok ve fiyat ayarları -->
+                                <div class="row g-2 mb-3 bulk-options">
                                     <div class="col-md-6">
-                                        <label class="form-label">Toplu Stok Ayarla</label>
-                                        <div class="input-group">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">Toplu Stok</span>
                                             <input type="number" class="form-control" id="bulkStock" value="10" min="1">
-                                            <button class="btn btn-outline-secondary" type="button" id="applyBulkStock">Uygula</button>
+                                            <button class="btn btn-outline-primary" type="button" id="applyBulkStock" title="Seçili varyantlara uygula">
+                                                <i class="fas fa-check"></i>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Toplu Fiyat Ayarla</label>
-                                        <div class="input-group">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">Toplu Fiyat</span>
                                             <input type="number" class="form-control" id="bulkPrice" value="100" min="0.01" step="0.01">
-                                            <button class="btn btn-outline-secondary" type="button" id="applyBulkPrice">Uygula</button>
+                                            <button class="btn btn-outline-primary" type="button" id="applyBulkPrice" title="Seçili varyantlara uygula">
+                                                <i class="fas fa-check"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <h5 class="mt-4 mb-3">Varyantlar</h5>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 50px;">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="selectAllVariants">
-                                            </div>
-                                        </th>
-                                        <th>ID</th>
-                                        <th>IWASKU</th>
-                                        <th>Renk</th>
-                                        <th>Ebat</th>
-                                        <th>Stok</th>
-                                        <th>Fiyat (TL)</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="variantsTableBody"></tbody>
-                                </table>
+                                <!-- Varyant listesi tablosu -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover table-sm">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 40px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="selectAllVariants">
+                                                </div>
+                                            </th>
+                                            <th style="width: 80px;">ID</th>
+                                            <th>IWASKU</th>
+                                            <th>Renk</th>
+                                            <th>Ebat</th>
+                                            <th style="width: 90px;">Stok</th>
+                                            <th style="width: 110px;">Fiyat (₺)</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="variantsTableBody">
+                                        <!-- Varyantlar burada listelenecek -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Seçim bilgisi -->
+                                <div class="mt-2 text-end text-muted">
+                                    <small id="selectionInfo">0 varyant seçildi</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-success" id="createListingBtn" disabled>Listing Oluştur</button>
+                    <button type="button" class="btn btn-success" id="createListingBtn" disabled>
+                        <i class="fas fa-plus-circle me-1"></i> Listing Oluştur
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        /* Modal Stilleri */
         .modal-dialog-scrollable .modal-body {
             max-height: 70vh;
             overflow-y: auto;
@@ -420,6 +455,8 @@
         .modal-body {
             flex: 1 1 auto;
         }
+
+        /* Ürün Kart Stilleri */
         .product-card {
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -470,17 +507,21 @@
             max-height: 300px;
             overflow-y: auto;
         }
+
+        /* Görsel Galerisi Stilleri */
         #imageGallery .image-item {
             position: relative;
             width: 100px;
             height: 100px;
         }
+
         #imageGallery .image-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: .25rem;
         }
+
         #imageGallery .remove-btn {
             position: absolute;
             top: -6px;
@@ -494,143 +535,234 @@
             height: 20px;
             cursor: pointer;
         }
-    </style>
-{% endblock %}
-{% block body_scripts %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <script>
-        document.getElementById('selectAllVariants').addEventListener('change', function() {
-            const isChecked = this.checked;
-            document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
-                checkbox.checked = isChecked;
-            });
-            updateCreateButton();
-        });
-
-        // Varyant seçildiğinde butonu güncelle
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('variant-checkbox')) {
-                updateCreateButton();
-            }
-        });
-
-        // Kategori seçildiğinde butonu güncelle
-        document.getElementById('categorySelect').addEventListener('change', function() {
-            updateCreateButton();
-        });
-
-        // Listing oluştur butonunu güncelle
-        function updateCreateButton() {
-            const selectedVariants = document.querySelectorAll('.variant-checkbox:checked');
-            const selectedCategory = document.getElementById('categorySelect').value;
-
-            // Listing options container'ı göster/gizle
-            const listingOptionsContainer = document.getElementById('listingOptionsContainer');
-            if (selectedVariants.length > 0) {
-                listingOptionsContainer.classList.remove('d-none');
-            } else {
-                listingOptionsContainer.classList.add('d-none');
-            }
-
-            // Butonu aktifleştir/deaktifleştir
-            document.getElementById('createListingBtn').disabled = !(selectedVariants.length > 0 && selectedCategory);
+        /* Geliştirilmiş varyant tablosu stil */
+        #variantsTableBody tr:hover {
+            background-color: rgba(0,123,255,0.05);
         }
 
-        document.getElementById('createListingBtn').addEventListener('click', function() {
-            const selectedRows = document.querySelectorAll('.variant-checkbox:checked');
-            if (selectedRows.length === 0) {
-                alert('Lütfen en az bir varyant seçin');
-                return;
-            }
+        /* Seçili tablo satırı stillendirmesi */
+        #variantsTableBody tr.selected-row {
+            background-color: rgba(0,123,255,0.15);
+        }
 
-            const categoryId = document.getElementById('categorySelect').value;
-            if (!categoryId) {
-                alert('Lütfen bir kategori seçin');
-                return;
-            }
+        /* Toplu işlemler bölümünün arayüzü */
+        .bulk-options {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+{% endblock %}
 
-            // Seçili varyantları topla - her biri için stok ve fiyat değerlerini de al
-            const variants = [];
-            selectedRows.forEach(function(checkbox) {
-                const row = checkbox.closest('tr');
-                const stockInput = row.querySelector('.variant-stock');
-                const priceInput = row.querySelector('.variant-price');
-
-                variants.push({
-                    id: checkbox.value,
-                    iwasku: checkbox.getAttribute('data-iwasku'),
-                    color: checkbox.getAttribute('data-color'),
-                    size: checkbox.getAttribute('data-size'),
-                    stock: stockInput ? stockInput.value : 0,
-                    price: priceInput ? priceInput.value : 0
-                });
-            });
-
-            // Form verisini hazırla
-            const formData = {
-                productId: document.getElementById('productId').textContent,
-                productName: document.getElementById('productName').textContent,
-                categoryId: categoryId,
-                variants: variants
-            };
-
-            console.log('Gönderilecek veri:', formData);
-
-            // API isteği gönder
-            fetch('/create-ciceksepeti-listing', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Listing başarıyla oluşturuldu!');
-                        location.reload(); // Sayfayı yenile
-                    } else {
-                        alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Listing oluşturma hatası:', error);
-                    alert('Bağlantı hatası oluştu');
-                });
-        });
-
-        // Toplu stok ve fiyat ayarlama butonları
-        document.getElementById('applyBulkStock').addEventListener('click', function() {
-            const bulkStock = document.getElementById('bulkStock').value;
-            document.querySelectorAll('.variant-checkbox:checked').forEach(function(checkbox) {
-                const row = checkbox.closest('tr');
-                const stockInput = row.querySelector('.variant-stock');
-                if (stockInput) stockInput.value = bulkStock;
-            });
-        });
-
-        document.getElementById('applyBulkPrice').addEventListener('click', function() {
-            const bulkPrice = document.getElementById('bulkPrice').value;
-            document.querySelectorAll('.variant-checkbox:checked').forEach(function(checkbox) {
-                const row = checkbox.closest('tr');
-                const priceInput = row.querySelector('.variant-price');
-                if (priceInput) priceInput.value = bulkPrice;
-            });
-        });
-
-
-
+{% block body_scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
+            /**
+             * Ürün Varyant Görüntüleme İşlemleri
+             * Ürün kartlarındaki varyant listesini açıp kapatan butonlar için olay dinleyicilerini ayarlar
+             */
+            const toggleButtons = document.querySelectorAll('.toggle-variants');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const mainCode = this.getAttribute('data-main-code');
+                    const variantsContainer = document.querySelector(`.variants-container[data-main-code="${mainCode}"]`);
+                    const icon = this.querySelector('.toggle-icon');
+
+                    if (variantsContainer.classList.contains('d-none')) {
+                        variantsContainer.classList.remove('d-none');
+                        this.innerHTML = '<i class="fas fa-chevron-up toggle-icon"></i> Varyantları Gizle';
+                    } else {
+                        variantsContainer.classList.add('d-none');
+                        this.innerHTML = '<i class="fas fa-chevron-down toggle-icon"></i> Varyantları Göster';
+                    }
+                });
+            });
+
+            /**
+             * Düzenleme Modalı İşlemleri
+             * Varyant düzenleme modalını açarken ilgili varyantın verilerini forma yükler
+             */
+            document.querySelectorAll(".open-edit-modal").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    document.getElementById("formProductName").value = this.dataset.productName || '';
+                    document.getElementById("formProductCode").value = this.dataset.productCode || '';
+                    document.getElementById("formBarcode").value = this.dataset.barcode || '';
+                    document.getElementById("formStock").value = this.dataset.stock || '';
+                    document.getElementById("formSalesPrice").value = this.dataset.salesPrice || '';
+                    document.getElementById("formListPrice").value = this.dataset.listPrice || '';
+                    document.getElementById("formDescription").value = this.dataset.description || '';
+                    document.getElementById("formCategoryId").value = this.dataset.categoryId || '';
+                    document.getElementById("formVariantActive").value = this.dataset.variantIsactive || '0';
+                    document.getElementById("formProductActive").value = this.dataset.productIsactive || '0';
+                    document.getElementById("formMainProductCode").value = this.dataset.mainProductCode || '';
+                    document.getElementById("formStockCode").value = this.dataset.productStockCode || '';
+                    document.getElementById("formCommissionRate").value = this.dataset.commissionRate || '0';
+                    document.getElementById("formDeliveryType").value = this.dataset.deliveryType || '1';
+                    document.getElementById("formDeliveryMessageType").value = this.dataset.deliveryMessageType || '1';
+
+                    // JSON verisini formatlı göster
+                    const attributes = this.dataset.attributes;
+                    try {
+                        const parsed = JSON.parse(attributes);
+                        const formatted = JSON.stringify(parsed, null, 4);
+                        document.getElementById("formAttributes").value = formatted;
+                    } catch (e) {
+                        document.getElementById("formAttributes").value = attributes;
+                    }
+
+                    // Görselleri yükle
+                    const rawImages = this.dataset.images;
+                    try {
+                        currentImages = JSON.parse(rawImages);
+                    } catch {
+                        currentImages = rawImages ? [rawImages] : [];
+                    }
+                    updateImageGallery();
+                });
+            });
+
+            /**
+             * Görsel Galerisi İşlemleri
+             * Ürün/varyant görsellerini yönetmek için kullanılan fonksiyonlar
+             */
+            let currentImages = [];
+
+            // Görsel galerisini günceller ve sürükle-bırak sıralama özelliği ekler
+            function updateImageGallery() {
+                const gallery = document.getElementById("imageGallery");
+                gallery.innerHTML = "";
+
+                currentImages.forEach((url, index) => {
+                    const item = document.createElement("div");
+                    item.className = "image-item";
+                    item.setAttribute("data-index", index);
+
+                    const img = document.createElement("img");
+                    img.src = url;
+
+                    // Görsele tıklanınca büyütme özelliği (isteğe bağlı)
+                    img.addEventListener("click", () => {
+                        if (img.classList.contains("image-zoomed")) {
+                            img.classList.remove("image-zoomed");
+                            document.body.style.overflow = "auto";
+                        } else {
+                            document.querySelectorAll(".image-zoomed").forEach(el => el.classList.remove("image-zoomed"));
+                            img.classList.add("image-zoomed");
+                            document.body.style.overflow = "hidden";
+                        }
+                    });
+
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "remove-btn";
+                    removeBtn.innerHTML = "&times;";
+                    removeBtn.addEventListener("click", () => {
+                        currentImages.splice(index, 1);
+                        updateImageGallery();
+                    });
+
+                    item.appendChild(img);
+                    item.appendChild(removeBtn);
+                    gallery.appendChild(item);
+                });
+
+                // Galeriyi sıralama için güncelle
+                if (gallery.children.length > 0) {
+                    Sortable.create(gallery, {
+                        animation: 150,
+                        onEnd: function (evt) {
+                            const newOrder = [];
+                            gallery.querySelectorAll(".image-item").forEach(item => {
+                                const src = item.querySelector("img").src;
+                                newOrder.push(src);
+                            });
+                            currentImages = newOrder;
+                            document.getElementById("imagesInput").value = JSON.stringify(currentImages);
+                        }
+                    });
+                }
+
+                document.getElementById("imagesInput").value = JSON.stringify(currentImages);
+            }
+
+            // Görsel ekleme butonunun fonksiyonelliği
+            document.getElementById("addImageBtn").addEventListener("click", () => {
+                const newUrl = document.getElementById("newImageUrl").value.trim();
+                if (newUrl.startsWith("https://")) {
+                    currentImages.push(newUrl);
+                    updateImageGallery();
+                    document.getElementById("newImageUrl").value = "";
+                } else {
+                    alert("Lütfen geçerli bir HTTPS URL girin.");
+                }
+            });
+
+            /**
+             * Varyant Formu Gönderimi İşlemi
+             * Düzenleme modalındaki formu AJAX ile gönderir
+             */
+            document.getElementById('variantForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                let formData = new FormData(event.target);
+
+                fetch('/variant/update', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Varyant güncelleme verileri:', data);
+                        alert('Varyant başarıyla güncellendi.');
+                    })
+                    .catch(error => {
+                        console.error('Güncelleme hatası:', error);
+                        alert('Güncellerken bir hata oluştu.');
+                    });
+            });
+
+            // ----- YENİ LISTING OLUŞTURMA İŞLEMLERİ ----- //
+
+            /**
+             * Yeni Listing Modal Kontrolleri
+             * Modal açılma/kapanma ve sıfırlama işlemleri
+             */
+            let isModalFirstOpen = true;
+
+            // Modal açılınca form sıfırlama işlemi
             document.getElementById('newListingBtn').addEventListener('click', function() {
                 const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
+
+                if (isModalFirstOpen) {
+                    // Form alanlarını sıfırla
+                    document.getElementById('productIdentifier').value = '';
+                    const resultsContainer = document.getElementById('searchResultsContainer');
+                    const errorMessage = document.getElementById('errorMessage');
+                    const productInfo = document.getElementById('productInfo');
+
+                    if (resultsContainer) resultsContainer.classList.add('d-none');
+                    if (errorMessage) errorMessage.classList.add('d-none');
+                    if (productInfo) productInfo.classList.add('d-none');
+
+                    isModalFirstOpen = false;
+                }
+
                 modal.show();
             });
 
-            document.getElementById('searchBtn').addEventListener('click', function() {
-                searchProduct();
+            // Modal kapanınca sıfırlama değişkenini resetleme
+            document.getElementById('newListingModal').addEventListener('hidden.bs.modal', function () {
+                isModalFirstOpen = true;
             });
 
+            /**
+             * Ürün Arama İşlemi
+             * API'ye istek atarak ürün bilgilerini ve varyantlarını getirir
+             */
+            document.getElementById('searchBtn').addEventListener('click', searchProduct);
+
+            // Enter tuşuyla arama yapma özelliği
             document.getElementById('productIdentifier').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -638,6 +770,7 @@
                 }
             });
 
+            // Ürün arama işlevini gerçekleştiren fonksiyon
             function searchProduct() {
                 const identifier = document.getElementById('productIdentifier').value.trim();
 
@@ -646,6 +779,7 @@
                     return;
                 }
 
+                // UI elemanlarını hazırla
                 const resultsContainer = document.getElementById('searchResultsContainer');
                 const loadingSpinner = document.getElementById('loadingSpinner');
                 const errorMessage = document.getElementById('errorMessage');
@@ -656,6 +790,7 @@
                 if (errorMessage) errorMessage.classList.add('d-none');
                 if (productInfo) productInfo.classList.add('d-none');
 
+                // API isteği gönder
                 fetch(`/api/products/search/${encodeURIComponent(identifier)}`)
                     .then(response => {
                         if (!response.ok) {
@@ -667,52 +802,11 @@
                         if (loadingSpinner) loadingSpinner.classList.add('d-none');
 
                         if (data.success && data.product) {
-                            const productNameEl = document.getElementById('productName');
-                            const productIdEl = document.getElementById('productId');
-                            const productCategoryEl = document.getElementById('productCategory');
-                            const variantsTableBody = document.getElementById('variantsTableBody');
+                            // Ürün bilgilerini görüntüle
+                            displayProductInfo(data.product);
 
-                            if (productNameEl) productNameEl.textContent = data.product.name || 'İsimsiz Ürün';
-                            if (productIdEl) productIdEl.textContent = data.product.id || '';
-                            if (productCategoryEl) productCategoryEl.textContent = data.product.productCategory || '';
-
-                            if (variantsTableBody) {
-                                variantsTableBody.innerHTML = '';
-
-                                if (data.product.variants && data.product.variants.length > 0) {
-                                    data.product.variants.forEach(variant => {
-                                        const row = document.createElement('tr');
-                                        row.innerHTML = `
-                <td>
-                    <div class="form-check">
-                        <input class="form-check-input variant-checkbox" type="checkbox"
-                               value="${variant.id}"
-                               data-iwasku="${variant.iwasku || ''}"
-                               data-color="${variant.variationColor || ''}"
-                               data-size="${variant.variationSize || ''}">
-                    </div>
-                </td>
-                <td>${variant.id}</td>
-                <td>${variant.iwasku || '-'}</td>
-                <td>${variant.variationColor || '-'}</td>
-                <td>${variant.variationSize || '-'}</td>
-                <td>
-                    <input type="number" class="form-control form-control-sm variant-stock"
-                           min="1" value="10" style="width: 80px;">
-                </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm variant-price"
-                           min="0.01" step="0.01" value="100" style="width: 100px;">
-                </td>
-            `;
-                                        variantsTableBody.appendChild(row);
-                                    });
-
-                                    console.log(`${data.product.variants.length} varyant bulundu.`);
-                                } else {
-                                    variantsTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
-                                }
-                            }
+                            // Kategori değişimini dinle
+                            document.getElementById('categorySelect').addEventListener('change', updateCreateButton);
 
                             // Ürün bilgilerini göster
                             if (productInfo) productInfo.classList.remove('d-none');
@@ -733,178 +827,306 @@
                         }
                     });
             }
-            let isModalFirstOpen = true;
-            document.getElementById('newListingBtn').addEventListener('click', function() {
-                const modal = new bootstrap.Modal(document.getElementById('newListingModal'));
 
-                if (isModalFirstOpen) {
-                    document.getElementById('productIdentifier').value = '';
-                    const resultsContainer = document.getElementById('searchResultsContainer');
-                    const errorMessage = document.getElementById('errorMessage');
-                    const productInfo = document.getElementById('productInfo');
+            /**
+             * Ürün Bilgilerini Görüntüleme
+             * API'den gelen ürün ve varyant verilerini ekranda gösterir
+             */
+            function displayProductInfo(product) {
+                // Ana ürün bilgilerini göster
+                const productNameEl = document.getElementById('productName');
+                const productIdEl = document.getElementById('productId');
+                const productCategoryEl = document.getElementById('productCategory');
 
-                    if (resultsContainer) resultsContainer.classList.add('d-none');
-                    if (errorMessage) errorMessage.classList.add('d-none');
-                    if (productInfo) productInfo.classList.add('d-none');
+                if (productNameEl) productNameEl.textContent = product.name || 'İsimsiz Ürün';
+                if (productIdEl) productIdEl.textContent = product.id || '';
+                if (productCategoryEl) productCategoryEl.textContent = product.productCategory || '';
 
-                    isModalFirstOpen = false;
-                }
+                // Varyantları listele
+                displayVariants(product.variants || []);
 
-                modal.show();
-            });
-
-            document.getElementById('newListingModal').addEventListener('hidden.bs.modal', function () {
-                isModalFirstOpen = true;
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleButtons = document.querySelectorAll('.toggle-variants');
-
-            toggleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const mainCode = this.getAttribute('data-main-code');
-                    const variantsContainer = document.querySelector(`.variants-container[data-main-code="${mainCode}"]`);
-                    const icon = this.querySelector('.toggle-icon');
-
-                    if (variantsContainer.classList.contains('d-none')) {
-                        variantsContainer.classList.remove('d-none');
-                        this.innerHTML = '<i class="fas fa-chevron-up toggle-icon"></i> Varyantları Gizle';
-                    } else {
-                        variantsContainer.classList.add('d-none');
-                        this.innerHTML = '<i class="fas fa-chevron-down toggle-icon"></i> Varyantları Göster';
-                    }
-                });
-            });
-        });
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".open-edit-modal").forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    document.getElementById("formProductName").value = this.dataset.productName || '';
-                    document.getElementById("formProductCode").value = this.dataset.productCode || '';
-                    document.getElementById("formBarcode").value = this.dataset.barcode || '';
-                    document.getElementById("formStock").value = this.dataset.stock || '';
-                    document.getElementById("formSalesPrice").value = this.dataset.salesPrice || '';
-                    document.getElementById("formListPrice").value = this.dataset.listPrice || '';
-                    document.getElementById("formDescription").value = this.dataset.description || '';
-                    document.getElementById("formCategoryId").value = this.dataset.categoryId || '';
-                    document.getElementById("formVariantActive").value = this.dataset.variantIsActive || '0';
-                    document.getElementById("formProductActive").value = this.dataset.productIsActive || '0';
-                    document.getElementById("formMainProductCode").value = this.dataset.mainProductCode || '';
-                    document.getElementById("formStockCode").value = this.dataset.productStockCode || '';
-                    document.getElementById("formCommissionRate").value = this.dataset.commissionRate || '0';
-                    document.getElementById("formDeliveryType").value = this.dataset.deliveryType || '1';
-                    document.getElementById("formDeliveryMessageType").value = this.dataset.deliveryMessageType || '1';
-                    const attributes = this.dataset.attributes;
-                    try {
-                        const parsed = JSON.parse(attributes);
-                        const formatted = JSON.stringify(parsed, null, 4);
-                        document.getElementById("formAttributes").value = formatted;
-                    } catch (e) {
-                        document.getElementById("formAttributes").value = attributes;
-                    }
-                });
-            });
-        });
-        let currentImages = [];
-
-        function updateImageGallery() {
-            const gallery = document.getElementById("imageGallery");
-            gallery.innerHTML = "";
-
-            currentImages.forEach((url, index) => {
-                const item = document.createElement("div");
-                item.className = "image-item";
-                item.setAttribute("data-index", index);
-
-                const img = document.createElement("img");
-                img.src = url;
-
-                img.addEventListener("click", () => {
-                    if (img.classList.contains("image-zoomed")) {
-                        img.classList.remove("image-zoomed");
-                        document.body.style.overflow = "auto";
-                    } else {
-                        document.querySelectorAll(".image-zoomed").forEach(el => el.classList.remove("image-zoomed"));
-                        img.classList.add("image-zoomed");
-                        document.body.style.overflow = "hidden";
-                    }
-                });
-
-                img.addEventListener("click", () => {
-                    document.getElementById("imagePreviewContent").src = url;
-                });
-
-                const removeBtn = document.createElement("button");
-                removeBtn.className = "remove-btn";
-                removeBtn.innerHTML = "&times;";
-                removeBtn.addEventListener("click", () => {
-                    currentImages.splice(index, 1);
-                    updateImageGallery();
-                });
-
-                item.appendChild(img);
-                item.appendChild(removeBtn);
-                gallery.appendChild(item);
-            });
-
-            // Galeriyi sıralama için güncelle
-            Sortable.create(gallery, {
-                animation: 150,
-                onEnd: function (evt) {
-                    const newOrder = [];
-                    gallery.querySelectorAll(".image-item").forEach(item => {
-                        const src = item.querySelector("img").src;
-                        newOrder.push(src);
-                    });
-                    currentImages = newOrder;
-                    document.getElementById("imagesInput").value = JSON.stringify(currentImages);
-                }
-            });
-
-            document.getElementById("imagesInput").value = JSON.stringify(currentImages);
-        }
-
-        document.getElementById("addImageBtn").addEventListener("click", () => {
-            const newUrl = document.getElementById("newImageUrl").value.trim();
-            if (newUrl.startsWith("https://")) {
-                currentImages.push(newUrl);
-                updateImageGallery();
-                document.getElementById("newImageUrl").value = "";
-            } else {
-                alert("Lütfen geçerli bir HTTPS URL girin.");
+                // Seçim sayacını güncelle
+                updateSelectionCounter();
             }
-        });
 
-        document.querySelectorAll(".open-edit-modal").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const rawImages = btn.dataset.images;
-                try {
-                    currentImages = JSON.parse(rawImages);
-                } catch {
-                    currentImages = rawImages ? [rawImages] : [];
+            /**
+             * Varyantları Tabloda Görüntüleme
+             * Ürünün varyantlarını tabloda listeler
+             */
+            function displayVariants(variants) {
+                const variantsTableBody = document.getElementById('variantsTableBody');
+
+                if (variantsTableBody) {
+                    variantsTableBody.innerHTML = '';
+
+                    if (variants.length > 0) {
+                        variants.forEach(variant => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input variant-checkbox" type="checkbox"
+                                               value="${variant.id}"
+                                               data-iwasku="${variant.iwasku || ''}"
+                                               data-color="${variant.variationColor || ''}"
+                                               data-size="${variant.variationSize || ''}">
+                                    </div>
+                                </td>
+                                <td>${variant.id}</td>
+                                <td>${variant.iwasku || '-'}</td>
+                                <td>${variant.variationColor || '-'}</td>
+                                <td>${variant.variationSize || '-'}</td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm variant-stock"
+                                           min="1" value="10" style="width: 80px;">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm variant-price"
+                                           min="0.01" step="0.01" value="100" style="width: 100px;">
+                                </td>
+                            `;
+                            variantsTableBody.appendChild(row);
+                        });
+
+                        // Varyant seçimine tıkladığında satırı vurgula ve buton durumunu güncelle
+                        document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                            checkbox.addEventListener('change', function() {
+                                const row = this.closest('tr');
+                                if (this.checked) {
+                                    row.classList.add('selected-row');
+                                } else {
+                                    row.classList.remove('selected-row');
+                                }
+                                updateCreateButton();
+                                updateSelectionCounter();
+                            });
+                        });
+
+                        console.log(`${variants.length} varyant bulundu.`);
+                    } else {
+                        variantsTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
+                    }
                 }
-                updateImageGallery();
-            });
-        });
+            }
 
-        document.getElementById('variantForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let formData = new FormData(event.target);
+            /**
+             * Seçilen Varyant Sayısını Güncelleme
+             * Kullanıcı arayüzünde kaç varyantın seçildiğini gösterir
+             */
+            function updateSelectionCounter() {
+                const selectedCount = document.querySelectorAll('.variant-checkbox:checked').length;
+                const totalCount = document.querySelectorAll('.variant-checkbox').length;
+                const selectionInfo = document.getElementById('selectionInfo');
 
-            fetch('/variant/update', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Formdan gelen veriler:', data);
-                    alert('Form başarıyla gönderildi. Veriler F12 konsolunda görüntülenebilir.');
-                })
-                .catch(error => {
-                    console.error('Bir hata oluştu:', error);
+                if (selectionInfo) {
+                    selectionInfo.textContent = `${selectedCount} / ${totalCount} varyant seçildi`;
+                }
+            }
+
+            /**
+             * Tüm Varyant Seçme/Kaldırma İşlemi
+             * Tablodaki tüm varyantları toplu olarak seçer veya seçimi kaldırır
+             */
+            document.getElementById('selectAllVariants').addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                    const row = checkbox.closest('tr');
+                    if (isChecked) {
+                        row.classList.add('selected-row');
+                    } else {
+                        row.classList.remove('selected-row');
+                    }
                 });
+                updateCreateButton();
+                updateSelectionCounter();
+            });
+
+            // Tümünü Seç butonu
+            document.getElementById('selectAllVariantsBtn').addEventListener('click', function() {
+                document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                    checkbox.checked = true;
+                    checkbox.closest('tr').classList.add('selected-row');
+                });
+                document.getElementById('selectAllVariants').checked = true;
+                updateCreateButton();
+                updateSelectionCounter();
+            });
+
+            // Seçimi Kaldır butonu
+            document.getElementById('deselectAllVariantsBtn').addEventListener('click', function() {
+                document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                    checkbox.checked = false;
+                    checkbox.closest('tr').classList.remove('selected-row');
+                });
+                document.getElementById('selectAllVariants').checked = false;
+                updateCreateButton();
+                updateSelectionCounter();
+            });
+
+            /**
+             * Toplu Stok ve Fiyat Ayarlama
+             * Seçili varyantlara toplu olarak stok ve fiyat değeri atar
+             */
+            document.getElementById('applyBulkStock').addEventListener('click', function() {
+                const bulkStock = document.getElementById('bulkStock').value;
+                let appliedCount = 0;
+
+                document.querySelectorAll('.variant-checkbox:checked').forEach(function(checkbox) {
+                    const row = checkbox.closest('tr');
+                    const stockInput = row.querySelector('.variant-stock');
+                    if (stockInput) {
+                        stockInput.value = bulkStock;
+                        appliedCount++;
+                    }
+                });
+
+                // Bildirim göster
+                if (appliedCount > 0) {
+                    showToast(`${appliedCount} varyanta stok değeri uygulandı`);
+                }
+            });
+
+            document.getElementById('applyBulkPrice').addEventListener('click', function() {
+                const bulkPrice = document.getElementById('bulkPrice').value;
+                let appliedCount = 0;
+
+                document.querySelectorAll('.variant-checkbox:checked').forEach(function(checkbox) {
+                    const row = checkbox.closest('tr');
+                    const priceInput = row.querySelector('.variant-price');
+                    if (priceInput) {
+                        priceInput.value = bulkPrice;
+                        appliedCount++;
+                    }
+                });
+
+                // Bildirim göster
+                if (appliedCount > 0) {
+                    showToast(`${appliedCount} varyanta fiyat değeri uygulandı`);
+                }
+            });
+
+            /**
+             * Toast Bildirimi Gösterme
+             * Kullanıcıya geçici bildirim göstermek için kullanılır
+             */
+            function showToast(message) {
+                // Varsa mevcut toastı kaldır
+                const existingToast = document.querySelector('.toast-notification');
+                if (existingToast) {
+                    existingToast.remove();
+                }
+
+                // Yeni toast oluştur
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification alert alert-info';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '20px';
+                toast.style.right = '20px';
+                toast.style.zIndex = '9999';
+                toast.style.minWidth = '200px';
+                toast.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                toast.innerHTML = message;
+
+                document.body.appendChild(toast);
+
+                // 3 saniye sonra kaldır
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            /**
+             * Listing Oluştur Butonu Durumu Güncelleme
+             * Seçim ve kategori durumuna göre butonun aktif/pasif olmasını kontrol eder
+             */
+            function updateCreateButton() {
+                const selectedVariants = document.querySelectorAll('.variant-checkbox:checked').length;
+                const selectedCategory = document.getElementById('categorySelect').value;
+
+                // Butonu aktifleştir/deaktifleştir
+                document.getElementById('createListingBtn').disabled = !(selectedVariants > 0 && selectedCategory);
+            }
+
+            /**
+             * Listing Oluşturma İşlemi
+             * Seçilen varyantlar, kategori ve fiyat/stok bilgilerini API'ye gönderir
+             */
+            document.getElementById('createListingBtn').addEventListener('click', function() {
+                const selectedRows = document.querySelectorAll('.variant-checkbox:checked');
+                if (selectedRows.length === 0) {
+                    alert('Lütfen en az bir varyant seçin');
+                    return;
+                }
+
+                const categoryId = document.getElementById('categorySelect').value;
+                if (!categoryId) {
+                    alert('Lütfen bir kategori seçin');
+                    return;
+                }
+
+                // Butonu devre dışı bırak ve işlem göstergesi ekle
+                const createButton = this;
+                const originalButtonText = createButton.innerHTML;
+                createButton.disabled = true;
+                createButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> İşleniyor...';
+
+                // Seçili varyantları topla - her biri için stok ve fiyat değerlerini de al
+                const variants = [];
+                selectedRows.forEach(function(checkbox) {
+                    const row = checkbox.closest('tr');
+                    const stockInput = row.querySelector('.variant-stock');
+                    const priceInput = row.querySelector('.variant-price');
+
+                    variants.push({
+                        id: checkbox.value,
+                        iwasku: checkbox.getAttribute('data-iwasku'),
+                        color: checkbox.getAttribute('data-color'),
+                        size: checkbox.getAttribute('data-size'),
+                        stock: stockInput ? stockInput.value : 0,
+                        price: priceInput ? priceInput.value : 0
+                    });
+                });
+
+                // Form verisini hazırla
+                const formData = {
+                    productId: document.getElementById('productId').textContent,
+                    productName: document.getElementById('productName').textContent,
+                    productCategory: document.getElementById('productCategory').textContent,
+                    categoryId: categoryId,
+                    variants: variants
+                };
+
+                console.log('Gönderilecek veri:', formData);
+
+                // API isteği gönder
+                fetch('/create-ciceksepeti-listing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Listing başarıyla oluşturuldu!');
+                            location.reload(); // Sayfayı yenile
+                        } else {
+                            alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu'));
+                            // Butonu eski haline getir
+                            createButton.disabled = false;
+                            createButton.innerHTML = originalButtonText;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Listing oluşturma hatası:', error);
+                        alert('Bağlantı hatası oluştu');
+                        // Butonu eski haline getir
+                        createButton.disabled = false;
+                        createButton.innerHTML = originalButtonText;
+                    });
+            });
         });
     </script>
-
 {% endblock %}
