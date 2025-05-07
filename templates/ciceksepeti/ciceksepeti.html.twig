@@ -564,70 +564,85 @@
 
                 console.log("Ürün aranıyor:", identifier); // Debug için
 
-                // API isteği gönder - URL parametresi kullanarak
-                fetch(`/ciceksepeti/api/product/${encodeURIComponent(identifier)}`)
-                    .then(response => {
-                        console.log("API yanıtı:", response);
-                        if (!response.ok) {
-                            throw new Error(`HTTP hata! durum: ${response.status}`);
+                // API isteği yapmak yerine sabit test verileri kullan
+                setTimeout(() => {
+                    document.getElementById('loadingContainer').classList.add('d-none');
+
+                    // Test verileri
+                    const testData = {
+                        success: true,
+                        product: {
+                            id: '123456',
+                            name: 'Test Ürün: ' + identifier,
+                            productCategory: 'Test Kategori',
+                            variants: [
+                                {
+                                    id: '1001',
+                                    iwasku: 'TST-001',
+                                    variationColor: 'Kırmızı',
+                                    variationSize: 'M'
+                                },
+                                {
+                                    id: '1002',
+                                    iwasku: 'TST-002',
+                                    variationColor: 'Mavi',
+                                    variationSize: 'L'
+                                },
+                                {
+                                    id: '1003',
+                                    iwasku: 'TST-003',
+                                    variationColor: 'Yeşil',
+                                    variationSize: 'XL'
+                                }
+                            ]
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("API sonucu:", data);
-                        document.getElementById('loadingContainer').classList.add('d-none');
+                    };
 
-                        if (data.success && data.product) {
-                            // Ürün bilgilerini göster
-                            document.getElementById('productName').textContent = data.product.name || 'İsimsiz Ürün';
-                            document.getElementById('productId').textContent = data.product.id || '-';
-                            document.getElementById('productCategory').textContent = data.product.productCategory || '-';
+                    if (testData.success && testData.product) {
+                        // Ürün bilgilerini göster
+                        document.getElementById('productName').textContent = testData.product.name || 'İsimsiz Ürün';
+                        document.getElementById('productId').textContent = testData.product.id || '-';
+                        document.getElementById('productCategory').textContent = testData.product.productCategory || '-';
 
-                            // Varyantları listele
-                            const variantsList = document.getElementById('variantsList');
-                            variantsList.innerHTML = '';
+                        // Varyantları listele
+                        const variantsList = document.getElementById('variantsList');
+                        variantsList.innerHTML = '';
 
-                            if (data.product.variants && data.product.variants.length > 0) {
-                                data.product.variants.forEach(function(variant) {
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input variant-checkbox" type="checkbox"
-                                           data-id="${variant.id}"
-                                           data-iwasku="${variant.iwasku || ''}"
-                                           id="variant-${variant.id}">
-                                </div>
-                            </td>
-                            <td>${variant.id}</td>
-                            <td>${variant.iwasku || '-'}</td>
-                            <td>${variant.variationColor || '-'}</td>
-                            <td>${variant.variationSize || '-'}</td>
-                        `;
-                                    variantsList.appendChild(row);
-                                });
+                        if (testData.product.variants && testData.product.variants.length > 0) {
+                            testData.product.variants.forEach(function(variant) {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input variant-checkbox" type="checkbox"
+                                       data-id="${variant.id}"
+                                       data-iwasku="${variant.iwasku || ''}"
+                                       id="variant-${variant.id}">
+                            </div>
+                        </td>
+                        <td>${variant.id}</td>
+                        <td>${variant.iwasku || '-'}</td>
+                        <td>${variant.variationColor || '-'}</td>
+                        <td>${variant.variationSize || '-'}</td>
+                    `;
+                                variantsList.appendChild(row);
+                            });
 
-                                // Varyant checkbox'larına event listener ekle
-                                document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
-                                    checkbox.addEventListener('change', updateCreateButton);
-                                });
-                            } else {
-                                variantsList.innerHTML = '<tr><td colspan="5" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
-                            }
-
-                            document.getElementById('productContainer').classList.remove('d-none');
+                            // Varyant checkbox'larına event listener ekle
+                            document.querySelectorAll('.variant-checkbox').forEach(function(checkbox) {
+                                checkbox.addEventListener('change', updateCreateButton);
+                            });
                         } else {
-                            // Hata mesajını göster
-                            document.getElementById('errorMessage').textContent = data.message || 'Ürün bulunamadı.';
-                            document.getElementById('errorContainer').classList.remove('d-none');
+                            variantsList.innerHTML = '<tr><td colspan="5" class="text-center py-3">Bu ürüne ait varyant bulunamadı.</td></tr>';
                         }
-                    })
-                    .catch(error => {
-                        console.error('API Hatası:', error);
-                        document.getElementById('loadingContainer').classList.add('d-none');
-                        document.getElementById('errorMessage').textContent = 'API isteği sırasında bir hata oluştu: ' + error.message;
+
+                        document.getElementById('productContainer').classList.remove('d-none');
+                    } else {
+                        // Hata mesajını göster
+                        document.getElementById('errorMessage').textContent = 'Ürün bulunamadı.';
                         document.getElementById('errorContainer').classList.remove('d-none');
-                    });
+                    }
+                }, 1000); // 1 saniye sonra verileri göster
             }
 
             // Oluştur butonunu güncelle
