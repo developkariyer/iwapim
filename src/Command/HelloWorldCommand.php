@@ -57,6 +57,7 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $identifier = "CA-001A";
         $productSql = '
         SELECT oo_id, name, productCategory from object_query_product
         WHERE productIdentifier = :productIdentifier AND productLevel = 0
@@ -66,14 +67,6 @@ class HelloWorldCommand extends AbstractCommand
         WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $identifier]);
-        if (!is_array($product) || empty($product)) {
-            return $this->json(['success' => false, 'message' => 'Ürün bulunamadı']);
-        }
-
-        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $identifier]);
-        if (!is_array($variants) || empty($variants)) {
-            return $this->json(['success' => false, 'message' => 'Variant bulunamadı']);
-        }
 
         $productData = [
             'id' => $product[0]['oo_id'],
