@@ -66,9 +66,7 @@ class CiceksepetiCommand extends AbstractCommand
         ];
         $variantData = [];
         foreach ($variants as $variant) {
-            $variantData[] = [
-                $variant['oo_id']
-            ];
+            $variantData[] = $variant['oo_id'];
         }
         $productData['variants'] = $variantData;
         print_r($productData);
