@@ -77,6 +77,9 @@ class ListingHelperService
                         if ($listingMarketplaceType != "Shopify")
                             continue;
                         $title = $listingItem->getTitle();
+                        if (strpos(ltrim($title), '🎁') === 0) {
+                            continue;
+                        }
                         $salePrice = $listingItem->getSalePrice();
                         $currency = $listingItem->getSaleCurrency();
                         $marketplaceKey = $listingItem->getMarketplace()->getKey();
