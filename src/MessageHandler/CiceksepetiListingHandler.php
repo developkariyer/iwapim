@@ -137,8 +137,8 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-
-        try {
+        print_r($formattedData);
+        /*try {
             $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
             $result = $ciceksepetiConnector->createListing($formattedData);
             echo "created connector listing api \n";
@@ -154,7 +154,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($result);
+        print_r($result);*/
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
