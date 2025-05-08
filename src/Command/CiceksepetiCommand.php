@@ -37,33 +37,37 @@ class CiceksepetiCommand extends AbstractCommand
     protected function configure(): void
     {
         $this->setDescription('Ciceksepeti ürün araması')
-            ->addArgument('productCode', InputArgument::REQUIRED, 'Ürün kodu');
+            ->addArgument('productCodes', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Birden fazla ürün kodu, boşluk ile ayırarak girin');
     }
 
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $productCodes = $input->getArgument('productCodes');
+        echo "Ciceksepeti Command - Ürün Kodları: " . implode(', ', $productCodes) . "\n";
 
-        echo "Ciceksepeti Command \n";
-        $productCode = $input->getArgument('productCode');
-        echo "Ciceksepeti Command - Ürün Kodu: $productCode \n";
-        $productData  = $this->searchProductAndReturnIds($productCode);
-        $productId = $productData['product_id'];
-        $variantIds = $productData['variantIds'];
+        foreach ($productCodes as $productCode) {
+            echo "İşlem Yapılıyor: $productCode\n";
+            $productData = $this->searchProductAndReturnIds($productCode);
+            $productId = $productData['product_id'];
+            $variantIds = $productData['variantIds'];
 
-        $ciceksepetiMessage = new ProductListingMessage(
-            'list',
-            $productId,
-            265384,
-            'ciceksepetiUser',
-            $variantIds,
-            [],
-            1,
-            'test'
-        );
-        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
-        $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
+            $ciceksepetiMessage = new ProductListingMessage(
+                'list',
+                $productId,
+                265384,
+                'ciceksepetiUser',
+                $variantIds,
+                [],
+                1,
+                'test'
+            );
+            $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+            $this->bus->dispatch($ciceksepetiMessage, $stamps);
+
+            echo "Istek CICEKSEPETI kuyruğuna gönderildi: $productCode\n";
+            sleep(5);
+        }
         return Command::SUCCESS;
     }
 
