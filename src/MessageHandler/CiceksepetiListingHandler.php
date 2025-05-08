@@ -112,19 +112,8 @@ class CiceksepetiListingHandler
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
             sleep(5);
         }
-        echo "merged results\n";
-        print_r($mergedResults);
-        /*try {
-            $prompt = $this->generateListingPrompt($jsonString, $categories);
-            echo "created prompt\n";
-            $result = GeminiConnector::chat($prompt);
-            echo "gemini connector result\n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
+        $status = 'Processing';
+        $errorMessage = '';
         $this->listingHelper->saveState(
             $traceId,
             'Gemini Chat',
@@ -132,45 +121,24 @@ class CiceksepetiListingHandler
             $errorMessage,
         );
 
-
-        try {
-            $data = $this->parseAndValidateResponse($result);
-            echo "parsed and validating response \n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Gemini Parse And Validating Response',
-            $status,
-            $errorMessage,
-        );*/
-       /*try {
+       try {
             $data = $this->fillAttributeData($mergedResults);
             echo "filled attributes \n";
             $status = 'Processing';
             $errorMessage = '';
-        } catch (\Throwable $e) {
+       } catch (\Throwable $e) {
             $status = 'Error';
             $errorMessage = $e->getMessage();
-        }
+       }
         $this->listingHelper->saveState(
             $traceId,
             'Filled Attributes',
             $status,
             $errorMessage,
-        );*/
-        echo "filled attributes \n";
-        $data = $this->fillAttributeData($mergedResults);
-        print_r($data);
-        echo "Formatted data \n";
-        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        print_r($formattedData);
+        );
 
-        /*try {
+
+        try {
             $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
             echo "formatted data\n";
             $status = 'Processing';
@@ -185,7 +153,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($formattedData);*/
+        print_r($formattedData);
 
 
         /*try {
