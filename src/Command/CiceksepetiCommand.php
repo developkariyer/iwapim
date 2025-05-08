@@ -71,7 +71,7 @@ class CiceksepetiCommand extends AbstractCommand
             ];
         }
         $productData['variants'] = $variantData;
-        print_r($productData);
+        return $productData;
     }
 
 

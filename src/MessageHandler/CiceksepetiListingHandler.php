@@ -71,7 +71,8 @@ class CiceksepetiListingHandler
      */
     private function processListingData($traceId, $jsonString, $categories)
     {
-        try {
+        print_r($jsonString);
+        /*try {
             $prompt = $this->generateListingPrompt($jsonString, $categories);
             echo "created prompt\n";
             $result = GeminiConnector::chat($prompt);
@@ -136,7 +137,7 @@ class CiceksepetiListingHandler
             $errorMessage
         );
 
-        print_r($formattedData);
+        print_r($formattedData);*/
 
 
         /*try {
