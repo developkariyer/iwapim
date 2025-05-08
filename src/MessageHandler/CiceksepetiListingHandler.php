@@ -71,73 +71,58 @@ class CiceksepetiListingHandler
      */
     private function processListingData($traceId, $jsonString, $categories)
     {
-        print_r($jsonString);
-        /*try {
-            $prompt = $this->generateListingPrompt($jsonString, $categories);
-            echo "created prompt\n";
-            $result = GeminiConnector::chat($prompt);
-            echo "gemini connector result\n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Gemini Chat',
-            $status,
-            $errorMessage,
-        );
+        $json = json_decode($jsonString, true);
+        $products = $json['Ciceksepeti'];
+        $finalCombinedData = [];
+        foreach ($products as $productCode => $productData) {
+            $originalSkus = $productData['skus'];
+            $skuChunks = array_chunk($originalSkus, 2, true);
+            $allProcessedSkus = [];
 
-        try {
-            $data = $this->parseAndValidateResponse($result);
-            echo "parsed and validating response \n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Gemini Parse And Validating Response',
-            $status,
-            $errorMessage,
-        );
-        try {
-            $data = $this->fillAttributeData($data);
-            echo "filled attributes \n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Filled Attributes',
-            $status,
-            $errorMessage,
-        );
+            foreach ($skuChunks as $chunkIndex => $skuChunk) {
+                $miniJson = [
+                    'Ciceksepeti' => [
+                        $productCode => [
+                            'category' => $productData['category'],
+                            'name'     => $productData['name'],
+                            'skus'     => $skuChunk
+                        ]
+                    ]
+                ];
 
-        try {
-            $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-            echo "formatted data\n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Filled Missing Data And Formatted',
-            $status,
-            $errorMessage
-        );
+                $prompt = $this->generateListingPrompt(json_encode($miniJson), $categories);
 
-        print_r($formattedData);*/
+                try {
+                    echo "created prompt for chunk $chunkIndex of $productCode\n";
+                    $result = GeminiConnector::chat($prompt);
+                    $parsedData = $this->parseAndValidateResponse($result);
+                    $filledData = $this->fillAttributeData($parsedData);
+
+                    $processedSkus = $filledData['Ciceksepeti'][$productCode]['skus'];
+                    foreach ($processedSkus as $sku => $data) {
+                        $allProcessedSkus[$sku] = $data;
+                    }
+
+                } catch (\Throwable $e) {
+                    $this->listingHelper->saveState(
+                        $traceId,
+                        "Chunk $chunkIndex of $productCode Error",
+                        'Error',
+                        $e->getMessage()
+                    );
+                    continue;
+                }
+            }
+
+            $finalCombinedData['Ciceksepeti'][$productCode] = [
+                'category' => $productData['category'],
+                'name'     => $productData['name'],
+                'skus'     => $allProcessedSkus
+            ];
+        }
+
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($finalCombinedData);
+        print_r($formattedData);
 
 
         /*try {
