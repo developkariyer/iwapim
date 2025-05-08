@@ -60,7 +60,18 @@ class CiceksepetiCommand extends AbstractCommand
         if (!is_array($variants) || empty($variants)) {
             return [];
         }
-        echo $product[0]['name'];
+
+        $productData = [
+            'id' => $product[0]['oo_id']
+        ];
+        $variantData = [];
+        foreach ($variants as $variant) {
+            $variantData[] = [
+                'id' => $variant['oo_id']
+            ];
+        }
+        $productData['variants'] = $variantData;
+        print_r($productData);
     }
 
 
