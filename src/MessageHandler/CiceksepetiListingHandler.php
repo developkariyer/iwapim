@@ -67,9 +67,54 @@ class CiceksepetiListingHandler
 
     }
 
+    private function chunkSkus($data, $chunkSize = 2)
+    {
+        $chunks = [];
+
+        foreach ($data as $productCode => $productData) {
+            $skus = $productData['skus'];
+            $skuChunks = array_chunk($skus, $chunkSize, true);
+
+            foreach ($skuChunks as $chunk) {
+                $chunks[] = [
+                    $productCode => [
+                        'category' => $productData['category'],
+                        'name' => $productData['name'],
+                        'skus' => $chunk
+                    ]
+                ];
+            }
+        }
+
+        return $chunks;
+    }
+
     private function processListingData($traceId, $jsonString, $categories)
     {
         print_r($jsonString);
+
+        $fullData = json_decode($jsonString, true);
+
+        if (!$fullData || !isset($fullData['Ciceksepeti'])) {
+            throw new \Exception("Geçersiz JSON verisi.");
+        }
+
+        $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
+        $mergedResults = [];
+
+        foreach ($chunks as $chunkData) {
+            $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
+            $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
+            echo "created prompt\n";
+
+            $result = GeminiConnector::chat($prompt);
+            echo "gemini connector result\n";
+
+            $parsedResult = $this->parseAndValidateResponse($result);
+            $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
+            sleep(5);
+        }
+        print_r($mergedResults);
         /*try {
             $prompt = $this->generateListingPrompt($jsonString, $categories);
             echo "created prompt\n";
@@ -87,9 +132,9 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );
-        $data = $this->parseAndValidateResponse($result);
+        $data = $this->parseAndValidateResponse($result);*/
 
-        try {
+        /*try {
             $data = $this->parseAndValidateResponse($result);
             echo "parsed and validating response \n";
             $status = 'Processing';
@@ -103,8 +148,8 @@ class CiceksepetiListingHandler
             'Gemini Parse And Validating Response',
             $status,
             $errorMessage,
-        );
-        try {
+        );*/
+       /* try {
             $data = $this->fillAttributeData($data);
             echo "filled attributes \n";
             $status = 'Processing';
@@ -136,6 +181,8 @@ class CiceksepetiListingHandler
             $errorMessage
         );
         print_r($formattedData);*/
+
+
         /*try {
             $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
             $result = $ciceksepetiConnector->createListing($formattedData);
