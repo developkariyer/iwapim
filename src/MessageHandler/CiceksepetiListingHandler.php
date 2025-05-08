@@ -88,7 +88,8 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );
-        print_r($result);
+        $data = $this->parseAndValidateResponse($result);
+        print_r($data);
 
         /*try {
             $data = $this->parseAndValidateResponse($result);
