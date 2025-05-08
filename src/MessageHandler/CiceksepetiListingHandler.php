@@ -155,12 +155,6 @@ class CiceksepetiListingHandler
             $errorMessage
         );
         print_r($result);
-        /*$ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $result = $ciceksepetiConnector->createListing($formattedData);
-        echo "created connector listing api \n";*/
-
-
-        //return $data;
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
