@@ -67,10 +67,12 @@ class CiceksepetiListingHandler
 
     }
 
-    /**
-     * @throws \Exception
-     */
     private function processListingData($traceId, $jsonString, $categories)
+    {
+        print_r($jsonString);
+    }
+
+    /*private function processListingData($traceId, $jsonString, $categories)
     {
         try {
             $prompt = $this->generateListingPrompt($jsonString, $categories);
@@ -155,7 +157,7 @@ class CiceksepetiListingHandler
             $errorMessage
         );
         print_r($result);
-    }
+    }*/
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
     {
