@@ -105,7 +105,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );
-
+        print_r($data);
         try {
             $data = $this->fillAttributeData($data);
             echo "filled attributes \n";
