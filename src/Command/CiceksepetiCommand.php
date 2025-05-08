@@ -33,10 +33,20 @@ class CiceksepetiCommand extends AbstractCommand
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->setDescription('Ciceksepeti ürün araması')
+            ->addArgument('productCode', InputArgument::REQUIRED, 'Ürün kodu');
+    }
+
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         echo "Ciceksepeti Command \n";
-        $productData  = $this->searchProductAndReturnIds('IJ-006');
+        $productCode = $input->getArgument('productCode');
+        echo "Ciceksepeti Command - Ürün Kodu: $productCode \n";
+        $productData  = $this->searchProductAndReturnIds($productCode);
         $productId = $productData['product_id'];
         $variantIds = $productData['variantIds'];
 
@@ -53,7 +63,6 @@ class CiceksepetiCommand extends AbstractCommand
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
         echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
-
         return Command::SUCCESS;
     }
 
@@ -85,7 +94,6 @@ class CiceksepetiCommand extends AbstractCommand
             $variantData[] = $variant['oo_id'];
         }
         $productData['variantIds'] = $variantData;
-        print_r($productData);
         return $productData;
     }
 
