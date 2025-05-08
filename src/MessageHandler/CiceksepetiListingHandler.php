@@ -91,8 +91,6 @@ class CiceksepetiListingHandler
 
     private function processListingData($traceId, $jsonString, $categories)
     {
-        print_r($jsonString);
-
         $fullData = json_decode($jsonString, true);
 
         if (!$fullData || !isset($fullData['Ciceksepeti'])) {
@@ -114,6 +112,8 @@ class CiceksepetiListingHandler
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
             sleep(5);
         }
+        echo "merged results\n";
+        print_r($mergedResults);
         /*try {
             $prompt = $this->generateListingPrompt($jsonString, $categories);
             echo "created prompt\n";
@@ -131,7 +131,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );
-        $data = $this->parseAndValidateResponse($result);
+
 
         try {
             $data = $this->parseAndValidateResponse($result);
@@ -148,7 +148,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );*/
-       try {
+       /*try {
             $data = $this->fillAttributeData($mergedResults);
             echo "filled attributes \n";
             $status = 'Processing';
@@ -162,9 +162,15 @@ class CiceksepetiListingHandler
             'Filled Attributes',
             $status,
             $errorMessage,
-        );
+        );*/
+        echo "filled attributes \n";
+        $data = $this->fillAttributeData($mergedResults);
+        print_r($data);
+        echo "Formatted data \n";
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        print_r($formattedData);
 
-        try {
+        /*try {
             $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
             echo "formatted data\n";
             $status = 'Processing';
@@ -179,7 +185,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($formattedData);
+        print_r($formattedData);*/
 
 
         /*try {
