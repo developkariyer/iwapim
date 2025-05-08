@@ -89,9 +89,8 @@ class CiceksepetiListingHandler
             $errorMessage,
         );
         $data = $this->parseAndValidateResponse($result);
-        print_r($data);
 
-        /*try {
+        try {
             $data = $this->parseAndValidateResponse($result);
             echo "parsed and validating response \n";
             $status = 'Processing';
@@ -138,7 +137,7 @@ class CiceksepetiListingHandler
             $errorMessage
         );
 
-        print_r($formattedData);*/
+        print_r($formattedData);
 
 
         /*try {
