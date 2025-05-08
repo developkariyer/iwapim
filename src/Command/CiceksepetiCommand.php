@@ -7,7 +7,6 @@ use App\Message\TestMessage;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
-use phpseclib3\File\ASN1\Maps\AttributeValue;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
@@ -37,8 +36,31 @@ class CiceksepetiCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         echo "Ciceksepeti Command \n";
+        $this->searchProductAndReturnIds('IJ-006');
 
         return Command::SUCCESS;
+    }
+
+    private function searchProductAndReturnIds($productIdentifier)
+    {
+        $productSql = '
+        SELECT oo_id, name, productCategory from object_query_product
+        WHERE productIdentifier = :productIdentifier AND productLevel = 0
+        LIMIT 1';
+        $variantSql = '
+        SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
+        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
+
+        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $productIdentifier]);
+        if (!is_array($product) || empty($product)) {
+            return [];
+        }
+
+        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $productIdentifier]);
+        if (!is_array($variants) || empty($variants)) {
+            return [];
+        }
+        echo $product[0]['name'];
     }
 
 
