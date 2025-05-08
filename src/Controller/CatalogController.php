@@ -94,7 +94,11 @@ class CatalogController extends FrontendController
         $catalog = $this->getProducts(query: $query, category: $category, page: $page, pageSize: $pageSize);
         $products = [];
         foreach ($catalog as $product) {
-            $imageUrl = $this->getThumbnail($product['imageUrl'] ?? '', 'katalog');
+            $mainProduct = Product::getById($product['id']);
+            $imageUrl = "";
+            if ($mainProduct instanceof Product) {
+                $imageUrl = $mainProduct->getImage()?->getThumbnail('katalog')->getPath();
+            }
             $variationSizeList = $variationColorList = $iwaskuList = $album = [];
             $children = json_decode($product['children'], true);
             foreach ($children as $child) {
