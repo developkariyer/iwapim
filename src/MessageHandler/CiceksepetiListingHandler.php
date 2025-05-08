@@ -114,7 +114,6 @@ class CiceksepetiListingHandler
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
             sleep(5);
         }
-        print_r($mergedResults);
         /*try {
             $prompt = $this->generateListingPrompt($jsonString, $categories);
             echo "created prompt\n";
@@ -132,9 +131,9 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );
-        $data = $this->parseAndValidateResponse($result);*/
+        $data = $this->parseAndValidateResponse($result);
 
-        /*try {
+        try {
             $data = $this->parseAndValidateResponse($result);
             echo "parsed and validating response \n";
             $status = 'Processing';
@@ -149,8 +148,8 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );*/
-       /* try {
-            $data = $this->fillAttributeData($data);
+       try {
+            $data = $this->fillAttributeData($mergedResults);
             echo "filled attributes \n";
             $status = 'Processing';
             $errorMessage = '';
@@ -180,7 +179,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($formattedData);*/
+        print_r($formattedData);
 
 
         /*try {
