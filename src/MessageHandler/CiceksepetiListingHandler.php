@@ -24,6 +24,7 @@ class CiceksepetiListingHandler
 
     public function __invoke(ProductListingMessage $message)
     {
+        sleep(5);
         $this->listingHelper->saveMessage($message);
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
