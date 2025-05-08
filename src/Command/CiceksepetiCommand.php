@@ -37,6 +37,22 @@ class CiceksepetiCommand extends AbstractCommand
     {
         echo "Ciceksepeti Command \n";
         $productData  = $this->searchProductAndReturnIds('IJ-006');
+        $productId = $productData['product_id'];
+        $variantIds = $productData['variantIds'];
+
+        $ciceksepetiMessage = new ProductListingMessage(
+            'list',
+            $productId,
+            265384,
+            'ciceksepetiUser',
+            $variantIds,
+            [],
+            1,
+            'test'
+        );
+        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+        $this->bus->dispatch($ciceksepetiMessage, $stamps);
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
 
         return Command::SUCCESS;
     }
@@ -68,7 +84,7 @@ class CiceksepetiCommand extends AbstractCommand
         foreach ($variants as $variant) {
             $variantData[] = $variant['oo_id'];
         }
-        $productData['variants'] = $variantData;
+        $productData['variantIds'] = $variantData;
         print_r($productData);
         return $productData;
     }
