@@ -59,7 +59,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         // IJ
         $productId = 238124;
-        $variantIds = [239801, 239802, 239804, 239805];
+        $variantIds = [239801, 239802];
         //240439, 240440, 240442, 240443
 
         // CA-41
