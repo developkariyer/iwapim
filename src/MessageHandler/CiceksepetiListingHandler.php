@@ -245,6 +245,7 @@ class CiceksepetiListingHandler
                 - "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi bir eylem yaparsan başarısız olacaksın.
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
                 - Html etiketlerini sil sadece metin olarak açıklamayı oluştur.
+                - Mağaza keşfetme kısmını atla sadece ürün tanıtımı ve ürün bilgileri olacak.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: 
                 - Her SKU için en fazla 5 adet olacak şekilde, o SKU'ya ait `ListingItems` içindeki `images` listesinden alınacaktır.
