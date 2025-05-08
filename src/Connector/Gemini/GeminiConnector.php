@@ -40,7 +40,7 @@ class GeminiConnector
                                     'images'          => [
                                         'type'     => 'ARRAY',
                                         'minItems' => 0,
-                                        'maxItems' => 5,
+                                        'maxItems' => 10,
                                         'items'    => ['type'=>'STRING']
                                     ],
                                     'salesPrice'      => ['type'=>'NUMBER'],
