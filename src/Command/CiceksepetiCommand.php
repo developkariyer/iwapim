@@ -36,7 +36,7 @@ class CiceksepetiCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         echo "Ciceksepeti Command \n";
-        $this->searchProductAndReturnIds('IJ-006');
+        $productData  = $this->searchProductAndReturnIds('IJ-006');
 
         return Command::SUCCESS;
     }
@@ -71,6 +71,7 @@ class CiceksepetiCommand extends AbstractCommand
             ];
         }
         $productData['variants'] = $variantData;
+        print_r($productData);
         return $productData;
     }
 
