@@ -51,7 +51,6 @@ class CiceksepetiListingHandler
             $status = 'Error';
             $errorMessage = $e->getMessage();
         }
-        print_r($jsonString);
         $this->listingHelper->saveState(
             $traceId,
             'Get Pim Listings Info',
@@ -90,7 +89,6 @@ class CiceksepetiListingHandler
             $errorMessage,
         );
 
-
         try {
             $data = $this->parseAndValidateResponse($result);
             echo "parsed and validating response \n";
@@ -106,7 +104,6 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage,
         );
-        print_r($data);
         try {
             $data = $this->fillAttributeData($data);
             echo "filled attributes \n";

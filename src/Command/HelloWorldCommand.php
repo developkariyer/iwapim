@@ -57,16 +57,23 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $productIdentifier = 'IJ-006';
+
+
+
         // IJ
-        $productId = 238124;
-        $variantIds = [239801, 239802];
+        //$productId = 238124;
+        //$variantIds = [239801, 239802];
         //240439, 240440, 240442, 240443
 
         // CA-41
         //$productId = 154770;
         //$variantIds = [155464, 155462, 155468, 155466, 155434, 155432, 155437, 155435];
 
-        $ciceksepetiMessage = new ProductListingMessage(
+
+
+
+        /*$ciceksepetiMessage = new ProductListingMessage(
             'list',
             $productId,
             265384,
@@ -78,7 +85,7 @@ class HelloWorldCommand extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($ciceksepetiMessage, $stamps);
-        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";
+        echo "Istek CICEKSEPETI kuyruğuna gönderildi.\n";*/
 
 
 
