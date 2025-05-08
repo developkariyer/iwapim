@@ -66,7 +66,6 @@ class CiceksepetiCommand extends AbstractCommand
             $this->bus->dispatch($ciceksepetiMessage, $stamps);
 
             echo "Istek CICEKSEPETI kuyruğuna gönderildi: $productCode\n";
-            sleep(5);
         }
         return Command::SUCCESS;
     }
