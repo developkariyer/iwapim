@@ -392,13 +392,14 @@ class CiceksepetiListingHandler
     private function normalizeAttributeValue($value)
     {
         if (!empty($value)) {
-            $value = mb_strtolower(trim($value), 'UTF-8');
+            $value = trim($value);
 
             $search = ['ı', 'ğ', 'ü', 'ş', 'ö', 'ç', 'İ', 'Ğ', 'Ü', 'Ş', 'Ö', 'Ç'];
             $replace = ['i', 'g', 'u', 's', 'o', 'c', 'i', 'g', 'u', 's', 'o', 'c'];
             $value = str_replace($search, $replace, $value);
-        }
 
+            $value = mb_strtolower($value, 'UTF-8');
+        }
         return $value;
     }
 
