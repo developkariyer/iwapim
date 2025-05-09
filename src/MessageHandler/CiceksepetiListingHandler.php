@@ -153,7 +153,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        //print_r($formattedData);
+        print_r($formattedData);
 
 
         /*try {
@@ -339,13 +339,10 @@ class CiceksepetiListingHandler
     }
 
     /**
-     * Verilen değer ile veritabanındaki attribute değerleri arasında
-     * bulanık eşleştirme yaparak en iyi eşleşmeyi döndürür
-     *
-     * @param int $attributeId Özellik ID'si
-     * @param string $searchValue Aranacak değer
-     * @param int $threshold Benzerlik eşiği (0-100 arası)
-     * @return array|null En iyi eşleşme ['attribute_value_id' => x, 'name' => y] formatında veya null
+     * @param int $attributeId
+     * @param string $searchValue
+     * @param int $threshold
+     * @return array|null
      */
     private function findBestAttributeMatch($attributeId, $searchValue, $threshold = 80)
     {
@@ -366,31 +363,14 @@ class CiceksepetiListingHandler
             $dbValue = $this->normalizeAttributeValue($value['name']);
 
             if ($searchValue === $dbValue) {
-                echo ">>> TAM EŞLEŞME BULUNDU (Döngüden çıkılıyor):\n";
-                echo "    Aranan (Normalize): '{$searchValue}'\n";
-                echo "    DB (Normalize): '{$dbValue}'\n";
-                echo "------------------------------------\n";
                 return $value;
             }
-
-            /*$similarity = 0;
-            similar_text($searchValue, $dbValue, $similarity);
-
-            if ($similarity >= $threshold && $similarity > $highestSimilarity) {
-                $highestSimilarity = $similarity;
-                $bestMatch = $value;
-            }*/
 
             $levenDistance = levenshtein($searchValue, $dbValue);
             $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
             $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
 
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
-                echo ">>> YENİ EN İYİ EŞLEŞME GÜNCELLENDİ:\n";
-                echo "    Aranan (Normalize): '{$searchValue}'\n";
-                echo "    DB (Normalize): '{$dbValue}'\n";
-                echo "    YENİ Benzerlik Skoru: {$similarity}% (Eski En Yüksek: {$highestSimilarity}%)\n";
-                echo "------------------------------------\n";
                 $highestSimilarity = $similarity;
                 $bestMatch = $value;
             }
@@ -400,10 +380,8 @@ class CiceksepetiListingHandler
     }
 
     /**
-     * Değeri normalize eder - karşılaştırmalar için
-     *
      * @param string $value
-     * @return string Normalize edilmiş değer
+     * @return string
      */
     private function normalizeAttributeValue($value)
     {
