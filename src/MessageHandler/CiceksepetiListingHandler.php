@@ -153,7 +153,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($formattedData);
+        //print_r($formattedData);
 
 
         /*try {
@@ -366,6 +366,10 @@ class CiceksepetiListingHandler
             $dbValue = $this->normalizeAttributeValue($value['name']);
 
             if ($searchValue === $dbValue) {
+                echo ">>> TAM EŞLEŞME BULUNDU (Döngüden çıkılıyor):\n";
+                echo "    Aranan (Normalize): '{$searchValue}'\n";
+                echo "    DB (Normalize): '{$dbValue}'\n";
+                echo "------------------------------------\n";
                 return $value;
             }
 
@@ -382,6 +386,11 @@ class CiceksepetiListingHandler
             $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
 
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
+                echo ">>> YENİ EN İYİ EŞLEŞME GÜNCELLENDİ:\n";
+                echo "    Aranan (Normalize): '{$searchValue}'\n";
+                echo "    DB (Normalize): '{$dbValue}'\n";
+                echo "    YENİ Benzerlik Skoru: {$similarity}% (Eski En Yüksek: {$highestSimilarity}%)\n";
+                echo "------------------------------------\n";
                 $highestSimilarity = $similarity;
                 $bestMatch = $value;
             }
@@ -406,6 +415,7 @@ class CiceksepetiListingHandler
             $value = str_replace($search, $replace, $value);
 
             $value = mb_strtolower($value, 'UTF-8');
+            $value = preg_replace('/\s+/', '', $value);
         }
         return $value;
     }
