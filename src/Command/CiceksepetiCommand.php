@@ -78,7 +78,8 @@ class CiceksepetiCommand extends AbstractCommand
         LIMIT 1';
         $variantSql = '
         SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
-        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
+        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL
+        LIMIT 6';
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $productIdentifier]);
         if (!is_array($product) || empty($product)) {
