@@ -347,7 +347,7 @@ class CiceksepetiListingHandler
      * @param int $threshold Benzerlik eşiği (0-100 arası)
      * @return array|null En iyi eşleşme ['attribute_value_id' => x, 'name' => y] formatında veya null
      */
-    private function findBestAttributeMatch($attributeId, $searchValue, $threshold = 70)
+    private function findBestAttributeMatch($attributeId, $searchValue, $threshold = 85)
     {
         $searchValue = $this->normalizeAttributeValue($searchValue);
 
