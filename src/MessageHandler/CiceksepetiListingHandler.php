@@ -369,22 +369,22 @@ class CiceksepetiListingHandler
                 return $value;
             }
 
-            $similarity = 0;
+            /*$similarity = 0;
             similar_text($searchValue, $dbValue, $similarity);
 
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
                 $highestSimilarity = $similarity;
                 $bestMatch = $value;
-            }
+            }*/
 
-            /*$levenDistance = levenshtein($searchValue, $dbValue);
+            $levenDistance = levenshtein($searchValue, $dbValue);
             $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
             $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
 
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
                 $highestSimilarity = $similarity;
                 $bestMatch = $value;
-            }*/
+            }
         }
 
         return $bestMatch;
