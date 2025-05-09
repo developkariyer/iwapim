@@ -156,7 +156,7 @@ class CiceksepetiListingHandler
         print_r($formattedData);
 
 
-        try {
+        /*try {
             $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
             $result = $ciceksepetiConnector->createListing($formattedData);
             echo "created connector listing api \n";
@@ -172,7 +172,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($result);
+        print_r($result);*/
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
@@ -278,7 +278,131 @@ class CiceksepetiListingHandler
         EOD;
     }
 
+
     public function fillAttributeData($data)
+    {
+        foreach ($data as $sku => &$product) {
+            $categoryId = $product['categoryId'];
+
+            $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes 
+                             WHERE category_id = :categoryId 
+                             AND type = 'Variant Özelliği' 
+                             AND attribute_name = 'Renk' 
+                             LIMIT 1";
+            $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
+            $attributeColorId = $attributeColorSqlResult[0]['attribute_id'] ?? null;
+
+            $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes 
+                            WHERE category_id = :categoryId 
+                            AND type = 'Variant Özelliği' 
+                            AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
+                            LIMIT 1";
+            $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
+            $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'] ?? null;
+
+            $attributes = [];
+
+            if ($attributeColorId && isset($product['renk']) && !empty($product['renk'])) {
+                $colorValue = trim($product['renk']);
+
+                $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue);
+
+                if ($bestColorMatch) {
+                    $attributes[] = [
+                        'id' => $attributeColorId,
+                        'ValueId' => $bestColorMatch['attribute_value_id']
+                    ];
+
+                    echo "Renk eşleştirme: {$colorValue} -> {$bestColorMatch['name']}\n";
+                }
+            }
+
+            if ($attributeSizeId && isset($product['ebat']) && !empty($product['ebat'])) {
+                $sizeValue = trim($product['ebat']);
+
+                $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue);
+
+                if ($bestSizeMatch) {
+                    $attributes[] = [
+                        'id' => $attributeSizeId,
+                        'ValueId' => $bestSizeMatch['attribute_value_id']
+                    ];
+
+                    echo "Ebat eşleştirme: {$sizeValue} -> {$bestSizeMatch['name']}\n";
+                }
+            }
+
+            $product['Attributes'] = $attributes;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Verilen değer ile veritabanındaki attribute değerleri arasında
+     * bulanık eşleştirme yaparak en iyi eşleşmeyi döndürür
+     *
+     * @param int $attributeId Özellik ID'si
+     * @param string $searchValue Aranacak değer
+     * @param int $threshold Benzerlik eşiği (0-100 arası)
+     * @return array|null En iyi eşleşme ['attribute_value_id' => x, 'name' => y] formatında veya null
+     */
+    private function findBestAttributeMatch($attributeId, $searchValue, $threshold = 80)
+    {
+        $searchValue = $this->normalizeAttributeValue($searchValue);
+
+        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
+            WHERE attribute_id = :attribute_id";
+        $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
+
+        if (empty($allValues)) {
+            return null;
+        }
+
+        $bestMatch = null;
+        $highestSimilarity = 0;
+
+        foreach ($allValues as $value) {
+            $dbValue = $this->normalizeAttributeValue($value['name']);
+
+            if ($searchValue === $dbValue) {
+                return $value;
+            }
+
+            $levenDistance = levenshtein($searchValue, $dbValue);
+            $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
+
+            $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
+
+            if ($similarity >= $threshold && $similarity > $highestSimilarity) {
+                $highestSimilarity = $similarity;
+                $bestMatch = $value;
+            }
+        }
+
+        return $bestMatch;
+    }
+
+    /**
+     * Değeri normalize eder - karşılaştırmalar için
+     *
+     * @param string $value
+     * @return string Normalize edilmiş değer
+     */
+    private function normalizeAttributeValue($value)
+    {
+        if (!empty($value)) {
+            $value = mb_strtolower(trim($value), 'UTF-8');
+
+            $search = ['ı', 'ğ', 'ü', 'ş', 'ö', 'ç', 'İ', 'Ğ', 'Ü', 'Ş', 'Ö', 'Ç'];
+            $replace = ['i', 'g', 'u', 's', 'o', 'c', 'i', 'g', 'u', 's', 'o', 'c'];
+            $value = str_replace($search, $replace, $value);
+        }
+
+        return $value;
+    }
+
+    /*public function fillAttributeData($data)
     {
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
@@ -318,7 +442,7 @@ class CiceksepetiListingHandler
             $product['Attributes'] = $attributes;
         }
         return $data;
-    }
+    }*/
 
     public function categoryAttributeUpdate($marketplaceId)
     {
