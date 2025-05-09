@@ -397,9 +397,12 @@ class CiceksepetiListingHandler
             $search = ['ı', 'ğ', 'ü', 'ş', 'ö', 'ç', 'İ', 'Ğ', 'Ü', 'Ş', 'Ö', 'Ç'];
             $replace = ['i', 'g', 'u', 's', 'o', 'c', 'i', 'g', 'u', 's', 'o', 'c'];
             $value = str_replace($search, $replace, $value);
-
             $value = mb_strtolower($value, 'UTF-8');
+            $value = preg_replace('/[\*×x]/u', 'x', $value);
+            $value = str_replace(['cm', 'mm', 'inç', 'inch'], '', $value);
+            $value = preg_replace('/\s+/', '', $value);
         }
+
         return $value;
     }
 
