@@ -369,15 +369,22 @@ class CiceksepetiListingHandler
                 return $value;
             }
 
-            $levenDistance = levenshtein($searchValue, $dbValue);
-            $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
-
-            $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
+            $similarity = 0;
+            similar_text($searchValue, $dbValue, $similarity);
 
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
                 $highestSimilarity = $similarity;
                 $bestMatch = $value;
             }
+
+            /*$levenDistance = levenshtein($searchValue, $dbValue);
+            $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
+            $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
+
+            if ($similarity >= $threshold && $similarity > $highestSimilarity) {
+                $highestSimilarity = $similarity;
+                $bestMatch = $value;
+            }*/
         }
 
         return $bestMatch;
@@ -397,12 +404,9 @@ class CiceksepetiListingHandler
             $search = ['ı', 'ğ', 'ü', 'ş', 'ö', 'ç', 'İ', 'Ğ', 'Ü', 'Ş', 'Ö', 'Ç'];
             $replace = ['i', 'g', 'u', 's', 'o', 'c', 'i', 'g', 'u', 's', 'o', 'c'];
             $value = str_replace($search, $replace, $value);
-            $value = mb_strtolower($value, 'UTF-8');
-            $value = preg_replace('/[\*×x]/u', 'x', $value);
-            $value = str_replace(['cm', 'mm', 'inç', 'inch'], '', $value);
-            $value = preg_replace('/\s+/', '', $value);
-        }
 
+            $value = mb_strtolower($value, 'UTF-8');
+        }
         return $value;
     }
 
