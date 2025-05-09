@@ -28,19 +28,13 @@ class CiceksepetiListingHandler
         $this->listingHelper->saveMessage($message);
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
-        try {
-            $categories = $this->getCiceksepetiCategoriesDetails();
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
+
+        $categories = $this->getCiceksepetiCategoriesDetails();
         $this->listingHelper->saveState(
             $traceId,
             'Fetch Categories',
-            $status,
-            $errorMessage,
+            'Processing',
+            '',
         );
 
         try {
@@ -277,7 +271,6 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
     }
-
 
     public function fillAttributeData($data)
     {
