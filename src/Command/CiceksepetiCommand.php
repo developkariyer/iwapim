@@ -2,16 +2,12 @@
 
 namespace App\Command;
 
-use App\Message\CiceksepetiCategoryUpdateMessage;
-use App\Message\TestMessage;
-use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\AbstractObject;
-use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -36,18 +32,17 @@ class CiceksepetiCommand extends AbstractCommand
 
     protected function configure(): void
     {
-        $this->setDescription('Ciceksepeti ürün araması')
-            ->addArgument('productCodes', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Birden fazla ürün kodu, boşluk ile ayırarak girin');
+        $this->setDescription('Ciceksepeti product searches and listings')
+            ->addArgument('productCodes', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'One or more product codes to search and list.');
     }
-
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $productCodes = $input->getArgument('productCodes');
-        echo "Ciceksepeti Command - Ürün Kodları: " . implode(', ', $productCodes) . "\n";
+        echo "Ciceksepeti Command - Product Codes: " . implode(', ', $productCodes) . "\n";
 
         foreach ($productCodes as $productCode) {
-            echo "İşlem Yapılıyor: $productCode\n";
+            echo "Started process: $productCode\n";
             $productData = $this->searchProductAndReturnIds($productCode);
             $productId = $productData['product_id'];
             $variantIds = $productData['variantIds'];
@@ -56,7 +51,7 @@ class CiceksepetiCommand extends AbstractCommand
                 'list',
                 $productId,
                 265384,
-                'ciceksepetiUser',
+                'admin',
                 $variantIds,
                 [],
                 1,
@@ -65,7 +60,7 @@ class CiceksepetiCommand extends AbstractCommand
             $stamps = [new TransportNamesStamp(['ciceksepeti'])];
             $this->bus->dispatch($ciceksepetiMessage, $stamps);
 
-            echo "Istek CICEKSEPETI kuyruğuna gönderildi: $productCode\n";
+            echo "Request sent to queue: $productCode\n";
         }
         return Command::SUCCESS;
     }
@@ -78,11 +73,10 @@ class CiceksepetiCommand extends AbstractCommand
         LIMIT 1';
         $variantSql = '
         SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
-        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL
-        ';
+        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
 
         $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $productIdentifier]);
-        if (!is_array($product) || empty($product)) {
+        if (!is_array($product) || empty($product) || !isset($product[0]['oo_id'])) {
             return [];
         }
 
@@ -95,12 +89,12 @@ class CiceksepetiCommand extends AbstractCommand
             'product_id' => $product[0]['oo_id']
         ];
         $variantData = [];
+
         foreach ($variants as $variant) {
             $variantData[] = $variant['oo_id'];
         }
         $productData['variantIds'] = $variantData;
         return $productData;
     }
-
 
 }
