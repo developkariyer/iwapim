@@ -2,14 +2,17 @@
 namespace App\Connector\Gemini;
 use Symfony\Component\HttpClient\HttpClient;
 
-
+/*
+ * MODELS
+ * gemini-2.0-flash (LAST REQUEST 404 ERROR)
+ * gemini-2.5-flash-preview-04-17
+ * */
 class GeminiConnector
 {
-    private $geminiApiKey;
-    private $httpClient;
-
-    //gemini-2.0-flash
-    //gemini-2.5-flash-preview-04-17
+    /*
+     * Ciceksepeti chat
+     * TODO global chat all marketplaces (not priority)
+     * */
     public static function chat($message, $model='gemini-2.5-flash-preview-04-17')
     {
         try {
@@ -57,14 +60,13 @@ class GeminiConnector
                     ]
                 ],
             ]);
-
             if ($response->getStatusCode() === 200) {
                 return $response->toArray();
             } else {
                 throw new \Exception("API Error: " . $response->getStatusCode() . " " . $response->getContent(false));
             }
         } catch (\Exception $e) {
-            echo "Hata: " . $e->getMessage();
+            echo "Error: " . $e->getMessage();
             return null;
         }
     }
