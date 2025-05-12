@@ -14,7 +14,16 @@ class ListingHelperService
     public function saveMessage($message)
     {
         $sql = 'INSERT INTO iwa_product_listing_message (trace_id, action_type, product_id, marketplace_id, user_name, variant_ids, payload, priority, target_account_key)
-                VALUES (:trace_id, :action_type, :product_id, :marketplace_id, :user_name, :variant_ids, :payload, :priority, :target_account_key)';
+                VALUES (:trace_id, :action_type, :product_id, :marketplace_id, :user_name, :variant_ids, :payload, :priority, :target_account_key)
+                ON DUPLICATE KEY UPDATE
+                    action_type = VALUES(action_type),
+                    product_id = VALUES(product_id),
+                    marketplace_id = VALUES(marketplace_id),
+                    user_name = VALUES(user_name),
+                    variant_ids = VALUES(variant_ids),
+                    payload = VALUES(payload),
+                    priority = VALUES(priority),
+                    target_account_key = VALUES(target_account_key)';
         Utility::executeSql($sql, [
             'trace_id' => $message->getTraceId(),
             'action_type' => $message->getActionType(),
@@ -25,23 +34,6 @@ class ListingHelperService
             'payload' => json_encode($message->getPayload(), false),
             'priority' => $message->getPriority(),
             'target_account_key' => $message->getTargetAccountKey(),
-        ]);
-    }
-
-    public function saveState($trace_id, $current_stage, $status, $error_message)
-    {
-        $sql = 'INSERT INTO iwa_auto_listing_status (trace_id, current_stage, status, error_message)
-                VALUES (:trace_id, :current_stage, :status, :error_message)
-                ON DUPLICATE KEY UPDATE
-                    current_stage = VALUES(current_stage),
-                    status = VALUES(status),
-                    error_message = VALUES(error_message)';
-
-        Utility::executeSql($sql, [
-            'trace_id' => $trace_id,
-            'current_stage' => $current_stage,
-            'status' => $status,
-            'error_message' => $error_message
         ]);
     }
 
