@@ -125,30 +125,12 @@ class CiceksepetiListingHandler
         }
         //print_r($data);
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        $this->logger->info("filled attributes data: " . json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         print_r($formattedData);
 
 
-
+        // API
         /*
-
-        try {
-            $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-            echo "formatted data\n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Filled Missing Data And Formatted',
-            $status,
-            $errorMessage
-        );
-        print_r($formattedData);
-
-
         try {
             $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
             $result = $ciceksepetiConnector->createListing($formattedData);
