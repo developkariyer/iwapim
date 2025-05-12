@@ -95,6 +95,8 @@ class CiceksepetiListingHandler
             sleep(5);
         }
         print_r($mergedResults);
+        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+
 
 
         /*$status = 'Processing';
