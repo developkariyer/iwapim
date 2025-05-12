@@ -123,9 +123,9 @@ class CiceksepetiListingHandler
             $this->logger->error("No products found in data");
             return [];
         }
-        print_r($data);
-        //$formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-
+        //print_r($data);
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        print_r($formattedData);
 
 
 
@@ -184,7 +184,7 @@ class CiceksepetiListingHandler
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
                 'stockQuantity' => 0,
-                'salesPrice' => 3000.0,
+                'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'],
                 'images' => $httpsImages,
                 'Attributes' => $product['Attributes'],
             ];
