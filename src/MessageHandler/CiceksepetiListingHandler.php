@@ -39,12 +39,13 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories \n";
         $this->logger->info("Ciceksepeti categories details complated");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        $this->logger->info("Pim listings info complated");
-        $messageType = $message->getActionType();
-        match ($messageType) {
-            'list' => $this->processListingData($traceId, $jsonString, $categories),
-            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        print_r($jsonString);
+//        $this->logger->info("Pim listings info complated");
+//        $messageType = $message->getActionType();
+//        match ($messageType) {
+//            'list' => $this->processListingData($traceId, $jsonString, $categories),
+//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+//        };
     }
 
     private function chunkSkus($data): array
@@ -97,7 +98,7 @@ class CiceksepetiListingHandler
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $data = $this->fillAttributeData($mergedResults);
         $this->logger->info("filled attributes : " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        
+
 
         /*
 
