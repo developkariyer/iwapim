@@ -93,27 +93,29 @@ class CiceksepetiListingHandler
     private function processListingData($traceId, $jsonString, $categories)
     {
         $fullData = json_decode($jsonString, true);
-
         if (!$fullData || !isset($fullData['Ciceksepeti'])) {
-            throw new \Exception("Geçersiz JSON verisi.");
+            throw new \Exception("Invalid JSON data:");
         }
-
         $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
         $mergedResults = [];
-
-        foreach ($chunks as $chunkData) {
+        $totalChunks = count($chunks);
+        foreach ($chunks as $index => $chunkData) {
+            $chunkNumber = $index + 1;
+            echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
             $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
             $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
-            echo "created prompt\n";
-
             $result = GeminiConnector::chat($prompt);
-            echo "gemini connector result\n";
-
-            $parsedResult = $this->parseAndValidateResponse($result);
+            $parsedResult = $this->parseGeminiResult($result);
+            if (!$parsedResult) {
+                echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
+                continue;
+            }
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
+            echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
             sleep(5);
         }
         print_r($mergedResults);
+
         /*$status = 'Processing';
         $errorMessage = '';
         $this->listingHelper->saveState(
@@ -203,7 +205,7 @@ class CiceksepetiListingHandler
         return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
-    private function parseAndValidateResponse($result)
+    private function parseGeminiResult($result)
     {
         $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
         $json = preg_replace('/[\x00-\x1F\x7F]/u', '', $json);
@@ -233,7 +235,6 @@ class CiceksepetiListingHandler
                 ...
               }
             }
-            
             Hiçbir açıklama, kod bloğu, yorum ekleme.  
             Sadece geçerli, düzgün bir JSON üret.
             Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.  
@@ -245,7 +246,7 @@ class CiceksepetiListingHandler
             **Uyarı**: Lütfen yalnızca gönderdiğim **JSON verisini** kullanarak işlem yapınız ve dışarı çıkmayınız. Verilen verinin dışında başka veri kullanımı yapılmamalıdır.
             
             Gönderdiğim veriye göre çıkarılması gereken ve ÇiçekSepeti listing formatında istenen alanlar skus dizisi altındaki tüm skulara ayrı olacak şekilde:
-            - **productName**: Gönderilen verideki **title** alanlarından alınır. Bu başlıklardan Türkçe olanları, ÇiçekSepeti'ne uygun şekilde güncellenmelidir. Bu alan her SKU için aynı olacak.
+            - **productName**: Gönderilen verideki **title** alanlarından alınır. Bu başlıklardan Türkçe olanları, ÇiçekSepeti'ne uygun şekilde güncellenmelidir. Bu alan her SKU için aynı olacak. Bu alan size ya da color bilgisi içermez.
             - **mainProductCode**: Gönderilen verideki ÇiçekSepeti altındaki **field** genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her SKU için aynı olacak.
             - **stockCode**: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir. Bu her SKU'ya özel olacak.
             - **description**: 
