@@ -256,7 +256,7 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
     }
-1
+
     public function fillAttributeData($data)
     {
         foreach ($data as $sku => &$product) {
