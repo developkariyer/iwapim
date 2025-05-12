@@ -97,7 +97,7 @@ class CiceksepetiListingHandler
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $data = $this->fillAttributeData($mergedResults);
         $this->logger->info("filled attributes : " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-
+        
 
         /*
 
@@ -259,29 +259,29 @@ class CiceksepetiListingHandler
 
     public function fillAttributeData($data)
     {
+        $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
+        $attributeColorSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
+                             WHERE category_id = :categoryId 
+                             AND type = 'Variant Özelliği' 
+                             AND attribute_name = 'Renk' 
+                             LIMIT 1";
+        $attributeSizeSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
+                            WHERE category_id = :categoryId 
+                            AND type = 'Variant Özelliği' 
+                            AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
+                            LIMIT 1";
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
-            $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
             $categoryName = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId])[0]['category_name'] ?? null;
             if (!$categoryName) {
                 $this->logger->error("categoryName not found for categoryId: " . $categoryId);
                 continue;
             }
 
-            $attributeColorSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
-                             WHERE category_id = :categoryId 
-                             AND type = 'Variant Özelliği' 
-                             AND attribute_name = 'Renk' 
-                             LIMIT 1";
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult[0]['attribute_id'] ?? null;
             $attributeColorName = $attributeColorSqlResult[0]['attribute_name'] ?? null;
 
-            $attributeSizeSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
-                            WHERE category_id = :categoryId 
-                            AND type = 'Variant Özelliği' 
-                            AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
-                            LIMIT 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'] ?? null;
             $attributeSizeName = $attributeSizeSqlResult[0]['attribute_name'] ?? null;
@@ -293,38 +293,36 @@ class CiceksepetiListingHandler
                 continue;
             }
 
-
-            ///
             $attributes = [];
-            if ($attributeColorId && isset($product['renk']) && !empty($product['renk'])) {
+            $hasColor = isset($product['renk']) && !empty(trim($product['renk']));
+            $hasSize = isset($product['ebat']) && !empty(trim($product['ebat']));
+            if ($hasColor && $hasSize) {
                 $colorValue = trim($product['renk']);
                 $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue);
-                if ($bestColorMatch) {
+
+                $sizeValue = trim($product['ebat']);
+                $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue);
+
+                if ($bestColorMatch && $bestSizeMatch) {
                     $attributes[] = [
                         'id' => $attributeColorId,
                         'ValueId' => $bestColorMatch['attribute_value_id']
                     ];
-
-                    echo "Renk eşleştirme: {$colorValue} -> {$bestColorMatch['name']}\n";
-                }
-            }
-
-            if ($attributeSizeId && isset($product['ebat']) && !empty($product['ebat'])) {
-                $sizeValue = trim($product['ebat']);
-                $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue);
-                if ($bestSizeMatch) {
                     $attributes[] = [
                         'id' => $attributeSizeId,
                         'ValueId' => $bestSizeMatch['attribute_value_id']
                     ];
-
-                    echo "Ebat eşleştirme: {$sizeValue} -> {$bestSizeMatch['name']}\n";
+                    $this->logger->info("best color match: {$bestColorMatch['name']}:{$bestColorMatch['attribute_value_id']}");
+                    $this->logger->info("best size match: {$bestSizeMatch['name']}:{$bestSizeMatch['attribute_value_id']}");
+                }
+                else {
+                    $this->logger->error("best color match not found: {$colorValue}");
+                    $this->logger->error("best size match not found: {$sizeValue}");
+                    continue;
                 }
             }
-
             $product['Attributes'] = $attributes;
         }
-
         return $data;
     }
 
@@ -337,35 +335,29 @@ class CiceksepetiListingHandler
     private function findBestAttributeMatch($attributeId, $searchValue, $threshold = 80)
     {
         $searchValue = $this->normalizeAttributeValue($searchValue);
-
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
-
         if (empty($allValues)) {
             return null;
         }
-
         $bestMatch = null;
         $highestSimilarity = 0;
-
         foreach ($allValues as $value) {
             $dbValue = $this->normalizeAttributeValue($value['name']);
-
             if ($searchValue === $dbValue) {
+                $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$dbValue['attribute_value_id']}:{$dbValue['name']}");
                 return $value;
             }
-
             $levenDistance = levenshtein($searchValue, $dbValue);
             $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
             $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
-
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
                 $highestSimilarity = $similarity;
                 $bestMatch = $value;
             }
         }
-
+        $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
         return $bestMatch;
     }
 
@@ -377,11 +369,9 @@ class CiceksepetiListingHandler
     {
         if (!empty($value)) {
             $value = trim($value);
-
             $search = ['ı', 'ğ', 'ü', 'ş', 'ö', 'ç', 'İ', 'Ğ', 'Ü', 'Ş', 'Ö', 'Ç'];
             $replace = ['i', 'g', 'u', 's', 'o', 'c', 'i', 'g', 'u', 's', 'o', 'c'];
             $value = str_replace($search, $replace, $value);
-
             $value = mb_strtolower($value, 'UTF-8');
             $value = preg_replace('/\s+/', '', $value);
         }
