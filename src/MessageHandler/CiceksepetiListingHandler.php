@@ -293,12 +293,12 @@ class CiceksepetiListingHandler
                 continue;
             }
 
-            $attributes = [];
 
+            ///
+            $attributes = [];
             if ($attributeColorId && isset($product['renk']) && !empty($product['renk'])) {
                 $colorValue = trim($product['renk']);
                 $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue);
-
                 if ($bestColorMatch) {
                     $attributes[] = [
                         'id' => $attributeColorId,
@@ -311,9 +311,7 @@ class CiceksepetiListingHandler
 
             if ($attributeSizeId && isset($product['ebat']) && !empty($product['ebat'])) {
                 $sizeValue = trim($product['ebat']);
-
                 $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue);
-
                 if ($bestSizeMatch) {
                     $attributes[] = [
                         'id' => $attributeSizeId,
