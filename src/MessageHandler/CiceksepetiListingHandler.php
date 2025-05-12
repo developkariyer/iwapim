@@ -85,62 +85,51 @@ class CiceksepetiListingHandler
     private function processListingData($traceId, $jsonString, $categories)
     {
         $fullData = json_decode($jsonString, true);
-        if (!$fullData || !isset($fullData['Ciceksepeti'])) {
-            $this->logger->error("Invalid JSON data: " . $jsonString);
-            throw new \Exception("Invalid JSON data:");
-        }
-        $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
-        $mergedResults = [];
-        $totalChunks = count($chunks);
-        foreach ($chunks as $index => $chunkData) {
-            $chunkNumber = $index + 1;
-            echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
-            $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
-            $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
-            $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
-            $result = GeminiConnector::chat($prompt);
-            $parsedResult = $this->parseGeminiResult($result);
-            if (!$parsedResult) {
-                $this->logger->error("Gemini result is empty or error gemini api");
-                echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
-                continue;
-            }
-            $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
-            echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
-            $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
-            sleep(5);
-        }
-        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        $data = $this->fillAttributeData($mergedResults);
-        foreach ($data as $sku => $product) {
-            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-                unset($data[$sku]);
-                $this->logger->info("Attributes is empty for sku: {$sku}");
-            }
-        }
-        $this->logger->info("filled attributes : " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        print_r($fullData);
+//        if (!$fullData || !isset($fullData['Ciceksepeti'])) {
+//            $this->logger->error("Invalid JSON data: " . $jsonString);
+//            throw new \Exception("Invalid JSON data:");
+//        }
+//        $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
+//        $mergedResults = [];
+//        $totalChunks = count($chunks);
+//        foreach ($chunks as $index => $chunkData) {
+//            $chunkNumber = $index + 1;
+//            echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
+//            $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
+//            $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
+//            $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
+//            $result = GeminiConnector::chat($prompt);
+//            $parsedResult = $this->parseGeminiResult($result);
+//            if (!$parsedResult) {
+//                $this->logger->error("Gemini result is empty or error gemini api");
+//                echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
+//                continue;
+//            }
+//            $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
+//            echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
+//            $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
+//            sleep(5);
+//        }
+//        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        $data = $this->fillAttributeData($mergedResults);
+//        foreach ($data as $sku => $product) {
+//            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+//                unset($data[$sku]);
+//                $this->logger->info("Attributes is empty for sku: {$sku}");
+//            }
+//        }
+//        $this->logger->info("filled attributes data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        if (empty($data)) {
+//            $this->logger->error("No products found in data");
+//            return [];
+//        }
+//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
 
 
 
 
         /*
-
-       try {
-            $data = $this->fillAttributeData($mergedResults);
-            echo "filled attributes \n";
-            $status = 'Processing';
-            $errorMessage = '';
-       } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-       }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Filled Attributes',
-            $status,
-            $errorMessage,
-        );
-
 
         try {
             $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
@@ -182,12 +171,10 @@ class CiceksepetiListingHandler
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
     {
         $formattedData = [];
-
         foreach ($data as $sku => $product) {
             $httpsImages = array_map(function($image) {
                 return preg_replace('/^http:/', 'https:', $image);
             }, $product['images'] ?? []);
-
             $formattedData['products'][] = [
                 'productName' => $product['productName'],
                 'mainProductCode' => $product['mainProductCode'],
@@ -198,7 +185,7 @@ class CiceksepetiListingHandler
                 'deliveryType' => 2,
                 'stockQuantity' => 0,
                 'salesPrice' => 3000.0,
-                'images' => array_slice($httpsImages, 0, 5),
+                'images' => $httpsImages,
                 'Attributes' => $product['Attributes'],
             ];
         }
@@ -345,8 +332,7 @@ class CiceksepetiListingHandler
                     continue;
                 }
             }
-            //$product['Attributes'] = $attributes;
-            $product['Attributes'] = [];
+            $product['Attributes'] = $attributes;
         }
         return $data;
     }
@@ -371,7 +357,6 @@ class CiceksepetiListingHandler
         foreach ($allValues as $value) {
             $dbValue = $this->normalizeAttributeValue($value['name']);
             if ($searchValue === $dbValue) {
-                echo "DB value: " . $dbValue . " search value: " . $searchValue . "\n";
                 $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$dbValue}");
                 return $value;
             }
