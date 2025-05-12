@@ -61,7 +61,7 @@ class ListingHelperService
                 $ean = $variantProduct->getEanGtin();
                 $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['size'] = $size;
                 $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['color'] = $color;
-                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ean'] = $ean;
+                //$data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ean'] = $ean;
                 $listingItems = $variantProduct->getListingItems();
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
@@ -97,9 +97,20 @@ class ListingHelperService
                         }
                     }
                 }
+                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['price'] = $this->calculatePrice($salePrice, $currency);
             }
         }
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function calculatePrice($price, $currency)
+    {
+        if ($currency == "TRY" or $currency == "TL") {
+            return $price;
+        }
+        if ($currency == "US DOLLAR") {
+            return Utility::convertCurrency($price, "USD", "TRY", date('Y-m-d'));
+        }
     }
 
 }
