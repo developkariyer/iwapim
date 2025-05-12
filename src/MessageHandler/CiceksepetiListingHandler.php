@@ -9,17 +9,20 @@ use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use LoggerFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\HttpClient\HttpClient;
 use App\MessageHandler\ListingHelperService;
+use Psr\Log\LoggerInterface;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
 class CiceksepetiListingHandler
 {
-
+    private LoggerInterface $logger;
     public function __construct(ListingHelperService $listingHelperService)
     {
         $this->listingHelper = $listingHelperService;
+        $this->logger = LoggerFactory::create('auto_listing');
     }
 
     /**
@@ -31,7 +34,7 @@ class CiceksepetiListingHandler
         $this->listingHelper->saveMessage($message);
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
-
+        $this->logger->info("Auto listing process started.");
         try {
             $categories = $this->getCiceksepetiCategoriesDetails();
             echo "ciceksepeti categories \n";
@@ -115,6 +118,15 @@ class CiceksepetiListingHandler
             sleep(5);
         }
         print_r($mergedResults);
+        $status = 'Processing';
+        $errorMessage = '';
+        $this->listingHelper->saveState(
+            $traceId,
+            'Gemini Chat',
+            $status,
+            $errorMessage,
+        );
+
 
         /*$status = 'Processing';
         $errorMessage = '';
