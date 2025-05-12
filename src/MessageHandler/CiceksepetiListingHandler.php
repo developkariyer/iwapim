@@ -85,46 +85,46 @@ class CiceksepetiListingHandler
     private function processListingData($traceId, $jsonString, $categories)
     {
         $fullData = json_decode($jsonString, true);
-        print_r($fullData);
-//        if (!$fullData || !isset($fullData['Ciceksepeti'])) {
-//            $this->logger->error("Invalid JSON data: " . $jsonString);
-//            throw new \Exception("Invalid JSON data:");
-//        }
-//        $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
-//        $mergedResults = [];
-//        $totalChunks = count($chunks);
-//        foreach ($chunks as $index => $chunkData) {
-//            $chunkNumber = $index + 1;
-//            echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
-//            $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
-//            $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
-//            $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
-//            $result = GeminiConnector::chat($prompt);
-//            $parsedResult = $this->parseGeminiResult($result);
-//            if (!$parsedResult) {
-//                $this->logger->error("Gemini result is empty or error gemini api");
-//                echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
-//                continue;
-//            }
-//            $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
-//            echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
-//            $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
-//            sleep(5);
-//        }
-//        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        $data = $this->fillAttributeData($mergedResults);
-//        foreach ($data as $sku => $product) {
-//            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-//                unset($data[$sku]);
-//                $this->logger->info("Attributes is empty for sku: {$sku}");
-//            }
-//        }
-//        $this->logger->info("filled attributes data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        if (empty($data)) {
-//            $this->logger->error("No products found in data");
-//            return [];
-//        }
-//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        if (!$fullData || !isset($fullData['Ciceksepeti'])) {
+            $this->logger->error("Invalid JSON data: " . $jsonString);
+            throw new \Exception("Invalid JSON data:");
+        }
+        $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
+        $mergedResults = [];
+        $totalChunks = count($chunks);
+        foreach ($chunks as $index => $chunkData) {
+            $chunkNumber = $index + 1;
+            echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
+            $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
+            $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
+            $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
+            $result = GeminiConnector::chat($prompt);
+            $parsedResult = $this->parseGeminiResult($result);
+            if (!$parsedResult) {
+                $this->logger->error("Gemini result is empty or error gemini api");
+                echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
+                continue;
+            }
+            $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
+            echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
+            $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
+            sleep(5);
+        }
+        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $data = $this->fillAttributeData($mergedResults);
+        foreach ($data as $sku => $product) {
+            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+                unset($data[$sku]);
+                $this->logger->info("Attributes is empty for sku: {$sku}");
+            }
+        }
+        $this->logger->info("filled attributes data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        if (empty($data)) {
+            $this->logger->error("No products found in data");
+            return [];
+        }
+        print_r($data);
+        //$formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
 
 
 
@@ -228,7 +228,6 @@ class CiceksepetiListingHandler
             Bu JSON'da bazı alanlar eksik veya hatalı olabilir.  
             Gönderdiğim veride ana ürün kodu altında sku'lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında "size" ve "color" bilgisi yer alacaktır.
             ListingItems alanında bu ürüne ait farklı pazaryerlerine yapılmış listingler yer alır. Bunlara benzer ÇiçekSepeti özgün hale getireceğiz.
-            ÇiçekSepeti para birimi TL'dir.
             
             **Uyarı**: Lütfen yalnızca gönderdiğim **JSON verisini** kullanarak işlem yapınız ve dışarı çıkmayınız. Verilen verinin dışında başka veri kullanımı yapılmamalıdır.
             
@@ -252,11 +251,8 @@ class CiceksepetiListingHandler
                 - Yalnızca **en az 500x500** ve **en fazla 2000x2000** piksel boyutlarındaki görseller dahil edilecektir.
                 - Bu boyut aralığı dışında kalan görseller filtrelenecektir. 
                                     
-            - **salesPrice**: 
-                 "currency" alanına bak.
-               - Eğer para birimi TRY/TL değilse, "salePrice" değerini TL'ye çevir. Döviz kuru bilgisine sahipsen kullan.
-               - Eğer para birimi zaten TRY veya TL ise, olduğu gibi kullan.
-
+            - **salesPrice**: Ürün içinde yer alan **price** alanını direkt kullan. 
+                
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
             -**renk**: renk bilgisi verideki sku altında color fieldı Türkçe ye çevir anlamsız olursa bilinen yakın bir renk yap
@@ -393,48 +389,6 @@ class CiceksepetiListingHandler
         }
         return $value;
     }
-
-    /*public function fillAttributeData($data)
-    {
-        foreach ($data as $sku => &$product) {
-            $categoryId = $product['categoryId'];
-            $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and attribute_name= 'Renk' limit 1";
-            $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
-            $attributeColorId = $attributeColorSqlResult[0]['attribute_id'];
-
-            $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes where category_id = :categoryId and type= 'Variant Özelliği' and 
-                                                                   (attribute_name= 'Ebat' or attribute_name= 'Boyut' or attribute_name= 'Beden' ) limit 1";
-            $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
-            $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'];
-
-            $attributeValueSql = "SELECT attribute_value_id FROM iwa_ciceksepeti_category_attributes_values where attribute_id = :attribute_id and name = :name limit 1";
-            $attributeColorValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
-                'attribute_id' => $attributeColorId,
-                'name' => $product['renk']
-            ]);
-            $attributeSizeValueSqlResult = Utility::fetchFromSql($attributeValueSql, [
-                'attribute_id' => $attributeSizeId,
-                'name' => $product['ebat']
-            ]);
-
-            $attributes = [];
-            if ($attributeColorValueSqlResult) {
-                $attributes[] = [
-                    'id' => $attributeColorId,
-                    'ValueId' => $attributeColorValueSqlResult[0]['attribute_value_id']
-                ];
-            }
-
-            if ($attributeSizeValueSqlResult) {
-                $attributes[] = [
-                    'id' => $attributeSizeId,
-                    'ValueId' => $attributeSizeValueSqlResult[0]['attribute_value_id']
-                ];
-            }
-            $product['Attributes'] = $attributes;
-        }
-        return $data;
-    }*/
 
     public function categoryAttributeUpdate($marketplaceId)
     {
