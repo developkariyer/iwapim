@@ -94,19 +94,12 @@ class CiceksepetiListingHandler
             $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
             sleep(5);
         }
-        print_r($mergedResults);
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $data = $this->fillAttributeData($mergedResults);
+        $this->logger->info("filled attributes : " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
 
-
-        /*$status = 'Processing';
-        $errorMessage = '';
-        $this->listingHelper->saveState(
-            $traceId,
-            'Gemini Chat',
-            $status,
-            $errorMessage,
-        );
+        /*
 
        try {
             $data = $this->fillAttributeData($mergedResults);
@@ -263,33 +256,47 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
     }
-
+1
     public function fillAttributeData($data)
     {
         foreach ($data as $sku => &$product) {
             $categoryId = $product['categoryId'];
+            $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
+            $categoryName = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId])[0]['category_name'] ?? null;
+            if (!$categoryName) {
+                $this->logger->error("categoryName not found for categoryId: " . $categoryId);
+                continue;
+            }
 
-            $attributeColorSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes 
+            $attributeColorSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
                              WHERE category_id = :categoryId 
                              AND type = 'Variant Özelliği' 
                              AND attribute_name = 'Renk' 
                              LIMIT 1";
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult[0]['attribute_id'] ?? null;
+            $attributeColorName = $attributeColorSqlResult[0]['attribute_name'] ?? null;
 
-            $attributeSizeSql = "SELECT attribute_id from iwa_ciceksepeti_category_attributes 
+            $attributeSizeSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
                             WHERE category_id = :categoryId 
                             AND type = 'Variant Özelliği' 
                             AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
                             LIMIT 1";
             $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
             $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'] ?? null;
+            $attributeSizeName = $attributeSizeSqlResult[0]['attribute_name'] ?? null;
+
+            $this->logger->info("categoryName: " . $categoryName . " attributeColorId: " . $attributeColorId  .
+                " attributeColorName: " . $attributeColorName . " attributeSizeId: " . $attributeSizeId . " attributeName: " . $attributeSizeName);
+            if (!$attributeColorId || !$attributeColorName || !$attributeSizeId || !$attributeSizeName) {
+                $this->logger->error("attribute color or size not found in DB");
+                continue;
+            }
 
             $attributes = [];
 
             if ($attributeColorId && isset($product['renk']) && !empty($product['renk'])) {
                 $colorValue = trim($product['renk']);
-
                 $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue);
 
                 if ($bestColorMatch) {
