@@ -71,14 +71,12 @@ class CiceksepetiListingHandler
         };
     }
 
-    private function chunkSkus($data, $chunkSize = 2)
+    private function chunkSkus($data): array
     {
         $chunks = [];
-
         foreach ($data as $productCode => $productData) {
             $skus = $productData['skus'];
-            $skuChunks = array_chunk($skus, $chunkSize, true);
-
+            $skuChunks = array_chunk($skus, 2, true);
             foreach ($skuChunks as $chunk) {
                 $chunks[] = [
                     $productCode => [
@@ -89,7 +87,6 @@ class CiceksepetiListingHandler
                 ];
             }
         }
-
         return $chunks;
     }
 
