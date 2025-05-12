@@ -22,7 +22,7 @@ class CiceksepetiListingHandler
     public function __construct(ListingHelperService $listingHelperService)
     {
         $this->listingHelper = $listingHelperService;
-        $this->logger = LoggerFactory::create('auto_listing');
+        $this->logger = LoggerFactory::create('ciceksepeti','auto_listing');
     }
 
     /**
@@ -34,39 +34,12 @@ class CiceksepetiListingHandler
         $this->listingHelper->saveMessage($message);
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
-        $this->logger->info("Auto listing process started.");
-        try {
-            $categories = $this->getCiceksepetiCategoriesDetails();
-            echo "ciceksepeti categories \n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Get Ciceksepeti Categories',
-            $status,
-            $errorMessage,
-        );
-
-        try {
-            $jsonString = $this->listingHelper->getPimListingsInfo($message);
-            echo "pim getting listing info \n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-        $this->listingHelper->saveState(
-            $traceId,
-            'Get Pim Listings Info',
-            $status,
-            $errorMessage,
-        );
-
+        $this->logger->info("Auto listing process started trace id: {$traceId}.");
+        $categories = $this->getCiceksepetiCategoriesDetails();
+        echo "ciceksepeti categories \n";
+        $this->logger->info("Ciceksepeti categories details complated");
+        $jsonString = $this->listingHelper->getPimListingsInfo($message);
+        $this->logger->info("Pim listings info complated");
         $messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($traceId, $jsonString, $categories),
@@ -97,6 +70,7 @@ class CiceksepetiListingHandler
     {
         $fullData = json_decode($jsonString, true);
         if (!$fullData || !isset($fullData['Ciceksepeti'])) {
+            $this->logger->error("Invalid JSON data: " . $jsonString);
             throw new \Exception("Invalid JSON data:");
         }
         $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
@@ -105,27 +79,22 @@ class CiceksepetiListingHandler
         foreach ($chunks as $index => $chunkData) {
             $chunkNumber = $index + 1;
             echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
+            $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
             $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
             $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
             $result = GeminiConnector::chat($prompt);
             $parsedResult = $this->parseGeminiResult($result);
             if (!$parsedResult) {
+                $this->logger->error("Gemini result is empty or error gemini api");
                 echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
                 continue;
             }
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
             echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
+            $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
             sleep(5);
         }
         print_r($mergedResults);
-        $status = 'Processing';
-        $errorMessage = '';
-        $this->listingHelper->saveState(
-            $traceId,
-            'Gemini Chat',
-            $status,
-            $errorMessage,
-        );
 
 
         /*$status = 'Processing';
