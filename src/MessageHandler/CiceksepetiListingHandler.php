@@ -46,7 +46,8 @@ class CiceksepetiListingHandler
             $status = 'Error';
             $errorMessage = $e->getMessage();
         }
-        $this->listingHelper->saveState(
+        print_r($jsonString);
+        /*$this->listingHelper->saveState(
             $traceId,
             'Get Pim Listings Info',
             $status,
@@ -57,7 +58,7 @@ class CiceksepetiListingHandler
         match ($messageType) {
             'list' => $this->processListingData($traceId, $jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        };*/
 
     }
 
