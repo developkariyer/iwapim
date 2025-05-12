@@ -59,7 +59,6 @@ class CiceksepetiCommand extends AbstractCommand
             );
             $stamps = [new TransportNamesStamp(['ciceksepeti'])];
             $this->bus->dispatch($ciceksepetiMessage, $stamps);
-
             echo "Request sent to queue: $productCode\n";
         }
         return Command::SUCCESS;
