@@ -22,6 +22,9 @@ class CiceksepetiListingHandler
         $this->listingHelper = $listingHelperService;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function __invoke(ProductListingMessage $message)
     {
         sleep(5);
@@ -29,12 +32,20 @@ class CiceksepetiListingHandler
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
 
-        $categories = $this->getCiceksepetiCategoriesDetails();
+        try {
+            $categories = $this->getCiceksepetiCategoriesDetails();
+            echo "ciceksepeti categories \n";
+            $status = 'Processing';
+            $errorMessage = '';
+        } catch (\Throwable $e) {
+            $status = 'Error';
+            $errorMessage = $e->getMessage();
+        }
         $this->listingHelper->saveState(
             $traceId,
-            'Fetch Categories',
-            'Processing',
-            '',
+            'Get Ciceksepeti Categories',
+            $status,
+            $errorMessage,
         );
 
         try {
@@ -46,8 +57,7 @@ class CiceksepetiListingHandler
             $status = 'Error';
             $errorMessage = $e->getMessage();
         }
-        print_r($jsonString);
-        /*$this->listingHelper->saveState(
+        $this->listingHelper->saveState(
             $traceId,
             'Get Pim Listings Info',
             $status,
@@ -58,8 +68,7 @@ class CiceksepetiListingHandler
         match ($messageType) {
             'list' => $this->processListingData($traceId, $jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };*/
-
+        };
     }
 
     private function chunkSkus($data, $chunkSize = 2)
@@ -107,7 +116,8 @@ class CiceksepetiListingHandler
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
             sleep(5);
         }
-        $status = 'Processing';
+        print_r($mergedResults);
+        /*$status = 'Processing';
         $errorMessage = '';
         $this->listingHelper->saveState(
             $traceId,
@@ -167,7 +177,7 @@ class CiceksepetiListingHandler
             $status,
             $errorMessage
         );
-        print_r($result);
+        print_r($result);*/
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
@@ -470,15 +480,12 @@ class CiceksepetiListingHandler
     public function getCiceksepetiCategoriesDetails()
     {
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-
         if (empty($categoryIdList)) {
             return [];
         }
-
         $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
         $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
         $categories = Utility::fetchFromSql($sql, $categoryIdList);
-
         return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
