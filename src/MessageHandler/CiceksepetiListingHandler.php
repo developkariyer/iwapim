@@ -9,11 +9,11 @@ use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
-use LoggerFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\HttpClient\HttpClient;
 use App\MessageHandler\ListingHelperService;
 use Psr\Log\LoggerInterface;
+use App\Logger\LoggerFactory;
 
 #[AsMessageHandler(fromTransport: 'ciceksepeti')]
 class CiceksepetiListingHandler
