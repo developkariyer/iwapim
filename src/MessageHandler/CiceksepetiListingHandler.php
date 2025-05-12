@@ -362,7 +362,8 @@ class CiceksepetiListingHandler
         foreach ($allValues as $value) {
             $dbValue = $this->normalizeAttributeValue($value['name']);
             if ($searchValue === $dbValue) {
-                $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$dbValue['attribute_value_id']}:{$dbValue['name']}");
+                echo "DB value: " . $dbValue . " search value: " . $searchValue . "\n";
+                $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$dbValue}");
                 return $value;
             }
             $levenDistance = levenshtein($searchValue, $dbValue);
@@ -373,7 +374,12 @@ class CiceksepetiListingHandler
                 $bestMatch = $value;
             }
         }
-        $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
+        if ($bestMatch) {
+            $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
+        }
+        else {
+            $this->logger->info("best match null");
+        }
         return $bestMatch;
     }
 
