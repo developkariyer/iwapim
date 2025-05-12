@@ -112,7 +112,15 @@ class CiceksepetiListingHandler
         }
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $data = $this->fillAttributeData($mergedResults);
+        foreach ($data as $sku => $product) {
+            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+                unset($data[$sku]);
+                $this->logger->info("Attributes is empty for sku: {$sku}");
+            }
+        }
         $this->logger->info("filled attributes : " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+
+
 
 
         /*
@@ -337,7 +345,8 @@ class CiceksepetiListingHandler
                     continue;
                 }
             }
-            $product['Attributes'] = $attributes;
+            //$product['Attributes'] = $attributes;
+            $product['Attributes'] = [];
         }
         return $data;
     }
