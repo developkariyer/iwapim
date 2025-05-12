@@ -39,13 +39,28 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories \n";
         $this->logger->info("Ciceksepeti categories details complated");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        print_r($jsonString);
+        $this->printProductInfoLogger($jsonString);
 //        $this->logger->info("Pim listings info complated");
 //        $messageType = $message->getActionType();
 //        match ($messageType) {
 //            'list' => $this->processListingData($traceId, $jsonString, $categories),
 //            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
 //        };
+    }
+
+    private function printProductInfoLogger($jsonString): void
+    {
+        $jsonData = json_decode($jsonString, true);
+        if (isset($jsonData['Ciceksepeti']) && is_array($jsonData['Ciceksepeti'])) {
+            foreach ($jsonData['Ciceksepeti'] as $productId => $productData) {
+                $name = $productData['name'] ?? 'Unknown';
+                $skus = array_keys($productData['skus'] ?? []);
+                $skuList = implode(', ', $skus);
+                $this->logger->info("Product ID: {$productId}, Name: {$name}, SKUs: {$skuList}");
+            }
+        } else {
+            $this->logger->error("Invalid or missing Ciceksepeti data in JSON");
+        }
     }
 
     private function chunkSkus($data): array
