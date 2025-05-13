@@ -62,6 +62,7 @@ class ListingHelperService
                 $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['color'] = $color;
                 //$data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ean'] = $ean;
                 $listingItems = $variantProduct->getListingItems();
+                $priceTL = 0;
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
                         $listingMarketplaceType = $listingItem->getMarketplace()->getMarketplaceType();
@@ -73,6 +74,10 @@ class ListingHelperService
                         }
                         $salePrice = $listingItem->getSalePrice();
                         $currency = $listingItem->getSaleCurrency();
+                        if ($currency == "TL") {
+                            $priceTL = $salePrice;
+                        }
+
                         $marketplaceKey = $listingItem->getMarketplace()->getKey();
                         $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
 
@@ -96,7 +101,12 @@ class ListingHelperService
                         }
                     }
                 }
-                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['price'] = $this->calculatePrice($salePrice, $currency);
+                if ($priceTL != 0) {
+                    $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['price'] = $priceTL;
+                }
+                else {
+                    $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['price'] = $this->calculatePrice($salePrice, $currency);
+                }
             }
         }
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
