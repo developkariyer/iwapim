@@ -362,13 +362,13 @@ class CiceksepetiListingHandler
                     }
                 }
             }
-            $levenDistance = levenshtein($searchValueNormalized, $dbValueNormalized);
-            $maxLength = max(mb_strlen($searchValueNormalized), mb_strlen($dbValueNormalized));
-            $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
-            if ($similarity >= $threshold && $similarity > $highestSimilarity) {
-                $highestSimilarity = $similarity;
-                $bestMatch = $value;
-            }
+//            $levenDistance = levenshtein($searchValueNormalized, $dbValueNormalized);
+//            $maxLength = max(mb_strlen($searchValueNormalized), mb_strlen($dbValueNormalized));
+//            $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
+//            if ($similarity >= $threshold && $similarity > $highestSimilarity) {
+//                $highestSimilarity = $similarity;
+//                $bestMatch = $value;
+//            }
         }
         if ($bestMatch) {
             $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValueNormalized} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
