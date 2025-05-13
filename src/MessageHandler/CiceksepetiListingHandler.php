@@ -260,7 +260,7 @@ class CiceksepetiListingHandler
                             AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
                             LIMIT 1";
         foreach ($data as $sku => &$product) {
-            $this->logger->info("sku: " . $sku);
+            $this->logger->info("iwasku: " . $product['stockCode']);
             $categoryId = $product['categoryId'];
             $categoryName = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId])[0]['category_name'] ?? null;
             if (!$categoryName) {
