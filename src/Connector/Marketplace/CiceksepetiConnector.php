@@ -227,7 +227,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        print_r($this->getBatchRequestResult("2eb86765-a2f1-4657-be12-9b16079478fc"));
+        print_r($this->getBatchRequestResult("aa4d085e-7c0c-44b8-8d02-afaa79e712d3"));
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
