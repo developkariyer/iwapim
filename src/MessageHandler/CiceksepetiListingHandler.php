@@ -219,7 +219,7 @@ class CiceksepetiListingHandler
                 
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
 
-            -**renk**: renk bilgisi verideki sku altında color fieldı Türkçe ye çevir anlamsız olursa bilinen yakın bir renk yap
+            -**renk**: renk bilgisi verideki sku altında color fieldı Türkçe ye çevir çiçeksepetinde bulunan çok bilinen renklerden olsun.
             -**ebat**: ebat bilgisi verideki sku altında size fieldı cm olarak al (örn: 250cm) yanında boyut belirten S-M-XL gibi durum varsa bunu alma.
             
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
