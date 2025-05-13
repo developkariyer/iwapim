@@ -179,6 +179,7 @@ class CiceksepetiListingHandler
             $product['Attributes'] = array_filter($product['Attributes'], function ($attribute) use ($commonValueIds) {
                 return !isset($commonValueIds[$attribute['ValueId']]);
             });
+            $product['Attributes'] = array_values($product['Attributes']);
             if (empty($product['Attributes'])) {
                 $product['Attributes'] = [];
             }
