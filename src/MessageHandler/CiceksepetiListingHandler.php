@@ -155,6 +155,36 @@ class CiceksepetiListingHandler
         return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
+    private function removeCommonAttributes($data): array
+    {
+        $valueIdCount = [];
+        $totalProducts = count($data);
+        foreach ($data as $product) {
+            if (!isset($product['Attributes']) || empty($product['Attributes'])) {
+                continue;
+            }
+            foreach ($product['Attributes'] as $attribute) {
+                $valueId = $attribute['ValueId'];
+                $valueIdCount[$valueId] = ($valueIdCount[$valueId] ?? 0) + 1;
+            }
+        }
+        $commonValueIds = array_filter($valueIdCount, function ($count) use ($totalProducts) {
+            return $count === $totalProducts;
+        });
+        foreach ($data as &$product) {
+            if (!isset($product['Attributes']) || empty($product['Attributes'])) {
+                continue;
+            }
+            $product['Attributes'] = array_filter($product['Attributes'], function ($attribute) use ($commonValueIds) {
+                return !isset($commonValueIds[$attribute['ValueId']]);
+            });
+            if (empty($product['Attributes'])) {
+                $product['Attributes'] = [];
+            }
+        }
+        return $data;
+    }
+
     private function parseGeminiResult($result)
     {
         $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
