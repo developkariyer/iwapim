@@ -308,13 +308,20 @@ class CiceksepetiListingHandler
         $normalized = str_replace(',', '.', $normalized);
         $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
         $parts = explode('x', $normalized);
-        if (count($parts) !== 2) {
-            return null;
+        if (count($parts) === 2) {
+            return [
+                'width' => (int) round((float) $parts[0]),
+                'height' => (int) round((float) $parts[1]),
+            ];
         }
-        return [
-            'width' => (int) round((float) $parts[0]),
-            'height' => (int) round((float) $parts[1]),
-        ];
+        if (count($parts) === 1 && is_numeric($parts[0])) {
+            return [
+                'width' => (int) round((float) $parts[0]),
+                'height' => 0,
+            ];
+        }
+
+        return null;
     }
 
     /**
@@ -350,7 +357,7 @@ class CiceksepetiListingHandler
                     $widthDiff = abs($searchDims['width'] - $dbDims['width']);
                     $heightDiff = abs($searchDims['height'] - $dbDims['height']);
                     $totalDiff = $widthDiff + $heightDiff;
-                    if ($widthDiff <= 25 && $heightDiff <= 25 && $totalDiff < $smallestDiff) {
+                    if ($widthDiff <= 25 && ($searchDims['height'] === 0 || $heightDiff <= 25) && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
                     }
