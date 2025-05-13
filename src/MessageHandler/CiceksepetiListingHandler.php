@@ -124,7 +124,7 @@ class CiceksepetiListingHandler
             return [];
         }
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        $this->logger->info("filled attributes data: " . json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $this->logger->info("filled attributes data: " . $formattedData);
 
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $result = $ciceksepetiConnector->createListing($formattedData);
