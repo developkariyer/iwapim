@@ -270,10 +270,10 @@ class CiceksepetiListingHandler
             $hasSize = isset($product['ebat']) && !empty(trim($product['ebat']));
             if ($hasColor && $hasSize) {
                 $colorValue = trim($product['renk']);
-                $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue);
+                $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue, 0);
 
                 $sizeValue = trim($product['ebat']);
-                $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue);
+                $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue, 1);
 
                 if ($bestColorMatch && $bestSizeMatch) {
                     $attributes[] = [
@@ -298,15 +298,31 @@ class CiceksepetiListingHandler
         return $data;
     }
 
+    private function parseDimensions($value): ?array
+    {
+        $normalized = preg_replace('/[^\dx]/', '', strtolower($value));
+        $parts = explode('x', $normalized);
+        if (count($parts) !== 2) {
+            return null;
+        }
+        return [
+            'width' => (int)$parts[0],
+            'height' => (int)$parts[1],
+        ];
+    }
+
     /**
      * @param int $attributeId
      * @param string $searchValue
      * @param int $threshold
      * @return array|null
      */
-    private function findBestAttributeMatch($attributeId, $searchValue, $threshold = 80)
+    private function findBestAttributeMatch($attributeId, $searchValue, $isSize, $threshold = 80)
     {
-        $searchValue = $this->normalizeAttributeValue($searchValue);
+        $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
+        if ($isSize) {
+            $searchDims = $this->parseDimensions($searchValueNormalized);
+        }
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
@@ -316,13 +332,24 @@ class CiceksepetiListingHandler
         $bestMatch = null;
         $highestSimilarity = 0;
         foreach ($allValues as $value) {
-            $dbValue = $this->normalizeAttributeValue($value['name']);
-            if ($searchValue === $dbValue) {
-                $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$dbValue}");
+            $dbValueNormalized  = $this->normalizeAttributeValue($value['name']);
+            if ($searchValueNormalized === $dbValueNormalized) {
+                $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValueNormalized} -> {$dbValueNormalized}");
                 return $value;
             }
-            $levenDistance = levenshtein($searchValue, $dbValue);
-            $maxLength = max(mb_strlen($searchValue), mb_strlen($dbValue));
+            if ($isSize) {
+                $dbDims = $this->parseDimensions($dbValueNormalized);
+                if ($searchDims && $dbDims) {
+                    $widthDiff = abs($searchDims['width'] - $dbDims['width']);
+                    $heightDiff = abs($searchDims['height'] - $dbDims['height']);
+                    if ($widthDiff <= 5 && $heightDiff <= 5) {
+                        $this->logger->info("dimension matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$value['attribute_value_id']}:{$value['name']}");
+                        return $value;
+                    }
+                }
+            }
+            $levenDistance = levenshtein($searchValueNormalized, $dbValueNormalized);
+            $maxLength = max(mb_strlen($searchValueNormalized), mb_strlen($dbValueNormalized));
             $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
             if ($similarity >= $threshold && $similarity > $highestSimilarity) {
                 $highestSimilarity = $similarity;
@@ -330,7 +357,7 @@ class CiceksepetiListingHandler
             }
         }
         if ($bestMatch) {
-            $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
+            $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValueNormalized} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
         }
         else {
             $this->logger->info("best match null");
