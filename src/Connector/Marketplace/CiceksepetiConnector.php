@@ -484,7 +484,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         print_r($combinedData);
         $filename = "CREATE_LISTING_{$responseData['batchId']}.json";
         $this->putToCache($filename, ['request'=>$data, 'response'=>$combinedData]);
-        return $combinedData;
+        return $responseData['batchId'];
     }
 
     /*public function updateProduct(VariantProduct $listing, string $sku)

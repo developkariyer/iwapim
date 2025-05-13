@@ -123,31 +123,13 @@ class CiceksepetiListingHandler
             $this->logger->error("No products found in data");
             return [];
         }
-        //print_r($data);
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         $this->logger->info("filled attributes data: " . json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        print_r($formattedData);
 
-
-        // API
-        /*
-        try {
-            $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-            $result = $ciceksepetiConnector->createListing($formattedData);
-            echo "created connector listing api \n";
-            $status = 'Processing';
-            $errorMessage = '';
-        } catch (\Throwable $e) {
-            $status = 'Error';
-            $errorMessage = $e->getMessage();
-        }
-         $this->listingHelper->saveState(
-            $traceId,
-            'Listing Api',
-            $status,
-            $errorMessage
-        );
-        print_r($result);*/
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $result = $ciceksepetiConnector->createListing($formattedData);
+        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
