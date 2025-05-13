@@ -141,7 +141,8 @@ class CiceksepetiListingHandler
             }, $product['images'] ?? []);
             $formattedData['products'][] = [
                 'productName' => $product['productName'],
-                'mainProductCode' => $product['mainProductCode'],
+                //'mainProductCode' => $product['mainProductCode'],
+                'mainProductCode' => 'CA-062TEST',
                 'stockCode' => $product['stockCode'],
                 'categoryId' => $product['categoryId'],
                 'description' => $product['description'],
