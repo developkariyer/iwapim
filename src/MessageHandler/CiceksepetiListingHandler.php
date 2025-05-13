@@ -337,6 +337,7 @@ class CiceksepetiListingHandler
         }
         $bestMatch = null;
         $highestSimilarity = 0;
+        $smallestDiff = PHP_INT_MAX;
         foreach ($allValues as $value) {
             $dbValueNormalized  = $this->normalizeAttributeValue($value['name']);
             if ($searchValueNormalized === $dbValueNormalized) {
@@ -348,9 +349,10 @@ class CiceksepetiListingHandler
                 if ($searchDims && $dbDims) {
                     $widthDiff = abs($searchDims['width'] - $dbDims['width']);
                     $heightDiff = abs($searchDims['height'] - $dbDims['height']);
-                    if ($widthDiff <= 25 && $heightDiff <= 25) {
-                        $this->logger->info("dimension matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$value['attribute_value_id']}:{$value['name']}");
-                        return $value;
+                    $totalDiff = $widthDiff + $heightDiff;
+                    if ($widthDiff <= 25 && $heightDiff <= 25 && $totalDiff < $smallestDiff) {
+                        $smallestDiff = $totalDiff;
+                        $bestMatch = $value;
                     }
                 }
             }
