@@ -133,6 +133,7 @@ class CiceksepetiListingHandler
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
     {
+        $data = $this->removeCommonAttributes($data);
         $formattedData = [];
         foreach ($data as $sku => $product) {
             $httpsImages = array_map(function($image) {
