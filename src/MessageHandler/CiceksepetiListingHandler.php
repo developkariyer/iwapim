@@ -114,7 +114,6 @@ class CiceksepetiListingHandler
         $data = $this->fillAttributeData($mergedResults);
         foreach ($data as $sku => $product) {
             if (isset($product['Attributes']) && empty($product['Attributes'])) {
-                unset($data[$sku]);
                 $this->logger->info("Attributes is empty for sku: {$sku}");
             }
         }
@@ -362,13 +361,15 @@ class CiceksepetiListingHandler
                     }
                 }
             }
-//            $levenDistance = levenshtein($searchValueNormalized, $dbValueNormalized);
-//            $maxLength = max(mb_strlen($searchValueNormalized), mb_strlen($dbValueNormalized));
-//            $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
-//            if ($similarity >= $threshold && $similarity > $highestSimilarity) {
-//                $highestSimilarity = $similarity;
-//                $bestMatch = $value;
-//            }
+            else {
+                $levenDistance = levenshtein($searchValueNormalized, $dbValueNormalized);
+                $maxLength = max(mb_strlen($searchValueNormalized), mb_strlen($dbValueNormalized));
+                $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
+                if ($similarity >= $threshold && $similarity > $highestSimilarity) {
+                    $highestSimilarity = $similarity;
+                    $bestMatch = $value;
+                }
+            }
         }
         if ($bestMatch) {
             $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValueNormalized} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
