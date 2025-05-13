@@ -36,7 +36,7 @@ class CiceksepetiListingHandler
         echo "Ciceksepeti Listing Handler\n";
         $this->logger->info("Auto listing process started trace id: {$traceId}.");
         $categories = $this->getCiceksepetiCategoriesDetails();
-        echo "ciceksepeti categories \n";
+        echo "ciceksepeti categories fetched\n";
         $this->logger->info("Ciceksepeti categories details complated");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         $this->printProductInfoLogger($jsonString);

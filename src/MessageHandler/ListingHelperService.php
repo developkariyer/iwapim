@@ -52,7 +52,6 @@ class ListingHelperService
             $data[$marketplaceName][$productIdentifier]['name'] = $productName;
         }
         foreach ($variantIds as $variantId) {
-            echo $variantId . "\n";
             $variantProduct = Product::getById($variantId);
             if ($variantProduct instanceof Product) {
                 $iwasku = $variantProduct->getIwasku();
