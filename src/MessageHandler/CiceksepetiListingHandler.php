@@ -320,7 +320,6 @@ class CiceksepetiListingHandler
                 'height' => 0,
             ];
         }
-
         return null;
     }
 
