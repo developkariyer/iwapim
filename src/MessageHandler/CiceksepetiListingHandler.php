@@ -304,14 +304,16 @@ class CiceksepetiListingHandler
 
     private function parseDimensions($value): ?array
     {
-        $normalized = preg_replace('/[^\dx]/', '', strtolower($value));
+        $normalized = strtolower(trim($value));
+        $normalized = str_replace(',', '.', $normalized);
+        $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
         $parts = explode('x', $normalized);
         if (count($parts) !== 2) {
             return null;
         }
         return [
-            'width' => (int)$parts[0],
-            'height' => (int)$parts[1],
+            'width' => (int) round((float) $parts[0]),
+            'height' => (int) round((float) $parts[1]),
         ];
     }
 
@@ -346,7 +348,7 @@ class CiceksepetiListingHandler
                 if ($searchDims && $dbDims) {
                     $widthDiff = abs($searchDims['width'] - $dbDims['width']);
                     $heightDiff = abs($searchDims['height'] - $dbDims['height']);
-                    if ($widthDiff <= 5 && $heightDiff <= 5) {
+                    if ($widthDiff <= 25 && $heightDiff <= 25) {
                         $this->logger->info("dimension matched Pim Value -> Ciceksepeti DB Value : {$searchValue} -> {$value['attribute_value_id']}:{$value['name']}");
                         return $value;
                     }
