@@ -55,6 +55,11 @@ class CiceksepetiController extends FrontendController
 
     }
 
+    public function getBatchIds()
+    {
+
+    }
+
     /**
      * @Route("/create-ciceksepeti-listing", name="create_ciceksepeti_listing", methods={"POST"})
      */
