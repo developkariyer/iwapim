@@ -165,7 +165,7 @@ class CiceksepetiListingHandler
                 continue;
             }
             foreach ($product['Attributes'] as $attribute) {
-                $valueId = $attribute['ValueId'];
+                $valueId = $attribute['attributesvalueId'];
                 $valueIdCount[$valueId] = ($valueIdCount[$valueId] ?? 0) + 1;
             }
         }
@@ -177,7 +177,7 @@ class CiceksepetiListingHandler
                 continue;
             }
             $product['Attributes'] = array_filter($product['Attributes'], function ($attribute) use ($commonValueIds) {
-                return !isset($commonValueIds[$attribute['ValueId']]);
+                return !isset($commonValueIds[$attribute['attributesvalueId']]);
             });
             $product['Attributes'] = array_values($product['Attributes']);
             if (empty($product['Attributes'])) {
