@@ -124,12 +124,10 @@ class CiceksepetiListingHandler
         }
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         $this->logger->info("filled attributes data: " . $formattedData);
-        print_r($formattedData);
-
-//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-//        $result = $ciceksepetiConnector->createListing($formattedData);
-//        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        print_r($result);
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $result = $ciceksepetiConnector->createListing($formattedData);
+        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
@@ -149,7 +147,7 @@ class CiceksepetiListingHandler
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
                 'stockQuantity' => 0,
-                'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'],
+                'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'] * 2,
                 'images' => $httpsImages,
                 'Attributes' => $product['Attributes'],
             ];
