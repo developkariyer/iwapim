@@ -584,7 +584,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function getBatchRequestResult($batchId): array
+    public function getBatchRequestResult($batchId): array // same body 1/min, different body 5/sec
     {
         $url = static::$apiUrl['batchStatus'] . $batchId;
         $response = $this->httpClient->request('GET', $url);
@@ -593,6 +593,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
             return [];
         }
+        sleep(5);
         return $response->toArray();
     }
 
