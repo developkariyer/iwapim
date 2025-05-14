@@ -568,16 +568,26 @@
     <script>
         document.getElementById('checkListingBtn').addEventListener('click', function () {
             fetch('/listing/batch-ids')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ağ hatası: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     console.log('Batch ID Verileri:', data);
-                    alert("Toplam " + data.length + " batch bulundu.");
+                    if (data.success) {
+                        alert("Toplam " + data.product.length + " batch bulundu.");
+                    } else {
+                        alert("Veri alınırken bir sorun oluştu.");
+                    }
                 })
                 .catch(error => {
                     console.error('Hata:', error);
-                    alert("Hata oluştu.");
+                    alert("Hata oluştu: " + error.message);
                 });
         });
+
         document.addEventListener('DOMContentLoaded', function() {
             // ----- MEVCUT VARYANT YÖNETİMİ İŞLEVLERİ ----- //
 
