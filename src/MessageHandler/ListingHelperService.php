@@ -132,15 +132,17 @@ class ListingHelperService
         $imageGallery = $listingItem->getImageGallery();
         foreach ($imageGallery as $hotspotImage) {
             $image = $hotspotImage->getImage();
-            $imageUrl = $image->getFullPath();
-            $host = \Pimcore\Tool::getHostUrl();
             $width = $image->getWidth();
             $height = $image->getHeight();
-            $images[] = [
-                'url' => $host . $imageUrl,
-                'width' => $width,
-                'height' => $height
-            ];
+            if ($width >= 500 && $width <= 2000 && $height >= 500 && $height <= 2000) {
+                $imageUrl = $image->getFullPath();
+                $host = \Pimcore\Tool::getHostUrl();
+                $images[] = [
+                    'url' => $host . $imageUrl,
+                    'width' => $width,
+                    'height' => $height
+                ];
+            }
         }
         return $images;
     }
