@@ -60,6 +60,12 @@ class CiceksepetiController extends FrontendController
     public function getBatchIds(): Response
     {
         $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ciceksepeti";
+        if (!is_dir($directory)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Directory does not exist: ' . $directory
+            ]);
+        }
         $files = array_filter(scandir($directory), function ($file) use ($directory) {
             return is_file($directory . DIRECTORY_SEPARATOR . $file) && str_starts_with($file, 'CREATE_LISTING_');
         });
