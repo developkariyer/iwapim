@@ -201,6 +201,11 @@
             </div>
         </div>
     </div>
+    <div class="col-12 mt-3">
+        <h4>Batch ID'leri</h4>
+        <ul id="batchList" class="list-group">
+        </ul>
+    </div>
 
     <!-- Düzenleme Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -575,18 +580,32 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Batch ID Verileri:', data);
+                    const batchList = document.getElementById('batchList');
+                    batchList.innerHTML = '';  
+
                     if (data.success) {
-                        alert("Toplam " + data.product.length + " batch bulundu.");
+                        data.product.forEach(item => {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('list-group-item');
+                            listItem.textContent = item.batchId;
+                            batchList.appendChild(listItem);
+                        });
                     } else {
-                        alert("Veri alınırken bir sorun oluştu.");
+                        const errorMessage = document.createElement('li');
+                        errorMessage.classList.add('list-group-item', 'list-group-item-danger');
+                        errorMessage.textContent = 'Veri alınırken bir sorun oluştu.';
+                        batchList.appendChild(errorMessage);
                     }
                 })
                 .catch(error => {
-                    console.error('Hata:', error);
-                    alert("Hata oluştu: " + error.message);
+                    const batchList = document.getElementById('batchList');
+                    const errorMessage = document.createElement('li');
+                    errorMessage.classList.add('list-group-item', 'list-group-item-danger');
+                    errorMessage.textContent = 'Hata oluştu: ' + error.message;
+                    batchList.appendChild(errorMessage);
                 });
         });
+
 
         document.addEventListener('DOMContentLoaded', function() {
             // ----- MEVCUT VARYANT YÖNETİMİ İŞLEVLERİ ----- //
