@@ -38,7 +38,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ciceksepeti";
         $files = array_filter(scandir($directory), function ($file) use ($directory) {
-            return is_file($directory . DIRECTORY_SEPARATOR . $file);
+            return is_file($directory . DIRECTORY_SEPARATOR . $file) && str_starts_with($file, 'CREATE_LISTING_');
         });
 
         foreach ($files as $fileName) {
