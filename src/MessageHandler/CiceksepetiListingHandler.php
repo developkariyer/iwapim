@@ -30,22 +30,23 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message)
     {
-        sleep(5);
-        $this->listingHelper->saveMessage($message);
-        $traceId = $message->getTraceId();
-        echo "Ciceksepeti Listing Handler\n";
-        $this->logger->info("Auto listing process started trace id: {$traceId}.");
-        $categories = $this->getCiceksepetiCategoriesDetails();
-        echo "ciceksepeti categories fetched\n";
-        $this->logger->info("Ciceksepeti categories details complated");
-        $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        $this->printProductInfoLogger($jsonString);
-        $this->logger->info("Pim listings info complated");
-        $messageType = $message->getActionType();
-        match ($messageType) {
-            'list' => $this->processListingData($traceId, $jsonString, $categories),
-            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        $this->categoryAttributeUpdate();
+//        sleep(5);
+//        $this->listingHelper->saveMessage($message);
+//        $traceId = $message->getTraceId();
+//        echo "Ciceksepeti Listing Handler\n";
+//        $this->logger->info("Auto listing process started trace id: {$traceId}.");
+//        $categories = $this->getCiceksepetiCategoriesDetails();
+//        echo "ciceksepeti categories fetched\n";
+//        $this->logger->info("Ciceksepeti categories details complated");
+//        $jsonString = $this->listingHelper->getPimListingsInfo($message);
+//        $this->printProductInfoLogger($jsonString);
+//        $this->logger->info("Pim listings info complated");
+//        $messageType = $message->getActionType();
+//        match ($messageType) {
+//            'list' => $this->processListingData($traceId, $jsonString, $categories),
+//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+//        };
     }
 
     private function printProductInfoLogger($jsonString): void

@@ -287,9 +287,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             if (!isset($category['id']) || !isset($category['name'])) {
                 continue;
             }
-
             $currentPath = $path ? $path . ' | ' . $category['name'] : $category['name'];
-
             if (empty($category['subCategories'])) {
                 $id = $category['id'];
                 //echo "$currentPath (ID: $id)\n";
@@ -299,7 +297,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                         category_name = VALUES(category_name)";
                 Utility::executeSql($sql, ['id' => $id, 'category_name' => $currentPath]);
             }
-
             if (!empty($category['subCategories'])) {
                 $this->processCategoriesAndSaveDatabase($category['subCategories'], $currentPath);
             }
@@ -321,11 +318,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             }
         }
 
-        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, type)
-                         VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :type)
+        $attributeSql = "INSERT INTO iwa_ciceksepeti_category_attributes (attribute_id, category_id, attribute_name, is_required, varianter, type)
+                         VALUES (:attribute_id, :category_id, :attribute_name, :is_required, :varianter, :type)
                          ON DUPLICATE KEY UPDATE
                          attribute_name = VALUES(attribute_name),
                          is_required = VALUES(is_required),
+                         varianter = VALUES(varianter),
                          type = VALUES(type)";
 
         $response = $this->httpClient->request('GET', static::$apiUrl['categories'] . $categoryId . '/attributes');
@@ -350,6 +348,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'category_id' => $categoryId,
                 'attribute_name' => $attribute['attributeName'],
                 'is_required' => $attribute['required'],
+                'varianter' => $attribute['varianter'],
                 'type' => $attribute['type']
             ]);
             foreach ($attribute['attributeValues'] as $attributeValue) {
