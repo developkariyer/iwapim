@@ -143,7 +143,6 @@ class CiceksepetiListingHandler
                 'productName' => $product['productName'],
                 'mainProductCode' => $product['mainProductCode'],
                 'stockCode' => $product['stockCode'],
-                'barcode' => $product['stockCode'],
                 'categoryId' => $product['categoryId'],
                 'description' => $product['description'],
                 'deliveryMessageType' => 5,
