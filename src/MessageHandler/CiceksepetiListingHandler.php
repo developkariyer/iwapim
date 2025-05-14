@@ -30,23 +30,22 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message)
     {
-        $this->categoryAttributeUpdate(265384);
-//        sleep(5);
-//        $this->listingHelper->saveMessage($message);
-//        $traceId = $message->getTraceId();
-//        echo "Ciceksepeti Listing Handler\n";
-//        $this->logger->info("Auto listing process started trace id: {$traceId}.");
-//        $categories = $this->getCiceksepetiCategoriesDetails();
-//        echo "ciceksepeti categories fetched\n";
-//        $this->logger->info("Ciceksepeti categories details complated");
-//        $jsonString = $this->listingHelper->getPimListingsInfo($message);
-//        $this->printProductInfoLogger($jsonString);
-//        $this->logger->info("Pim listings info complated");
-//        $messageType = $message->getActionType();
-//        match ($messageType) {
-//            'list' => $this->processListingData($traceId, $jsonString, $categories),
-//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-//        };
+        sleep(5);
+        $this->listingHelper->saveMessage($message);
+        $traceId = $message->getTraceId();
+        echo "Ciceksepeti Listing Handler\n";
+        $this->logger->info("Auto listing process started trace id: {$traceId}.");
+        $categories = $this->getCiceksepetiCategoriesDetails();
+        echo "ciceksepeti categories fetched\n";
+        $this->logger->info("Ciceksepeti categories details complated");
+        $jsonString = $this->listingHelper->getPimListingsInfo($message);
+        $this->printProductInfoLogger($jsonString);
+        $this->logger->info("Pim listings info complated");
+        $messageType = $message->getActionType();
+        match ($messageType) {
+            'list' => $this->processListingData($traceId, $jsonString, $categories),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+        };
     }
 
     private function printProductInfoLogger($jsonString): void
@@ -148,7 +147,7 @@ class CiceksepetiListingHandler
                 'description' => $product['description'],
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
-                'stockQuantity' => 5,
+                'StockQuantity' => 5,
                 'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'],
                 'images' => $httpsImages,
                 'Attributes' => $product['Attributes'],
@@ -313,12 +312,12 @@ class CiceksepetiListingHandler
 
                 if ($bestColorMatch && $bestSizeMatch) {
                     $attributes[] = [
-                        'id' => $attributeColorId,
-                        'ValueId' => $bestColorMatch['attribute_value_id']
+                        'attributesid' => $attributeColorId,
+                        'attributesvalueId' => $bestColorMatch['attribute_value_id']
                     ];
                     $attributes[] = [
-                        'id' => $attributeSizeId,
-                        'ValueId' => $bestSizeMatch['attribute_value_id']
+                        'attributesid' => $attributeSizeId,
+                        'attributesvalueId' => $bestSizeMatch['attribute_value_id']
                     ];
                     $this->logger->info("best color match: {$bestColorMatch['name']}:{$bestColorMatch['attribute_value_id']}");
                     $this->logger->info("best size match: {$bestSizeMatch['name']}:{$bestSizeMatch['attribute_value_id']}");
