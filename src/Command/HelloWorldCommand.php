@@ -42,38 +42,47 @@ class HelloWorldCommand extends AbstractCommand
         });
 
         foreach ($files as $fileName) {
+            echo $fileName . PHP_EOL;
             $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
             $content = file_get_contents($filePath);
             $json = json_decode($content, true);
-
-            echo $fileName . PHP_EOL;
+            $this->test($json);
         }
-
         return Command::SUCCESS;
     }
 
     public function test($json)
     {
-        if (!$json['response'])
+        if (empty($json['response'])) {
             return;
+        }
         $batchId = $json['response']['batchRequestResult']['batchId'];
         $items = $json['response']['batchRequestResult']['items'];
-        $createdDate = null;
-        $mainProduct = null;
+        $result = [];
         foreach ($items as $item) {
             $createdDate = $item['lastModificationDate'];
-            $mainProduct = $item['data']['mainProductCode'];
-            $status = $item['status'];
-            $iwasku = $item['data']['stockCode'];
-            $failureReasons = $item['failureReasons'];
-            $lastModificationDate = $item['lastModificationDate'];
-            if (!empty($failureReasons)) {
-                foreach ($failureReasons as $failureReason) {
-                    $reason = $failureReason['message'];
-                    $code = $failureReason['code'];
+            $mainProduct = $item['data']['mainProductCode'] ?? null;
+            $status = $item['status'] ?? null;
+            $iwasku = $item['data']['stockCode'] ?? null;
+            $failureReasons = [];
+            if (!empty($item['failureReasons'])) {
+                foreach ($item['failureReasons'] as $failureReason) {
+                    $failureReasons[] = [
+                        'code' => $failureReason['code'] ?? '',
+                        'message' => $failureReason['message'] ?? ''
+                    ];
                 }
             }
+            $result[] = [
+                'batchId' => $batchId,
+                'createdDate' => $createdDate,
+                'mainProduct' => $mainProduct,
+                'iwasku' => $iwasku,
+                'status' => $status,
+                'failureReasons' => $failureReasons
+            ];
         }
-
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        // return $result; // dilersen diziyi ham olarak da döndürebilirsin
     }
 }
