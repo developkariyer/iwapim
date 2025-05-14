@@ -129,7 +129,7 @@ class CiceksepetiListingHandler
         foreach ($formattedData['products'] as $product) {
             $singleProductPayload = ['products' => [$product]];
             $result =  $ciceksepetiConnector->createListing(json_encode($singleProductPayload));
-            $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            $this->logger->info("ciceksepetiConnector result batch id", ['result' => $result]);
             print_r($result);
         }
         //$result = $ciceksepetiConnector->createListing($formattedData);
