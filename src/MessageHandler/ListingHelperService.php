@@ -65,9 +65,7 @@ class ListingHelperService
                 $priceTL = 0;
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
-                        $listingMarketplaceType = $listingItem->getMarketplace()->getMarketplaceType();
-                        if ($listingMarketplaceType != "Shopify")
-                            continue;
+                        //$listingMarketplaceType = $listingItem->getMarketplace()->getMarketplaceType();
                         $title = $listingItem->getTitle();
                         if (strpos(ltrim($title), '🎁') === 0) {
                             continue;
@@ -87,18 +85,18 @@ class ListingHelperService
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['description'] = $parentApiJson['descriptionHtml'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['seo'] = $parentApiJson['seo']['description'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['tags'] = $parentApiJson['tags'] ?? '';
-
-                        $imageGallery = $listingItem->getImageGallery();
-                        foreach ($imageGallery as $hotspotImage) {
-                            $image = $hotspotImage->getImage();
-                            $imageUrl = $image->getFullPath();
-                            $host = \Pimcore\Tool::getHostUrl();
-                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['images'][] = [
-                                'url' => $host . $imageUrl,
-                                'width' => $image->getWidth(),
-                                'height' => $image->getHeight(),
-                            ];
-                        }
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['images'] = $this->getImages($listingItem);
+//                        $imageGallery = $listingItem->getImageGallery();
+//                        foreach ($imageGallery as $hotspotImage) {
+//                            $image = $hotspotImage->getImage();
+//                            $imageUrl = $image->getFullPath();
+//                            $host = \Pimcore\Tool::getHostUrl();
+//                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['images'][] = [
+//                                'url' => $host . $imageUrl,
+//                                'width' => $image->getWidth(),
+//                                'height' => $image->getHeight(),
+//                            ];
+//                        }
                     }
                 }
                 if ($priceTL != 0) {
@@ -109,7 +107,42 @@ class ListingHelperService
                 }
             }
         }
+        // Shopify Filter
+        foreach ($data as &$products) {
+            foreach ($products as &$product) {
+                foreach ($product['skus'] as &$sku) {
+                    $sku['ListingItems'] = array_filter(
+                        $sku['ListingItems'] ?? [],
+                        fn($v, $k) => str_starts_with($k, 'Shopify'),
+                        ARRAY_FILTER_USE_BOTH
+                    );
+                    if (empty($sku['ListingItems'])) {
+                        unset($sku['ListingItems']);
+                    }
+                }
+            }
+        }
+        unset($products, $product, $sku);
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function getImages($listingItem)
+    {
+        $images = [];
+        $imageGallery = $listingItem->getImageGallery();
+        foreach ($imageGallery as $hotspotImage) {
+            $image = $hotspotImage->getImage();
+            $imageUrl = $image->getFullPath();
+            $host = \Pimcore\Tool::getHostUrl();
+            $width = $image->getWidth();
+            $height = $image->getHeight();
+            $images[] = [
+                'url' => $host . $imageUrl,
+                'width' => $width,
+                'height' => $height
+            ];
+        }
+        return $images;
     }
 
     private function calculatePrice($price, $currency)
