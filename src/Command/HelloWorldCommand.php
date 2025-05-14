@@ -42,9 +42,34 @@ class HelloWorldCommand extends AbstractCommand
         });
 
         foreach ($files as $fileName) {
+            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+            $content = file_get_contents($filePath);
+            $json = json_decode($content, true);
+
             echo $fileName . PHP_EOL;
         }
 
         return Command::SUCCESS;
+    }
+
+    public function test($json)
+    {
+        if (!$json['response'])
+            return;
+        $batchId = $json['response']['inventory']['batchId'];
+        $items = $json['batchRequestResult']['items'];
+        $lastModificationDate = null;
+        $mainProduct = null;
+        foreach ($items as $item) {
+            $lastModificationDate = $item['lastModificationDate'];
+            $mainProduct = $item['data']['mainProductCode'];
+            $status = $item['status'];
+            $iwasku = $item['data']['stockCode'];
+            $failureReasons = $item['failureReasons'];
+            if (!empty($failureReasons)) {
+
+            }
+        }
+
     }
 }
