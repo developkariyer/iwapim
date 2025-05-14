@@ -228,9 +228,11 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function downloadInventory(): void
     {
         //65597460-0891-49ca-a97d-6024941e4942 PROD CA-057 KUBA MAP
-        //2f641201-53bf-467a-b49d-36b21898aa7a
-        //705f24f1-ca36-45f2-85fd-432d6623c9af
-        print_r($this->getBatchRequestResult("65597460-0891-49ca-a97d-6024941e4942"));
+        //fce777f8-b7c1-49e8-b6fe-b5baf5f727de PROD IJ-004
+        //
+
+
+        print_r($this->getBatchRequestResult("fce777f8-b7c1-49e8-b6fe-b5baf5f727de"));
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
