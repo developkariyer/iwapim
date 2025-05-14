@@ -227,7 +227,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        print_r($this->getBatchRequestResult("370eb04d-d080-4ba0-81dc-e22f332b4336"));
+        print_r($this->getBatchRequestResult("0a9c9d8b-d654-4e14-8ecc-3086fc3ec1bd"));
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
@@ -486,6 +486,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         print_r($combinedData);
         $filename = "CREATE_LISTING_{$responseData['batchId']}.json";
         $this->putToCache($filename, ['request'=>$data, 'response'=>$combinedData]);
+        sleep(5);
         return $responseData['batchId'];
     }
 
