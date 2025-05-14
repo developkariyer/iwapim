@@ -147,7 +147,7 @@ class CiceksepetiListingHandler
                 'description' => $product['description'],
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
-                'StockQuantity' => 5,
+                'stockQuantity' => 5,
                 'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'],
                 'images' => $httpsImages,
                 'Attributes' => $product['Attributes'],
@@ -165,7 +165,7 @@ class CiceksepetiListingHandler
                 continue;
             }
             foreach ($product['Attributes'] as $attribute) {
-                $valueId = $attribute['attributesvalueId'];
+                $valueId = $attribute['ValueId'];
                 $valueIdCount[$valueId] = ($valueIdCount[$valueId] ?? 0) + 1;
             }
         }
@@ -177,7 +177,7 @@ class CiceksepetiListingHandler
                 continue;
             }
             $product['Attributes'] = array_filter($product['Attributes'], function ($attribute) use ($commonValueIds) {
-                return !isset($commonValueIds[$attribute['attributesvalueId']]);
+                return !isset($commonValueIds[$attribute['ValueId']]);
             });
             $product['Attributes'] = array_values($product['Attributes']);
             if (empty($product['Attributes'])) {
@@ -312,12 +312,12 @@ class CiceksepetiListingHandler
 
                 if ($bestColorMatch && $bestSizeMatch) {
                     $attributes[] = [
-                        'attributesid' => $attributeColorId,
-                        'attributesvalueId' => $bestColorMatch['attribute_value_id']
+                        'Id' => $attributeColorId,
+                        'ValueId' => $bestColorMatch['attribute_value_id']
                     ];
                     $attributes[] = [
-                        'attributesid' => $attributeSizeId,
-                        'attributesvalueId' => $bestSizeMatch['attribute_value_id']
+                        'Id' => $attributeSizeId,
+                        'ValueId' => $bestSizeMatch['attribute_value_id']
                     ];
                     $this->logger->info("best color match: {$bestColorMatch['name']}:{$bestColorMatch['attribute_value_id']}");
                     $this->logger->info("best size match: {$bestSizeMatch['name']}:{$bestSizeMatch['attribute_value_id']}");
