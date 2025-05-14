@@ -128,7 +128,7 @@ class CiceksepetiListingHandler
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         foreach ($formattedData['products'] as $product) {
             $singleProductPayload = ['products' => [$product]];
-            $ciceksepetiConnector->createListing($singleProductPayload);
+            $ciceksepetiConnector->createListing(json_encode($singleProductPayload));
         }
         //$result = $ciceksepetiConnector->createListing($formattedData);
         $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
@@ -157,7 +157,7 @@ class CiceksepetiListingHandler
                 'Attributes' => $product['Attributes'],
             ];
         }
-        return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        return $formattedData;
     }
 
     private function removeCommonAttributes($data): array
