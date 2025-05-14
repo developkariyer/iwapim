@@ -227,10 +227,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        //24b4c616-2fe0-4059-b01d-9cdc6721eb9c
+        //65597460-0891-49ca-a97d-6024941e4942 PROD CA-057 KUBA MAP
         //2f641201-53bf-467a-b49d-36b21898aa7a
         //705f24f1-ca36-45f2-85fd-432d6623c9af
-        print_r($this->getBatchRequestResult("3ef85b62-7de9-476e-9dd6-715b82e305b0"));
+        print_r($this->getBatchRequestResult("65597460-0891-49ca-a97d-6024941e4942"));
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
