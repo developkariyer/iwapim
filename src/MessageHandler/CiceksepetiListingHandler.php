@@ -39,7 +39,6 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories fetched\n";
         $this->logger->info("Ciceksepeti categories details complated");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        print_r($jsonString);
         $this->printProductInfoLogger($jsonString);
         $this->logger->info("Pim listings info complated");
         $messageType = $message->getActionType();
@@ -243,7 +242,7 @@ class CiceksepetiListingHandler
                 - Mağaza bilgilerini mağazayla ilgili açıklamaları sil.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: 
-                - Her SKU için en fazla 5 adet olacak şekilde, `ListingItems` içindeki `images` listesinden alınacaktır.
+                - Her SKU için en fazla 5 adet olacak şekilde,`images` listesinden alınacaktır.
                 - Resimler dizi (array) formatında verilecektir.
                 - Yalnızca **en az 500x500** ve **en fazla 2000x2000** piksel boyutlarındaki görseller dahil edilecektir.
                 - Bu boyut aralığı dışında kalan görseller filtrelenecektir. 
