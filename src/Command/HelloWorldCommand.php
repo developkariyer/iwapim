@@ -42,7 +42,6 @@ class HelloWorldCommand extends AbstractCommand
         });
 
         foreach ($files as $fileName) {
-            echo $fileName . PHP_EOL;
 //            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 //            $content = file_get_contents($filePath);
 //            $json = json_decode($content, true);
