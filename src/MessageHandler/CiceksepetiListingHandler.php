@@ -126,7 +126,11 @@ class CiceksepetiListingHandler
         $this->logger->info("filled attributes data: " . $formattedData);
 
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $result = $ciceksepetiConnector->createListing($formattedData);
+        foreach ($formattedData['products'] as $product) {
+            $singleProductPayload = ['products' => [$product]];
+            $ciceksepetiConnector->createListing($singleProductPayload);
+        }
+        //$result = $ciceksepetiConnector->createListing($formattedData);
         $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         print_r($result);
     }
