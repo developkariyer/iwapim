@@ -313,12 +313,14 @@ class CiceksepetiListingHandler
 
                 if ($bestColorMatch && $bestSizeMatch) {
                     $attributes[] = [
-                        'Id' => $attributeColorId,
-                        'ValueId' => $bestColorMatch['attribute_value_id']
+                        'id' => $attributeColorId,
+                        'ValueId' => $bestColorMatch['attribute_value_id'],
+                        "TextLength" => 0
                     ];
                     $attributes[] = [
-                        'Id' => $attributeSizeId,
-                        'ValueId' => $bestSizeMatch['attribute_value_id']
+                        'id' => $attributeSizeId,
+                        'ValueId' => $bestSizeMatch['attribute_value_id'],
+                        "TextLength" => 0
                     ];
                     $this->logger->info("best color match: {$bestColorMatch['name']}:{$bestColorMatch['attribute_value_id']}");
                     $this->logger->info("best size match: {$bestSizeMatch['name']}:{$bestSizeMatch['attribute_value_id']}");
