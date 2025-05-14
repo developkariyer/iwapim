@@ -30,7 +30,7 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message)
     {
-        $this->categoryAttributeUpdate();
+        $this->categoryAttributeUpdate(265384);
 //        sleep(5);
 //        $this->listingHelper->saveMessage($message);
 //        $traceId = $message->getTraceId();
