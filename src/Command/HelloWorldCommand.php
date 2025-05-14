@@ -56,18 +56,22 @@ class HelloWorldCommand extends AbstractCommand
     {
         if (!$json['response'])
             return;
-        $batchId = $json['response']['inventory']['batchId'];
-        $items = $json['batchRequestResult']['items'];
-        $lastModificationDate = null;
+        $batchId = $json['response']['batchRequestResult']['batchId'];
+        $items = $json['response']['batchRequestResult']['items'];
+        $createdDate = null;
         $mainProduct = null;
         foreach ($items as $item) {
-            $lastModificationDate = $item['lastModificationDate'];
+            $createdDate = $item['lastModificationDate'];
             $mainProduct = $item['data']['mainProductCode'];
             $status = $item['status'];
             $iwasku = $item['data']['stockCode'];
             $failureReasons = $item['failureReasons'];
+            $lastModificationDate = $item['lastModificationDate'];
             if (!empty($failureReasons)) {
-
+                foreach ($failureReasons as $failureReason) {
+                    $reason = $failureReason['message'];
+                    $code = $failureReason['code'];
+                }
             }
         }
 
