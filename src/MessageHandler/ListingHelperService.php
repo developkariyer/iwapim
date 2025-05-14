@@ -85,7 +85,7 @@ class ListingHelperService
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['description'] = $parentApiJson['descriptionHtml'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['seo'] = $parentApiJson['seo']['description'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['tags'] = $parentApiJson['tags'] ?? '';
-                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['images'] = $this->getImages($listingItem);
+                        $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['images'][] = $this->getImages($listingItem);
 //                        $imageGallery = $listingItem->getImageGallery();
 //                        foreach ($imageGallery as $hotspotImage) {
 //                            $image = $hotspotImage->getImage();
