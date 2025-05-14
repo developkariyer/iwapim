@@ -128,11 +128,13 @@ class CiceksepetiListingHandler
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         foreach ($formattedData['products'] as $product) {
             $singleProductPayload = ['products' => [$product]];
-            $ciceksepetiConnector->createListing(json_encode($singleProductPayload));
+            $result =  $ciceksepetiConnector->createListing(json_encode($singleProductPayload));
+            $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            print_r($result);
         }
         //$result = $ciceksepetiConnector->createListing($formattedData);
-        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        print_r($result);
+        //$this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        //print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
