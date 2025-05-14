@@ -245,6 +245,7 @@ class CiceksepetiListingHandler
                 - Resimler dizi (array) formatında verilecektir.
                 - Yalnızca **en az 500x500** ve **en fazla 2000x2000** piksel boyutlarındaki görseller dahil edilecektir.
                 - Bu boyut aralığı dışında kalan görseller filtrelenecektir. 
+                - Boş bırakma.
                                     
             - **salesPrice**: Ürün içinde yer alan **price** alanını direkt kullan her sku için farklı olabilir buna dikkat et.
                 
