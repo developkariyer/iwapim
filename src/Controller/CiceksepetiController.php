@@ -52,13 +52,64 @@ class CiceksepetiController extends FrontendController
             Response::HTTP_OK,
             ['Content-Type' => 'application/json']
         );
-
     }
 
-    public function getBatchIds()
+    /**
+     * @Route("/listing/batch-ids", name="listing_batch_ids")
+     */
+    public function getBatchIds(): Response
     {
-
+        $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ciceksepeti";
+        $files = array_filter(scandir($directory), function ($file) use ($directory) {
+            return is_file($directory . DIRECTORY_SEPARATOR . $file) && str_starts_with($file, 'CREATE_LISTING_');
+        });
+        $result = [];
+        foreach ($files as $fileName) {
+            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+            $content = file_get_contents($filePath);
+            $json = json_decode($content, true);
+            $result[] = $this->extractBatchIdData($json);
+        }
+         return $this->json([
+            'success' => true,
+            'product' => $result
+        ]);
     }
+
+    private function extractBatchIdData($json)
+    {
+        if (empty($json['response'])) {
+            return;
+        }
+        $batchId = $json['response']['batchRequestResult']['batchId'];
+        $items = $json['response']['batchRequestResult']['items'];
+        $result = [];
+        foreach ($items as $item) {
+            $createdDate = $item['lastModificationDate'];
+            $mainProduct = $item['data']['mainProductCode'] ?? null;
+            $status = $item['status'] ?? null;
+            $iwasku = $item['data']['stockCode'] ?? null;
+            $failureReasons = [];
+            if (!empty($item['failureReasons'])) {
+                foreach ($item['failureReasons'] as $failureReason) {
+                    $failureReasons[] = [
+                        'code' => $failureReason['code'] ?? '',
+                        'message' => $failureReason['message'] ?? ''
+                    ];
+                }
+            }
+            $result[] = [
+                'batchId' => $batchId,
+                'createdDate' => $createdDate,
+                'mainProduct' => $mainProduct,
+                'iwasku' => $iwasku,
+                'status' => $status,
+                'failureReasons' => $failureReasons
+            ];
+        }
+        return json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
 
     /**
      * @Route("/create-ciceksepeti-listing", name="create_ciceksepeti_listing", methods={"POST"})

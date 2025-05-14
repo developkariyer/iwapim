@@ -566,6 +566,18 @@
 {% block body_scripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
+        document.getElementById('checkListingBtn').addEventListener('click', function () {
+            fetch('/listing/batch-ids')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Batch ID Verileri:', data);
+                    alert("Toplam " + data.length + " batch bulundu.");
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    alert("Hata oluştu.");
+                });
+        });
         document.addEventListener('DOMContentLoaded', function() {
             // ----- MEVCUT VARYANT YÖNETİMİ İŞLEVLERİ ----- //
 

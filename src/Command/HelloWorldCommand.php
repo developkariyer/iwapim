@@ -42,16 +42,11 @@ class HelloWorldCommand extends AbstractCommand
         });
 
         foreach ($files as $fileName) {
-//            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-//            $content = file_get_contents($filePath);
-//            $json = json_decode($content, true);
-//            $this->test($json);
-            $parts = explode('_', $fileName, 3);
-            if (isset($parts[2])) {
-                $idWithJson = $parts[2];
-                $id = pathinfo($idWithJson, PATHINFO_FILENAME);
-                echo $id . PHP_EOL;
-            }
+            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+            $content = file_get_contents($filePath);
+            $json = json_decode($content, true);
+            $this->test($json);
+
         }
         return Command::SUCCESS;
     }
