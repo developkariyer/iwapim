@@ -36,8 +36,14 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/";
-        print_r($directory);
+        $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ciceksepeti";
+        $files = array_filter(scandir($directory), function ($file) use ($directory) {
+            return is_file($directory . DIRECTORY_SEPARATOR . $file);
+        });
+
+        foreach ($files as $fileName) {
+            echo $fileName . PHP_EOL;
+        }
 
         return Command::SUCCESS;
     }
