@@ -387,10 +387,10 @@ class CiceksepetiListingHandler
             if ($isSize) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
                 if ($searchDims && $dbDims) {
-                    $widthDiff = abs($searchDims['width'] - $dbDims['width']);
-                    $heightDiff = abs($searchDims['height'] - $dbDims['height']);
+                    $widthDiff = $searchDims['width'] - $dbDims['width'];
+                    $heightDiff = $searchDims['height'] - $dbDims['height'];
                     $totalDiff = $widthDiff + $heightDiff;
-                    if ($widthDiff <= 25 && ($searchDims['height'] === 0 || $heightDiff <= 25) && $totalDiff < $smallestDiff) {
+                    if ($widthDiff >= 0 && $widthDiff <= 25 && ($searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25)) && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
                     }
