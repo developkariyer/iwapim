@@ -65,7 +65,6 @@ class ListingHelperService
                 $priceTL = 0;
                 foreach ($listingItems as $listingItem) {
                     if ($listingItem instanceof VariantProduct) {
-                        //$listingMarketplaceType = $listingItem->getMarketplace()->getMarketplaceType();
                         $title = $listingItem->getTitle();
                         if (strpos(ltrim($title), '🎁') === 0) {
                             continue;
@@ -78,7 +77,6 @@ class ListingHelperService
 
                         $marketplaceKey = $listingItem->getMarketplace()->getKey();
                         $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
-
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['title'] = $title;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['salePrice'] = $salePrice;
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['currency'] = $currency;
@@ -86,17 +84,6 @@ class ListingHelperService
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['seo'] = $parentApiJson['seo']['description'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['tags'] = $parentApiJson['tags'] ?? '';
                         $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['images'][] = $this->getImages($listingItem);
-//                        $imageGallery = $listingItem->getImageGallery();
-//                        foreach ($imageGallery as $hotspotImage) {
-//                            $image = $hotspotImage->getImage();
-//                            $imageUrl = $image->getFullPath();
-//                            $host = \Pimcore\Tool::getHostUrl();
-//                            $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ListingItems'][$marketplaceKey]['images'][] = [
-//                                'url' => $host . $imageUrl,
-//                                'width' => $image->getWidth(),
-//                                'height' => $image->getHeight(),
-//                            ];
-//                        }
                     }
                 }
                 if ($priceTL != 0) {

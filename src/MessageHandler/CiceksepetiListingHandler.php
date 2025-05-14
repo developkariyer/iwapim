@@ -40,13 +40,13 @@ class CiceksepetiListingHandler
         $this->logger->info("Ciceksepeti categories details complated");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         print_r($jsonString);
-        /*$this->printProductInfoLogger($jsonString);
+        $this->printProductInfoLogger($jsonString);
         $this->logger->info("Pim listings info complated");
         $messageType = $message->getActionType();
         match ($messageType) {
             'list' => $this->processListingData($traceId, $jsonString, $categories),
             default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };*/
+        };
     }
 
     private function printProductInfoLogger($jsonString): void
@@ -125,11 +125,12 @@ class CiceksepetiListingHandler
         }
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
         $this->logger->info("filled attributes data: " . $formattedData);
+        print_r($formattedData);
 
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $result = $ciceksepetiConnector->createListing($formattedData);
-        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        print_r($result);
+//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+//        $result = $ciceksepetiConnector->createListing($formattedData);
+//        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
