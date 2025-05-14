@@ -232,9 +232,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //34a56d8e-1b15-4877-b40e-e109bd7a9f12 PROD CA-120
         //2b26fe29-eada-4234-aacd-f918c082c95e PROD CM-008 IMAGE ERROR
         //223da069-8021-4d3f-beb3-c41a12a86481 PROD CM-008 REPEAT
+        //cf3f06ab-0804-4462-8172-8eb591cfbf8b PROD CM-002
 
 
-        print_r($this->getBatchRequestResult("223da069-8021-4d3f-beb3-c41a12a86481"));
+        print_r($this->getBatchRequestResult("cf3f06ab-0804-4462-8172-8eb591cfbf8b"));
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
