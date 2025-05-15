@@ -177,9 +177,9 @@
             background-color: var(--secondary-color) !important;
         }
 
-        .update-all-btn {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+        .query-batch-btn {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
             color: white;
             font-size: 0.875rem;
             padding: 0.375rem 0.75rem;
@@ -189,9 +189,9 @@
             transition: all 0.2s;
         }
 
-        .update-all-btn:hover {
-            background-color: #4338ca;
-            border-color: #4338ca;
+        .query-batch-btn:hover {
+            background-color: #0284c7;
+            border-color: #0284c7;
         }
 
         .batch-items-row td {
@@ -270,9 +270,136 @@
             margin: 0 auto;
         }
 
+        /* JSON Modal Styles */
+        .batch-details-modal .modal-dialog {
+            max-width: 90%;
+            margin: 1.75rem auto;
+        }
+
+        .batch-details-modal .modal-content {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .batch-details-modal .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+            padding: 1rem 1.5rem;
+        }
+
+        .batch-details-modal .btn-close {
+            color: white;
+            filter: invert(1) brightness(200%);
+            opacity: 0.8;
+        }
+
+        .batch-details-modal .btn-close:hover {
+            opacity: 1;
+        }
+
+        .json-viewer {
+            max-height: 70vh;
+            overflow: auto;
+            background-color: #1e1e1e;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #d4d4d4;
+            white-space: pre-wrap;
+        }
+
+        .json-key {
+            color: #9cdcfe;
+        }
+
+        .json-string {
+            color: #ce9178;
+        }
+
+        .json-number {
+            color: #b5cea8;
+        }
+
+        .json-boolean {
+            color: #569cd6;
+        }
+
+        .json-null {
+            color: #569cd6;
+            font-style: italic;
+        }
+
+        .copy-json-btn {
+            position: absolute;
+            top: 15px;
+            right: 60px;
+            z-index: 1056;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .copy-json-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .json-toolbar {
+            position: sticky;
+            top: 0;
+            background-color: #1e1e1e;
+            padding: 0.5rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            z-index: 1;
+            margin: -1.5rem -1.5rem 0.5rem -1.5rem;
+            border-bottom: 1px solid #333;
+            padding-right: 1rem;
+        }
+
+        .btn-toolbar {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #d4d4d4;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8125rem;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.15s;
+        }
+
+        .btn-toolbar:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-toolbar:active {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
         @media (max-width: 768px) {
             .d-flex.gap-2 {
                 flex-wrap: wrap;
+            }
+
+            .batch-details-modal .modal-dialog {
+                max-width: 95%;
+                margin: 0.5rem auto;
+            }
+
+            .json-viewer {
+                font-size: 0.8rem;
+                padding: 1rem;
             }
         }
     </style>
@@ -414,9 +541,9 @@
                                         <td>
                                             {% if batchGroup.createdDate %}
                                                 <span class="text-secondary">
-                                                        <i class="far fa-calendar-alt me-1"></i>
-                                                        {{ batchGroup.createdDate|date('d.m.Y H:i') }}
-                                                    </span>
+                                                    <i class="far fa-calendar-alt me-1"></i>
+                                                    {{ batchGroup.createdDate|date('d.m.Y H:i') }}
+                                                </span>
                                             {% else %}
                                                 -
                                             {% endif %}
@@ -440,36 +567,36 @@
                                             <div class="d-flex gap-2 align-items-center flex-wrap">
                                                 {% if successCount > 0 %}
                                                     <span class="badge bg-success">
-                                                            <i class="fas fa-check-circle me-1"></i>
-                                                            {{ successCount }} Başarılı
-                                                        </span>
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        {{ successCount }} Başarılı
+                                                    </span>
                                                 {% endif %}
 
                                                 {% if failedCount > 0 %}
                                                     <span class="badge bg-danger">
-                                                            <i class="fas fa-times-circle me-1"></i>
-                                                            {{ failedCount }} Başarısız
-                                                        </span>
+                                                        <i class="fas fa-times-circle me-1"></i>
+                                                        {{ failedCount }} Başarısız
+                                                    </span>
                                                 {% endif %}
 
                                                 {% if processingCount > 0 %}
                                                     <span class="badge bg-primary">
-                                                            <i class="fas fa-sync-alt me-1"></i>
-                                                            {{ processingCount }} İşleniyor
-                                                        </span>
+                                                        <i class="fas fa-sync-alt me-1"></i>
+                                                        {{ processingCount }} İşleniyor
+                                                    </span>
                                                 {% endif %}
 
                                                 <span class="badge bg-secondary">
-                                                        <i class="fas fa-tag me-1"></i>
-                                                        Toplam: {{ totalItems }}
-                                                    </span>
+                                                    <i class="fas fa-tag me-1"></i>
+                                                    Toplam: {{ totalItems }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="update-all-btn btn btn-sm"
+                                            <button class="query-batch-btn btn btn-sm"
                                                     data-batch-id="{{ batchGroup.batchId }}"
-                                                    aria-label="Tüm batch'i güncelle">
-                                                <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
+                                                    aria-label="Batch'i sorgula">
+                                                <i class="fas fa-search me-1" aria-hidden="true"></i> Sorgula
                                             </button>
                                         </td>
                                     </tr>
@@ -490,24 +617,24 @@
                                                             <td>
                                                                 {% if item.status == 'Success' %}
                                                                     <span class="badge bg-success" role="status">
-                                                                                <i class="fas fa-check-circle me-1"></i>
-                                                                                {{ item.status }}
-                                                                            </span>
+                                                                        <i class="fas fa-check-circle me-1"></i>
+                                                                        {{ item.status }}
+                                                                    </span>
                                                                 {% elseif item.status == 'Failed' %}
                                                                     <span class="badge bg-danger" role="status">
-                                                                                <i class="fas fa-times-circle me-1"></i>
-                                                                                {{ item.status }}
-                                                                            </span>
+                                                                        <i class="fas fa-times-circle me-1"></i>
+                                                                        {{ item.status }}
+                                                                    </span>
                                                                 {% elseif item.status == 'Processing' %}
                                                                     <span class="badge bg-primary" role="status">
-                                                                                <i class="fas fa-sync-alt me-1"></i>
-                                                                                {{ item.status }}
-                                                                            </span>
+                                                                        <i class="fas fa-sync-alt me-1"></i>
+                                                                        {{ item.status }}
+                                                                    </span>
                                                                 {% else %}
                                                                     <span class="badge bg-secondary" role="status">
-                                                                                <i class="fas fa-question-circle me-1"></i>
-                                                                                {{ item.status|default('Bilinmiyor') }}
-                                                                            </span>
+                                                                        <i class="fas fa-question-circle me-1"></i>
+                                                                        {{ item.status|default('Bilinmiyor') }}
+                                                                    </span>
                                                                 {% endif %}
 
                                                                 {% if item.failureReasons is defined and item.failureReasons is not empty %}
@@ -534,6 +661,54 @@
             </div>
         </div>
     {% endif %}
+</div>
+
+<!-- Batch Details Modal -->
+<div class="modal fade batch-details-modal" id="batchDetailsModal" tabindex="-1" aria-labelledby="batchDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batchDetailsModalLabel">
+                    <i class="fas fa-search me-2"></i>
+                    Batch Sorgu Sonucu: <span id="modalBatchId"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div id="batchResponseLoader" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="mt-3 text-secondary">Batch bilgileri alınıyor...</p>
+                </div>
+
+                <div id="batchResponseError" class="alert alert-danger d-none" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="batchResponseErrorMessage">Hata oluştu.</span>
+                </div>
+
+                <div id="batchResponseContainer" class="d-none">
+                    <div id="jsonViewer" class="json-viewer">
+                        <div class="json-toolbar">
+                            <button id="copyJsonBtn" class="btn-toolbar">
+                                <i class="fas fa-copy me-1"></i> Kopyala
+                            </button>
+                            <button id="expandJsonBtn" class="btn-toolbar">
+                                <i class="fas fa-expand-alt me-1"></i> Genişlet
+                            </button>
+                            <button id="collapseJsonBtn" class="btn-toolbar">
+                                <i class="fas fa-compress-alt me-1"></i> Daralt
+                            </button>
+                        </div>
+                        <pre id="jsonContent"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- JavaScript -->
@@ -596,8 +771,8 @@
         // Satıra tıklandığında detayları aç/kapat
         document.querySelectorAll('.batch-row').forEach(row => {
             row.addEventListener('click', function(e) {
-                // Toggle butonuna veya güncelleme butonuna tıklandıysa işleme
-                if (e.target.closest('.toggle-items') || e.target.closest('.update-all-btn')) {
+                // Toggle butonuna veya sorgulama butonuna tıklandıysa işleme
+                if (e.target.closest('.toggle-items') || e.target.closest('.query-batch-btn')) {
                     return;
                 }
 
@@ -610,8 +785,8 @@
             });
         });
 
-        // Batch güncelleme
-        document.querySelectorAll('.update-all-btn').forEach(btn => {
+        // Batch sorgulama
+        document.querySelectorAll('.query-batch-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation(); // Satır tıklamasını engelle
 
@@ -622,21 +797,25 @@
                     return;
                 }
 
-                if (!confirm(`"${batchId}" batch ID'li tüm ürünleri güncellemek istediğinizden emin misiniz?`)) {
-                    return;
-                }
+                // Modal'ı açma ve hazırlama
+                const batchDetailsModal = new bootstrap.Modal(document.getElementById('batchDetailsModal'));
+                document.getElementById('modalBatchId').textContent = batchId;
+                document.getElementById('batchResponseLoader').classList.remove('d-none');
+                document.getElementById('batchResponseError').classList.add('d-none');
+                document.getElementById('batchResponseContainer').classList.add('d-none');
+                document.getElementById('jsonContent').innerHTML = '';
 
-                const originalText = this.innerHTML;
-                this.disabled = true;
-                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Güncelleniyor...';
+                batchDetailsModal.show();
 
+                // API isteği
                 fetch(`/api/update-batch/${batchId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        batchId: batchId
+                        batchId: batchId,
+                        queryOnly: true
                     })
                 })
                     .then(response => {
@@ -646,25 +825,88 @@
                         return response.json();
                     })
                     .then(data => {
+                        // Yükleme göstergesini gizle
+                        document.getElementById('batchResponseLoader').classList.add('d-none');
+
                         if (data.success) {
-                            showToast(`"${batchId}" ID'li batch başarıyla güncellendi.`, 'success');
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
+                            // JSON görünümünü göster
+                            document.getElementById('batchResponseContainer').classList.remove('d-none');
+
+                            // JSON'u formatlama ve gösterme
+                            const jsonData = data.response || {};
+                            const formattedJson = syntaxHighlight(JSON.stringify(jsonData, null, 2));
+                            document.getElementById('jsonContent').innerHTML = formattedJson;
+
+                            // JSON genişlet/daralt düğmeleri
+                            setupJsonViewerButtons(jsonData);
                         } else {
-                            showToast(data.message || 'Güncelleme sırasında hata oluştu.', 'danger');
-                            this.disabled = false;
-                            this.innerHTML = originalText;
+                            // Hata mesajını göster
+                            document.getElementById('batchResponseError').classList.remove('d-none');
+                            document.getElementById('batchResponseErrorMessage').textContent =
+                                data.message || 'Batch bilgileri alınamadı.';
                         }
                     })
                     .catch(error => {
-                        console.error('Güncelleme hatası:', error);
-                        showToast(`Bağlantı hatası: ${error.message}`, 'danger');
-                        this.disabled = false;
-                        this.innerHTML = originalText;
+                        console.error('Sorgulama hatası:', error);
+                        // Hata mesajını göster
+                        document.getElementById('batchResponseLoader').classList.add('d-none');
+                        document.getElementById('batchResponseError').classList.remove('d-none');
+                        document.getElementById('batchResponseErrorMessage').textContent =
+                            `Bağlantı hatası: ${error.message}`;
                     });
             });
         });
+
+        // JSON viewer butonlarını ayarla
+        function setupJsonViewerButtons(jsonData) {
+            // Kopyala butonu
+            document.getElementById('copyJsonBtn').addEventListener('click', function() {
+                copyToClipboard(JSON.stringify(jsonData, null, 2));
+                showToast('JSON veri panoya kopyalandı', 'success');
+            });
+
+            // Genişlet butonu
+            document.getElementById('expandJsonBtn').addEventListener('click', function() {
+                const formattedJson = syntaxHighlight(JSON.stringify(jsonData, null, 2));
+                document.getElementById('jsonContent').innerHTML = formattedJson;
+            });
+
+            // Daralt butonu
+            document.getElementById('collapseJsonBtn').addEventListener('click', function() {
+                const formattedJson = syntaxHighlight(JSON.stringify(jsonData));
+                document.getElementById('jsonContent').innerHTML = formattedJson;
+            });
+        }
+
+        // JSON sözdizimi vurgulama
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        // Panoya kopyala
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
 
         // Toast bildirim göster
         function showToast(message, type = 'info') {

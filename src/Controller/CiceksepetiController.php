@@ -68,41 +68,20 @@ class CiceksepetiController extends FrontendController
                     'message' => 'Geçersiz veri'
                 ], Response::HTTP_BAD_REQUEST);
             }
+
             $ciceksepetiConnector = new CiceksepetiConnector(265384);
             $response = $ciceksepetiConnector->getBatchRequestResult($batchId);
-
-            // Burada güncelleme işlemini gerçekleştiriyoruz
-            // Örnek olarak yeni veri oluşturuyoruz (gerçek uygulamada API'den alınacak)
-            $updatedData = [
-                'batchId' => $batchId,
-                'mainProduct' => $data['mainProduct'] ?? 'Ana Ürün',
-                'createdDate' => new \DateTime(),
-                'items' => [
-                    [
-                        'batchId' => $batchId,
-                        'iwasku' => 'IWA123456',
-                        'status' => 'Success',
-                        'mainProduct' => $data['mainProduct'] ?? 'Ana Ürün'
-                    ],
-                    [
-                        'batchId' => $batchId,
-                        'iwasku' => 'IWA789012',
-                        'status' => 'Processing',
-                        'mainProduct' => $data['mainProduct'] ?? 'Ana Ürün'
-                    ]
-                ]
-            ];
-
+            $queryOnly = isset($data['queryOnly']) && $data['queryOnly'];
             return $this->json([
                 'success' => true,
-                'message' => 'Batch başarıyla güncellendi',
+                'message' => $queryOnly ? 'Batch bilgileri başarıyla alındı' : 'Batch başarıyla güncellendi',
                 'batchId' => $batchId,
-                'updatedData' => $updatedData
+                'response' => $response
             ]);
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'message' => 'Güncelleme sırasında hata oluştu: ' . $e->getMessage()
+                'message' => 'İşlem sırasında hata oluştu: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
