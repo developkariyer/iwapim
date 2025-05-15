@@ -98,7 +98,7 @@ class CiceksepetiListingHandler
             $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
             $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
             $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
-            $result = GeminiConnector::chat($prompt);
+            $result = GeminiConnector::chat($prompt, 'ciceksepeti');
             $parsedResult = $this->parseGeminiResult($result);
             if (!$parsedResult) {
                 $this->logger->error("Gemini result is empty or error gemini api");
@@ -111,23 +111,24 @@ class CiceksepetiListingHandler
             sleep(5);
         }
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        $data = $this->fillAttributeData($mergedResults);
-        foreach ($data as $sku => $product) {
-            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-                $this->logger->info("Attributes is empty for sku: {$sku}");
-            }
-        }
-        $this->logger->info("filled attributes data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        if (empty($data)) {
-            $this->logger->error("No products found in data");
-            return [];
-        }
-        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        $this->logger->info("filled attributes data: " . $formattedData);
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $result = $ciceksepetiConnector->createListing($formattedData);
-        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        print_r($result);
+        print_r($mergedResults);
+//        $data = $this->fillAttributeData($mergedResults);
+//        foreach ($data as $sku => $product) {
+//            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+//                $this->logger->info("Attributes is empty for sku: {$sku}");
+//            }
+//        }
+//        $this->logger->info("filled attributes data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        if (empty($data)) {
+//            $this->logger->error("No products found in data");
+//            return [];
+//        }
+//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+//        $this->logger->info("filled attributes data: " . $formattedData);
+//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+//        $result = $ciceksepetiConnector->createListing($formattedData);
+//        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
