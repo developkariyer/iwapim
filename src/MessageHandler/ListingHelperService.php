@@ -109,6 +109,7 @@ class ListingHelperService
         $foundSameCurrency = false;
         $result = [];
         $images = [];
+        $result['items'] = [];
         foreach ($listingItem as $listingItem) {
             if (!$listingItem instanceof VariantProduct) {
                 continue;
@@ -136,7 +137,6 @@ class ListingHelperService
                 'seo' => $parentApiJson['seo']['description'] ?? '',
                 'tags' => $parentApiJson['tags'] ?? ''
             ];
-            echo $title . ' ' . $listingSalePrice . ' ' . $currency . ' ' . $marketplaceSalePrice . ' ' . $marketplaceCurrency . ' ' . $foundSameCurrency . "\n";
         }
         $result['price'] = $marketplaceSalePrice;
         $result['images'] = $images;
