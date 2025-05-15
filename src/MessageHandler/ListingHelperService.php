@@ -136,9 +136,7 @@ class ListingHelperService
                 'seo' => $parentApiJson['seo']['description'] ?? '',
                 'tags' => $parentApiJson['tags'] ?? ''
             ];
-        }
-        if (!isset($result['items'])) {
-            $result['items'] = [];
+            echo $title . ' ' . $listingSalePrice . ' ' . $currency . ' ' . $marketplaceSalePrice . ' ' . $marketplaceCurrency . ' ' . $foundSameCurrency . "\n";
         }
         $result['price'] = $marketplaceSalePrice;
         $result['images'] = $images;
