@@ -63,7 +63,7 @@ class ListingHelperService
                 ]
             ]
         ];
-        $data = $this->filterShopifyListingItems($data);
+        //$data = $this->filterShopifyListingItems($data);
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
@@ -200,6 +200,7 @@ class ListingHelperService
         unset($products, $product, $sku);
         return $data;
     }
+
 
     public function getPimListingsInfoN(ProductListingMessage $message): false|string
     {
