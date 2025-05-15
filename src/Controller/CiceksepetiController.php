@@ -56,7 +56,6 @@ class CiceksepetiController extends FrontendController
 
     /**
      * @Route("/api/update-batch/{batchId}", name="api_update_batch", methods={"POST"})
-     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      */
     public function updateBatch(Request $request, string $batchId): Response
     {
