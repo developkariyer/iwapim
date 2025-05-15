@@ -60,7 +60,7 @@ class ListingHelperService
                 $ean = $variantProduct->getEanGtin();
                 $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['size'] = $size;
                 $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['color'] = $color;
-                //$data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ean'] = $ean;
+                $data[$marketplaceName][$productIdentifier]['skus'][$iwasku]['ean'] = $ean;
                 $listingItems = $variantProduct->getListingItems();
                 $priceTL = 0;
                 foreach ($listingItems as $listingItem) {
