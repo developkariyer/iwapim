@@ -127,8 +127,8 @@ class CiceksepetiController extends FrontendController
         return $this->render('ciceksepeti/batch_listings.html.twig', [
             'batchData' => $batchData,
             'errorMessage' => $errorMessage,
-            'directory' => $directory,
-            'success' => ($errorMessage === null)
+            'pageTitle' => 'Çiçeksepeti Batch Listesi',
+            'simpleLayout' => true // Basit düzen için bir bayrak
         ]);
     }
 

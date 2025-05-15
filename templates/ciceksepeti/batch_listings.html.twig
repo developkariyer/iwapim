@@ -4,7 +4,10 @@
 {% block header %}{% endblock %}
 
 {% block content %}
-    <div class="container-fluid mt-4">
+    {% if simpleLayout is not defined or not simpleLayout %}
+        <div class="sidebar">
+        </div>
+    {% endif %}    <div class="container-fluid mt-4">
         <div class="row mb-4">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h1>Çiçeksepeti Batch Listesi</h1>
