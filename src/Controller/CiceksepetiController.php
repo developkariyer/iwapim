@@ -84,7 +84,7 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
-     * @Route("/ciceksepeti/batch-listings", name="ciceksepeti_batch_listings")
+     * @Route("/batch-listings", name="batch_listings")
      */
     public function batchListingsPage(): Response
     {
@@ -111,7 +111,7 @@ class CiceksepetiController extends FrontendController
                         $json = json_decode($content, true);
 
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            continue; // Geçersiz JSON, bu dosyayı atla
+                            continue;
                         }
 
                         $extractedData = $this->extractBatchIdData($json);
