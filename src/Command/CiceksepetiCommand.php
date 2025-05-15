@@ -46,7 +46,6 @@ class CiceksepetiCommand extends AbstractCommand
             $productData = $this->searchProductAndReturnIds($productCode);
             $productId = $productData['product_id'];
             $variantIds = $productData['variantIds'];
-
             $ciceksepetiMessage = new ProductListingMessage(
                 'list',
                 $productId,
@@ -78,17 +77,14 @@ class CiceksepetiCommand extends AbstractCommand
         if (!is_array($product) || empty($product) || !isset($product[0]['oo_id'])) {
             return [];
         }
-
         $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $productIdentifier]);
         if (!is_array($variants) || empty($variants)) {
             return [];
         }
-
         $productData = [
             'product_id' => $product[0]['oo_id']
         ];
         $variantData = [];
-
         foreach ($variants as $variant) {
             $variantData[] = $variant['oo_id'];
         }
