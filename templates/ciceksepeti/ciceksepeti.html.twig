@@ -675,14 +675,18 @@
             // Düzleştirilmiş veri oluştur
             let allItems = [];
 
-            batches.forEach(batch => {
-                console.log("İşlenen batch:", batch);
-                if (Array.isArray(batch)) {
-                    console.log("   Batch bir dizi, eleman sayısı:", batch.length);
-                    allItems = allItems.concat(batch);
-                } else if (batch && typeof batch === 'object') {
-                    console.log("   Batch bir nesne");
-                    allItems.push(batch);
+            // ÖNEMLİ: data.product bir dizi ve her eleman da bir dizi, her ikisini de düzleştirmeliyiz
+            batches.forEach((batchArray, index) => {
+                console.log(`Batch ${index} işleniyor:`, batchArray);
+
+                // Her bir iç diziyi allItems'a ekle
+                if (Array.isArray(batchArray)) {
+                    // Diziyi düzleştir ve allItems'a ekle
+                    batchArray.forEach(item => {
+                        if (item && typeof item === 'object') {
+                            allItems.push(item);
+                        }
+                    });
                 }
             });
 
@@ -702,16 +706,17 @@
                 return;
             }
 
+            // Tüm satırlar için tek HTML içeriği oluştur
+            let tableContent = '';
+
             // Her öğe için tablo satırı oluştur
             allItems.forEach(item => {
                 console.log("Tablo satırı oluşturuluyor:", item);
 
-                const row = document.createElement('tr');
-
                 let errorMessages = '';
                 if (Array.isArray(item.failureReasons) && item.failureReasons.length > 0) {
                     errorMessages = item.failureReasons.map(reason =>
-                        `<div class="text-danger small">${reason.message} (${reason.code})</div>`
+                        `<div class="text-danger small">${reason.message || ''} (${reason.code || ''})</div>`
                     ).join('');
                 }
 
@@ -720,27 +725,30 @@
                 else if (item.status === 'Failed') statusClass = 'bg-danger';
                 else if (item.status === 'Processing') statusClass = 'bg-primary';
 
-                row.innerHTML = `
-            <td>${item.batchId || '-'}</td>
-            <td>${item.mainProduct || '-'}</td>
-            <td>${item.iwasku || '-'}</td>
-            <td>${formatDate(item.createdDate)}</td>
-            <td>
-                <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
-                ${errorMessages}
-            </td>
-            <td>
-                <button class="btn btn-sm btn-primary update-batch-btn"
-                        data-batch-id="${item.batchId || ''}"
-                        data-main-product="${item.mainProduct || ''}"
-                        data-iwasku="${item.iwasku || ''}">
-                    <i class="fas fa-sync-alt me-1"></i> Güncelle
-                </button>
-            </td>
+                tableContent += `
+            <tr>
+                <td>${item.batchId || '-'}</td>
+                <td>${item.mainProduct || '-'}</td>
+                <td>${item.iwasku || '-'}</td>
+                <td>${formatDate(item.createdDate)}</td>
+                <td>
+                    <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
+                    ${errorMessages}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary update-batch-btn"
+                            data-batch-id="${item.batchId || ''}"
+                            data-main-product="${item.mainProduct || ''}"
+                            data-iwasku="${item.iwasku || ''}">
+                        <i class="fas fa-sync-alt me-1"></i> Güncelle
+                    </button>
+                </td>
+            </tr>
         `;
-
-                tableBody.appendChild(row);
             });
+
+            // Tüm içeriği bir kerede ekle
+            tableBody.innerHTML = tableContent;
 
             // Yenileme butonuna event listener ekle
             document.getElementById('refreshBatchesBtn').addEventListener('click', function() {
