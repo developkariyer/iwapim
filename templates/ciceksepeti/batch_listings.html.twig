@@ -14,6 +14,8 @@
         body {
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
+            padding-top: 20px;
+            padding-bottom: 40px;
         }
         .header-container {
             background-color: #fff;
@@ -44,128 +46,157 @@
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+        .status-badge {
+            font-size: 0.85rem;
+            font-weight: normal;
+            padding: 0.35em 0.65em;
+        }
+        .btn-back {
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .btn-back:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 <body>
-<!-- Header -->
-<div class="header-container">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="h3 mb-0">Çiçeksepeti Batch Listesi</h1>
-            </div>
-            <div>
-                <a href="{{ path('ciceksepeti_main_page') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Geri Dön
-                </a>
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h2 mb-0">Çiçeksepeti Batch Listesi</h1>
+                        <a href="/ciceksepeti" class="btn-back">
+                            <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Main Content -->
-<div class="container">
     <!-- Error Message -->
-    {% if errorMessage %}
-        <div class="alert alert-danger">
-            <div class="text-center py-4">
-                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                <h4>Hata</h4>
-                <p>{{ errorMessage }}</p>
+    {% if errorMessage is defined and errorMessage %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3" aria-hidden="true"></i>
+                        <h4>Hata</h4>
+                        <p>{{ errorMessage }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     {% endif %}
 
     <!-- No Data Message -->
-    {% if not errorMessage and (batchData is empty) %}
-        <div class="alert alert-warning">
-            <div class="text-center py-4">
-                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-                <h4>Batch verisi bulunamadı</h4>
-                <p>Henüz oluşturulmuş bir batch bulunmuyor.</p>
+    {% if (errorMessage is not defined or not errorMessage) and (batchData is not defined or batchData is empty) %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-circle fa-3x mb-3" aria-hidden="true"></i>
+                        <h4>Batch verisi bulunamadı</h4>
+                        <p>Henüz oluşturulmuş bir batch bulunmuyor.</p>
+                    </div>
+                </div>
             </div>
         </div>
     {% endif %}
 
     <!-- Batch Data -->
-    {% if not errorMessage and batchData is not empty %}
-        <div class="card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Batch Verileri ({{ batchData|length }} adet)</h5>
-                <button id="refreshBtn" class="btn btn-sm btn-light">
-                    <i class="fas fa-sync-alt me-1"></i> Yenile
-                </button>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                        <tr>
-                            <th class="px-3 py-3">Batch ID</th>
-                            <th class="px-3 py-3">Ana Ürün Kodu</th>
-                            <th class="px-3 py-3">IWASKU</th>
-                            <th class="px-3 py-3">Oluşturma Tarihi</th>
-                            <th class="px-3 py-3">Durum</th>
-                            <th class="px-3 py-3">İşlemler</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for batch in batchData %}
-                            {% for item in batch %}
+    {% if batchData is defined and batchData is not empty %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Batch Verileri {% if batchData|length %} ({{ batchData|length }} adet) {% endif %}</h5>
+                        <button id="refreshBtn" class="btn btn-sm btn-light" aria-label="Listeyi yenile">
+                            <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Yenile
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
                                 <tr>
-                                    <td class="px-3 py-3">{{ item.batchId|default('-') }}</td>
-                                    <td class="px-3 py-3">{{ item.mainProduct|default('-') }}</td>
-                                    <td class="px-3 py-3">{{ item.iwasku|default('-') }}</td>
-                                    <td class="px-3 py-3">
-                                        {% if item.createdDate is defined and item.createdDate %}
-                                            {{ item.createdDate|date('d.m.Y H:i') }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td class="px-3 py-3">
-                                        {% if item.status == 'Success' %}
-                                            <span class="badge bg-success">{{ item.status }}</span>
-                                        {% elseif item.status == 'Failed' %}
-                                            <span class="badge bg-danger">{{ item.status }}</span>
-                                        {% elseif item.status == 'Processing' %}
-                                            <span class="badge bg-primary">{{ item.status }}</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">{{ item.status|default('Bilinmiyor') }}</span>
-                                        {% endif %}
-
-                                        {% if item.failureReasons is defined and item.failureReasons is not empty %}
-                                            {% for reason in item.failureReasons %}
-                                                <div class="text-danger small">{{ reason.message }} ({{ reason.code }})</div>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </td>
-                                    <td class="px-3 py-3">
-                                        <button class="btn btn-sm btn-primary update-batch-btn"
-                                                data-batch-id="{{ item.batchId|default('') }}"
-                                                data-main-product="{{ item.mainProduct|default('') }}"
-                                                data-iwasku="{{ item.iwasku|default('') }}">
-                                            <i class="fas fa-sync-alt me-1"></i> Güncelle
-                                        </button>
-                                    </td>
+                                    <th scope="col" class="px-3 py-3">Batch ID</th>
+                                    <th scope="col" class="px-3 py-3">Ana Ürün Kodu</th>
+                                    <th scope="col" class="px-3 py-3">IWASKU</th>
+                                    <th scope="col" class="px-3 py-3">Oluşturma Tarihi</th>
+                                    <th scope="col" class="px-3 py-3">Durum</th>
+                                    <th scope="col" class="px-3 py-3">İşlemler</th>
                                 </tr>
-                            {% endfor %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                {% for batch in batchData %}
+                                    {% for item in batch %}
+                                        <tr>
+                                            <td class="px-3 py-3">{{ item.batchId|default('-') }}</td>
+                                            <td class="px-3 py-3">{{ item.mainProduct|default('-') }}</td>
+                                            <td class="px-3 py-3">{{ item.iwasku|default('-') }}</td>
+                                            <td class="px-3 py-3">
+                                                {% if item.createdDate is defined and item.createdDate %}
+                                                    {{ item.createdDate|date('d.m.Y H:i') }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-3 py-3">
+                                                {% if item.status == 'Success' %}
+                                                    <span class="badge bg-success status-badge" role="status">{{ item.status }}</span>
+                                                {% elseif item.status == 'Failed' %}
+                                                    <span class="badge bg-danger status-badge" role="status">{{ item.status }}</span>
+                                                {% elseif item.status == 'Processing' %}
+                                                    <span class="badge bg-primary status-badge" role="status">{{ item.status }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary status-badge" role="status">{{ item.status|default('Bilinmiyor') }}</span>
+                                                {% endif %}
+
+                                                {% if item.failureReasons is defined and item.failureReasons is not empty %}
+                                                    <div role="alert">
+                                                        {% for reason in item.failureReasons %}
+                                                            <div class="text-danger small mt-1">{{ reason.message }} ({{ reason.code }})</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-3 py-3">
+                                                <button class="btn btn-sm btn-primary update-batch-btn"
+                                                        data-batch-id="{{ item.batchId|default('') }}"
+                                                        data-main-product="{{ item.mainProduct|default('') }}"
+                                                        data-iwasku="{{ item.iwasku|default('') }}"
+                                                        aria-label="{{ item.mainProduct|default('-') }} - {{ item.iwasku|default('-') }} ürününü güncelle">
+                                                    <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     {% endif %}
 </div>
 
-<!-- JavaScript Dependencies -->
+<!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Custom JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Refresh button functionality
+        // Sayfayı yenile
         const refreshBtn = document.getElementById('refreshBtn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', function() {
@@ -173,7 +204,7 @@
             });
         }
 
-        // Batch update functionality
+        // Batch güncelleme
         document.querySelectorAll('.update-batch-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const batchId = this.getAttribute('data-batch-id');
@@ -189,12 +220,12 @@
                     return;
                 }
 
-                // Store original button state
+                // Buton durumunu sakla
                 const originalText = this.innerHTML;
                 this.disabled = true;
                 this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Güncelleniyor...';
 
-                // Send API request
+                // API isteği gönder
                 fetch(`/api/update-batch/${batchId}`, {
                     method: 'POST',
                     headers: {
@@ -206,7 +237,12 @@
                         iwasku: iwasku
                     })
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP hata: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             showToast(`"${iwasku}" başarıyla güncellendi.`, 'success');
@@ -228,7 +264,7 @@
             });
         });
 
-        // Toast notification function
+        // Toast bildirimi göster
         function showToast(message, type = 'info') {
             const existingToast = document.querySelector('.toast-notification');
             if (existingToast) {
@@ -237,6 +273,9 @@
 
             const toast = document.createElement('div');
             toast.className = `toast-notification alert alert-${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
             toast.style.position = 'fixed';
             toast.style.bottom = '20px';
             toast.style.right = '20px';
