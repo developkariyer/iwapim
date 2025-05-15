@@ -71,12 +71,13 @@ class CiceksepetiController extends FrontendController
 
             $ciceksepetiConnector = new CiceksepetiConnector(265384);
             $response = $ciceksepetiConnector->getBatchRequestResult($batchId);
+            $responseJson = json_decode($response, true);
             $queryOnly = isset($data['queryOnly']) && $data['queryOnly'];
             return $this->json([
                 'success' => true,
                 'message' => $queryOnly ? 'Batch bilgileri başarıyla alındı' : 'Batch başarıyla güncellendi',
                 'batchId' => $batchId,
-                'response' => $response
+                'response' => $responseJson
             ]);
         } catch (\Exception $e) {
             return $this->json([
