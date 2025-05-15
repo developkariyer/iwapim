@@ -52,13 +52,14 @@ class ListingHelperService
         if (empty($variantIds)) {
             return false;
         }
+        $marketplaceCurrency = $marketplace->getCurrency();
         $productIdentifier = $product->getProductIdentifier();
         $data = [
             $marketplaceName => [
                 $productIdentifier => [
                     'category' => $product->getProductCategory(),
                     'name' => $product->getName(),
-                    'skus' => $this->processVariantProduct($variantIds)
+                    'skus' => $this->processVariantProduct($variantIds, $marketplaceCurrency)
                 ]
             ]
         ];
@@ -66,7 +67,7 @@ class ListingHelperService
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    private function processVariantProduct($variantIds):array
+    private function processVariantProduct($variantIds, $marketplaceCurrency):array
     {
         $result = [];
         foreach ($variantIds as $variantId) {
@@ -79,45 +80,96 @@ class ListingHelperService
                 continue;
             }
             $iwasku = $variantProduct->getIwasku();
-            $listingItemsData = [];
-            $images = [];
-            foreach ($listingItems as $listingItem)
-            {
-                if (!$listingItem instanceof VariantProduct) {
-                    continue;
-                }
-                $listingItemsData[] = $this->processListingItems($listingItem);
-                $images = array_merge($images, $this->getImages($listingItem));
-            }
+//            $listingItemsData = [];
+//            $images = [];
+//            foreach ($listingItems as $listingItem)
+//            {
+//                if (!$listingItem instanceof VariantProduct) {
+//                    continue;
+//                }
+//                $listingItemsData[] = $this->processListingItems($listingItem);
+//                $images = array_merge($images, $this->getImages($listingItem));
+//            }
+            $listingItemsresult = $this->processListingItems($listingItems, $marketplaceCurrency);
             $result[$iwasku] = [
                 'size' => $variantProduct->getVariationSize(),
                 'color' => $variantProduct->getVariationColor(),
                 'ean' => $variantProduct->getEanGtin(),
-                'ListingItems' => $listingItemsData,
-                'images' => $images
+                'ListingItems' => $listingItemsresult['items'],
+                'images' => $listingItemsresult['images'],
+                'price' => $listingItemsresult['price'],
             ];
         }
         return $result;
     }
 
-    private function processListingItems($listingItem)
+    private function processListingItems($listingItem, $marketplaceCurrency)
     {
-        $title = $listingItem->getTitle();
-        if (strpos(ltrim($title), '🎁') === 0) {
-            return [];
-        }
-        $marketplaceKey = $listingItem->getMarketplace()->getKey();
-        $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
-        return [
-            $marketplaceKey => [
+        $marketplaceSalePrice = null;
+        $foundSameCurrency = false;
+        $result = [];
+        $images = [];
+        foreach ($listingItem as $listingItem) {
+            if (!$listingItem instanceof VariantProduct) {
+                continue;
+            }
+            $title = $listingItem->getTitle();
+            if (strpos(ltrim($title), '🎁') === 0) {
+                return [];
+            }
+            $marketplaceKey = $listingItem->getMarketplace()->getKey();
+            $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
+            $listingSalePrice = $listingItem->getSalePrice();
+            $currency = $listingItem->getSaleCurrency();
+            if (!$foundSameCurrency && $this->normalizeCurrency($currency) === $this->normalizeCurrency($marketplaceCurrency)) {
+                $marketplaceSalePrice = $listingSalePrice;
+                $foundSameCurrency = true;
+            } elseif (!$foundSameCurrency && $marketplaceSalePrice === null) {
+                $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $currency, $marketplaceCurrency);
+            }
+            $images = array_merge($images, $this->getImages($listingItem));
+            $result['items'][$marketplaceKey] = [
                 'title' => $title,
-                'salePrice' => $listingItem->getSalePrice(),
-                'currency' => $listingItem->getSaleCurrency(),
+                'salePrice' => $listingSalePrice,
+                'currency' => $currency,
                 'description' => $parentApiJson['descriptionHtml'] ?? '',
                 'seo' => $parentApiJson['seo']['description'] ?? '',
                 'tags' => $parentApiJson['tags'] ?? ''
-            ]
+            ];
+        }
+        $result['price'] = $marketplaceSalePrice;
+        $result['images'] = $images;
+        return $result;
+//        $title = $listingItem->getTitle();
+//        if (strpos(ltrim($title), '🎁') === 0) {
+//            return [];
+//        }
+//        $marketplaceKey = $listingItem->getMarketplace()->getKey();
+//        $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
+//        return [
+//            $marketplaceKey => [
+//                'title' => $title,
+//                'salePrice' => $listingItem->getSalePrice(),
+//                'currency' => $listingItem->getSaleCurrency(),
+//                'description' => $parentApiJson['descriptionHtml'] ?? '',
+//                'seo' => $parentApiJson['seo']['description'] ?? '',
+//                'tags' => $parentApiJson['tags'] ?? ''
+//            ]
+//        ];
+    }
+
+    private function normalizeCurrency($currency)
+    {
+        $map = [
+            'TL' => 'TRY',
+            'TRY' => 'TRY',
+            'USD' => 'USD',
+            'US DOLLAR' => 'USD',
+            'Dolar' => 'USD',
+            '₺' => 'TRY',
+            '$' => 'USD',
         ];
+        return $map[trim($currency)] ?? strtoupper(trim($currency));
     }
 
     private function filterShopifyListingItems($data)
@@ -244,14 +296,9 @@ class ListingHelperService
         return $images;
     }
 
-    private function calculatePrice($price, $currency)
+    private function calculatePrice($price, $fromCurrency, $toCurrency)
     {
-        if ($currency == "TRY" or $currency == "TL") {
-            return $price;
-        }
-        if ($currency == "US DOLLAR") {
-            return Utility::convertCurrency($price, "USD", "TRY", date('Y-m-d'));
-        }
+        return Utility::convertCurrency($price, "USD", "TRY", date('Y-m-d'));
     }
 
 }
