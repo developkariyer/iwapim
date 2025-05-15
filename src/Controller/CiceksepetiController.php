@@ -55,6 +55,14 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
+     * @Route("/ciceksepeti/batch-listings", name="ciceksepeti_batch_listings")
+     */
+    public function batchListingsPage(): Response
+    {
+        return $this->render('ciceksepeti/batch_listings.html.twig');
+    }
+
+    /**
      * @Route("/listing/batch-ids", name="listing_batch_ids")
      */
     public function getBatchIds(): Response
