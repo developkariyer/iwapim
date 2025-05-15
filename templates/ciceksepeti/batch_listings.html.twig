@@ -62,6 +62,36 @@
         .btn-back:hover {
             background-color: #e9ecef;
         }
+        .batch-items-container {
+            padding: 0.5rem;
+            border-top: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .batch-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .batch-row:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+        .batch-row.active {
+            background-color: rgba(13, 110, 253, 0.08);
+        }
+        .toggle-items {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .toggle-items.open {
+            transform: rotate(180deg);
+        }
+        .batch-items-row {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -125,61 +155,154 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-hover mb-0" id="batchTable">
                                 <thead class="table-light">
                                 <tr>
+                                    <th width="40" class="px-3 py-3"></th>
                                     <th scope="col" class="px-3 py-3">Batch ID</th>
                                     <th scope="col" class="px-3 py-3">Ana Ürün Kodu</th>
-                                    <th scope="col" class="px-3 py-3">IWASKU</th>
                                     <th scope="col" class="px-3 py-3">Oluşturma Tarihi</th>
                                     <th scope="col" class="px-3 py-3">Durum</th>
-                                    <th scope="col" class="px-3 py-3">İşlemler</th>
                                 </tr>
                                 </thead>
                                 <tbody>
+                                {% set groupedBatches = {} %}
+
+                                {# Önce batch ID'ye göre gruplandırma yap #}
                                 {% for batch in batchData %}
                                     {% for item in batch %}
-                                        <tr>
-                                            <td class="px-3 py-3">{{ item.batchId|default('-') }}</td>
-                                            <td class="px-3 py-3">{{ item.mainProduct|default('-') }}</td>
-                                            <td class="px-3 py-3">{{ item.iwasku|default('-') }}</td>
-                                            <td class="px-3 py-3">
-                                                {% if item.createdDate is defined and item.createdDate %}
-                                                    {{ item.createdDate|date('d.m.Y H:i') }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </td>
-                                            <td class="px-3 py-3">
+                                        {% set batchId = item.batchId|default('-') %}
+                                        {% set itemMainProduct = item.mainProduct|default('-') %}
+                                        {% set itemCreatedDate = item.createdDate is defined ? item.createdDate : null %}
+
+                                        {% if batchId != '-' %}
+                                            {% if groupedBatches[batchId] is not defined %}
+                                                {% set groupedBatches = groupedBatches|merge({
+                                                    (batchId): {
+                                                        'batchId': batchId,
+                                                        'mainProduct': itemMainProduct,
+                                                        'createdDate': itemCreatedDate,
+                                                        'items': []
+                                                    }
+                                                }) %}
+                                            {% endif %}
+
+                                            {% set groupedBatches = groupedBatches|merge({
+                                                (batchId): {
+                                                    'batchId': batchId,
+                                                    'mainProduct': itemMainProduct,
+                                                    'createdDate': itemCreatedDate,
+                                                    'items': groupedBatches[batchId].items|merge([item])
+                                                }
+                                            }) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+
+                                {# Gruplandırılmış veriyi göster #}
+                                {% for batchId, batchGroup in groupedBatches %}
+                                    <tr class="batch-row" data-batch-id="{{ batchId }}">
+                                        <td class="px-3 py-3 text-center">
+                                            <button class="btn btn-sm btn-outline-secondary toggle-items"
+                                                    data-batch-id="{{ batchId }}"
+                                                    aria-expanded="false"
+                                                    aria-controls="batch-items-{{ batchId }}"
+                                                    aria-label="Batch detaylarını göster/gizle">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </td>
+                                        <td class="px-3 py-3 fw-bold">{{ batchId }}</td>
+                                        <td class="px-3 py-3">{{ batchGroup.mainProduct }}</td>
+                                        <td class="px-3 py-3">
+                                            {% if batchGroup.createdDate %}
+                                                {{ batchGroup.createdDate|date('d.m.Y H:i') }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-3 py-3">
+                                            {% set totalItems = batchGroup.items|length %}
+                                            {% set successCount = 0 %}
+                                            {% set failedCount = 0 %}
+                                            {% set processingCount = 0 %}
+
+                                            {% for item in batchGroup.items %}
                                                 {% if item.status == 'Success' %}
-                                                    <span class="badge bg-success status-badge" role="status">{{ item.status }}</span>
+                                                    {% set successCount = successCount + 1 %}
                                                 {% elseif item.status == 'Failed' %}
-                                                    <span class="badge bg-danger status-badge" role="status">{{ item.status }}</span>
+                                                    {% set failedCount = failedCount + 1 %}
                                                 {% elseif item.status == 'Processing' %}
-                                                    <span class="badge bg-primary status-badge" role="status">{{ item.status }}</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary status-badge" role="status">{{ item.status|default('Bilinmiyor') }}</span>
+                                                    {% set processingCount = processingCount + 1 %}
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            <div class="d-flex gap-2 align-items-center">
+                                                {% if successCount > 0 %}
+                                                    <span class="badge bg-success">{{ successCount }} Başarılı</span>
                                                 {% endif %}
 
-                                                {% if item.failureReasons is defined and item.failureReasons is not empty %}
-                                                    <div role="alert">
-                                                        {% for reason in item.failureReasons %}
-                                                            <div class="text-danger small mt-1">{{ reason.message }} ({{ reason.code }})</div>
-                                                        {% endfor %}
-                                                    </div>
+                                                {% if failedCount > 0 %}
+                                                    <span class="badge bg-danger">{{ failedCount }} Başarısız</span>
                                                 {% endif %}
-                                            </td>
-                                            <td class="px-3 py-3">
-                                                <button class="btn btn-sm btn-primary update-batch-btn"
-                                                        data-batch-id="{{ item.batchId|default('') }}"
-                                                        data-main-product="{{ item.mainProduct|default('') }}"
-                                                        data-iwasku="{{ item.iwasku|default('') }}"
-                                                        aria-label="{{ item.mainProduct|default('-') }} - {{ item.iwasku|default('-') }} ürününü güncelle">
-                                                    <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
+
+                                                {% if processingCount > 0 %}
+                                                    <span class="badge bg-primary">{{ processingCount }} İşleniyor</span>
+                                                {% endif %}
+
+                                                <span class="badge bg-secondary ms-2">Toplam: {{ totalItems }}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="batch-items-row d-none" id="batch-items-{{ batchId }}">
+                                        <td colspan="5" class="p-0">
+                                            <div class="batch-items-container bg-light">
+                                                <table class="table table-sm mb-0">
+                                                    <thead class="table-secondary">
+                                                    <tr>
+                                                        <th class="px-3 py-2">IWASKU</th>
+                                                        <th class="px-3 py-2">Durum</th>
+                                                        <th class="px-3 py-2">İşlemler</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for item in batchGroup.items %}
+                                                        <tr class="batch-item">
+                                                            <td class="px-3 py-2">{{ item.iwasku|default('-') }}</td>
+                                                            <td class="px-3 py-2">
+                                                                {% if item.status == 'Success' %}
+                                                                    <span class="badge bg-success status-badge" role="status">{{ item.status }}</span>
+                                                                {% elseif item.status == 'Failed' %}
+                                                                    <span class="badge bg-danger status-badge" role="status">{{ item.status }}</span>
+                                                                {% elseif item.status == 'Processing' %}
+                                                                    <span class="badge bg-primary status-badge" role="status">{{ item.status }}</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-secondary status-badge" role="status">{{ item.status|default('Bilinmiyor') }}</span>
+                                                                {% endif %}
+
+                                                                {% if item.failureReasons is defined and item.failureReasons is not empty %}
+                                                                    <div role="alert">
+                                                                        {% for reason in item.failureReasons %}
+                                                                            <div class="text-danger small mt-1">{{ reason.message }} ({{ reason.code }})</div>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td class="px-3 py-2">
+                                                                <button class="btn btn-sm btn-primary update-batch-btn"
+                                                                        data-batch-id="{{ item.batchId|default('') }}"
+                                                                        data-main-product="{{ item.mainProduct|default('') }}"
+                                                                        data-iwasku="{{ item.iwasku|default('') }}"
+                                                                        aria-label="{{ item.mainProduct|default('-') }} - {{ item.iwasku|default('-') }} ürününü güncelle">
+                                                                    <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 {% endfor %}
                                 </tbody>
                             </table>
@@ -203,8 +326,53 @@
                 window.location.reload();
             });
         }
+        document.querySelectorAll('.toggle-items').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const batchId = this.getAttribute('data-batch-id');
+                const itemsRow = document.getElementById(`batch-items-${batchId}`);
+                const parentRow = this.closest('.batch-row');
+                const isOpen = this.classList.contains('open');
+                document.querySelectorAll('.batch-items-row').forEach(row => {
+                    if (row.id !== `batch-items-${batchId}`) {
+                        row.classList.add('d-none');
+                    }
+                });
 
-        // Batch güncelleme
+                document.querySelectorAll('.toggle-items').forEach(btn => {
+                    if (btn !== this) {
+                        btn.classList.remove('open');
+                        btn.closest('.batch-row').classList.remove('active');
+                    }
+                });
+
+                // Bu row'u toggle et
+                if (isOpen) {
+                    this.classList.remove('open');
+                    itemsRow.classList.add('d-none');
+                    parentRow.classList.remove('active');
+                    this.setAttribute('aria-expanded', 'false');
+                } else {
+                    this.classList.add('open');
+                    itemsRow.classList.remove('d-none');
+                    parentRow.classList.add('active');
+                    this.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
+        document.querySelectorAll('.batch-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (e.target.closest('.toggle-items')) {
+                    return;
+                }
+                const batchId = this.getAttribute('data-batch-id');
+                const toggleButton = this.querySelector(`.toggle-items[data-batch-id="${batchId}"]`);
+                if (toggleButton) {
+                    toggleButton.click();
+                }
+            });
+        });
         document.querySelectorAll('.update-batch-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const batchId = this.getAttribute('data-batch-id');
@@ -220,12 +388,10 @@
                     return;
                 }
 
-                // Buton durumunu sakla
                 const originalText = this.innerHTML;
                 this.disabled = true;
                 this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Güncelleniyor...';
 
-                // API isteği gönder
                 fetch(`/api/update-batch/${batchId}`, {
                     method: 'POST',
                     headers: {
@@ -263,8 +429,6 @@
                     });
             });
         });
-
-        // Toast bildirimi göster
         function showToast(message, type = 'info') {
             const existingToast = document.querySelector('.toast-notification');
             if (existingToast) {
