@@ -170,7 +170,7 @@ class ListingHelperService
 
     private function calculatePrice($price, $fromCurrency, $toCurrency)
     {
-        return Utility::convertCurrency($price, "USD", "TRY", date('Y-m-d'));
+        return Utility::convertCurrency($price, $fromCurrency, $toCurrency, date('Y-m-d'));
     }
 
 }
