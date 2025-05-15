@@ -80,16 +80,6 @@ class ListingHelperService
                 continue;
             }
             $iwasku = $variantProduct->getIwasku();
-//            $listingItemsData = [];
-//            $images = [];
-//            foreach ($listingItems as $listingItem)
-//            {
-//                if (!$listingItem instanceof VariantProduct) {
-//                    continue;
-//                }
-//                $listingItemsData[] = $this->processListingItems($listingItem);
-//                $images = array_merge($images, $this->getImages($listingItem));
-//            }
             $listingItemsresult = $this->processListingItems($listingItems, $marketplaceCurrency);
             $result[$iwasku] = [
                 'size' => $variantProduct->getVariationSize(),
@@ -128,6 +118,7 @@ class ListingHelperService
             } elseif (!$foundSameCurrency && $marketplaceSalePrice === null) {
                 $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $currency, $marketplaceCurrency);
             }
+            echo "Sale Price: " . $listingSalePrice . " Currency: " . $currency . " Marketplace Sale Price: " . $marketplaceSalePrice . "\n";
             $images = array_merge($images, $this->getImages($listingItem));
             $items[$marketplaceKey] = [
                 'title' => $title,
@@ -142,22 +133,6 @@ class ListingHelperService
         $result['images'] = $images;
         $result['items'] = $items;
         return $result;
-//        $title = $listingItem->getTitle();
-//        if (strpos(ltrim($title), '🎁') === 0) {
-//            return [];
-//        }
-//        $marketplaceKey = $listingItem->getMarketplace()->getKey();
-//        $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
-//        return [
-//            $marketplaceKey => [
-//                'title' => $title,
-//                'salePrice' => $listingItem->getSalePrice(),
-//                'currency' => $listingItem->getSaleCurrency(),
-//                'description' => $parentApiJson['descriptionHtml'] ?? '',
-//                'seo' => $parentApiJson['seo']['description'] ?? '',
-//                'tags' => $parentApiJson['tags'] ?? ''
-//            ]
-//        ];
     }
 
     private function normalizeCurrency($currency)
@@ -197,7 +172,6 @@ class ListingHelperService
         unset($products, $product, $sku);
         return $data;
     }
-
 
     public function getPimListingsInfoN(ProductListingMessage $message): false|string
     {
