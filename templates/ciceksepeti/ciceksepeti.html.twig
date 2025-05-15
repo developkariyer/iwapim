@@ -589,15 +589,79 @@
                 })
                 .then(data => {
                     console.log('Batch ID Verileri:', data);
-                    if (data.success && Array.isArray(data.product)) {
-                        displayBatchesTable(data.product);
-                    } else {
-                        showErrorMessage("Veri alınırken bir sorun oluştu.");
+
+                    productListContainer.innerHTML = '';
+
+                    const titleElement = document.createElement('div');
+                    titleElement.className = 'col-12 mb-4';
+                    titleElement.innerHTML = '<h4>Batch Verileri</h4>';
+                    productListContainer.appendChild(titleElement);
+
+                    if (!data.success || !data.product || data.product.length === 0) {
+                        const noDataElement = document.createElement('div');
+                        noDataElement.className = 'col-12';
+                        noDataElement.innerHTML = `
+                    <div class="alert alert-warning">
+                        <p>Batch verisi bulunamadı.</p>
+                    </div>
+                `;
+                        productListContainer.appendChild(noDataElement);
+                        return;
                     }
+
+                    const tableElement = document.createElement('div');
+                    tableElement.className = 'col-12';
+                    tableElement.innerHTML = `
+                <table class="table table-bordered" id="batchTable">
+                    <thead>
+                        <tr>
+                            <th>Batch ID</th>
+                            <th>Ana Ürün Kodu</th>
+                            <th>IWASKU</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `;
+                    productListContainer.appendChild(tableElement);
+
+                    const tableBody = tableElement.querySelector('tbody');
+
+                    let allItems = [];
+
+                    data.product.forEach(batch => {
+                        if (Array.isArray(batch)) {
+                            batch.forEach(item => {
+                                if (item && typeof item === 'object') {
+                                    allItems.push(item);
+                                }
+                            });
+                        }
+                    });
+
+                    allItems.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                    <td>${item.batchId || '-'}</td>
+                    <td>${item.mainProduct || '-'}</td>
+                    <td>${item.iwasku || '-'}</td>
+                    <td>${item.status || 'Bilinmiyor'}</td>
+                `;
+                        tableBody.appendChild(row);
+                    });
                 })
                 .catch(error => {
                     console.error('Hata:', error);
-                    showErrorMessage("Hata oluştu: " + error.message);
+                    if (productListContainer) {
+                        productListContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <p>Hata oluştu: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                    }
                 });
         });
 
