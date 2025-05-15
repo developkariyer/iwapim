@@ -819,16 +819,25 @@
                     })
                 })
                     .then(response => {
-                        return response.json().then(data => {
-                            if (!response.ok) {
-                                throw new Error(data.message || `HTTP hata: ${response.status}`);
+                        // İlk olarak text olarak yanıtı alıyoruz, böylece HTML içeriği olup olmadığını kontrol edebiliriz
+                        return response.text().then(text => {
+                            try {
+                                // JSON'a çevirmeyi deneyelim
+                                const data = JSON.parse(text);
+                                if (!response.ok) {
+                                    throw new Error(data.message || `HTTP hata: ${response.status}`);
+                                }
+                                return data;
+                            } catch (error) {
+                                // JSON parse hatası aldıysak, HTML yanıt olup olmadığını kontrol edelim
+                                if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+                                    console.error('HTML yanıtı alındı:', text);
+                                    throw new Error('Sunucu HTML yanıtı döndürdü. Muhtemelen bir sayfa hatası veya yönlendirme var.');
+                                } else {
+                                    console.error('JSON parse hatası:', error, 'Raw response:', text);
+                                    throw new Error(`JSON parse hatası: ${error.message}`);
+                                }
                             }
-                            return data;
-                        }).catch(error => {
-                            if (error instanceof SyntaxError) {
-                                throw new Error(`JSON parse hatası: ${error.message}`);
-                            }
-                            throw error;
                         });
                     })
                     .then(data => {
@@ -848,11 +857,18 @@
                     })
                     .catch(error => {
                         console.error('Sorgulama hatası:', error);
-                        // Hata mesajını göster
                         document.getElementById('batchResponseLoader').classList.add('d-none');
                         document.getElementById('batchResponseError').classList.remove('d-none');
-                        document.getElementById('batchResponseErrorMessage').textContent =
-                            `Bağlantı hatası: ${error.message}`;
+                        document.getElementById('batchResponseErrorMessage').textContent = error.message;
+
+                        if (error.rawResponse) {
+                            const errorDetails = document.createElement('div');
+                            errorDetails.className = 'mt-3 border p-2 bg-light';
+                            errorDetails.style.maxHeight = '200px';
+                            errorDetails.style.overflow = 'auto';
+                            errorDetails.innerHTML = `<small><pre class="text-muted">${error.rawResponse.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></small>`;
+                            document.getElementById('batchResponseError').appendChild(errorDetails);
+                        }
                     });
             });
         });

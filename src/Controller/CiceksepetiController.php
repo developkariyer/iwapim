@@ -69,8 +69,51 @@ class CiceksepetiController extends FrontendController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            $ciceksepetiConnector = new CiceksepetiConnector(265384);
-            $response = $ciceksepetiConnector->getBatchRequestResult($batchId);
+            // Test modu - gerçek API yerine örnek veri kullanın
+            $testMode = true; // Geliştirme sırasında true olarak ayarlayın
+
+            if ($testMode) {
+                // Örnek yanıt verisi
+                $response = [
+                    'batchId' => $batchId,
+                    'status' => 'Success',
+                    'items' => [
+                        [
+                            'iwasku' => 'TEST12345',
+                            'productId' => 123456,
+                            'status' => 'Success',
+                            'message' => 'İşlem başarılı'
+                        ],
+                        [
+                            'iwasku' => 'TEST67890',
+                            'productId' => 789012,
+                            'status' => 'Processing',
+                            'message' => 'İşleniyor'
+                        ]
+                    ],
+                    'metadata' => [
+                        'totalItems' => 2,
+                        'successCount' => 1,
+                        'processingCount' => 1,
+                        'failedCount' => 0
+                    ],
+                    'timestamps' => [
+                        'created' => date('Y-m-d H:i:s'),
+                        'updated' => date('Y-m-d H:i:s')
+                    ]
+                ];
+            } else {
+                try {
+                    $ciceksepetiConnector = new CiceksepetiConnector(265384);
+                    $response = $ciceksepetiConnector->getBatchRequestResult($batchId);
+                } catch (\Exception $connectorException) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'API bağlantı hatası: ' . $connectorException->getMessage()
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+
             $queryOnly = isset($data['queryOnly']) && $data['queryOnly'];
             return $this->json([
                 'success' => true,
