@@ -609,6 +609,8 @@
             const productListContainer = document.getElementById('productList');
             if (!productListContainer) return;
 
+            console.log("Gelen batch veriler:", batches);
+
             if (!batches || batches.length === 0) {
                 productListContainer.innerHTML = `
             <div class="col-12">
@@ -625,46 +627,69 @@
             }
 
             productListContainer.innerHTML = `
-        <div class="col-12 mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4>Batch Verileri (${batches.length} adet)</h4>
-                <button id="refreshBatchesBtn" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-sync-alt me-1"></i> Yenile
-                </button>
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Batch ID</th>
-                            <th>Ana Ürün Kodu</th>
-                            <th>IWASKU</th>
-                            <th>Oluşturma Tarihi</th>
-                            <th>Durum</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody id="batchTableBody">
-                        <!-- Batch verileri JavaScript ile buraya eklenecek -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `;
-
+                <div class="col-12 mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4>Batch Verileri (${batches.length} adet)</h4>
+                        <button id="refreshBatchesBtn" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-sync-alt me-1"></i> Yenile
+                        </button>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Batch ID</th>
+                                    <th>Ana Ürün Kodu</th>
+                                    <th>IWASKU</th>
+                                    <th>Oluşturma Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batchTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
             const tableBody = document.getElementById('batchTableBody');
-            if (!tableBody) return;
-
+            console.log("TableBody bulundu mu:", tableBody !== null);
+            if (!tableBody) {
+                console.error("batchTableBody bulunamadı!");
+                return;
+            }
             let allItems = [];
-            batches.forEach(batch => {
-                if (Array.isArray(batch)) {
-                    allItems = allItems.concat(batch);
-                }
-            });
+            if (Array.isArray(batches)) {
+                batches.forEach(batch => {
+                    console.log("Batch türü:", typeof batch);
+                    if (Array.isArray(batch)) {
+                        allItems = allItems.concat(batch);
+                    } else if (batch && typeof batch === 'object') {
+                        allItems.push(batch);
+                    }
+                });
+            }
+            console.log("Düzleştirilmiş öğe sayısı:", allItems.length);
 
+            if (allItems.length === 0) {
+                tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-3">
+                    <div class="alert alert-warning mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        İşlenebilir batch verisi bulunamadı
+                    </div>
+                </td>
+            </tr>
+        `;
+                return;
+            }
+            let tableContent = '';
             allItems.forEach(item => {
+                console.log("İşlenen öğe:", item);
+
                 let errorMessages = '';
                 if (Array.isArray(item.failureReasons) && item.failureReasons.length > 0) {
                     errorMessages = item.failureReasons.map(reason =>
@@ -677,28 +702,28 @@
                 else if (item.status === 'Failed') statusClass = 'bg-danger';
                 else if (item.status === 'Processing') statusClass = 'bg-primary';
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-            <td>${item.batchId || '-'}</td>
-            <td>${item.mainProduct || '-'}</td>
-            <td>${item.iwasku || '-'}</td>
-            <td>${formatDate(item.createdDate)}</td>
-            <td>
-                <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
-                ${errorMessages}
-            </td>
-            <td>
-                <button class="btn btn-sm btn-primary update-batch-btn"
-                        data-batch-id="${item.batchId}"
-                        data-main-product="${item.mainProduct}"
-                        data-iwasku="${item.iwasku}">
-                    <i class="fas fa-sync-alt me-1"></i> Güncelle
-                </button>
-            </td>
+                tableContent += `
+            <tr>
+                <td>${item.batchId || '-'}</td>
+                <td>${item.mainProduct || '-'}</td>
+                <td>${item.iwasku || '-'}</td>
+                <td>${formatDate(item.createdDate)}</td>
+                <td>
+                    <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
+                    ${errorMessages}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary update-batch-btn"
+                            data-batch-id="${item.batchId || ''}"
+                            data-main-product="${item.mainProduct || ''}"
+                            data-iwasku="${item.iwasku || ''}">
+                        <i class="fas fa-sync-alt me-1"></i> Güncelle
+                    </button>
+                </td>
+            </tr>
         `;
-                tableBody.appendChild(row);
             });
-
+            tableBody.innerHTML = tableContent;
             document.getElementById('refreshBatchesBtn').addEventListener('click', function() {
                 document.getElementById('checkListingBtn').click();
             });
