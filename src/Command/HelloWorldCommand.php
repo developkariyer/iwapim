@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Connector\Gemini\GeminiConnector;
 use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Message\TestMessage;
+use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
@@ -37,8 +38,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $result = GeminiConnector::chat("Test Message: Hello World!");
-        print_r($result);
+        $marketplace = Marketplace::getById(265384);
+        print_r($marketplace->getCurreny());
         return Command::SUCCESS;
     }
 

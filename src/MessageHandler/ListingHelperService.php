@@ -147,7 +147,6 @@ class ListingHelperService
         return $data;
     }
 
-
     public function getPimListingsInfoN(ProductListingMessage $message): false|string
     {
         $data = [];
