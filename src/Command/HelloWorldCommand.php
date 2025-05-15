@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Connector\Gemini\GeminiConnector;
 use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Message\TestMessage;
 use App\Model\DataObject\VariantProduct;
@@ -36,53 +37,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ciceksepeti";
-        $files = array_filter(scandir($directory), function ($file) use ($directory) {
-            return is_file($directory . DIRECTORY_SEPARATOR . $file) && str_starts_with($file, 'CREATE_LISTING_');
-        });
-
-        foreach ($files as $fileName) {
-            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-            $content = file_get_contents($filePath);
-            $json = json_decode($content, true);
-            $this->test($json);
-
-        }
+        GeminiConnector::chat("Test Message: Hello World!");
         return Command::SUCCESS;
     }
 
-    public function test($json)
-    {
-        if (empty($json['response'])) {
-            return;
-        }
-        $batchId = $json['response']['batchRequestResult']['batchId'];
-        $items = $json['response']['batchRequestResult']['items'];
-        $result = [];
-        foreach ($items as $item) {
-            $createdDate = $item['lastModificationDate'];
-            $mainProduct = $item['data']['mainProductCode'] ?? null;
-            $status = $item['status'] ?? null;
-            $iwasku = $item['data']['stockCode'] ?? null;
-            $failureReasons = [];
-            if (!empty($item['failureReasons'])) {
-                foreach ($item['failureReasons'] as $failureReason) {
-                    $failureReasons[] = [
-                        'code' => $failureReason['code'] ?? '',
-                        'message' => $failureReason['message'] ?? ''
-                    ];
-                }
-            }
-            $result[] = [
-                'batchId' => $batchId,
-                'createdDate' => $createdDate,
-                'mainProduct' => $mainProduct,
-                'iwasku' => $iwasku,
-                'status' => $status,
-                'failureReasons' => $failureReasons
-            ];
-        }
-        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        // return $result; // dilersen diziyi ham olarak da döndürebilirsin
-    }
 }
