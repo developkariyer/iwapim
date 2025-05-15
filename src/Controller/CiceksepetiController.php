@@ -55,32 +55,80 @@ class CiceksepetiController extends FrontendController
     }
 
     /**
+     * @Route("/api/update-batch/{batchId}", name="api_update_batch", methods={"POST"})
+     */
+    public function updateBatch(Request $request, string $batchId): Response
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            if (!$data) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Geçersiz veri'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Batch başarıyla güncellendi',
+                'batchId' => $batchId,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Güncelleme sırasında hata oluştu: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * @Route("/ciceksepeti/batch-listings", name="ciceksepeti_batch_listings")
      */
     public function batchListingsPage(): Response
     {
-        return $this->render('ciceksepeti/batch_listings.html.twig');
-    }
+        $directory = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/Ciceksepeti";
+        $batchData = [];
+        $errorMessage = null;
 
-    /**
-     * @Route("/listing/batch-ids", name="listing_batch_ids")
-     */
-    public function getBatchIds(): Response
-    {
-        $directory = PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/Ciceksepeti";
-        $files = array_filter(scandir($directory), function ($file) use ($directory) {
-            return is_file($directory . DIRECTORY_SEPARATOR . $file) && str_starts_with($file, 'CREATE_LISTING_');
-        });
-        $result = [];
-        foreach ($files as $fileName) {
-            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-            $content = file_get_contents($filePath);
-            $json = json_decode($content, true);
-            $result[] = $this->extractBatchIdData($json);
+        try {
+            if (!is_dir($directory)) {
+                $errorMessage = "Dizin bulunamadı: $directory";
+            } else {
+                $files = array_filter(scandir($directory), function ($file) use ($directory) {
+                    return is_file($directory . DIRECTORY_SEPARATOR . $file) &&
+                        str_starts_with($file, 'CREATE_LISTING_');
+                });
+
+                if (empty($files)) {
+                    $errorMessage = "CREATE_LISTING_ ile başlayan dosya bulunamadı";
+                } else {
+                    foreach ($files as $fileName) {
+                        $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+                        $content = file_get_contents($filePath);
+                        $json = json_decode($content, true);
+
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            continue; // Geçersiz JSON, bu dosyayı atla
+                        }
+
+                        $extractedData = $this->extractBatchIdData($json);
+                        if ($extractedData) {
+                            $batchData[] = $extractedData;
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $errorMessage = "Hata oluştu: " . $e->getMessage();
         }
-         return $this->json([
-            'success' => true,
-            'product' => $result
+
+        return $this->render('ciceksepeti/batch_listings.html.twig', [
+            'batchData' => $batchData,
+            'errorMessage' => $errorMessage,
+            'directory' => $directory,
+            'success' => ($errorMessage === null)
         ]);
     }
 

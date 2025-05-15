@@ -14,219 +14,116 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Batch Verileri</h5>
-                        <button id="refreshBtn" class="btn btn-sm btn-light">
-                            <i class="fas fa-sync-alt me-1"></i> Yenile
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <!-- Yükleniyor göstergesi -->
-                        <div id="loadingIndicator" class="text-center my-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Yükleniyor...</span>
-                            </div>
-                            <p class="mt-3">Batch bilgileri yükleniyor...</p>
-                        </div>
-
-                        <!-- Sonuçlar burada gösterilecek -->
-                        <div id="resultsContainer" class="d-none">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <thead class="table-light">
+        {% if errorMessage %}
+            <div class="alert alert-danger">
+                <div class="text-center py-4">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h4>Hata</h4>
+                    <p>{{ errorMessage }}</p>
+                </div>
+            </div>
+        {% elseif batchData is empty %}
+            <div class="alert alert-warning">
+                <div class="text-center py-4">
+                    <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                    <h4>Batch verisi bulunamadı</h4>
+                    <p>Henüz oluşturulmuş bir batch bulunmuyor.</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Batch Verileri ({{ batchData|length }} adet)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Batch ID</th>
+                                <th>Ana Ürün Kodu</th>
+                                <th>IWASKU</th>
+                                <th>Oluşturma Tarihi</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for batch in batchData %}
+                                {% for item in batch %}
                                     <tr>
-                                        <th>Batch ID</th>
-                                        <th>Ana Ürün Kodu</th>
-                                        <th>IWASKU</th>
-                                        <th>Oluşturma Tarihi</th>
-                                        <th>Durum</th>
-                                        <th>İşlemler</th>
+                                        <td>{{ item.batchId|default('-') }}</td>
+                                        <td>{{ item.mainProduct|default('-') }}</td>
+                                        <td>{{ item.iwasku|default('-') }}</td>
+                                        <td>
+                                            {% if item.createdDate is defined and item.createdDate %}
+                                                {{ item.createdDate|date('d.m.Y H:i') }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item.status == 'Success' %}
+                                                <span class="badge bg-success">{{ item.status }}</span>
+                                            {% elseif item.status == 'Failed' %}
+                                                <span class="badge bg-danger">{{ item.status }}</span>
+                                            {% elseif item.status == 'Processing' %}
+                                                <span class="badge bg-primary">{{ item.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ item.status|default('Bilinmiyor') }}</span>
+                                            {% endif %}
+
+                                            {% if item.failureReasons is defined and item.failureReasons is not empty %}
+                                                {% for reason in item.failureReasons %}
+                                                    <div class="text-danger small">{{ reason.message }} ({{ reason.code }})</div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary update-batch-btn"
+                                                    data-batch-id="{{ item.batchId|default('') }}"
+                                                    data-main-product="{{ item.mainProduct|default('') }}"
+                                                    data-iwasku="{{ item.iwasku|default('') }}">
+                                                <i class="fas fa-sync-alt me-1"></i> Güncelle
+                                            </button>
+                                        </td>
                                     </tr>
-                                    </thead>
-                                    <tbody id="batchTableBody">
-                                    <!-- Batch verileri JavaScript ile buraya eklenecek -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Hata mesajı -->
-                        <div id="errorMessage" class="alert alert-danger d-none"></div>
-
-                        <!-- Veri yok mesajı -->
-                        <div id="noDataMessage" class="alert alert-warning d-none">
-                            <div class="text-center py-4">
-                                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-                                <h4>Batch verisi bulunamadı</h4>
-                                <p>Henüz oluşturulmuş bir batch bulunmuyor.</p>
-                            </div>
-                        </div>
+                                {% endfor %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </div>
 {% endblock %}
 
 {% block body_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Sayfa yüklendiğinde verileri getir
-            fetchBatchData();
+            // Güncelleme butonlarına tıklandığında
+            document.querySelectorAll('.update-batch-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const batchId = this.getAttribute('data-batch-id');
+                    const mainProduct = this.getAttribute('data-main-product');
+                    const iwasku = this.getAttribute('data-iwasku');
 
-            // Yenile butonuna tıklandığında verileri yeniden getir
-            document.getElementById('refreshBtn').addEventListener('click', function() {
-                fetchBatchData();
-            });
-
-            // Batch verilerini API'den getiren fonksiyon
-            function fetchBatchData() {
-                // UI elemanlarını al
-                const loadingIndicator = document.getElementById('loadingIndicator');
-                const resultsContainer = document.getElementById('resultsContainer');
-                const errorMessage = document.getElementById('errorMessage');
-                const noDataMessage = document.getElementById('noDataMessage');
-                const tableBody = document.getElementById('batchTableBody');
-
-                // Önce tüm mesajları gizle
-                loadingIndicator.classList.remove('d-none');
-                resultsContainer.classList.add('d-none');
-                errorMessage.classList.add('d-none');
-                noDataMessage.classList.add('d-none');
-
-                // API isteği gönder
-                fetch('/listing/batch-ids')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Ağ hatası: ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Batch ID Verileri:', data);
-                        loadingIndicator.classList.add('d-none');
-
-                        // Başarısız cevap kontrolü
-                        if (!data.success) {
-                            errorMessage.textContent = data.message || 'Veriler alınırken bir hata oluştu.';
-                            errorMessage.classList.remove('d-none');
-                            return;
-                        }
-
-                        // Veri var mı kontrolü
-                        if (!data.product || data.product.length === 0) {
-                            noDataMessage.classList.remove('d-none');
-                            return;
-                        }
-
-                        // Veriler geldi, tabloya ekle
-                        displayBatchData(data.product);
-                    })
-                    .catch(error => {
-                        console.error('Hata:', error);
-                        loadingIndicator.classList.add('d-none');
-                        errorMessage.textContent = 'Hata oluştu: ' + error.message;
-                        errorMessage.classList.remove('d-none');
-                    });
-            }
-
-            // Batch verilerini tabloya ekleyen fonksiyon
-            function displayBatchData(batches) {
-                const tableBody = document.getElementById('batchTableBody');
-                tableBody.innerHTML = ''; // Tabloyu temizle
-
-                // Düzleştirilmiş veri dizisi oluştur
-                let allItems = [];
-
-                // İç içe batch dizilerini düzleştir
-                batches.forEach(batch => {
-                    if (Array.isArray(batch)) {
-                        batch.forEach(item => {
-                            if (item && typeof item === 'object') {
-                                allItems.push(item);
-                            }
-                        });
-                    }
-                });
-
-                // Veri yoksa mesaj göster
-                if (allItems.length === 0) {
-                    document.getElementById('noDataMessage').classList.remove('d-none');
-                    return;
-                }
-
-                // Sonuçları göster
-                document.getElementById('resultsContainer').classList.remove('d-none');
-
-                // Her bir öğe için tablo satırı oluştur
-                allItems.forEach(item => {
-                    let errorMessages = '';
-                    if (Array.isArray(item.failureReasons) && item.failureReasons.length > 0) {
-                        errorMessages = item.failureReasons.map(reason =>
-                            `<div class="text-danger small">${reason.message || ''} (${reason.code || ''})</div>`
-                        ).join('');
+                    if (!batchId) {
+                        alert('Batch ID bilgisi eksik!');
+                        return;
                     }
 
-                    // Durum badge rengi
-                    let statusClass = 'bg-secondary';
-                    if (item.status === 'Success') statusClass = 'bg-success';
-                    else if (item.status === 'Failed') statusClass = 'bg-danger';
-                    else if (item.status === 'Processing') statusClass = 'bg-primary';
+                    if (!confirm(`"${mainProduct}" - "${iwasku}" ürününü güncellemek istediğinizden emin misiniz?`)) {
+                        return;
+                    }
 
-                    // Yeni satır oluştur
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.batchId || '-'}</td>
-                        <td>${item.mainProduct || '-'}</td>
-                        <td>${item.iwasku || '-'}</td>
-                        <td>${formatDate(item.createdDate)}</td>
-                        <td>
-                            <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
-                            ${errorMessages}
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary update-batch-btn"
-                                    data-batch-id="${item.batchId || ''}"
-                                    data-main-product="${item.mainProduct || ''}"
-                                    data-iwasku="${item.iwasku || ''}">
-                                <i class="fas fa-sync-alt me-1"></i> Güncelle
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                    // Butonun eski durumunu sakla
+                    const originalText = this.innerHTML;
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Güncelleniyor...';
 
-                // Güncelleme butonlarına tıklandığında
-                document.querySelectorAll('.update-batch-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const batchId = this.getAttribute('data-batch-id');
-                        const mainProduct = this.getAttribute('data-main-product');
-                        const iwasku = this.getAttribute('data-iwasku');
-                        updateBatchItem(batchId, mainProduct, iwasku);
-                    });
-                });
-            }
-
-            // Batch öğesini güncelleme fonksiyonu
-            function updateBatchItem(batchId, mainProduct, iwasku) {
-                if (!batchId) {
-                    alert('Batch ID bilgisi eksik!');
-                    return;
-                }
-
-                if (!confirm(`"${mainProduct}" - "${iwasku}" ürününü güncellemek istediğinizden emin misiniz?`)) {
-                    return;
-                }
-
-                const btn = document.querySelector(`.update-batch-btn[data-batch-id="${batchId}"][data-iwasku="${iwasku}"]`);
-                if (btn) {
-                    const originalText = btn.innerHTML;
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Güncelleniyor...';
-
+                    // API isteği gönder
                     fetch(`/api/update-batch/${batchId}`, {
                         method: 'POST',
                         headers: {
@@ -240,49 +137,38 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            showToast(`"${iwasku}" başarıyla güncellendi.`, 'success');
-                            // Verileri yenile
-                            setTimeout(() => {
-                                fetchBatchData();
-                            }, 1000);
+                            if (data.success) {
+                                showToast(`"${iwasku}" başarıyla güncellendi.`, 'success');
+                                // Sayfayı yenile
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                showToast(data.message || 'Güncelleme sırasında hata oluştu.', 'danger');
+                                // Butonu eski haline getir
+                                this.disabled = false;
+                                this.innerHTML = originalText;
+                            }
                         })
                         .catch(error => {
                             console.error('Güncelleme hatası:', error);
-                            showToast(`Güncelleme sırasında hata oluştu: ${error.message}`, 'danger');
-
-                            if (btn) {
-                                btn.disabled = false;
-                                btn.innerHTML = originalText;
-                            }
+                            showToast(`Bağlantı hatası: ${error.message}`, 'danger');
+                            // Butonu eski haline getir
+                            this.disabled = false;
+                            this.innerHTML = originalText;
                         });
-                }
-            }
-
-            // Tarih biçimlendirme fonksiyonu
-            function formatDate(dateString) {
-                if (!dateString) return '-';
-
-                try {
-                    const date = new Date(dateString);
-                    return date.toLocaleString('tr-TR', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                } catch (e) {
-                    return dateString;
-                }
-            }
+                });
+            });
 
             // Toast bildirim fonksiyonu
             function showToast(message, type = 'info') {
+                // Mevcut bildirimi kaldır
                 const existingToast = document.querySelector('.toast-notification');
                 if (existingToast) {
                     existingToast.remove();
                 }
 
+                // Yeni bildirim oluştur
                 const toast = document.createElement('div');
                 toast.className = `toast-notification alert alert-${type}`;
                 toast.style.position = 'fixed';
@@ -292,8 +178,10 @@
                 toast.style.minWidth = '250px';
                 toast.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
                 toast.innerHTML = message;
+
                 document.body.appendChild(toast);
 
+                // 3 saniye sonra kaldır
                 setTimeout(() => {
                     toast.remove();
                 }, 3000);
@@ -305,11 +193,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
         .toast-notification {
             position: fixed;
             bottom: 20px;
