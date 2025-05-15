@@ -39,7 +39,7 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $marketplace = Marketplace::getById(265384);
-        print_r($marketplace->getCurreny());
+        print_r($marketplace->getCurrency());
         return Command::SUCCESS;
     }
 
