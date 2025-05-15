@@ -819,28 +819,28 @@
                     })
                 })
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP hata: ${response.status}`);
-                        }
-                        return response.json();
+                        return response.json().then(data => {
+                            if (!response.ok) {
+                                throw new Error(data.message || `HTTP hata: ${response.status}`);
+                            }
+                            return data;
+                        }).catch(error => {
+                            if (error instanceof SyntaxError) {
+                                throw new Error(`JSON parse hatası: ${error.message}`);
+                            }
+                            throw error;
+                        });
                     })
                     .then(data => {
-                        // Yükleme göstergesini gizle
                         document.getElementById('batchResponseLoader').classList.add('d-none');
 
                         if (data.success) {
-                            // JSON görünümünü göster
                             document.getElementById('batchResponseContainer').classList.remove('d-none');
-
-                            // JSON'u formatlama ve gösterme
                             const jsonData = data.response || {};
                             const formattedJson = syntaxHighlight(JSON.stringify(jsonData, null, 2));
                             document.getElementById('jsonContent').innerHTML = formattedJson;
-
-                            // JSON genişlet/daralt düğmeleri
                             setupJsonViewerButtons(jsonData);
                         } else {
-                            // Hata mesajını göster
                             document.getElementById('batchResponseError').classList.remove('d-none');
                             document.getElementById('batchResponseErrorMessage').textContent =
                                 data.message || 'Batch bilgileri alınamadı.';
