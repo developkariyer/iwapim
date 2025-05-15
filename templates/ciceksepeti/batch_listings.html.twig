@@ -6,91 +6,274 @@
     <title>Çiçeksepeti Batch Listesi</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #0ea5e9;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --border-radius: 0.5rem;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
         body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-            padding-top: 20px;
-            padding-bottom: 40px;
+            background-color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: var(--dark-color);
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
-        .header-container {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 15px 0;
-            margin-bottom: 30px;
-        }
+
         .card {
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
         }
-        .card-header {
-            border-radius: 10px 10px 0 0 !important;
-            font-weight: bold;
+
+        .header-card {
+            background-color: white;
         }
-        .toast-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 250px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .table-container {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .status-badge {
-            font-size: 0.85rem;
-            font-weight: normal;
-            padding: 0.35em 0.65em;
-        }
+
         .btn-back {
-            text-decoration: none;
-            padding: 6px 16px;
-            border-radius: 4px;
+            color: var(--secondary-color);
             display: inline-flex;
             align-items: center;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+        }
+
+        .btn-back:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+            border-bottom: none;
+        }
+
+        .btn-refresh {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             transition: all 0.2s;
         }
-        .btn-back:hover {
-            background-color: #e9ecef;
+
+        .btn-refresh:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--primary-color);
         }
-        .batch-items-container {
-            padding: 0.5rem;
-            border-top: 1px solid #dee2e6;
-            border-bottom: 1px solid #dee2e6;
+
+        .table {
+            margin-bottom: 0;
         }
+
+        .table thead th {
+            background-color: #f8fafc;
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
         .batch-row {
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.15s;
         }
+
         .batch-row:hover {
-            background-color: rgba(0,0,0,0.02);
+            background-color: rgba(79, 70, 229, 0.04);
         }
+
         .batch-row.active {
-            background-color: rgba(13, 110, 253, 0.08);
+            background-color: rgba(79, 70, 229, 0.08);
         }
+
+        .batch-row td {
+            vertical-align: middle;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
         .toggle-items {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s;
+            border-radius: 50%;
+            transition: all 0.2s;
+            background-color: #f1f5f9;
+            color: var(--secondary-color);
+            border: 1px solid #e2e8f0;
         }
+
+        .toggle-items:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
         .toggle-items.open {
             transform: rotate(180deg);
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
-        .batch-items-row {
-            background-color: #f8f9fa;
+
+        .batch-id {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .batch-items-container {
+            background-color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+            font-size: 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .badge.bg-success {
+            background-color: var(--success-color) !important;
+        }
+
+        .badge.bg-danger {
+            background-color: var(--danger-color) !important;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--info-color) !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .update-all-btn {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .update-all-btn:hover {
+            background-color: #4338ca;
+            border-color: #4338ca;
+        }
+
+        .batch-items-row td {
+            padding: 0 !important;
+        }
+
+        .detail-table {
+            margin-bottom: 0;
+        }
+
+        .detail-table thead th {
+            background-color: #e2e8f0;
+            color: var(--secondary-color);
+            font-size: 0.8125rem;
+            padding: 0.625rem 1rem;
+            font-weight: 600;
+        }
+
+        .detail-table tbody td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            min-width: 300px;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            font-weight: 500;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            border-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .empty-state, .error-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .empty-icon, .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-icon {
+            color: #cbd5e1;
+        }
+
+        .error-icon {
+            color: var(--danger-color);
+        }
+
+        .empty-title, .error-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-message, .error-message {
+            color: var(--secondary-color);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .d-flex.gap-2 {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
@@ -99,10 +282,10 @@
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
+            <div class="card header-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="h2 mb-0">Çiçeksepeti Batch Listesi</h1>
+                        <h1 class="h3 mb-0 fw-bold">Çiçeksepeti Batch Listesi</h1>
                         <a href="/ciceksepeti" class="btn-back">
                             <i class="fas fa-arrow-left me-2"></i>Geri Dön
                         </a>
@@ -116,11 +299,11 @@
     {% if errorMessage is defined and errorMessage %}
         <div class="row">
             <div class="col-12">
-                <div class="alert alert-danger">
-                    <div class="text-center py-4">
-                        <i class="fas fa-exclamation-triangle fa-3x mb-3" aria-hidden="true"></i>
-                        <h4>Hata</h4>
-                        <p>{{ errorMessage }}</p>
+                <div class="card">
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle error-icon" aria-hidden="true"></i>
+                        <h4 class="error-title">Hata</h4>
+                        <p class="error-message">{{ errorMessage }}</p>
                     </div>
                 </div>
             </div>
@@ -131,11 +314,11 @@
     {% if (errorMessage is not defined or not errorMessage) and (batchData is not defined or batchData is empty) %}
         <div class="row">
             <div class="col-12">
-                <div class="alert alert-warning">
-                    <div class="text-center py-4">
-                        <i class="fas fa-exclamation-circle fa-3x mb-3" aria-hidden="true"></i>
-                        <h4>Batch verisi bulunamadı</h4>
-                        <p>Henüz oluşturulmuş bir batch bulunmuyor.</p>
+                <div class="card">
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list empty-icon" aria-hidden="true"></i>
+                        <h4 class="empty-title">Batch verisi bulunamadı</h4>
+                        <p class="empty-message">Henüz oluşturulmuş bir batch bulunmuyor.</p>
                     </div>
                 </div>
             </div>
@@ -147,23 +330,29 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Batch Verileri {% if batchData|length %} ({{ batchData|length }} adet) {% endif %}</h5>
-                        <button id="refreshBtn" class="btn btn-sm btn-light" aria-label="Listeyi yenile">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-layer-group me-2"></i>
+                            <span>Batch Verileri</span>
+                            {% if batchData|length %}
+                                <span class="badge bg-light text-dark ms-2">{{ batchData|length }} adet</span>
+                            {% endif %}
+                        </div>
+                        <button id="refreshBtn" class="btn btn-sm btn-refresh" aria-label="Listeyi yenile">
                             <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Yenile
                         </button>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0" id="batchTable">
-                                <thead class="table-light">
+                                <thead>
                                 <tr>
-                                    <th width="40" class="px-3 py-3"></th>
-                                    <th scope="col" class="px-3 py-3">Batch ID</th>
-                                    <th scope="col" class="px-3 py-3">Ana Ürün Kodu</th>
-                                    <th scope="col" class="px-3 py-3">Oluşturma Tarihi</th>
-                                    <th scope="col" class="px-3 py-3">Durum</th>
-                                    <th scope="col" class="px-3 py-3">Güncelle</th>
+                                    <th width="50" class="text-center"></th>
+                                    <th>Batch ID</th>
+                                    <th>Ana Ürün Kodu</th>
+                                    <th>Oluşturma Tarihi</th>
+                                    <th>Durum</th>
+                                    <th width="120">İşlemler</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -200,28 +389,39 @@
                                     {% endfor %}
                                 {% endfor %}
 
-                                {# Gruplandırılmış veriyi göster #}
+                                {# Tarihe göre sırala (yeniden eskiye) #}
+                                {% set sortedBatches = [] %}
                                 {% for batchId, batchGroup in groupedBatches %}
-                                    <tr class="batch-row" data-batch-id="{{ batchId }}">
-                                        <td class="px-3 py-3 text-center">
-                                            <button class="btn btn-sm btn-outline-secondary toggle-items"
-                                                    data-batch-id="{{ batchId }}"
+                                    {% set sortedBatches = sortedBatches|merge([batchGroup]) %}
+                                {% endfor %}
+
+                                {% set sortedBatches = sortedBatches|sort((a, b) => b.createdDate|date('U') <=> a.createdDate|date('U')) %}
+
+                                {# Gruplandırılmış ve sıralanmış veriyi göster #}
+                                {% for batchGroup in sortedBatches %}
+                                    <tr class="batch-row" data-batch-id="{{ batchGroup.batchId }}">
+                                        <td class="text-center">
+                                            <button class="toggle-items btn btn-sm"
+                                                    data-batch-id="{{ batchGroup.batchId }}"
                                                     aria-expanded="false"
-                                                    aria-controls="batch-items-{{ batchId }}"
+                                                    aria-controls="batch-items-{{ batchGroup.batchId }}"
                                                     aria-label="Batch detaylarını göster/gizle">
                                                 <i class="fas fa-chevron-down"></i>
                                             </button>
                                         </td>
-                                        <td class="px-3 py-3 fw-bold">{{ batchId }}</td>
-                                        <td class="px-3 py-3">{{ batchGroup.mainProduct }}</td>
-                                        <td class="px-3 py-3">
+                                        <td class="batch-id">{{ batchGroup.batchId }}</td>
+                                        <td>{{ batchGroup.mainProduct }}</td>
+                                        <td>
                                             {% if batchGroup.createdDate %}
-                                                {{ batchGroup.createdDate|date('d.m.Y H:i') }}
+                                                <span class="text-secondary">
+                                                        <i class="far fa-calendar-alt me-1"></i>
+                                                        {{ batchGroup.createdDate|date('d.m.Y H:i') }}
+                                                    </span>
                                             {% else %}
                                                 -
                                             {% endif %}
                                         </td>
-                                        <td class="px-3 py-3">
+                                        <td>
                                             {% set totalItems = batchGroup.items|length %}
                                             {% set successCount = 0 %}
                                             {% set failedCount = 0 %}
@@ -237,60 +437,83 @@
                                                 {% endif %}
                                             {% endfor %}
 
-                                            <div class="d-flex gap-2 align-items-center">
+                                            <div class="d-flex gap-2 align-items-center flex-wrap">
                                                 {% if successCount > 0 %}
-                                                    <span class="badge bg-success">{{ successCount }} Başarılı</span>
+                                                    <span class="badge bg-success">
+                                                            <i class="fas fa-check-circle me-1"></i>
+                                                            {{ successCount }} Başarılı
+                                                        </span>
                                                 {% endif %}
 
                                                 {% if failedCount > 0 %}
-                                                    <span class="badge bg-danger">{{ failedCount }} Başarısız</span>
+                                                    <span class="badge bg-danger">
+                                                            <i class="fas fa-times-circle me-1"></i>
+                                                            {{ failedCount }} Başarısız
+                                                        </span>
                                                 {% endif %}
 
                                                 {% if processingCount > 0 %}
-                                                    <span class="badge bg-primary">{{ processingCount }} İşleniyor</span>
+                                                    <span class="badge bg-primary">
+                                                            <i class="fas fa-sync-alt me-1"></i>
+                                                            {{ processingCount }} İşleniyor
+                                                        </span>
                                                 {% endif %}
 
-                                                <span class="badge bg-secondary ms-2">Toplam: {{ totalItems }}</span>
+                                                <span class="badge bg-secondary">
+                                                        <i class="fas fa-tag me-1"></i>
+                                                        Toplam: {{ totalItems }}
+                                                    </span>
                                             </div>
                                         </td>
-                                        <td class="px-3 py-3">
-                                            <button class="btn btn-sm btn-primary update-all-btn ms-2"
-                                                    data-batch-id="{{ batchId }}"
-                                                    data-main-product="{{ batchGroup.mainProduct }}"
+                                        <td>
+                                            <button class="update-all-btn btn btn-sm"
+                                                    data-batch-id="{{ batchGroup.batchId }}"
                                                     aria-label="Tüm batch'i güncelle">
                                                 <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
                                             </button>
                                         </td>
                                     </tr>
-                                    <tr class="batch-items-row d-none" id="batch-items-{{ batchId }}">
-                                        <td colspan="5" class="p-0">
-                                            <div class="batch-items-container bg-light">
-                                                <table class="table table-sm mb-0">
-                                                    <thead class="table-secondary">
+                                    <tr class="batch-items-row d-none" id="batch-items-{{ batchGroup.batchId }}">
+                                        <td colspan="6" class="p-0">
+                                            <div class="batch-items-container">
+                                                <table class="table detail-table table-sm mb-0">
+                                                    <thead>
                                                     <tr>
-                                                        <th class="px-3 py-2">IWASKU</th>
-                                                        <th class="px-3 py-2">Durum</th>
+                                                        <th>IWASKU</th>
+                                                        <th>Durum</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     {% for item in batchGroup.items %}
                                                         <tr class="batch-item">
-                                                            <td class="px-3 py-2">{{ item.iwasku|default('-') }}</td>
-                                                            <td class="px-3 py-2">
+                                                            <td>{{ item.iwasku|default('-') }}</td>
+                                                            <td>
                                                                 {% if item.status == 'Success' %}
-                                                                    <span class="badge bg-success status-badge" role="status">{{ item.status }}</span>
+                                                                    <span class="badge bg-success" role="status">
+                                                                                <i class="fas fa-check-circle me-1"></i>
+                                                                                {{ item.status }}
+                                                                            </span>
                                                                 {% elseif item.status == 'Failed' %}
-                                                                    <span class="badge bg-danger status-badge" role="status">{{ item.status }}</span>
+                                                                    <span class="badge bg-danger" role="status">
+                                                                                <i class="fas fa-times-circle me-1"></i>
+                                                                                {{ item.status }}
+                                                                            </span>
                                                                 {% elseif item.status == 'Processing' %}
-                                                                    <span class="badge bg-primary status-badge" role="status">{{ item.status }}</span>
+                                                                    <span class="badge bg-primary" role="status">
+                                                                                <i class="fas fa-sync-alt me-1"></i>
+                                                                                {{ item.status }}
+                                                                            </span>
                                                                 {% else %}
-                                                                    <span class="badge bg-secondary status-badge" role="status">{{ item.status|default('Bilinmiyor') }}</span>
+                                                                    <span class="badge bg-secondary" role="status">
+                                                                                <i class="fas fa-question-circle me-1"></i>
+                                                                                {{ item.status|default('Bilinmiyor') }}
+                                                                            </span>
                                                                 {% endif %}
 
                                                                 {% if item.failureReasons is defined and item.failureReasons is not empty %}
-                                                                    <div role="alert">
+                                                                    <div role="alert" class="mt-2">
                                                                         {% for reason in item.failureReasons %}
-                                                                            <div class="text-danger small mt-1">{{ reason.message }} ({{ reason.code }})</div>
+                                                                            <div class="text-danger small">{{ reason.message }} ({{ reason.code }})</div>
                                                                         {% endfor %}
                                                                     </div>
                                                                 {% endif %}
@@ -314,7 +537,7 @@
 </div>
 
 <!-- JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -322,16 +545,26 @@
         const refreshBtn = document.getElementById('refreshBtn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', function() {
-                window.location.reload();
+                this.disabled = true;
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Yenileniyor...';
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300);
             });
         }
+
+        // Batch detaylarını aç/kapat
         document.querySelectorAll('.toggle-items').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.stopPropagation();
+
                 const batchId = this.getAttribute('data-batch-id');
                 const itemsRow = document.getElementById(`batch-items-${batchId}`);
                 const parentRow = this.closest('.batch-row');
                 const isOpen = this.classList.contains('open');
+
+                // Diğer açık satırları kapat
                 document.querySelectorAll('.batch-items-row').forEach(row => {
                     if (row.id !== `batch-items-${batchId}`) {
                         row.classList.add('d-none');
@@ -345,7 +578,7 @@
                     }
                 });
 
-                // Bu row'u toggle et
+                // Bu satırı aç/kapa
                 if (isOpen) {
                     this.classList.remove('open');
                     itemsRow.classList.add('d-none');
@@ -360,27 +593,32 @@
             });
         });
 
+        // Satıra tıklandığında detayları aç/kapat
         document.querySelectorAll('.batch-row').forEach(row => {
             row.addEventListener('click', function(e) {
-                if (e.target.closest('.toggle-items')) {
+                // Toggle butonuna veya güncelleme butonuna tıklandıysa işleme
+                if (e.target.closest('.toggle-items') || e.target.closest('.update-all-btn')) {
                     return;
                 }
+
                 const batchId = this.getAttribute('data-batch-id');
                 const toggleButton = this.querySelector(`.toggle-items[data-batch-id="${batchId}"]`);
+
                 if (toggleButton) {
                     toggleButton.click();
                 }
             });
         });
+
+        // Batch güncelleme
         document.querySelectorAll('.update-all-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation(); // Satır tıklamasını engelle
 
                 const batchId = this.getAttribute('data-batch-id');
-                const mainProduct = this.getAttribute('data-main-product');
 
                 if (!batchId) {
-                    alert('Batch ID bilgisi eksik!');
+                    showToast('Batch ID bilgisi eksik!', 'danger');
                     return;
                 }
 
@@ -398,9 +636,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        batchId: batchId,
-                        mainProduct: mainProduct,
-                        updateAll: true
+                        batchId: batchId
                     })
                 })
                     .then(response => {
@@ -429,6 +665,8 @@
                     });
             });
         });
+
+        // Toast bildirim göster
         function showToast(message, type = 'info') {
             const existingToast = document.querySelector('.toast-notification');
             if (existingToast) {
@@ -440,14 +678,20 @@
             toast.setAttribute('role', 'alert');
             toast.setAttribute('aria-live', 'assertive');
             toast.setAttribute('aria-atomic', 'true');
-            toast.style.position = 'fixed';
-            toast.style.bottom = '20px';
-            toast.style.right = '20px';
-            toast.style.zIndex = '9999';
-            toast.style.minWidth = '250px';
-            toast.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-            toast.innerHTML = message;
 
+            // İkon ekle
+            let icon = '';
+            if (type === 'success') {
+                icon = '<i class="fas fa-check-circle me-2"></i>';
+            } else if (type === 'danger') {
+                icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+            } else if (type === 'warning') {
+                icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+            } else {
+                icon = '<i class="fas fa-info-circle me-2"></i>';
+            }
+
+            toast.innerHTML = `${icon}${message}`;
             document.body.appendChild(toast);
 
             setTimeout(() => {
