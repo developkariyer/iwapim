@@ -125,12 +125,14 @@ class ListingHelperService
         foreach ($data as &$products) {
             foreach ($products as &$product) {
                 foreach ($product['skus'] as &$sku) {
-                    $sku['ListingItems'] = array_filter(
+                    $shopifyListingItems = array_filter(
                         $sku['ListingItems'] ?? [],
                         fn($v, $k) => str_starts_with($k, 'Shopify'),
                         ARRAY_FILTER_USE_BOTH
                     );
-                    if (empty($sku['ListingItems'])) {
+                    if (!empty($shopifyListingItems)) {
+                        $sku['ListingItems'] = $shopifyListingItems;
+                    } else {
                         unset($sku['ListingItems']);
                     }
                 }
@@ -139,6 +141,7 @@ class ListingHelperService
         unset($products, $product, $sku);
         return $data;
     }
+
 
     public function getPimListingsInfoN(ProductListingMessage $message): false|string
     {
