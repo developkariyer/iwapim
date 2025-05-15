@@ -125,15 +125,20 @@ class ListingHelperService
         foreach ($data as &$products) {
             foreach ($products as &$product) {
                 foreach ($product['skus'] as &$sku) {
-                    $shopifyListingItems = array_filter(
-                        $sku['ListingItems'] ?? [],
-                        fn($v, $k) => str_starts_with($k, 'Shopify'),
-                        ARRAY_FILTER_USE_BOTH
-                    );
-                    if (!empty($shopifyListingItems)) {
-                        $sku['ListingItems'] = $shopifyListingItems;
-                    } else {
-                        unset($sku['ListingItems']);
+                    if (isset($sku['ListingItems']) && is_array($sku['ListingItems'])) {
+                        $filtered = [];
+                        foreach ($sku['ListingItems'] as $item) {
+                            foreach ($item as $key => $value) {
+                                if (str_starts_with($key, 'Shopify')) {
+                                    $filtered[] = [$key => $value];
+                                }
+                            }
+                        }
+                        if (!empty($filtered)) {
+                            $sku['ListingItems'] = $filtered;
+                        } else {
+                            unset($sku['ListingItems']);
+                        }
                     }
                 }
             }
