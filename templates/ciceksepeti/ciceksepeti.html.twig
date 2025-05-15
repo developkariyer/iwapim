@@ -601,15 +601,14 @@
                 });
         });
 
-        /**
-         * Batch Verilerini Tablo Olarak Gösterme
-         * @param {Array} batches - batch verileri dizisi
-         */
         function displayBatchesTable(batches) {
-            const productListContainer = document.getElementById('productList');
-            if (!productListContainer) return;
+            console.log("displayBatchesTable çağrıldı, veriler:", batches);
 
-            console.log("Gelen batch veriler:", batches);
+            const productListContainer = document.getElementById('productList');
+            if (!productListContainer) {
+                console.error("productListContainer bulunamadı!");
+                return;
+            }
 
             if (!batches || batches.length === 0) {
                 productListContainer.innerHTML = `
@@ -626,51 +625,67 @@
                 return;
             }
 
-            productListContainer.innerHTML = `
-                <div class="col-12 mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4>Batch Verileri (${batches.length} adet)</h4>
-                        <button id="refreshBatchesBtn" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-sync-alt me-1"></i> Yenile
-                        </button>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Batch ID</th>
-                                    <th>Ana Ürün Kodu</th>
-                                    <th>IWASKU</th>
-                                    <th>Oluşturma Tarihi</th>
-                                    <th>Durum</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody id="batchTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
+            // İçeriği tamamen sil ve yeniden oluştur
+            productListContainer.innerHTML = '';
+
+            // Başlık div'i ekle
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'col-12 mb-4';
+            headerDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <h4>Batch Verileri (${batches.length} adet)</h4>
+            <button id="refreshBatchesBtn" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-sync-alt me-1"></i> Yenile
+            </button>
+        </div>
+    `;
+            productListContainer.appendChild(headerDiv);
+
+            // Tablo div'i ekle
+            const tableDiv = document.createElement('div');
+            tableDiv.className = 'col-12';
+            tableDiv.innerHTML = `
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Batch ID</th>
+                        <th>Ana Ürün Kodu</th>
+                        <th>IWASKU</th>
+                        <th>Oluşturma Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="batchTableBody"></tbody>
+            </table>
+        </div>
+    `;
+            productListContainer.appendChild(tableDiv);
+
+            // Şimdi tbody elementini al
             const tableBody = document.getElementById('batchTableBody');
             console.log("TableBody bulundu mu:", tableBody !== null);
+
             if (!tableBody) {
                 console.error("batchTableBody bulunamadı!");
                 return;
             }
+
+            // Düzleştirilmiş veri oluştur
             let allItems = [];
-            if (Array.isArray(batches)) {
-                batches.forEach(batch => {
-                    console.log("Batch türü:", typeof batch);
-                    if (Array.isArray(batch)) {
-                        allItems = allItems.concat(batch);
-                    } else if (batch && typeof batch === 'object') {
-                        allItems.push(batch);
-                    }
-                });
-            }
+
+            batches.forEach(batch => {
+                console.log("İşlenen batch:", batch);
+                if (Array.isArray(batch)) {
+                    console.log("   Batch bir dizi, eleman sayısı:", batch.length);
+                    allItems = allItems.concat(batch);
+                } else if (batch && typeof batch === 'object') {
+                    console.log("   Batch bir nesne");
+                    allItems.push(batch);
+                }
+            });
+
             console.log("Düzleştirilmiş öğe sayısı:", allItems.length);
 
             if (allItems.length === 0) {
@@ -686,9 +701,12 @@
         `;
                 return;
             }
-            let tableContent = '';
+
+            // Her öğe için tablo satırı oluştur
             allItems.forEach(item => {
-                console.log("İşlenen öğe:", item);
+                console.log("Tablo satırı oluşturuluyor:", item);
+
+                const row = document.createElement('tr');
 
                 let errorMessages = '';
                 if (Array.isArray(item.failureReasons) && item.failureReasons.length > 0) {
@@ -702,38 +720,39 @@
                 else if (item.status === 'Failed') statusClass = 'bg-danger';
                 else if (item.status === 'Processing') statusClass = 'bg-primary';
 
-                tableContent += `
-            <tr>
-                <td>${item.batchId || '-'}</td>
-                <td>${item.mainProduct || '-'}</td>
-                <td>${item.iwasku || '-'}</td>
-                <td>${formatDate(item.createdDate)}</td>
-                <td>
-                    <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
-                    ${errorMessages}
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-primary update-batch-btn"
-                            data-batch-id="${item.batchId || ''}"
-                            data-main-product="${item.mainProduct || ''}"
-                            data-iwasku="${item.iwasku || ''}">
-                        <i class="fas fa-sync-alt me-1"></i> Güncelle
-                    </button>
-                </td>
-            </tr>
+                row.innerHTML = `
+            <td>${item.batchId || '-'}</td>
+            <td>${item.mainProduct || '-'}</td>
+            <td>${item.iwasku || '-'}</td>
+            <td>${formatDate(item.createdDate)}</td>
+            <td>
+                <span class="badge ${statusClass}">${item.status || 'Bilinmiyor'}</span>
+                ${errorMessages}
+            </td>
+            <td>
+                <button class="btn btn-sm btn-primary update-batch-btn"
+                        data-batch-id="${item.batchId || ''}"
+                        data-main-product="${item.mainProduct || ''}"
+                        data-iwasku="${item.iwasku || ''}">
+                    <i class="fas fa-sync-alt me-1"></i> Güncelle
+                </button>
+            </td>
         `;
+
+                tableBody.appendChild(row);
             });
-            tableBody.innerHTML = tableContent;
+
+            // Yenileme butonuna event listener ekle
             document.getElementById('refreshBatchesBtn').addEventListener('click', function() {
                 document.getElementById('checkListingBtn').click();
             });
 
+            // Güncelleme butonlarına event listener ekle
             document.querySelectorAll('.update-batch-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const batchId = this.getAttribute('data-batch-id');
                     const mainProduct = this.getAttribute('data-main-product');
                     const iwasku = this.getAttribute('data-iwasku');
-
                     updateBatchItem(batchId, mainProduct, iwasku);
                 });
             });
