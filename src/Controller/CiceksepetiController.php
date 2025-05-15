@@ -110,7 +110,7 @@ class CiceksepetiController extends FrontendController
                         $json = json_decode($content, true);
 
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            continue; // Geçersiz JSON, bu dosyayı atla
+                            continue;
                         }
 
                         $extractedData = $this->extractBatchIdData($json);
@@ -127,8 +127,6 @@ class CiceksepetiController extends FrontendController
         return $this->render('ciceksepeti/batch_listings.html.twig', [
             'batchData' => $batchData,
             'errorMessage' => $errorMessage,
-            'pageTitle' => 'Çiçeksepeti Batch Listesi',
-            'simpleLayout' => true // Basit düzen için bir bayrak
         ]);
     }
 
