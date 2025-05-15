@@ -128,7 +128,7 @@ class ListingHelperService
                 $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $currency, $marketplaceCurrency);
             }
             $images = array_merge($images, $this->getImages($listingItem));
-            $result['items'][$marketplaceKey][] = [
+            $result['items'][$marketplaceKey] = [
                 'title' => $title,
                 'salePrice' => $listingSalePrice,
                 'currency' => $currency,
@@ -136,6 +136,9 @@ class ListingHelperService
                 'seo' => $parentApiJson['seo']['description'] ?? '',
                 'tags' => $parentApiJson['tags'] ?? ''
             ];
+        }
+        if (!isset($result['items'])) {
+            $result['items'] = [];
         }
         $result['price'] = $marketplaceSalePrice;
         $result['images'] = $images;
