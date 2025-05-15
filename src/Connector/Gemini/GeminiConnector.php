@@ -9,10 +9,6 @@ use Symfony\Component\HttpClient\HttpClient;
  * */
 class GeminiConnector
 {
-    /*
-     * Ciceksepeti chat
-     * TODO global chat all marketplaces (not priority)
-     * */
     public static function chat($message, $model='gemini-2.5-flash-preview-04-17', $maxRetries = 3, $initialDelay  = 30)
     {
         $geminiApiKey = $_ENV['GEMINI_API_KEY'];
