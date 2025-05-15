@@ -109,6 +109,7 @@ class ListingHelperService
         $foundSameCurrency = false;
         $result = [];
         $images = [];
+        $items = [];
         foreach ($listingItem as $listingItem) {
             if (!$listingItem instanceof VariantProduct) {
                 continue;
@@ -128,7 +129,7 @@ class ListingHelperService
                 $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $currency, $marketplaceCurrency);
             }
             $images = array_merge($images, $this->getImages($listingItem));
-            $result['items'][$marketplaceKey][] = [
+            $items[$marketplaceKey][] = [
                 'title' => $title,
                 'salePrice' => $listingSalePrice,
                 'currency' => $currency,
@@ -137,11 +138,9 @@ class ListingHelperService
                 'tags' => $parentApiJson['tags'] ?? ''
             ];
         }
-        if (!isset($result['items'])) {
-            $result['items'] = [];
-        }
         $result['price'] = $marketplaceSalePrice;
         $result['images'] = $images;
+        $result['items'] = $items;
         return $result;
 //        $title = $listingItem->getTitle();
 //        if (strpos(ltrim($title), '🎁') === 0) {
