@@ -52,8 +52,7 @@ class GeminiConnector
         $url = "https://generativelanguage.googleapis.com/v1beta/models/" . $model . ":generateContent?key=" . $geminiApiKey;
         $generationConfig = match ($platform) {
             'ciceksepeti' => self::$ciceksepetiGenerationConfig,
-            'default'     => [],
-            default       => [],
+            default       => null,
         };
         $payload = [
             'headers' => ['Content-Type' => 'application/json'],
