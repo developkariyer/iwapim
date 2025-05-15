@@ -129,7 +129,7 @@ class ListingHelperService
                 $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $currency, $marketplaceCurrency);
             }
             $images = array_merge($images, $this->getImages($listingItem));
-            $items[$marketplaceKey][] = [
+            $items[$marketplaceKey] = [
                 'title' => $title,
                 'salePrice' => $listingSalePrice,
                 'currency' => $currency,
