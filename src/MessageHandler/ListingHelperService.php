@@ -86,11 +86,13 @@ class ListingHelperService
             $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
             $listingSalePrice = $listingItem->getSalePrice();
             $currency = $listingItem->getSaleCurrency();
-            if (!$foundSameCurrency && $this->normalizeCurrency($currency) === $this->normalizeCurrency($marketplaceCurrency)) {
+            $normalizedCurrency = $this->normalizeCurrency($currency);
+            $normalizedMarketplaceCurrency = $this->normalizeCurrency($marketplaceCurrency);
+            if (!$foundSameCurrency && $normalizedCurrency === $normalizedMarketplaceCurrency) {
                 $marketplaceSalePrice = $listingSalePrice;
                 $foundSameCurrency = true;
             } elseif (!$foundSameCurrency && $marketplaceSalePrice === null) {
-                $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $currency, $marketplaceCurrency);
+                $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $normalizedCurrency, $normalizedMarketplaceCurrency);
             }
             echo "Sale Price: " . $listingSalePrice . " Currency: " . $currency . " Marketplace Sale Price: " . $marketplaceSalePrice . "\n";
             $images = array_merge($images, $this->getImages($listingItem));
