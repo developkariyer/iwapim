@@ -251,6 +251,12 @@
 
                                                 <span class="badge bg-secondary ms-2">Toplam: {{ totalItems }}</span>
                                             </div>
+                                            <button class="btn btn-sm btn-primary update-all-btn ms-2"
+                                                    data-batch-id="{{ batchId }}"
+                                                    data-main-product="{{ batchGroup.mainProduct }}"
+                                                    aria-label="Tüm batch'i güncelle">
+                                                <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
+                                            </button>
                                         </td>
                                     </tr>
                                     <tr class="batch-items-row d-none" id="batch-items-{{ batchId }}">
@@ -286,15 +292,6 @@
                                                                         {% endfor %}
                                                                     </div>
                                                                 {% endif %}
-                                                            </td>
-                                                            <td class="px-3 py-2">
-                                                                <button class="btn btn-sm btn-primary update-batch-btn"
-                                                                        data-batch-id="{{ item.batchId|default('') }}"
-                                                                        data-main-product="{{ item.mainProduct|default('') }}"
-                                                                        data-iwasku="{{ item.iwasku|default('') }}"
-                                                                        aria-label="{{ item.mainProduct|default('-') }} - {{ item.iwasku|default('-') }} ürününü güncelle">
-                                                                    <i class="fas fa-sync-alt me-1" aria-hidden="true"></i> Güncelle
-                                                                </button>
                                                             </td>
                                                         </tr>
                                                     {% endfor %}
@@ -373,18 +370,19 @@
                 }
             });
         });
-        document.querySelectorAll('.update-batch-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+        document.querySelectorAll('.update-all-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Satır tıklamasını engelle
+
                 const batchId = this.getAttribute('data-batch-id');
                 const mainProduct = this.getAttribute('data-main-product');
-                const iwasku = this.getAttribute('data-iwasku');
 
                 if (!batchId) {
                     alert('Batch ID bilgisi eksik!');
                     return;
                 }
 
-                if (!confirm(`"${mainProduct}" - "${iwasku}" ürününü güncellemek istediğinizden emin misiniz?`)) {
+                if (!confirm(`"${batchId}" batch ID'li tüm ürünleri güncellemek istediğinizden emin misiniz?`)) {
                     return;
                 }
 
@@ -400,7 +398,7 @@
                     body: JSON.stringify({
                         batchId: batchId,
                         mainProduct: mainProduct,
-                        iwasku: iwasku
+                        updateAll: true
                     })
                 })
                     .then(response => {
@@ -411,7 +409,7 @@
                     })
                     .then(data => {
                         if (data.success) {
-                            showToast(`"${iwasku}" başarıyla güncellendi.`, 'success');
+                            showToast(`"${batchId}" ID'li batch başarıyla güncellendi.`, 'success');
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1000);
