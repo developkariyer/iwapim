@@ -88,6 +88,7 @@ class CiceksepetiController extends FrontendController
      */
     public function batchListingsPage(): Response
     {
+        // Yeni bağımsız şablona doğrudan render yapıyoruz (extends kullanmıyoruz)
         $directory = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/Ciceksepeti";
         $batchData = [];
         $errorMessage = null;
@@ -110,7 +111,7 @@ class CiceksepetiController extends FrontendController
                         $json = json_decode($content, true);
 
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            continue;
+                            continue; // Geçersiz JSON, bu dosyayı atla
                         }
 
                         $extractedData = $this->extractBatchIdData($json);
@@ -124,10 +125,11 @@ class CiceksepetiController extends FrontendController
             $errorMessage = "Hata oluştu: " . $e->getMessage();
         }
 
+        $response = new Response();
         return $this->render('ciceksepeti/batch_listings.html.twig', [
             'batchData' => $batchData,
-            'errorMessage' => $errorMessage,
-        ]);
+            'errorMessage' => $errorMessage
+        ], $response);
     }
 
     private function extractBatchIdData($json)
