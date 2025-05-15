@@ -37,7 +37,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        print_r(GeminiConnector::chat("Test Message: Hello World!"));
+        $result = GeminiConnector::chat("Test Message: Hello World!");
+        print_r($result);
         return Command::SUCCESS;
     }
 
