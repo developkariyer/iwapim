@@ -39,6 +39,88 @@ class ListingHelperService
 
     public function getPimListingsInfo(ProductListingMessage $message): false|string
     {
+        $marketplace = Marketplace::getById($message->getMarketplaceId());
+        if (!$marketplace instanceof Marketplace) {
+            return false;
+        }
+        $product = Product::getById($message->getProductId());
+        if (!$product instanceof Product) {
+            return false;
+        }
+        $marketplaceName = $marketplace->getMarketplaceType();
+        $variantIds = $message->getVariantIds();
+        if (empty($variantIds)) {
+            return false;
+        }
+        $productIdentifier = $product->getProductIdentifier();
+        $data = [
+            $marketplaceName => [
+                $productIdentifier => [
+                    'category' => $product->getProductCategory(),
+                    'name' => $product->getName(),
+                    'skus' => $this->processVariantProduct($variantIds)
+                ]
+            ]
+        ];
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function processVariantProduct($variantIds):array
+    {
+        $result = [];
+        foreach ($variantIds as $variantId) {
+            $variantProduct = Product::getById($variantId);
+            if (!$variantProduct instanceof Product) {
+                continue;
+            }
+            $listingItems = $variantProduct->getListingItems();
+            if (empty($listingItems)) {
+                continue;
+            }
+            $iwasku = $variantProduct->getIwasku();
+            $listingItemsData = [];
+            $images = [];
+            foreach ($listingItems as $listingItem)
+            {
+                if (!$listingItem instanceof VariantProduct) {
+                    continue;
+                }
+                $listingItemsData[] = $this->processListingItems($listingItem);
+                $images = array_merge($images, $this->getImages($listingItem));
+            }
+            $result[$iwasku] = [
+                'size' => $variantProduct->getVariationSize(),
+                'color' => $variantProduct->getVariationColor(),
+                'ean' => $variantProduct->getEanGtin(),
+                'ListingItems' => $listingItemsData,
+                'images' => $images
+            ];
+        }
+        return $result;
+    }
+
+    private function processListingItems($listingItem)
+    {
+        $title = $listingItem->getTitle();
+        if (strpos(ltrim($title), '🎁') === 0) {
+            return [];
+        }
+        $marketplaceKey = $listingItem->getMarketplace()->getKey();
+        $parentApiJson = json_decode($listingItem->jsonRead('parentResponseJson'), true);
+        return [
+            $marketplaceKey => [
+                'title' => $title,
+                'salePrice' => $listingItem->getSalePrice(),
+                'currency' => $listingItem->getSaleCurrency(),
+                'description' => $parentApiJson['descriptionHtml'] ?? '',
+                'seo' => $parentApiJson['seo']['description'] ?? '',
+                'tags' => $parentApiJson['tags'] ?? ''
+            ]
+        ];
+    }
+
+    public function getPimListingsInfoN(ProductListingMessage $message): false|string
+    {
         $data = [];
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         $marketplaceName = $marketplace->getMarketplaceType();
