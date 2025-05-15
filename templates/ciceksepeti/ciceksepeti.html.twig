@@ -61,9 +61,9 @@
                         </button>
                     </div>
                     <div class="col-6">
-                        <button type="button" class="btn btn-primary w-100" id="checkListingBtn">
-                            <i class="fas fa-search me-2"></i>Listing Kontrol
-                        </button>
+                        <a href="{{ path('ciceksepeti_batch_listings') }}" id="checkListingBtn" class="btn btn-primary">
+                            <i class="fas fa-list-ul me-2"></i>Batch Listesi
+                        </a>
                     </div>
                 </div>
                 {% if app.request.get('category') %}
@@ -567,12 +567,6 @@
 {% block body_scripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
-        document.getElementById('checkListingBtn').addEventListener('click', function() {
-            window.location.href = '/ciceksepeti/batch-listings';
-        });
-
-
-
 
         document.addEventListener('DOMContentLoaded', function() {
             // ----- MEVCUT VARYANT YÖNETİMİ İŞLEVLERİ ----- //
