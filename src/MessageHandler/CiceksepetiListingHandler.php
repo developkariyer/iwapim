@@ -248,7 +248,6 @@ class CiceksepetiListingHandler
                 - Eğer açıklama İngilizce ise, sadece doğrudan çeviri yap. Cümle yapısını, kelime sırasını ve anlamını olduğu gibi koru. Yeniden yazma, özgünleştirme, yorum ekleme yapma.
                 - "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi bir eylem yaparsan başarısız olacaksın.
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
-                - Html etiketlerini sil sadece metin olarak açıklamayı oluştur.
                 - Mağaza bilgilerini mağazayla ilgili açıklamaları sil.
                 - Çıktısı HTML olarak düzenle.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
