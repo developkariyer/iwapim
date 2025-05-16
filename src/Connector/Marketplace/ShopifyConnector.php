@@ -666,28 +666,22 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
 
     protected function getImage($listing, $mainListing)
     {
-        $lastImage = '';
+        $firstImage = '';
         $images = $mainListing['media']['nodes'] ?? [];
+        if (!empty($images) && isset($images[0]['preview']['image']['url'])) {
+            $firstImage = Utility::getCachedImage($images[0]['preview']['image']['url']);
+        }
         foreach ($images as $img) {
             $imageId = $listing['image']['id'] ?? null;
             $imgId = $img['id'] ?? null;
             if ($imageId === null || $imgId === null) {
                 continue;
             }
-            if ( basename($imgId) === basename($imageId)) {
+            if (basename($imgId) === basename($imageId)) {
                 return Utility::getCachedImage($img['preview']['image']['url'] ?? '');
             }
-
-            if (empty($lastImage)) {
-                $lastImage = Utility::getCachedImage($img['preview']['image']['url'] ?? '');
-            }
         }
-        $count = count($images);
-        if ($count >= 2) {
-            $secondLast = $images[$count - 2];
-            return Utility::getCachedImage($secondLast['preview']['image']['url'] ?? '');
-        }
-        return $lastImage;
+        return $firstImage;
     }
 
     /**
