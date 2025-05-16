@@ -138,6 +138,12 @@ class CiceksepetiListingHandler
             $httpsImages = array_map(function($image) {
                 return preg_replace('/^http:/', 'https:', $image);
             }, $product['images'] ?? []);
+            $salesPrice = $product['salesPrice'] ?? 0;
+            $attributes = $product['Attributes'] ?? null;
+            if (empty($httpsImages) || $salesPrice === 0 || $salesPrice === "0" || $attributes === null) {
+                $this->logger->error("Missing data for sku: {$sku} sales price: {$salesPrice}");
+                continue;
+            }
             $formattedData['products'][] = [
                 'productName' => $product['productName'],
                 'mainProductCode' => $product['mainProductCode'],
@@ -152,6 +158,7 @@ class CiceksepetiListingHandler
                 'Attributes' => $product['Attributes'],
             ];
         }
+
         return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
