@@ -147,7 +147,7 @@ class CiceksepetiListingHandler
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
                 'stockQuantity' => 0,
-                'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'] * 2,
+                'salesPrice' => ($product['salesPrice'] === 0 || $product['salesPrice'] === "0" || !isset($product['salesPrice'])) ? 10000 : $product['salesPrice'],
                 'images' => $httpsImages,
                 'Attributes' => $product['Attributes'],
             ];
