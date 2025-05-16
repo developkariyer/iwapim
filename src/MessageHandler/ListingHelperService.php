@@ -87,14 +87,17 @@ class ListingHelperService
             $listingSalePrice = $listingItem->getSalePrice();
             $currency = $listingItem->getSaleCurrency();
             $normalizedCurrency = $this->normalizeCurrency($currency);
-            echo "Currency: " . $currency . " Normalized Currency: " . $normalizedCurrency . "\n";
             $normalizedMarketplaceCurrency = $this->normalizeCurrency($marketplaceCurrency);
-            echo "Marketplace Currency: " . $marketplaceCurrency . " Normalized Marketplace Currency: " . $normalizedMarketplaceCurrency . "\n";
+
+            echo "[DEBUG] Raw currency: '{$currency}' Normalized: '{$normalizedCurrency}'\n";
+            echo "[DEBUG] Raw marketplace currency: '{$marketplaceCurrency}' Normalized: '{$normalizedMarketplaceCurrency}'\n";
+
             if (!$foundSameCurrency && $normalizedCurrency === $normalizedMarketplaceCurrency) {
                 $marketplaceSalePrice = $listingSalePrice;
                 $foundSameCurrency = true;
             } elseif (!$foundSameCurrency && $marketplaceSalePrice === null) {
                 $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $normalizedCurrency, $normalizedMarketplaceCurrency);
+                echo "[DEBUG] Calculated Price from {$listingSalePrice} {$normalizedCurrency} to {$normalizedMarketplaceCurrency}: " . $marketplaceSalePrice . "\n";
             }
             echo "Sale Price: " . $listingSalePrice . " Currency: " . $currency . " Marketplace Sale Price: " . $marketplaceSalePrice . "\n";
             $images = array_merge($images, $this->getImages($listingItem));
@@ -107,6 +110,7 @@ class ListingHelperService
                 'tags' => $parentApiJson['tags'] ?? ''
             ];
         }
+        echo "Last marketplace sale price: " . $marketplaceSalePrice . "\n";
         $result['price'] = $marketplaceSalePrice;
         $result['images'] = $images;
         $result['items'] = $items;
