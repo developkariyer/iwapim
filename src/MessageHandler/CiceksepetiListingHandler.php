@@ -141,7 +141,7 @@ class CiceksepetiListingHandler
             $salesPrice = $product['salesPrice'] ?? 0;
             $attributes = $product['Attributes'] ?? null;
             if (empty($httpsImages) || $salesPrice === 0 || $salesPrice === "0" || $attributes === null) {
-                $this->logger->error("Missing data for sku: {$sku} sales price: {$salesPrice}");
+                $this->logger->error("Missing data for sku: {$product['stockCode']}");
                 continue;
             }
             $formattedData['products'][] = [
