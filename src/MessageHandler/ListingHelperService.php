@@ -88,19 +88,12 @@ class ListingHelperService
             $currency = $listingItem->getSaleCurrency();
             $normalizedCurrency = $this->normalizeCurrency($currency);
             $normalizedMarketplaceCurrency = $this->normalizeCurrency($marketplaceCurrency);
-
-            echo "[DEBUG] Raw currency: '{$currency}' Normalized: '{$normalizedCurrency}'\n";
-            echo "[DEBUG] Raw marketplace currency: '{$marketplaceCurrency}' Normalized: '{$normalizedMarketplaceCurrency}'\n";
-
             if (!$foundSameCurrency && $normalizedCurrency === $normalizedMarketplaceCurrency) {
                 $marketplaceSalePrice = $listingSalePrice;
                 $foundSameCurrency = true;
             } elseif (!$foundSameCurrency && $marketplaceSalePrice === null) {
                 $marketplaceSalePrice = $this->calculatePrice($listingSalePrice, $normalizedCurrency, $normalizedMarketplaceCurrency);
-                echo "[DEBUG] Calculated Price from {$listingSalePrice} {$normalizedCurrency} to {$normalizedMarketplaceCurrency}: " . $marketplaceSalePrice . "\n";
             }
-            echo "Sale Price: " . $listingSalePrice . " Currency: " . $currency . " Marketplace Sale Price: " . $marketplaceSalePrice . "\n";
-            echo "[ITEM #" . $listingItem->getId() . "] Currency: '{$currency}' Normalized: '{$normalizedCurrency}' Sale Price: {$listingSalePrice}\n";
             $images = array_merge($images, $this->getImages($listingItem));
             $items[$marketplaceKey] = [
                 'title' => $title,
@@ -179,6 +172,9 @@ class ListingHelperService
 
     private function calculatePrice($price, $fromCurrency, $toCurrency)
     {
+        if (empty($price) || empty($fromCurrency) || empty($toCurrency)) {
+            return null;
+        }
         return Utility::convertCurrency($price, $fromCurrency, $toCurrency, date('Y-m-d'));
     }
 
