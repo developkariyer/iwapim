@@ -87,7 +87,9 @@ class ListingHelperService
             $listingSalePrice = $listingItem->getSalePrice();
             $currency = $listingItem->getSaleCurrency();
             $normalizedCurrency = $this->normalizeCurrency($currency);
+            echo "Currency: " . $currency . " Normalized Currency: " . $normalizedCurrency . "\n";
             $normalizedMarketplaceCurrency = $this->normalizeCurrency($marketplaceCurrency);
+            echo "Marketplace Currency: " . $marketplaceCurrency . " Normalized Marketplace Currency: " . $normalizedMarketplaceCurrency . "\n";
             if (!$foundSameCurrency && $normalizedCurrency === $normalizedMarketplaceCurrency) {
                 $marketplaceSalePrice = $listingSalePrice;
                 $foundSameCurrency = true;
