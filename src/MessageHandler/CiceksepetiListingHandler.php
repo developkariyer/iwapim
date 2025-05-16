@@ -243,14 +243,13 @@ class CiceksepetiListingHandler
             - **stockCode**: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir. Bu her SKU'ya özel olacak.
             - **description**: 
                 Açıklama (description) sadece ve sadece aşağıdaki şekilde oluşturulacak:
-                - Kendin açıklama uydurma.
-                - Eğer açıklama Türkçe ise, hiçbir değişiklik yapmadan kopyala link iletişim bilgilerini çıkar.
-                - Eğer açıklama İngilizce ise, sadece doğrudan çeviri yap. Cümle yapısını, kelime sırasını ve anlamını olduğu gibi koru. Yeniden yazma, özgünleştirme, yorum ekleme yapma.
-                - "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi bir eylem yaparsan başarısız olacaksın.
-                - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
-                - Mağaza bilgilerini mağazayla ilgili açıklamaları sil.
-                - Çevirideki cümle bozukluklarını cümlenin anlamını değiştirmeden düzelt.
-                - description çıktısını HTML olarak profosyonel biçimde düzenle.
+                1. Türkçe açıklama: Türkçe açıklama verisi varsa, hiçbir değişiklik yapılmadan olduğu gibi kopyalanacak ve link ya da iletişim bilgileri çıkarılacaktır.
+                2. İngilizce açıklama: İngilizce açıklama verisi varsa, yalnızca doğru ve doğrudan çeviri yapılacak. Cümle yapısı, kelime sırası ve anlam korunacaktır. Yeniden yazma, özgünleştirme, yorum ekleme gibi işlemler yapılmayacaktır.
+                3. Yasaklı işlemler: "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi işlemler yapılması halinde işlem başarısız olacaktır.
+                4. Türkçe olmayan açıklama: Eğer açıklama bulunmazsa, ürün adı (product name) ve renk bilgileri (color) yazılacaktır.
+                5. Mağaza bilgileri: Mağazaya dair herhangi bir bilgi veya açıklama silinecektir.
+                6. Çeviri düzeltmeleri: Eğer İngilizce açıklamada cümle bozukluğu varsa, bu bozukluk düzeltilerek cümle anlamı korunacaktır.
+                7. HTML formatı: Açıklama, profesyonel bir şekilde HTML formatında düzenlenecektir
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: 
                 - Her SKU için en fazla 5 adet olacak şekilde,`images` listesinden alınacaktır.
