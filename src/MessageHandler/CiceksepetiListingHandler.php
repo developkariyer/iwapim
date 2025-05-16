@@ -170,7 +170,7 @@ class CiceksepetiListingHandler
             ];
         }
 
-        return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     private function removeCommonAttributes($data): array
