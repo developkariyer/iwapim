@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(
     name: 'app:autolisting',
