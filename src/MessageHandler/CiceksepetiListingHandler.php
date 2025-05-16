@@ -358,7 +358,7 @@ class CiceksepetiListingHandler
         $normalized = str_replace(',', '.', $normalized);
         $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
         $parts = explode('x', $normalized);
-        if (count($parts) === 2) {
+        if (count($parts) >= 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
             return [
                 'width' => (int) round((float) $parts[0]),
                 'height' => (int) round((float) $parts[1]),
