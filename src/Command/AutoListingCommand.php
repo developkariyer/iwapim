@@ -73,7 +73,6 @@ class AutoListingCommand extends AbstractCommand
                 1,
                 'test'
             );
-
             $stamps = [new TransportNamesStamp([$marketplace])];
             $this->bus->dispatch($message, $stamps);
             $output->writeln("Dispatched to queue for: $productCode");
