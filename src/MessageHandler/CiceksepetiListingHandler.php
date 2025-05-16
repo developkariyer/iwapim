@@ -28,7 +28,7 @@ class CiceksepetiListingHandler
     /**
      * @throws \Exception
      */
-    public function __invoke(ProductListingMessage $message)
+    public function __invoke(ProductListingMessage $message): void
     {
         sleep(5);
         $traceId = $message->getTraceId();
