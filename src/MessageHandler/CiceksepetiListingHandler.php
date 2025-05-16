@@ -130,7 +130,7 @@ class CiceksepetiListingHandler
 //        print_r($result);
     }
 
-    private function fillMissingListingDataAndFormattedCiceksepetiListing($data)
+    private function fillMissingListingDataAndFormattedCiceksepetiListing($data): false|string
     {
         $data = $this->removeCommonAttributes($data);
         $formattedData = [];
@@ -194,7 +194,7 @@ class CiceksepetiListingHandler
         return (json_last_error() === JSON_ERROR_NONE) ? $data : null;
     }
 
-    private function generateListingPrompt($jsonString, $categories)
+    private function generateListingPrompt($jsonString, $categories): string
     {
         return <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
@@ -362,7 +362,7 @@ class CiceksepetiListingHandler
      * @param int $threshold
      * @return array|null
      */
-    private function findBestAttributeMatch($attributeId, $searchValue, $isSize, $threshold = 80)
+    private function findBestAttributeMatch($attributeId, $searchValue, $isSize, $threshold = 80): ?array
     {
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
         if ($isSize) {
@@ -418,7 +418,7 @@ class CiceksepetiListingHandler
      * @param string $value
      * @return string
      */
-    private function normalizeAttributeValue($value)
+    private function normalizeAttributeValue($value): string
     {
         if (!empty($value)) {
             $value = trim($value);
@@ -431,7 +431,7 @@ class CiceksepetiListingHandler
         return $value;
     }
 
-    public function categoryAttributeUpdate($marketplaceId)
+    public function categoryAttributeUpdate($marketplaceId): void
     {
         $this->ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById($marketplaceId));
         echo "Ciceksepeti Connector Created\n";
@@ -464,7 +464,7 @@ class CiceksepetiListingHandler
         return array_unique($categoryIdList);
     }
 
-    public function getCiceksepetiCategoriesDetails()
+    public function getCiceksepetiCategoriesDetails(): false|array|string
     {
         $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
         if (empty($categoryIdList)) {
