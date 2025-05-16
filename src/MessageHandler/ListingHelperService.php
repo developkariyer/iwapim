@@ -110,20 +110,6 @@ class ListingHelperService
         return $result;
     }
 
-    private function normalizeCurrency($currency)
-    {
-        $map = [
-            'TL' => 'TRY',
-            'TRY' => 'TRY',
-            'USD' => 'USD',
-            'US DOLLAR' => 'USD',
-            'Dolar' => 'USD',
-            '₺' => 'TRY',
-            '$' => 'USD',
-        ];
-        return $map[trim($currency)] ?? strtoupper(trim($currency));
-    }
-
     private function filterShopifyListingItems($data)
     {
         foreach ($data as &$products) {
@@ -146,6 +132,20 @@ class ListingHelperService
         }
         unset($products, $product, $sku);
         return $data;
+    }
+
+    private function normalizeCurrency($currency)
+    {
+        $map = [
+            'TL' => 'TRY',
+            'TRY' => 'TRY',
+            'USD' => 'USD',
+            'US DOLLAR' => 'USD',
+            'Dolar' => 'USD',
+            '₺' => 'TRY',
+            '$' => 'USD',
+        ];
+        return $map[trim($currency)] ?? strtoupper(trim($currency));
     }
 
     private function getImages($listingItem)
