@@ -25,7 +25,10 @@ class GeminiConnector
                     'productName'     => ['type'=>'STRING'],
                     'mainProductCode' => ['type'=>'STRING'],
                     'stockCode'       => ['type'=>'STRING'],
-                    'description'     => ['type'=>'STRING'],
+                    'description'     => [
+                        'type'   => 'STRING',
+                        'format' => 'html',
+                    ],
                     'images'          => [
                         'type'     => 'ARRAY',
                         'minItems' => 0,
