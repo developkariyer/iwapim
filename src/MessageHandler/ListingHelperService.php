@@ -104,7 +104,6 @@ class ListingHelperService
                 'tags' => $parentApiJson['tags'] ?? ''
             ];
         }
-        echo "Last marketplace sale price: " . $marketplaceSalePrice . "\n";
         $result['price'] = $marketplaceSalePrice;
         $result['images'] = $images;
         $result['items'] = $items;

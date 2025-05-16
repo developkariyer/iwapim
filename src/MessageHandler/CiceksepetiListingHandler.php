@@ -38,14 +38,13 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories fetched\n";
         $this->logger->info("Ciceksepeti categories details complated");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        //print_r($jsonString);
-//        $this->printProductInfoLogger($jsonString);
-//        $this->logger->info("Pim listings info complated");
-//        $messageType = $message->getActionType();
-//        match ($messageType) {
-//            'list' => $this->processListingData($traceId, $jsonString, $categories),
-//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-//        };
+        $this->printProductInfoLogger($jsonString);
+        $this->logger->info("Pim listings info complated");
+        $messageType = $message->getActionType();
+        match ($messageType) {
+            'list' => $this->processListingData($traceId, $jsonString, $categories),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+        };
     }
 
     private function printProductInfoLogger($jsonString): void
