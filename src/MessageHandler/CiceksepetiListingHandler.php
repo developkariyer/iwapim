@@ -145,6 +145,7 @@ class CiceksepetiListingHandler
                 $this->logger->error("Missing data for sku: {$product['stockCode']}");
                 continue;
             }
+            $description = str_replace(['\/', '\"'], ['/', '"'], $description);
             $formattedData['products'][] = [
                 'productName' => mb_strlen($product['productName']) > 255
                     ? mb_substr($product['productName'], 0, 255)
