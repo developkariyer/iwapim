@@ -100,6 +100,7 @@ class ListingHelperService
                 echo "[DEBUG] Calculated Price from {$listingSalePrice} {$normalizedCurrency} to {$normalizedMarketplaceCurrency}: " . $marketplaceSalePrice . "\n";
             }
             echo "Sale Price: " . $listingSalePrice . " Currency: " . $currency . " Marketplace Sale Price: " . $marketplaceSalePrice . "\n";
+            echo "[ITEM #" . $listingItem->getId() . "] Currency: '{$currency}' Normalized: '{$normalizedCurrency}' Sale Price: {$listingSalePrice}\n";
             $images = array_merge($images, $this->getImages($listingItem));
             $items[$marketplaceKey] = [
                 'title' => $title,
