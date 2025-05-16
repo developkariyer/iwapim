@@ -140,16 +140,21 @@ class CiceksepetiListingHandler
             }, $product['images'] ?? []);
             $salesPrice = $product['salesPrice'] ?? 0;
             $attributes = $product['Attributes'] ?? null;
-            if (empty($httpsImages) || $salesPrice === 0 || $salesPrice === "0" || $attributes === null) {
+            $description = $product['description'];
+            if (empty($httpsImages) || $salesPrice === 0 || $salesPrice === "0" || $attributes === null || mb_strlen($description) < 30) {
                 $this->logger->error("Missing data for sku: {$product['stockCode']}");
                 continue;
             }
             $formattedData['products'][] = [
-                'productName' => $product['productName'],
+                'productName' => mb_strlen($product['productName']) > 255
+                    ? mb_substr($product['productName'], 0, 255)
+                    : $product['productName'],
                 'mainProductCode' => $product['mainProductCode'],
                 'stockCode' => $product['stockCode'],
                 'categoryId' => $product['categoryId'],
-                'description' => $product['description'],
+                'description' => mb_strlen($description) > 20000
+                    ? mb_substr($description, 0, 20000)
+                    : $description,
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
                 'stockQuantity' => 0,
@@ -245,6 +250,7 @@ class CiceksepetiListingHandler
                 - Kesinlikle açıklama Türkçe olacak. Veri bulamazsan ürün size ve color bilgilerini yaz.
                 - Html etiketlerini sil sadece metin olarak açıklamayı oluştur.
                 - Mağaza bilgilerini mağazayla ilgili açıklamaları sil.
+                - Çıktısı HTML olarak düzenle.
                 Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
             - **images**: 
                 - Her SKU için en fazla 5 adet olacak şekilde,`images` listesinden alınacaktır.
