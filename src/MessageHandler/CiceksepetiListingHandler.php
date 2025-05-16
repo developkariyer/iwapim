@@ -145,7 +145,11 @@ class CiceksepetiListingHandler
                 $this->logger->error("Missing data for sku: {$product['stockCode']}");
                 continue;
             }
-            $description = str_replace(['\/', '\"'], ['/', '"'], $description);
+            $description = str_replace(['\/', '\"', '\\\\', '\\n', '\\r', '\\t'], ['/', '"', '\\', "\n", "\r", "\t"], $description);
+            $description = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($matches) {
+                return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UTF-16BE');
+            }, $description);
+            $description = html_entity_decode($description, ENT_QUOTES | ENT_HTML5, 'UTF-8');
             $formattedData['products'][] = [
                 'productName' => mb_strlen($product['productName']) > 255
                     ? mb_substr($product['productName'], 0, 255)
