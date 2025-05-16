@@ -150,7 +150,6 @@ class CiceksepetiListingHandler
                 return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UTF-16BE');
             }, $description);
             $description = html_entity_decode($description, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            print_r($description);
             $formattedData['products'][] = [
                 'productName' => mb_strlen($product['productName']) > 255
                     ? mb_substr($product['productName'], 0, 255)
