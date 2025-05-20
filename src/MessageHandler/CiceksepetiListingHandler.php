@@ -122,12 +122,12 @@ class CiceksepetiListingHandler
             return [];
         }
         $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-//        print_r($formattedData);
-        $this->logger->info("filled attributes data: " . $formattedData);
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $result = $ciceksepetiConnector->createListing($formattedData);
-        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        print_r($result);
+        print_r($formattedData);
+//        $this->logger->info("filled attributes data: " . $formattedData);
+//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+//        $result = $ciceksepetiConnector->createListing($formattedData);
+//        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data): false|string
