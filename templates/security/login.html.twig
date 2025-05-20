@@ -1,0 +1,175 @@
+{# templates/security/login.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Giriş Yap{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
+            max-width: 450px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .login-header {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: linear-gradient(to right, #4481eb, #04befe);
+            color: white;
+        }
+
+        .login-logo {
+            height: 70px;
+            width: 70px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .login-logo i {
+            font-size: 2rem;
+        }
+
+        .login-body {
+            padding: 2.5rem;
+            background-color: white;
+        }
+
+        .login-title {
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #212529;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-floating > .form-control:focus {
+            border-color: #4481eb;
+            box-shadow: 0 0 0 0.25rem rgba(68, 129, 235, 0.25);
+        }
+
+        .form-floating > label {
+            color: #6c757d;
+        }
+
+        .btn-login {
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #4481eb, #04befe);
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, .1), 0 3px 6px rgba(0, 0, 0, .08);
+            filter: brightness(1.05);
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            border-color: #fed7d7;
+            color: #e53e3e;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="login-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-5 col-lg-6 col-md-8">
+                    <div class="card login-card">
+                        <div class="login-header">
+                            <div class="login-logo">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h2>IWAPIM</h2>
+                            <p class="mb-0">Ürün Yönetim Sistemi</p>
+                        </div>
+
+                        <div class="login-body">
+                            {% if error %}
+                                <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if app.user %}
+                                <div class="text-center">
+                                    <i class="fas fa-user-check fa-3x mb-3" style="color: #4481eb;"></i>
+                                    <h5 class="mb-3">Zaten giriş yaptınız</h5>
+                                    <p class="mb-4">
+                                        <strong>{{ app.user.getUserIdentifier() | default('Kullanıcı') }}</strong> olarak oturum açtınız.
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ path('default_homepage') }}" class="btn btn-primary">
+                                            <i class="fas fa-home me-2"></i> Anasayfaya Dön
+                                        </a>
+                                        <a href="{{ path('app_frontend_logout') }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
+                                        </a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <h3 class="login-title">Hoş Geldiniz!</h3>
+                                <p class="login-subtitle">Lütfen bilgilerinizle giriş yapın</p>
+
+                                <form method="post" action="{{ path('app_frontend_login_check') }}">
+                                    <div class="form-floating mb-4">
+                                        <input type="text" value="{{ last_username }}" name="_username" id="floatingInput"
+                                               class="form-control" placeholder="Kullanıcı Adı" autocomplete="username" required autofocus>
+                                        <label for="floatingInput"><i class="fas fa-user me-2"></i>Kullanıcı Adı</label>
+                                    </div>
+
+                                    <div class="form-floating mb-4">
+                                        <input type="password" name="_password" id="floatingPassword"
+                                               class="form-control" placeholder="Şifre" autocomplete="current-password" required>
+                                        <label for="floatingPassword"><i class="fas fa-lock me-2"></i>Şifre</label>
+                                    </div>
+
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                    <div class="d-grid">
+                                        <button class="btn btn-primary btn-login" type="submit">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
