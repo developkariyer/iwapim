@@ -439,6 +439,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
+        print_r($data);
         $combinedData = [
             'inventory' => $data,
             'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
