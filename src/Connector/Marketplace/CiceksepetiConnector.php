@@ -238,7 +238,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         //print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
 
-        $variantProduct = VariantProduct::getById(277605);
+        $variantProduct = VariantProduct::getById(277606);
         $this->setInventory($variantProduct, 2);
 
         //$this->downloadCategories();
