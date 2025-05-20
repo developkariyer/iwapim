@@ -237,10 +237,18 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
 
         //print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
-
-//        $variantProduct = VariantProduct::getById($id);
-//        $this->setInventory($variantProduct, 2);
-
+        $ids = [
+            277133,
+277134,
+277135
+        ];
+        foreach ($ids as $id) {
+            echo "ID: $id\n";
+            $variantProduct = VariantProduct::getById($id);
+            $price = $variantProduct->getSalePrice();
+            $targetPrice = $price * 2;
+            $this->setPrice($variantProduct, $targetPrice, "TRY", "TRY");
+        }
 
 
         //$this->downloadCategories();
@@ -441,18 +449,18 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
-        if (empty($targetPrice)) {
-            echo "Error: Price cannot be empty\n";
-            return;
-        }
-        if ($targetCurrency === null) {
-            $targetCurrency = $listing->getSaleCurrency();
-        }
-        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
-        if (empty($finalPrice)) {
-            echo "Error: Currency conversion failed\n";
-            return;
-        }
+//        if (empty($targetPrice)) {
+//            echo "Error: Price cannot be empty\n";
+//            return;
+//        }
+//        if ($targetCurrency === null) {
+//            $targetCurrency = $listing->getSaleCurrency();
+//        }
+//        $finalPrice = $this->convertCurrency($targetPrice, $targetCurrency, $listing->getSaleCurrency());
+//        if (empty($finalPrice)) {
+//            echo "Error: Currency conversion failed\n";
+//            return;
+//        }
         $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
         if (empty($stockCode)) {
             echo "Failed to get inventory item id for {$listing->getKey()}\n";
@@ -462,12 +470,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'items' => [
                 [
                     'stockCode' => $stockCode,
-                    'salesPrice' => (float)$finalPrice,
+                    'salesPrice' => (float)$targetPrice,
                 ]
             ]
         ];
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], ['body' => json_encode($body)]);
-        echo $finalPrice . "\n";
+        echo $targetPrice . "\n";
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
