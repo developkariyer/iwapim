@@ -236,7 +236,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //361eb507-5ae3-460b-90e0-f4db0fe5cf19 PROD CM-087
 
 
-        print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
+        //print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
+
+        $variantProduct = VariantProduct::findById(277604);
+        $this->setInventory($variantProduct, 2);
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
