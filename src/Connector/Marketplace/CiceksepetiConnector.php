@@ -445,6 +445,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         ];
         echo "Inventory set\n";
         $filename = "SETINVENTORY_{$stockCode}.json";
+        print_r($combinedData);
         $this->putToCache($filename, ['requeest'=>$body, 'response'=>$combinedData]);
     }
 
