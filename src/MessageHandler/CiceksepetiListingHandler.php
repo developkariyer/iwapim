@@ -163,8 +163,8 @@ class CiceksepetiListingHandler
                     : $description,
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
-                'stockQuantity' => 0,
-                'salesPrice' => $salesPrice,
+                'stockQuantity' => 3,
+                'salesPrice' => $salesPrice * 1.5,
                 'images' => $httpsImages,
                 'Attributes' => $attributes,
             ];
