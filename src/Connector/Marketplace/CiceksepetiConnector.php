@@ -238,13 +238,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         //print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
         $ids = [
-            277608,
-277609,
-277610,
-277611,
-277612,
-277613,
-277615
         ];
         foreach ($ids as $id) {
             echo "ID: $id\n";
