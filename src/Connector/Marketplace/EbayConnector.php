@@ -223,12 +223,9 @@ class EbayConnector extends MarketplaceConnectorAbstract
 
         //$this->getItemXml();
 
-        $this->refreshToAccessToken();
-        $this->fetchItemAspects("EBAY_US");
-
 
         // control expiresIn
-        /*$this->refreshToAccessToken();
+        $this->refreshToAccessToken();
         if (!$forceDownload && $this->getListingsFromCache()) {
             echo "Using cached listings\n";
             return;
@@ -291,7 +288,7 @@ class EbayConnector extends MarketplaceConnectorAbstract
             }
         } while ($startDate < $currentDate);
         $this->listings = json_decode(json_encode($this->listings), true);
-        $this->putListingsToCache();*/
+        $this->putListingsToCache();
     }
 
     public function getSellerList()
