@@ -237,9 +237,30 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
 
         //print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
+        $ids = [277102,
+                277103,
+                277104,
+                277105,
+                277106,
+                277107,
+                277108,
+                277109,
+                277110,
+                277111,
+                277112,
+                277113,
+                277114,
+                277115,
+                277116,
+                277117,
+                277118,
+                277119,
+                277120];
+        foreach ($ids as $id) {
+            $variantProduct = VariantProduct::getById(277611);
+            $this->setInventory($variantProduct, 2);
+        }
 
-        $variantProduct = VariantProduct::getById(277611);
-        $this->setInventory($variantProduct, 2);
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
@@ -411,6 +432,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             ]
         ];
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], ['body' => json_encode($body)]);
+        sleep(1);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
