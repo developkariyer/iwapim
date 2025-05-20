@@ -237,15 +237,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
 
         //print_r($this->getBatchRequestResult("34a56d8e-1b15-4877-b40e-e109bd7a9f12"));
-        $ids = [
-        ];
-        foreach ($ids as $id) {
-            echo "ID: $id\n";
-            $variantProduct = VariantProduct::getById($id);
-            $price = $variantProduct->getSalePrice();
-            $targetPrice = $price * 2;
-            $this->setPrice($variantProduct, $targetPrice, "TRY", "TRY");
-        }
+//        $ids = [
+//        ];
+//        foreach ($ids as $id) {
+//            echo "ID: $id\n";
+//            $variantProduct = VariantProduct::getById($id);
+//            $price = $variantProduct->getSalePrice();
+//            $targetPrice = $price * 2;
+//            $this->setPrice($variantProduct, $targetPrice, "TRY", "TRY");
+//        }
 
 
         //$this->downloadCategories();
