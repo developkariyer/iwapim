@@ -434,12 +434,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $response = $this->httpClient->request('PUT', static::$apiUrl['updateInventoryPrice'], ['body' => json_encode($body)]);
         sleep(1);
         $statusCode = $response->getStatusCode();
+        print_r($response->toArray());
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
             return;
         }
         $data = $response->toArray();
-        print_r($response->toContent());
         $combinedData = [
             'inventory' => $data,
             'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
