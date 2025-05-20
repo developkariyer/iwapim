@@ -257,7 +257,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 277119,
                 277120];
         foreach ($ids as $id) {
-            $variantProduct = VariantProduct::getById(277611);
+            echo "ID: $id\n";
+            $variantProduct = VariantProduct::getById($id);
             $this->setInventory($variantProduct, 2);
         }
 
