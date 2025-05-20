@@ -67,7 +67,7 @@ class ListingHelperService
         return $result;
     }
 
-    private function processListingItems($listingItem, $marketplaceCurrency)
+    private function processListingItems($listingItem, $marketplaceCurrency): array
     {
         $marketplaceSalePrice = null;
         $foundSameCurrency = false;
@@ -134,7 +134,7 @@ class ListingHelperService
         return $data;
     }
 
-    private function normalizeCurrency($currency)
+    private function normalizeCurrency($currency): string
     {
         $map = [
             'TL' => 'TRY',
@@ -148,7 +148,7 @@ class ListingHelperService
         return $map[trim($currency)] ?? strtoupper(trim($currency));
     }
 
-    private function getImages($listingItem)
+    private function getImages($listingItem): array
     {
         $images = [];
         $imageGallery = $listingItem->getImageGallery();
@@ -169,7 +169,7 @@ class ListingHelperService
         return $images;
     }
 
-    private function calculatePrice($price, $fromCurrency, $toCurrency)
+    private function calculatePrice($price, $fromCurrency, $toCurrency): ?string
     {
         if (empty($price) || empty($fromCurrency) || empty($toCurrency)) {
             return null;
