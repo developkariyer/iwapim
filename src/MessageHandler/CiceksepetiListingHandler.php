@@ -9,6 +9,7 @@ use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
+use Exception;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\HttpClient\HttpClient;
 use App\MessageHandler\ListingHelperService;
@@ -26,25 +27,25 @@ class CiceksepetiListingHandler
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function __invoke(ProductListingMessage $message): void
     {
         sleep(5);
         $traceId = $message->getTraceId();
         echo "Ciceksepeti Listing Handler\n";
-        $this->logger->info("Auto listing process started trace id: {$traceId}.");
+        $this->logger->info("🚀 [Listing Started] Automated product listing process started Ciceksepeti | Trace ID: {$traceId}");
         $categories = $this->getCiceksepetiCategoriesDetails();
         echo "ciceksepeti categories fetched\n";
-        $this->logger->info("Ciceksepeti categories details complated");
+        $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         $this->printProductInfoLogger($jsonString);
-        $this->logger->info("Pim listings info complated");
-        $messageType = $message->getActionType();
-        match ($messageType) {
-            'list' => $this->processListingData($traceId, $jsonString, $categories),
-            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+//        $this->logger->info("Pim listings info complated");
+//        $messageType = $message->getActionType();
+//        match ($messageType) {
+//            'list' => $this->processListingData($traceId, $jsonString, $categories),
+//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+//        };
     }
 
     private function printProductInfoLogger($jsonString): void
@@ -86,7 +87,7 @@ class CiceksepetiListingHandler
         $fullData = json_decode($jsonString, true);
         if (!$fullData || !isset($fullData['Ciceksepeti'])) {
             $this->logger->error("Invalid JSON data: " . $jsonString);
-            throw new \Exception("Invalid JSON data:");
+            throw new Exception("Invalid JSON data:");
         }
         $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
         $mergedResults = [];
@@ -462,6 +463,18 @@ class CiceksepetiListingHandler
         echo "Ciceksepeti Category Attributes Updated\n";
     }
 
+    public function getCiceksepetiCategoriesDetails(): false|array|string
+    {
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        if (empty($categoryIdList)) {
+            return [];
+        }
+        $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
+        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
+        $categories = Utility::fetchFromSql($sql, $categoryIdList);
+        return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
     public function getCiceksepetiListingCategoriesIdList(): array
     {
         $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
@@ -479,18 +492,6 @@ class CiceksepetiListingHandler
             $categoryIdList[] = $apiData['categoryId'];
         }
         return array_unique($categoryIdList);
-    }
-
-    public function getCiceksepetiCategoriesDetails(): false|array|string
-    {
-        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-        if (empty($categoryIdList)) {
-            return [];
-        }
-        $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
-        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
-        $categories = Utility::fetchFromSql($sql, $categoryIdList);
-        return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
 }
