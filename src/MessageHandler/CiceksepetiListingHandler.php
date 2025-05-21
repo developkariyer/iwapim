@@ -127,9 +127,9 @@ class CiceksepetiListingHandler
         }
         foreach ($data as $sku => $product) {
             if (isset($product['Attributes']) && empty($product['Attributes'])) {
-                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$sku}");
+                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
             } else {
-                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$sku}");
+                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
             }
         }
         $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
