@@ -462,63 +462,101 @@ class CiceksepetiListingHandler
     }
 
     /**
-     * @param int $attributeId
-     * @param string $searchValue
-     * @param int $threshold
-     * @return array|null
+     * Find the best matching attribute value for a given search value
+     *
+     * @param int $attributeId The attribute ID to search values for
+     * @param string $searchValue The value to match against database values
+     * @param bool $isSize Whether this is a size attribute (true) or color attribute (false)
+     * @return array|null The matched attribute value or null if no match found
      */
-    private function findBestAttributeMatch($attributeId, $searchValue, $isSize, $threshold = 80): ?array
+    private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
     {
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-        if ($isSize) {
-            $searchDims = $this->parseDimensions($searchValueNormalized);
-            $this->logger->info("Parsing size dimensions: {$searchValueNormalized} -> Width: {$searchDims['width']}, Height: {$searchDims['height']}");
-        }
-        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-            WHERE attribute_id = :attribute_id";
-        $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
-        if (empty($allValues)) {
-            $this->logger->info("No attribute values found for attributeId: {$attributeId}");
+        if (empty($searchValueNormalized)) {
+            $this->logger->error("❌ [Empty Value] Cannot match empty search value for attribute ID: {$attributeId}");
             return null;
         }
-        $bestMatch = null;
-        $highestSimilarity = 0;
-        $smallestDiff = PHP_INT_MAX;
-        foreach ($allValues as $value) {
-            $dbValueNormalized  = $this->normalizeAttributeValue($value['name']);
+        $attributeValues = $this->getAttributeValuesFromDatabase($attributeId);
+        if (empty($attributeValues)) {
+            return null;
+        }
+        foreach ($attributeValues as $value) {
+            $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
             if ($searchValueNormalized === $dbValueNormalized) {
-                $this->logger->info("✅ Fully matched: Search Value: {$searchValueNormalized} -> DB Value: {$dbValueNormalized}");
+                $this->logger->info("✅ [Exact Match] Found for '{$searchValue}' → '{$value['name']}' (ID: {$value['attribute_value_id']})");
                 return $value;
             }
-            if ($isSize) {
-                $dbDims = $this->parseDimensions($dbValueNormalized);
-                if ($searchDims && $dbDims) {
-                    $widthDiff = $searchDims['width'] - $dbDims['width'];
-                    $heightDiff = $searchDims['height'] - $dbDims['height'];
-                    $totalDiff = $widthDiff + $heightDiff;
-                    if ($widthDiff >= 0 && $widthDiff <= 25 && ($searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25)) && $totalDiff < $smallestDiff) {
-                        $smallestDiff = $totalDiff;
-                        $bestMatch = $value;
-                        $this->logger->info("✔️ Size match found with width diff: {$widthDiff} and height diff: {$heightDiff}");
-                    }
-                }
+        }
+        if (!$isSize) {
+            $this->logger->error("❌ [No Color Match] No exact match found for color: '{$searchValue}'");
+            return null;
+        }
+        return $this->findBestSizeMatch($searchValueNormalized, $attributeValues);
+    }
+
+    /**
+     * Get attribute values from database
+     *
+     * @param int $attributeId The attribute ID to fetch values for
+     * @return array List of attribute values
+     */
+    private function getAttributeValuesFromDatabase(int $attributeId): array
+    {
+        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
+            WHERE attribute_id = :attribute_id";
+        $values = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
+        if (empty($values)) {
+            $this->logger->error("❌ [DB Error] No attribute values found for attributeId: {$attributeId}");
+            return [];
+        }
+        $this->logger->info("✅ [DB Success] Found {count($values)} values for attribute ID: {$attributeId}");
+        return $values;
+    }
+
+    /**
+     * Find the best size match based on dimensions
+     *
+     * @param string $searchValueNormalized Normalized search value
+     * @param array $attributeValues Available attribute values from database
+     * @return array|null Best matching size or null if no match found
+     */
+    private function findBestSizeMatch(string $searchValueNormalized, array $attributeValues): ?array
+    {
+        $searchDims = $this->parseDimensions($searchValueNormalized);
+        if (!$searchDims) {
+            $this->logger->error("❌ [Size Parse Error] Could not parse dimensions from: {$searchValueNormalized}");
+            return null;
+        }
+        $this->logger->info("🔍 [Size Parsing] '{$searchValueNormalized}' → Width: {$searchDims['width']}, Height: {$searchDims['height']}");
+        $bestMatch = null;
+        $smallestDiff = PHP_INT_MAX;
+        foreach ($attributeValues as $value) {
+            $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
+            $dbDims = $this->parseDimensions($dbValueNormalized);
+            if (!$dbDims) {
+                continue;
             }
-            else {
-                $levenDistance = levenshtein($searchValueNormalized, $dbValueNormalized);
-                $maxLength = max(mb_strlen($searchValueNormalized), mb_strlen($dbValueNormalized));
-                $similarity = 100 - ($levenDistance * 100 / ($maxLength > 0 ? $maxLength : 1));
-                if ($similarity >= $threshold && $similarity > $highestSimilarity) {
-                    $highestSimilarity = $similarity;
-                    $bestMatch = $value;
-                    $this->logger->info("✔️ Similarity found: {$similarity}% for Search: {$searchValueNormalized} -> DB: {$dbValueNormalized}");
-                }
+            $widthDiff = abs($searchDims['width'] - $dbDims['width']);
+            $heightDiff = 0;
+            if ($searchDims['height'] > 0 && $dbDims['height'] > 0) {
+                $heightDiff = abs($searchDims['height'] - $dbDims['height']);
+            }
+            $totalDiff = $widthDiff + $heightDiff;
+            if ($widthDiff >= 0 && $widthDiff <= 25 &&
+                ($searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25)) &&
+                $totalDiff < $smallestDiff) {
+                $smallestDiff = $totalDiff;
+                $bestMatch = $value;
+                $this->logger->info("✔️ [Size Candidate] '{$value['name']}' with width diff: {$widthDiff}, height diff: {$heightDiff}");
             }
         }
+
         if ($bestMatch) {
-            $this->logger->info("✅ Best match found: Search Value: {$searchValueNormalized} -> DB Value: {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
+            $this->logger->info("✅ [Size Match] Best match for '{$searchValueNormalized}' → '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
         } else {
-            $this->logger->info("❌ No match found for Search Value: {$searchValueNormalized}");
+            $this->logger->error("❌ [Size Match] No suitable size match found for: '{$searchValueNormalized}'");
         }
+
         return $bestMatch;
     }
 
